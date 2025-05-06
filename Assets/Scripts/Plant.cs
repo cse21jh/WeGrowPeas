@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public enum CompleteTraitType // 기존 형질
+/*public enum CompleteTraitType // 기존 형질
 {
     NaturalDeath,
     WindResistance,
@@ -12,7 +12,7 @@ public enum CompleteTraitType // 기존 형질
     ColdResistance,
     HeavyRainResistance,
     None
-}
+}*/
 
 public enum IncompleteTraitType // 불완전 형질
 {
@@ -34,7 +34,14 @@ public enum WaveType
 
 public abstract class Plant : MonoBehaviour
 {
-    public Vector2Int gridPosition;
+    protected List<GeneticTrait> traits = new List<GeneticTrait>();
+
+    public void Init(List<GeneticTrait> newTraits)
+    {
+        traits = newTraits;
+    }
+
+    /*public Vector2Int gridPosition;
     public int gridNumber;
 
     [SerializeField]
@@ -136,7 +143,7 @@ public abstract class Plant : MonoBehaviour
         }
         return resistance;
 
-    }
+    }*/
 
     public void Die()
     {

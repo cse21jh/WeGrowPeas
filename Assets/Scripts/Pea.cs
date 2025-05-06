@@ -5,8 +5,12 @@ using System;
 
 public class Pea : Plant
 {
-    
-    public override void Initialize(int gridNumber, Plant parent1, Plant parent2)
+    public override void Init(List<GeneticTrait> newTraits)
+    {
+        traits = newTraits;
+    }
+
+    /*public override void Initialize(int gridNumber, Plant parent1, Plant parent2)
     {
         base.Initialize(gridNumber, parent1, parent2);
     }
@@ -32,7 +36,7 @@ public class Pea : Plant
     {
         base.InitializeIncompleteTrait(parent1, parent2);
         // 저항력 계산 및 삽입 필요
-    }
+    }*/
 
 
 
