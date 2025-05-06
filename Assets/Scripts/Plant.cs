@@ -36,7 +36,7 @@ public abstract class Plant : MonoBehaviour
 {
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
 
-    public void Init(List<GeneticTrait> newTraits)
+    public virtual void Init(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
     }
