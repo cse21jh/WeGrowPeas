@@ -13,19 +13,28 @@ public class Grid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < 2; i++)
-        {
-            GameObject obj = Instantiate(peaPrefab);
-            Pea pea = obj.GetComponent<Pea>();
-            //pea.Initialize();
-            plants.Add(pea);
-        }
+        InitGrid();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    private void InitGrid()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject obj = Instantiate(peaPrefab);
+            Pea pea = obj.GetComponent<Pea>();
+            List<GeneticTrait> basicTrait = new List<GeneticTrait>
+            {
+                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f, 1)
+            };
+            pea.Init(basicTrait);
+            plants.Add(pea);
+        }
     }
 
     public IEnumerator Breeding()
