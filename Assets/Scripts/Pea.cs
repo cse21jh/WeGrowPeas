@@ -10,6 +10,10 @@ public class Pea : Plant
         traits = newTraits;
     }
 
+    public override List<GeneticTrait> GetGeneticTrait()
+    {
+        return traits;
+    }
     /*public override void Initialize(int gridNumber, Plant parent1, Plant parent2)
     {
         base.Initialize(gridNumber, parent1, parent2);
