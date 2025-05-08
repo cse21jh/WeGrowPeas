@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
 
 public class Grid : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class Grid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitGrid();
+        InitGrid();        
     }
 
     // Update is called once per frame
@@ -42,9 +42,97 @@ public class Grid : MonoBehaviour
         //40초 동안 아래 과정 반복 진행 가능
 
         //교배할 부모 완두콩 두 개 선택
+        GameObject obj1 = null;
+        GameObject obj2 = null;
 
-        //자식 완두콩 형질 계산 후 Instantiate
+        Debug.Log("40초 시작.");
+        float startTime = Time.time;
+        float endTime = startTime + 40.0f;
 
+        while (Time.time < endTime)
+        {
+            if (Input.GetMouseButtonDown(0)) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // 현재는 콜라이더 component 있어야 확인 가능. 추후 grid 좌표 계산 되면 수정 예정.
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    GameObject clickedObject = hit.collider.gameObject;
+                    Pea clickedPea = clickedObject.GetComponent<Pea>();
+
+                    if (clickedPea != null)
+                    {
+                        if(obj1 == clickedObject)
+                        {
+                            Debug.Log("부모 1 선택 취소");
+                            obj1 = null;
+                        }
+                        else if(obj2 == clickedObject)
+                        {
+                            Debug.Log("부모 2 선택 취소");
+                            obj2 = null;
+                        }
+                        else if(obj1 == null)
+                        {
+                            Debug.Log("부모 1 선택");
+                            obj1 = clickedObject;
+                        }
+                        else if(obj2 == null)
+                        {
+                            Debug.Log("부모 2 선택");
+                            obj2 = clickedObject;
+                        }
+                        else
+                        {
+                            Debug.Log("이미 두 부모가 모두 선택된 상태");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("콩을 선택해주세요");
+                    }
+                }
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                if (obj1 != null && obj2 != null) // 교배 버튼 등으로 추후 수정
+                {
+                    Pea parent1 = obj1.GetComponent<Pea>();
+                    Pea parent2 = obj2.GetComponent<Pea>();
+                    //자식 완두콩 형질 계산 후 Instantiate
+                    List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
+                    GameObject childObj = Instantiate(peaPrefab);
+                    Pea child = childObj.GetComponent<Pea>();
+                    if(child != null)
+                    {
+                        child.Init(childTrait);
+                        plants.Add(child);
+                        Debug.Log("자식 생성 성공");
+                        obj1 = null;
+                        obj2 = null;
+                        Debug.Log("부모 선택 초기화");
+                    }
+                    else
+                    {
+                        Debug.Log("자식 생성에 오류 발생");
+                        Destroy(childObj);
+                    }
+                    
+                }
+                else
+                {
+                    Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
+                }
+            }
+
+            yield return null;
+        }
+
+
+        Debug.Log("교배 페이즈 종료");
         //Grid 리로드
 
         yield return null;
@@ -53,5 +141,71 @@ public class Grid : MonoBehaviour
     private void ShowPlantsOnGrid()
     {
 
+    }
+
+    private List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
+    {
+        List<GeneticTrait> childTrait = new List<GeneticTrait>();
+
+        foreach (CompleteTraitType trait in System.Enum.GetValues(typeof(CompleteTraitType)))
+        {
+            if (trait == CompleteTraitType.None)
+                break;
+
+            int p1Trait;
+            int p2Trait;
+            
+            int childGenetic = 0;
+
+            int traitNotInParent = 0;
+
+            if(parent1.Any(t=>t.traitType == trait))
+            {
+                p1Trait = parent1.First(t => t.traitType == trait).genetics;
+            }
+            else
+            {
+                p1Trait = 2;
+                traitNotInParent += 1;
+            }
+
+            if (parent2.Any(t => t.traitType == trait))
+            {
+                p2Trait = parent2.First(t => t.traitType == trait).genetics;
+            }
+            else
+            {
+                p2Trait = 2;
+                traitNotInParent += 1;
+            }
+
+            if (traitNotInParent == 2)
+                continue;
+
+            switch (p1Trait)
+            {
+                case 2: childGenetic += 1; break;
+                case 1: childGenetic += (Random.Range(0, 2)); break;
+                default: break;
+            }
+
+            switch (p2Trait)
+            {
+                case 2: childGenetic += 1; break;
+                case 1: childGenetic += (Random.Range(0, 2)); break;
+                default: break;
+            }
+
+            float resistance = 0f;
+            switch (childGenetic)
+            {
+                case 0: resistance = 0.9f; break;
+                default: resistance = 0.7f; break;
+            }
+            childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
+        }
+
+
+        return childTrait;  
     }
 }

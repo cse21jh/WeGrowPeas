@@ -41,6 +41,11 @@ public abstract class Plant : MonoBehaviour
         traits = newTraits;
     }
 
+    public virtual List<GeneticTrait> GetGeneticTrait()
+    {
+        return traits;
+    }
+
     /*public Vector2Int gridPosition;
     public int gridNumber;
 
