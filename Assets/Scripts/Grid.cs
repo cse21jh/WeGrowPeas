@@ -6,7 +6,8 @@ using System.Linq;
 public class Grid : MonoBehaviour
 {
     List<Plant> plants = new List<Plant>();
-    private int maxPlantNum = 16;
+    public int maxCol = 4;
+    Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
 
     [SerializeField] private GameObject peaPrefab;
 
@@ -33,7 +34,8 @@ public class Grid : MonoBehaviour
                 new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f, 1)
             };
             pea.Init(basicTrait);
-            plants.Add(pea);
+            //plants.Add(pea);
+            AddPlantToGrid(pea);
         }
     }
 
@@ -138,11 +140,6 @@ public class Grid : MonoBehaviour
         yield return null;
     }    
 
-    private void ShowPlantsOnGrid()
-    {
-
-    }
-
     private List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
@@ -208,4 +205,32 @@ public class Grid : MonoBehaviour
 
         return childTrait;  
     }
+
+    private void AddPlantToGrid(Plant plant)
+    {
+        for(int idx = 0; idx < maxCol*4; idx++)
+        {
+            if(!plantGrid.ContainsKey(idx))
+            {
+                plantGrid[idx] = plant;
+
+                Transform soilTransform = GetSoilTransform(idx);
+                plant.transform.position = soilTransform.position;
+
+                return;
+            }
+        }
+    }
+
+    private Transform GetSoilTransform(int idx)
+    {
+        int row = idx / maxCol;
+        int col = idx % maxCol;
+
+        Transform rowT = transform.GetChild(row);
+        Transform colT = rowT.GetChild(col);
+
+        return colT;
+    }
 }
+
