@@ -14,7 +14,8 @@ public class Grid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitGrid();        
+        InitGrid();
+        StartCoroutine(Breeding());
     }
 
     // Update is called once per frame
@@ -111,7 +112,8 @@ public class Grid : MonoBehaviour
                     if(child != null)
                     {
                         child.Init(childTrait);
-                        plants.Add(child);
+                        //plants.Add(child);
+                        AddPlantToGrid(child);
                         Debug.Log("자식 생성 성공");
                         obj1 = null;
                         obj2 = null;
