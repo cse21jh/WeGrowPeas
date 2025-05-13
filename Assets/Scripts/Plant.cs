@@ -19,16 +19,7 @@ public enum IncompleteTraitType // 불완전 형질
     None
 }
 
-public enum WaveType
-{
-    Aging,
-    Wind,
-    Flood,
-    Pest,
-    Cold,
-    HeavyRain,
-    None
-}
+
 
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 

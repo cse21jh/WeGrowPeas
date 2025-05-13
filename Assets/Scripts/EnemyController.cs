@@ -2,6 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WaveType
+{
+    Aging,
+    Wind,
+    Flood,
+    Pest,
+    Cold,
+    HeavyRain,
+    None
+}
+
 public class EnemyController : MonoBehaviour
 {
     public Grid grid;
