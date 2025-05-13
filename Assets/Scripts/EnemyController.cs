@@ -23,6 +23,8 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        currentWave = WaveType.Aging;
+        nextWave = WaveType.Aging;
     }
 
     // Update is called once per frame
@@ -34,6 +36,7 @@ public class EnemyController : MonoBehaviour
     public void EnemyWave()
     {
         WaveType wave = currentWave;
+        Debug.Log("currentWave : " + currentWave);
         for (int idx = 0; idx < grid.maxCol * 4; idx++)
         {
             if (grid.plantGrid.ContainsKey(idx))
@@ -52,9 +55,16 @@ public class EnemyController : MonoBehaviour
 
             }
         }
+        SetNextWave();
         return;
-        // grid의 plants 순회하며 plant 있는 칸에 plant 받아오기
-        // 현 wave의 resistance value 가져와서 해당 확률 따라 죽일지 살릴지 결정. getresistance value 받아와야 하고, 추가로 해당 값 따라 랜덤으로 죽는지 사는지 결정하도록 알고리즘
-        // 죽었으면 plant에서 die 띄우기 
     }
+
+    private void SetNextWave()
+    {
+        currentWave = nextWave;
+        int next = Random.Range(0, 2);
+        nextWave = (WaveType)next;
+        return;
+    }
+
 }

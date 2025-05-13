@@ -31,12 +31,15 @@ public class GameManager : MonoBehaviour
             yield return StartCoroutine(StartStage());
             stage++;
         }
-        
+        Debug.Log("Game Over");
     }
     IEnumerator StartStage()
     {
         yield return StartCoroutine(grid.Breeding());
 
-       enemyController.EnemyWave();
+        enemyController.EnemyWave();
+
+        gameOver = grid.CheckGameOver();
+            
     }
 }

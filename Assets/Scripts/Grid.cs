@@ -8,6 +8,8 @@ public class Grid : MonoBehaviour
     List<Plant> plants = new List<Plant>();
     public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    public float breedTimer = 40.0f;
+    public int maxBreedCount = 5;
 
     [SerializeField] private GameObject peaPrefab;
 
@@ -49,9 +51,11 @@ public class Grid : MonoBehaviour
         GameObject obj1 = null;
         GameObject obj2 = null;
 
-        Debug.Log("40초 시작.");
+        int breedCount = 0;
+
+        Debug.Log("40초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
         float startTime = Time.time;
-        float endTime = startTime + 40.0f;
+        float endTime = startTime + breedTimer;
 
         while (Time.time < endTime)
         {
@@ -117,7 +121,7 @@ public class Grid : MonoBehaviour
                             canBreed = true;
                         }
                     }
-                    if (canBreed)
+                    if (canBreed && breedCount < maxBreedCount)
                     {
                         GameObject childObj = Instantiate(peaPrefab);
                         Plant child = childObj.GetComponent<Plant>();
@@ -126,10 +130,10 @@ public class Grid : MonoBehaviour
                             child.Init(childTrait);
                             //plants.Add(child);
                             AddPlantToGrid(child);
-                            Debug.Log("자식 생성 성공");
+                            breedCount++;
+                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
                             obj1 = null;
                             obj2 = null;
-                            Debug.Log("부모 선택 초기화");
                         }
                         else
                         {
@@ -138,10 +142,15 @@ public class Grid : MonoBehaviour
                         }
                             
                     }
+                    else if(breedCount >= maxBreedCount)
+                    {
+                        Debug.Log("최대 교배 횟수 초과");
+                    }
                     else
                     {
                         Debug.Log("키울 공간이 부족합니다");
                     }
+
                     
                 }
                 else
@@ -259,6 +268,19 @@ public class Grid : MonoBehaviour
         plant.Die();
         plantGrid.Remove(gridNum);
         return;
+    }
+
+    public bool CheckGameOver()
+    {
+        bool gameOver = true;
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                gameOver = false;
+            }
+        }
+        return gameOver;
     }
 }
 
