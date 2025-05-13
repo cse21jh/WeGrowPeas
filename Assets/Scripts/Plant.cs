@@ -62,7 +62,6 @@ public abstract class Plant : MonoBehaviour
 
     protected float GetResistanceValue(WaveType wave)
     {
-        GeneticTrait trait;
         CompleteTraitType traitType = CompleteTraitType.None;
         float defaultResistance = 0.7f;
         switch(wave)
