@@ -34,6 +34,7 @@ public enum WaveType
 
 public abstract class Plant : MonoBehaviour
 {
+    public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
 
     public virtual void Init(List<GeneticTrait> newTraits)
@@ -44,6 +45,15 @@ public abstract class Plant : MonoBehaviour
     public virtual List<GeneticTrait> GetGeneticTrait()
     {
         return traits;
+    }
+    protected virtual void OnMouseEnter()
+    {
+        UIPlantStat.Instance.ShowInfo(speciesname, traits);
+    }
+
+    protected virtual void OnMouseExit()
+    {
+        UIPlantStat.Instance.HideInfo();
     }
 
     /*public Vector2Int gridPosition;

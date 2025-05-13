@@ -7,6 +7,7 @@ public class Pea : Plant
 {
     public override void Init(List<GeneticTrait> newTraits)
     {
+        speciesname = "¿ÏµÎÄá";
         traits = newTraits;
     }
 
