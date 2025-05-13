@@ -7,7 +7,7 @@ public class Grid : MonoBehaviour
 {
     List<Plant> plants = new List<Plant>();
     public int maxCol = 4;
-    Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
 
     [SerializeField] private GameObject peaPrefab;
 
@@ -15,7 +15,6 @@ public class Grid : MonoBehaviour
     void Start()
     {
         InitGrid();
-        StartCoroutine(Breeding());
     }
 
     // Update is called once per frame
@@ -34,6 +33,8 @@ public class Grid : MonoBehaviour
             {
                 new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f, 1)
             };
+            if (i == 0)
+                basicTrait.Add(new GeneticTrait(CompleteTraitType.WindResistance, 0.7f, 1));
             pea.Init(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
@@ -62,7 +63,7 @@ public class Grid : MonoBehaviour
                 if (Physics.Raycast(ray, out hit))
                 {
                     GameObject clickedObject = hit.collider.gameObject;
-                    Pea clickedPea = clickedObject.GetComponent<Pea>();
+                    Plant clickedPea = clickedObject.GetComponent<Plant>();
 
                     if (clickedPea != null)
                     {
@@ -103,26 +104,43 @@ public class Grid : MonoBehaviour
             {
                 if (obj1 != null && obj2 != null) // 교배 버튼 등으로 추후 수정
                 {
-                    Pea parent1 = obj1.GetComponent<Pea>();
-                    Pea parent2 = obj2.GetComponent<Pea>();
+                    Plant parent1 = obj1.GetComponent<Plant>();
+                    Plant parent2 = obj2.GetComponent<Plant>();
                     //자식 완두콩 형질 계산 후 Instantiate
                     List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
-                    GameObject childObj = Instantiate(peaPrefab);
-                    Pea child = childObj.GetComponent<Pea>();
-                    if(child != null)
+                    
+                    bool canBreed = false;
+                    for (int idx = 0; idx < maxCol * 4; idx++)
                     {
-                        child.Init(childTrait);
-                        //plants.Add(child);
-                        AddPlantToGrid(child);
-                        Debug.Log("자식 생성 성공");
-                        obj1 = null;
-                        obj2 = null;
-                        Debug.Log("부모 선택 초기화");
+                        if (!plantGrid.ContainsKey(idx))
+                        {
+                            canBreed = true;
+                        }
+                    }
+                    if (canBreed)
+                    {
+                        GameObject childObj = Instantiate(peaPrefab);
+                        Plant child = childObj.GetComponent<Plant>();
+                        if (child != null) 
+                        {
+                            child.Init(childTrait);
+                            //plants.Add(child);
+                            AddPlantToGrid(child);
+                            Debug.Log("자식 생성 성공");
+                            obj1 = null;
+                            obj2 = null;
+                            Debug.Log("부모 선택 초기화");
+                        }
+                        else
+                        {
+                            Debug.Log("자식 생성에 오류 발생");
+                            Destroy(childObj);
+                        }
+                            
                     }
                     else
                     {
-                        Debug.Log("자식 생성에 오류 발생");
-                        Destroy(childObj);
+                        Debug.Log("키울 공간이 부족합니다");
                     }
                     
                 }
@@ -233,6 +251,14 @@ public class Grid : MonoBehaviour
         Transform colT = rowT.GetChild(col);
 
         return colT;
+    }
+
+    public void DestroyPlant(int gridNum)
+    {
+        Plant plant = plantGrid[gridNum];
+        plant.Die();
+        plantGrid.Remove(gridNum);
+        return;
     }
 }
 

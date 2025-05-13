@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         stage = 1;
-        GameStart();
+        StartCoroutine(GameStart());
     }
 
     // Update is called once per frame
@@ -24,11 +24,11 @@ public class GameManager : MonoBehaviour
         
     }
 
-    private void GameStart()
+    IEnumerator GameStart()
     {
         while(!gameOver)
         {
-            StartCoroutine(StartStage());
+            yield return StartCoroutine(StartStage());
             stage++;
         }
         
@@ -37,6 +37,6 @@ public class GameManager : MonoBehaviour
     {
         yield return StartCoroutine(grid.Breeding());
 
-        enemyController.EnemyAttack();
+       enemyController.EnemyWave();
     }
 }

@@ -56,6 +56,45 @@ public abstract class Plant : MonoBehaviour
         UIPlantStat.Instance.HideInfo();
     }
 
+    public bool CanResist(WaveType wave) // if can't resist, Call Die()
+    {
+        int randomNumber = UnityEngine.Random.Range(0, 100);
+        if (randomNumber <= (int)(GetResistanceValue(wave) * 100))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    protected float GetResistanceValue(WaveType wave)
+    {
+        GeneticTrait trait;
+        CompleteTraitType traitType = CompleteTraitType.None;
+        float defaultResistance = 0.7f;
+        switch(wave)
+        {
+            case WaveType.Wind: traitType = CompleteTraitType.WindResistance; break;
+            case WaveType.Flood: traitType = CompleteTraitType.FloodResistance; break;
+            case WaveType.Pest: traitType = CompleteTraitType.PestResistance; break;
+            case WaveType.Cold: traitType = CompleteTraitType.ColdResistance; break;
+            case WaveType.HeavyRain: traitType = CompleteTraitType.HeavyRainResistance; break;
+            case WaveType.Aging: traitType = CompleteTraitType.NaturalDeath; break;
+                // 특성 추가되면 추가
+        }
+
+        foreach(GeneticTrait g in traits)
+        {
+            if(g.traitType == traitType)
+                return g.resistance;
+        }
+        
+        return defaultResistance;
+
+    }
+
     /*public Vector2Int gridPosition;
     public int gridNumber;
 
@@ -130,39 +169,11 @@ public abstract class Plant : MonoBehaviour
         // 불완전 유전 법칙 따라 저항력 계산 + 식물 종류 따라 다른 계산 식 필요
     }
 
-    public void CanResist(WaveType wave) // if can't resist, Call Die()
-    {
-        int randomNumber = UnityEngine.Random.Range(0, 100);
-        if(randomNumber <= (int) (GetResistanceValue(wave) * 100))
-        {
-            return;
-        }
-        else
-        {
-            Die();
-        }
-    }
-
-    protected float GetResistanceValue(WaveType wave)
-    {
-        float resistance = 0f;
-        switch (wave)
-        {
-            case WaveType.Wind: resistance = completeResistances[CompleteTraitType.WindResistance]; break;
-            case WaveType.Flood: resistance = completeResistances[CompleteTraitType.FloodResistance]; break;
-            case WaveType.Pest: resistance = completeResistances[CompleteTraitType.PestResistance]; break;
-            case WaveType.Cold: resistance = completeResistances[CompleteTraitType.ColdResistance]; break;
-            case WaveType.HeavyRain: resistance = completeResistances[CompleteTraitType.HeavyRainResistance]; break;
-            case WaveType.Aging: resistance = completeResistances[CompleteTraitType.NaturalDeath]; break;
-            // 특성 추가되면 추가
-        }
-        return resistance;
-
-    }*/
+    */
 
     public void Die()
     {
-        // 웨이브를 버티지 못하거나, 칸에 있는 애 지울 때?
+        Destroy(this.gameObject);
     }
 
     void Start()
