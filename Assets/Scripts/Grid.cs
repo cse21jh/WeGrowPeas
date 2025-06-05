@@ -282,5 +282,11 @@ public class Grid : MonoBehaviour
         }
         return gameOver;
     }
+
+    public void AddBreedTimer(int time)
+    {
+        breedTimer += time;
+        return;
+    }
 }
 
