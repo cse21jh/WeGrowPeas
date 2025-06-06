@@ -8,23 +8,34 @@ public class UpgradeManager : MonoBehaviour
 {    
     public static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
     {
-        { typeof(BreedTimerUpgrade), () => new BreedTimerUpgrade()},
+        
         { typeof(AddNaturalDeathPlantUpgrade), () => new AddNaturalDeathPlantUpgrade()},
         { typeof(AddWindPlantUpgrade), () => new AddWindPlantUpgrade()},
         { typeof(AddFloodPlantUpgrade), () => new AddFloodPlantUpgrade()},
         { typeof(AddPestPlantUpgrade), () => new AddPestPlantUpgrade()},
         { typeof(AddColdPlantUpgrade), () => new AddColdPlantUpgrade()},
         { typeof(AddHeavyRainPlantUpgrade), () => new AddHeavyRainPlantUpgrade()},
-        
+        { typeof(NaturalDeathResistenceUpgrade), () => new NaturalDeathResistenceUpgrade()},
+        { typeof(WindResistenceUpgrade), () => new WindResistenceUpgrade()},
+        { typeof(FloodResistenceUpgrade), () => new FloodResistenceUpgrade()},
+        { typeof(PestResistenceUpgrade), () => new PestResistenceUpgrade()},
+        { typeof(ColdResistenceUpgrade), () => new ColdResistenceUpgrade()},
+        { typeof(HeavyRainResistenceUpgrade), () => new HeavyRainResistenceUpgrade()},
+        { typeof(AddSoilUpgrade), () => new AddSoilUpgrade()},
+        { typeof(BreedTimerUpgrade), () => new BreedTimerUpgrade()},
+        { typeof(MaxBreedCountUpgrade), () => new MaxBreedCountUpgrade()},
+        { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
+        { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
+        { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
 
 
     };
 
     private Dictionary<Type, int> remainUpgrade = new();
-    public Type[] randomUpgrade = new Type[3];
+    private Type[] randomUpgrade = new Type[3];
 
     private float upgradeTimer = 30.0f;
-    private int rerollCount = 3;
+    private int maxRerollCount = 0;
 
     void Start() 
     {
@@ -62,11 +73,11 @@ public class UpgradeManager : MonoBehaviour
         {
             if (randomUpgrade[i] != null)
             {
-                Debug.Log($"Random Upgrade Slot {i}: {randomUpgrade[i].Name}");
+                Debug.Log($"Random Upgrade Slot {i+1}: {randomUpgrade[i].Name}");
             }
             else
             {
-                Debug.Log($"Random Upgrade Slot {i}: Empty");
+                Debug.Log($"Random Upgrade Slot {i+1}: Empty");
             }
         }
 
@@ -87,7 +98,7 @@ public class UpgradeManager : MonoBehaviour
 
     public IEnumerator UpgradePhase()
     {
-        Debug.Log("업그레이드 페이즈 시작");
+        Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
         
         SetRandomUpgrade();
         bool select = false;
@@ -95,6 +106,7 @@ public class UpgradeManager : MonoBehaviour
 
         float startTime = Time.time;
         float endTime = startTime + upgradeTimer;
+        int rerollCount = 0;
 
         while (!select && (Time.time < endTime))
         {
@@ -117,7 +129,7 @@ public class UpgradeManager : MonoBehaviour
             }
             
             // 임시 리롤 기능.
-            if(Input.GetKeyDown(KeyCode.R) && rerollCount > 0)
+            if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
             {
                 SetRandomUpgrade();
                 rerollCount--;
@@ -127,6 +139,12 @@ public class UpgradeManager : MonoBehaviour
 
         Debug.Log("업그레이드 페이즈 종료");
         yield return null;
+    }
+
+    public void AddMaxRerollCount(int count)
+    {
+        maxRerollCount += count;
+        return;
     }
 
 }

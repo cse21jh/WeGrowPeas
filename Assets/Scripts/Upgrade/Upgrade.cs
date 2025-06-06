@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public abstract class Upgrade : MonoBehaviour
+public abstract class Upgrade
 {
     public virtual string Name => null;
     public virtual string Explanation => null;

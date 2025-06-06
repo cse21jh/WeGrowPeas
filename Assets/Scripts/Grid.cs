@@ -6,10 +6,11 @@ using System.Linq;
 public class Grid : MonoBehaviour
 {
     List<Plant> plants = new List<Plant>();
-    public int maxCol = 4;
+    private int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
-    public float breedTimer = 40.0f;
-    public int maxBreedCount = 5;
+    private float breedTimer = 5.0f;
+    private int maxBreedCount = 5;
+    private int waveSkipCount = 0;
 
     [SerializeField] private GameObject peaPrefab;
 
@@ -100,6 +101,15 @@ public class Grid : MonoBehaviour
                 }
             }
 
+            if (Input.GetKeyDown(KeyCode.S)) 
+            {
+                if (waveSkipCount > 0)
+                {
+                    GameManager.Instance.enemyController.SetNextWave();
+                    waveSkipCount--;
+                    Debug.Log("다음 웨이브를 스킵했습니다");
+                }
+            }
 
             if (Input.GetKeyDown(KeyCode.B))
             {
@@ -286,12 +296,29 @@ public class Grid : MonoBehaviour
         return;
     }
 
+    public void AddMaxBreedCount(int count)
+    {
+        maxBreedCount += count;
+        return;
+    }
+
     public void AddPlant(List<GeneticTrait> trait)
     {
         GameObject obj = Instantiate(peaPrefab);
         Pea pea = obj.GetComponent<Pea>();
         pea.Init(trait);
         AddPlantToGrid(pea);
+    }
+
+    public int GetMaxCol()
+    {
+        return maxCol; 
+    }
+
+    public void AddWaveSkipCount(int count)
+    {
+        waveSkipCount += count;
+        return;
     }
 }
 

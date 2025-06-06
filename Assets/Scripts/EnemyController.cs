@@ -37,7 +37,7 @@ public class EnemyController : MonoBehaviour
     {
         WaveType wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
-        for (int idx = 0; idx < grid.maxCol * 4; idx++)
+        for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
         {
             if (grid.plantGrid.ContainsKey(idx))
             {
@@ -59,7 +59,7 @@ public class EnemyController : MonoBehaviour
         return;
     }
 
-    private void SetNextWave()
+    public void SetNextWave()
     {
         currentWave = nextWave;
         int next = Random.Range(0, 2);

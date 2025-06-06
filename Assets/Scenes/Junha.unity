@@ -303,6 +303,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &522168314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 522168316}
+  - component: {fileID: 522168315}
+  m_Layer: 0
+  m_Name: UpgradeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &522168315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522168314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90d280af2f9e8cb478e4cc03d3ea866c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &522168316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522168314}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.1320891, y: -0.22387323, z: -0.96523464}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &617472455 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3609175152646191560, guid: 1436ac99d07cad54a9722d7b0f04bb2c, type: 3}
@@ -608,9 +652,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1bbe4ccb04bc424bb8915d90cb9f563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCol: 4
-  breedTimer: 10
-  maxBreedCount: 5
   peaPrefab: {fileID: 6114093203436464154, guid: 4c6a0f8f65286d64d836cdaca49f40dd, type: 3}
 --- !u!4 &1072018328
 Transform:
@@ -958,7 +999,7 @@ MonoBehaviour:
   stage: 0
   grid: {fileID: 1072018327}
   enemyController: {fileID: 415974144}
-  upgradeManager: {fileID: 1461606229}
+  upgradeManager: {fileID: 522168315}
 --- !u!4 &1461606228
 Transform:
   m_ObjectHideFlags: 0
@@ -986,8 +1027,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90d280af2f9e8cb478e4cc03d3ea866c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeTimer: 30
-  rerollCount: 3
 --- !u!1001 &1491733306
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1574,3 +1613,4 @@ SceneRoots:
   - {fileID: 1452348766}
   - {fileID: 1461606228}
   - {fileID: 415974145}
+  - {fileID: 522168316}
