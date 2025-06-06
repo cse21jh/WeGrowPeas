@@ -23,7 +23,7 @@ public class UIPlantStat : MonoBehaviour
 
         foreach (var trait in traits)
         {
-            string temp = $"{trait.traitType} | {(trait.resistance * 100f):F1}% | {trait.genetics}\n";
+            string temp = $"<sprite={(int)(trait.traitType+1)}> {(trait.resistance * 100f):F1}% | {trait.genetics}\n";
             traitline += temp;
         }
         textStat.text = traitline;
