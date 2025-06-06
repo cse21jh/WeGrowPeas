@@ -9,6 +9,15 @@ public class UpgradeManager : MonoBehaviour
     public static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
     {
         { typeof(BreedTimerUpgrade), () => new BreedTimerUpgrade()},
+        { typeof(AddNaturalDeathPlantUpgrade), () => new AddNaturalDeathPlantUpgrade()},
+        { typeof(AddWindPlantUpgrade), () => new AddWindPlantUpgrade()},
+        { typeof(AddFloodPlantUpgrade), () => new AddFloodPlantUpgrade()},
+        { typeof(AddPestPlantUpgrade), () => new AddPestPlantUpgrade()},
+        { typeof(AddColdPlantUpgrade), () => new AddColdPlantUpgrade()},
+        { typeof(AddHeavyRainPlantUpgrade), () => new AddHeavyRainPlantUpgrade()},
+        
+
+
     };
 
     private Dictionary<Type, int> remainUpgrade = new();
@@ -34,7 +43,7 @@ public class UpgradeManager : MonoBehaviour
     private void SetRandomUpgrade()
     {
         // randomUpgrade에 3개 랜덤하게 설정하기 remainUpgrade 0이면 안 나오도록. reroll하면 해당 함수 재호출?
-        List<Type> availableUpgrades = remainUpgrade.Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key).ToList();
+        List<Type> availableUpgrades = remainUpgrade.Where(kvp => kvp.Value != 0).Select(kvp => kvp.Key).ToList();
         for (int i = 0; i < randomUpgrade.Length; i++)
             randomUpgrade[i] = null; 
 

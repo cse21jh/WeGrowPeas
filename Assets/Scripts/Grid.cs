@@ -35,8 +35,6 @@ public class Grid : MonoBehaviour
             {
                 new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f, 1)
             };
-            if (i == 0)
-                basicTrait.Add(new GeneticTrait(CompleteTraitType.WindResistance, 0.7f, 1));
             pea.Init(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
@@ -286,6 +284,14 @@ public class Grid : MonoBehaviour
     {
         breedTimer += time;
         return;
+    }
+
+    public void AddPlant(List<GeneticTrait> trait)
+    {
+        GameObject obj = Instantiate(peaPrefab);
+        Pea pea = obj.GetComponent<Pea>();
+        pea.Init(trait);
+        AddPlantToGrid(pea);
     }
 }
 

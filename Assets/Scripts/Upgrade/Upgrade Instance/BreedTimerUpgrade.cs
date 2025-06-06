@@ -10,6 +10,6 @@ public class BreedTimerUpgrade : Upgrade
     public override void OnSelectAction() 
     {
         GameManager.Instance.grid.AddBreedTimer(10);
-        Debug.Log(GameManager.Instance.grid.breedTimer);
+        Debug.Log(Explanation);
     }
 }
