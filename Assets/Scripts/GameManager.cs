@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     public int stage = 0;
     private bool gameOver = false;
 
     public Grid grid;
     public EnemyController enemyController;
+    public UpgradeManager upgradeManager;
 
 
     // Start is called before the first frame update
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log("Game Over");
     }
+
     IEnumerator StartStage()
     {
         yield return StartCoroutine(grid.Breeding());
@@ -40,6 +42,8 @@ public class GameManager : MonoBehaviour
         enemyController.EnemyWave();
 
         gameOver = grid.CheckGameOver();
-            
+        
+        if(!gameOver)
+            yield return StartCoroutine(upgradeManager.UpgradePhase());
     }
 }

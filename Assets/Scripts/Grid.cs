@@ -45,15 +45,14 @@ public class Grid : MonoBehaviour
 
     public IEnumerator Breeding()
     {
-        //40초 동안 아래 과정 반복 진행 가능
+        //breedTimer 만큼 동안 아래 과정 반복 진행 가능
 
         //교배할 부모 완두콩 두 개 선택
         GameObject obj1 = null;
         GameObject obj2 = null;
 
         int breedCount = 0;
-
-        Debug.Log("40초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
+        Debug.Log(breedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 

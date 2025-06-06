@@ -609,7 +609,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxCol: 4
-  breedTimer: 40
+  breedTimer: 10
   maxBreedCount: 5
   peaPrefab: {fileID: 6114093203436464154, guid: 4c6a0f8f65286d64d836cdaca49f40dd, type: 3}
 --- !u!4 &1072018328
@@ -958,7 +958,7 @@ MonoBehaviour:
   stage: 0
   grid: {fileID: 1072018327}
   enemyController: {fileID: 415974144}
-  upgradeManager: {fileID: 0}
+  upgradeManager: {fileID: 1461606229}
 --- !u!4 &1461606228
 Transform:
   m_ObjectHideFlags: 0
@@ -986,6 +986,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90d280af2f9e8cb478e4cc03d3ea866c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upgradeTimer: 30
+  rerollCount: 3
 --- !u!1001 &1491733306
 PrefabInstance:
   m_ObjectHideFlags: 0
