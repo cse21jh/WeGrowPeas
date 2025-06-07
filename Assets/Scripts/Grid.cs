@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TMPro;
 
 public class Grid : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject peaPrefab;
     [SerializeField] private GameObject soilPrefab;
 
+    [SerializeField] private TimerUI breedTimerUI;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +31,7 @@ public class Grid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     private void InitGrid()
@@ -55,6 +59,9 @@ public class Grid : MonoBehaviour
         GameObject obj2 = null;
 
         int breedCount = 0;
+
+        breedTimerUI.StartBreedingTimer();
+
         Debug.Log(breedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
@@ -173,7 +180,7 @@ public class Grid : MonoBehaviour
             yield return null;
         }
 
-
+        //breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
         //Grid 리로드
 

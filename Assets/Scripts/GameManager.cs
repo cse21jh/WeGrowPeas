@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-    public int stage = 0;
+    [HideInInspector] public int stage = 0;
     private bool gameOver = false;
 
     public Grid grid;
     public EnemyController enemyController;
     public UpgradeManager upgradeManager;
+
+    [SerializeField] private TextMeshProUGUI textStage;
 
 
     // Start is called before the first frame update
@@ -29,6 +32,7 @@ public class GameManager : Singleton<GameManager>
     {
         while(!gameOver)
         {
+            UpdateStageUI();
             yield return StartCoroutine(StartStage());
             stage++;
         }
@@ -45,5 +49,10 @@ public class GameManager : Singleton<GameManager>
         
         if(!gameOver)
             yield return StartCoroutine(upgradeManager.UpgradePhase());
+    }
+
+    private void UpdateStageUI()
+    {
+        textStage.text = $"<sprite=0>STAGE {stage}";
     }
 }

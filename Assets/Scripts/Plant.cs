@@ -63,7 +63,7 @@ public abstract class Plant : MonoBehaviour
     protected float GetResistanceValue(WaveType wave)
     {
         CompleteTraitType traitType = CompleteTraitType.None;
-        float defaultResistance = 0.7f;
+        float defaultResistance = 0.0f;
         switch(wave)
         {
             case WaveType.Wind: traitType = CompleteTraitType.WindResistance; break;
@@ -81,7 +81,7 @@ public abstract class Plant : MonoBehaviour
                 return g.resistance;
         }
         
-        return defaultResistance + GameManager.Instance.grid.GetAdditionalResistance(traitType);
+        return defaultResistance /*+ GameManager.Instance.grid.GetAdditionalResistance(traitType)*/;
     }
 
     public void UpdateResistance(CompleteTraitType traitType, float value)
