@@ -9,11 +9,14 @@ public class Grid : MonoBehaviour
     private int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     private Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
-    private float breedTimer = 5.0f;
-    private int maxBreedCount = 5;
+    private int additionalInheritance = 0;
+    private float breedTimer = 40.0f;
+    private int maxBreedCount = 4;
     private int waveSkipCount = 0;
 
+
     [SerializeField] private GameObject peaPrefab;
+    [SerializeField] private GameObject soilPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -24,7 +27,7 @@ public class Grid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void InitGrid()
@@ -70,22 +73,22 @@ public class Grid : MonoBehaviour
 
                     if (clickedPea != null)
                     {
-                        if(obj1 == clickedObject)
+                        if (obj1 == clickedObject)
                         {
                             Debug.Log("부모 1 선택 취소");
                             obj1 = null;
                         }
-                        else if(obj2 == clickedObject)
+                        else if (obj2 == clickedObject)
                         {
                             Debug.Log("부모 2 선택 취소");
                             obj2 = null;
                         }
-                        else if(obj1 == null)
+                        else if (obj1 == null)
                         {
                             Debug.Log("부모 1 선택");
                             obj1 = clickedObject;
                         }
-                        else if(obj2 == null)
+                        else if (obj2 == null)
                         {
                             Debug.Log("부모 2 선택");
                             obj2 = clickedObject;
@@ -102,7 +105,7 @@ public class Grid : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.S)) 
+            if (Input.GetKeyDown(KeyCode.S))
             {
                 if (waveSkipCount > 0)
                 {
@@ -120,7 +123,7 @@ public class Grid : MonoBehaviour
                     Plant parent2 = obj2.GetComponent<Plant>();
                     //자식 완두콩 형질 계산 후 Instantiate
                     List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
-                    
+
                     bool canBreed = false;
                     for (int idx = 0; idx < maxCol * 4; idx++)
                     {
@@ -133,7 +136,7 @@ public class Grid : MonoBehaviour
                     {
                         GameObject childObj = Instantiate(peaPrefab);
                         Plant child = childObj.GetComponent<Plant>();
-                        if (child != null) 
+                        if (child != null)
                         {
                             child.Init(childTrait);
                             //plants.Add(child);
@@ -148,9 +151,9 @@ public class Grid : MonoBehaviour
                             Debug.Log("자식 생성에 오류 발생");
                             Destroy(childObj);
                         }
-                            
+
                     }
-                    else if(breedCount >= maxBreedCount)
+                    else if (breedCount >= maxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
                     }
@@ -159,7 +162,7 @@ public class Grid : MonoBehaviour
                         Debug.Log("키울 공간이 부족합니다");
                     }
 
-                    
+
                 }
                 else
                 {
@@ -175,7 +178,7 @@ public class Grid : MonoBehaviour
         //Grid 리로드
 
         yield return null;
-    }    
+    }
 
     private List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
     {
@@ -188,12 +191,12 @@ public class Grid : MonoBehaviour
 
             int p1Trait;
             int p2Trait;
-            
+
             int childGenetic = 0;
 
             int traitNotInParent = 0;
 
-            if(parent1.Any(t=>t.traitType == trait))
+            if (parent1.Any(t => t.traitType == trait))
             {
                 p1Trait = parent1.First(t => t.traitType == trait).genetics;
             }
@@ -219,20 +222,20 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (Random.Range(0, 2)); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
                 default: break;
             }
 
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (Random.Range(0, 2)); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
                 default: break;
             }
 
             float resistance = 0f;
             float additional = GetAdditionalResistance(trait);
-            
+
 
             switch (childGenetic)
             {
@@ -243,14 +246,14 @@ public class Grid : MonoBehaviour
         }
 
 
-        return childTrait;  
+        return childTrait;
     }
 
     private void AddPlantToGrid(Plant plant)
     {
-        for(int idx = 0; idx < maxCol*4; idx++)
+        for (int idx = 0; idx < maxCol * 4; idx++)
         {
-            if(!plantGrid.ContainsKey(idx))
+            if (!plantGrid.ContainsKey(idx))
             {
                 plantGrid[idx] = plant;
 
@@ -264,8 +267,8 @@ public class Grid : MonoBehaviour
 
     private Transform GetSoilTransform(int idx)
     {
-        int row = idx / maxCol;
-        int col = idx % maxCol;
+        int row = idx / 4;
+        int col = idx % 4;
 
         Transform rowT = transform.GetChild(row);
         Transform colT = rowT.GetChild(col);
@@ -316,7 +319,7 @@ public class Grid : MonoBehaviour
 
     public int GetMaxCol()
     {
-        return maxCol; 
+        return maxCol;
     }
 
     public void AddWaveSkipCount(int count)
@@ -341,11 +344,24 @@ public class Grid : MonoBehaviour
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                GeneticTrait genetic;
                 plant.UpdateResistance(traitType, value);
             }
         }
 
+        return;
+    }
+
+    public void AddAdditionalInheritance(int value)
+    {
+        additionalInheritance += value;
+        return;
+    }
+
+    public void AddSoil()
+    {
+        maxCol += 1;
+        GameObject obj = Instantiate(soilPrefab, this.transform);
+        obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
         return;
     }
 }

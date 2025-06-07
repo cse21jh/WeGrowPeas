@@ -132,7 +132,7 @@ public class UpgradeManager : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
             {
                 SetRandomUpgrade();
-                rerollCount--;
+                rerollCount++;
             }
             yield return null;
         }

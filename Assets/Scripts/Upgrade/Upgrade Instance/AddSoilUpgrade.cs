@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class AddSoilUpgrade : Upgrade
 {
-    // Start is called before the first frame update
-    void Start()
+    public override string Name => "³óÀå È®Àå";
+    public override string Explanation => "³óÀåÀÌ 4Ä­ Áõ°¡ÇÕ´Ï´Ù";
+    public override int MaxAmount => 4;
+    public override void OnSelectAction()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameManager.Instance.grid.AddSoil();
     }
 }
