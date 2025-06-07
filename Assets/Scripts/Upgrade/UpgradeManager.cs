@@ -37,18 +37,15 @@ public class UpgradeManager : MonoBehaviour
     private float upgradeTimer = 30.0f;
     private int maxRerollCount = 0;
 
-    void Start() 
-    {
-        InitUpgrade();
-    }
-
-    private void InitUpgrade()
+    public void UnlockUpgrade(int stage)
     {
         foreach (var type in UpgradeInstance.Keys)
         {
             Upgrade tmp = UpgradeInstance[type]();
-            remainUpgrade.Add(type, tmp.MaxAmount);
+            if (tmp.UnlockStage == stage)
+                remainUpgrade.Add(type, tmp.MaxAmount);
         }
+        return;
     }
 
     private void SetRandomUpgrade()
@@ -91,7 +88,11 @@ public class UpgradeManager : MonoBehaviour
             Debug.Log("업그레이드 존재 X");
             return;
         }
-        remainUpgrade[tmp]--;            
+        remainUpgrade[tmp]--;   
+        if (remainUpgrade[tmp] == 0)
+        {
+            remainUpgrade.Remove(tmp);
+        }
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
     }

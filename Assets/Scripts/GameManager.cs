@@ -18,7 +18,7 @@ public class GameManager : Singleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
-        stage = 1;
+        StageUpdate();
         StartCoroutine(GameStart());
     }
 
@@ -34,9 +34,16 @@ public class GameManager : Singleton<GameManager>
         {
             UpdateStageUI();
             yield return StartCoroutine(StartStage());
-            stage++;
+            StageUpdate();
         }
         Debug.Log("Game Over");
+    }
+
+    private void StageUpdate()
+    {
+        stage++;
+        upgradeManager.UnlockUpgrade(stage);
+        enemyController.UnlockWave(stage);
     }
 
     IEnumerator StartStage()

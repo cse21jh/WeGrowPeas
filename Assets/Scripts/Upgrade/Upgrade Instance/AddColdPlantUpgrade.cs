@@ -7,11 +7,13 @@ public class AddColdPlantUpgrade : Upgrade
     public override string Name => "추위 식물 추가";
     public override string Explanation => "추위에 강한 식물을 하나 추가합니다";
     public override int MaxAmount => -1;
+    public override int UnlockStage => 15;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.ColdResistance, 0.9f, 2)
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1),
+            new GeneticTrait(CompleteTraitType.ColdResistance, 0.5f, 1)
         };
         GameManager.Instance.grid.AddPlant(trait);
         Debug.Log(Explanation);

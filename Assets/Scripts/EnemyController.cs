@@ -19,6 +19,7 @@ public class EnemyController : MonoBehaviour
 
     private WaveType currentWave;
     private WaveType nextWave;
+    private int waveUnlocked = 2;
 
     // Start is called before the first frame update
     void Start()
@@ -62,9 +63,31 @@ public class EnemyController : MonoBehaviour
     public void SetNextWave()
     {
         currentWave = nextWave;
-        int next = Random.Range(0, 2);
+        int next = Random.Range(0, waveUnlocked);
         nextWave = (WaveType)next;
         return;
     }
 
+    public void UnlockWave(int stage)
+    {
+        switch (stage)
+        {
+            case 5:
+                waveUnlocked++;
+                break;
+            case 10:
+                waveUnlocked++;
+                break;
+            case 15:
+                waveUnlocked++;
+                break;
+            case 20:
+                waveUnlocked++;
+                break;
+            case 25:
+                waveUnlocked++;
+                break;
+        }
+        return;
+    }
 }

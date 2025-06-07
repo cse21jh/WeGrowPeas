@@ -42,7 +42,7 @@ public class Grid : MonoBehaviour
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
             {
-                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f, 1)
+                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1)
             };
             pea.Init(basicTrait);
             //plants.Add(pea);
@@ -66,7 +66,7 @@ public class Grid : MonoBehaviour
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 
-        while (Time.time < endTime)
+        while (Time.time < endTime && breedCount < maxBreedCount)
         {
             if (Input.GetMouseButtonDown(0)) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
             {
@@ -229,14 +229,14 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
                 default: break;
             }
 
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
                 default: break;
             }
 
@@ -246,8 +246,8 @@ public class Grid : MonoBehaviour
 
             switch (childGenetic)
             {
-                case 0: resistance = 0.9f + additional; break;
-                default: resistance = 0.7f + additional; break;
+                case 0: resistance = 0.8f + additional; break;
+                default: resistance = 0.5f + additional; break;
             }
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
         }
@@ -345,7 +345,10 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalResistance(CompleteTraitType traitType, float value)
     {
-        additionalResistance.Add(traitType, value);
+        if(additionalResistance.TryGetValue(traitType, out float var))
+            additionalResistance[traitType] += value;
+        else
+            additionalResistance[traitType] = value;
         for (int idx = 0; idx < GetMaxCol() * 4; idx++) // 기존에 존재하던 식물의 resistance도 증가
         {
             if (plantGrid.ContainsKey(idx))
