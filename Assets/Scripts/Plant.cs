@@ -81,8 +81,21 @@ public abstract class Plant : MonoBehaviour
                 return g.resistance;
         }
         
-        return defaultResistance;
+        return defaultResistance + GameManager.Instance.grid.GetAdditionalResistance(traitType);
+    }
 
+    public void UpdateResistance(CompleteTraitType traitType, float value)
+    {
+        for(int i=0; i < traits.Count; i++)
+        {
+            if(traits[i].traitType == traitType)
+            {
+                traits[i] = new GeneticTrait(traitType, traits[i].resistance + value, traits[i].genetics);
+            
+                return;
+            }
+        }
+        return;
     }
 
     /*public Vector2Int gridPosition;

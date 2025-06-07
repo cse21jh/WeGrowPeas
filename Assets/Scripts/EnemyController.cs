@@ -17,8 +17,8 @@ public class EnemyController : MonoBehaviour
 {
     public Grid grid;
 
-    public WaveType currentWave;
-    public WaveType nextWave;
+    private WaveType currentWave;
+    private WaveType nextWave;
 
     // Start is called before the first frame update
     void Start()

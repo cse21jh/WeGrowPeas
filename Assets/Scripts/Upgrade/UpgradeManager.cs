@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UpgradeManager : MonoBehaviour
 {    
-    public static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
+    private static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
     {
         
         { typeof(AddNaturalDeathPlantUpgrade), () => new AddNaturalDeathPlantUpgrade()},
@@ -73,11 +73,11 @@ public class UpgradeManager : MonoBehaviour
         {
             if (randomUpgrade[i] != null)
             {
-                Debug.Log($"Random Upgrade Slot {i+1}: {randomUpgrade[i].Name}");
+                Debug.Log($"업그레이드 슬롯 {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
             }
             else
             {
-                Debug.Log($"Random Upgrade Slot {i+1}: Empty");
+                Debug.Log($"업그레이드 슬롯 {i+1}: 가능한 업그레이드가 없습니다");
             }
         }
 

@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class WindResistenceUpgrade : Upgrade
 {
-    // Start is called before the first frame update
-    void Start()
+    public override string Name => "바람 저항 확률 증가";
+    public override string Explanation => "바람에 저항할 확률이 5% 증가합니다";
+    public override int MaxAmount => 1;
+    public override void OnSelectAction()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameManager.Instance.grid.AddAdditionalResistance(CompleteTraitType.WindResistance, 0.05f);
+        Debug.Log(Explanation);
     }
 }

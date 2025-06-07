@@ -8,6 +8,7 @@ public class Grid : MonoBehaviour
     List<Plant> plants = new List<Plant>();
     private int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    private Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     private float breedTimer = 5.0f;
     private int maxBreedCount = 5;
     private int waveSkipCount = 0;
@@ -230,10 +231,13 @@ public class Grid : MonoBehaviour
             }
 
             float resistance = 0f;
+            float additional = GetAdditionalResistance(trait);
+            
+
             switch (childGenetic)
             {
-                case 0: resistance = 0.9f; break;
-                default: resistance = 0.7f; break;
+                case 0: resistance = 0.9f + additional; break;
+                default: resistance = 0.7f + additional; break;
             }
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
         }
@@ -318,6 +322,30 @@ public class Grid : MonoBehaviour
     public void AddWaveSkipCount(int count)
     {
         waveSkipCount += count;
+        return;
+    }
+
+    public float GetAdditionalResistance(CompleteTraitType traitType)
+    {
+        if (additionalResistance.TryGetValue(traitType, out float value))
+            return value;
+        else
+            return 0f;
+    }
+
+    public void AddAdditionalResistance(CompleteTraitType traitType, float value)
+    {
+        additionalResistance.Add(traitType, value);
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++) // 기존에 존재하던 식물의 resistance도 증가
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                Plant plant = plantGrid[idx];
+                GeneticTrait genetic;
+                plant.UpdateResistance(traitType, value);
+            }
+        }
+
         return;
     }
 }
