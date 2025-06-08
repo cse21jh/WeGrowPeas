@@ -6,6 +6,7 @@ using System;
 public class Pea : Plant
 {
     [SerializeField] private Sprite[] deathFrames;
+    [SerializeField] private Sprite[] selectedSprite;
 
     public override void Init(List<GeneticTrait> newTraits)
     {
@@ -62,6 +63,18 @@ public class Pea : Plant
 
         Destroy(gameObject);
     }
+
+    public override void MakeSelectedSprite()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sprite = selectedSprite[1];
+    }
+
+    public override void MakeDefaultSprite()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.sprite = selectedSprite[0];
+    }    
 
     void Start()
     {

@@ -179,7 +179,15 @@ public abstract class Plant : MonoBehaviour
         Destroy(this.gameObject);
     }
 
+    public virtual void MakeSelectedSprite()
+    {
 
+    }
+
+    public virtual void MakeDefaultSprite()
+    {
+
+    }
     void Start()
     {
         

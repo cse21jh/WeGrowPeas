@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TMPro;
+using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
 {
@@ -15,11 +16,14 @@ public class Grid : MonoBehaviour
     private int maxBreedCount = 4;
     private int waveSkipCount = 0;
 
+    private bool isBreedButtonPressed = false;
+
 
     [SerializeField] private GameObject peaPrefab;
     [SerializeField] private GameObject soilPrefab;
 
     [SerializeField] private TimerUI breedTimerUI;
+    [SerializeField] private Button breedButton;
 
 
     // Start is called before the first frame update
@@ -82,23 +86,31 @@ public class Grid : MonoBehaviour
                     {
                         if (obj1 == clickedObject)
                         {
-                            Debug.Log("부모 1 선택 취소");
+                            //Debug.Log("부모 1 선택 취소");
+                            Plant p = obj1.GetComponent<Plant>();
+                            p.MakeDefaultSprite();
                             obj1 = null;
                         }
                         else if (obj2 == clickedObject)
                         {
-                            Debug.Log("부모 2 선택 취소");
+                            //Debug.Log("부모 2 선택 취소");
+                            Plant p = obj2.GetComponent<Plant>();
+                            p.MakeDefaultSprite();
                             obj2 = null;
                         }
                         else if (obj1 == null)
                         {
-                            Debug.Log("부모 1 선택");
+                            //Debug.Log("부모 1 선택");
                             obj1 = clickedObject;
+                            Plant p = obj1.GetComponent<Plant>();
+                            p.MakeSelectedSprite();
                         }
                         else if (obj2 == null)
                         {
-                            Debug.Log("부모 2 선택");
+                            //Debug.Log("부모 2 선택");
                             obj2 = clickedObject;
+                            Plant p = obj2.GetComponent<Plant>();
+                            p.MakeSelectedSprite();
                         }
                         else
                         {
@@ -374,5 +386,16 @@ public class Grid : MonoBehaviour
         obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
         return;
     }
+
+    private void ActivateBreed()
+    {
+        isBreedButtonPressed = true;
+    }
+
+    private void DeactivateBreed()
+    {
+        isBreedButtonPressed = false;
+    }
+
 }
 
