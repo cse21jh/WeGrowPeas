@@ -180,7 +180,7 @@ public class Grid : MonoBehaviour
             yield return null;
         }
 
-        //breedTimerUI.StopTimer();
+        breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
         //Grid 리로드
 

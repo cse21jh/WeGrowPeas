@@ -32,7 +32,10 @@ public class TimerUI : MonoBehaviour
     public void StopTimer()
     {
         if (countdownRoutine != null)
+        {
+            textTimer.text = $"<sprite=7> {breedingTime}";
             StopCoroutine(countdownRoutine);
+        }
     }
 
     private IEnumerator BreedingCountdown()

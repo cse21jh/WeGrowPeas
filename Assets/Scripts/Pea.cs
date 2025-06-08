@@ -5,6 +5,8 @@ using System;
 
 public class Pea : Plant
 {
+    [SerializeField] private Sprite[] deathFrames;
+
     public override void Init(List<GeneticTrait> newTraits)
     {
         speciesname = "완두콩";
@@ -43,8 +45,23 @@ public class Pea : Plant
         // 저항력 계산 및 삽입 필요
     }*/
 
+    public override void Die()
+    {
+        StartCoroutine(PeaDeathAnimation());
+    }
 
+    IEnumerator PeaDeathAnimation()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
+        for(int i = 0; i < deathFrames.Length; i++)
+        {
+            sr.sprite = deathFrames[i];
+            yield return new WaitForSeconds(0.3f);
+        }
+
+        Destroy(gameObject);
+    }
 
     void Start()
     {
