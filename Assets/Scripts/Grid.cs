@@ -23,13 +23,14 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject soilPrefab;
 
     [SerializeField] private TimerUI breedTimerUI;
-    [SerializeField] private Button breedButton;
+    [SerializeField] private GameObject breedButton;
 
 
     // Start is called before the first frame update
     void Start()
     {
         InitGrid();
+        breedButton.SetActive(false);
     }
 
     // Update is called once per frame
@@ -134,7 +135,12 @@ public class Grid : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.B))
+            if (obj1 != null && obj2 != null)
+            {
+                breedButton.SetActive(true);
+            }
+
+            if (isBreedButtonPressed)
             {
                 if (obj1 != null && obj2 != null) // 교배 버튼 등으로 추후 수정
                 {
@@ -168,6 +174,7 @@ public class Grid : MonoBehaviour
                             p2.MakeDefaultSprite();
                             obj1 = null;
                             obj2 = null;
+                            DeactivateBreed();
                         }
                         else
                         {
@@ -391,13 +398,14 @@ public class Grid : MonoBehaviour
         return;
     }
 
-    private void ActivateBreed()
+    public void ActivateBreed()
     {
         isBreedButtonPressed = true;
     }
 
     private void DeactivateBreed()
     {
+        breedButton.SetActive(false);
         isBreedButtonPressed = false;
     }
 
