@@ -162,6 +162,10 @@ public class Grid : MonoBehaviour
                             AddPlantToGrid(child);
                             breedCount++;
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
+                            Plant p1 = obj1.GetComponent<Plant>();
+                            Plant p2 = obj2.GetComponent<Plant>();
+                            p1.MakeDefaultSprite();
+                            p2.MakeDefaultSprite();
                             obj1 = null;
                             obj2 = null;
                         }
