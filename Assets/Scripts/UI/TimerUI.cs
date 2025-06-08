@@ -24,7 +24,10 @@ public class TimerUI : MonoBehaviour
     public void StartBreedingTimer()
     {
         if (countdownRoutine != null)
+        {
+            breedingTime = (int)GameManager.Instance.grid.GetBreedTimer();
             StopCoroutine(countdownRoutine);
+        }
 
         countdownRoutine = StartCoroutine(BreedingCountdown());
     }

@@ -333,6 +333,11 @@ public class Grid : MonoBehaviour
         return;
     }
 
+    public float GetBreedTimer()
+    {
+        return breedTimer;
+    }
+
     public void AddMaxBreedCount(int count)
     {
         maxBreedCount += count;
