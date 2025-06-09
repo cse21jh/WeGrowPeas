@@ -180,16 +180,19 @@ public class Grid : MonoBehaviour
                         {
                             Debug.Log("자식 생성에 오류 발생");
                             Destroy(childObj);
+                            isBreedButtonPressed = false;
                         }
 
                     }
                     else if (breedCount >= maxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
+                        isBreedButtonPressed = false;
                     }
                     else
                     {
                         Debug.Log("키울 공간이 부족합니다");
+                        isBreedButtonPressed = false;
                     }
 
 
@@ -293,6 +296,9 @@ public class Grid : MonoBehaviour
                 return;
             }
         }
+
+        Destroy(plant.gameObject);
+        return;
     }
 
     private Transform GetSoilTransform(int idx)
