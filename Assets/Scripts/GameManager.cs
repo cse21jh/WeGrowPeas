@@ -53,6 +53,8 @@ public class GameManager : Singleton<GameManager>
         enemyController.EnemyWave();
 
         gameOver = grid.CheckGameOver();
+
+        yield return new WaitForSeconds(2.0f);
         
         if(!gameOver)
             yield return StartCoroutine(upgradeManager.UpgradePhase());

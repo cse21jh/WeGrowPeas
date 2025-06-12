@@ -6,6 +6,7 @@ public class WaveSkipUpgrade : Upgrade
 {
     public override string Name => "¿þÀÌºê ½ºÅµ È½¼ö Áõ°¡";
     public override string Explanation => "´ÙÀ½ ¿þÀÌºê ½ºÅµ °¡´É È½¼ö +1";
+    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_17");
     public override int MaxAmount => -1;
     public override int UnlockStage => 15;
     public override void OnSelectAction()

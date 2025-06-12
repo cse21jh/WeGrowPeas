@@ -31,11 +31,20 @@ public class UpgradeManager : MonoBehaviour
 
     };
 
+    public GameObject upgradePanel;
+    private UpgradeCardUI[] upgradeCards;
+
     private Dictionary<Type, int> remainUpgrade = new();
     private Type[] randomUpgrade = new Type[3];
 
     private float upgradeTimer = 30.0f;
     private int maxRerollCount = 0;
+
+    private void Start()
+    {
+        upgradeCards = upgradePanel.GetComponentsInChildren<UpgradeCardUI>();
+        upgradePanel.SetActive(false);
+    }
 
     public void UnlockUpgrade(int stage)
     {
@@ -71,6 +80,8 @@ public class UpgradeManager : MonoBehaviour
             if (randomUpgrade[i] != null)
             {
                 Debug.Log($"업그레이드 슬롯 {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
+                Upgrade randUpgrade = UpgradeInstance[randomUpgrade[i]]();
+                upgradeCards[i].Set(randUpgrade);
             }
             else
             {
@@ -102,6 +113,7 @@ public class UpgradeManager : MonoBehaviour
         Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
         
         SetRandomUpgrade();
+        upgradePanel.SetActive(true);
         bool select = false;
         
 
@@ -139,6 +151,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         Debug.Log("업그레이드 페이즈 종료");
+        upgradePanel.SetActive(false);
         yield return null;
     }
 
