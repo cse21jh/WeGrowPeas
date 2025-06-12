@@ -24,6 +24,7 @@ public class Grid : MonoBehaviour
 
     [SerializeField] private TimerUI breedTimerUI;
     [SerializeField] private GameObject breedButton;
+    [SerializeField] private TextMeshProUGUI breedCountUI;
 
 
     // Start is called before the first frame update
@@ -68,6 +69,7 @@ public class Grid : MonoBehaviour
         breedTimerUI.StartBreedingTimer();
 
         Debug.Log(breedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
+        UpdateBreedCountUI(maxBreedCount);
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 
@@ -168,6 +170,7 @@ public class Grid : MonoBehaviour
                             AddPlantToGrid(child);
                             breedCount++;
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
+                            UpdateBreedCountUI(maxBreedCount - breedCount);
                             Plant p1 = obj1.GetComponent<Plant>();
                             Plant p2 = obj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
@@ -420,5 +423,9 @@ public class Grid : MonoBehaviour
         isBreedButtonPressed = false;
     }
 
+    private void UpdateBreedCountUI(int count)
+    {
+        breedCountUI.text = $"<sprite=8> {count}";
+    }
 }
 
