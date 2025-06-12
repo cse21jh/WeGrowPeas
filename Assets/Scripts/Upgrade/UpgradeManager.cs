@@ -39,6 +39,7 @@ public class UpgradeManager : MonoBehaviour
 
     private float upgradeTimer = 30.0f;
     private int maxRerollCount = 0;
+    private bool select = false;
 
     private void Start()
     {
@@ -81,7 +82,7 @@ public class UpgradeManager : MonoBehaviour
             {
                 Debug.Log($"업그레이드 슬롯 {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
                 Upgrade randUpgrade = UpgradeInstance[randomUpgrade[i]]();
-                upgradeCards[i].Set(randUpgrade);
+                upgradeCards[i].Set(randUpgrade, i, this);
             }
             else
             {
@@ -91,7 +92,7 @@ public class UpgradeManager : MonoBehaviour
 
     }
 
-    private void SelectUpgrade(int idx)
+    public void SelectUpgrade(int idx)
     {
         var tmp = randomUpgrade[idx];
         if (tmp == null)
@@ -106,6 +107,8 @@ public class UpgradeManager : MonoBehaviour
         }
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
+        select = true;
+        
     }
 
     public IEnumerator UpgradePhase()
@@ -114,7 +117,7 @@ public class UpgradeManager : MonoBehaviour
         
         SetRandomUpgrade();
         upgradePanel.SetActive(true);
-        bool select = false;
+        select = false;
         
 
         float startTime = Time.time;
@@ -125,7 +128,7 @@ public class UpgradeManager : MonoBehaviour
         {
             // 임시로 1,2,3 버튼 누를 시 되도록 설정
             // UI 띄워 선택 가능하도록 수정 필요
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            /*if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 SelectUpgrade(0);
                 select = true;
@@ -139,7 +142,7 @@ public class UpgradeManager : MonoBehaviour
             {
                 SelectUpgrade(2);
                 select = true;
-            }
+            }*/
             
             // 임시 리롤 기능.
             if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
