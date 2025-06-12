@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class UpgradeManager : MonoBehaviour
@@ -38,8 +39,11 @@ public class UpgradeManager : MonoBehaviour
     private Type[] randomUpgrade = new Type[3];
 
     private float upgradeTimer = 30.0f;
-    private int maxRerollCount = 0;
+    private int maxRerollCount = 2;
+    private int curRerollCount = 0;
     private bool select = false;
+
+    [SerializeField] TextMeshProUGUI rerollNum;
 
     private void Start()
     {
@@ -114,7 +118,9 @@ public class UpgradeManager : MonoBehaviour
     public IEnumerator UpgradePhase()
     {
         Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
-        
+        curRerollCount = maxRerollCount;
+        SetRerollCountUI(curRerollCount);
+
         SetRandomUpgrade();
         upgradePanel.SetActive(true);
         select = false;
@@ -122,7 +128,7 @@ public class UpgradeManager : MonoBehaviour
 
         float startTime = Time.time;
         float endTime = startTime + upgradeTimer;
-        int rerollCount = 0;
+        //int rerollCount = 0;
 
         while (!select && (Time.time < endTime))
         {
@@ -145,11 +151,11 @@ public class UpgradeManager : MonoBehaviour
             }*/
             
             // 임시 리롤 기능.
-            if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
+            /*if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
             {
                 SetRandomUpgrade();
                 rerollCount++;
-            }
+            }*/
             yield return null;
         }
 
@@ -164,4 +170,18 @@ public class UpgradeManager : MonoBehaviour
         return;
     }
 
+    public void Reroll()
+    {
+        if (curRerollCount > 0)
+        {
+            SetRandomUpgrade();
+            curRerollCount--;
+            SetRerollCountUI(curRerollCount);
+        }
+    }
+
+    private void SetRerollCountUI(int count)
+    {
+        rerollNum.text = count.ToString();
+    }
 }
