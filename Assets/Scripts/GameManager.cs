@@ -48,6 +48,8 @@ public class GameManager : Singleton<GameManager>
 
     IEnumerator StartStage()
     {
+        enemyController.ShowNextWaveText();
+
         yield return StartCoroutine(grid.Breeding());
 
         enemyController.EnemyWave();

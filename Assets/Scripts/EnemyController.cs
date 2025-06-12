@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public enum WaveType
@@ -20,6 +21,8 @@ public class EnemyController : MonoBehaviour
     private WaveType currentWave;
     private WaveType nextWave;
     private int waveUnlocked = 2;
+
+    [SerializeField] TextMeshProUGUI nextWaveText;
 
     // Start is called before the first frame update
     void Start()
@@ -57,6 +60,7 @@ public class EnemyController : MonoBehaviour
             }
         }
         SetNextWave();
+        FlushNextWaveText();
         return;
     }
 
@@ -89,5 +93,15 @@ public class EnemyController : MonoBehaviour
                 break;
         }
         return;
+    }
+
+    public void ShowNextWaveText()
+    {
+        nextWaveText.text = "¤»¤» ÇãÁ¢ ÄÆ";
+    }
+
+    private void FlushNextWaveText()
+    {
+        nextWaveText.text = "";
     }
 }
