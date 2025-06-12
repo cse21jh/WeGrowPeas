@@ -39,7 +39,7 @@ public class UpgradeManager : MonoBehaviour
     private Type[] randomUpgrade = new Type[3];
 
     private float upgradeTimer = 30.0f;
-    private int maxRerollCount = 2;
+    private int maxRerollCount = 0;
     private int curRerollCount = 0;
     private bool select = false;
 
