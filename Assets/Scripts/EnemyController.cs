@@ -16,6 +16,17 @@ public enum WaveType
 
 public class EnemyController : MonoBehaviour
 {
+    private static readonly Dictionary<WaveType, string> waveDescriptions = new()
+    {
+        { WaveType.Aging, "곧 하루가 지나갑니다......" },
+        { WaveType.Wind, "거센 바람이 몰아칩니다......" },
+        { WaveType.Flood, "홍수가 덮쳐옵니다......" },
+        { WaveType.Pest, "불길한 날개소리가 들립니다......" },
+        { WaveType.Cold, "기온이 떨어지고 있습니다......" },
+        { WaveType.HeavyRain, "폭우가 내리기 시작합니다......" },
+        { WaveType.None, "오늘은 아무 일도 일어나지 않을 것 같습니다." }
+    };
+
     public Grid grid;
 
     private WaveType currentWave;
@@ -97,7 +108,7 @@ public class EnemyController : MonoBehaviour
 
     public void ShowNextWaveText()
     {
-        nextWaveText.text = "ㅋㅋ 허접 컷";
+        nextWaveText.text = waveDescriptions[currentWave];
     }
 
     private void FlushNextWaveText()
