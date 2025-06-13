@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Grid : MonoBehaviour
 {
     List<Plant> plants = new List<Plant>();
-    private int maxCol = 4;
+    [HideInInspector] public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     private Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     private int additionalInheritance = 0;
@@ -304,7 +304,7 @@ public class Grid : MonoBehaviour
         return;
     }
 
-    private Transform GetSoilTransform(int idx)
+    public Transform GetSoilTransform(int idx)
     {
         int row = idx / 4;
         int col = idx % 4;
@@ -320,6 +320,25 @@ public class Grid : MonoBehaviour
         Plant plant = plantGrid[gridNum];
         plant.Die();
         plantGrid.Remove(gridNum);
+        return;
+    }
+
+    public void DestroyPlantByShovel(Plant plant)
+    {
+        int keyToRemove = -1;
+
+        foreach (var pair in plantGrid)
+        {
+            if (pair.Value == plant)
+            {
+                keyToRemove = pair.Key;
+                break;
+            }
+        }
+
+        GameObject.Destroy(plant.gameObject);
+        plantGrid.Remove(keyToRemove);
+
         return;
     }
 
