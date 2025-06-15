@@ -59,6 +59,20 @@ public class UpgradeManager : MonoBehaviour
             if (tmp.UnlockStage == stage)
                 remainUpgrade.Add(type, tmp.MaxAmount);
         }
+        // stage 끝나고 나와야 하는 필수 업그레이드
+        switch(stage)
+        {
+            case 5:
+                randomUpgrade[0] = typeof(AddWindPlantUpgrade);  break;
+            case 10:
+                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
+            case 15:
+                randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
+            case 20:
+                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
+            case 25:
+                randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
+        }
         return;
     }
 
@@ -66,9 +80,6 @@ public class UpgradeManager : MonoBehaviour
     {
         // randomUpgrade에 3개 랜덤하게 설정하기 remainUpgrade 0이면 안 나오도록. reroll하면 해당 함수 재호출?
         List<Type> availableUpgrades = remainUpgrade.Where(kvp => kvp.Value != 0).Select(kvp => kvp.Key).ToList();
-        for (int i = 0; i < randomUpgrade.Length; i++)
-            randomUpgrade[i] = null; 
-
         
         for(int i = 0; i<randomUpgrade.Length; i++)
         {
@@ -76,8 +87,11 @@ public class UpgradeManager : MonoBehaviour
                 break;
 
             int randomIndex = UnityEngine.Random.Range(0, availableUpgrades.Count);
-            randomUpgrade[i] = availableUpgrades[randomIndex];
-            availableUpgrades.RemoveAt(randomIndex);
+            if (randomUpgrade[i] == null)
+            {
+                randomUpgrade[i] = availableUpgrades[randomIndex];
+                availableUpgrades.RemoveAt(randomIndex);
+            }
         }
 
         for (int i = 0; i < randomUpgrade.Length; i++)
@@ -112,7 +126,10 @@ public class UpgradeManager : MonoBehaviour
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
         select = true;
-        
+
+        for (int i = 0; i < randomUpgrade.Length; i++)
+            randomUpgrade[i] = null;
+
     }
 
     public IEnumerator UpgradePhase()

@@ -258,14 +258,14 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
                 default: break;
             }
 
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
                 default: break;
             }
 

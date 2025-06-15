@@ -85,7 +85,8 @@ public class EnemyController : MonoBehaviour
 
     public void UnlockWave(int stage)
     {
-        switch (stage)
+        // wave 설정은 현 stage의 wave가 끝나고 다다음 wave를 설정할 때 waveUnlocked를 사용. unlock자체는 stage 입장 직전. 즉, 6 스테이지부터 바람이 뜨려면 4스테이지 스테이지 진입 전 언락 필요. 
+        switch (stage + 1)
         {
             case 5:
                 waveUnlocked++;

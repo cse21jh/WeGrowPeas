@@ -42,8 +42,8 @@ public class GameManager : Singleton<GameManager>
     private void StageUpdate()
     {
         stage++;
-        upgradeManager.UnlockUpgrade(stage);
         enemyController.UnlockWave(stage);
+        upgradeManager.UnlockUpgrade(stage);   
     }
 
     IEnumerator StartStage()
