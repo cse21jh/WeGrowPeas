@@ -20,7 +20,8 @@ public class Grid : MonoBehaviour
 
     private bool isBreedButtonPressed = false;
 
-    private float bugSpeed = 5.0f;
+    private float bugSpeed = 2.5f;
+    private float bugSpawnTimeInterval = 5.0f;
 
     [SerializeField] private GameObject peaPrefab;
     [SerializeField] private GameObject soilPrefab;
@@ -79,8 +80,17 @@ public class Grid : MonoBehaviour
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 
+        float spawnBugTime = startTime + bugSpawnTimeInterval;
+
         while (Time.time < endTime && breedCount < maxBreedCount)
         {
+            if(Time.time > spawnBugTime)
+            {
+                List<int> targetIdx = new List<int>(plantGrid.Keys);
+                SpawnBug(targetIdx[Random.Range(0, targetIdx.Count)]);
+                spawnBugTime += bugSpawnTimeInterval;
+            }
+
             if (Input.GetMouseButtonDown(0)) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // 현재는 콜라이더 component 있어야 확인 가능. 추후 grid 좌표 계산 되면 수정 예정.
@@ -490,11 +500,36 @@ public class Grid : MonoBehaviour
         breedCountUI.text = $"<sprite=8> {count}";
     }
 
-    private void MakeBug(int targetObjIdx)
+    private void SpawnBug(int targetObjIdx)
     {
         GameObject obj = Instantiate(bugPrefab);
-        
-        obj.GetComponent<Bug>().InitBug(targetObjIdx, bugSpeed, this, new Vector3(7.0f,0.0f,peaPrefab.transform.position.z));
+
+        int edge = Random.Range(0, 4);
+
+        float x=0f;
+        float y=0f;
+
+        switch(edge)
+        {
+            case 0:
+                x= Random.Range(-9f, 9f);
+                y = 5.0f;
+                break;
+            case 1:
+                x = 9.0f;
+                y = Random.Range(-5f, 5f);
+                break;
+            case 2:
+                x = Random.Range(-9f, 9f);
+                y = -5.0f;
+                break;
+            case 3:
+                x = -9.0f;
+                y = Random.Range(-5f, 5f);
+                break;
+        }
+
+        obj.GetComponent<Bug>().InitBug(targetObjIdx, bugSpeed, this, new Vector3(x,y,peaPrefab.transform.position.z));
     }
 
     public bool GetIsBreeding()
