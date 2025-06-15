@@ -36,7 +36,6 @@ public class GameManager : Singleton<GameManager>
             yield return StartCoroutine(StartStage());
             StageUpdate();
         }
-        Debug.Log("Game Over");
     }
 
     private void StageUpdate()
@@ -58,12 +57,17 @@ public class GameManager : Singleton<GameManager>
 
         yield return new WaitForSeconds(2.0f);
         
-        if(!gameOver)
-            yield return StartCoroutine(upgradeManager.UpgradePhase());
+        yield return StartCoroutine(upgradeManager.UpgradePhase());
     }
 
     private void UpdateStageUI()
     {
         textStage.text = $"<sprite=0> STAGE {stage}";
+    }
+
+    public void GameOver()
+    {
+        //Time.timeScale = 0.0f;
+        Debug.Log("GameOver");
     }
 }

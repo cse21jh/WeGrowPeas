@@ -12,15 +12,19 @@ public class Grid : MonoBehaviour
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     private Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     private int additionalInheritance = 0;
-    private float breedTimer = 40.0f;
+    private float breedTimer = 30.0f;
     private int maxBreedCount = 4;
     private int waveSkipCount = 0;
 
+    private bool isBreeding = false;
+
     private bool isBreedButtonPressed = false;
 
+    private float bugSpeed = 5.0f;
 
     [SerializeField] private GameObject peaPrefab;
     [SerializeField] private GameObject soilPrefab;
+    [SerializeField] private GameObject bugPrefab;
 
     [SerializeField] private TimerUI breedTimerUI;
     [SerializeField] private GameObject breedButton;
@@ -37,7 +41,7 @@ public class Grid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void InitGrid()
@@ -61,6 +65,8 @@ public class Grid : MonoBehaviour
         //breedTimer 만큼 동안 아래 과정 반복 진행 가능
 
         //교배할 부모 완두콩 두 개 선택
+        isBreeding = true;
+
         GameObject obj1 = null;
         GameObject obj2 = null;
 
@@ -84,48 +90,58 @@ public class Grid : MonoBehaviour
                 {
                     GameObject clickedObject = hit.collider.gameObject;
                     Plant clickedPea = clickedObject.GetComponent<Plant>();
+                    Bug clickedBug = clickedObject.GetComponent<Bug>();
 
                     if (clickedPea != null)
                     {
-                        if (obj1 == clickedObject)
+
+                        if (clickedPea != null)
                         {
-                            //Debug.Log("부모 1 선택 취소");
-                            Plant p = obj1.GetComponent<Plant>();
-                            p.MakeDefaultSprite();
-                            obj1 = null;
+                            if (obj1 == clickedObject)
+                            {
+                                //Debug.Log("부모 1 선택 취소");
+                                Plant p = obj1.GetComponent<Plant>();
+                                p.MakeDefaultSprite();
+                                obj1 = null;
+                            }
+                            else if (obj2 == clickedObject)
+                            {
+                                //Debug.Log("부모 2 선택 취소");
+                                Plant p = obj2.GetComponent<Plant>();
+                                p.MakeDefaultSprite();
+                                obj2 = null;
+                            }
+                            else if (obj1 == null)
+                            {
+                                //Debug.Log("부모 1 선택");
+                                obj1 = clickedObject;
+                                Plant p = obj1.GetComponent<Plant>();
+                                p.MakeSelectedSprite();
+                            }
+                            else if (obj2 == null)
+                            {
+                                //Debug.Log("부모 2 선택");
+                                obj2 = clickedObject;
+                                Plant p = obj2.GetComponent<Plant>();
+                                p.MakeSelectedSprite();
+                            }
+                            else
+                            {
+                                Debug.Log("이미 두 부모가 모두 선택된 상태");
+                            }
                         }
-                        else if (obj2 == clickedObject)
-                        {
-                            //Debug.Log("부모 2 선택 취소");
-                            Plant p = obj2.GetComponent<Plant>();
-                            p.MakeDefaultSprite();
-                            obj2 = null;
-                        }
-                        else if (obj1 == null)
-                        {
-                            //Debug.Log("부모 1 선택");
-                            obj1 = clickedObject;
-                            Plant p = obj1.GetComponent<Plant>();
-                            p.MakeSelectedSprite();
-                        }
-                        else if (obj2 == null)
-                        {
-                            //Debug.Log("부모 2 선택");
-                            obj2 = clickedObject;
-                            Plant p = obj2.GetComponent<Plant>();
-                            p.MakeSelectedSprite();
-                        }
-                        else
-                        {
-                            Debug.Log("이미 두 부모가 모두 선택된 상태");
-                        }
+                    }
+                    else if (clickedBug != null)
+                    {
+                        clickedBug.KillBug();
                     }
                     else
                     {
-                        Debug.Log("콩을 선택해주세요");
+                        Debug.Log("올바른 오브젝트 선택이 아닙니다.");
                     }
                 }
             }
+
 
             if (Input.GetKeyDown(KeyCode.S))
             {
@@ -211,6 +227,7 @@ public class Grid : MonoBehaviour
 
         breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
+        isBreeding = false;
         //Grid 리로드
 
         yield return null;
@@ -295,7 +312,6 @@ public class Grid : MonoBehaviour
 
                 Transform soilTransform = GetSoilTransform(idx);
                 plant.transform.position = soilTransform.position;
-
                 return;
             }
         }
@@ -320,6 +336,10 @@ public class Grid : MonoBehaviour
         Plant plant = plantGrid[gridNum];
         plant.Die();
         plantGrid.Remove(gridNum);
+        if (CheckGameOver())
+        {
+            GameManager.Instance.GameOver();
+        }
         return;
     }
 
@@ -339,20 +359,43 @@ public class Grid : MonoBehaviour
         GameObject.Destroy(plant.gameObject);
         plantGrid.Remove(keyToRemove);
 
+        if (CheckGameOver())
+        {
+            GameManager.Instance.GameOver();
+        }
+
+        return;
+    }
+
+    public void DestroyPlantByBug(Plant plant)
+    {
+        int keyToRemove = -1;
+
+        foreach (var pair in plantGrid)
+        {
+            if (pair.Value == plant)
+            {
+                keyToRemove = pair.Key;
+                break;
+            }
+        }
+
+        GameObject.Destroy(plant.gameObject);
+        plantGrid.Remove(keyToRemove);
+
+        if (CheckGameOver())
+        {
+            GameManager.Instance.GameOver();
+        }
+
         return;
     }
 
     public bool CheckGameOver()
-    {
-        bool gameOver = true;
-        for (int idx = 0; idx < maxCol * 4; idx++)
-        {
-            if (plantGrid.ContainsKey(idx))
-            {
-                gameOver = false;
-            }
-        }
-        return gameOver;
+    { 
+        if (plantGrid.Count == 0)
+            return true;
+        return false;
     }
 
     public void AddBreedTimer(int time)
@@ -446,5 +489,18 @@ public class Grid : MonoBehaviour
     {
         breedCountUI.text = $"<sprite=8> {count}";
     }
+
+    private void MakeBug(int targetObjIdx)
+    {
+        GameObject obj = Instantiate(bugPrefab);
+        
+        obj.GetComponent<Bug>().InitBug(targetObjIdx, bugSpeed, this, new Vector3(7.0f,0.0f,peaPrefab.transform.position.z));
+    }
+
+    public bool GetIsBreeding()
+    { 
+        return isBreeding;
+    }
+
 }
 
