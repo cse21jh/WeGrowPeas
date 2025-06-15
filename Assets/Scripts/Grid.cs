@@ -87,8 +87,11 @@ public class Grid : MonoBehaviour
             if(Time.time > spawnBugTime)
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
-                SpawnBug(targetIdx[Random.Range(0, targetIdx.Count)]);
-                spawnBugTime += bugSpawnTimeInterval;
+                if (targetIdx.Count > 0)
+                {
+                    SpawnBug(targetIdx[Random.Range(0, targetIdx.Count)]);
+                    spawnBugTime += bugSpawnTimeInterval;
+                }
             }
 
             if (Input.GetMouseButtonDown(0)) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
