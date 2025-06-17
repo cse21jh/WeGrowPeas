@@ -21,10 +21,12 @@ public class UIPlantStat : MonoBehaviour
         textSpecies.text = speciesname;
         string traitline = $"";
 
-        foreach (var trait in traits)
+        for(int i = 0; i < traits.Count; i += 2)
         {
-            string temp = $"<sprite={(int)(trait.traitType+1)}> {(trait.resistance * 100f):F1}% | {trait.genetics}\n";
-            traitline += temp;
+            string left = $"<sprite={(int)(traits[i].traitType+1)}> {(traits[i].resistance * 100f):F1}% | {traits[i].genetics}";
+            string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {(traits[i + 1].resistance * 100f):F1}% | {traits[i + 1].genetics}" : "";
+
+            traitline += $"{left}\t{right}\n";
         }
         textStat.text = traitline;
 
