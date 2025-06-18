@@ -54,11 +54,14 @@ public class GameManager : Singleton<GameManager>
 
         enemyController.EnemyWave();
 
+        yield return new WaitForSeconds(2.0f);
+
         gameOver = grid.CheckGameOver();
 
-        yield return new WaitForSeconds(2.0f);
-        
-        yield return StartCoroutine(upgradeManager.UpgradePhase());
+        if (!gameOver)
+            yield return StartCoroutine(upgradeManager.UpgradePhase());
+        else
+            GameOver();
     }
 
     private void UpdateStageUI()

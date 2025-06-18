@@ -253,6 +253,10 @@ public class Grid : MonoBehaviour
             yield return null;
         }
 
+        if(obj1 != null) obj1.GetComponent<Plant>().MakeDefaultSprite();
+        if(obj2 != null) obj2.GetComponent<Plant>().MakeDefaultSprite();
+
+
         breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
@@ -366,10 +370,6 @@ public class Grid : MonoBehaviour
         Plant plant = plantGrid[gridNum];
         plant.Die();
         plantGrid.Remove(gridNum);
-        if (CheckGameOver())
-        {
-            GameManager.Instance.GameOver();
-        }
         return;
     }
 
