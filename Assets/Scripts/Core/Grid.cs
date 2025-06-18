@@ -30,7 +30,10 @@ public class Grid : MonoBehaviour
     [SerializeField] private TimerUI breedTimerUI;
     [SerializeField] private GameObject breedButton;
     [SerializeField] private TextMeshProUGUI breedCountUI;
-
+    
+    public int killBugCount = 0;
+    public int totalBreedCount = 0;
+        
 
     // Start is called before the first frame update
     void Start()
@@ -311,7 +314,7 @@ public class Grid : MonoBehaviour
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
         }
 
-
+        totalBreedCount++;
         return childTrait;
     }
 
