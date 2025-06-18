@@ -34,7 +34,7 @@ public class SoundManager : Singleton<SoundManager>
         BGMVolume = 1f;
         EffectVolume = 0.3f;
 
-        //EffectSoundDictionary.Add("Click", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-21"));
+        EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-21"));
         //EffectSoundDictionary.Add("MoveScene", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-26"));
         //EffectSoundDictionary.Add("GetItem", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-45"));
         

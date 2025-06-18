@@ -87,7 +87,7 @@ public class Grid : MonoBehaviour
 
         while (Time.time < endTime && breedCount < maxBreedCount)
         {
-            if(Time.time > spawnBugTime)
+            if (Time.time > spawnBugTime)
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
@@ -110,41 +110,51 @@ public class Grid : MonoBehaviour
 
                     if (clickedPea != null)
                     {
-
-                        if (clickedPea != null)
+                        if (obj1 == clickedObject)
                         {
-                            if (obj1 == clickedObject)
+                            //Debug.Log("부모 1 선택 취소");
+                            SoundManager.Instance.PlayEffect("SelectPlant");
+                            Plant p = obj1.GetComponent<Plant>();
+                            p.MakeDefaultSprite();
+                            obj1 = null;
+                            breedButton.SetActive(false);
+                        }
+                        else if (obj2 == clickedObject)
+                        {
+                            //Debug.Log("부모 2 선택 취소");
+                            SoundManager.Instance.PlayEffect("SelectPlant");
+                            Plant p = obj2.GetComponent<Plant>();
+                            p.MakeDefaultSprite();
+                            obj2 = null;
+                            breedButton.SetActive(false);
+                        }
+                        else if (obj1 == null)
+                        {
+                            //Debug.Log("부모 1 선택");
+                            SoundManager.Instance.PlayEffect("SelectPlant");
+                            obj1 = clickedObject;
+                            Plant p = obj1.GetComponent<Plant>();
+                            p.MakeSelectedSprite();
+                            if (obj1 != null && obj2 != null)
                             {
-                                //Debug.Log("부모 1 선택 취소");
-                                Plant p = obj1.GetComponent<Plant>();
-                                p.MakeDefaultSprite();
-                                obj1 = null;
+                                breedButton.SetActive(true);
                             }
-                            else if (obj2 == clickedObject)
+                        }
+                        else if (obj2 == null)
+                        {
+                            //Debug.Log("부모 2 선택");
+                            SoundManager.Instance.PlayEffect("SelectPlant");
+                            obj2 = clickedObject;
+                            Plant p = obj2.GetComponent<Plant>();
+                            p.MakeSelectedSprite();
+                            if (obj1 != null && obj2 != null)
                             {
-                                //Debug.Log("부모 2 선택 취소");
-                                Plant p = obj2.GetComponent<Plant>();
-                                p.MakeDefaultSprite();
-                                obj2 = null;
+                                breedButton.SetActive(true);
                             }
-                            else if (obj1 == null)
-                            {
-                                //Debug.Log("부모 1 선택");
-                                obj1 = clickedObject;
-                                Plant p = obj1.GetComponent<Plant>();
-                                p.MakeSelectedSprite();
-                            }
-                            else if (obj2 == null)
-                            {
-                                //Debug.Log("부모 2 선택");
-                                obj2 = clickedObject;
-                                Plant p = obj2.GetComponent<Plant>();
-                                p.MakeSelectedSprite();
-                            }
-                            else
-                            {
-                                Debug.Log("이미 두 부모가 모두 선택된 상태");
-                            }
+                        }
+                        else
+                        {
+                            Debug.Log("이미 두 부모가 모두 선택된 상태");
                         }
                     }
                     else if (clickedBug != null)
@@ -167,11 +177,6 @@ public class Grid : MonoBehaviour
                     waveSkipCount--;
                     Debug.Log("다음 웨이브를 스킵했습니다");
                 }
-            }
-
-            if (obj1 != null && obj2 != null)
-            {
-                breedButton.SetActive(true);
             }
 
             if (isBreedButtonPressed)
@@ -243,6 +248,7 @@ public class Grid : MonoBehaviour
 
         breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
+        breedButton.SetActive(false);
         isBreeding = false;
         //Grid 리로드
 
