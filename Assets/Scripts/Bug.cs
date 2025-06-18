@@ -9,15 +9,15 @@ public class Bug : MonoBehaviour
     private float speed;
     private Grid grid;
 
-
     private float rotationOffset = -90f;
+    private bool isDie = false;
 
     // Update is called once per frame
     void Update()
     {
         if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
             FindNewTargetObj();
-        else if (grid.GetIsBreeding())
+        else if (grid.GetIsBreeding() && !isDie)
         {
             Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
             Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
@@ -85,6 +85,24 @@ public class Bug : MonoBehaviour
     {
         SoundManager.Instance.PlayEffect("KillBug");
         grid.killBugCount++;
+        isDie = true;
+        StartCoroutine(FadeOut());
+    }
+
+    private IEnumerator FadeOut()
+    {
+        float f = 1;
+
+        Renderer renderer = gameObject.GetComponent<SpriteRenderer>();
+        while (f > 0)
+        {
+            f -= 0.1f;
+            Color ColorAlhpa = renderer.material.color;
+            ColorAlhpa.a = f;
+            renderer.material.color = ColorAlhpa;
+            yield return new WaitForSeconds(0.02f);
+        }
+
         Destroy(this.gameObject);
     }
 }
