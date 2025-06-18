@@ -194,7 +194,6 @@ public class Grid : MonoBehaviour
                     Plant parent1 = obj1.GetComponent<Plant>();
                     Plant parent2 = obj2.GetComponent<Plant>();
                     //자식 완두콩 형질 계산 후 Instantiate
-                    List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
 
                     bool canBreed = false;
                     for (int idx = 0; idx < maxCol * 4; idx++)
@@ -206,6 +205,7 @@ public class Grid : MonoBehaviour
                     }
                     if (canBreed && breedCount < maxBreedCount)
                     {
+                        List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
                         GameObject childObj = Instantiate(peaPrefab);
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
@@ -235,11 +235,13 @@ public class Grid : MonoBehaviour
                     else if (breedCount >= maxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
+                        SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
                     else
                     {
                         Debug.Log("키울 공간이 부족합니다");
+                        SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
 
