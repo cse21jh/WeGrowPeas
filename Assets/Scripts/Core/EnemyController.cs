@@ -27,6 +27,17 @@ public class EnemyController : MonoBehaviour
         { WaveType.None, "오늘은 아무 일도 일어나지 않을 것 같습니다." }
     };
 
+    private static readonly Dictionary<WaveType, string> waveSoundString= new()
+    {
+        { WaveType.Aging, "Aging" },
+        { WaveType.Wind, "Wind" },
+        { WaveType.Flood, "Flood" },
+        { WaveType.Pest, "Pest" },
+        { WaveType.Cold, "Cold" },
+        { WaveType.HeavyRain, "HeavyRain" },
+        { WaveType.None, "Aging" }
+    };
+
     public Grid grid;
 
     private WaveType currentWave;
@@ -52,6 +63,8 @@ public class EnemyController : MonoBehaviour
     {
         WaveType wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
+        SoundManager.Instance.PlayEffect(waveSoundString[currentWave]);
+
         for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
         {
             if (grid.plantGrid.ContainsKey(idx))

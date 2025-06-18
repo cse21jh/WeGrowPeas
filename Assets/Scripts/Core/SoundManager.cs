@@ -34,19 +34,20 @@ public class SoundManager : Singleton<SoundManager>
         BGMVolume = 0.05f;
         EffectVolume = 0.3f;
 
-        EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-21"));
-        //EffectSoundDictionary.Add("MoveScene", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-26"));
-        //EffectSoundDictionary.Add("GetItem", Resources.Load<AudioClip>("Audio/CasualGameSounds/DM-CGS-45"));
-        
-        EffectSoundDictionary.Add("KillBug", Resources.Load<AudioClip>("Audio/Shapeforms Audio Free Sound Effects/PUNCH_DESIGNED_HEAVY_23"));
+        EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/Effect/SelectPlant"));
+        EffectSoundDictionary.Add("Breed", Resources.Load<AudioClip>("Audio/Effect/Breed"));
+        EffectSoundDictionary.Add("WrongSelect", Resources.Load<AudioClip>("Audio/Effect/WrongSelect"));
+        EffectSoundDictionary.Add("Shovel", Resources.Load<AudioClip>("Audio/Effect/Shovel"));
+        EffectSoundDictionary.Add("KillBug", Resources.Load<AudioClip>("Audio/Effect/KillBug"));
+
+        EffectSoundDictionary.Add("Aging", Resources.Load<AudioClip>("Audio/Wave/Aging"));
+        EffectSoundDictionary.Add("Wind", Resources.Load<AudioClip>("Audio/Wave/Wind"));
+        EffectSoundDictionary.Add("Flood", Resources.Load<AudioClip>("Audio/Wave/Flood"));
+        EffectSoundDictionary.Add("Pest", Resources.Load<AudioClip>("Audio/Wave/Pest"));
+        EffectSoundDictionary.Add("Cold", Resources.Load<AudioClip>("Audio/Wave/Cold"));
+        EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
+
         EffectSoundDictionary.Add("Farm", Resources.Load<AudioClip>("Audio/BGM/BGM"));
-
-        //EffectSoundDictionary.Add("Farming", Resources.Load<AudioClip>("Audio/BGM/farming_¾û¶×ÇÑ ÀÛ´ç¸ðÀÇ"));
-        //EffectSoundDictionary.Add("Magician Cave", Resources.Load<AudioClip>("Audio/BGM/magician_´Ï°¡ ¸ÕÀú ÇßÀÝ¾Æ (Short)"));
-        //EffectSoundDictionary.Add("Cake Shop", Resources.Load<AudioClip>("Audio/BGM/Shop_Fluffing a Duck"));
-        //EffectSoundDictionary.Add("TutorialScene", Resources.Load<AudioClip>("Audio/BGM/tutorial_LP1607180062_ÀÌÇý¸°_Tongtong"));
-
-        //EffectSoundDictionary.Add("MainMenu", EffectSoundDictionary["Cake Shop"]);
     }
 
     public void PlayEffect(string name)

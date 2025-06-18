@@ -161,6 +161,7 @@ public class Grid : MonoBehaviour
                         }
                         else
                         {
+                            SoundManager.Instance.PlayEffect("WrongSelect");
                             Debug.Log("이미 두 부모가 모두 선택된 상태");
                         }
                     }
@@ -331,7 +332,7 @@ public class Grid : MonoBehaviour
             }
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
         }
-
+        SoundManager.Instance.PlayEffect("Breed");
         totalBreedCount++;
         return childTrait;
     }
@@ -382,6 +383,7 @@ public class Grid : MonoBehaviour
             if (pair.Value == plant)
             {
                 keyToRemove = pair.Key;
+                SoundManager.Instance.PlayEffect("Shovel");
                 break;
             }
         }
