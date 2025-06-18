@@ -18,6 +18,7 @@ public class GameManager : Singleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
+        SoundManager.Instance.PlayBgm("Farm");
         StageUpdate();
         StartCoroutine(GameStart());
     }
