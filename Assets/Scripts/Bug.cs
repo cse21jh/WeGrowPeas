@@ -12,6 +12,10 @@ public class Bug : MonoBehaviour
     private float rotationOffset = -90f;
     private bool isDie = false;
 
+    private GameObject bugKillerPrefab;
+    private GameObject bugKiller;
+
+
     // Update is called once per frame
     void Update()
     {
@@ -46,6 +50,8 @@ public class Bug : MonoBehaviour
         speed = speedValue;
         grid = g;
         transform.position = initialPos;
+
+        bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
     }
 
     private void FindNewTargetObj()
@@ -81,11 +87,26 @@ public class Bug : MonoBehaviour
         }
     }
 
-    public void KillBug()
+    public IEnumerator KillBug()
     {
-        SoundManager.Instance.PlayEffect("KillBug");
-        grid.killBugCount++;
-        isDie = true;
+        if(!isDie)
+        { 
+            SoundManager.Instance.PlayEffect("KillBug");
+            grid.killBugCount++;
+            isDie = true;
+            yield return StartCoroutine(ShowBugKiller());
+            yield return StartCoroutine(FadeOut());
+            Destroy(this.gameObject);
+        }
+    }
+
+    private IEnumerator ShowBugKiller()
+    {
+        bugKiller = Instantiate(bugKillerPrefab);
+        Vector3 currentPos = this.gameObject.transform.position;
+        bugKiller.transform.position = new Vector3(currentPos.x + 0.3f, currentPos.y - 0.3f, currentPos.z);
+        yield return new WaitForSeconds(0.1f);
+        Destroy(bugKiller);
         StartCoroutine(FadeOut());
     }
 
@@ -102,7 +123,5 @@ public class Bug : MonoBehaviour
             renderer.material.color = ColorAlhpa;
             yield return new WaitForSeconds(0.02f);
         }
-
-        Destroy(this.gameObject);
     }
 }

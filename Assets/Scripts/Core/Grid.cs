@@ -149,7 +149,7 @@ public class Grid : MonoBehaviour
                     }
                     else if (clickedBug != null)
                     {
-                        clickedBug.KillBug();
+                        StartCoroutine(clickedBug.KillBug());
                     }
                     else
                     {
