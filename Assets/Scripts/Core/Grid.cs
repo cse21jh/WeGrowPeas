@@ -20,6 +20,8 @@ public class Grid : MonoBehaviour
 
     private bool isBreedButtonPressed = false;
 
+    private bool isBreedSkipButtonPressed = false;
+
     private float bugSpeed = 2.5f;
     private float bugSpawnTimeInterval = 5.0f;
 
@@ -29,6 +31,7 @@ public class Grid : MonoBehaviour
 
     [SerializeField] private TimerUI breedTimerUI;
     [SerializeField] private GameObject breedButton;
+    [SerializeField] private GameObject breedSkipButton;
     [SerializeField] private TextMeshProUGUI breedCountUI;
     
     public int killBugCount = 0;
@@ -85,7 +88,11 @@ public class Grid : MonoBehaviour
 
         float spawnBugTime = startTime + bugSpawnTimeInterval;
 
-        while (Time.time < endTime && breedCount < maxBreedCount)
+        breedSkipButton.SetActive(true);
+        isBreedSkipButtonPressed = false;
+
+
+        while (Time.time < endTime && !isBreedSkipButtonPressed)
         {
             if (Time.time > spawnBugTime)
             {
@@ -250,6 +257,7 @@ public class Grid : MonoBehaviour
         Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
         isBreeding = false;
+        breedSkipButton.SetActive(false);
         //Grid 리로드
 
         yield return null;
@@ -505,6 +513,11 @@ public class Grid : MonoBehaviour
     {
         breedButton.SetActive(false);
         isBreedButtonPressed = false;
+    }
+
+    public void SkipBreed()
+    {
+        isBreedSkipButtonPressed = true;
     }
 
     private void UpdateBreedCountUI(int count)
