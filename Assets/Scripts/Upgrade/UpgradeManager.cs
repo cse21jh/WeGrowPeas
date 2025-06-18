@@ -92,6 +92,14 @@ public class UpgradeManager : MonoBehaviour
                 randomUpgrade[i] = availableUpgrades[randomIndex];
                 availableUpgrades.RemoveAt(randomIndex);
             }
+            else
+            {
+                int a = availableUpgrades.IndexOf(randomUpgrade[i]);
+                if(a != -1)
+                {
+                    availableUpgrades.RemoveAt(a);
+                }
+            }
         }
 
         for (int i = 0; i < randomUpgrade.Length; i++)

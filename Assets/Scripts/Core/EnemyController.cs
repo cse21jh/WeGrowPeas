@@ -42,7 +42,7 @@ public class EnemyController : MonoBehaviour
 
     private WaveType currentWave;
     private WaveType nextWave;
-    private int waveUnlocked = 2;
+    private int waveUnlocked = 1;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
