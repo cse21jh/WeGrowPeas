@@ -48,6 +48,9 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
 
         EffectSoundDictionary.Add("Farm", Resources.Load<AudioClip>("Audio/BGM/BGM"));
+        EffectSoundDictionary.Add("StartScene", Resources.Load<AudioClip>("Audio/BGM/StartSceneBGM"));
+
+        PlayBgm("StartScene");
     }
 
     public void PlayEffect(string name)
