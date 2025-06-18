@@ -191,6 +191,8 @@ public class UpgradeManager : MonoBehaviour
     {
         if (curRerollCount > 0)
         {
+            for (int i = 0; i < randomUpgrade.Length; i++)
+                randomUpgrade[i] = null;
             SetRandomUpgrade();
             curRerollCount--;
             SetRerollCountUI(curRerollCount);
