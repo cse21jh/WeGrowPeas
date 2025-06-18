@@ -32,6 +32,11 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
+    public void LoadStartScene()
+    {
+        SceneManager.LoadScene("StartScene");
+    }
+
     public void LoadGardenScene()
     {
         SceneManager.LoadScene("Garden");

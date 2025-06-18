@@ -68,6 +68,8 @@ public class GameManager : Singleton<GameManager>
 
     public void GameOver()
     {
+        GameRecordHolder.SaveData(stage, grid.totalBreedCount, grid.killBugCount);
+        SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
         Debug.Log("GameOver");
     }
