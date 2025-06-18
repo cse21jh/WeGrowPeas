@@ -83,6 +83,7 @@ public class Bug : MonoBehaviour
 
     public void KillBug()
     {
+        SoundManager.Instance.PlayEffect("KillBug");
         Destroy(this.gameObject);
     }
 }
