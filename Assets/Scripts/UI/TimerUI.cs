@@ -37,6 +37,7 @@ public class TimerUI : MonoBehaviour
         if (countdownRoutine != null)
         {
             textTimer.text = $"<sprite=7> {breedingTime}";
+            textTimer.color = Color.black;
             StopCoroutine(countdownRoutine);
         }
     }
