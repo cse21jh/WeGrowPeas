@@ -390,6 +390,7 @@ public class Grid : MonoBehaviour
             }
         }
 
+        UIPlantStat.Instance.HideInfo();
         GameObject.Destroy(plant.gameObject);
         plantGrid.Remove(keyToRemove);
 

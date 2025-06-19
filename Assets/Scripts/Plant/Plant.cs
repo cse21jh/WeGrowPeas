@@ -176,6 +176,7 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void Die()
     {
+        UIPlantStat.Instance.HideInfo();
         Destroy(this.gameObject);
     }
 
