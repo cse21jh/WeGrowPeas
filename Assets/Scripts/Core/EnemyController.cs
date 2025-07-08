@@ -3,54 +3,25 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public enum WaveType
-{
-    Aging,
-    Wind,
-    Flood,
-    Pest,
-    Cold,
-    HeavyRain,
-    None
-}
 
 public class EnemyController : MonoBehaviour
 {
-    private static readonly Dictionary<WaveType, string> waveDescriptions = new()
-    {
-        { WaveType.Aging, "곧 하루가 지나갑니다......" },
-        { WaveType.Wind, "거센 바람이 몰아칩니다......" },
-        { WaveType.Flood, "홍수가 덮쳐옵니다......" },
-        { WaveType.Pest, "불길한 날개소리가 들립니다......" },
-        { WaveType.Cold, "기온이 떨어지고 있습니다......" },
-        { WaveType.HeavyRain, "폭우가 내리기 시작합니다......" },
-        { WaveType.None, "오늘은 아무 일도 일어나지 않을 것 같습니다." }
-    };
-
-    private static readonly Dictionary<WaveType, string> waveSoundString= new()
-    {
-        { WaveType.Aging, "Aging" },
-        { WaveType.Wind, "Wind" },
-        { WaveType.Flood, "Flood" },
-        { WaveType.Pest, "Pest" },
-        { WaveType.Cold, "Cold" },
-        { WaveType.HeavyRain, "HeavyRain" },
-        { WaveType.None, "Aging" }
-    };
 
     public Grid grid;
 
-    private WaveType currentWave;
-    private WaveType nextWave;
-    private int waveUnlocked = 1;
+    private static readonly List<Wave> unlockedWave = new List<Wave>();
+
+    private Wave currentWave;
+    private Wave nextWave;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
     // Start is called before the first frame update
     void Start()
     {
-        currentWave = WaveType.Aging;
-        nextWave = WaveType.Aging;
+        unlockedWave.Add(new AgingWave());
+        currentWave = unlockedWave[0];
+        nextWave = unlockedWave[0];
     }
 
     // Update is called once per frame
@@ -61,9 +32,9 @@ public class EnemyController : MonoBehaviour
 
     public void EnemyWave()
     {
-        WaveType wave = currentWave;
+        Wave wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
-        SoundManager.Instance.PlayEffect(waveSoundString[currentWave]);
+        SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
         for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
         {
@@ -71,7 +42,7 @@ public class EnemyController : MonoBehaviour
             {
                 Plant plant = grid.plantGrid[idx];
 
-                if(plant.CanResist(wave))
+                if(plant.CanResist(wave.WaveType))
                 {
                     Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
                 }
@@ -91,8 +62,8 @@ public class EnemyController : MonoBehaviour
     public void SetNextWave()
     {
         currentWave = nextWave;
-        int next = Random.Range(0, waveUnlocked);
-        nextWave = (WaveType)next;
+        int next = Random.Range(0, unlockedWave.Count);
+        nextWave = unlockedWave[next];
         return;
     }
 
@@ -102,19 +73,19 @@ public class EnemyController : MonoBehaviour
         switch (stage + 1)
         {
             case 5:
-                waveUnlocked++;
+                unlockedWave.Add(new WindWave());
                 break;
             case 10:
-                waveUnlocked++;
+                unlockedWave.Add(new FloodWave());
                 break;
             case 15:
-                waveUnlocked++;
+                unlockedWave.Add(new PestWave());
                 break;
             case 20:
-                waveUnlocked++;
+                unlockedWave.Add(new ColdWave());
                 break;
             case 25:
-                waveUnlocked++;
+                unlockedWave.Add(new HeavyRainWave());
                 break;
         }
         return;
@@ -122,7 +93,7 @@ public class EnemyController : MonoBehaviour
 
     public void ShowNextWaveText()
     {
-        nextWaveText.text = waveDescriptions[currentWave];
+        nextWaveText.text = currentWave.WaveDescription;
     }
 
     private void FlushNextWaveText()
