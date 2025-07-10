@@ -61,7 +61,7 @@ public class Grid : MonoBehaviour
             {
                 new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1)
             };
-            pea.Init(basicTrait);
+            pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
         }
@@ -210,7 +210,7 @@ public class Grid : MonoBehaviour
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
                         {
-                            child.Init(childTrait);
+                            child.SetTrait(childTrait);
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
@@ -346,6 +346,7 @@ public class Grid : MonoBehaviour
             if (!plantGrid.ContainsKey(idx))
             {
                 plantGrid[idx] = plant;
+                plant.Init(idx, this);
 
                 Transform soilTransform = GetSoilTransform(idx);
                 plant.transform.position = soilTransform.position;
@@ -368,62 +369,22 @@ public class Grid : MonoBehaviour
         return colT;
     }
 
-    public void DestroyPlant(int gridNum)
+    /*public void DestroyPlant(int gridNum)
     {
         Plant plant = plantGrid[gridNum];
         plant.Die();
         plantGrid.Remove(gridNum);
         return;
-    }
+    }*/
 
-    public void DestroyPlantByShovel(Plant plant)
+    public void ClearGridIndex(int gridIndex)
     {
-        int keyToRemove = -1;
-
-        foreach (var pair in plantGrid)
-        {
-            if (pair.Value == plant)
-            {
-                keyToRemove = pair.Key;
-                SoundManager.Instance.PlayEffect("Shovel");
-                break;
-            }
-        }
-
-        UIPlantStat.Instance.HideInfo();
-        GameObject.Destroy(plant.gameObject);
-        plantGrid.Remove(keyToRemove);
+        if(plantGrid.ContainsKey(gridIndex)) plantGrid.Remove(gridIndex);
 
         if (CheckGameOver())
         {
             GameManager.Instance.GameOver();
         }
-
-        return;
-    }
-
-    public void DestroyPlantByBug(Plant plant)
-    {
-        int keyToRemove = -1;
-
-        foreach (var pair in plantGrid)
-        {
-            if (pair.Value == plant)
-            {
-                keyToRemove = pair.Key;
-                break;
-            }
-        }
-
-        GameObject.Destroy(plant.gameObject);
-        plantGrid.Remove(keyToRemove);
-
-        if (CheckGameOver())
-        {
-            GameManager.Instance.GameOver();
-        }
-
-        return;
     }
 
     public bool CheckGameOver()
@@ -454,7 +415,7 @@ public class Grid : MonoBehaviour
     {
         GameObject obj = Instantiate(peaPrefab);
         Pea pea = obj.GetComponent<Pea>();
-        pea.Init(trait);
+        pea.SetTrait(trait);
         AddPlantToGrid(pea);
     }
 

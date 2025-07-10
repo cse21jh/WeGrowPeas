@@ -67,8 +67,10 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         if(Physics.Raycast(ray, out RaycastHit hit))
         {
             Plant plant = hit.collider.GetComponent<Plant>();
-            
-            grid.DestroyPlantByShovel( plant );
+
+            SoundManager.Instance.PlayEffect("Shovel");
+
+            plant.Die();
 
             //Debug.Log("[Shovel] Raycast Hit: " + hit.collider.name);
         }

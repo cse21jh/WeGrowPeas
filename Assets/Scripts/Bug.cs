@@ -83,7 +83,7 @@ public class Bug : MonoBehaviour
         Plant plant = obj.gameObject.GetComponent<Plant>();
         if (plant != null)
         {
-            grid.DestroyPlantByBug(plant);
+            plant.Die();
         }
     }
 

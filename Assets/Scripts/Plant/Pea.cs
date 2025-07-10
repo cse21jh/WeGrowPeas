@@ -8,9 +8,14 @@ public class Pea : Plant
     [SerializeField] private Sprite[] deathFrames;
     [SerializeField] private Sprite[] selectedSprite;
 
-    public override void Init(List<GeneticTrait> newTraits)
+    public override void Init(int gridIndex, Grid grid)
     {
         speciesname = "¿ÏµÎÄá";
+        base.Init(gridIndex, grid);
+    }
+
+    public override void SetTrait(List<GeneticTrait> newTraits)
+    {
         traits = newTraits;
     }
 
@@ -48,6 +53,11 @@ public class Pea : Plant
 
     public override void Die()
     {
+        base.Die();
+    }
+
+    public override void DieWithAnimation()
+    {
         StartCoroutine(PeaDeathAnimation());
     }
 
@@ -61,7 +71,8 @@ public class Pea : Plant
             yield return new WaitForSeconds(0.3f);
         }
 
-        Destroy(gameObject);
+        Die();
+        //Destroy(gameObject);
     }
 
     public override void MakeSelectedSprite()

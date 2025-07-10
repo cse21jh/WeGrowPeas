@@ -28,7 +28,16 @@ public abstract class Plant : MonoBehaviour
     public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
 
-    public virtual void Init(List<GeneticTrait> newTraits)
+    public int gridIndex { get; private set; }
+    private Grid grid;
+
+    public virtual void Init(int gridIndex, Grid grid)
+    {
+        this.gridIndex = gridIndex;
+        this.grid = grid;
+    }
+
+    public virtual void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
     }
@@ -177,7 +186,13 @@ public abstract class Plant : MonoBehaviour
     public virtual void Die()
     {
         UIPlantStat.Instance.HideInfo();
+        grid.ClearGridIndex(gridIndex);
         Destroy(this.gameObject);
+    }
+
+    public virtual void DieWithAnimation()
+    {
+
     }
 
     public virtual void MakeSelectedSprite()
