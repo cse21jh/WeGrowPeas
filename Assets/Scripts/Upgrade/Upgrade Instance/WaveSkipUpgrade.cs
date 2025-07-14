@@ -8,10 +8,10 @@ public class WaveSkipUpgrade : Upgrade
     public override string Explanation => "다음 웨이브 스킵 가능 횟수 +1";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_17");
     public override int MaxAmount => -1;
-    public override int UnlockStage => 999;
+    public override int UnlockStage => 15;
     public override void OnSelectAction()
     {
-        GameManager.Instance.enemyController.SetNextWave();
+        GameManager.Instance.grid.AddWaveSkipCount(1);
         Debug.Log(Explanation);
     }
 }

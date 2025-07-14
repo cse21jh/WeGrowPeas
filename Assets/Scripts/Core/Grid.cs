@@ -181,7 +181,7 @@ public class Grid : MonoBehaviour
             {
                 if (waveSkipCount > 0)
                 {
-                    GameManager.Instance.enemyController.SetNextWave();
+                    GameManager.Instance.enemyController.WaveSkip();
                     waveSkipCount--;
                     Debug.Log("다음 웨이브를 스킵했습니다");
                 }

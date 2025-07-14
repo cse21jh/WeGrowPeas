@@ -59,10 +59,11 @@ public class GameManager : Singleton<GameManager>
 
         gameOver = grid.CheckGameOver();
 
-        if (!gameOver)
-            yield return StartCoroutine(upgradeManager.UpgradePhase());
-        else
+        if(gameOver)
             GameOver();
+        else if (!enemyController.IsLastWaveNone())
+            yield return StartCoroutine(upgradeManager.UpgradePhase());
+    
     }
 
     private void UpdateStageUI()

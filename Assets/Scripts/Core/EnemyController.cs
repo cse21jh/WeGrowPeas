@@ -11,8 +11,11 @@ public class EnemyController : MonoBehaviour
 
     private static readonly List<Wave> unlockedWave = new List<Wave>();
 
+    private Wave lastWave;
     private Wave currentWave;
     private Wave nextWave;
+
+    private Wave noneWave;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
@@ -20,6 +23,8 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         unlockedWave.Add(new AgingWave());
+        noneWave = new NoneWave();
+        lastWave = unlockedWave[0];
         currentWave = unlockedWave[0];
         nextWave = unlockedWave[0];
     }
@@ -36,24 +41,29 @@ public class EnemyController : MonoBehaviour
         Debug.Log("currentWave : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
-        for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+        if (currentWave != noneWave)
         {
-            if (grid.plantGrid.ContainsKey(idx))
+            for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
             {
-                Plant plant = grid.plantGrid[idx];
-
-                if(plant.CanResist(wave.WaveType))
+                if (grid.plantGrid.ContainsKey(idx))
                 {
-                    Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
-                }
-                else
-                {
-                    Debug.Log(idx + "번째 식물이 죽었습니다");
-                    plant.DieWithAnimation();
-                }
+                    Plant plant = grid.plantGrid[idx];
 
+                    if (plant.CanResist(wave.WaveType))
+                    {
+                        Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
+                    }
+                    else
+                    {
+                        Debug.Log(idx + "번째 식물이 죽었습니다");
+                        plant.DieWithAnimation();
+                    }
+
+                }
             }
         }
+        else
+            Debug.Log("오늘은 아무일도 일어나지 않았습니다");
         SetNextWave();
         FlushNextWaveText();
         return;
@@ -61,10 +71,26 @@ public class EnemyController : MonoBehaviour
 
     public void SetNextWave()
     {
+        lastWave = currentWave;
         currentWave = nextWave;
         int next = Random.Range(0, unlockedWave.Count);
         nextWave = unlockedWave[next];
         return;
+    }
+
+    public void WaveSkip()
+    {
+        currentWave = noneWave;
+        ShowNextWaveText();
+        return;
+    }
+
+    public bool IsLastWaveNone()
+    {
+        if (lastWave == noneWave)
+            return true;
+        else
+            return false;
     }
 
     public void UnlockWave(int stage)
