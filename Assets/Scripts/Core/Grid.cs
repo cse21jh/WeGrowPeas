@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
 {
+    private EnemyController enemyController;
+
     List<Plant> plants = new List<Plant>();
     [HideInInspector] public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -14,7 +16,7 @@ public class Grid : MonoBehaviour
     private int additionalInheritance = 0;
     private float breedTimer = 30.0f;
     private int maxBreedCount = 4;
-    private int waveSkipCount = 0;
+    
 
     private bool isBreeding = false;
 
@@ -41,6 +43,7 @@ public class Grid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         InitGrid();
         breedButton.SetActive(false);
     }
@@ -89,6 +92,7 @@ public class Grid : MonoBehaviour
         float spawnBugTime = startTime + bugSpawnTimeInterval;
 
         breedSkipButton.SetActive(true);
+        enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
 
@@ -176,17 +180,6 @@ public class Grid : MonoBehaviour
                 }
             }
 
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                if (waveSkipCount > 0)
-                {
-                    GameManager.Instance.enemyController.WaveSkip();
-                    waveSkipCount--;
-                    Debug.Log("다음 웨이브를 스킵했습니다");
-                }
-            }
-
             if (isBreedButtonPressed)
             {
                 if (obj1 != null && obj2 != null) // 교배 버튼 등으로 추후 수정
@@ -263,6 +256,7 @@ public class Grid : MonoBehaviour
         breedTimerUI.StopTimer();
         Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
+        enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
         //Grid 리로드
@@ -422,12 +416,6 @@ public class Grid : MonoBehaviour
     public int GetMaxCol()
     {
         return maxCol;
-    }
-
-    public void AddWaveSkipCount(int count)
-    {
-        waveSkipCount += count;
-        return;
     }
 
     public float GetAdditionalResistance(CompleteTraitType traitType)

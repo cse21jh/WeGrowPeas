@@ -11,7 +11,7 @@ public class WaveSkipUpgrade : Upgrade
     public override int UnlockStage => 15;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddWaveSkipCount(1);
+        GameManager.Instance.enemyController.AddWaveSkipCount(1);
         Debug.Log(Explanation);
     }
 }

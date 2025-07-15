@@ -17,11 +17,17 @@ public class EnemyController : MonoBehaviour
 
     private Wave noneWave;
 
+    private int waveSkipCount = 0;
+
     [SerializeField] TextMeshProUGUI nextWaveText;
+
+    [SerializeField] private GameObject waveSkipButton;
+    [SerializeField] TextMeshProUGUI waveSkipCountText;
 
     // Start is called before the first frame update
     void Start()
     {
+        HideWaveSkipButton();
         unlockedWave.Add(new AgingWave());
         noneWave = new NoneWave();
         lastWave = unlockedWave[0];
@@ -80,8 +86,15 @@ public class EnemyController : MonoBehaviour
 
     public void WaveSkip()
     {
-        currentWave = noneWave;
-        ShowNextWaveText();
+        if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave!=noneWave)
+        {
+            currentWave = noneWave;
+            waveSkipCount--;
+            SetWaveSkipCountText();            
+            ShowNextWaveText();
+        }
+        if(waveSkipCount <= 0)
+            HideWaveSkipButton();
         return;
     }
 
@@ -125,5 +138,41 @@ public class EnemyController : MonoBehaviour
     private void FlushNextWaveText()
     {
         nextWaveText.text = "";
+    }
+
+    public void AddWaveSkipCount(int count)
+    {
+        ShowWaveSkipButton();
+        waveSkipCount += count;
+        SetWaveSkipCountText();
+        return;
+    }
+
+    private void SetWaveSkipCountText()
+    {
+        if (waveSkipCountText == null)
+            return;
+
+        waveSkipCountText.text = "½ºÅµ °¡´É È½¼ö :" + waveSkipCount.ToString();
+        return;
+    }
+
+    public void ShowWaveSkipButton()
+    {
+        if (waveSkipButton == null)
+            return;
+
+        if(waveSkipCount > 0) 
+            waveSkipButton.SetActive(true);
+        return;
+    }
+
+    public void HideWaveSkipButton()
+    {
+        if (waveSkipButton == null)
+            return;
+
+        waveSkipButton.SetActive(false);
+        return;
     }
 }
