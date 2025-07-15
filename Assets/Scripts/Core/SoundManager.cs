@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class SoundManager : Singleton<SoundManager>
@@ -12,6 +13,8 @@ public class SoundManager : Singleton<SoundManager>
     public float EffectVolume { get; set; }
 
     [SerializeField] private AudioClip[] EffectAudioClips;
+    [SerializeField] private Slider BGMVolumeSlider;
+    [SerializeField] private Slider EffectVolumeSlider;
 
     private Dictionary<string, AudioClip> EffectSoundDictionary = new Dictionary<string, AudioClip>();
 
@@ -71,6 +74,18 @@ public class SoundManager : Singleton<SoundManager>
     {
         BgmPlayer.clip = null;
         BgmPlayer.Stop();
+    }
+
+    public void ChangeBGMVolume()
+    {
+        BGMVolume = BGMVolumeSlider.value;
+        BgmPlayer.volume = BGMVolumeSlider.value;
+    }
+
+    public void ChangeEffectVolume()
+    {
+        EffectVolume = EffectVolumeSlider.value;
+        EffectPlayer.volume = EffectVolumeSlider.value;
     }
 
 }

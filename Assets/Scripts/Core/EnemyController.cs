@@ -27,6 +27,7 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        SetWaveSkipCountText();
         HideWaveSkipButton();
         unlockedWave.Add(new AgingWave());
         noneWave = new NoneWave();

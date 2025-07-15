@@ -14,4 +14,13 @@ public class UIClickEvent : MonoBehaviour
     {
         SceneLoader.Instance?.LoadStartScene();
     }
+
+    public void OnClick_QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
 }
