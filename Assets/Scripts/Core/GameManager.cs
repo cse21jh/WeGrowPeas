@@ -14,18 +14,25 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] private TextMeshProUGUI textStage;
 
-    private bool isSaved = false;
-
-
     // Start is called before the first frame update
     void Start()
     {
         SoundManager.Instance.StopBgm();
         SoundManager.Instance.PlayBgm("Farm");
 
-        if (isSaved) LoadGame();
-        else StageUpdate();
+        switch(GameStartContext.StartType)
+        {
+            case GameStartType.NewGame:
+                Debug.Log("새 게임");
+                StageUpdate();
+                break;
 
+            case GameStartType.ContinueGame:
+                Debug.Log("이어하기");
+                LoadGame();
+                break;
+        }
+        
         StartCoroutine(GameStart());
     }
 
@@ -82,13 +89,13 @@ public class GameManager : Singleton<GameManager>
         GameRecordHolder.SaveData(stage, grid.totalBreedCount, grid.killBugCount);
         SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
-        isSaved = false;
+        GameStartContext.SetStartType(GameStartType.NewGame);
         Debug.Log("GameOver");
     }
 
     private void LoadGame()
     {
-
+        StageUpdate();
     }
 
     private void SaveGame()
