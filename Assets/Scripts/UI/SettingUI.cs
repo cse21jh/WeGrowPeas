@@ -19,6 +19,7 @@ public class SettingUI : MonoBehaviour
             return;
         SettingPanel.SetActive(true);
         Time.timeScale = 0;
+        ClickRouter.Instance.IsBlockedByUI = true;
         return;
     }
 
@@ -28,6 +29,7 @@ public class SettingUI : MonoBehaviour
             return;
         SettingPanel.SetActive(false);
         Time.timeScale = 1;
+        ClickRouter.Instance.IsBlockedByUI = false;
         return;
     }
 

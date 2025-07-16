@@ -108,7 +108,7 @@ public class Grid : MonoBehaviour
                 }
             }
 
-            if (Input.GetMouseButtonDown(0)) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
+            if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // 현재는 콜라이더 component 있어야 확인 가능. 추후 grid 좌표 계산 되면 수정 예정.
                 RaycastHit hit;

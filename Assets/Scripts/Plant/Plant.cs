@@ -48,6 +48,8 @@ public abstract class Plant : MonoBehaviour
     }
     protected virtual void OnMouseEnter()
     {
+        if (ClickRouter.Instance.IsBlockedByUI) return;
+
         UIPlantStat.Instance.ShowInfo(speciesname, traits);
     }
 
