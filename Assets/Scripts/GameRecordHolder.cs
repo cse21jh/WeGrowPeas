@@ -10,7 +10,7 @@ public static class GameRecordHolder
 
     public static void SaveData(int stage, int peas, int bugs)
     {
-        maxStageReached = stage;
+        maxStageReached = stage - 1;
         TotalPeas = peas;
         TotalBugsKilled = bugs;
     }
