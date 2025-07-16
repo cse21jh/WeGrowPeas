@@ -15,6 +15,12 @@ public class UIClickEvent : MonoBehaviour
         SceneLoader.Instance?.LoadStartScene();
     }
 
+    public void OnClick_SaveAndReturnMain()
+    {
+        //SaveGame() »£√‚
+        SceneLoader.Instance?.LoadStartScene();
+    }
+
     public void OnClick_QuitGame()
     {
 #if UNITY_EDITOR
