@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
 {    
@@ -44,6 +45,7 @@ public class UpgradeManager : MonoBehaviour
     private bool select = false;
 
     [SerializeField] TextMeshProUGUI rerollNum;
+    [SerializeField] Slider upgradeTimeSlider;
 
     private void Start()
     {
@@ -174,13 +176,17 @@ public class UpgradeManager : MonoBehaviour
                 SelectUpgrade(2);
                 select = true;
             }*/
-            
+
             // 임시 리롤 기능.
             /*if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
             {
                 SetRandomUpgrade();
                 rerollCount++;
             }*/
+
+            float timeRatio = Mathf.Clamp01((Time.time - startTime) / upgradeTimer);
+            UpgradeTimerUI(timeRatio);
+
             yield return null;
         }
 
@@ -210,5 +216,10 @@ public class UpgradeManager : MonoBehaviour
     private void SetRerollCountUI(int count)
     {
         rerollNum.text = count.ToString();
+    }
+
+    private void UpgradeTimerUI(float timeRatio)
+    {
+        upgradeTimeSlider.value = timeRatio;
     }
 }
