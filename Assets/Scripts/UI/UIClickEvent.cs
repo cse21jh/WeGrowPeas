@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -21,7 +23,6 @@ public static class GameStartContext
 
 public class UIClickEvent : MonoBehaviour
 {
-    // Start is called before the first frame update
     public void OnClick_StartNewGame()
     {
         GameStartContext.SetStartType(GameStartType.NewGame);
@@ -30,9 +31,15 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_ContinueGame()
     {
-        //StartType이 Continue가 아니거나 JSON이 존재하지 않으면 return;
-        GameStartContext.SetStartType(GameStartType.ContinueGame);
-        SceneLoader.Instance?.LoadGardenScene();
+        string path = Application.dataPath + "/UserData.json";
+
+        if(File.Exists(path) && GameStartContext.StartType == GameStartType.ContinueGame)
+        {
+            GameStartContext.SetStartType(GameStartType.ContinueGame);
+            SceneLoader.Instance?.LoadGardenScene();
+        }
+
+        return;
     }
 
     public void OnClick_PlayAgain()
@@ -42,7 +49,7 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_SaveAndReturnMain()
     {
-        //SaveGame() 호출
+        //GameEvents.RequestSaveGame();
         SceneLoader.Instance?.LoadStartScene();
     }
 

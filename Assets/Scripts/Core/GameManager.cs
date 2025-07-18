@@ -1,7 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
+
+[System.Serializable]
+public class SaveData
+{
+    public List<PlantData> plantList = new();
+    public int remainBreedCount;
+    //public float remainBreedTime;
+    public int remainWaveSkipCount;
+    public int remainUpgradeRerollCount;
+    public WaveType curWaveType;
+    //환경설정 내용
+    //GameRecordHolder에 저장될 내용
+}
+
+[System.Serializable]
+public class PlantData
+{
+    public string speciesname;
+    public List<GeneticTrait> traits = new List<GeneticTrait>();
+    public int gridIndex;
+}
 
 public class GameManager : Singleton<GameManager>
 {
@@ -20,10 +43,13 @@ public class GameManager : Singleton<GameManager>
         SoundManager.Instance.StopBgm();
         SoundManager.Instance.PlayBgm("Farm");
 
+        ClickRouter.Instance.IsBlockedByUI = false;
+
         switch(GameStartContext.StartType)
         {
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
+                grid.InitGrid();
                 StageUpdate();
                 break;
 
@@ -40,6 +66,16 @@ public class GameManager : Singleton<GameManager>
     void Update()
     {
         
+    }
+
+    private void OnEnable()
+    {
+        GameEvents.OnSaveGameRequested += SaveGame;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnSaveGameRequested -= SaveGame;
     }
 
     IEnumerator GameStart()
@@ -86,7 +122,7 @@ public class GameManager : Singleton<GameManager>
 
     public void GameOver()
     {
-        GameRecordHolder.SaveData(stage, grid.totalBreedCount, grid.killBugCount);
+        GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount);
         SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.NewGame);
@@ -95,11 +131,59 @@ public class GameManager : Singleton<GameManager>
 
     private void LoadGame()
     {
-        StageUpdate();
+        //StageUpdate();
+        //LoadGrid;
+
+        string json = File.ReadAllText(GetSavePath());
+        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+        //grid.plantGrid.Clear(); //if needed......
+
+        foreach (var item in saveData.plantList)
+        {
+            //GameObject peaPrefab = Resources.Load<GameObject>("Prefabs/Pea");
+            //GameObject obj = Instantiate(peaPrefab);
+            //Pea pea = obj.GetComponent<Pea>();
+
+            Debug.Log(item.gridIndex);
+        }
+
+        Debug.Log("불러옴");
     }
 
     private void SaveGame()
     {
+        var saveData = new SaveData();
 
+        foreach (var pair in grid.plantGrid)
+        {
+            var plantData = new PlantData
+            {
+                speciesname = pair.Value.speciesname,
+                traits = pair.Value.GetGeneticTrait(),
+                gridIndex = pair.Value.gridIndex
+          
+            };
+
+            saveData.plantList.Add(plantData);
+        }
+
+        saveData.remainBreedCount = grid.BreedCount;
+        //saveData.remainBreedTime = 30.0f;
+        saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
+        saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
+        saveData.curWaveType = enemyController.CurrentWave.WaveType;
+
+        string json = JsonUtility.ToJson(saveData, true);
+        File.WriteAllText(GetSavePath(), json);
+
+        GameStartContext.SetStartType(GameStartType.ContinueGame); 
+
+        Debug.Log("저장됨");
+    }
+
+    private string GetSavePath()
+    {
+        return Application.dataPath + "/UserData.json";
     }
 }

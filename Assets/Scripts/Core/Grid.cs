@@ -16,7 +16,8 @@ public class Grid : MonoBehaviour
     private int additionalInheritance = 0;
     private float breedTimer = 30.0f;
     private int maxBreedCount = 4;
-    
+    private int breedCount = 0;
+    public int BreedCount => breedCount;
 
     private bool isBreeding = false;
 
@@ -44,7 +45,7 @@ public class Grid : MonoBehaviour
     void Start()
     {
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
-        InitGrid();
+        //InitGrid();
         breedButton.SetActive(false);
     }
 
@@ -54,7 +55,7 @@ public class Grid : MonoBehaviour
 
     }
 
-    private void InitGrid()
+    public void InitGrid()
     {
         for (int i = 0; i < 2; i++)
         {
@@ -80,7 +81,7 @@ public class Grid : MonoBehaviour
         GameObject obj1 = null;
         GameObject obj2 = null;
 
-        int breedCount = 0;
+        //int breedCount = 0;
 
         breedTimerUI.StartBreedingTimer();
 
@@ -254,6 +255,7 @@ public class Grid : MonoBehaviour
 
 
         breedTimerUI.StopTimer();
+        breedCount = 0;
         Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
         enemyController.HideWaveSkipButton();

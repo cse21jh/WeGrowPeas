@@ -41,6 +41,7 @@ public class UpgradeManager : MonoBehaviour
 
     private float upgradeTimer = 30.0f;
     private int maxRerollCount = 0;
+    public int MaxRerollCount => maxRerollCount;
     private int curRerollCount = 0;
     private bool select = false;
 

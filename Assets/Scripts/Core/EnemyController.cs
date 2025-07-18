@@ -1,23 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 
 public class EnemyController : MonoBehaviour
 {
 
     public Grid grid;
-
     private static readonly List<Wave> unlockedWave = new List<Wave>();
 
     private Wave lastWave;
     private Wave currentWave;
+    public Wave CurrentWave => currentWave;
     private Wave nextWave;
 
     private Wave noneWave;
 
     private int waveSkipCount = 0;
+    public int WaveSkipCount => waveSkipCount;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
@@ -175,5 +178,19 @@ public class EnemyController : MonoBehaviour
 
         waveSkipButton.SetActive(false);
         return;
+    }
+
+    public static Wave GetWaveFromWaveType(WaveType waveType)
+    {
+        return waveType switch
+        {
+            WaveType.Aging => new AgingWave(),
+            WaveType.Wind => new WindWave(),
+            WaveType.Flood => new FloodWave(),
+            WaveType.Pest => new PestWave(),
+            WaveType.Cold => new ColdWave(),
+            WaveType.HeavyRain => new HeavyRainWave(),
+            WaveType.None => new NoneWave(),
+        };
     }
 }
