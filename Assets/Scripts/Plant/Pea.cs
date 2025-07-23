@@ -85,16 +85,5 @@ public class Pea : Plant
     {
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[0];
-    }    
-
-    void Start()
-    {
-        
-    }
-
-    
-    void Update()
-    {
-        
     }
 }

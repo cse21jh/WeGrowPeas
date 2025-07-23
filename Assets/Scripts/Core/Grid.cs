@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using TMPro;
 using UnityEngine.UI;
+using System.Drawing;
 
 public class Grid : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class Grid : MonoBehaviour
 
     private bool isBreeding = false;
 
+    private GameObject breedObj1 = null;
+    private GameObject breedObj2 = null;
     private bool isBreedButtonPressed = false;
 
     private bool isBreedSkipButtonPressed = false;
@@ -46,6 +49,7 @@ public class Grid : MonoBehaviour
     {
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         //InitGrid();
+        InitSoils();
         breedButton.SetActive(false);
     }
 
@@ -77,9 +81,8 @@ public class Grid : MonoBehaviour
 
         //교배할 부모 완두콩 두 개 선택
         isBreeding = true;
-
-        GameObject obj1 = null;
-        GameObject obj2 = null;
+        breedObj1 = null;
+        breedObj2 = null;
 
         //int breedCount = 0;
 
@@ -109,84 +112,29 @@ public class Grid : MonoBehaviour
                 }
             }
 
-            if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI) // 완두콩 선택 과정. 취소는 이미 눌렀던 완두콩 클릭하면 취소. 
+            if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // 현재는 콜라이더 component 있어야 확인 가능. 추후 grid 좌표 계산 되면 수정 예정.
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
 
                 if (Physics.Raycast(ray, out hit))
                 {
                     GameObject clickedObject = hit.collider.gameObject;
-                    Plant clickedPea = clickedObject.GetComponent<Plant>();
                     Bug clickedBug = clickedObject.GetComponent<Bug>();
 
-                    if (clickedPea != null)
-                    {
-                        if (obj1 == clickedObject)
-                        {
-                            //Debug.Log("부모 1 선택 취소");
-                            SoundManager.Instance.PlayEffect("SelectPlant");
-                            Plant p = obj1.GetComponent<Plant>();
-                            p.MakeDefaultSprite();
-                            obj1 = null;
-                            breedButton.SetActive(false);
-                        }
-                        else if (obj2 == clickedObject)
-                        {
-                            //Debug.Log("부모 2 선택 취소");
-                            SoundManager.Instance.PlayEffect("SelectPlant");
-                            Plant p = obj2.GetComponent<Plant>();
-                            p.MakeDefaultSprite();
-                            obj2 = null;
-                            breedButton.SetActive(false);
-                        }
-                        else if (obj1 == null)
-                        {
-                            //Debug.Log("부모 1 선택");
-                            SoundManager.Instance.PlayEffect("SelectPlant");
-                            obj1 = clickedObject;
-                            Plant p = obj1.GetComponent<Plant>();
-                            p.MakeSelectedSprite();
-                            if (obj1 != null && obj2 != null)
-                            {
-                                breedButton.SetActive(true);
-                            }
-                        }
-                        else if (obj2 == null)
-                        {
-                            //Debug.Log("부모 2 선택");
-                            SoundManager.Instance.PlayEffect("SelectPlant");
-                            obj2 = clickedObject;
-                            Plant p = obj2.GetComponent<Plant>();
-                            p.MakeSelectedSprite();
-                            if (obj1 != null && obj2 != null)
-                            {
-                                breedButton.SetActive(true);
-                            }
-                        }
-                        else
-                        {
-                            SoundManager.Instance.PlayEffect("WrongSelect");
-                            Debug.Log("이미 두 부모가 모두 선택된 상태");
-                        }
-                    }
-                    else if (clickedBug != null)
+                    if (clickedBug != null)
                     {
                         StartCoroutine(clickedBug.KillBug());
-                    }
-                    else
-                    {
-                        Debug.Log("올바른 오브젝트 선택이 아닙니다.");
                     }
                 }
             }
 
             if (isBreedButtonPressed)
             {
-                if (obj1 != null && obj2 != null) // 교배 버튼 등으로 추후 수정
+                if (breedObj1 != null && breedObj2 != null) // 교배 버튼 등으로 추후 수정
                 {
-                    Plant parent1 = obj1.GetComponent<Plant>();
-                    Plant parent2 = obj2.GetComponent<Plant>();
+                    Plant parent1 = breedObj1.GetComponent<Plant>();
+                    Plant parent2 = breedObj2.GetComponent<Plant>();
                     //자식 완두콩 형질 계산 후 Instantiate
 
                     bool canBreed = false;
@@ -210,12 +158,12 @@ public class Grid : MonoBehaviour
                             breedCount++;
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
                             UpdateBreedCountUI(maxBreedCount - breedCount);
-                            Plant p1 = obj1.GetComponent<Plant>();
-                            Plant p2 = obj2.GetComponent<Plant>();
+                            Plant p1 = breedObj1.GetComponent<Plant>();
+                            Plant p2 = breedObj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
                             p2.MakeDefaultSprite();
-                            obj1 = null;
-                            obj2 = null;
+                            breedObj1 = null;
+                            breedObj2 = null;
                             DeactivateBreed();
                         }
                         else
@@ -250,9 +198,8 @@ public class Grid : MonoBehaviour
             yield return null;
         }
 
-        if(obj1 != null) obj1.GetComponent<Plant>().MakeDefaultSprite();
-        if(obj2 != null) obj2.GetComponent<Plant>().MakeDefaultSprite();
-
+        if(breedObj1 != null) breedObj1.GetComponent<Plant>().MakeDefaultSprite();
+        if(breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
 
         breedTimerUI.StopTimer();
         breedCount = 0;
@@ -457,7 +404,78 @@ public class Grid : MonoBehaviour
         maxCol += 1;
         GameObject obj = Instantiate(soilPrefab, this.transform);
         obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
-        return;
+
+        for (int row = 0; row < 4; row++)
+        {
+            Transform soilT = obj.transform.GetChild(row);
+            Soil soil = soilT.GetComponent<Soil>();
+
+            if (soil != null)
+            {
+                int index = row * maxCol + (maxCol - 1);
+                soil.Init(index);
+            }
+        }
+    }
+    private void InitSoils()
+    {
+        for (int col = 0; col < maxCol; col++)
+        {
+            Transform soilColT = transform.GetChild(col);
+            for (int row = 0; row < 4; row++)
+            {
+                Transform soilT = soilColT.GetChild(row);
+                Soil soil = soilT.GetComponent<Soil>();
+                if (soil != null)
+                {
+                    int index = col * 4 + row;
+                    soil.Init(index);
+                }
+            }
+        }
+    }
+
+    public void RequestBreedSelect(GameObject clickedObject)
+    {
+        Plant clickedPea = clickedObject.GetComponent<Plant>();
+        if (clickedPea == null) return;
+
+        if (breedObj1 == clickedObject)
+        {
+            // 부모 1 선택 취소
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            clickedPea.MakeDefaultSprite();
+            breedObj1 = null;
+        }
+        else if (breedObj2 == clickedObject)
+        {
+            // 부모 2 선택 취소
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            clickedPea.MakeDefaultSprite();
+            breedObj2 = null;
+        }
+        else if (breedObj1 == null)
+        {
+            // 부모 1 선택
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            breedObj1 = clickedObject;
+            clickedPea.MakeSelectedSprite();
+        }
+        else if (breedObj2 == null)
+        {
+            // 부모 2 선택
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            breedObj2 = clickedObject;
+            clickedPea.MakeSelectedSprite();
+        }
+        else
+        {
+            // 이미 두 부모 선택됨
+            SoundManager.Instance.PlayEffect("WrongSelect");
+            Debug.Log("이미 두 부모가 모두 선택된 상태");
+        }
+
+        breedButton.SetActive(breedObj1 != null && breedObj2 != null);
     }
 
     public void ActivateBreed()
@@ -518,5 +536,46 @@ public class Grid : MonoBehaviour
         return isBreeding;
     }
 
+    public bool TryPlacePlant(Plant plant, Vector3 screenPosition)
+    {
+        int? targetIndex = GetGridIndexFromPosition(screenPosition);
+
+        // 토양 감지 실패 또는 해당 칸에 이미 식물이 있는 경우
+        if (!targetIndex.HasValue || plantGrid.ContainsKey(targetIndex.Value))
+        {
+            // 원래 위치로 되돌리기
+            Transform originalSoil = GetSoilTransform(plant.gridIndex);
+            plant.transform.position = originalSoil.position;
+            return false;
+        }
+
+        // 새로운 위치에 심기
+        plantGrid.Remove(plant.gridIndex); // 원래 위치에서 제거
+        plantGrid[targetIndex.Value] = plant;
+
+        plant.SetGridIndex(targetIndex.Value);
+        Transform soilT = GetSoilTransform(targetIndex.Value);
+        plant.transform.position = soilT.position;
+
+        return true;
+    }
+
+    public int? GetGridIndexFromPosition(Vector3 screenPosition)
+    {
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPosition);
+        Vector2 worldPos2D = new Vector2(worldPos.x, worldPos.y);
+
+        RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
+
+        if (hit.collider != null)
+        {
+            Soil soil = hit.collider.GetComponent<Soil>();
+            if (soil != null)
+            {
+                return soil.GridIndex;
+            }
+        }
+        return null;
+    }
 }
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 /*public enum CompleteTraitType // 기존 형질
 {
@@ -31,6 +32,16 @@ public abstract class Plant : MonoBehaviour
     public int gridIndex { get; private set; }
     private Grid grid;
 
+    //이동을 위한 변수
+    private float holdTime = 0f;
+    private bool isHolding = false;
+    private bool isDragging = false;
+    private const float HoldDuration = 1.5f;
+
+    //옮기기 게이지
+    [SerializeField] private Image holdGaugeImage;
+    [SerializeField] private GameObject holdGaugeCanvas;
+
     public virtual void Init(int gridIndex, Grid grid)
     {
         this.gridIndex = gridIndex;
@@ -56,6 +67,86 @@ public abstract class Plant : MonoBehaviour
     protected virtual void OnMouseExit()
     {
         UIPlantStat.Instance.HideInfo();
+    }
+    
+    //식물 이동
+    private void OnMouseDown()
+    {
+        holdTime = 0f;
+        isHolding = true;
+        holdGaugeImage.fillAmount = 0f;
+        holdGaugeCanvas.SetActive(true);
+    }
+
+    private void OnMouseUp()
+    {
+        if (isDragging)
+        {
+            grid.TryPlacePlant(this, Input.mousePosition);
+        }
+        else
+        {
+            grid.RequestBreedSelect(this.gameObject);
+        }
+
+            Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        isDragging = false;
+        isHolding = false;
+        holdTime = 0f;
+        holdGaugeImage.fillAmount = 0f;
+        holdGaugeCanvas.SetActive(false);
+    }
+    protected virtual void Update()
+    {
+        if (isHolding)
+        {
+            holdTime += Time.deltaTime;
+            holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
+
+            if (holdTime >= HoldDuration && !isDragging)
+            {
+                StartDragging();
+                holdGaugeCanvas.SetActive(false);
+            }
+        }
+
+        if (isDragging)
+        {
+            FollowMouse();
+        }
+    }
+    private void StartDragging()
+    {
+        Debug.Log("식물 들기 성공");
+        isDragging = true;
+
+        Vector3 pos = transform.position;
+        transform.position = new Vector3(pos.x, pos.y, pos.z - 0.1f);
+
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+    }
+
+    private void FollowMouse()
+    {
+        Vector3 screenPos = Input.mousePosition;
+        screenPos.z = Camera.main.WorldToScreenPoint(transform.position).z;
+
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+        transform.position = worldPos;
+    }
+
+    public void SetGridIndex(int idx)
+    {
+        gridIndex = idx;
     }
 
     public bool CanResist(WaveType wave) // if can't resist, Call Die()
@@ -207,12 +298,6 @@ public abstract class Plant : MonoBehaviour
 
     }
     void Start()
-    {
-        
-    }
-
-    
-    void Update()
     {
         
     }
