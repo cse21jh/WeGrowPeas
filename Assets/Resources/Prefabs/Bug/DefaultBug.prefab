@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 7377728899889839665}
   - component: {fileID: 1538269843699928241}
-  - component: {fileID: 4391106425259652}
   - component: {fileID: -5664339543015887516}
   - component: {fileID: 6294642669481588143}
+  - component: {fileID: -945410629647455719}
   m_Layer: 0
-  m_Name: Bug
+  m_Name: DefaultBug
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,18 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4391106425259652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3979688952226491961}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f1b660ff21d5b340ab025ded44dc0f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &-5664339543015887516
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -147,3 +135,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.85333335
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-945410629647455719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3979688952226491961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00d8aabd8ce844f4594c7e4f6cf9fbc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

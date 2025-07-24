@@ -41,7 +41,7 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("Breed", Resources.Load<AudioClip>("Audio/Effect/Breed"));
         EffectSoundDictionary.Add("WrongSelect", Resources.Load<AudioClip>("Audio/Effect/WrongSelect"));
         EffectSoundDictionary.Add("Shovel", Resources.Load<AudioClip>("Audio/Effect/Shovel"));
-        EffectSoundDictionary.Add("KillBug", Resources.Load<AudioClip>("Audio/Effect/KillBug"));
+        EffectSoundDictionary.Add("HitBug", Resources.Load<AudioClip>("Audio/Effect/HitBug"));
 
         EffectSoundDictionary.Add("Aging", Resources.Load<AudioClip>("Audio/Wave/Aging"));
         EffectSoundDictionary.Add("Wind", Resources.Load<AudioClip>("Audio/Wave/Wind"));

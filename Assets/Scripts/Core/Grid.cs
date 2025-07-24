@@ -107,25 +107,8 @@ public class Grid : MonoBehaviour
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
                 {
-                    SpawnBug(targetIdx[Random.Range(0, targetIdx.Count)]);
+                    SpawnBug();
                     spawnBugTime += bugSpawnTimeInterval;
-                }
-            }
-
-            if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-
-                if (Physics.Raycast(ray, out hit))
-                {
-                    GameObject clickedObject = hit.collider.gameObject;
-                    Bug clickedBug = clickedObject.GetComponent<Bug>();
-
-                    if (clickedBug != null)
-                    {
-                        StartCoroutine(clickedBug.KillBug());
-                    }
                 }
             }
 
@@ -499,7 +482,7 @@ public class Grid : MonoBehaviour
         breedCountUI.text = $"<sprite=8> {count}";
     }
 
-    private void SpawnBug(int targetObjIdx)
+    private void SpawnBug()
     {
         GameObject obj = Instantiate(bugPrefab);
 
@@ -528,7 +511,7 @@ public class Grid : MonoBehaviour
                 break;
         }
 
-        obj.GetComponent<Bug>().InitBug(targetObjIdx, bugSpeed, this, new Vector3(x,y,peaPrefab.transform.position.z));
+        obj.GetComponent<Bug>().InitBug(bugSpeed, this, new Vector3(x,y,peaPrefab.transform.position.z));
     }
 
     public bool GetIsBreeding()

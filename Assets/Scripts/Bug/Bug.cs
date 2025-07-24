@@ -5,48 +5,29 @@ using UnityEngine;
 
 public class Bug : MonoBehaviour
 {
-    private int targetObjIdx;
-    private float speed;
-    private Grid grid;
+    protected Grid grid;
+
+    protected int targetObjIdx = 999;
+    
+    protected float speed;
+    protected bool isDie = false;
+    protected bool isHit = false;
+
 
     private float rotationOffset = -90f;
-    private bool isDie = false;
 
     private GameObject bugKillerPrefab;
     private GameObject bugKiller;
 
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
-            FindNewTargetObj();
-        else if (grid.GetIsBreeding() && !isDie)
-        {
-            Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
-            Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
-            float distanceToTarget2D = Vector2.Distance(currentPos, targetPos);
-
-            Vector2 directionToTarget = (targetPos - currentPos).normalized;
-
-            if (directionToTarget != Vector2.zero)
-            {
-                float angleInRadians = Mathf.Atan2(directionToTarget.y, directionToTarget.x);
-                float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-
-                transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees + rotationOffset);
-            }
-
-            Vector2 newPosition2D = Vector2.MoveTowards(currentPos, targetPos, speed * Time.deltaTime);
-            transform.position = new Vector3(newPosition2D.x, newPosition2D.y, transform.position.z);
-        }
-    }
     
-
-
-    public void InitBug(int gridNum, float speedValue, Grid g, Vector3 initialPos)
+    private void OnMouseDown()
     {
-        targetObjIdx = gridNum;
+        if(!ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
+            StartCoroutine(HitBug());
+    }
+
+    public void InitBug(float speedValue, Grid g, Vector3 initialPos)
+    {
         speed = speedValue;
         grid = g;
         transform.position = initialPos;
@@ -54,7 +35,7 @@ public class Bug : MonoBehaviour
         bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
     }
 
-    private void FindNewTargetObj()
+    protected void FindNewTargetObj()
     {
         Plant plant = null;
         int newTarget = targetObjIdx + 1;
@@ -75,7 +56,6 @@ public class Bug : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
     
 
     void OnTriggerEnter(Collider obj)
@@ -87,14 +67,43 @@ public class Bug : MonoBehaviour
         }
     }
 
-    public IEnumerator KillBug()
+    protected void MoveToward(Vector2 targetPos)
+    {
+        Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
+        float distanceToTarget2D = Vector2.Distance(currentPos, targetPos);
+
+        Vector2 directionToTarget = (targetPos - currentPos).normalized;
+
+        if (directionToTarget != Vector2.zero)
+        {
+            float angleInRadians = Mathf.Atan2(directionToTarget.y, directionToTarget.x);
+            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+
+            transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees + rotationOffset);
+        }
+
+        Vector2 newPosition2D = Vector2.MoveTowards(currentPos, targetPos, speed * Time.deltaTime);
+        transform.position = new Vector3(newPosition2D.x, newPosition2D.y, transform.position.z);
+
+        return;
+    }
+
+    protected virtual IEnumerator HitBug()
+    {
+        if (!isDie)
+        {
+            SoundManager.Instance.PlayEffect("HitBug");
+            isHit = true;
+            yield return StartCoroutine(ShowBugKiller());
+        }
+    }
+
+    protected virtual IEnumerator KillBug()
     {
         if(!isDie)
         { 
-            SoundManager.Instance.PlayEffect("KillBug");
             grid.killBugCount++;
             isDie = true;
-            yield return StartCoroutine(ShowBugKiller());
             yield return StartCoroutine(FadeOut());
             Destroy(this.gameObject);
         }
@@ -107,7 +116,6 @@ public class Bug : MonoBehaviour
         bugKiller.transform.position = new Vector3(currentPos.x + 0.3f, currentPos.y - 0.3f, currentPos.z);
         yield return new WaitForSeconds(0.1f);
         Destroy(bugKiller);
-        StartCoroutine(FadeOut());
     }
 
     private IEnumerator FadeOut()
