@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Soil : MonoBehaviour
 {
-    private int _gridIndex;
+    [SerializeField] private int _gridIndex;
 
     public int GridIndex => _gridIndex;
 

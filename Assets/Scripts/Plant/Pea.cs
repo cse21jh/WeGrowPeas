@@ -17,6 +17,17 @@ public class Pea : Plant
     public override void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
+
+
+        StemController stem = GetComponentInChildren<StemController>();
+        if (stem != null)
+        {
+            stem.SetTraits(newTraits);
+        }
+        else
+        {
+            Debug.LogWarning("StemController not found in Plant");
+        }
     }
 
     public override List<GeneticTrait> GetGeneticTrait()

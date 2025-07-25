@@ -70,6 +70,7 @@ public class Grid : MonoBehaviour
             {
                 new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1)
             };
+            Debug.Log(basicTrait);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
@@ -398,7 +399,7 @@ public class Grid : MonoBehaviour
 
             if (soil != null)
             {
-                int index = row * maxCol + (maxCol - 1);
+                int index = row + (maxCol - 1) * 4;
                 soil.Init(index);
             }
         }
@@ -552,6 +553,7 @@ public class Grid : MonoBehaviour
         Vector2 worldPos2D = new Vector2(worldPos.x, worldPos.y);
 
         RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
+        //Debug.Log(hit.transform.name + hit.transform.position);
 
         if (hit.collider != null)
         {
