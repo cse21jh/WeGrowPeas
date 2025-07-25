@@ -32,7 +32,8 @@ public class Grid : MonoBehaviour
     private float bugSpawnTimeInterval = 5.0f;
 
     [SerializeField] private GameObject peaPrefab;
-    [SerializeField] private GameObject soilPrefab;
+    //[SerializeField] private GameObject soilPrefab;
+    [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] private GameObject bugPrefab;
 
     [SerializeField] private TimerUI breedTimerUI;
@@ -385,12 +386,14 @@ public class Grid : MonoBehaviour
     public void AddSoil()
     {
         maxCol += 1;
-        GameObject obj = Instantiate(soilPrefab, this.transform);
-        obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
+        //GameObject obj = Instantiate(soilPrefab, this.transform);
+        //obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
+
+        disabledSoil[maxCol - 5].SetActive(true);
 
         for (int row = 0; row < 4; row++)
         {
-            Transform soilT = obj.transform.GetChild(row);
+            Transform soilT = disabledSoil[maxCol - 5].transform.GetChild(row);
             Soil soil = soilT.GetComponent<Soil>();
 
             if (soil != null)
