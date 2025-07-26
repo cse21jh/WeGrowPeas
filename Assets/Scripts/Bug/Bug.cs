@@ -103,6 +103,7 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
+            grid.AddAdditionalResistance(CompleteTraitType.PestResistance, 0.0005f);
             isDie = true;
             yield return StartCoroutine(FadeOut());
             Destroy(this.gameObject);

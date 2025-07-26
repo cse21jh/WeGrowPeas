@@ -20,7 +20,7 @@ public class UpgradeManager : MonoBehaviour
         { typeof(NaturalDeathResistenceUpgrade), () => new NaturalDeathResistenceUpgrade()},
         { typeof(WindResistenceUpgrade), () => new WindResistenceUpgrade()},
         { typeof(FloodResistenceUpgrade), () => new FloodResistenceUpgrade()},
-        { typeof(PestResistenceUpgrade), () => new PestResistenceUpgrade()},
+        //{ typeof(PestResistenceUpgrade), () => new PestResistenceUpgrade()},
         { typeof(ColdResistenceUpgrade), () => new ColdResistenceUpgrade()},
         { typeof(HeavyRainResistenceUpgrade), () => new HeavyRainResistenceUpgrade()},
         { typeof(AddSoilUpgrade), () => new AddSoilUpgrade()},

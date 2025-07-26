@@ -362,10 +362,15 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalResistance(CompleteTraitType traitType, float value)
     {
-        if(additionalResistance.TryGetValue(traitType, out float var))
-            additionalResistance[traitType] += value;
+        if (additionalResistance.TryGetValue(traitType, out float var))
+        {
+            if (additionalResistance[traitType] <= 0.15f)
+                additionalResistance[traitType] += value;
+            else
+                return;
+        }
         else
-            additionalResistance[traitType] = value;
+            additionalResistance.Add(traitType, value);
         for (int idx = 0; idx < GetMaxCol() * 4; idx++) // 기존에 존재하던 식물의 resistance도 증가
         {
             if (plantGrid.ContainsKey(idx))
