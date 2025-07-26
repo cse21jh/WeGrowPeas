@@ -74,6 +74,7 @@ public class Pea : Plant
 
     IEnumerator PeaDeathAnimation()
     {
+        /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
         for(int i = 0; i < deathFrames.Length; i++)
@@ -81,20 +82,25 @@ public class Pea : Plant
             sr.sprite = deathFrames[i];
             yield return new WaitForSeconds(0.3f);
         }
-
+        */
         Die();
+        yield return null;
         //Destroy(gameObject);
     }
 
     public override void MakeSelectedSprite()
     {
+        /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[1];
+        */
     }
 
     public override void MakeDefaultSprite()
     {
+        /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[0];
+        */
     }
 }
