@@ -28,13 +28,12 @@ public class Grid : MonoBehaviour
 
     private bool isBreedSkipButtonPressed = false;
 
-    private float bugSpeed = 2.5f;
     private float bugSpawnTimeInterval = 5.0f;
 
     [SerializeField] private GameObject peaPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
-    [SerializeField] private GameObject bugPrefab;
+    [SerializeField] private List<GameObject> bugPrefabs;
 
     [SerializeField] private TimerUI breedTimerUI;
     [SerializeField] private GameObject breedButton;
@@ -109,7 +108,7 @@ public class Grid : MonoBehaviour
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
                 {
-                    SpawnBug();
+                    SpawnRandomBug();
                     spawnBugTime += bugSpawnTimeInterval;
                 }
             }
@@ -489,36 +488,11 @@ public class Grid : MonoBehaviour
         breedCountUI.text = $"<sprite=8> {count}";
     }
 
-    private void SpawnBug()
+    private void SpawnRandomBug()
     {
-        GameObject obj = Instantiate(bugPrefab);
-
-        int edge = Random.Range(0, 4);
-
-        float x=0f;
-        float y=0f;
-
-        switch(edge)
-        {
-            case 0:
-                x= Random.Range(-9f, 9f);
-                y = 5.0f;
-                break;
-            case 1:
-                x = 9.0f;
-                y = Random.Range(-5f, 5f);
-                break;
-            case 2:
-                x = Random.Range(-9f, 9f);
-                y = -5.0f;
-                break;
-            case 3:
-                x = -9.0f;
-                y = Random.Range(-5f, 5f);
-                break;
-        }
-
-        obj.GetComponent<Bug>().InitBug(bugSpeed, this, new Vector3(x,y,peaPrefab.transform.position.z));
+        int i = Random.Range(0, bugPrefabs.Count);
+        Instantiate(bugPrefabs[i]);
+        return;
     }
 
     public bool GetIsBreeding()

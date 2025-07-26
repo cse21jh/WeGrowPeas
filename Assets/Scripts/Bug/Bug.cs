@@ -8,7 +8,9 @@ public class Bug : MonoBehaviour
     protected Grid grid;
 
     protected int targetObjIdx = 999;
-    
+    protected int spawnEdge;
+
+    [SerializeField]
     protected float speed;
     protected bool isDie = false;
     protected bool isHit = false;
@@ -19,20 +21,91 @@ public class Bug : MonoBehaviour
     private GameObject bugKillerPrefab;
     private GameObject bugKiller;
 
-    
+    private GameObject WarningPrefab;
+    private GameObject Warning;
+
+    protected virtual void Start()
+    {
+        bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
+        WarningPrefab = Resources.Load<GameObject>("Prefabs/Warning");
+        grid = GameObject.Find("Grid").GetComponent<Grid>();
+        InitRandomPos();
+        StartCoroutine(Moving());
+    }
+
+    protected virtual IEnumerator Moving()
+    {    
+        ShowWarningSign();
+        yield return new WaitForSeconds(1.0f);
+        DestroyWarningSign();
+    }
+
+    private void ShowWarningSign()
+    {
+        Warning = Instantiate(WarningPrefab);
+        Vector3 pos = this.transform.position;
+
+        switch (spawnEdge)
+        {
+            case 0:
+                pos.y += -2f;
+                break;
+            case 1:
+                pos.x += -2f;
+                break;
+            case 2:
+                pos.y += 2f;
+                break;
+            case 3:
+                pos.x += 2f;
+                break;
+        }
+        Warning.transform.position = pos;
+        return;
+        
+    }
+
+    protected void DestroyWarningSign()
+    {
+        Destroy(Warning);
+    }
+
     private void OnMouseDown()
     {
         if(!ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
             StartCoroutine(HitBug());
     }
 
-    public void InitBug(float speedValue, Grid g, Vector3 initialPos)
+    protected void InitRandomPos()
     {
-        speed = speedValue;
-        grid = g;
-        transform.position = initialPos;
+        spawnEdge = Random.Range(0, 4);
 
-        bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
+        float x = 0f;
+        float y = 0f;
+
+        switch (spawnEdge)
+        {
+            case 0:
+                x = Random.Range(-9f, 9f);
+                y = 6.0f;
+                break;
+            case 1:
+                x = 10.0f;
+                y = Random.Range(-5f, 5f);
+                break;
+            case 2:
+                x = Random.Range(-9f, 9f);
+                y = -6.0f;
+                break;
+            case 3:
+                x = -10.0f;
+                y = Random.Range(-5f, 5f);
+                break;
+        }
+
+        transform.position = new Vector3(x, y, 0f);
+
+        return;
     }
 
     protected void FindNewTargetObj()
@@ -90,7 +163,7 @@ public class Bug : MonoBehaviour
 
     protected virtual IEnumerator HitBug()
     {
-        if (!isDie)
+        if (!isDie && !isHit)
         {
             SoundManager.Instance.PlayEffect("HitBug");
             isHit = true;

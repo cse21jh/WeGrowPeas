@@ -4,14 +4,25 @@ using UnityEngine;
 
 public class DefaultBug : Bug
 {
-    void Update()
+    protected override void Start()
     {
-        if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
-            FindNewTargetObj();
-        else if (grid.GetIsBreeding() && !isDie && !isHit)
+        base.Start();
+    }
+
+    protected override IEnumerator Moving()
+    {
+        yield return StartCoroutine(base.Moving());
+
+        while(true)
         {
-            Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
-            MoveToward(targetPos);
+            if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
+                FindNewTargetObj();
+            else if (grid.GetIsBreeding() && !isDie && !isHit)
+            {
+                Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
+                MoveToward(targetPos);
+            }
+            yield return null;
         }
     }
 
