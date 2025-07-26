@@ -43,6 +43,8 @@ public class GameManager : Singleton<GameManager>
         SoundManager.Instance.StopBgm();
         SoundManager.Instance.PlayBgm("Farm");
 
+        Time.timeScale = 1;
+
         ClickRouter.Instance.IsBlockedByUI = false;
 
         switch(GameStartContext.StartType)
@@ -125,13 +127,13 @@ public class GameManager : Singleton<GameManager>
         GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount);
         SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
-        GameStartContext.SetStartType(GameStartType.NewGame);
+        GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
     }
 
     private void LoadGame()
     {
-        //StageUpdate();
+        StageUpdate();
         //LoadGrid;
 
         string json = File.ReadAllText(GetSavePath());
@@ -139,14 +141,7 @@ public class GameManager : Singleton<GameManager>
 
         //grid.plantGrid.Clear(); //if needed......
 
-        foreach (var item in saveData.plantList)
-        {
-            //GameObject peaPrefab = Resources.Load<GameObject>("Prefabs/Pea");
-            //GameObject obj = Instantiate(peaPrefab);
-            //Pea pea = obj.GetComponent<Pea>();
-
-            Debug.Log(item.gridIndex);
-        }
+        grid.LoadGrid(saveData.plantList);
 
         Debug.Log("ºÒ·¯¿È");
     }

@@ -8,7 +8,8 @@ using UnityEngine;
 public enum GameStartType
 {
     NewGame,
-    ContinueGame
+    ContinueGame,
+    GameOver
 }
 
 public static class GameStartContext
@@ -33,7 +34,7 @@ public class UIClickEvent : MonoBehaviour
     {
         string path = Application.dataPath + "/UserData.json";
 
-        if(File.Exists(path) && GameStartContext.StartType == GameStartType.ContinueGame)
+        if(File.Exists(path) && GameStartContext.StartType != GameStartType.GameOver)
         {
             GameStartContext.SetStartType(GameStartType.ContinueGame);
             SceneLoader.Instance?.LoadGardenScene();

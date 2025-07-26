@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Drawing;
 using System.Linq;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Drawing;
 
 public class Grid : MonoBehaviour
 {
@@ -273,11 +273,9 @@ public class Grid : MonoBehaviour
         {
             if (!plantGrid.ContainsKey(idx))
             {
-                plantGrid[idx] = plant;
                 plant.Init(idx, this);
+                Plantplant(plant);
 
-                Transform soilTransform = GetSoilTransform(idx);
-                plant.transform.position = soilTransform.position;
                 return;
             }
         }
@@ -543,11 +541,9 @@ public class Grid : MonoBehaviour
 
         // 새로운 위치에 심기
         plantGrid.Remove(plant.gridIndex); // 원래 위치에서 제거
-        plantGrid[targetIndex.Value] = plant;
-
         plant.SetGridIndex(targetIndex.Value);
-        Transform soilT = GetSoilTransform(targetIndex.Value);
-        plant.transform.position = soilT.position;
+
+        Plantplant(plant);
 
         return true;
     }
@@ -569,6 +565,27 @@ public class Grid : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void Plantplant(Plant plant)
+    {
+        plantGrid[plant.gridIndex] = plant;
+
+        Transform soilT = GetSoilTransform(plant.gridIndex);
+        plant.transform.position = soilT.position;
+    }
+
+    public void LoadGrid(List<PlantData> plantList)
+    {
+        foreach (var item in plantList)
+        {
+            GameObject obj = Instantiate(peaPrefab);
+            Plant plant = obj.GetComponent<Plant>();
+            plant.Init(item.gridIndex, this);
+            plant.SetTrait(item.traits);
+
+            Plantplant(plant);
+        }
     }
 }
 
