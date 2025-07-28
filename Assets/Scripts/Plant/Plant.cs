@@ -196,12 +196,22 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void MakeSelectedSprite()
     {
-
+        ChangeLayerOfAllChild(gameObject, "Outline"); // "Outline" 레이어로 변경
     }
 
     public virtual void MakeDefaultSprite()
     {
+        ChangeLayerOfAllChild(gameObject, "Default"); // "Default" 레이어로 변경
+    }
 
+    private void ChangeLayerOfAllChild(GameObject obj, string layerName)
+    {
+        obj.layer = LayerMask.NameToLayer(layerName);
+
+        foreach (Transform child in obj.transform)
+        {
+            ChangeLayerOfAllChild(child.gameObject, layerName);
+        }
     }
     void Start()
     {

@@ -90,6 +90,7 @@ public class Pea : Plant
 
     public override void MakeSelectedSprite()
     {
+        base.MakeSelectedSprite();
         /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[1];
@@ -98,6 +99,7 @@ public class Pea : Plant
 
     public override void MakeDefaultSprite()
     {
+        base.MakeDefaultSprite();
         /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[0];
