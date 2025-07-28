@@ -24,10 +24,30 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] private Image holdGaugeImage;
     [SerializeField] private GameObject holdGaugeCanvas;
 
+    //각종 효과 관련
+    [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
+    private SpriteRenderer[] childSpriteRenderers;
+    private Material[] childMaterials;
+    private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
+    [SerializeField] private GameObject vanishEffect;
+
+    [SerializeField] private GameObject appearEffect;
+
+
+
     public virtual void Init(int gridIndex, Grid grid)
     {
         this.gridIndex = gridIndex;
         this.grid = grid;
+
+        childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+        childMaterials = new Material[childSpriteRenderers.Length];
+        for (int i = 0; i < childSpriteRenderers.Length; i++)
+        {
+            childMaterials[i] = childSpriteRenderers[i].material;
+        }
+
+        StartCoroutine(Appear());
     }
 
     public virtual void SetTrait(List<GeneticTrait> newTraits)
@@ -184,14 +204,56 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void Die()
     {
+        StartCoroutine(Vanish());
         UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
-        Destroy(this.gameObject);
+        Destroy(this.gameObject, dissolveDuration);
     }
 
     public virtual void DieWithAnimation()
     {
 
+    }
+
+    private IEnumerator Vanish()
+    {
+        ParticlePrefab effect = Instantiate(vanishEffect, transform.position, Quaternion.identity).GetComponent<ParticlePrefab>();
+        effect.PlayEffect();
+
+        float elapsedTime = 0f;
+        while (elapsedTime < dissolveDuration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float lerpedDissolve = Mathf.Lerp(0f, 1.1f, elapsedTime / dissolveDuration);
+
+            for(int i = 0; i < childMaterials.Length; i++)
+            {
+                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+            }
+
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator Appear()
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < dissolveDuration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float lerpedDissolve = Mathf.Lerp(1.1f, 0f, elapsedTime / dissolveDuration);
+
+            for (int i = 0; i < childMaterials.Length; i++)
+            {
+                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+            }
+
+
+            yield return null;
+        }
     }
 
     public virtual void MakeSelectedSprite()
