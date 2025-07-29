@@ -18,6 +18,10 @@ public class Pea : Plant
     {
         traits = newTraits;
 
+        foreach (GeneticTrait g in traits)
+        {
+            additionalResistance.Add(g.traitType, 0f);
+        }
 
         StemController stem = GetComponentInChildren<StemController>();
         if (stem != null)

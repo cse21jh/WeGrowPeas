@@ -10,6 +10,7 @@ public abstract class Plant : MonoBehaviour
 {
     public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
+    protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
 
     public int gridIndex { get; private set; }
     private Grid grid;
@@ -44,7 +45,7 @@ public abstract class Plant : MonoBehaviour
         childMaterials = new Material[childSpriteRenderers.Length];
         for (int i = 0; i < childSpriteRenderers.Length; i++)
         {
-            childMaterials[i] = childSpriteRenderers[i].material;
+            childMaterials[i] = childSpriteRenderers[i].material; 
         }
 
         StartCoroutine(Appear());
@@ -53,6 +54,10 @@ public abstract class Plant : MonoBehaviour
     public virtual void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
+        foreach (GeneticTrait g in traits)
+        {
+            additionalResistance.Add(g.traitType, 0f);
+        }
     }
 
     public virtual List<GeneticTrait> GetGeneticTrait()
@@ -63,7 +68,7 @@ public abstract class Plant : MonoBehaviour
     {
         if (ClickRouter.Instance.IsBlockedByUI) return;
 
-        UIPlantStat.Instance.ShowInfo(speciesname, traits);
+        UIPlantStat.Instance.ShowInfo(speciesname, traits, additionalResistance);
     }
 
     protected virtual void OnMouseExit()
@@ -182,7 +187,7 @@ public abstract class Plant : MonoBehaviour
         foreach(GeneticTrait g in traits)
         {
             if(g.traitType == traitType)
-                return g.resistance;
+                return g.resistance + additionalResistance[traitType];
         }
         
         return defaultResistance /*+ GameManager.Instance.grid.GetAdditionalResistance(traitType)*/;
@@ -280,8 +285,18 @@ public abstract class Plant : MonoBehaviour
             ChangeLayerOfAllChild(child.gameObject, layerName);
         }
     }
-    void Start()
+
+
+    public void AddAdditionalResistance(CompleteTraitType traitType, float value)
     {
-        
+        if (additionalResistance.TryGetValue(traitType, out float var))
+        {
+            additionalResistance[traitType] += value;
+            if (additionalResistance[traitType] >= 0.15f)
+                additionalResistance[traitType] = 0.15f;
+        }
+        return;
     }
+
+
 }

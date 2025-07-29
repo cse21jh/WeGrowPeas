@@ -13,7 +13,7 @@ public class AddNaturalDeathPlantUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f + GameManager.Instance.grid.GetAdditionalResistance(CompleteTraitType.NaturalDeath), 0)
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f , 0)
         };
         GameManager.Instance.grid.AddPlant(trait); 
         Debug.Log(Explanation);

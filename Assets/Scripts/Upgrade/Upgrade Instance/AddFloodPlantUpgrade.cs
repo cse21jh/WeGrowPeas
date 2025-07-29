@@ -13,8 +13,8 @@ public class AddFloodPlantUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f + GameManager.Instance.grid.GetAdditionalResistance(CompleteTraitType.NaturalDeath), 1),
-            new GeneticTrait(CompleteTraitType.FloodResistance, 0.5f + GameManager.Instance.grid.GetAdditionalResistance(CompleteTraitType.FloodResistance), 1)
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1),
+            new GeneticTrait(CompleteTraitType.FloodResistance, 0.5f , 1)
         };
         GameManager.Instance.grid.AddPlant(trait);
         Debug.Log(Explanation);

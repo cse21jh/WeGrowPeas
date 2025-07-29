@@ -13,8 +13,8 @@ public class AddHeavyRainPlantUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f + GameManager.Instance.grid.GetAdditionalResistance(CompleteTraitType.NaturalDeath), 1),
-            new GeneticTrait(CompleteTraitType.HeavyRainResistance, 0.5f + GameManager.Instance.grid.GetAdditionalResistance(CompleteTraitType.HeavyRainResistance), 1)
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1),
+            new GeneticTrait(CompleteTraitType.HeavyRainResistance, 0.5f, 1)
         };
         GameManager.Instance.grid.AddPlant(trait);
         Debug.Log(Explanation);

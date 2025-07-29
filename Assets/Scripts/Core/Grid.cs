@@ -13,7 +13,6 @@ public class Grid : MonoBehaviour
     List<Plant> plants = new List<Plant>();
     [HideInInspector] public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
-    private Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     private int additionalInheritance = 0;
     private float breedTimer = 30.0f;
     private int maxBreedCount = 4;
@@ -29,6 +28,8 @@ public class Grid : MonoBehaviour
     private bool isBreedSkipButtonPressed = false;
 
     private float bugSpawnTimeInterval = 5.0f;
+    
+    private float additionalPestResistance = 0f;
 
     [SerializeField] private GameObject peaPrefab;
     //[SerializeField] private GameObject soilPrefab;
@@ -254,13 +255,14 @@ public class Grid : MonoBehaviour
             }
 
             float resistance = 0f;
-            float additional = GetAdditionalResistance(trait);
 
+            if (trait == CompleteTraitType.PestResistance)
+                resistance += additionalPestResistance;
 
             switch (childGenetic)
             {
-                case 0: resistance = 0.8f + additional; break;
-                default: resistance = 0.5f + additional; break;
+                case 0: resistance += 0.8f; break;
+                default: resistance += 0.5f; break;
             }
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
         }
@@ -352,35 +354,30 @@ public class Grid : MonoBehaviour
         return maxCol;
     }
 
-    public float GetAdditionalResistance(CompleteTraitType traitType)
+    public void AddAdditionalResistanceInGrid(CompleteTraitType traitType, float value)
     {
-        if (additionalResistance.TryGetValue(traitType, out float value))
-            return value;
-        else
-            return 0f;
-    }
-
-    public void AddAdditionalResistance(CompleteTraitType traitType, float value)
-    {
-        if (additionalResistance.TryGetValue(traitType, out float var))
-        {
-            if (additionalResistance[traitType] <= 0.15f)
-                additionalResistance[traitType] += value;
-            else
-                return;
-        }
-        else
-            additionalResistance.Add(traitType, value);
-        for (int idx = 0; idx < GetMaxCol() * 4; idx++) // 기존에 존재하던 식물의 resistance도 증가
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++) // grid에 있는 식물들 저항력 증가
         {
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                plant.UpdateResistance(traitType, value);
+                plant.AddAdditionalResistance(traitType, value);
             }
         }
-
         return;
+    }
+
+    public void AddAdditionalPestResistance(float value)
+    {
+        additionalPestResistance += value;
+        if (additionalPestResistance > 0.15f)
+            additionalPestResistance = 0.15f;
+        AddAdditionalResistanceInGrid(CompleteTraitType.PestResistance, value);
+    }
+
+    public float GetAdditionalPestResistance()
+    {
+        return additionalPestResistance;
     }
 
     public void AddAdditionalInheritance(int value)
