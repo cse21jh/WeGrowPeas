@@ -396,21 +396,21 @@ public class Grid : MonoBehaviour
 
         disabledSoil[maxCol - 5].SetActive(true);
 
-        for (int row = 0; row < 4; row++)
-        {
-            Transform soilT = disabledSoil[maxCol - 5].transform.GetChild(row);
-            Soil soil = soilT.GetComponent<Soil>();
+        //for (int row = 0; row < 4; row++)
+        //{
+        //    Transform soilT = disabledSoil[maxCol - 5].transform.GetChild(row);
+        //    Soil soil = soilT.GetComponent<Soil>();
 
-            if (soil != null)
-            {
-                int index = row + (maxCol - 1) * 4;
-                soil.Init(index);
-            }
-        }
+        //    if (soil != null)
+        //    {
+        //        int index = row + (maxCol - 1) * 4;
+        //        soil.Init(index);
+        //    }
+        //}
     }
     private void InitSoils()
     {
-        for (int col = 0; col < maxCol; col++)
+        for (int col = 0; col < 8; col++)
         {
             Transform soilColT = transform.GetChild(col);
             for (int row = 0; row < 4; row++)
@@ -506,8 +506,8 @@ public class Grid : MonoBehaviour
     {
         int? targetIndex = GetGridIndexFromPosition(screenPosition);
 
-        // 토양 감지 실패 또는 해당 칸에 이미 식물이 있는 경우
-        if (!targetIndex.HasValue || plantGrid.ContainsKey(targetIndex.Value))
+        // 토양 감지 실패
+        if (!targetIndex.HasValue)
         {
             // 원래 위치로 되돌리기
             Transform originalSoil = GetSoilTransform(plant.gridIndex);
@@ -515,13 +515,40 @@ public class Grid : MonoBehaviour
             return false;
         }
 
-        // 새로운 위치에 심기
-        plantGrid.Remove(plant.gridIndex); // 원래 위치에서 제거
-        plant.SetGridIndex(targetIndex.Value);
+        int fromIndex = plant.gridIndex;
+        int toIndex = targetIndex.Value;
 
-        Plantplant(plant);
+        if (plantGrid.ContainsKey(toIndex))
+        {
+            // 대상 칸에 식물이 있는 경우: 서로 위치 교환
+            Plant targetPlant = plantGrid[toIndex];
 
-        return true;
+            // 서로 gridIndex 바꾸기
+            plant.SetGridIndex(toIndex);
+            targetPlant.SetGridIndex(fromIndex);
+
+            // 위치 바꾸기
+            Transform fromSoil = GetSoilTransform(fromIndex);
+            Transform toSoil = GetSoilTransform(toIndex);
+            plant.transform.position = toSoil.position;
+            targetPlant.transform.position = fromSoil.position;
+
+            // plantGrid 업데이트
+            plantGrid[toIndex] = plant;
+            plantGrid[fromIndex] = targetPlant;
+
+            return true;
+        }
+        else
+        {
+            // 빈 칸이면 원래대로 심기
+            plantGrid.Remove(fromIndex); // 원래 위치에서 제거
+            plant.SetGridIndex(toIndex);
+            plant.transform.position = GetSoilTransform(toIndex).position;
+            plantGrid[toIndex] = plant;
+
+            return true;
+        }
     }
 
     public int? GetGridIndexFromPosition(Vector3 screenPosition)

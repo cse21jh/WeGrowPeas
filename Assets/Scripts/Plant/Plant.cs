@@ -96,12 +96,6 @@ public abstract class Plant : MonoBehaviour
             grid.RequestBreedSelect(this.gameObject);
         }
 
-            Collider col = GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = true;
-        }
-
         isDragging = false;
         isHolding = false;
         holdTime = 0f;
@@ -134,12 +128,6 @@ public abstract class Plant : MonoBehaviour
 
         Vector3 pos = transform.position;
         transform.position = new Vector3(pos.x, pos.y, pos.z - 0.1f);
-
-        Collider col = GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = false;
-        }
     }
 
     private void FollowMouse()
