@@ -42,7 +42,10 @@ public class Grid : MonoBehaviour
     
     public int killBugCount = 0;
     public int totalBreedCount = 0;
-        
+
+    [SerializeField] private Sprite[] gardenSprites; // 정원 배경 스프라이트들
+    [SerializeField] private SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
+
 
     // Start is called before the first frame update
     void Start()
@@ -391,6 +394,8 @@ public class Grid : MonoBehaviour
         maxCol += 1;
         //GameObject obj = Instantiate(soilPrefab, this.transform);
         //obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
+
+        gardenRenderer.sprite = gardenSprites[maxCol - 4]; // 정원 배경 스프라이트 변경
 
         disabledSoil[maxCol - 5].SetActive(true);
 

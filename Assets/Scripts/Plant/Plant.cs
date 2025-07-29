@@ -268,6 +268,11 @@ public abstract class Plant : MonoBehaviour
 
     private void ChangeLayerOfAllChild(GameObject obj, string layerName)
     {
+        if(obj.name == "shadow")
+        {
+            return; // 그림자 오브젝트는 레이어 변경하지 않음
+        }
+
         obj.layer = LayerMask.NameToLayer(layerName);
 
         foreach (Transform child in obj.transform)
