@@ -313,7 +313,7 @@ public class Grid : MonoBehaviour
 
         if (CheckGameOver())
         {
-            GameManager.Instance.GameOver();
+            StartCoroutine(GameManager.Instance.GameOver());
         }
     }
 

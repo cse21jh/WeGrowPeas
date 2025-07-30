@@ -106,15 +106,16 @@ public class GameManager : Singleton<GameManager>
 
         enemyController.EnemyWave();
 
-        yield return new WaitForSeconds(2.0f);
-
         gameOver = grid.CheckGameOver();
 
         if(gameOver)
-            GameOver();
+            yield return StartCoroutine(GameOver());
         else if (!enemyController.IsLastWaveNone())
+        {
+            yield return new WaitForSeconds(2.0f);
             yield return StartCoroutine(upgradeManager.UpgradePhase());
-    
+        }
+
     }
 
     private void UpdateStageUI()
@@ -122,8 +123,9 @@ public class GameManager : Singleton<GameManager>
         textStage.text = $"<sprite=0> STAGE {stage}";
     }
 
-    public void GameOver()
+    public IEnumerator GameOver()
     {
+        yield return new WaitForSeconds(2.0f);
         GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount);
         SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
