@@ -66,6 +66,7 @@ public class EnemyController : MonoBehaviour
                     else
                     {
                         Debug.Log(idx + "번째 식물이 죽었습니다");
+                        plant.Die();
                     }
 
                 }
