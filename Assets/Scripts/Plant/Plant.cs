@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
@@ -261,9 +262,9 @@ public abstract class Plant : MonoBehaviour
 
     private void ChangeLayerOfAllChild(GameObject obj, string layerName)
     {
-        if(obj.name == "shadow")
+        if(obj.name == "shadow" || obj.name == "HoldGaugeUI")
         {
-            return; // 그림자 오브젝트는 레이어 변경하지 않음
+            return; // 그림자 또는 게이지 오브젝트는 레이어 변경하지 않음
         }
 
         obj.layer = LayerMask.NameToLayer(layerName);
