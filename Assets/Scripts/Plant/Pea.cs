@@ -71,27 +71,6 @@ public class Pea : Plant
         base.Die();
     }
 
-    public override void DieWithAnimation()
-    {
-        StartCoroutine(PeaDeathAnimation());
-    }
-
-    IEnumerator PeaDeathAnimation()
-    {
-        /*
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-
-        for(int i = 0; i < deathFrames.Length; i++)
-        {
-            sr.sprite = deathFrames[i];
-            yield return new WaitForSeconds(0.3f);
-        }
-        */
-        Die();
-        yield return null;
-        //Destroy(gameObject);
-    }
-
     public override void MakeSelectedSprite()
     {
         base.MakeSelectedSprite();

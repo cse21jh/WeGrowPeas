@@ -13,8 +13,8 @@ public class AddWindPlantUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1),
-            new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1)
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
+            new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
         };
         GameManager.Instance.grid.AddPlant(trait);
         Debug.Log(Explanation);

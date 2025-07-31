@@ -19,11 +19,13 @@ public struct GeneticTrait
     public CompleteTraitType traitType;
     public float resistance;
     public int genetics;
+    public float additionalResistance;
 
-    public GeneticTrait(CompleteTraitType type, float resistance, int genetics)
+    public GeneticTrait(CompleteTraitType type, float resistance, int genetics, float addR)
     {
         this.traitType = type;
         this.resistance = resistance;
         this.genetics = genetics;
+        this.additionalResistance = addR;
     }
 }

@@ -16,15 +16,15 @@ public class UIPlantStat : MonoBehaviour
         Instance = this;
         statPanel.SetActive(false);
     }
-    public void ShowInfo(string speciesname, List<GeneticTrait> traits, Dictionary<CompleteTraitType, float> additionalResistance)
+    public void ShowInfo(string speciesname, List<GeneticTrait> traits)
     {
         textSpecies.text = speciesname;
         string traitline = $"";
 
         for(int i = 0; i < traits.Count; i += 2)
         {
-            string left = $"<sprite={(int)(traits[i].traitType+1)}> {((traits[i].resistance + additionalResistance[traits[i].traitType]) * 100f):F2}% | {traits[i].genetics}";
-            string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((traits[i + 1].resistance + additionalResistance[traits[i+1].traitType]) * 100f):F2}% | {traits[i + 1].genetics}" : "";
+            string left = $"<sprite={(int)(traits[i].traitType+1)}> {((traits[i].resistance + traits[i].additionalResistance) * 100f):F2}% | {traits[i].genetics}";
+            string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((traits[i + 1].resistance + traits[i].additionalResistance) * 100f):F2}% | {traits[i + 1].genetics}" : "";
 
             traitline += $"{left}\t{right}\n";
         }

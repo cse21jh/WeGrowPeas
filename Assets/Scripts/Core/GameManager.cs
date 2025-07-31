@@ -26,6 +26,7 @@ public class PlantData
     public int gridIndex;
 }
 
+
 public class GameManager : Singleton<GameManager>
 {
     [HideInInspector] public int stage = 0;
@@ -152,16 +153,15 @@ public class GameManager : Singleton<GameManager>
     {
         var saveData = new SaveData();
 
-        foreach (var pair in grid.plantGrid)
+        foreach (var p in grid.plantGrid.Values)
         {
             var plantData = new PlantData
             {
-                speciesname = pair.Value.speciesname,
-                traits = pair.Value.GetGeneticTrait(),
-                gridIndex = pair.Value.gridIndex
-          
+                speciesname = p.speciesname,
+                traits = p.GetGeneticTrait(),
+                gridIndex = p.gridIndex
             };
-
+            
             saveData.plantList.Add(plantData);
         }
 

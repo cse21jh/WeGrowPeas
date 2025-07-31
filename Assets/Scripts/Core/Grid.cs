@@ -71,7 +71,7 @@ public class Grid : MonoBehaviour
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
             {
-                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1)
+                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f)
             };
             Debug.Log(basicTrait);
             pea.SetTrait(basicTrait);
@@ -264,7 +264,7 @@ public class Grid : MonoBehaviour
                 case 0: resistance += 0.8f; break;
                 default: resistance += 0.5f; break;
             }
-            childTrait.Add(new GeneticTrait(trait, resistance, childGenetic));
+            childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
         SoundManager.Instance.PlayEffect("Breed");
         totalBreedCount++;

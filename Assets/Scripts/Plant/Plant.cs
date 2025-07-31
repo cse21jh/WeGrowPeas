@@ -55,10 +55,6 @@ public abstract class Plant : MonoBehaviour
     public virtual void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
-        foreach (GeneticTrait g in traits)
-        {
-            additionalResistance.Add(g.traitType, 0f);
-        }
     }
 
     public virtual List<GeneticTrait> GetGeneticTrait()
@@ -69,7 +65,7 @@ public abstract class Plant : MonoBehaviour
     {
         if (ClickRouter.Instance.IsBlockedByUI) return;
 
-        UIPlantStat.Instance.ShowInfo(speciesname, traits, additionalResistance);
+        UIPlantStat.Instance.ShowInfo(speciesname, traits);
     }
 
     protected virtual void OnMouseExit()
@@ -176,24 +172,10 @@ public abstract class Plant : MonoBehaviour
         foreach(GeneticTrait g in traits)
         {
             if(g.traitType == traitType)
-                return g.resistance + additionalResistance[traitType];
+                return g.resistance + g.additionalResistance;
         }
         
-        return defaultResistance /*+ GameManager.Instance.grid.GetAdditionalResistance(traitType)*/;
-    }
-
-    public void UpdateResistance(CompleteTraitType traitType, float value)
-    {
-        for(int i=0; i < traits.Count; i++)
-        {
-            if(traits[i].traitType == traitType)
-            {
-                traits[i] = new GeneticTrait(traitType, traits[i].resistance + value, traits[i].genetics);
-            
-                return;
-            }
-        }
-        return;
+        return defaultResistance;
     }
 
     public virtual void Die()
@@ -202,11 +184,6 @@ public abstract class Plant : MonoBehaviour
         UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         Destroy(this.gameObject, dissolveDuration);
-    }
-
-    public virtual void DieWithAnimation()
-    {
-
     }
 
     private IEnumerator Vanish()
@@ -278,13 +255,17 @@ public abstract class Plant : MonoBehaviour
 
     public void AddAdditionalResistance(CompleteTraitType traitType, float value)
     {
-        if (additionalResistance.TryGetValue(traitType, out float var))
+        for (int i = 0; i < traits.Count; i++)
         {
-            additionalResistance[traitType] += value;
-            if (additionalResistance[traitType] >= 0.15f)
-                additionalResistance[traitType] = 0.15f;
+            if (traits[i].traitType == traitType)
+            {
+                traits[i] = new GeneticTrait(traitType, traits[i].resistance, traits[i].genetics, traits[i].additionalResistance + value);
+
+                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, traits[i].resistance, traits[i].genetics, 0.15f);
+
+                return;
+            }
         }
-        return;
     }
 
 
