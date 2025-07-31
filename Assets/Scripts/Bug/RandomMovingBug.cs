@@ -24,6 +24,11 @@ public class RandomMovingBug : Bug
 
         while (true)
         {
+            if (!grid.GetIsBreeding() || isDie || isHit)
+            {
+                yield return null;
+                continue;
+            }
             time += Time.deltaTime / 10 * speed;
 
             distSelfToTarget = Vector2.Distance(transform.position, targetPos);
@@ -49,11 +54,6 @@ public class RandomMovingBug : Bug
 
             yield return null;
 
-            //벌레 사망 시 추가 움직임 제한
-            if (isDie)
-            {
-                yield break;
-            }
         }
     }
 

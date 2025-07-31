@@ -18,6 +18,11 @@ public class StraightMovingBug : Bug
 
         while (distSelfToTarget > 0.5f)
         {
+            if (!grid.GetIsBreeding() || isDie || isHit)
+            {
+                yield return null;
+                continue;
+            }
             MoveToward(targetPos);
             yield return null;
             distSelfToTarget = Vector2.Distance(transform.position, targetPos);
