@@ -24,11 +24,30 @@ public class Bug : MonoBehaviour
     private GameObject WarningPrefab;
     private GameObject Warning;
 
+
+    //각종 효과 관련
+    [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
+    private SpriteRenderer[] childSpriteRenderers;
+    private Material[] childMaterials;
+    private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
+    [SerializeField] private GameObject vanishEffect;
+
+
+
     protected virtual void Start()
     {
         bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
         WarningPrefab = Resources.Load<GameObject>("Prefabs/Warning");
         grid = GameObject.Find("Grid").GetComponent<Grid>();
+
+        childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+        childMaterials = new Material[childSpriteRenderers.Length];
+        for (int i = 0; i < childSpriteRenderers.Length; i++)
+        {
+            childMaterials[i] = childSpriteRenderers[i].material;
+        }
+        Debug.Log(childMaterials.Length);
+
         InitRandomPos();
         StartCoroutine(Moving());
     }
@@ -134,7 +153,7 @@ public class Bug : MonoBehaviour
     void OnTriggerEnter(Collider obj)
     {
         Plant plant = obj.gameObject.GetComponent<Plant>();
-        if (plant != null)
+        if (plant != null && !isDie)
         {
             plant.Die();
         }
@@ -178,7 +197,7 @@ public class Bug : MonoBehaviour
             grid.killBugCount++;
             grid.AddAdditionalPestResistance(0.0005f);
             isDie = true;
-            yield return StartCoroutine(FadeOut());
+            yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }
     }
@@ -204,6 +223,28 @@ public class Bug : MonoBehaviour
             ColorAlhpa.a = f;
             renderer.material.color = ColorAlhpa;
             yield return new WaitForSeconds(0.02f);
+        }
+    }
+
+    private IEnumerator Vanish()
+    {
+        ParticlePrefab effect = Instantiate(vanishEffect, transform.position, Quaternion.identity).GetComponent<ParticlePrefab>();
+        effect.PlayEffect();
+
+        float elapsedTime = 0f;
+        while (elapsedTime < dissolveDuration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float lerpedDissolve = Mathf.Lerp(0f, 1.1f, elapsedTime / dissolveDuration);
+
+            for (int i = 0; i < childMaterials.Length; i++)
+            {
+                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+            }
+
+
+            yield return null;
         }
     }
 }

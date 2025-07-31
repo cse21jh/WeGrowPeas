@@ -48,6 +48,12 @@ public class RandomMovingBug : Bug
             MoveToward(Vector2.Lerp(position4, position5, time));
 
             yield return null;
+
+            //벌레 사망 시 추가 움직임 제한
+            if (isDie)
+            {
+                yield break;
+            }
         }
     }
 

@@ -39,9 +39,9 @@ public class ReviveBug : Bug
         {
             SpriteRenderer sr = GetComponent<SpriteRenderer>();
             transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-            sr.sprite = eggSprite;
+            //sr.sprite = eggSprite;
             yield return new WaitForSeconds(1.0f);
-            sr.sprite = bugSprite;
+            //sr.sprite = bugSprite;
             reviveCount--;
             isHit = false;
         }

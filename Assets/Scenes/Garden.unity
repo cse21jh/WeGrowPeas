@@ -1179,6 +1179,7 @@ GameObject:
   - component: {fileID: 255824982}
   - component: {fileID: 255824981}
   - component: {fileID: 255824979}
+  - component: {fileID: 255824983}
   m_Layer: 6
   m_Name: Outline Camera
   m_TagString: Untagged
@@ -1209,7 +1210,7 @@ MonoBehaviour:
     m_Bits: 65
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 0
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1296,6 +1297,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &255824983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255824978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 5ff48de93d3435e4ea2a950b1bf23da0, type: 2}
 --- !u!1 &273581887
 GameObject:
   m_ObjectHideFlags: 0
