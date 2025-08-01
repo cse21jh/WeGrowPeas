@@ -76,6 +76,8 @@ public abstract class Plant : MonoBehaviour
     //식물 이동
     private void OnMouseDown()
     {
+        if (!grid.GetIsBreeding())
+            return;
         holdTime = 0f;
         isHolding = true;
         holdGaugeImage.fillAmount = 0f;
@@ -101,6 +103,7 @@ public abstract class Plant : MonoBehaviour
     }
     protected virtual void Update()
     {
+
         if (isHolding)
         {
             holdTime += Time.deltaTime;
@@ -115,7 +118,19 @@ public abstract class Plant : MonoBehaviour
 
         if (isDragging)
         {
-            FollowMouse();
+            if (!grid.GetIsBreeding())
+                grid.TryPlacePlant(this, Input.mousePosition);
+            else
+                FollowMouse();
+        }
+
+        if(!grid.GetIsBreeding())
+        {
+            isDragging = false;
+            isHolding = false;
+            holdTime = 0f;
+            holdGaugeImage.fillAmount = 0f;
+            holdGaugeCanvas.SetActive(false);
         }
     }
     private void StartDragging()

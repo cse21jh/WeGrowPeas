@@ -24,7 +24,7 @@ public class UIPlantStat : MonoBehaviour
         for(int i = 0; i < traits.Count; i += 2)
         {
             string left = $"<sprite={(int)(traits[i].traitType+1)}> {((traits[i].resistance + traits[i].additionalResistance) * 100f):F2}% | {traits[i].genetics}";
-            string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((traits[i + 1].resistance + traits[i].additionalResistance) * 100f):F2}% | {traits[i + 1].genetics}" : "";
+            string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((traits[i + 1].resistance + traits[i + 1].additionalResistance) * 100f):F2}% | {traits[i + 1].genetics}" : "";
 
             traitline += $"{left}\t{right}\n";
         }
