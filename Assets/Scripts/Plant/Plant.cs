@@ -20,7 +20,7 @@ public abstract class Plant : MonoBehaviour
     private float holdTime = 0f;
     private bool isHolding = false;
     private bool isDragging = false;
-    private const float HoldDuration = 1.5f;
+    private const float HoldDuration = 0.7f;
 
     //옮기기 게이지
     [SerializeField] private Image holdGaugeImage;
