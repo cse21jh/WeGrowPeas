@@ -7,6 +7,7 @@ public class ReviveBug : Bug
     private int reviveCount = 1;
     [SerializeField]
     private Sprite eggSprite;
+    [SerializeField] private GameObject egg;
 
     protected override void Start()
     {
@@ -39,8 +40,11 @@ public class ReviveBug : Bug
             transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             transform.GetChild(0).gameObject.SetActive(false);
             sr.sprite = eggSprite;
+            //egg.SetActive(true);
+            //egg.transform.localRotation = transform.GetChild(0).localRotation;
             yield return new WaitForSeconds(1.0f);
             transform.GetChild(0).gameObject.SetActive(true);
+            //egg.SetActive(false);
             sr.sprite = null;
             reviveCount--;
             isHit = false;

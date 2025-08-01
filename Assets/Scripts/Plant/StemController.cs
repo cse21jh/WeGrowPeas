@@ -18,7 +18,10 @@ public class StemController : MonoBehaviour
 
             if (traits[i].traitType == CompleteTraitType.PestResistance)
             {
-                SpriteRenderer sr = Instantiate(electricEffectPrefab, peaSprites[i].transform.position, Quaternion.identity).GetComponent<SpriteRenderer>();
+                GameObject effect = Instantiate(electricEffectPrefab, peaSprites[i].transform.position, Quaternion.identity);
+                effect.transform.SetParent(peaSprites[i].transform);
+                effect.transform.localPosition = Vector3.zero;
+                SpriteRenderer sr = effect.GetComponent<SpriteRenderer>();
                 sr.sortingOrder = peaSprites[i].GetComponent<SpriteRenderer>().sortingOrder + 2;
             }
         }
