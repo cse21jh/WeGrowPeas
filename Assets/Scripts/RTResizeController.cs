@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,12 @@ public class RTResizeController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        StartCoroutine(DelayResizeRT(0.1f));
+    }
+
+    private IEnumerator DelayResizeRT(float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
         ResizeRenderTextures();
     }
 
