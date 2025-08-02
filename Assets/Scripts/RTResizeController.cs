@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 public class RTResizeController : MonoBehaviour
 {
     [SerializeField] private RenderTexture[] rtArray;
+    [SerializeField] private Camera[] camArray;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,6 +31,24 @@ public class RTResizeController : MonoBehaviour
             rt.width = Screen.width;
             rt.height = Screen.height;
             rt.Create();
+
+            
+        }
+
+        foreach (Camera camera in camArray)
+        {
+            if (camera != null)
+            {
+                camera.ResetAspect();
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            ResizeRenderTextures();
         }
     }
 }
