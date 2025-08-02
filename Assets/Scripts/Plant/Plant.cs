@@ -92,6 +92,7 @@ public abstract class Plant : MonoBehaviour
         }
         else
         {
+            if (ClickRouter.Instance.IsBlockedByUI) return;
             grid.RequestBreedSelect(this.gameObject);
         }
 
