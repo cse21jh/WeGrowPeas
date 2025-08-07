@@ -27,7 +27,8 @@ public class Grid : MonoBehaviour
 
     private bool isBreedSkipButtonPressed = false;
 
-    private float bugSpawnTimeInterval = 5.0f;
+    private float bugSpawnTimeInterval = 10.0f;
+    private float lastBugSpawnTimeInterval = 0f;
     
     private float additionalPestResistance = 0f;
 
@@ -98,8 +99,6 @@ public class Grid : MonoBehaviour
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 
-        float spawnBugTime = startTime + bugSpawnTimeInterval;
-
         breedSkipButton.SetActive(true);
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
@@ -107,13 +106,14 @@ public class Grid : MonoBehaviour
 
         while (Time.time < endTime && !isBreedSkipButtonPressed)
         {
-            if (Time.time > spawnBugTime)
+            lastBugSpawnTimeInterval += Time.deltaTime;
+            if (lastBugSpawnTimeInterval > bugSpawnTimeInterval)
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
                 {
                     SpawnRandomBug();
-                    spawnBugTime += bugSpawnTimeInterval;
+                    lastBugSpawnTimeInterval = 0f;
                 }
             }
 
@@ -131,9 +131,19 @@ public class Grid : MonoBehaviour
                         if (!plantGrid.ContainsKey(idx))
                         {
                             canBreed = true;
+                            break;
                         }
                     }
-                    if (canBreed && breedCount < maxBreedCount)
+
+                    bool isEqualPlant = false;
+                    if((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
+                    {
+                        isEqualPlant = true;
+                    }
+
+                    Debug.Log(parent1.GetType());
+
+                    if (canBreed && breedCount < maxBreedCount && isEqualPlant)
                     {
                         List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
                         GameObject childObj = Instantiate(peaPrefab);
@@ -168,6 +178,12 @@ public class Grid : MonoBehaviour
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
+                    else if (isEqualPlant)
+                    {
+                        Debug.Log("두 종이 일치하지 않습니다");
+                        SoundManager.Instance.PlayEffect("WrongSelect");
+                        isBreedButtonPressed = false;
+                    }
                     else
                     {
                         Debug.Log("키울 공간이 부족합니다");
@@ -181,6 +197,10 @@ public class Grid : MonoBehaviour
                 {
                     Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
                 }
+            }
+            else
+            {
+                isBreedButtonPressed = false; // 버그로 인해 Breed 버튼이 활성화된 상태에서 버튼 먼저 누르면 교배가 바로 되던 현상 수정
             }
 
             yield return null;
