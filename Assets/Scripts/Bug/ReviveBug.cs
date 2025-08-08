@@ -56,7 +56,7 @@ public class ReviveBug : Bug
         
     }
 
-    protected override IEnumerator KillBug()
+    public override IEnumerator KillBug()
     {
         yield return StartCoroutine(base.KillBug());
     }

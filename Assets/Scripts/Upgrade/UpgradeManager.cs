@@ -29,7 +29,7 @@ public class UpgradeManager : MonoBehaviour
         { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
         { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
         { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
-
+        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
 
     };
 

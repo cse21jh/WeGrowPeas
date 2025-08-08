@@ -14,17 +14,8 @@ public abstract class Plant : MonoBehaviour
     protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
 
     public int gridIndex { get; private set; }
-    private Grid grid;
+    protected Grid grid;
 
-    //이동을 위한 변수
-    private float holdTime = 0f;
-    private bool isHolding = false;
-    private bool isDragging = false;
-    private const float HoldDuration = 0.7f;
-
-    //옮기기 게이지
-    [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvas;
 
     //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
@@ -61,96 +52,11 @@ public abstract class Plant : MonoBehaviour
     {
         return traits;
     }
-    protected virtual void OnMouseEnter()
-    {
-        if (ClickRouter.Instance.IsBlockedByUI) return;
 
-        UIPlantStat.Instance.ShowInfo(speciesname, traits);
-    }
+    protected abstract void OnMouseEnter();
 
-    protected virtual void OnMouseExit()
-    {
-        UIPlantStat.Instance.HideInfo();
-    }
-    
-    //식물 이동
-    private void OnMouseDown()
-    {
-        if (!grid.GetIsBreeding())
-            return;
-        holdTime = 0f;
-        isHolding = true;
-        holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(true);
-    }
+    protected abstract void OnMouseExit();
 
-    private void OnMouseUp()
-    {
-        if (isDragging)
-        {
-            grid.TryPlacePlant(this, Input.mousePosition);
-        }
-        else
-        {
-            if (ClickRouter.Instance.IsBlockedByUI) return;
-            grid.RequestBreedSelect(this.gameObject);
-        }
-
-        isDragging = false;
-        isHolding = false;
-        holdTime = 0f;
-        holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(false);
-    }
-    protected virtual void Update()
-    {
-
-        if (isHolding)
-        {
-            holdTime += Time.deltaTime;
-            holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
-
-            if (holdTime >= HoldDuration && !isDragging)
-            {
-                StartDragging();
-                holdGaugeCanvas.SetActive(false);
-            }
-        }
-
-        if (isDragging)
-        {
-            if (!grid.GetIsBreeding())
-                grid.TryPlacePlant(this, Input.mousePosition);
-            else
-                FollowMouse();
-        }
-
-        if(!grid.GetIsBreeding())
-        {
-            isDragging = false;
-            isHolding = false;
-            holdTime = 0f;
-            holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvas.SetActive(false);
-        }
-    }
-    private void StartDragging()
-    {
-        Debug.Log("식물 들기 성공");
-        isDragging = true;
-
-        Vector3 pos = transform.position;
-        transform.position = new Vector3(pos.x, pos.y, pos.z - 0.1f);
-    }
-
-    private void FollowMouse()
-    {
-        Vector3 screenPos = Input.mousePosition;
-        screenPos.z = Camera.main.WorldToScreenPoint(transform.position).z;
-
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
-        transform.position = worldPos;
-    }
 
     public void SetGridIndex(int idx)
     {
@@ -170,7 +76,7 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    protected float GetResistanceValue(WaveType wave)
+    protected virtual float GetResistanceValue(WaveType wave)
     {
         CompleteTraitType traitType = CompleteTraitType.None;
         float defaultResistance = 0.0f;
@@ -284,5 +190,7 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    public abstract float GetResistanceBasedOnGenetics(int genetics);
 
+    public abstract void ContactBug(Bug bug);
 }

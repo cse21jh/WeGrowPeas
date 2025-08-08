@@ -33,6 +33,7 @@ public class Grid : MonoBehaviour
     private float additionalPestResistance = 0f;
 
     [SerializeField] private GameObject peaPrefab;
+    [SerializeField] private GameObject NepenthesPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] private List<GameObject> bugPrefabs;
@@ -141,20 +142,20 @@ public class Grid : MonoBehaviour
                         isEqualPlant = true;
                     }
 
-                    Debug.Log(parent1.GetType());
-
+                    
                     if (canBreed && breedCount < maxBreedCount && isEqualPlant)
                     {
-                        List<GeneticTrait> childTrait = Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait());
                         GameObject childObj = Instantiate(peaPrefab);
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
                         {
-                            child.SetTrait(childTrait);
+                            Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), child);
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
+                            SoundManager.Instance.PlayEffect("Breed");
+                            totalBreedCount++;
                             UpdateBreedCountUI(maxBreedCount - breedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
@@ -221,7 +222,7 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
-    private List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
+    private void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
@@ -263,36 +264,40 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
                 default: break;
             }
 
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 1 : 0); break;
+                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
                 default: break;
             }
 
-            float resistance = 0f;
+            float resistance = child.GetResistanceBasedOnGenetics(childGenetic);
 
             if (trait == CompleteTraitType.PestResistance)
                 resistance += additionalPestResistance;
 
-            switch (childGenetic)
-            {
-                case 0: resistance += 0.8f; break;
-                default: resistance += 0.5f; break;
-            }
             childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
-        SoundManager.Instance.PlayEffect("Breed");
-        totalBreedCount++;
-        return childTrait;
+        child.SetTrait(childTrait);
     }
 
-    private void AddPlantToGrid(Plant plant)
+    private void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
     {
+        if(grididx != -1)
+        {
+            if (!plantGrid.ContainsKey(grididx))
+            {
+                plant.Init(grididx, this);
+                Plantplant(plant);
+
+                return;
+            }
+        }
+
         for (int idx = 0; idx < maxCol * 4; idx++)
         {
             if (!plantGrid.ContainsKey(idx))
@@ -306,6 +311,21 @@ public class Grid : MonoBehaviour
 
         Destroy(plant.gameObject);
         return;
+    }
+
+    public void AddPlant(List<GeneticTrait> trait)
+    {
+        GameObject obj = Instantiate(peaPrefab);
+        Pea pea = obj.GetComponent<Pea>();
+        pea.SetTrait(trait);
+        AddPlantToGrid(pea);
+    }
+
+    public void AddNepenthes(int idx)
+    {
+        GameObject obj = Instantiate(NepenthesPrefab);
+        Nepenthes nepenthes = obj.GetComponent<Nepenthes>();
+        AddPlantToGrid(nepenthes, idx);
     }
 
     public Transform GetSoilTransform(int idx)
@@ -338,10 +358,19 @@ public class Grid : MonoBehaviour
     }
 
     public bool CheckGameOver()
-    { 
-        if (plantGrid.Count == 0)
-            return true;
-        return false;
+    {
+        Plant plant;
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            plant = null;
+            plantGrid.TryGetValue(idx, out plant);
+            if (plant == null)
+                continue;
+            Debug.Log(plant.GetType());
+            if (plant.GetType() == typeof(Pea)) 
+                return false;
+        }
+        return true;
     }
 
     public void AddBreedTimer(int time)
@@ -359,14 +388,6 @@ public class Grid : MonoBehaviour
     {
         maxBreedCount += count;
         return;
-    }
-
-    public void AddPlant(List<GeneticTrait> trait)
-    {
-        GameObject obj = Instantiate(peaPrefab);
-        Pea pea = obj.GetComponent<Pea>();
-        pea.SetTrait(trait);
-        AddPlantToGrid(pea);
     }
 
     public int GetMaxCol()

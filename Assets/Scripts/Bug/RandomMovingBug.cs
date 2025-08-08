@@ -68,7 +68,7 @@ public class RandomMovingBug : Bug
         yield return StartCoroutine(KillBug());
     }
 
-    protected override IEnumerator KillBug()
+    public override IEnumerator KillBug()
     {
         yield return StartCoroutine(base.KillBug());
     }

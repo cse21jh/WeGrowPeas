@@ -137,8 +137,11 @@ public class Bug : MonoBehaviour
                 newTarget = 0;
             if (grid.plantGrid.TryGetValue(newTarget, out plant))
             {
-                targetObjIdx = newTarget;
-                break;
+                if (plant.GetType() != typeof(Nepenthes)) // 이거 시발 안됨
+                {
+                    targetObjIdx = newTarget;
+                    break;
+                }
             }
             newTarget++;
         }
@@ -155,7 +158,7 @@ public class Bug : MonoBehaviour
         Plant plant = obj.gameObject.GetComponent<Plant>();
         if (plant != null && !isDie)
         {
-            plant.Die();
+            plant.ContactBug(this);
         }
     }
 
@@ -190,7 +193,7 @@ public class Bug : MonoBehaviour
         }
     }
 
-    protected virtual IEnumerator KillBug()
+    public virtual IEnumerator KillBug()
     {
         if(!isDie)
         { 
