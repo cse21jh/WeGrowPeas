@@ -39,7 +39,7 @@ public class UpgradeManager : MonoBehaviour
     private Dictionary<Type, int> remainUpgrade = new();
     private Type[] randomUpgrade = new Type[3];
 
-    private float upgradeTimer = 30.0f;
+    private float upgradeTimer = 50.0f;
     private int maxRerollCount = 0;
     public int MaxRerollCount => maxRerollCount;
     private int curRerollCount = 0;
