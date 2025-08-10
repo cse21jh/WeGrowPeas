@@ -79,7 +79,7 @@ public abstract class Plant : MonoBehaviour
     protected virtual float GetResistanceValue(WaveType wave)
     {
         CompleteTraitType traitType = CompleteTraitType.None;
-        float defaultResistance = 0.0f;
+        float defaultResistance = 0.1f;
         switch(wave)
         {
             case WaveType.Wind: traitType = CompleteTraitType.WindResistance; break;

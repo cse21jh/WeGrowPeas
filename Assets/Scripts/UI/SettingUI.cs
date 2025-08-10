@@ -13,6 +13,14 @@ public class SettingUI : MonoBehaviour
             SettingPanel.SetActive(false);
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleSettingPanel();
+        }
+    }
+
     public void ShowSettingPanel()
     {
         if (SettingPanel == null)

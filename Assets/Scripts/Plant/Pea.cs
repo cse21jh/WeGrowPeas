@@ -199,11 +199,13 @@ public class Pea : Plant
             case 1: return 0.5f;
             case 2: return 0.8f;
         }
-        return 0.0f;
+        return 0.1f;
     }
 
     public override void ContactBug(Bug bug)
     {
         Die();
     }
+
+
 }

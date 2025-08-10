@@ -108,6 +108,17 @@ public class Grid : MonoBehaviour
         while (Time.time < endTime && !isBreedSkipButtonPressed)
         {
             lastBugSpawnTimeInterval += Time.deltaTime;
+
+            if(Input.GetKeyDown(KeyCode.S))
+            {
+                SkipBreed();
+            }
+
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                enemyController.WaveSkip();
+            }
+
             if (lastBugSpawnTimeInterval > bugSpawnTimeInterval)
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
@@ -118,7 +129,7 @@ public class Grid : MonoBehaviour
                 }
             }
 
-            if (isBreedButtonPressed)
+            if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
                 if (breedObj1 != null && breedObj2 != null) // 교배 버튼 등으로 추후 수정
                 {
@@ -127,7 +138,7 @@ public class Grid : MonoBehaviour
                     //자식 완두콩 형질 계산 후 Instantiate
 
                     bool canBreed = false;
-                    for (int idx = 0; idx < maxCol * 4; idx++)
+                    for (int idx = 0; idx < maxCol * 4; idx++) // 빈 칸이 있는가
                     {
                         if (!plantGrid.ContainsKey(idx))
                         {
@@ -197,6 +208,7 @@ public class Grid : MonoBehaviour
                 else
                 {
                     Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
+                    isBreedButtonPressed = false;
                 }
             }
             else
@@ -244,7 +256,7 @@ public class Grid : MonoBehaviour
             }
             else
             {
-                p1Trait = 2;
+                p1Trait = 0;
                 traitNotInParent += 1;
             }
 
@@ -254,7 +266,7 @@ public class Grid : MonoBehaviour
             }
             else
             {
-                p2Trait = 2;
+                p2Trait = 0;
                 traitNotInParent += 1;
             }
 
@@ -471,6 +483,7 @@ public class Grid : MonoBehaviour
     {
         Plant clickedPea = clickedObject.GetComponent<Plant>();
         if (clickedPea == null) return;
+
 
         if (breedObj1 == clickedObject)
         {
