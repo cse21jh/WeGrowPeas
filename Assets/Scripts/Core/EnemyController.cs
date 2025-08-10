@@ -30,6 +30,7 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        unlockedWave.Clear();
         SetWaveSkipCountText();
         HideWaveSkipButton();
         unlockedWave.Add(new AgingWave());
@@ -47,6 +48,7 @@ public class EnemyController : MonoBehaviour
 
     public void EnemyWave()
     {
+        //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
         Wave wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
