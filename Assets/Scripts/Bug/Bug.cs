@@ -12,9 +12,11 @@ public class Bug : MonoBehaviour
 
     [SerializeField]
     protected float speed;
+    [SerializeField]
+    protected float hitRange;
     protected bool isDie = false;
     protected bool isHit = false;
-
+    
 
     private float rotationOffset = -90f;
 
@@ -23,6 +25,7 @@ public class Bug : MonoBehaviour
 
     private GameObject WarningPrefab;
     private GameObject Warning;
+
 
 
     //각종 효과 관련
@@ -50,6 +53,18 @@ public class Bug : MonoBehaviour
 
         InitRandomPos();
         StartCoroutine(Moving());
+    }
+
+    protected void Update()
+    {
+        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
+        {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));            
+            if (Vector3.Distance(new Vector3(mousePos.x, mousePos.y, 0), transform.position) < hitRange)
+            { 
+                StartCoroutine(HitBug());
+            }
+        }
     }
 
     protected virtual IEnumerator Moving()
@@ -89,11 +104,6 @@ public class Bug : MonoBehaviour
         Destroy(Warning);
     }
 
-    private void OnMouseDown()
-    {
-        if(!ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
-            StartCoroutine(HitBug());
-    }
 
     protected void InitRandomPos()
     {
