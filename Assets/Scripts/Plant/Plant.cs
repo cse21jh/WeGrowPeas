@@ -26,6 +26,8 @@ public abstract class Plant : MonoBehaviour
 
     [SerializeField] private GameObject appearEffect;
 
+    [SerializeField] private string[] doNotChangeLayerObjects;
+
 
 
     public virtual void Init(int gridIndex, Grid grid)
@@ -161,12 +163,15 @@ public abstract class Plant : MonoBehaviour
 
     private void ChangeLayerOfAllChild(GameObject obj, string layerName)
     {
-        if(obj.name == "shadow" || obj.name == "HoldGaugeUI")
-        {
-            return; // 그림자 또는 게이지 오브젝트는 레이어 변경하지 않음
-        }
-
         obj.layer = LayerMask.NameToLayer(layerName);
+
+        foreach (string doNotChangeLayerObject in doNotChangeLayerObjects)
+        {
+            if (obj.name == doNotChangeLayerObject)
+            {
+                obj.layer = LayerMask.NameToLayer("Default"); // 자기 자신은 레이어 변경하지 않음 - 즉, "Default" 레이어로 변경
+            }
+        }
 
         foreach (Transform child in obj.transform)
         {
