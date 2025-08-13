@@ -11,12 +11,12 @@ public class UpgradeManager : MonoBehaviour
     private static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
     {
         
-        { typeof(AddNaturalDeathPlantUpgrade), () => new AddNaturalDeathPlantUpgrade()},
-        { typeof(AddWindPlantUpgrade), () => new AddWindPlantUpgrade()},
-        { typeof(AddFloodPlantUpgrade), () => new AddFloodPlantUpgrade()},
-        { typeof(AddPestPlantUpgrade), () => new AddPestPlantUpgrade()},
-        { typeof(AddColdPlantUpgrade), () => new AddColdPlantUpgrade()},
-        { typeof(AddHeavyRainPlantUpgrade), () => new AddHeavyRainPlantUpgrade()},
+        { typeof(AddNaturalDeathPeaUpgrade), () => new AddNaturalDeathPeaUpgrade()},
+        { typeof(AddWindPeaUpgrade), () => new AddWindPeaUpgrade()},
+        { typeof(AddFloodPeaUpgrade), () => new AddFloodPeaUpgrade()},
+        { typeof(AddPestPeaUpgrade), () => new AddPestPeaUpgrade()},
+        { typeof(AddColdPeaUpgrade), () => new AddColdPeaUpgrade()},
+        { typeof(AddHeavyRainPeaUpgrade), () => new AddHeavyRainPeaUpgrade()},
         { typeof(NaturalDeathResistenceUpgrade), () => new NaturalDeathResistenceUpgrade()},
         { typeof(WindResistenceUpgrade), () => new WindResistenceUpgrade()},
         { typeof(FloodResistenceUpgrade), () => new FloodResistenceUpgrade()},
@@ -29,7 +29,9 @@ public class UpgradeManager : MonoBehaviour
         { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
         { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
         { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
-        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
+        // 아래는 디버깅용 
+        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()}, 
+        { typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
 
     };
 
@@ -66,15 +68,15 @@ public class UpgradeManager : MonoBehaviour
         switch(stage)
         {
             case 5:
-                randomUpgrade[0] = typeof(AddWindPlantUpgrade);  break;
+                randomUpgrade[0] = typeof(AddWindPeaUpgrade);  break;
             case 10:
-                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
+                randomUpgrade[0] = typeof(AddFloodPeaUpgrade); break;
             case 15:
-                randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
+                randomUpgrade[0] = typeof(AddPestPeaUpgrade); break;
             case 20:
-                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
+                randomUpgrade[0] = typeof(AddColdPeaUpgrade); break;
             case 25:
-                randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
+                randomUpgrade[0] = typeof(AddHeavyRainPeaUpgrade); break;
         }
         return;
     }

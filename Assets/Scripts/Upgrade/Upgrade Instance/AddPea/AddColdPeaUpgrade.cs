@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AddColdPlantUpgrade : Upgrade
+public class AddColdPeaUpgrade : Upgrade
 {
     public override string Name => "추위 식물 추가";
     public override string Explanation => "추위에 강한 식물을 하나 추가합니다";
@@ -16,7 +16,7 @@ public class AddColdPlantUpgrade : Upgrade
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
             new GeneticTrait(CompleteTraitType.ColdResistance, 0.5f , 1, 0.0f)
         };
-        GameManager.Instance.grid.AddPlant(trait);
+        GameManager.Instance.grid.AddPea(trait);
         Debug.Log(Explanation);
     }
 }

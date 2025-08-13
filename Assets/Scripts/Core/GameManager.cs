@@ -114,6 +114,7 @@ public class GameManager : Singleton<GameManager>
         else if (!enemyController.IsLastWaveNone())
         {
             yield return new WaitForSeconds(2.0f);
+            yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
         }
 
@@ -122,6 +123,24 @@ public class GameManager : Singleton<GameManager>
     private void UpdateStageUI()
     {
         textStage.text = $"<sprite=0> STAGE {stage}";
+    }
+
+    public IEnumerator BreedEndRoutine()
+    {
+        Plant plant;
+        List<Peanut> peanutList = new List<Peanut>();
+        for (int idx = 0; idx < grid.maxCol * 4; idx++)
+        {
+            plant = null;
+            grid.plantGrid.TryGetValue(idx, out plant);
+            if (plant == null)
+                continue;
+            if (plant.GetType() == typeof(Peanut))
+                peanutList.Add(plant.gameObject.GetComponent<Peanut>());
+        }
+        for (int i = 0; i < peanutList.Count; i++)
+            peanutList[i].TrySpawnCopy();
+        yield return null;
     }
 
     public IEnumerator GameOver()

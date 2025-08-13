@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AddNaturalDeathPlantUpgrade : Upgrade
+public class AddNaturalDeathPeaUpgrade : Upgrade
 {
     public override string Name => "자연사 식물 추가";
     public override string Explanation => "자연사에 강한 식물을 하나 추가합니다";
@@ -15,7 +15,7 @@ public class AddNaturalDeathPlantUpgrade : Upgrade
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f , 2, 0.0f)
         };
-        GameManager.Instance.grid.AddPlant(trait); 
+        GameManager.Instance.grid.AddPea(trait);
         Debug.Log(Explanation);
     }
 }

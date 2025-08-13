@@ -33,6 +33,7 @@ public class Grid : MonoBehaviour
     private float additionalPestResistance = 0f;
 
     [SerializeField] private GameObject peaPrefab;
+    [SerializeField] private GameObject peanutPrefab;
     [SerializeField] private GameObject NepenthesPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
@@ -45,6 +46,8 @@ public class Grid : MonoBehaviour
     
     public int killBugCount = 0;
     public int totalBreedCount = 0;
+    public int totalPeaBreedcount = 0;
+    public int totalPeanutBreedCount = 0;
 
     [SerializeField] private Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] private SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
@@ -69,6 +72,7 @@ public class Grid : MonoBehaviour
     {
         for (int i = 0; i < 2; i++)
         {
+            
             GameObject obj = Instantiate(peaPrefab);
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
@@ -79,6 +83,7 @@ public class Grid : MonoBehaviour
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
+           
         }
     }
 
@@ -156,7 +161,11 @@ public class Grid : MonoBehaviour
                     
                     if (canBreed && breedCount < maxBreedCount && isEqualPlant)
                     {
-                        GameObject childObj = Instantiate(peaPrefab);
+                        GameObject childObj = null;
+                        if (parent1.GetType() == typeof(Pea))
+                            childObj = Instantiate(peaPrefab);
+                        else if (parent1.GetType() == typeof(Peanut))
+                            childObj = Instantiate(peanutPrefab);
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
                         {
@@ -167,6 +176,10 @@ public class Grid : MonoBehaviour
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
                             SoundManager.Instance.PlayEffect("Breed");
                             totalBreedCount++;
+                            if (child.GetType() == typeof(Pea))
+                                totalPeaBreedcount++;
+                            else if (child.GetType() == typeof(Peanut))
+                                totalPeanutBreedCount++;
                             UpdateBreedCountUI(maxBreedCount - breedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
@@ -325,12 +338,20 @@ public class Grid : MonoBehaviour
         return;
     }
 
-    public void AddPlant(List<GeneticTrait> trait)
+    public void AddPea(List<GeneticTrait> trait, int grididx = -1)
     {
         GameObject obj = Instantiate(peaPrefab);
         Pea pea = obj.GetComponent<Pea>();
         pea.SetTrait(trait);
-        AddPlantToGrid(pea);
+        AddPlantToGrid(pea, grididx);
+    }
+
+    public void AddPeanut(List<GeneticTrait> trait, int grididx = -1)
+    {
+        GameObject obj = Instantiate(peanutPrefab);
+        Peanut peanut = obj.GetComponent<Peanut>();
+        peanut.SetTrait(trait);
+        AddPlantToGrid(peanut, grididx);
     }
 
     public void AddNepenthes(int idx)
@@ -378,8 +399,7 @@ public class Grid : MonoBehaviour
             plantGrid.TryGetValue(idx, out plant);
             if (plant == null)
                 continue;
-            Debug.Log(plant.GetType());
-            if (plant.GetType() == typeof(Pea)) 
+            if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
                 return false;
         }
         return true;

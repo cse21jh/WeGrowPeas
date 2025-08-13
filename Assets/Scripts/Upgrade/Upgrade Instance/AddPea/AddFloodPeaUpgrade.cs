@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AddFloodPlantUpgrade : Upgrade
+public class AddFloodPeaUpgrade : Upgrade
 {
     public override string Name => "홍수 식물 추가";
     public override string Explanation => "홍수에 강한 식물을 하나 추가합니다";
@@ -16,7 +16,7 @@ public class AddFloodPlantUpgrade : Upgrade
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
             new GeneticTrait(CompleteTraitType.FloodResistance, 0.5f , 1, 0.0f)
         };
-        GameManager.Instance.grid.AddPlant(trait);
+        GameManager.Instance.grid.AddPea(trait);
         Debug.Log(Explanation);
     }
 }
