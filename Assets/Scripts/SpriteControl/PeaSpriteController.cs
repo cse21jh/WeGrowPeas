@@ -62,7 +62,7 @@ public class PeaSpriteController : MonoBehaviour
                 break;
             case 2:
                 spriteRenderer.sprite = peaSprites[0]; // 全荐 历亲
-                accessoryRenderer.sprite = peaSprites[3];
+                accessoryRenderer.sprite = peaSprites[9];
                 break;
             case 3:
                 spriteRenderer.sprite = peaSprites[0]; // 秦面 历亲
