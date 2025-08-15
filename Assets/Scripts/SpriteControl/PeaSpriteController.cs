@@ -12,10 +12,21 @@ public class PeaSpriteController : MonoBehaviour
     [SerializeField] private Sprite[] peaSprites;
     [SerializeField] private SpriteRenderer accessoryRenderer;
 
+    [SerializeField] private GameObject WindEffect;
+
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        faceAnim = GetComponentInChildren<Animator>();
+        Animator[] anims = GetComponentsInChildren<Animator>();
+        for(int i = 0; i < anims.Length; i++)
+        {
+            if(anims[i].gameObject != this.gameObject)
+            {
+                faceAnim = anims[i];
+                break;
+            }
+        }
+
         if (faceAnim != null)
         {
             StartCoroutine(FaceStart());
@@ -46,8 +57,8 @@ public class PeaSpriteController : MonoBehaviour
                 accessoryRenderer.sprite = null;
                 break;
             case 1:
-                spriteRenderer.sprite = peaSprites[0]; // 바람 저항
-                accessoryRenderer.sprite = peaSprites[2];
+                spriteRenderer.sprite = peaSprites[7]; // 바람 저항
+                accessoryRenderer.sprite = null;
                 break;
             case 2:
                 spriteRenderer.sprite = peaSprites[0]; // 홍수 저항
@@ -74,6 +85,14 @@ public class PeaSpriteController : MonoBehaviour
                 break;
         }
 
+        if(index == 1)
+        {
+            WindEffect.SetActive(true);
+        }
+        else
+        {
+            WindEffect.SetActive(false);
+        }
 
     }
 
