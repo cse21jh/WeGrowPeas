@@ -131,18 +131,7 @@ public class Pea : Plant
         sr.sprite = selectedSprite[0];
         */
     }
-
-    protected override void OnMouseEnter()
-    {
-        if (ClickRouter.Instance.IsBlockedByUI) return;
-
-        UIPlantStat.Instance.ShowInfo(speciesname, traits);
-    }
-
-    protected override void OnMouseExit()
-    {
-        UIPlantStat.Instance.HideInfo();
-    }
+    
 
     private void OnMouseDown()
     {

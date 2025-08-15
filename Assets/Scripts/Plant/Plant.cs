@@ -55,9 +55,17 @@ public abstract class Plant : MonoBehaviour
         return traits;
     }
 
-    protected abstract void OnMouseEnter();
+    protected void OnMouseEnter()
+    {
+        //if (ClickRouter.Instance.IsBlockedByUI) return;
 
-    protected abstract void OnMouseExit();
+        UIPlantStat.Instance.ShowInfo(speciesname, traits);
+    }
+
+    protected void OnMouseExit()
+    {
+        UIPlantStat.Instance.HideInfo();
+    }
 
 
     public void SetGridIndex(int idx)
