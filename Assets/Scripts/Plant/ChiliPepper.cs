@@ -12,10 +12,6 @@ public class ChiliPepper : Plant
         return 1f;
     }
 
-    public override void ContactBug(Bug bug)
-    {
-        Die();
-    }
 
 
 

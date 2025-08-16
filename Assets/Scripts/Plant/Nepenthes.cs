@@ -14,11 +14,6 @@ public class Nepenthes : Plant
         return 1f;
     }
 
-    public override void ContactBug(Bug bug)
-    {
-        StartCoroutine(bug.KillBug());
-    }
-
 
     // 테스트용 더미 옮길 수 있도록
 

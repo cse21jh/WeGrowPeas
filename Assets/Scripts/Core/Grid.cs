@@ -29,7 +29,9 @@ public class Grid : MonoBehaviour
 
     private float bugSpawnTimeInterval = 10.0f;
     private float lastBugSpawnTimeInterval = 0f;
-    
+
+    private float ladyBugSpawnProbability = 0f;
+
     private float additionalPestResistance = 0f;
 
     [SerializeField] private GameObject peaPrefab;

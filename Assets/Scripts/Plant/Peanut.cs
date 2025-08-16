@@ -179,11 +179,6 @@ public class Peanut : Plant
         return 0.1f;
     }
 
-    public override void ContactBug(Bug bug)
-    {
-        Die();
-    }
-
     public int FindEmptyGridToCopy()
     {
         List<int> emptyGrid = new List<int>();

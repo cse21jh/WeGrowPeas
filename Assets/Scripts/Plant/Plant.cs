@@ -210,8 +210,6 @@ public abstract class Plant : MonoBehaviour
 
     public abstract float GetResistanceBasedOnGenetics(int genetics);
 
-    public abstract void ContactBug(Bug bug);
-
     public bool CheckChiliPepper()
     {
         Plant chiliPepper;

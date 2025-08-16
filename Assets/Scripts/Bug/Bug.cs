@@ -163,12 +163,15 @@ public class Bug : MonoBehaviour
     }
     
 
-    void OnTriggerEnter(Collider obj)
+    protected virtual void OnTriggerEnter(Collider obj)
     {
         Plant plant = obj.gameObject.GetComponent<Plant>();
         if (plant != null && !isDie)
         {
-            plant.ContactBug(this);
+            if (plant.GetType() == typeof(Nepenthes))
+                StartCoroutine(KillBug());
+            else
+                plant.Die();
         }
     }
 

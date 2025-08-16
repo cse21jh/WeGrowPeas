@@ -201,10 +201,6 @@ public class Pea : Plant
         return 0.1f;
     }
 
-    public override void ContactBug(Bug bug)
-    {
-        Die();
-    }
 
 
 }
