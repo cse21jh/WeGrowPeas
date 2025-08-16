@@ -37,9 +37,14 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene("StartScene");
     }
 
+    public void LoadTutorialScene()
+    {
+        SceneManager.LoadScene("TutorialScene");
+    }
+
     public void LoadGardenScene()
     {
-        SceneManager.LoadScene("Garden");
+        SceneManager.LoadScene("Garden_GrassUpdate");
     }
 
     public void LoadGameOverScene()
