@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
-public class Nepenthes : Plant
+public class ChiliPepper : Plant
 {
     protected override float GetResistanceValue(WaveType wave)
     {
         return 1f;
     }
-
     public override float GetResistanceBasedOnGenetics(int genetics)
     {
         return 1f;
@@ -20,7 +18,8 @@ public class Nepenthes : Plant
     }
 
 
-    // 테스트용 더미 옮길 수 있도록
+
+    // 테스트용 더미 옮기기 가능하도록
 
     private float holdTime = 0f;
     private bool isHolding = false;
@@ -103,4 +102,5 @@ public class Nepenthes : Plant
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
         transform.position = worldPos;
     }
+
 }

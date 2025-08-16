@@ -35,6 +35,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject peaPrefab;
     [SerializeField] private GameObject peanutPrefab;
     [SerializeField] private GameObject NepenthesPrefab;
+    [SerializeField] private GameObject ChiliPepperPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] private List<GameObject> bugPrefabs;
@@ -359,6 +360,13 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(NepenthesPrefab);
         Nepenthes nepenthes = obj.GetComponent<Nepenthes>();
         AddPlantToGrid(nepenthes, idx);
+    }
+
+    public void AddChiliPepper(int idx)
+    {
+        GameObject obj = Instantiate(ChiliPepperPrefab);
+        ChiliPepper chiliPepper= obj.GetComponent<ChiliPepper>();
+        AddPlantToGrid(chiliPepper, idx);
     }
 
     public Transform GetSoilTransform(int idx)

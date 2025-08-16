@@ -55,18 +55,6 @@ public abstract class Plant : MonoBehaviour
         return traits;
     }
 
-    protected void OnMouseEnter()
-    {
-        //if (ClickRouter.Instance.IsBlockedByUI) return;
-
-        UIPlantStat.Instance.ShowInfo(speciesname, traits);
-    }
-
-    protected void OnMouseExit()
-    {
-        UIPlantStat.Instance.HideInfo();
-    }
-
 
     public void SetGridIndex(int idx)
     {
@@ -100,14 +88,31 @@ public abstract class Plant : MonoBehaviour
             case WaveType.Aging: traitType = CompleteTraitType.NaturalDeath; break;
                 // 특성 추가되면 추가
         }
+        bool checkChiliPepper = CheckChiliPepper();
 
         foreach(GeneticTrait g in traits)
         {
-            if(g.traitType == traitType)
+            if (g.traitType == traitType)
+            {
+                if(checkChiliPepper) // 주변에 고추가 있으면 열성 저항력 반환
+                    return GetResistanceBasedOnGenetics(2) + g.additionalResistance;
                 return g.resistance + g.additionalResistance;
+            }
         }
         
         return defaultResistance;
+    }
+
+    public virtual float GetResistanceValueByOrder(int order)
+    {
+        bool checkChiliPepper = CheckChiliPepper();
+        GeneticTrait g = traits[order];
+        if(checkChiliPepper)
+        {
+            return GetResistanceBasedOnGenetics(2) + g.additionalResistance;
+        }
+        
+        return g.resistance + g.additionalResistance;
     }
 
     public virtual void Die()
@@ -206,4 +211,45 @@ public abstract class Plant : MonoBehaviour
     public abstract float GetResistanceBasedOnGenetics(int genetics);
 
     public abstract void ContactBug(Bug bug);
+
+    public bool CheckChiliPepper()
+    {
+        Plant chiliPepper;
+        if ((gridIndex - 1) / 4 == gridIndex / 4) // 위칸
+        {
+            if (grid.plantGrid.TryGetValue(gridIndex - 1, out chiliPepper))
+            {
+                if (chiliPepper.GetType() == typeof(ChiliPepper))
+                    return true;
+            }
+        }
+
+        if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래칸
+        {
+            if (grid.plantGrid.TryGetValue(gridIndex + 1, out chiliPepper))
+            {
+                if (chiliPepper.GetType() == typeof(ChiliPepper))
+                    return true;
+            }
+        }
+
+        if ((gridIndex - 4) >= 0) // 왼쪽칸
+        {
+            if (grid.plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
+            {
+                if (chiliPepper.GetType() == typeof(ChiliPepper))
+                    return true;
+            }
+        }
+
+        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // 오른쪽칸
+        {
+            if (grid.plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
+            {
+                if (chiliPepper.GetType() == typeof(ChiliPepper))
+                    return true;
+            }
+        }
+        return false;
+    }
 }

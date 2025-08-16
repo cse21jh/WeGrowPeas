@@ -30,7 +30,8 @@ public class UpgradeManager : MonoBehaviour
         { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
         { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
         // 아래는 디버깅용 
-        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()}, 
+        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
+        { typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
         { typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
 
     };

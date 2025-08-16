@@ -131,8 +131,17 @@ public class Pea : Plant
         sr.sprite = selectedSprite[0];
         */
     }
-    
+    protected void OnMouseEnter()
+    {
+        //if (ClickRouter.Instance.IsBlockedByUI) return;
 
+        UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
+    }
+
+    protected void OnMouseExit()
+    {
+        UIPlantStat.Instance.HideInfo();
+    }
     private void OnMouseDown()
     {
         if (!grid.GetIsBreeding())

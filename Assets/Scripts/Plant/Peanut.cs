@@ -108,6 +108,17 @@ public class Peanut : Plant
         */
     }
 
+    protected void OnMouseEnter()
+    {
+        //if (ClickRouter.Instance.IsBlockedByUI) return;
+
+        UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
+    }
+
+    protected void OnMouseExit()
+    {
+        UIPlantStat.Instance.HideInfo();
+    }
 
     private void OnMouseDown()
     {
@@ -174,7 +185,6 @@ public class Peanut : Plant
 
     public int FindEmptyGridToCopy()
     {
-        int tmp;
         List<int> emptyGrid = new List<int>();
         if ((gridIndex - 1) / 4 == gridIndex / 4) // À§Ä­
         {
