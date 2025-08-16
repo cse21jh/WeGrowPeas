@@ -8,10 +8,13 @@ public static class GameRecordHolder
     public static int TotalPeas { get; private set; }
     public static int TotalBugsKilled { get; private set; }
 
-    public static void SaveRecord(int stage, int peas, int bugs)
+    public static int[] TotalWaveKilled { get; private set; }
+
+    public static void SaveRecord(int stage, int peas, int bugs, int[] killed)
     {
         maxStageReached = stage - 1;
         TotalPeas = peas;
         TotalBugsKilled = bugs;
+        TotalWaveKilled = (int[])killed.Clone();
     }
 }

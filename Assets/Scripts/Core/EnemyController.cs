@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 
@@ -22,6 +23,9 @@ public class EnemyController : MonoBehaviour
     private int waveSkipCount = 0;
     public int WaveSkipCount => waveSkipCount;
 
+    private int[] waveKillCount;
+    public int[] WaveKillCount => waveKillCount;
+
     [SerializeField] TextMeshProUGUI nextWaveText;
 
     [SerializeField] private GameObject waveSkipButton;
@@ -31,6 +35,7 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         unlockedWave.Clear();
+        waveKillCount = new int[6];
         SetWaveSkipCountText();
         HideWaveSkipButton();
         unlockedWave.Add(new AgingWave());
@@ -67,6 +72,7 @@ public class EnemyController : MonoBehaviour
                     }
                     else
                     {
+                        waveKillCount[(int)currentWave.WaveType] += 1;
                         Debug.Log(idx + "번째 식물이 죽었습니다");
                         plant.Die();
                     }

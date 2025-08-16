@@ -146,7 +146,7 @@ public class GameManager : Singleton<GameManager>
     public IEnumerator GameOver()
     {
         yield return new WaitForSeconds(2.0f);
-        GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount);
+        GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount, enemyController.WaveKillCount);
         SceneLoader.Instance.LoadGameOverScene();
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.GameOver);
