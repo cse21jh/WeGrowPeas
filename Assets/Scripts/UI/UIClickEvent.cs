@@ -43,6 +43,11 @@ public class UIClickEvent : MonoBehaviour
         return;
     }
 
+    public void OnClick_GoToTutorial()
+    {
+        SceneLoader.Instance?.LoadTutorialScene();
+    }
+
     public void OnClick_PlayAgain()
     {
         SceneLoader.Instance?.LoadStartScene();
