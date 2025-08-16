@@ -43,7 +43,7 @@ public class Bug : MonoBehaviour
         WarningPrefab = Resources.Load<GameObject>("Prefabs/Warning");
         grid = GameObject.Find("Grid").GetComponent<Grid>();
 
-        childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+        childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
         childMaterials = new Material[childSpriteRenderers.Length];
         for (int i = 0; i < childSpriteRenderers.Length; i++)
         {

@@ -9,6 +9,10 @@ public class ReviveBug : Bug
     private Sprite eggSprite;
     [SerializeField] private GameObject egg;
 
+    [SerializeField] private GameObject[] metalBodies;
+    [SerializeField] private GameObject[] normalBodies;
+    [SerializeField] private GameObject fragEffect;
+
     protected override void Start()
     {
         base.Start();
@@ -36,6 +40,7 @@ public class ReviveBug : Bug
         yield return StartCoroutine(base.HitBug());
         if(reviveCount > 0)
         {
+            /*
             SpriteRenderer sr = GetComponent<SpriteRenderer>();
             transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             transform.GetChild(0).gameObject.SetActive(false);
@@ -46,6 +51,23 @@ public class ReviveBug : Bug
             transform.GetChild(0).gameObject.SetActive(true);
             //egg.SetActive(false);
             sr.sprite = null;
+            */
+
+            foreach (GameObject body in metalBodies)
+            {
+                body.SetActive(false);
+            }
+            foreach (GameObject body in normalBodies)
+            {
+                body.SetActive(true);
+            }
+            ParticleSystem[] effects = fragEffect.GetComponentsInChildren<ParticleSystem>();
+            foreach (ParticleSystem effect in effects)
+            {
+                effect.Play();
+            }
+            yield return new WaitForSeconds(1.0f);
+
             reviveCount--;
             isHit = false;
         }
