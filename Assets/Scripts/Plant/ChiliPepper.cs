@@ -14,7 +14,7 @@ public class ChiliPepper : Plant
 
     public override void ContactBug(Bug bug)
     {
-        StartCoroutine(bug.KillBug());
+        Die();
     }
 
 

@@ -147,7 +147,7 @@ public class Bug : MonoBehaviour
                 newTarget = 0;
             if (grid.plantGrid.TryGetValue(newTarget, out plant))
             {
-                if (plant.GetType() != typeof(Nepenthes)) // 이거 시발 안됨
+                if (plant.GetType() != typeof(Nepenthes))
                 {
                     targetObjIdx = newTarget;
                     break;

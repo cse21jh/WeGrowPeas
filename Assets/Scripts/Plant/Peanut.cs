@@ -135,6 +135,7 @@ public class Peanut : Plant
         if (isDragging)
         {
             grid.TryPlacePlant(this, Input.mousePosition);
+            UIPlantStat.Instance.UpdateInfo(speciesname, traits, this);
         }
         else
         {
