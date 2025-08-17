@@ -29,6 +29,10 @@ public class UpgradeManager : MonoBehaviour
         { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
         { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
         { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
+        { typeof(LadybugUpgrade), () => new LadybugUpgrade()},
+        { typeof(BugSpeedUpgrade), () => new BugSpeedUpgrade()},
+        { typeof(BugGoldUpgrade), () => new BugGoldUpgrade()},
+        { typeof(BugFrequencyUpgrade), () => new BugFrequencyUpgrade()},
         // 아래는 디버깅용 
         { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
         { typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},

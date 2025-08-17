@@ -51,6 +51,8 @@ public class Bug : MonoBehaviour
         }
         Debug.Log(childMaterials.Length);
 
+        speed = speed * (1f - grid.GetBugSpeedDecreasement());
+
         InitRandomPos();
         StartCoroutine(Moving());
     }

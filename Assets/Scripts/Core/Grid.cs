@@ -29,8 +29,11 @@ public class Grid : MonoBehaviour
 
     private float bugSpawnTimeInterval = 10.0f;
     private float lastBugSpawnTimeInterval = 0f;
-
-    private float ladyBugSpawnProbability = 0f;
+    
+    private float bugSpeedDecreasement= 0f;
+    private float bugSpawnIntervalIncreasement = 0f;
+    private float ladybugSpawnProbability = 0f;
+    private int additionalBugGold = 0;
 
     private float additionalPestResistance = 0f;
 
@@ -127,7 +130,7 @@ public class Grid : MonoBehaviour
                 enemyController.WaveSkip();
             }
 
-            if (lastBugSpawnTimeInterval > bugSpawnTimeInterval)
+            if (lastBugSpawnTimeInterval > bugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement))
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
@@ -576,7 +579,9 @@ public class Grid : MonoBehaviour
 
     private void SpawnRandomBug()
     {
-        int i = Random.Range(0, bugPrefabs.Count);
+        int i = Random.Range(0, bugPrefabs.Count - 1);
+        if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
+            i = bugPrefabs.Count - 1;
         Instantiate(bugPrefabs[i]);
         return;
     }
@@ -673,6 +678,36 @@ public class Grid : MonoBehaviour
 
             Plantplant(plant);
         }
+    }
+
+    public void AddBugSpeedDcreasement(float value)
+    {
+        bugSpeedDecreasement += value;
+    }
+
+    public float GetBugSpeedDecreasement() 
+    {
+        return bugSpeedDecreasement; 
+    }
+
+    public void AddBugSpawnIntervalIncreasement(float value)
+    {
+        bugSpawnIntervalIncreasement += value; 
+    }
+
+    public void AddLadybugSpawnProbability(float value)
+    {
+        ladybugSpawnProbability += value;
+    }
+
+    public void AddAdditionalBugGold(int value)
+    {
+        additionalBugGold += value;
+    }
+
+    public int GetAdditionalBugGold()
+    {
+        return additionalBugGold;
     }
 }
 
