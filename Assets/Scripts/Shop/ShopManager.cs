@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ShopManager : Singleton<ShopManager>
 {
+    /*
     [SerializeField] private ShopUI shopUI;
 
     public IEnumerator ShopPhase()
@@ -21,4 +22,5 @@ public class ShopManager : Singleton<ShopManager>
         while (!closed)
             yield return null;
     }
+    */
 }
