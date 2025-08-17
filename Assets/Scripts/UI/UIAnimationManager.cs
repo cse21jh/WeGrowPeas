@@ -4,9 +4,12 @@ using DG.Tweening;
 public class UIAnimationManager : MonoBehaviour
 {
     [SerializeField] private CameraManager[] camManagers;
-    [SerializeField] private RectTransform targetPanel;
-    [SerializeField] private RectTransform panelTransformOrigin;
-    [SerializeField] private RectTransform panelTransformMoved;
+    [SerializeField] private RectTransform upgrade_targetPanel;
+    [SerializeField] private RectTransform upgrade_panelTransformOrigin;
+    [SerializeField] private RectTransform upgrade_panelTransformMoved;
+    [SerializeField] private RectTransform shop_targetPanel;
+    [SerializeField] private RectTransform shop_panelTransformOrigin;
+    [SerializeField] private RectTransform shop_panelTransformMoved;
     [SerializeField] private Ease panelEase;
     [SerializeField] private float panelMoveDuration = 0.5f;
 
@@ -18,13 +21,28 @@ public class UIAnimationManager : MonoBehaviour
             camManager.SwitchCamera(type, panelMoveDuration);
         }
 
-        if (type == CameraManager.CameraType.Wide)
+        if (type == CameraManager.CameraType.Normal)
         {
-            targetPanel.DOAnchorPos(panelTransformMoved.anchoredPosition, panelMoveDuration)
+            upgrade_targetPanel.DOAnchorPos(upgrade_panelTransformOrigin.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
-        }else if(type == CameraManager.CameraType.Normal)
+
+            shop_targetPanel.DOAnchorPos(shop_panelTransformOrigin.anchoredPosition, panelMoveDuration)
+                .SetEase(panelEase);
+        }
+        else if (type == CameraManager.CameraType.Upgrade)
         {
-            targetPanel.DOAnchorPos(panelTransformOrigin.anchoredPosition, panelMoveDuration)
+            upgrade_targetPanel.DOAnchorPos(upgrade_panelTransformMoved.anchoredPosition, panelMoveDuration)
+                .SetEase(panelEase);
+
+            shop_targetPanel.DOAnchorPos(shop_panelTransformOrigin.anchoredPosition, panelMoveDuration)
+                .SetEase(panelEase);
+        }
+        else if (type == CameraManager.CameraType.Shop)
+        {
+            upgrade_targetPanel.DOAnchorPos(upgrade_panelTransformOrigin.anchoredPosition, panelMoveDuration)
+                .SetEase(panelEase);
+
+            shop_targetPanel.DOAnchorPos(shop_panelTransformMoved.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
         }
     }

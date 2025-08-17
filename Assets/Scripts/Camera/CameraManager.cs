@@ -8,7 +8,8 @@ public class CameraManager : MonoBehaviour
     public enum CameraType
     {
         Normal,
-        Wide,
+        Upgrade,
+        Shop,
     }
 
 

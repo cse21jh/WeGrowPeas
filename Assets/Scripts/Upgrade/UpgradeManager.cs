@@ -152,7 +152,7 @@ public class UpgradeManager : MonoBehaviour
 
     public IEnumerator UpgradePhase()
     {
-        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Wide);
+        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Upgrade);
 
         Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
         ClickRouter.Instance.IsBlockedByUI = true;
