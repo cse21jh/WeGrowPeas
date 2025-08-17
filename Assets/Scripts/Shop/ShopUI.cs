@@ -2,30 +2,53 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using DG.Tweening.Core.Easing;
+using UnityEngine.Rendering;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 public class ShopUI : MonoBehaviour
 {
-    [Header("Slot Parents")]
+    [Header("Refs")]
+    [SerializeField] private ShopServices services;
     [SerializeField] private Transform fixedParent;     // 트럭 상단 3개
     [SerializeField] private Transform rotationParent;  // 트럭 하단 3개
-
-    [Header("Prefabs")]
     [SerializeField] private ItemSlot itemSlotPrefab;
-
-    [Header("Footer")]
     [SerializeField] private TMP_Text footerText;       // 화면 하단 정보/에러 표기 텍스트
-    [SerializeField] private string cannotBuyMessage = "구매 불가";
 
     [Header("Config")]
     [SerializeField] private ItemData[] fixedItems = new ItemData[3]; // 고정 3종(비어있지 않게 세팅)
-    [SerializeField] private List<ItemData> rotationPool;             // 로테이션 후보 리스트
+    [SerializeField] private List<RotationEntry> rotationPool;           // 로테이션 후보 리스트
     [SerializeField] private int rotationCount = 3;
 
-    // 이번 상점 세션에서 이미 “한 번만 구매 가능한” 아이템을 샀는지 체크
-    private HashSet<ItemData> purchasedOnceSet = new();
-
     // 생성된 슬롯들 (갱신 시 접근용)
-    private readonly List<ItemSlot> currentSlots = new();
+    private readonly List<ItemSlot> slots = new();
+
+    [System.Serializable]
+    public class RotationEntry
+    {
+        public ItemData data;
+        public int weight = 1;     // 0이하면 무시
+        public int unlockDay = 0;  // 게임 진행 일수/턴 등과 비교해서 해금
+    }
+
+    private ShopContext ctx;
+    private ShopSession session;
+
+    private void Awake()
+    {
+        session = new ShopSession();
+        ctx = new ShopContext
+        {
+            //Player = services.Player,
+            Grid = services.Grid,
+            //Wave = services.Wave,
+            //Bugs = services.Bugs,
+            Economy = services.Economy,
+            Session = session,
+            ShowInfo = ShowInfo,
+            ShowError = ShowError
+        };
+    }
 
     private void OnEnable()
     {
@@ -37,76 +60,98 @@ public class ShopUI : MonoBehaviour
     {
         ClearChildren(fixedParent);
         ClearChildren(rotationParent);
-        currentSlots.Clear();
-        purchasedOnceSet.Clear();
+        slots.Clear();
+
 
         // 상단: 고정 아이템 3개
         for (int i = 0; i < 3 && i < fixedItems.Length; i++)
         {
             var data = fixedItems[i];
             if (data == null) continue;
-
-            var slot = Instantiate(itemSlotPrefab, fixedParent);
-            bool oneTime = !data.isStackable; // “개수 있는 물품 제외” → stackable 아니면 1회 제한
-            int initialStock = data.isStackable ? Mathf.Max(1, data.initialStock) : 1;
-
-            slot.Init(this, data, oneTime, initialStock);
-            currentSlots.Add(slot);
+            MakeSlot(fixedParent, data);
         }
 
         // 하단: 로테이션 아이템 3개(중복 없이)
-        var chosen = ChooseRandomUnique(rotationPool, rotationCount);
+        var chosen = PickRotationUnique(rotationPool, rotationCount, GameManager.Instance.stage);
         foreach (var data in chosen)
-        {
-            var slot = Instantiate(itemSlotPrefab, rotationParent);
-            bool oneTime = !data.isStackable;
-            int initialStock = data.isStackable ? Mathf.Max(1, data.initialStock) : 1;
-
-            slot.Init(this, data, oneTime, initialStock);
-            currentSlots.Add(slot);
-        }
+            MakeSlot(rotationParent, data);
     }
 
-    // 구매 시도: 규칙 체크 + MarketManager에게 결제 위임
-    public bool TryBuy(ItemData data, bool oneTimeOnly)
+    private void MakeSlot(Transform parent, ItemData data)
     {
-        // 1) 1회 제한인 경우 이미 샀으면 불가
-        if (oneTimeOnly && purchasedOnceSet.Contains(data))
-        {
-            ShowError(cannotBuyMessage);
-            return false;
-        }
+        var slot = Instantiate(itemSlotPrefab, parent);
+        slot.Bind(this, data);
+        slots.Add(slot);
+    }
 
-        // 2) 돈 있는지 확인 및 결제
-        if (!ShopManager.Instance.TryBuy(data))
+    public void OnClickBuy(ItemData data, ItemSlot slot)
+    {
+        // 상점 세션 1회 제한 처리
+        if (data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data))
         {
-            ShowError(cannotBuyMessage);
-            return false;
+            ShowError("구매 불가");
+            return;
         }
 
-        // 3) 성공 → 1회 제한이면 구매 기록
-        if (oneTimeOnly)
-            purchasedOnceSet.Add(data);
+        // 구매 가능 체크 (중복 상태/해금 등)
+        if (!data.CanPurchase(ctx, out string why))
+        {
+            ShowError(why ?? "구매 불가");
+            return;
+        }
 
-        ClearInfo(); // 성공 시 푸터 정리(원하면 “구매 성공” 같은 문구 넣어도 됨)
-        return true;
+        // 효과 시작 → 플로우 분기
+        data.StartEffect(ctx, onReady: () =>
+        {
+            switch (data.FlowType)
+            {
+                case ShopFlowType.Instant:
+                    TryChargeAndCommit(data, slot);
+                    break;
+
+                case ShopFlowType.PlaceOnTile:
+                    services.Placement.BeginTilePlacement(
+                        validate: (pos) => data.ValidatePosition(ctx, pos, out _),
+                        onConfirm: (pos) =>
+                        {
+                            data.SetPlacedPosition(pos);
+                            TryChargeAndCommit(data, slot);
+                        },
+                        onCancel: () => data.Cancel(ctx)
+                    );
+                    break;
+
+                case ShopFlowType.SelectExistingPlant:
+                    services.Placement.BeginPlantSelection(
+                        validate: (plant) => data.ValidateTarget(ctx, plant, out _),
+                        onConfirm: (plant) =>
+                        {
+                            data.SetSelectedPlant(plant);
+                            TryChargeAndCommit(data, slot);
+                        },
+                        onCancel: () => data.Cancel(ctx)
+                    );
+                    break;
+            }
+        },
+        onError: (err) => ShowError(err ?? "구매 불가"));
     }
-
-    // 하단 정보/에러 텍스트
-    public void ShowInfo(string msg)
+    private void TryChargeAndCommit(ItemData data, ItemSlot slot)
     {
-        if (footerText == null) return;
-        footerText.text = msg;
-        footerText.color = Color.white;
-    }
+        if (!services.Economy.HasGold(data.Price))
+        {
+            ShowError("구매 불가");
+            data.Cancel(ctx);
+            return;
+        }
 
-    public void ShowError(string msg)
-    {
-        if (footerText == null) return;
-        footerText.text = msg;
-        footerText.color = Color.red;
-    }
+        services.Economy.SpendGold(data.Price);
+        data.Commit(ctx);
 
+        if (!data.IsStackable) session.MarkBought(data);
+        slot.OnPurchased(data.IsStackable ? 1 : int.MaxValue); // 스택형: 1 감소, 비스택형: 즉시 품절
+        ShowInfo($"{data.DisplayName} 구매 완료");
+    }
     public void ClearInfo()
     {
         if (footerText == null) return;
@@ -115,22 +160,52 @@ public class ShopUI : MonoBehaviour
 
     private static void ClearChildren(Transform parent)
     {
-        if (parent == null) return;
         for (int i = parent.childCount - 1; i >= 0; i--)
-            GameObject.Destroy(parent.GetChild(i).gameObject);
+            Destroy(parent.GetChild(i).gameObject);
     }
 
-    private static List<ItemData> ChooseRandomUnique(List<ItemData> pool, int count)
+    private List<ItemData> PickRotationUnique(List<RotationEntry> pool, int count, int currentDay)
     {
-        if (pool == null || pool.Count == 0) return new List<ItemData>();
-        var list = pool.Where(x => x != null).Distinct().ToList();
-        count = Mathf.Min(count, list.Count);
-
-        for (int i = 0; i < list.Count; i++)
+        var candidates = new List<RotationEntry>();
+        foreach (var e in pool)
         {
-            int j = Random.Range(i, list.Count);
-            (list[i], list[j]) = (list[j], list[i]);
+            if (e?.data == null) continue;
+            if (e.weight <= 0) continue;
+            if (currentDay < e.unlockDay) continue; // 해금 이전 제외
+            if (!e.data.IsRotationUnlockOk(ctx)) continue; // 효과 자체의 해금 조건(웨이브 해금 등)
+            candidates.Add(e);
         }
-        return list.GetRange(0, count);
+
+        var result = new List<ItemData>();
+        // 가중치 중복 없는 추출
+        for (int k = 0; k < count; k++)
+        {
+            if (candidates.Count == 0) break;
+            int total = 0;
+            foreach (var c in candidates) total += c.weight;
+
+            int r = Random.Range(0, total);
+            int acc = 0;
+            int idx = -1;
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                acc += candidates[i].weight;
+                if (r < acc) { idx = i; break; }
+            }
+            result.Add(candidates[idx].data);
+            candidates.RemoveAt(idx); // 중복 방지
+        }
+        return result;
     }
+
+    private void ShowInfo(string msg) { if (footerText) { footerText.color = Color.white; footerText.text = msg; } }
+    private void ShowError(string msg) { if (footerText) { footerText.color = Color.red; footerText.text = msg; } }
+    private class ShopSession
+    {
+        private HashSet<ItemData> once = new();
+        public bool WasBought(ItemData e) => once.Contains(e);
+        public void MarkBought(ItemData e) => once.Add(e);
+        public void ClearThisShop() => once.Clear();
+    }
+
 }

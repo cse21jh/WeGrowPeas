@@ -1,0 +1,103 @@
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
+public class ChiliPepperItemData : ItemData
+{
+    [Header("Pepper Settings")]
+    [Range(0f, 1f)]
+    public float neighborBaseResist = 0.8f; // 인접 4칸 기본 저항 취급(추후 훅 연결용)
+
+    // 배치 확정 시 사용할 그리드 인덱스
+    private int? pendingIndex;
+
+    private void OnEnable()
+    {
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추";
+        if (Price <= 0) Price = 1500;
+
+        IsStackable = false;
+        InitialStock = 1;
+        OnePerShopIfNotStackable = true;
+        FlowType = ShopFlowType.PlaceOnTile;
+    }
+
+    public override bool IsRotationUnlockOk(ShopContext ctx) => true;
+
+    public override bool CanPurchase(ShopContext ctx, out string reason)
+    {
+        if (ctx == null || ctx.Grid == null)
+        {
+            reason = "Grid 참조가 없습니다 (ShopContext.Grid 주입 필요)";
+            return false;
+        }
+        reason = null;
+        return true;
+    }
+
+    // 배치 모드 진입: 별도 준비 없음
+    public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
+    {
+        onReady?.Invoke();
+    }
+
+    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    {
+        reason = null;
+        if (ctx == null || ctx.Grid == null)
+        {
+            reason = "Grid 참조가 없습니다";
+            return false;
+        }
+
+        // 스크린 좌표 → 그리드 인덱스
+        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
+        if (!idx.HasValue)
+        {
+            reason = "유효한 토양이 아닙니다";
+            return false;
+        }
+
+        // 빈 칸인지 확인
+        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        {
+            reason = "이미 식물이 있는 칸입니다";
+            return false;
+        }
+
+        // 문제 없으면 확정 후보 저장
+        pendingIndex = idx.Value;
+        return true;
+    }
+
+    // ShopUI가 확인된 위치를 넘겨줄 때 호출되지만,
+    // 우리 쪽은 인덱스를 pending으로 들고 있으므로 별도 저장 불필요
+    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
+
+    public override void Commit(ShopContext ctx)
+    {
+        if (ctx == null || ctx.Grid == null)
+        {
+            ctx?.ShowError?.Invoke("Grid 참조가 없습니다");
+            return;
+        }
+        if (!pendingIndex.HasValue)
+        {
+            ctx.ShowError?.Invoke("배치 위치가 유효하지 않습니다");
+            return;
+        }
+
+        // 실제 배치
+        ctx.Grid.AddChiliPepper(pendingIndex.Value);
+
+        // 인접 4칸 “기본 저항 80% 취급”은 현재 Grid API가 없으므로
+        // TODO: 아래 훅을 Grid/Plant 쪽에 추가하여 적용하는 것을 권장.
+        // ApplyNeighborRecessiveTrait(ctx, pendingIndex.Value, neighborBaseResist);
+
+        pendingIndex = null;
+    }
+
+    public override void Cancel(ShopContext ctx)
+    {
+        pendingIndex = null;
+    }
+}
