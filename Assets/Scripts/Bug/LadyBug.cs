@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LadyBug : Bug
+public class Ladybug : Bug
 {
     protected override void Start()
     {
