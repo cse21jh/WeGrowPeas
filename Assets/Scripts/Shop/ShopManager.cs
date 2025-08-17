@@ -1,18 +1,24 @@
-using NUnit.Framework.Interfaces;
+using System.Collections;
 using UnityEngine;
 
 public class ShopManager : Singleton<ShopManager>
 {
-    private int gold = 10;
-    public bool TryBuy(ItemData data)
-    {
-        if (gold < data.price)
-        {
-            Debug.Log("골드 부족");
-            return false;
-        }
+    [SerializeField] private ShopUI shopUI;
 
-        gold -= data.price;
-        return true;
+    public IEnumerator ShopPhase()
+    {
+        // 6일마다만 상점 오픈
+        if (GameManager.Instance.stage % 6 != 0)
+            yield break;
+
+        // UI 열기
+        shopUI.Open();
+
+        // UI에서 "구매 완료" / "닫기" 버튼이 눌릴 때까지 대기
+        bool closed = false;
+        shopUI.OnShopClosed += () => closed = true;
+
+        while (!closed)
+            yield return null;
     }
 }

@@ -58,6 +58,13 @@ public class Grid : MonoBehaviour
     [SerializeField] private Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] private SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
+    [Header("Shop")]
+    [SerializeField] private GameObject shopRoot;
+    [SerializeField] private CanvasGroup shopCanvas;
+
+    private bool isShopOpen = false;
+    private bool shopCloseRequested = false;
+
 
     // Start is called before the first frame update
     void Start()

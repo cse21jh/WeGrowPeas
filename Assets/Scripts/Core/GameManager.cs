@@ -35,6 +35,7 @@ public class GameManager : Singleton<GameManager>
     public Grid grid;
     public EnemyController enemyController;
     public UpgradeManager upgradeManager;
+    public ShopManager shopManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -116,6 +117,7 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitForSeconds(2.0f);
             yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
+            yield return StartCoroutine(shopManager.ShopPhase());
         }
 
     }
