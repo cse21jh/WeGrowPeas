@@ -90,9 +90,10 @@ public class Grid : MonoBehaviour
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
             {
-                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f)
+                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
             };
             Debug.Log(basicTrait);
+            FenceUIManager.Instance.SetFenceElements(basicTrait);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
