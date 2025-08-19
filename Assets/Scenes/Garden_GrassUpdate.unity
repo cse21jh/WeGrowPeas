@@ -21511,6 +21511,7 @@ GameObject:
   - component: {fileID: 135000019}
   - component: {fileID: 135000021}
   - component: {fileID: 135000020}
+  - component: {fileID: 135000022}
   m_Layer: 5
   m_Name: BugDeath
   m_TagString: Untagged
@@ -21582,6 +21583,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 135000018}
   m_CullTransparentMesh: 1
+--- !u!114 &135000022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135000018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 1489460544}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 108479090}
+  dnaImages:
+  - {fileID: 348393224}
+  - {fileID: 559720211}
+  dnaSprites: []
+  star: {fileID: 383486400}
 --- !u!1 &136203579
 GameObject:
   m_ObjectHideFlags: 0
@@ -65006,6 +65027,7 @@ GameObject:
   - component: {fileID: 424771089}
   - component: {fileID: 424771091}
   - component: {fileID: 424771090}
+  - component: {fileID: 424771092}
   m_Layer: 5
   m_Name: ColdDeath
   m_TagString: Untagged
@@ -65077,6 +65099,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 424771088}
   m_CullTransparentMesh: 1
+--- !u!114 &424771092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424771088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 984215192}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 693357690}
+  dnaImages:
+  - {fileID: 1573538279}
+  - {fileID: 6680448}
+  dnaSprites: []
+  star: {fileID: 1191908581}
 --- !u!1 &426218784
 GameObject:
   m_ObjectHideFlags: 0
@@ -79566,12 +79608,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526293815}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.95, y: -3.42, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 11.879998, y: -2.9099998, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 651542069}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &526293818
 MonoBehaviour:
@@ -91422,6 +91464,7 @@ GameObject:
   - component: {fileID: 611771240}
   - component: {fileID: 611771242}
   - component: {fileID: 611771241}
+  - component: {fileID: 611771243}
   m_Layer: 5
   m_Name: WindDeath
   m_TagString: Untagged
@@ -91492,6 +91535,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 611771239}
   m_CullTransparentMesh: 1
+--- !u!114 &611771243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611771239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 570488003}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 1005485461}
+  dnaImages:
+  - {fileID: 75238890}
+  - {fileID: 2023854879}
+  dnaSprites: []
+  star: {fileID: 2038581129}
 --- !u!1 &612299446
 GameObject:
   m_ObjectHideFlags: 0
@@ -97243,6 +97306,7 @@ Transform:
   - {fileID: 1646214736}
   - {fileID: 1797164496}
   - {fileID: 2105490901}
+  - {fileID: 526293817}
   m_Father: {fileID: 886220747}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &651802960
@@ -130400,6 +130464,7 @@ GameObject:
   - component: {fileID: 871274746}
   - component: {fileID: 871274748}
   - component: {fileID: 871274747}
+  - component: {fileID: 871274749}
   m_Layer: 5
   m_Name: NaturalDeath
   m_TagString: Untagged
@@ -130470,6 +130535,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 871274745}
   m_CullTransparentMesh: 1
+--- !u!114 &871274749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871274745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 1078752020}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 1478005345}
+  dnaImages:
+  - {fileID: 1136485464}
+  - {fileID: 2010453926}
+  dnaSprites: []
+  star: {fileID: 184056401}
 --- !u!1 &872011212
 GameObject:
   m_ObjectHideFlags: 0
@@ -158490,6 +158575,7 @@ GameObject:
   - component: {fileID: 1065358762}
   - component: {fileID: 1065358764}
   - component: {fileID: 1065358763}
+  - component: {fileID: 1065358765}
   m_Layer: 5
   m_Name: FloodDeath
   m_TagString: Untagged
@@ -158561,6 +158647,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1065358761}
   m_CullTransparentMesh: 1
+--- !u!114 &1065358765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065358761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 1289131348}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 1185476933}
+  dnaImages:
+  - {fileID: 294320609}
+  - {fileID: 6020314}
+  dnaSprites: []
+  star: {fileID: 1006857708}
 --- !u!1 &1067998840
 GameObject:
   m_ObjectHideFlags: 0
@@ -195668,6 +195774,7 @@ GameObject:
   - component: {fileID: 1312250696}
   - component: {fileID: 1312250698}
   - component: {fileID: 1312250697}
+  - component: {fileID: 1312250699}
   m_Layer: 5
   m_Name: RainDeath
   m_TagString: Untagged
@@ -195739,6 +195846,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312250695}
   m_CullTransparentMesh: 1
+--- !u!114 &1312250699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312250695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198b265e7f045824890dd3f564fad1b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceAnim: {fileID: 1993474355}
+  faceMaxDelay: 0.5
+  surviveProbability: {fileID: 7928376}
+  dnaImages:
+  - {fileID: 1651337987}
+  - {fileID: 507902702}
+  dnaSprites: []
+  star: {fileID: 905534817}
 --- !u!1 &1312334038
 GameObject:
   m_ObjectHideFlags: 0
@@ -279203,6 +279330,7 @@ GameObject:
   - component: {fileID: 1912975208}
   - component: {fileID: 1912975207}
   - component: {fileID: 1912975206}
+  - component: {fileID: 1912975210}
   m_Layer: 5
   m_Name: FenceCanvas
   m_TagString: Untagged
@@ -279298,6 +279426,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 800, y: 449.99997}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1912975210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912975205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf6a2b05f0fc43458b11e8d13d46d19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1914399787
 GameObject:
   m_ObjectHideFlags: 0
@@ -313775,4 +313915,3 @@ SceneRoots:
   - {fileID: 66307782}
   - {fileID: 1553829375}
   - {fileID: 1801813057}
-  - {fileID: 526293817}
