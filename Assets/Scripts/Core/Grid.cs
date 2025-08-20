@@ -6,68 +6,69 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Grid : MonoBehaviour
 {
-    private EnemyController enemyController;
+    protected EnemyController enemyController;
 
     List<Plant> plants = new List<Plant>();
     [HideInInspector] public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
-    private int additionalInheritance = 0;
-    private float breedTimer = 30.0f;
-    private int maxBreedCount = 4;
-    private int breedCount = 0;
+    protected int additionalInheritance = 0;
+    protected float breedTimer = 30.0f;
+    protected int maxBreedCount = 4;
+    protected int breedCount = 0;
     public int BreedCount => breedCount;
 
-    private bool isBreeding = false;
+    protected bool isBreeding = false;
 
-    private GameObject breedObj1 = null;
-    private GameObject breedObj2 = null;
-    private bool isBreedButtonPressed = false;
+    protected GameObject breedObj1 = null;
+    protected GameObject breedObj2 = null;
+    protected bool isBreedButtonPressed = false;
 
-    private bool isBreedSkipButtonPressed = false;
+    protected bool isBreedSkipButtonPressed = false;
 
-    private float bugSpawnTimeInterval = 10.0f;
-    private float lastBugSpawnTimeInterval = 0f;
-    
-    private float bugSpeedDecreasement= 0f;
-    private float bugSpawnIntervalIncreasement = 0f;
-    private float ladybugSpawnProbability = 0f;
-    private int additionalBugGold = 0;
+    protected float bugSpawnTimeInterval = 10.0f;
+    protected float lastBugSpawnTimeInterval = 0f;
 
-    private float additionalPestResistance = 0f;
+    protected float bugSpeedDecreasement = 0f;
+    protected float bugSpawnIntervalIncreasement = 0f;
+    protected float ladybugSpawnProbability = 0f;
+    protected int additionalBugGold = 0;
 
-    [SerializeField] private GameObject peaPrefab;
-    [SerializeField] private GameObject peanutPrefab;
-    [SerializeField] private GameObject NepenthesPrefab;
-    [SerializeField] private GameObject ChiliPepperPrefab;
+    protected float additionalPestResistance = 0f;
+
+    [SerializeField] protected GameObject peaPrefab;
+    [SerializeField] protected GameObject peanutPrefab;
+    [SerializeField] protected GameObject NepenthesPrefab;
+    [SerializeField] protected GameObject ChiliPepperPrefab;
     //[SerializeField] private GameObject soilPrefab;
-    [SerializeField] private GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
-    [SerializeField] private List<GameObject> bugPrefabs;
+    [SerializeField] protected GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
+    [SerializeField] protected List<GameObject> bugPrefabs;
 
-    [SerializeField] private TimerUI breedTimerUI;
-    [SerializeField] private GameObject breedButton;
-    [SerializeField] private GameObject breedSkipButton;
-    [SerializeField] private TextMeshProUGUI breedCountUI;
-    
+    [SerializeField] protected TimerUI breedTimerUI;
+    [SerializeField] protected GameObject breedButton;
+    [SerializeField] protected GameObject breedSkipButton;
+    [SerializeField] protected TextMeshProUGUI breedCountUI;
+
     public int killBugCount = 0;
     public int totalBreedCount = 0;
     public int totalPeaBreedcount = 0;
     public int totalPeanutBreedCount = 0;
 
-    [SerializeField] private Sprite[] gardenSprites; // 정원 배경 스프라이트들
-    [SerializeField] private SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
+    [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
+    [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
     [Header("Shop")]
-    [SerializeField] private GameObject shopRoot;
-    [SerializeField] private CanvasGroup shopCanvas;
+    [SerializeField] protected GameObject shopRoot;
+    [SerializeField] protected CanvasGroup shopCanvas;
 
-    private bool isShopOpen = false;
-    private bool shopCloseRequested = false;
+    protected bool isShopOpen = false;
+    protected bool shopCloseRequested = false;
 
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         //InitGrid();
@@ -85,19 +86,19 @@ public class Grid : MonoBehaviour
     {
         for (int i = 0; i < 2; i++)
         {
-            
+
             GameObject obj = Instantiate(peaPrefab);
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
-            {
-                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
-            };
+        {
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
+        };
             Debug.Log(basicTrait);
             FenceUIManager.Instance.SetFenceElements(basicTrait);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
-           
+
         }
     }
 
@@ -128,7 +129,7 @@ public class Grid : MonoBehaviour
         {
             lastBugSpawnTimeInterval += Time.deltaTime;
 
-            if(Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.S))
             {
                 SkipBreed();
             }
@@ -167,12 +168,12 @@ public class Grid : MonoBehaviour
                     }
 
                     bool isEqualPlant = false;
-                    if((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
+                    if ((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
                     {
                         isEqualPlant = true;
                     }
 
-                    
+
                     if (canBreed && breedCount < maxBreedCount && isEqualPlant)
                     {
                         GameObject childObj = null;
@@ -246,8 +247,8 @@ public class Grid : MonoBehaviour
             yield return null;
         }
 
-        if(breedObj1 != null) breedObj1.GetComponent<Plant>().MakeDefaultSprite();
-        if(breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
+        if (breedObj1 != null) breedObj1.GetComponent<Plant>().MakeDefaultSprite();
+        if (breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
 
         breedTimerUI.StopTimer();
         breedCount = 0;
@@ -256,7 +257,7 @@ public class Grid : MonoBehaviour
         enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
-        //Grid 리로드
+        //GardenGrid 리로드
 
         yield return null;
     }
@@ -324,9 +325,9 @@ public class Grid : MonoBehaviour
         child.SetTrait(childTrait);
     }
 
-    private void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
+    protected void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
     {
-        if(grididx != -1)
+        if (grididx != -1)
         {
             if (!plantGrid.ContainsKey(grididx))
             {
@@ -342,6 +343,7 @@ public class Grid : MonoBehaviour
             if (!plantGrid.ContainsKey(idx))
             {
                 plant.Init(idx, this);
+                Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
                 Plantplant(plant);
 
                 return;
@@ -378,7 +380,7 @@ public class Grid : MonoBehaviour
     public void AddChiliPepper(int idx)
     {
         GameObject obj = Instantiate(ChiliPepperPrefab);
-        ChiliPepper chiliPepper= obj.GetComponent<ChiliPepper>();
+        ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
     }
 
@@ -403,7 +405,7 @@ public class Grid : MonoBehaviour
 
     public void ClearGridIndex(int gridIndex)
     {
-        if(plantGrid.ContainsKey(gridIndex)) plantGrid.Remove(gridIndex);
+        if (plantGrid.ContainsKey(gridIndex)) plantGrid.Remove(gridIndex);
 
         if (CheckGameOver())
         {
@@ -595,7 +597,7 @@ public class Grid : MonoBehaviour
     }
 
     public bool GetIsBreeding()
-    { 
+    {
         return isBreeding;
     }
 
@@ -693,14 +695,14 @@ public class Grid : MonoBehaviour
         bugSpeedDecreasement += value;
     }
 
-    public float GetBugSpeedDecreasement() 
+    public float GetBugSpeedDecreasement()
     {
-        return bugSpeedDecreasement; 
+        return bugSpeedDecreasement;
     }
 
     public void AddBugSpawnIntervalIncreasement(float value)
     {
-        bugSpawnIntervalIncreasement += value; 
+        bugSpawnIntervalIncreasement += value;
     }
 
     public void AddLadybugSpawnProbability(float value)
@@ -718,4 +720,5 @@ public class Grid : MonoBehaviour
         return additionalBugGold;
     }
 }
+
 

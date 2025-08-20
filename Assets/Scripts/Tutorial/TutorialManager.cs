@@ -15,7 +15,7 @@ public class TutorialManager : MonoBehaviour
 
         Time.timeScale = 1;
 
-        ClickRouter.Instance.IsBlockedByUI = false;
+        //ClickRouter.Instance.IsBlockedByUI = false;
 
         StartCoroutine(RunTutorial());
     }
@@ -37,7 +37,8 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator TutorialStep0()
     {
-        grid.InitGrid();
+        Debug.Log("튜토리얼 0 실행");
+        grid.InitTGrid();
         yield return null;
     }
 
