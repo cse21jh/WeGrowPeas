@@ -6,9 +6,11 @@ using UnityEngine;
 public class Bug : MonoBehaviour
 {
     protected Grid grid;
+    protected EconomyManager economyManager;
 
     protected int targetObjIdx = 999;
     protected int spawnEdge;
+    protected int gold = 100;
 
     [SerializeField]
     protected float speed;
@@ -41,6 +43,7 @@ public class Bug : MonoBehaviour
     {
         bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
         WarningPrefab = Resources.Load<GameObject>("Prefabs/Warning");
+        economyManager = GameObject.Find("EconomyManager").GetComponent<EconomyManager>();
         grid = GameObject.Find("Grid").GetComponent<Grid>();
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
@@ -215,6 +218,7 @@ public class Bug : MonoBehaviour
             grid.killBugCount++;
             grid.AddAdditionalPestResistance(0.0005f);
             isDie = true;
+            economyManager.AddGold(gold + grid.GetAdditionalBugGold());
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }
