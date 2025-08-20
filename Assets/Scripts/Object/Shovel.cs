@@ -7,7 +7,10 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 {
     [SerializeField] private Canvas canvas;
     [SerializeField] private Grid grid;
+    [SerializeField] protected EconomyManager economyManager;
     [SerializeField] private RectTransform shovelRectTransform;
+
+    
 
     private bool isDragging = false;
 
@@ -68,7 +71,11 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         {
             Plant plant = hit.collider.GetComponent<Plant>();
 
+            if (plant == null) return;
+
             SoundManager.Instance.PlayEffect("Shovel");
+
+            economyManager.AddGold(plant.GetSellingPrice());
 
             plant.Die();
 

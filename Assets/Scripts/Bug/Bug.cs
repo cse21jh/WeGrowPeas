@@ -174,7 +174,10 @@ public class Bug : MonoBehaviour
         if (plant != null && !isDie)
         {
             if (plant.GetType() == typeof(Nepenthes))
+            {
+                economyManager.AddGold(100);
                 StartCoroutine(KillBug());
+            }
             else
                 plant.Die();
         }

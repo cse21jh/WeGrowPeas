@@ -27,6 +27,7 @@ public class UIPlantStat : MonoBehaviour
             string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((plant.GetResistanceValueByOrder(i+1)) * 100f):F2}% | {traits[i + 1].genetics}" : "";
 
             traitline += $"{left}\t{right}\n";
+            traitline += $"¸À : {plant.GetTaste()}";
         }
         textStat.text = traitline;
 
@@ -44,6 +45,7 @@ public class UIPlantStat : MonoBehaviour
             string right = (i + 1 < traits.Count) ? $"<sprite={(int)(traits[i + 1].traitType + 1)}> {((plant.GetResistanceValueByOrder(i + 1)) * 100f):F2}% | {traits[i + 1].genetics}" : "";
 
             traitline += $"{left}\t{right}\n";
+            traitline += $"¸À : {plant.GetTaste()}";
         }
         textStat.text = traitline;
 

@@ -202,6 +202,21 @@ public class Pea : Plant
         return 0.1f;
     }
 
+    public override int GetSellingPrice()
+    {
+        switch (taste)
+        {
+            case 0: return 90;
+            case 1: return 130;
+            case 2: return 160;
+            case 3: return 180;
+            case 4: return 200;
+            case 5: return 230;
+            case 6: return 270;
+        }
+        return 0;
+    }
+
 
 
 }

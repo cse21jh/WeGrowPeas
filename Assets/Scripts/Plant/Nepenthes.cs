@@ -14,6 +14,11 @@ public class Nepenthes : Plant
         return 1f;
     }
 
+    public override int GetSellingPrice()
+    {
+        return 0;
+    }
+
 
     // 테스트용 더미 옮길 수 있도록
 

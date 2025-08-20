@@ -12,7 +12,10 @@ public class ChiliPepper : Plant
         return 1f;
     }
 
-
+    public override int GetSellingPrice()
+    {
+        return 500;
+    }
 
 
     // 테스트용 더미 옮기기 가능하도록

@@ -9,11 +9,15 @@ using Unity.VisualScripting;
 
 public abstract class Plant : MonoBehaviour
 {
+    //저장이 필요한 값들
     public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
     protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
-
     public int gridIndex { get; private set; }
+    protected int taste;
+    
+    
+
     protected Grid grid;
 
 
@@ -34,6 +38,7 @@ public abstract class Plant : MonoBehaviour
     {
         this.gridIndex = gridIndex;
         this.grid = grid;
+        taste = UnityEngine.Random.Range(0, 7);
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         childMaterials = new Material[childSpriteRenderers.Length];
@@ -210,6 +215,8 @@ public abstract class Plant : MonoBehaviour
 
     public abstract float GetResistanceBasedOnGenetics(int genetics);
 
+    public abstract int GetSellingPrice();
+
     public bool CheckChiliPepper()
     {
         Plant chiliPepper;
@@ -249,5 +256,10 @@ public abstract class Plant : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public int GetTaste()
+    {
+        return taste;
     }
 }
