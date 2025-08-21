@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,99 +18,40 @@ public class FenceUIManager : MonoBehaviour
     }
 
 
-    public void SetFenceElements(List<GeneticTrait> peaTraits)
-    { 
-        Debug.Log($"SetFenceElements called with {peaTraits.Count} traits.");
-        for (int i = 0; i < peaTraits.Count; i++)
+    public void SetFenceElements(int plantIndex, List<GeneticTrait> Traits, int taste)
+    {
+
+        foreach (var element in fenceElements)
         {
-            switch (i)
+            element.gameObject.SetActive(true);
+        }
+
+        Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
+        for (int i = 0; i < Traits.Count; i++)
+        {
+            bool isTasteActive = i < taste;
+            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive);
+        }
+
+        for(int i = Traits.Count; i < fenceElements.Length; i++)
+        {
+            bool isTasteActive = i < taste;
+            GeneticTrait defaultTrait = new GeneticTrait
             {
-                case 0:
-                    if (peaTraits[i].traitType == CompleteTraitType.NaturalDeath)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                case 1:
-                    if (peaTraits[i].traitType == CompleteTraitType.WindResistance)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                case 2:
-                    if (peaTraits[i].traitType == CompleteTraitType.FloodResistance)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                case 3:
-                    if (peaTraits[i].traitType == CompleteTraitType.PestResistance)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                case 4:
-                    if (peaTraits[i].traitType == CompleteTraitType.ColdResistance)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                case 5:
-                    if (peaTraits[i].traitType == CompleteTraitType.HeavyRainResistance)
-                    {
-                        SetElements(i, peaTraits[i]);
-                    }
-                    else
-                    {
-                        ResetElements(i);
-                    }
-                    break;
-                default:
-                    Debug.LogError($"Unexpected index {i} in SetFenceElements. Expected 0-5.");
-                    ResetElements(i);
-                    break;
-            }
+                traitType = CompleteTraitType.None,
+                resistance = 0f,
+                additionalResistance = 0f,
+                genetics = 0
+            };
+            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive);
         }
+    }
 
-        for(int i = peaTraits.Count; i < fenceElements.Length; i++)
+    public void HideFenceElements()
+    {
+        foreach (var element in fenceElements)
         {
-            ResetElements(i);
+            element.gameObject.SetActive(false);
         }
-    }
-
-    private void SetElements(int index, GeneticTrait trait)
-    {
-        // If the trait is not None, set the element to active with the trait's properties
-        float surviveProb = trait.resistance + trait.additionalResistance;
-        int dnaIndex = (int)trait.genetics;
-        bool isStarActive = false;
-        //isStarActive = i < trait.taste;
-        fenceElements[index].SetElement(true, "", surviveProb, dnaIndex, isStarActive);
-    }
-
-    private void ResetElements(int index)
-    {
-        // If the trait is None, set the element to inactive with the normal pea name
-        fenceElements[index].SetElement(false, normalPeaName);
     }
 }

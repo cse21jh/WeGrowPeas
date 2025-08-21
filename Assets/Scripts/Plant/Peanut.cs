@@ -113,11 +113,13 @@ public class Peanut : Plant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
+        FenceUIManager.Instance.SetFenceElements(1, traits, taste);
     }
 
     protected void OnMouseExit()
     {
         UIPlantStat.Instance.HideInfo();
+        FenceUIManager.Instance.HideFenceElements();
     }
 
     private void OnMouseDown()

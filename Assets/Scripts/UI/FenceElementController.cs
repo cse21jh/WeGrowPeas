@@ -6,17 +6,17 @@ using System.Collections;
 public class FenceElementController : MonoBehaviour
 {
     [Header("¿ÏµÎÄá ¸ð½À °ü·Ã")]
-    [SerializeField] private Animator faceAnim;
-    [SerializeField] private float faceMaxDelay = 0.5f;
-    [SerializeField] private GameObject prop;
-    Image faceImage;
-    [SerializeField] private Sprite defaultPeaBase;
-    [SerializeField] private Sprite normalPeaBase;
+    [SerializeField] private GameObject[] peas;
+    [SerializeField] private string[] peaNames;
+
+    [Space(10)]
+    [Header("¶¥Äá ¸ð½À °ü·Ã")]
+    [SerializeField] private GameObject[] peanuts;
+    [SerializeField] private string[] peanutNames;
 
     [Space(10)]
     [Header("UI ¿ä¼Òµé")]
     [SerializeField] private TextMeshProUGUI elementName;
-    [SerializeField] private string defaultName;
     [SerializeField] private TextMeshProUGUI surviveProbability;
     [SerializeField] private Image[] dnaImages;
     [SerializeField] private Sprite[] dnaSprites;
@@ -24,63 +24,119 @@ public class FenceElementController : MonoBehaviour
 
     private void Start()
     {
-        faceImage = GetComponent<Image>();
-        if (faceAnim != null)
-        {
-            StartCoroutine(FaceStart());
-        }
     }
 
-    public void SetElement(bool isActive, string name = "", float surviveProb = 0f, int dna = 0, bool isStarActive = false)
+    public void SetElement(int plantIndex, GeneticTrait trait, bool isTaste)
     {
-        if (!isActive)      // If the element is not active, hide all UI components
+        Debug.Log($"SetElement called with trait: {trait.traitType}, isTaste: {isTaste}");
+        float surviveProb = trait.resistance + trait.additionalResistance;
+        int dnaIndex = (int)trait.genetics;
+
+        //ÃÊ±âÈ­
+        foreach (GameObject pea in peas)
         {
-            faceImage.sprite = normalPeaBase; // Reset face image to normal pea base
-            if (prop != null)
-                prop.SetActive(false);
-            surviveProbability.gameObject.SetActive(false);
-            elementName.text = name;
-            dnaImages[0].gameObject.SetActive(false);
-            dnaImages[1].gameObject.SetActive(false);
-            star.gameObject.SetActive(false);
+            pea.SetActive(false);
         }
-        else                // If the element is active, set the UI components accordingly
+        foreach (GameObject peanut in peanuts)
         {
-            faceImage.sprite = defaultPeaBase; // Reset face image to default
-            if (prop != null)
-                prop.SetActive(true);
+            peanut.SetActive(false);
+        }
 
-            surviveProbability.gameObject.SetActive(true);
-            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%";
-
-            elementName.text = defaultName;
-
-            dnaImages[0].gameObject.SetActive(true);
-            dnaImages[1].gameObject.SetActive(true);
-            switch (dna)
+        //¿ÏµÎÄá ¹× ¶¥Äá ¼³Á¤
+        if (plantIndex == 0)
+        {
+            switch (trait.traitType)
             {
-                case 0:
-                    dnaImages[0].sprite = dnaSprites[0];
-                    dnaImages[1].sprite = dnaSprites[0];
+                case CompleteTraitType.NaturalDeath:
+                    peas[1].SetActive(true);
+                    elementName.text = peaNames[1];
                     break;
-                case 1:
-                    dnaImages[0].sprite = dnaSprites[1];
-                    dnaImages[1].sprite = dnaSprites[0];
+                case CompleteTraitType.WindResistance:
+                    peas[2].SetActive(true);
+                    elementName.text = peaNames[2];
                     break;
-                case 2:
-                    dnaImages[0].sprite = dnaSprites[1];
-                    dnaImages[1].sprite = dnaSprites[1];
+                case CompleteTraitType.FloodResistance:
+                    peas[3].SetActive(true);
+                    elementName.text = peaNames[3];
+                    break;
+                case CompleteTraitType.PestResistance:
+                    peas[4].SetActive(true);
+                    elementName.text = peaNames[4];
+                    break;
+                case CompleteTraitType.ColdResistance:
+                    peas[5].SetActive(true);
+                    elementName.text = peaNames[5];
+                    break;
+                case CompleteTraitType.HeavyRainResistance:
+                    peas[6].SetActive(true);
+                    elementName.text = peaNames[6];
+                    break;
+                default:
+                    peas[0].SetActive(true); // ±âº» ¿ÏµÎÄá
+                    elementName.text = peaNames[0];
                     break;
             }
-
-            star.gameObject.SetActive(isStarActive);
         }
+        else
+        {
+            switch (trait.traitType)
+            {
+                case CompleteTraitType.NaturalDeath:
+                    peanuts[1].SetActive(true);
+                    elementName.text = peanutNames[1];
+                    break;
+                case CompleteTraitType.WindResistance:
+                    peanuts[2].SetActive(true);
+                    elementName.text = peanutNames[2];
+                    break;
+                case CompleteTraitType.FloodResistance:
+                    peanuts[3].SetActive(true);
+                    elementName.text = peanutNames[3];
+                    break;
+                case CompleteTraitType.PestResistance:
+                    peanuts[4].SetActive(true);
+                    elementName.text = peanutNames[4];
+                    break;
+                case CompleteTraitType.ColdResistance:
+                    peanuts[5].SetActive(true);
+                    elementName.text = peanutNames[5];
+                    break;
+                case CompleteTraitType.HeavyRainResistance:
+                    peanuts[6].SetActive(true);
+                    elementName.text = peanutNames[6];
+                    break;
+                default:
+                    peanuts[0].SetActive(true); // ±âº» ¿ÏµÎÄá
+                    elementName.text = peanutNames[0];
+                    break;
+            }
+        }
+
+
+            surviveProbability.gameObject.SetActive(true);
+        surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%";
+
+
+        dnaImages[0].gameObject.SetActive(true);
+        dnaImages[1].gameObject.SetActive(true);
+        switch (dnaIndex)
+        {
+            case 0:
+                dnaImages[0].sprite = dnaSprites[0];
+                dnaImages[1].sprite = dnaSprites[0];
+                break;
+            case 1:
+                dnaImages[0].sprite = dnaSprites[1];
+                dnaImages[1].sprite = dnaSprites[0];
+                break;
+            case 2:
+                dnaImages[0].sprite = dnaSprites[1];
+                dnaImages[1].sprite = dnaSprites[1];
+                break;
+        }
+
+        star.gameObject.SetActive(isTaste);
     }
 
-    private IEnumerator FaceStart()
-    {
-        float delay = Random.Range(0f, faceMaxDelay);
-        yield return new WaitForSeconds(delay);
-        faceAnim.SetTrigger("Start");
-    }
+
 }
