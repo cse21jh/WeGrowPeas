@@ -54,4 +54,37 @@ public class FenceUIManager : MonoBehaviour
             element.gameObject.SetActive(false);
         }
     }
+
+
+    public void SetWaveHighlight(Wave wave)
+    {
+        foreach(var element in fenceElements)
+        {
+            element.SetLightActive(false, wave.WaveType);
+        }
+
+        switch (wave.WaveType)
+        {
+            case WaveType.Aging:
+                fenceElements[0].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Wind:
+                fenceElements[1].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Flood:
+                fenceElements[2].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Pest:
+                fenceElements[3].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Cold:
+                fenceElements[4].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.HeavyRain:
+                fenceElements[5].SetLightActive(true, wave.WaveType);
+                break;
+            default:
+                break;
+        }
+    }
 }

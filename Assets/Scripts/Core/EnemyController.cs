@@ -43,6 +43,7 @@ public class EnemyController : MonoBehaviour
         lastWave = unlockedWave[0];
         currentWave = unlockedWave[0];
         nextWave = unlockedWave[0];
+        FenceUIManager.Instance.SetWaveHighlight(currentWave);
     }
 
     // Update is called once per frame
@@ -91,6 +92,7 @@ public class EnemyController : MonoBehaviour
     {
         lastWave = currentWave;
         currentWave = nextWave;
+        FenceUIManager.Instance.SetWaveHighlight(currentWave);
         int next = Random.Range(0, unlockedWave.Count);
         nextWave = unlockedWave[next];
         return;
