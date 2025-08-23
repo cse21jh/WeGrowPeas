@@ -4,21 +4,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Narration : MonoBehaviour, IPointerClickHandler
+public class Narration : MonoBehaviour
 {
     private RectTransform narrationBoxContent;
 
     [SerializeField] private GameObject textBoxPrefab;
     [SerializeField] private int maxVisible = 4;
-
-    [TextArea]
-    public List<string> demoLines = new List<string>{
-        "오, 네가 우리를 관리해 줄 연구자구나?",
-        "만나서 반가워! 우리는 인류의 먹거리를 책임지게 될 완두콩!",
-        "1년 뒤에 돌아올 인간들을 위해 뛰어난 생존력을 가진 완두콩이 되는 게 우리의 목표야.",
-        "아, 혹시 완두콩을 교배해 본 적이 있어?",
-        "없구나?!",
-    };
 
     private readonly Queue<GameObject> spawnedText = new Queue<GameObject>();
     public int _nextIdx = 0;
@@ -33,11 +24,6 @@ public class Narration : MonoBehaviour, IPointerClickHandler
     void Update()
     {
        
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        AddLine(demoLines[_nextIdx++]);
     }
 
     public void AddLine(string text)
