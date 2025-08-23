@@ -42,8 +42,7 @@ public class UpgradeManager : MonoBehaviour
 
     public GameObject upgradePanel;
     private UpgradeCardUI[] upgradeCards;
-
-    private Dictionary<Type, int> remainUpgrade = new();
+    
     private Type[] randomUpgrade = new Type[3];
 
     private float upgradeTimer = 50.0f;
@@ -54,6 +53,9 @@ public class UpgradeManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI rerollNum;
     [SerializeField] Slider upgradeTimeSlider;
+
+    //저장 필요
+    private Dictionary<Type, int> remainUpgrade = new();
 
     private void Start()
     {
@@ -137,10 +139,6 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
         remainUpgrade[tmp]--;   
-        if (remainUpgrade[tmp] == 0)
-        {
-            remainUpgrade.Remove(tmp);
-        }
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
         select = true;
@@ -234,5 +232,26 @@ public class UpgradeManager : MonoBehaviour
     private void UpgradeTimerUI(float timeRatio)
     {
         upgradeTimeSlider.value = timeRatio;
+    }
+
+    public Dictionary<Type, int> GetRemainUpgrade()
+    {
+        return remainUpgrade;
+    }
+
+    public void LoadUpgradeManager(SaveData saveData)
+    {
+        maxRerollCount = saveData.remainUpgradeRerollCount;
+        int i = 0;
+        //이거 제대로 작동 안 할듯 unlock이 순서대로 안 되는거라
+        foreach (var type in UpgradeInstance.Keys)
+        {
+            if(remainUpgrade.ContainsKey(type))
+            {
+                remainUpgrade[type] = saveData.remainUpgradeCount[i];
+                i++;
+            }
+        }
+        return;
     }
 }

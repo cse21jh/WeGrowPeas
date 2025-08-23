@@ -167340,11 +167340,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1bbe4ccb04bc424bb8915d90cb9f563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  economyManager: {fileID: 1891974902}
   maxCol: 4
   peaPrefab: {fileID: 6114093203436464154, guid: 4c6a0f8f65286d64d836cdaca49f40dd, type: 3}
   peanutPrefab: {fileID: 6114093203436464154, guid: 7e169128925c6d0459ed410c2311f0a7, type: 3}
-  NepenthesPrefab: {fileID: 7123366062132582181, guid: 2dcd8e204861d494a9724080c786053d, type: 3}
-  ChiliPepperPrefab: {fileID: 7123366062132582181, guid: de5ab20a96b1a01429965676410b9b07, type: 3}
+  nepenthesPrefab: {fileID: 7123366062132582181, guid: 2dcd8e204861d494a9724080c786053d, type: 3}
+  chiliPepperPrefab: {fileID: 7123366062132582181, guid: de5ab20a96b1a01429965676410b9b07, type: 3}
   disabledSoil:
   - {fileID: 35899367}
   - {fileID: 422898736}
@@ -167362,10 +167363,6 @@ MonoBehaviour:
   breedButton: {fileID: 662809610}
   breedSkipButton: {fileID: 1940937886}
   breedCountUI: {fileID: 1555711060}
-  killBugCount: 0
-  totalBreedCount: 0
-  totalPeaBreedcount: 0
-  totalPeanutBreedCount: 0
   gardenSprites:
   - {fileID: 21300000, guid: 081b6e3e0b202454dab09e4511641b4c, type: 3}
   - {fileID: 21300000, guid: eba7044d5e2e84e4d97cd6c0adc49d66, type: 3}
@@ -167375,6 +167372,10 @@ MonoBehaviour:
   gardenRenderer: {fileID: 506643017}
   shopRoot: {fileID: 0}
   shopCanvas: {fileID: 0}
+  killBugCount: 0
+  totalBreedCount: 0
+  totalPeaBreedcount: 0
+  totalPeanutBreedCount: 0
 --- !u!4 &1072018328
 Transform:
   m_ObjectHideFlags: 0
@@ -227803,6 +227804,7 @@ MonoBehaviour:
   enemyController: {fileID: 415974144}
   upgradeManager: {fileID: 66307781}
   shopManager: {fileID: 0}
+  economyManager: {fileID: 1891974902}
   textStage: {fileID: 1746047134}
 --- !u!4 &1461606228
 Transform:

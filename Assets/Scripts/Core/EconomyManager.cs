@@ -26,4 +26,15 @@ public class EconomyManager : MonoBehaviour
     {
         CoinUI.text = $"{val}";
     }
+
+    public int GetGold()
+    {
+        return gold;
+    }
+
+    public void LoadEconomyManager(SaveData saveData)
+    {
+        gold = saveData.gold;
+        UpdateCoinUI(gold);
+    }
 }

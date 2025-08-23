@@ -60,6 +60,11 @@ public abstract class Plant : MonoBehaviour
         traits = newTraits;
     }
 
+    public void SetTaste(int val)
+    {
+        taste = val;
+    }
+
     public virtual List<GeneticTrait> GetGeneticTrait()
     {
         return traits;
@@ -115,6 +120,8 @@ public abstract class Plant : MonoBehaviour
 
     public virtual float GetResistanceValueByOrder(int order)
     {
+        if (order >= traits.Count)
+            return 0f;
         bool checkChiliPepper = CheckChiliPepper();
         GeneticTrait g = traits[order];
         if(checkChiliPepper)
@@ -128,7 +135,7 @@ public abstract class Plant : MonoBehaviour
     public virtual void Die()
     {
         StartCoroutine(Vanish());
-        UIPlantStat.Instance.HideInfo();
+        //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         Destroy(this.gameObject, dissolveDuration);
     }
@@ -216,6 +223,27 @@ public abstract class Plant : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public void SetAdditionalResistances(List<float> additionalResistances)
+    {
+        int i = 0;
+        foreach(var a in additionalResistances)
+        {
+            additionalResistance[traits[i].traitType] = a;
+            i++;
+        }
+        return;
+    }
+
+    public virtual List<float> GetAdditionalResistances()
+    {
+        var list = new List<float>();
+        foreach(var a in additionalResistance.Values)
+        {
+            list.Add(a);
+        }
+        return list;   
     }
 
     public abstract float GetResistanceBasedOnGenetics(int genetics);

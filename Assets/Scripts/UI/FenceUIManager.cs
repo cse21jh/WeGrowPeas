@@ -18,20 +18,21 @@ public class FenceUIManager : MonoBehaviour
     }
 
 
-    public void SetFenceElements(int plantIndex, List<GeneticTrait> Traits, int taste, int price)
+    public void SetFenceElements(int plantIndex, Plant plant)
     {
-        priceSign.SetPrice(price);
+        priceSign.SetPrice(plant.GetSellingPrice());
 
         foreach (var element in fenceElements)
         {
             element.gameObject.SetActive(true);
         }
-
+        List<GeneticTrait> Traits = plant.GetGeneticTrait();
+        int taste = plant.GetTaste();
         Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
         for (int i = 0; i < Traits.Count; i++)
         {
             bool isTasteActive = i < taste;
-            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive);
+            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive, plant, i);
         }
 
         for(int i = Traits.Count; i < fenceElements.Length; i++)
@@ -44,7 +45,7 @@ public class FenceUIManager : MonoBehaviour
                 additionalResistance = 0f,
                 genetics = 0
             };
-            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive);
+            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive, plant, i);
         }
     }
 

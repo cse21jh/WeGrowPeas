@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using TMPro;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,15 +11,11 @@ using UnityEngine.UI;
 public class Grid : MonoBehaviour
 {
     protected EnemyController enemyController;
+    [SerializeField] protected EconomyManager economyManager;
 
     List<Plant> plants = new List<Plant>();
-    [HideInInspector] public int maxCol = 4;
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
-    protected int additionalInheritance = 0;
-    protected float breedTimer = 30.0f;
-    protected int maxBreedCount = 4;
-    protected int breedCount = 0;
-    public int BreedCount => breedCount;
+    
 
     protected bool isBreeding = false;
 
@@ -28,20 +25,11 @@ public class Grid : MonoBehaviour
 
     protected bool isBreedSkipButtonPressed = false;
 
-    protected float bugSpawnTimeInterval = 10.0f;
-    protected float lastBugSpawnTimeInterval = 0f;
-
-    protected float bugSpeedDecreasement = 0f;
-    protected float bugSpawnIntervalIncreasement = 0f;
-    protected float ladybugSpawnProbability = 0f;
-    protected int additionalBugGold = 0;
-
-    protected float additionalPestResistance = 0f;
-
+    
     [SerializeField] protected GameObject peaPrefab;
     [SerializeField] protected GameObject peanutPrefab;
-    [SerializeField] protected GameObject NepenthesPrefab;
-    [SerializeField] protected GameObject ChiliPepperPrefab;
+    [SerializeField] protected GameObject nepenthesPrefab;
+    [SerializeField] protected GameObject chiliPepperPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] protected GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] protected List<GameObject> bugPrefabs;
@@ -51,10 +39,6 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject breedSkipButton;
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
-    public int killBugCount = 0;
-    public int totalBreedCount = 0;
-    public int totalPeaBreedcount = 0;
-    public int totalPeanutBreedCount = 0;
 
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
@@ -66,6 +50,41 @@ public class Grid : MonoBehaviour
     protected bool isShopOpen = false;
     protected bool shopCloseRequested = false;
 
+
+    //저장 필요
+    [HideInInspector] public int maxCol = 4;
+    public int killBugCount = 0;
+    public int totalBreedCount = 0;
+    public int totalPeaBreedcount = 0;
+    public int totalPeanutBreedCount = 0;
+
+    protected float bugSpawnTimeInterval = 10.0f;
+    protected float lastBugSpawnTimeInterval = 0f;
+
+    protected float bugSpeedDecreasement = 0f;
+    protected float bugSpawnIntervalIncreasement = 0f;
+    protected float ladybugSpawnProbability = 0f;
+    protected int additionalBugGold = 0;
+
+    protected float additionalPestResistance = 0f;
+
+    protected int additionalInheritance = 0;
+    protected float breedTimer = 30.0f;
+    protected int maxBreedCount = 4;
+    protected int breedCount = 0;
+
+    public int MaxCol => maxCol;
+    public float BugSpawnTimeInterval => bugSpawnTimeInterval;
+    public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
+    public float BugSpeedDecreasement => bugSpeedDecreasement;
+    public float BugSpawnIntervalIncreasement => bugSpawnIntervalIncreasement;
+    public float LadybugSpawnProbability => ladybugSpawnProbability;
+    public int AdditionalBugGold => additionalBugGold;
+    public float AdditionalPestResistance => additionalPestResistance;
+    public int AdditionalInheritance => additionalInheritance;
+    public float BreedTimer => breedTimer;
+    public int MaxBreedCount => maxBreedCount;
+    public int BreedCount => breedCount;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -94,7 +113,7 @@ public class Grid : MonoBehaviour
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
         };
             Debug.Log(basicTrait);
-            FenceUIManager.Instance.SetFenceElements(0, basicTrait, pea.GetTaste(), pea.GetSellingPrice());
+            FenceUIManager.Instance.SetFenceElements(0, pea);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);
@@ -113,10 +132,10 @@ public class Grid : MonoBehaviour
 
         //int breedCount = 0;
 
-        breedTimerUI.StartBreedingTimer();
-
+        
         Debug.Log(breedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
         UpdateBreedCountUI(maxBreedCount);
+        breedTimerUI.StartBreedingTimer();
         float startTime = Time.time;
         float endTime = startTime + breedTimer;
 
@@ -372,14 +391,14 @@ public class Grid : MonoBehaviour
 
     public void AddNepenthes(int idx)
     {
-        GameObject obj = Instantiate(NepenthesPrefab);
+        GameObject obj = Instantiate(nepenthesPrefab);
         Nepenthes nepenthes = obj.GetComponent<Nepenthes>();
         AddPlantToGrid(nepenthes, idx);
     }
 
     public void AddChiliPepper(int idx)
     {
-        GameObject obj = Instantiate(ChiliPepperPrefab);
+        GameObject obj = Instantiate(chiliPepperPrefab);
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
     }
@@ -503,6 +522,16 @@ public class Grid : MonoBehaviour
         //        soil.Init(index);
         //    }
         //}
+    }
+    public void UpdateSoil()
+    {
+        if (maxCol <= 4)
+            return;
+        for (int i = 5; i <= maxCol; i++)
+        {
+            gardenRenderer.sprite = gardenSprites[i - 4]; // 정원 배경 스프라이트 변경
+            disabledSoil[i - 5].SetActive(true);
+        }
     }
     private void InitSoils()
     {
@@ -677,17 +706,49 @@ public class Grid : MonoBehaviour
         plant.transform.position = soilT.position;
     }
 
-    public void LoadGrid(List<PlantData> plantList)
+    public void LoadGrid(SaveData saveData)
     {
+        List<PlantData> plantList = saveData.plantList;
         foreach (var item in plantList)
         {
-            GameObject obj = Instantiate(peaPrefab);
+            GameObject obj;
+            switch (item.speciesname)
+            {
+                case "완두콩": obj = Instantiate(peaPrefab); break;
+                case "땅콩": obj = Instantiate(peanutPrefab); break;
+                case "네펜데스": obj = Instantiate(nepenthesPrefab); break;
+                case "고추": obj = Instantiate(chiliPepperPrefab); break;
+                default: obj = Instantiate(peaPrefab); break;
+            }
+            
             Plant plant = obj.GetComponent<Plant>();
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
+            plant.SetAdditionalResistances(item.additionalResistance);
+            plant.SetTaste(item.taste);
 
             Plantplant(plant);
         }
+        maxCol = saveData.maxCol;
+        killBugCount = saveData.killBugCount;
+        totalBreedCount = saveData.totalBreedCount;
+        totalPeaBreedcount = saveData.totalPeaBreedcount;
+        totalPeanutBreedCount = saveData.totalPeanutBreedCount;
+
+        bugSpawnTimeInterval = saveData.bugSpawnTimeInterval;
+        lastBugSpawnTimeInterval = saveData.lastBugSpawnTimeInterval;
+
+        bugSpeedDecreasement = saveData.bugSpeedDecreasement;
+        bugSpawnIntervalIncreasement = saveData.bugSpawnIntervalIncreasement;
+        ladybugSpawnProbability = saveData.ladybugSpawnProbability;
+        additionalBugGold = saveData.additionalBugGold;
+
+        additionalPestResistance = saveData.additionalPestResistance;
+
+        additionalInheritance = saveData.additionalInheritance;
+        breedTimer = saveData.breedTimer;
+        maxBreedCount = saveData.maxBreedCount;
+        UpdateSoil();
     }
 
     public void AddBugSpeedDcreasement(float value)

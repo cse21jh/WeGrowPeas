@@ -15,8 +15,10 @@ public class EnemyController : MonoBehaviour
 
     private Wave lastWave;
     private Wave currentWave;
-    public Wave CurrentWave => currentWave;
     private Wave nextWave;
+    public Wave CurrentWave => currentWave;
+    public Wave NextWave => nextWave;
+    public Wave LastWave => lastWave;
 
     private Wave noneWave;
 
@@ -202,5 +204,23 @@ public class EnemyController : MonoBehaviour
             WaveType.HeavyRain => new HeavyRainWave(),
             WaveType.None => new NoneWave(),
         };
+    }
+
+    public void LoadEnemyController(SaveData saveData)
+    {
+        foreach(var e in unlockedWave)
+        {
+            if (e.WaveType == saveData.curWaveType)
+                currentWave = e;
+
+            if (e.WaveType == saveData.lastWaveType)
+                lastWave = e;
+
+            if (e.WaveType == saveData.nextWaveType)
+                nextWave = e;
+        }
+        waveSkipCount = saveData.remainWaveSkipCount;
+        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        ShowNextWaveText();
     }
 }

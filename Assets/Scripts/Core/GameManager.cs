@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -8,12 +9,51 @@ using UnityEngine.UIElements;
 [System.Serializable]
 public class SaveData
 {
+    //gameManager
+    public int stage;
+
+    //grid
     public List<PlantData> plantList = new();
     public int remainBreedCount;
+
+    public int maxCol; 
+
+    public int killBugCount;
+    public int totalBreedCount;
+    public int totalPeaBreedcount;
+    public int totalPeanutBreedCount;
+
+    public float bugSpawnTimeInterval;
+    public float lastBugSpawnTimeInterval;
+
+    public float bugSpeedDecreasement;
+    public float bugSpawnIntervalIncreasement;
+    public float ladybugSpawnProbability;
+    public int additionalBugGold;
+
+    public float additionalPestResistance;
+
+    public int additionalInheritance;
+    public float breedTimer;
+    public int maxBreedCount;
+    public int breedCount;
     //public float remainBreedTime;
-    public int remainWaveSkipCount;
+
+
+    //upgradeManager
     public int remainUpgradeRerollCount;
+    public List<Type> remainUpgradeType = new();
+    public List<int> remainUpgradeCount = new();
+
+    //enemyController
+    public WaveType lastWaveType;
     public WaveType curWaveType;
+    public WaveType nextWaveType;
+    public int remainWaveSkipCount;
+
+    //economyManager
+    public int gold;
+
     //환경설정 내용
     //GameRecordHolder에 저장될 내용
 }
@@ -24,6 +64,8 @@ public class PlantData
     public string speciesname;
     public List<GeneticTrait> traits = new List<GeneticTrait>();
     public int gridIndex;
+    public List<float> additionalResistance = new List<float>();
+    public int taste;
 }
 
 
@@ -36,6 +78,7 @@ public class GameManager : Singleton<GameManager>
     public EnemyController enemyController;
     public UpgradeManager upgradeManager;
     public ShopManager shopManager;
+    public EconomyManager economyManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -165,8 +208,11 @@ public class GameManager : Singleton<GameManager>
 
         //grid.plantGrid.Clear(); //if needed......
 
-        grid.LoadGrid(saveData.plantList);
-
+        stage = saveData.stage;
+        grid.LoadGrid(saveData);
+        upgradeManager.LoadUpgradeManager(saveData);
+        enemyController.LoadEnemyController(saveData);
+        economyManager.LoadEconomyManager(saveData);
         Debug.Log("불러옴");
     }
 
@@ -174,23 +220,61 @@ public class GameManager : Singleton<GameManager>
     {
         var saveData = new SaveData();
 
+        //gameManager
+        saveData.stage = stage;
+
+
+        //grid
         foreach (var p in grid.plantGrid.Values)
         {
             var plantData = new PlantData
             {
                 speciesname = p.speciesname,
                 traits = p.GetGeneticTrait(),
-                gridIndex = p.gridIndex
+                gridIndex = p.gridIndex,
+                additionalResistance = p.GetAdditionalResistances(),
+                taste = p.GetTaste()
             };
             
             saveData.plantList.Add(plantData);
         }
+        saveData.maxCol = grid.maxCol;
+        saveData.killBugCount = grid.killBugCount;
+        saveData.totalBreedCount = grid.totalBreedCount;
+        saveData.totalPeaBreedcount = grid.totalPeaBreedcount;
+        saveData.totalPeanutBreedCount = grid.totalPeanutBreedCount;
 
-        saveData.remainBreedCount = grid.BreedCount;
-        //saveData.remainBreedTime = 30.0f;
-        saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
+        saveData.bugSpawnTimeInterval = grid.BugSpawnTimeInterval;
+        saveData.lastBugSpawnTimeInterval = grid.LastBugSpawnTimeInterval;
+
+        saveData.bugSpeedDecreasement = grid.BugSpeedDecreasement;
+        saveData.bugSpawnIntervalIncreasement = grid.BugSpawnIntervalIncreasement;
+        saveData.ladybugSpawnProbability = grid.LadybugSpawnProbability;
+        saveData.additionalBugGold = grid.AdditionalBugGold;
+
+        saveData.additionalPestResistance = grid.AdditionalPestResistance;
+
+        saveData.additionalInheritance = grid.AdditionalInheritance;
+        saveData.breedTimer = grid.BreedTimer;
+        saveData.maxBreedCount = grid.MaxBreedCount;
+
+        //upgradeManager
         saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
+        Dictionary<Type, int> remainUpgrade = upgradeManager.GetRemainUpgrade();
+        foreach (KeyValuePair<Type, int> u in remainUpgrade)
+        {
+            saveData.remainUpgradeCount.Add(u.Value);
+        }
+
+        //enemyController
+        saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
         saveData.curWaveType = enemyController.CurrentWave.WaveType;
+        saveData.nextWaveType = enemyController.NextWave.WaveType;
+        saveData.lastWaveType = enemyController.LastWave.WaveType;
+
+        //economyManager
+        saveData.gold = economyManager.GetGold();
+
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);

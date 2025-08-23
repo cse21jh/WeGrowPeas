@@ -6,7 +6,7 @@ using UnityEngine;
 public class TimerUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textTimer;
-    [SerializeField] private int breedingTime = 30;
+    [SerializeField] private int breedingTime;
     private Coroutine countdownRoutine;
 
     // Start is called before the first frame update
@@ -56,4 +56,5 @@ public class TimerUI : MonoBehaviour
             timeLeft--;
         }
     }
+
 }

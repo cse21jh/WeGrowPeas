@@ -3,6 +3,11 @@ using UnityEngine.UI;
 
 public class ChiliPepper : Plant
 {
+    public override void Init(int gridIndex, Grid grid)
+    {
+        speciesname = "∞Ì√ﬂ";
+        base.Init(gridIndex, grid);
+    }
     protected override float GetResistanceValue(WaveType wave)
     {
         return 1f;

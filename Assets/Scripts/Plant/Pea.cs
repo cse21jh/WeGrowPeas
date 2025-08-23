@@ -136,7 +136,7 @@ public class Pea : Plant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         //UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(0, traits, taste, GetSellingPrice());
+        FenceUIManager.Instance.SetFenceElements(0, this);
         priceSign.gameObject.SetActive(true);
         priceSign.SetPrice(GetSellingPrice());
     }
@@ -162,7 +162,7 @@ public class Pea : Plant
         if (isDragging)
         {
             grid.TryPlacePlant(this, Input.mousePosition);
-            UIPlantStat.Instance.UpdateInfo(speciesname, traits, this);
+            FenceUIManager.Instance.SetFenceElements(0, this);
         }
         else
         {

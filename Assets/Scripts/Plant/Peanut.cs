@@ -22,7 +22,7 @@ public class Peanut : Plant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "Peanut";
+        speciesname = "¶¥Äá";
         base.Init(gridIndex, grid);
     }
 
@@ -112,13 +112,13 @@ public class Peanut : Plant
     {
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
-        UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(1, traits, taste, GetSellingPrice());
+        //UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
+        FenceUIManager.Instance.SetFenceElements(1, this);
     }
 
     protected void OnMouseExit()
     {
-        UIPlantStat.Instance.HideInfo();
+        //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
     }
 
@@ -137,7 +137,7 @@ public class Peanut : Plant
         if (isDragging)
         {
             grid.TryPlacePlant(this, Input.mousePosition);
-            UIPlantStat.Instance.UpdateInfo(speciesname, traits, this);
+            FenceUIManager.Instance.SetFenceElements(0, this);
         }
         else
         {
