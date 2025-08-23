@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System.Net.NetworkInformation;
 
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
@@ -31,6 +32,10 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] private GameObject appearEffect;
 
     [SerializeField] private string[] doNotChangeLayerObjects;
+
+
+    [SerializeField] protected PriceTagController priceSign;
+
 
 
 

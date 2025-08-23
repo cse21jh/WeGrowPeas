@@ -137,12 +137,15 @@ public class Pea : Plant
 
         UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
         FenceUIManager.Instance.SetFenceElements(0, traits, taste, GetSellingPrice());
+        priceSign.gameObject.SetActive(true);
+        priceSign.SetPrice(GetSellingPrice());
     }
 
     protected void OnMouseExit()
     {
         UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
+        priceSign.gameObject.SetActive(false);
     }
     private void OnMouseDown()
     {
