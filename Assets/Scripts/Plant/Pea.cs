@@ -136,7 +136,7 @@ public class Pea : Plant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(0, traits, taste);
+        FenceUIManager.Instance.SetFenceElements(0, traits, taste, GetSellingPrice());
     }
 
     protected void OnMouseExit()

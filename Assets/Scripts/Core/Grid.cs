@@ -94,7 +94,7 @@ public class Grid : MonoBehaviour
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
         };
             Debug.Log(basicTrait);
-            FenceUIManager.Instance.SetFenceElements(0, basicTrait, pea.GetTaste());
+            FenceUIManager.Instance.SetFenceElements(0, basicTrait, pea.GetTaste(), pea.GetSellingPrice());
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
             AddPlantToGrid(pea);

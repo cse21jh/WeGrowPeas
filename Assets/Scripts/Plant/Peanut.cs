@@ -113,7 +113,7 @@ public class Peanut : Plant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(1, traits, taste);
+        FenceUIManager.Instance.SetFenceElements(1, traits, taste, GetSellingPrice());
     }
 
     protected void OnMouseExit()

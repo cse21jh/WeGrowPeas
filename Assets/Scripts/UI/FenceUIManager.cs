@@ -9,7 +9,7 @@ public class FenceUIManager : MonoBehaviour
 
     [SerializeField] private FenceElementController[] fenceElements;
 
-    [SerializeField] private string normalPeaName = "ÀÏ¹Ý ¿ÏµÎÄá";
+    [SerializeField] private PriceSignController priceSign;
 
 
     private void Awake()
@@ -18,8 +18,9 @@ public class FenceUIManager : MonoBehaviour
     }
 
 
-    public void SetFenceElements(int plantIndex, List<GeneticTrait> Traits, int taste)
+    public void SetFenceElements(int plantIndex, List<GeneticTrait> Traits, int taste, int price)
     {
+        priceSign.SetPrice(price);
 
         foreach (var element in fenceElements)
         {
@@ -49,6 +50,8 @@ public class FenceUIManager : MonoBehaviour
 
     public void HideFenceElements()
     {
+        priceSign.HidePrice();
+
         foreach (var element in fenceElements)
         {
             element.gameObject.SetActive(false);
