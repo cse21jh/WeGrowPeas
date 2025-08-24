@@ -9,6 +9,7 @@ public class MaxRerollCountUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_16");
     public override int MaxAmount => 2;
     public override int UnlockStage => 15;
+    public override int UpgradeId => 17;
     public override void OnSelectAction()
     {
         GameManager.Instance.upgradeManager.AddMaxRerollCount(1);

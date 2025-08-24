@@ -9,6 +9,7 @@ public class WaveSkipUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_17");
     public override int MaxAmount => -1;
     public override int UnlockStage => 15;
+    public override int UpgradeId => 18;
     public override void OnSelectAction()
     {
         GameManager.Instance.enemyController.AddWaveSkipCount(1);

@@ -7,6 +7,7 @@ public class BugFrequencyUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
     public override int MaxAmount => 3;
     public override int UnlockStage => 25;
+    public override int UpgradeId => 21;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddBugSpawnIntervalIncreasement(0.1f);

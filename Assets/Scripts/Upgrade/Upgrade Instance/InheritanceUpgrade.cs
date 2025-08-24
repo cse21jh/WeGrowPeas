@@ -9,6 +9,7 @@ public class InheritanceUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_15");
     public override int MaxAmount => 2;
     public override int UnlockStage => 10;
+    public override int UpgradeId => 16;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddAdditionalInheritance(10);

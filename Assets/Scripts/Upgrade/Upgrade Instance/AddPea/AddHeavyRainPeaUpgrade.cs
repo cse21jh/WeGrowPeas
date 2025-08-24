@@ -9,6 +9,7 @@ public class AddHeavyRainPeaUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_5");
     public override int MaxAmount => -1;
     public override int UnlockStage => 20;
+    public override int UpgradeId => 6;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>

@@ -9,6 +9,7 @@ public class AddNepenthesUpgrade : Upgrade
     public override Sprite Icon => Resources.Load<Sprite>("Sprites/Plant/Nepenthes/Nepenthes");
     public override int MaxAmount => -1;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 301;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddNepenthes(12); 

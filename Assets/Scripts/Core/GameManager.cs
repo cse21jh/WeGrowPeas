@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +17,7 @@ public class SaveData
     public List<PlantData> plantList = new();
     public int remainBreedCount;
 
-    public int maxCol; 
+    public int maxCol;
 
     public int killBugCount;
     public int totalBreedCount;
@@ -42,7 +43,7 @@ public class SaveData
 
     //upgradeManager
     public int remainUpgradeRerollCount;
-    public List<Type> remainUpgradeType = new();
+    public List<int> remainUpgradeId = new();
     public List<int> remainUpgradeCount = new();
 
     //enemyController
@@ -92,7 +93,7 @@ public class GameManager : Singleton<GameManager>
 
         ClickRouter.Instance.IsBlockedByUI = false;
 
-        switch(GameStartContext.StartType)
+        switch (GameStartContext.StartType)
         {
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
@@ -105,14 +106,14 @@ public class GameManager : Singleton<GameManager>
                 LoadGame();
                 break;
         }
-        
+
         StartCoroutine(GameStart());
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnEnable()
@@ -127,7 +128,7 @@ public class GameManager : Singleton<GameManager>
 
     IEnumerator GameStart()
     {
-        while(!gameOver)
+        while (!gameOver)
         {
             UpdateStageUI();
             yield return StartCoroutine(StartStage());
@@ -140,7 +141,7 @@ public class GameManager : Singleton<GameManager>
     {
         stage++;
         enemyController.UnlockWave(stage);
-        upgradeManager.UnlockUpgrade(stage);   
+        upgradeManager.UnlockUpgrade(stage);
     }
 
     IEnumerator StartStage()
@@ -153,7 +154,7 @@ public class GameManager : Singleton<GameManager>
 
         gameOver = grid.CheckGameOver();
 
-        if(gameOver)
+        if (gameOver)
             yield return StartCoroutine(GameOver());
         else if (!enemyController.IsLastWaveNone())
         {
@@ -200,9 +201,6 @@ public class GameManager : Singleton<GameManager>
 
     private void LoadGame()
     {
-        StageUpdate();
-        //LoadGrid;
-
         string json = File.ReadAllText(GetSavePath());
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
@@ -235,7 +233,7 @@ public class GameManager : Singleton<GameManager>
                 additionalResistance = p.GetAdditionalResistances(),
                 taste = p.GetTaste()
             };
-            
+
             saveData.plantList.Add(plantData);
         }
         saveData.maxCol = grid.maxCol;
@@ -261,11 +259,12 @@ public class GameManager : Singleton<GameManager>
         //upgradeManager
         saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
         Dictionary<Type, int> remainUpgrade = upgradeManager.GetRemainUpgrade();
+        Dictionary<Type, Func<Upgrade>> upgradeInstance = upgradeManager.GetUpgradeInstance();
         foreach (KeyValuePair<Type, int> u in remainUpgrade)
         {
+            saveData.remainUpgradeId.Add(upgradeInstance[u.Key]().UpgradeId);
             saveData.remainUpgradeCount.Add(u.Value);
         }
-
         //enemyController
         saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
         saveData.curWaveType = enemyController.CurrentWave.WaveType;
@@ -279,7 +278,7 @@ public class GameManager : Singleton<GameManager>
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);
 
-        GameStartContext.SetStartType(GameStartType.ContinueGame); 
+        GameStartContext.SetStartType(GameStartType.ContinueGame);
 
         Debug.Log("저장됨");
     }

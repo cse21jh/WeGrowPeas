@@ -9,6 +9,7 @@ public class MaxBreedCountUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_14");
     public override int MaxAmount => 6;
     public override int UnlockStage => 10;
+    public override int UpgradeId => 15;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddMaxBreedCount(1);

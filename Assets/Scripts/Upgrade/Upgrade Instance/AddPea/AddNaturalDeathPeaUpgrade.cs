@@ -9,6 +9,7 @@ public class AddNaturalDeathPeaUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_0");
     public override int MaxAmount => -1;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 1;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>

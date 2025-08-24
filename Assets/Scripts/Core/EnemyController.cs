@@ -10,12 +10,9 @@ using UnityEngine.UIElements;
 public class EnemyController : MonoBehaviour
 {
 
-    public Grid grid;
-    private static readonly List<Wave> unlockedWave = new List<Wave>();
+    public Grid grid;    
 
-    private Wave lastWave;
-    private Wave currentWave;
-    private Wave nextWave;
+    
     public Wave CurrentWave => currentWave;
     public Wave NextWave => nextWave;
     public Wave LastWave => lastWave;
@@ -32,6 +29,13 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private GameObject waveSkipButton;
     [SerializeField] TextMeshProUGUI waveSkipCountText;
+
+    // 저장 필요
+    private static readonly List<Wave> unlockedWave = new List<Wave>(); // 실제 저장 자체는 안 하지만, UnlockWaveAtOnce()로 불러오기 필요
+
+    private Wave lastWave;
+    private Wave currentWave;
+    private Wave nextWave;
 
     // Start is called before the first frame update
     void Start()
@@ -221,6 +225,20 @@ public class EnemyController : MonoBehaviour
         }
         waveSkipCount = saveData.remainWaveSkipCount;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        LoadUnlockWaveAtOnce(GameManager.Instance.stage);
         ShowNextWaveText();
+    }
+    private void LoadUnlockWaveAtOnce(int stage)
+    {
+        if (stage + 1 >= 5)
+            unlockedWave.Add(new WindWave());
+        if (stage + 1 >= 10)
+            unlockedWave.Add(new FloodWave());
+        if (stage + 1 >= 15)
+            unlockedWave.Add(new PestWave());
+        if (stage + 1 >= 20)
+            unlockedWave.Add(new ColdWave());
+        if (stage + 1 >= 25)
+            unlockedWave.Add(new HeavyRainWave());
     }
 }

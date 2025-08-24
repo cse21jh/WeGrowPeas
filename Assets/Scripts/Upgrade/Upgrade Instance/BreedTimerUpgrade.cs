@@ -9,6 +9,7 @@ public class BreedTimerUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_13");
     public override int MaxAmount => 2;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 14;
     public override void OnSelectAction() 
     {
         GameManager.Instance.grid.AddBreedTimer(10);

@@ -7,6 +7,7 @@ public class LadybugUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
     public override int MaxAmount => 4;
     public override int UnlockStage => 10;
+    public override int UpgradeId => 20;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddLadybugSpawnProbability(0.1f);

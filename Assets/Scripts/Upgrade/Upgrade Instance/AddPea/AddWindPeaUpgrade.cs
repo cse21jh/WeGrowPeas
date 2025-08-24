@@ -9,6 +9,7 @@ public class AddWindPeaUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_1");
     public override int MaxAmount => -1;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 2;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>

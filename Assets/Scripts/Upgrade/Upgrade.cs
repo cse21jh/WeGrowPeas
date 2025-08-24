@@ -11,6 +11,7 @@ public abstract class Upgrade
     public virtual Sprite Icon { get; }
     public virtual int MaxAmount => 0;
     public virtual int UnlockStage => 0;
+    public virtual int UpgradeId => 0;
     public virtual void OnSelectAction() { }
 
     public int Amount = 0;

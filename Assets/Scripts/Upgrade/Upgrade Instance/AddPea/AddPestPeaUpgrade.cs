@@ -9,6 +9,7 @@ public class AddPestPeaUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_3");
     public override int MaxAmount => -1;
     public override int UnlockStage => 10;
+    public override int UpgradeId => 4;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>

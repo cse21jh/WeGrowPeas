@@ -69,7 +69,11 @@ public class UpgradeManager : MonoBehaviour
         {
             Upgrade tmp = UpgradeInstance[type]();
             if (tmp.UnlockStage == stage)
+            {
+                if (remainUpgrade.ContainsKey(type))
+                    continue;
                 remainUpgrade.Add(type, tmp.MaxAmount);
+            }
         }
         // stage 끝나고 나와야 하는 필수 업그레이드
         switch(stage)
@@ -87,6 +91,8 @@ public class UpgradeManager : MonoBehaviour
         }
         return;
     }
+
+    
 
     private void SetRandomUpgrade()
     {
@@ -239,18 +245,50 @@ public class UpgradeManager : MonoBehaviour
         return remainUpgrade;
     }
 
+    public Dictionary<Type, Func<Upgrade>> GetUpgradeInstance()
+    {
+        return UpgradeInstance;
+    }
+
     public void LoadUpgradeManager(SaveData saveData)
     {
         maxRerollCount = saveData.remainUpgradeRerollCount;
-        int i = 0;
-        //이거 제대로 작동 안 할듯 unlock이 순서대로 안 되는거라
+        int idx;
         foreach (var type in UpgradeInstance.Keys)
         {
-            if(remainUpgrade.ContainsKey(type))
+            Upgrade tmp = UpgradeInstance[type]();
+
+            if (tmp.UnlockStage <= saveData.stage)
             {
-                remainUpgrade[type] = saveData.remainUpgradeCount[i];
-                i++;
+                idx = saveData.remainUpgradeId.IndexOf(tmp.UpgradeId); // 해당 인덱스가 없다면 저장된 값에 없는 것. 오류
+                if (idx == -1)
+                {
+                    Debug.Log("이거슨 버그입니다");
+                    continue;
+                }
+
+                if (remainUpgrade.ContainsKey(type)) // 모종의 이유로 (unlockUpgrade를 먼저 했거나...) 이미 remainUpgrade에 값이 있는 경우 남은 업그레이드 개수만 갱신
+                {
+                    remainUpgrade[type] = saveData.remainUpgradeCount[idx];
+                    continue;
+                }
+                remainUpgrade.Add(type, saveData.remainUpgradeCount[idx]);
             }
+        }
+
+        // 필수 업그레이드가 있는 경우
+        switch (saveData.stage)
+        {
+            case 5:
+                randomUpgrade[0] = typeof(AddWindPeaUpgrade); break;
+            case 10:
+                randomUpgrade[0] = typeof(AddFloodPeaUpgrade); break;
+            case 15:
+                randomUpgrade[0] = typeof(AddPestPeaUpgrade); break;
+            case 20:
+                randomUpgrade[0] = typeof(AddColdPeaUpgrade); break;
+            case 25:
+                randomUpgrade[0] = typeof(AddHeavyRainPeaUpgrade); break;
         }
         return;
     }

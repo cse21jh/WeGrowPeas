@@ -9,6 +9,7 @@ public class AddChiliPepperUpgrade : Upgrade
     public override Sprite Icon => Resources.Load<Sprite>("Sprites/Plant/ChiliPepper/ChiliPepper");
     public override int MaxAmount => -1;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 302;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddChiliPepper(12); 

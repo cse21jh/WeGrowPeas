@@ -9,6 +9,7 @@ public class AddSoilUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_12");
     public override int MaxAmount => 4;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 13;
     public override void OnSelectAction()
     {
         GameManager.Instance.grid.AddSoil();

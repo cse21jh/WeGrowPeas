@@ -553,6 +553,9 @@ public class Grid : MonoBehaviour
 
     public void RequestBreedSelect(GameObject clickedObject)
     {
+        if (!isBreeding)        
+            return;
+
         Plant clickedPea = clickedObject.GetComponent<Plant>();
         if (clickedPea == null) return;
 

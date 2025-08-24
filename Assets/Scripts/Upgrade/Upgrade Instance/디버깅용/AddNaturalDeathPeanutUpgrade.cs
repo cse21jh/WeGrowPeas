@@ -9,6 +9,7 @@ public class AddNaturalDeathPeanutUpgrade : Upgrade
     public override Sprite Icon => Resources.Load<Sprite>("Sprites/Plant/Peanut/Peanut");
     public override int MaxAmount => -1;
     public override int UnlockStage => 1;
+    public override int UpgradeId => 300;
     public override void OnSelectAction()
     {
         for (int i = 0; i < 2; i++)

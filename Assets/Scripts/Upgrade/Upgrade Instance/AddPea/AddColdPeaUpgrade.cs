@@ -9,6 +9,7 @@ public class AddColdPeaUpgrade : Upgrade
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_4");
     public override int MaxAmount => -1;
     public override int UnlockStage => 15;
+    public override int UpgradeId => 5;
     public override void OnSelectAction()
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
