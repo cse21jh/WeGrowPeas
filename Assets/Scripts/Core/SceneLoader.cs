@@ -39,7 +39,7 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadTutorialScene()
     {
-        SceneManager.LoadScene("TutorialScene");
+        SceneManager.LoadScene("Tutorial");
     }
 
     public void LoadGardenScene()
