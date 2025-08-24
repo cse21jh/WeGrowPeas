@@ -167,7 +167,7 @@ public class GameManager : Singleton<GameManager>
 
     private void UpdateStageUI()
     {
-        textStage.text = $"<sprite=0> STAGE {stage}";
+        textStage.text = $"스테이지 {stage}";
     }
 
     public IEnumerator BreedEndRoutine()

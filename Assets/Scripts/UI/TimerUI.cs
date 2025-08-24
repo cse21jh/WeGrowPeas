@@ -9,6 +9,8 @@ public class TimerUI : MonoBehaviour
     [SerializeField] private int breedingTime;
     private Coroutine countdownRoutine;
 
+    [SerializeField] private BreedTimerController breedTimerController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +38,8 @@ public class TimerUI : MonoBehaviour
     {
         if (countdownRoutine != null)
         {
-            textTimer.text = $"<sprite=7> {breedingTime}";
+            textTimer.text = $"{breedingTime}s";
+            breedTimerController.SetFill(1f);
             textTimer.color = Color.black;
             StopCoroutine(countdownRoutine);
         }
@@ -45,15 +48,16 @@ public class TimerUI : MonoBehaviour
     private IEnumerator BreedingCountdown()
     {
         int timeLeft = breedingTime;
-        textTimer.color = Color.black;
+        textTimer.color = Color.white;
 
         while (timeLeft >= 0)
         {
             if (timeLeft <= 10) textTimer.color = Color.red;
 
-            textTimer.text = $"<sprite=7> {timeLeft}";
+            textTimer.text = $"{timeLeft}s";
             yield return new WaitForSeconds(1f);
             timeLeft--;
+            breedTimerController.SetFill(timeLeft / (float)breedingTime);
         }
     }
 
