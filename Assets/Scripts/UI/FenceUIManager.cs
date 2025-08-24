@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class FenceUIManager : MonoBehaviour
 {
@@ -8,6 +10,11 @@ public class FenceUIManager : MonoBehaviour
 
 
     [SerializeField] private FenceElementController[] fenceElements;
+    [SerializeField] private RectTransform[] showPos;
+    [SerializeField] private RectTransform[] hidePos;
+    [SerializeField] private float showDelay = 0.1f;
+    [SerializeField] private float moveDuration = 0.3f;
+    [SerializeField] private Ease moveEase = Ease.OutBack;
 
     [SerializeField] private PriceSignController priceSign;
 
@@ -22,10 +29,14 @@ public class FenceUIManager : MonoBehaviour
     {
         priceSign.SetPrice(plant.GetSellingPrice());
 
+        StartCoroutine(ShowUI());
+        /*
         foreach (var element in fenceElements)
         {
             element.gameObject.SetActive(true);
         }
+        */
+
         List<GeneticTrait> Traits = plant.GetGeneticTrait();
         int taste = plant.GetTaste();
         //Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
@@ -52,11 +63,38 @@ public class FenceUIManager : MonoBehaviour
     public void HideFenceElements()
     {
         priceSign.HidePrice();
+        StartCoroutine(HideUI());
 
+        /*
         foreach (var element in fenceElements)
         {
             element.gameObject.SetActive(false);
         }
+        */
+    }
+
+    private IEnumerator ShowUI()
+    {
+        Sequence showSeq = DOTween.Sequence();
+
+        for (int i = 0; i < fenceElements.Length; i++)
+        {
+            showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(showPos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+        }
+
+        yield return null;
+    }
+
+    private IEnumerator HideUI()
+    {
+        Sequence showSeq = DOTween.Sequence();
+
+        for (int i = 0; i < fenceElements.Length; i++)
+        {
+            showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(hidePos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+        }
+
+        yield return null;
     }
 
 
