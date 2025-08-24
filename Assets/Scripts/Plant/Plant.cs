@@ -31,10 +31,13 @@ public abstract class Plant : MonoBehaviour
 
     [SerializeField] private GameObject appearEffect;
 
-    [SerializeField] private string[] doNotChangeLayerObjects;
+    [SerializeField] private string[] defaultLayerObj;
+    [SerializeField] private string[] uiobjLayerObj;
 
 
     [SerializeField] protected PriceTagController priceSign;
+
+    [SerializeField] protected Canvas holdGaugeCanvas;
 
 
 
@@ -44,6 +47,8 @@ public abstract class Plant : MonoBehaviour
         this.gridIndex = gridIndex;
         this.grid = grid;
         taste = UnityEngine.Random.Range(0, 7);
+
+        holdGaugeCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         childMaterials = new Material[childSpriteRenderers.Length];
@@ -195,11 +200,18 @@ public abstract class Plant : MonoBehaviour
     {
         obj.layer = LayerMask.NameToLayer(layerName);
 
-        foreach (string doNotChangeLayerObject in doNotChangeLayerObjects)
+        foreach (string str in defaultLayerObj)
         {
-            if (obj.name == doNotChangeLayerObject)
+            if (obj.name == str)
             {
-                obj.layer = LayerMask.NameToLayer("Default"); // 자기 자신은 레이어 변경하지 않음 - 즉, "Default" 레이어로 변경
+                obj.layer = LayerMask.NameToLayer("Default"); // 레이어 변경하지 않음 - 즉, "Default" 레이어로 변경
+            }
+        }
+        foreach (string str in uiobjLayerObj)
+        {
+            if (obj.name == str)
+            {
+                obj.layer = LayerMask.NameToLayer("uiObjects"); // 레이어 변경하지 않음 - 즉, "uiObjects" 레이어로 변경
             }
         }
 

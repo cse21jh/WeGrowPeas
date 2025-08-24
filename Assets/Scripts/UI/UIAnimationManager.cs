@@ -3,7 +3,7 @@ using DG.Tweening;
 
 public class UIAnimationManager : MonoBehaviour
 {
-    [SerializeField] private CameraManager[] camManagers;
+    [SerializeField] public CameraManager[] camManagers;
     [SerializeField] private RectTransform upgrade_targetPanel;
     [SerializeField] private RectTransform upgrade_panelTransformOrigin;
     [SerializeField] private RectTransform upgrade_panelTransformMoved;

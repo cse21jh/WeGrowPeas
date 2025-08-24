@@ -17,7 +17,7 @@ public class Pea : Plant
 
     //옮기기 게이지
     [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvas;
+    [SerializeField] private GameObject holdGaugeCanvasObj;
 
     public override void Init(int gridIndex, Grid grid)
     {
@@ -55,7 +55,7 @@ public class Pea : Plant
             if (holdTime >= HoldDuration && !isDragging)
             {
                 StartDragging();
-                holdGaugeCanvas.SetActive(false);
+                holdGaugeCanvasObj.SetActive(false);
             }
         }
 
@@ -73,7 +73,7 @@ public class Pea : Plant
             isHolding = false;
             holdTime = 0f;
             holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvas.SetActive(false);
+            holdGaugeCanvasObj.SetActive(false);
         }
     }
 
@@ -154,7 +154,7 @@ public class Pea : Plant
         holdTime = 0f;
         isHolding = true;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(true);
+        holdGaugeCanvasObj.SetActive(true);
     }
 
     private void OnMouseUp()
@@ -174,7 +174,7 @@ public class Pea : Plant
         isHolding = false;
         holdTime = 0f;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(false);
+        holdGaugeCanvasObj.SetActive(false);
     }
 
     private void StartDragging()
