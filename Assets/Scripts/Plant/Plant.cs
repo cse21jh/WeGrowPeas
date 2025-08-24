@@ -37,7 +37,7 @@ public abstract class Plant : MonoBehaviour
 
     [SerializeField] protected PriceTagController priceSign;
 
-    [SerializeField] protected Canvas holdGaugeCanvas;
+    [SerializeField] protected Canvas holdCanvas;
 
 
 
@@ -48,7 +48,7 @@ public abstract class Plant : MonoBehaviour
         this.grid = grid;
         taste = UnityEngine.Random.Range(0, 7);
 
-        holdGaugeCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
+        holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         childMaterials = new Material[childSpriteRenderers.Length];
