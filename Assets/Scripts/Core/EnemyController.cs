@@ -169,7 +169,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = "½ºÅµ °¡´É È½¼ö :" + waveSkipCount.ToString();
+        waveSkipCountText.text = waveSkipCount.ToString() + "È¸";
         return;
     }
 

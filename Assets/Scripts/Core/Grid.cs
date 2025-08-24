@@ -613,7 +613,7 @@ public class Grid : MonoBehaviour
 
     private void UpdateBreedCountUI(int count)
     {
-        breedCountUI.text = $"<sprite=8> {count}";
+        breedCountUI.text = $"{count}°³";
     }
 
     private void SpawnRandomBug()

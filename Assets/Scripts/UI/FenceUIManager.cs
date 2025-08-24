@@ -28,7 +28,7 @@ public class FenceUIManager : MonoBehaviour
         }
         List<GeneticTrait> Traits = plant.GetGeneticTrait();
         int taste = plant.GetTaste();
-        Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
+        //Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
         for (int i = 0; i < Traits.Count; i++)
         {
             bool isTasteActive = i < taste;
