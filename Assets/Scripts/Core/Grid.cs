@@ -25,7 +25,8 @@ public class Grid : MonoBehaviour
 
     protected bool isBreedSkipButtonPressed = false;
 
-    
+    protected float breedTimer;
+
     [SerializeField] protected GameObject peaPrefab;
     [SerializeField] protected GameObject peanutPrefab;
     [SerializeField] protected GameObject nepenthesPrefab;
@@ -69,7 +70,7 @@ public class Grid : MonoBehaviour
     protected float additionalPestResistance = 0f;
 
     protected int additionalInheritance = 0;
-    protected float breedTimer = 30.0f;
+    protected float maxBreedTimer = 30.0f;
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
@@ -82,9 +83,9 @@ public class Grid : MonoBehaviour
     public int AdditionalBugGold => additionalBugGold;
     public float AdditionalPestResistance => additionalPestResistance;
     public int AdditionalInheritance => additionalInheritance;
-    public float BreedTimer => breedTimer;
+    public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
-    public int BreedCount => breedCount;
+    public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -133,20 +134,20 @@ public class Grid : MonoBehaviour
         //int breedCount = 0;
 
         
-        Debug.Log(breedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
+        Debug.Log(maxBreedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
         UpdateBreedCountUI(maxBreedCount);
+        breedTimer = maxBreedTimer;
         breedTimerUI.StartBreedingTimer();
-        float startTime = Time.time;
-        float endTime = startTime + breedTimer;
 
         breedSkipButton.SetActive(true);
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
 
-        while (Time.time < endTime && !isBreedSkipButtonPressed)
+        while (breedTimer > 0 && !isBreedSkipButtonPressed)
         {
             lastBugSpawnTimeInterval += Time.deltaTime;
+            breedTimer -= Time.deltaTime;
 
             if (Input.GetKeyDown(KeyCode.S))
             {
@@ -447,10 +448,15 @@ public class Grid : MonoBehaviour
         return true;
     }
 
-    public void AddBreedTimer(int time)
+    public void AddMaxBreedTimer(int time)
     {
-        breedTimer += time;
+        maxBreedTimer += time;
         return;
+    }
+
+    public float GetMaxBreedTimer()
+    {
+        return maxBreedTimer;
     }
 
     public float GetBreedTimer()
@@ -749,7 +755,7 @@ public class Grid : MonoBehaviour
         additionalPestResistance = saveData.additionalPestResistance;
 
         additionalInheritance = saveData.additionalInheritance;
-        breedTimer = saveData.breedTimer;
+        maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
         UpdateSoil();
     }

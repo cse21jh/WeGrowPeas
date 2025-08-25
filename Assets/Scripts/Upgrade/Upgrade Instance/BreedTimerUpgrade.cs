@@ -12,7 +12,7 @@ public class BreedTimerUpgrade : Upgrade
     public override int UpgradeId => 14;
     public override void OnSelectAction() 
     {
-        GameManager.Instance.grid.AddBreedTimer(10);
+        GameManager.Instance.grid.AddMaxBreedTimer(10);
         Debug.Log(Explanation);
     }
 }

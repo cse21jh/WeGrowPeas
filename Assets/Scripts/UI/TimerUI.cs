@@ -6,7 +6,7 @@ using UnityEngine;
 public class TimerUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI textTimer;
-    [SerializeField] private int breedingTime;
+    private int maxBreedingTime;
     private Coroutine countdownRoutine;
 
     [SerializeField] private BreedTimerController breedTimerController;
@@ -27,10 +27,11 @@ public class TimerUI : MonoBehaviour
     {
         if (countdownRoutine != null)
         {
-            breedingTime = (int)GameManager.Instance.grid.GetBreedTimer();
+            maxBreedingTime = (int)GameManager.Instance.grid.GetMaxBreedTimer();
             StopCoroutine(countdownRoutine);
         }
 
+        maxBreedingTime = (int)GameManager.Instance.grid.GetMaxBreedTimer();
         countdownRoutine = StartCoroutine(BreedingCountdown());
     }
 
@@ -38,7 +39,7 @@ public class TimerUI : MonoBehaviour
     {
         if (countdownRoutine != null)
         {
-            textTimer.text = $"{breedingTime}s";
+            textTimer.text = $"{maxBreedingTime}s";
             breedTimerController.SetFill(1f);
             textTimer.color = Color.black;
             StopCoroutine(countdownRoutine);
@@ -47,7 +48,7 @@ public class TimerUI : MonoBehaviour
 
     private IEnumerator BreedingCountdown()
     {
-        int timeLeft = breedingTime;
+        int timeLeft = maxBreedingTime;
         textTimer.color = Color.white;
 
         while (timeLeft >= 0)
@@ -57,7 +58,7 @@ public class TimerUI : MonoBehaviour
             textTimer.text = $"{timeLeft}s";
             yield return new WaitForSeconds(1f);
             timeLeft--;
-            breedTimerController.SetFill(timeLeft / (float)breedingTime);
+            breedTimerController.SetFill(timeLeft / (float)maxBreedingTime);
         }
     }
 

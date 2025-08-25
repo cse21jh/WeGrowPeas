@@ -35,7 +35,7 @@ public class SaveData
     public float additionalPestResistance;
 
     public int additionalInheritance;
-    public float breedTimer;
+    public float maxBreedTimer;
     public int maxBreedCount;
     public int breedCount;
     //public float remainBreedTime;
@@ -253,7 +253,7 @@ public class GameManager : Singleton<GameManager>
         saveData.additionalPestResistance = grid.AdditionalPestResistance;
 
         saveData.additionalInheritance = grid.AdditionalInheritance;
-        saveData.breedTimer = grid.BreedTimer;
+        saveData.maxBreedTimer = grid.MaxBreedTimer;
         saveData.maxBreedCount = grid.MaxBreedCount;
 
         //upgradeManager
