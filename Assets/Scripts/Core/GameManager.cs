@@ -150,7 +150,8 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(grid.Breeding());
 
-        enemyController.EnemyWave();
+        yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
+        //enemyController.EnemyWave();
 
         gameOver = grid.CheckGameOver();
 

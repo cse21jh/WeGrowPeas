@@ -16,6 +16,8 @@ public class FenceUIManager : MonoBehaviour
     [SerializeField] private float moveDuration = 0.3f;
     [SerializeField] private Ease moveEase = Ease.OutBack;
 
+    [SerializeField] private int fenceAnimSytle = 0; // 0: move, 1: scale
+
     [SerializeField] private PriceSignController priceSign;
 
 
@@ -79,7 +81,14 @@ public class FenceUIManager : MonoBehaviour
 
         for (int i = 0; i < fenceElements.Length; i++)
         {
-            showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(showPos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+            if(fenceAnimSytle == 0)
+            {
+                showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(showPos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+            }
+            else
+            {
+                showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOScale(new Vector3(0.8f, 0.8f, 0.8f), moveDuration).SetEase(Ease.OutBack));
+            }                
         }
 
         yield return null;
@@ -91,7 +100,14 @@ public class FenceUIManager : MonoBehaviour
 
         for (int i = 0; i < fenceElements.Length; i++)
         {
-            showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(hidePos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+            if (fenceAnimSytle == 0)
+            {
+                showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOAnchorPos(hidePos[i].anchoredPosition, moveDuration).SetEase(Ease.OutBack));
+            }
+            else
+            {
+                showSeq.Insert(i * showDelay, fenceElements[i].GetComponent<RectTransform>().DOScale(new Vector3(0, 0, 0), moveDuration).SetEase(Ease.OutBack));
+            }
         }
 
         yield return null;

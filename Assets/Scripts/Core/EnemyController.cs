@@ -30,6 +30,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private GameObject waveSkipButton;
     [SerializeField] TextMeshProUGUI waveSkipCountText;
 
+    [SerializeField] private float waveDuration = 1f;
+
     // 저장 필요
     private static readonly List<Wave> unlockedWave = new List<Wave>(); // 실제 저장 자체는 안 하지만, UnlockWaveAtOnce()로 불러오기 필요
 
@@ -58,12 +60,15 @@ public class EnemyController : MonoBehaviour
         
     }
 
-    public void EnemyWave()
+    public IEnumerator EnemyWaveCoroutine()
     {
         //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
         Wave wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
+        FindAnyObjectByType<WaveManager>().StartWave(waveDuration);
+
+        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
 
         if (currentWave != noneWave)
         {
@@ -91,9 +96,8 @@ public class EnemyController : MonoBehaviour
             Debug.Log("오늘은 아무일도 일어나지 않았습니다");
         SetNextWave();
         FlushNextWaveText();
-        return;
+        yield return null;
     }
-
     public void SetNextWave()
     {
         lastWave = currentWave;
