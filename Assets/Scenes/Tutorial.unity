@@ -21607,8 +21607,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textBoxPrefab: {fileID: 1410924029886416950, guid: 43dd0eefdf47ebf4a8daeb3df34277ef, type: 3}
-  maxVisible: 4
-  _nextIdx: 0
 --- !u!114 &131866180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68219,6 +68217,55 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &418885825
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 418885826}
+  - component: {fileID: 418885827}
+  m_Layer: 5
+  m_Name: SpawnedCircle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &418885826
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418885825}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1603051468}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.015495}
+  m_SizeDelta: {x: 800, y: 449.97}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &418885827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418885825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931e66eeb6db7d843b78df39d24eb7a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whiteCirclePrefab: {fileID: 0}
 --- !u!1 &418946667
 GameObject:
   m_ObjectHideFlags: 0
@@ -170925,7 +170972,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textTimer: {fileID: 1063364153}
-  breedingTime: 30
+  breedTimerController: {fileID: 0}
 --- !u!114 &1063364153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210546,9 +210593,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d7ce3a25554c80a44ade7918d0ca80de, type: 2}
   - {fileID: 11400000, guid: 6ca60a5ab5fa55046963db5b2233fe7f, type: 2}
   - {fileID: 11400000, guid: 46f17343efdf2ce44928396491a9b07b, type: 2}
-  - {fileID: 11400000, guid: bb7fae96ec339074e89e99f54c6f7986, type: 2}
-  step1: []
+  step1:
+  - {fileID: 11400000, guid: da9315dde9ab97946a77340a56fb5593, type: 2}
+  - {fileID: 11400000, guid: 15e08fdc7610993498ffe1cffe509f5f, type: 2}
+  - {fileID: 11400000, guid: eb2d861b7b28abd4e93fe84be639f19b, type: 2}
+  - {fileID: 11400000, guid: c44cea58168f389468a224cfefac930a, type: 2}
+  - {fileID: 11400000, guid: 361a4b832b979ab47b9ab156f508ae9d, type: 2}
+  - {fileID: 11400000, guid: 824c5637eebb0014ca59db88128b3dc8, type: 2}
+  - {fileID: 11400000, guid: 9315c11741909f14c8021270127b5cf4, type: 2}
+  - {fileID: 11400000, guid: 9f85c7182d672a4409eefabd578f4c2b, type: 2}
+  - {fileID: 11400000, guid: 3288c5a70aed55a4d828068822f1e726, type: 2}
+  step2:
+  - {fileID: 11400000, guid: 0f70058f9d3b5d2458c8cddcc2224960, type: 2}
+  - {fileID: 11400000, guid: 60ac2176a13417341903ac4ecbfe5eee, type: 2}
+  step3: []
+  step4: []
+  step5: []
   skipPopup: {fileID: 86399681}
+  spawnedCircle: {fileID: 1603051469}
 --- !u!4 &1305778344
 Transform:
   m_ObjectHideFlags: 0
@@ -257016,6 +257078,7 @@ GameObject:
   - component: {fileID: 1603051467}
   - component: {fileID: 1603051466}
   - component: {fileID: 1603051465}
+  - component: {fileID: 1603051469}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -257106,6 +257169,7 @@ RectTransform:
   - {fileID: 1731421894}
   - {fileID: 86399684}
   - {fileID: 131866183}
+  - {fileID: 418885826}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -257113,6 +257177,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1603051469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603051464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931e66eeb6db7d843b78df39d24eb7a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whiteCirclePrefab: {fileID: 6962819626267034685, guid: 85a645bbef206b34a9aa847bda0b41fb, type: 3}
 --- !u!1 &1603194120
 GameObject:
   m_ObjectHideFlags: 0
@@ -290178,13 +290255,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1305778341}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 1305778343}
+        m_TargetAssemblyTypeName: TutorialManager, Assembly-CSharp
+        m_MethodName: ContinueTutorial
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

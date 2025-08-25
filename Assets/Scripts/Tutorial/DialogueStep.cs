@@ -1,6 +1,17 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum DialogueTriggerType { NarrationClick, KeyPress, ObjectClick }
+
+public enum NextTutorialSequence { None, Step0, Step1, Step2, Step3, Step4, Step5 }
+
+public enum TutorialActions
+{
+    None,
+    ShowSkipPopUp,
+    ShowWhiteCircle,
+    FlushCircle,
+}
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
 public class DialogueStep : ScriptableObject
@@ -15,6 +26,9 @@ public class DialogueStep : ScriptableObject
     // ObjectClick 일 때만 사용 (이 오브젝트를 클릭해야 진행)
     public GameObject targetObject;
 
-    // 이 스텝을 마치면 "튜토리얼 스킵?" 팝업을 띄울지
-    public bool showSkipPopupOnComplete = false;
+    public TutorialActions action = TutorialActions.None;
+
+    public Vector3 whiteCirclePos = Vector3.zero;
+
+    public NextTutorialSequence chainTo = NextTutorialSequence.None;
 }

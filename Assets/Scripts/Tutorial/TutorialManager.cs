@@ -17,9 +17,16 @@ public class TutorialManager : MonoBehaviour
     [Header("Sequences")]
     [SerializeField] private DialogueStep[] step0;
     [SerializeField] private DialogueStep[] step1;
+    [SerializeField] private DialogueStep[] step2;
+    [SerializeField] private DialogueStep[] step3;
+    [SerializeField] private DialogueStep[] step4;
+    [SerializeField] private DialogueStep[] step5;
 
     [Header("Skip Popup")]
     [SerializeField] private GameObject skipPopup;
+
+    [Header("White Circle Area")]
+    [SerializeField] private SpawnedCircle spawnedCircle;
 
     private bool _narrationClickedThisFrame = false;
     private GameObject _lastClickedObject = null;
@@ -53,28 +60,39 @@ public class TutorialManager : MonoBehaviour
         enemyController.ShowNextWaveText();
 
         yield return PlayTutorialSequence(step0);
-        //yield return TutorialStep1();
-        //yield return TutorialStep2();
-        //yield return TutorialStep3();
-        //yield return TutorialStep4();
     }
 
     private IEnumerator PlayTutorialSequence(DialogueStep[] seq)
     {
         if (seq == null || seq.Length == 0) yield break;
 
+        n.Flush();
+
         for (int i = 0; i < seq.Length; i++)
         {
             var s = seq[i];
             if (s == null) continue;
 
-            // 1) 대사 출력
+            // 대사 출력
             n.AddLine(s.text);
 
-            // 2) 트리거 대기
+            // 트리거 대기
             yield return WaitForTrigger(s);
 
-            if (s.showSkipPopupOnComplete) skipPopup.SetActive(true);
+            // 튜토리얼 내의 특정 액션 발생
+            if (s.action != TutorialActions.None)
+            {
+                DoAction(s);
+            }
+
+            // 다음 step으로 넘어가는 상황
+            if (s.chainTo != NextTutorialSequence.None)
+            {
+                var next = ResolveSequence(s.chainTo);
+                if (next != null && next.Length > 0)
+                    yield return PlayTutorialSequence(next);
+                yield break;
+            }
         }
     }
 
@@ -105,6 +123,24 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
+    private void DoAction(DialogueStep s)
+    {
+        switch (s.action)
+        {
+            case TutorialActions.ShowSkipPopUp:
+                skipPopup.SetActive(true);
+                break;
+
+            case TutorialActions.ShowWhiteCircle:
+                spawnedCircle.ShowCircle(s.whiteCirclePos);
+                break;
+
+            case TutorialActions.FlushCircle:
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+        }
+    }
+
     /// <summary>NarrationBox의 EventTrigger/Button에서 OnClick에 연결</summary>
     public void OnNarrationBoxClicked()
     {
@@ -112,6 +148,7 @@ public class TutorialManager : MonoBehaviour
         // 같은 프레임에서 여러 신호가 섞이지 않게 다음 프레임에 자동 리셋(선택)
         StartCoroutine(ResetNarrationClickNextFrame());
     }
+
     private IEnumerator ResetNarrationClickNextFrame()
     {
         yield return null;
@@ -131,37 +168,26 @@ public class TutorialManager : MonoBehaviour
         _lastClickedObject = null;
     }
 
-    private IEnumerator TutorialStep0()
+    private DialogueStep[] ResolveSequence(NextTutorialSequence id)
     {
-        Debug.Log("튜토리얼 0 실행");
-        grid.InitTGrid();
-        UpdateStageUI();
-        enemyController.UnlockWave(tStage);
-        enemyController.ShowNextWaveText();
-        //Debug.Log("AddLine이 됐어야 했는데");
-
-        yield return null;
+        return id switch
+        {
+            NextTutorialSequence.Step0 => step0,
+            NextTutorialSequence.Step1 => step1,
+            NextTutorialSequence.Step2 => step2,
+            NextTutorialSequence.Step3 => step3,
+            NextTutorialSequence.Step4 => step4,
+            NextTutorialSequence.Step5 => step5,
+            _ => null
+        };
     }
 
-    private IEnumerator TutorialStep1()
+    public void ContinueTutorial()
     {
-        yield return null;
+        StartCoroutine(PlayTutorialSequence(step1));
+        skipPopup.SetActive(false);
     }
 
-    private IEnumerator TutorialStep2()
-    {
-        yield return null;
-    }
-
-    private IEnumerator TutorialStep3()
-    {
-        yield return null;
-    }
-
-    private IEnumerator TutorialStep4()
-    {
-        yield return null;
-    }
 
     private void UpdateStageUI()
     {

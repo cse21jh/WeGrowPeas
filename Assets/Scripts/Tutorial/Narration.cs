@@ -9,10 +9,9 @@ public class Narration : MonoBehaviour
     private RectTransform narrationBoxContent;
 
     [SerializeField] private GameObject textBoxPrefab;
-    [SerializeField] private int maxVisible = 4;
+    private int maxVisible = 3;
 
     private readonly Queue<GameObject> spawnedText = new Queue<GameObject>();
-    public int _nextIdx = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -44,6 +43,17 @@ public class Narration : MonoBehaviour
         if (tmp != null) tmp.text = text;
 
         spawnedText.Enqueue(tb);
+    }
+
+    public void Flush()
+    {
+        for(int i = narrationBoxContent.childCount - 1; i >= 0; i--)
+        {
+            var child = narrationBoxContent.GetChild(i);
+            if(child != null) Destroy(child.gameObject);
+        }
+
+        spawnedText.Clear();
     }
 
 }
