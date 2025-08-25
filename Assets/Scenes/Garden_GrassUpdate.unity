@@ -66663,6 +66663,7 @@ MonoBehaviour:
   nextWaveText: {fileID: 185629416}
   waveSkipButton: {fileID: 620511508}
   waveSkipCountText: {fileID: 572322440}
+  waveDuration: 1
 --- !u!4 &415974145
 Transform:
   m_ObjectHideFlags: 0
@@ -105006,7 +105007,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.3, y: -294.2}
+  m_AnchoredPosition: {x: 20, y: -350}
   m_SizeDelta: {x: 110, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &662809613
@@ -282226,7 +282227,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textTimer: {fileID: 1806027839}
-  breedingTime: 30
   breedTimerController: {fileID: 1075314496}
 --- !u!114 &1806027839
 MonoBehaviour:
@@ -297275,6 +297275,7 @@ MonoBehaviour:
   showDelay: 0.06
   moveDuration: 0.3
   moveEase: 4
+  fenceAnimSytle: 0
   priceSign: {fileID: 2038041512}
 --- !u!114 &1912975211
 MonoBehaviour:

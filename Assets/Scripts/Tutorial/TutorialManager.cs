@@ -22,8 +22,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private DialogueStep[] step4;
     [SerializeField] private DialogueStep[] step5;
 
-    [Header("Skip Popup")]
+    [Header("Popup")]
     [SerializeField] private GameObject skipPopup;
+    [SerializeField] private GameObject tutorialEndPopup;
 
     [Header("White Circle Area")]
     [SerializeField] private SpawnedCircle spawnedCircle;
@@ -138,6 +139,23 @@ public class TutorialManager : MonoBehaviour
             case TutorialActions.FlushCircle:
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;
+
+            case TutorialActions.SpawnBug:
+                break;
+
+            case TutorialActions.Breed:
+                break;
+
+            case TutorialActions.EnemyWave:
+                break;
+
+            case TutorialActions.Upgrade:
+                break;
+
+            case TutorialActions.ShowTutorialEndPopUp:
+                tutorialEndPopup.SetActive(true);
+                break;
+
         }
     }
 

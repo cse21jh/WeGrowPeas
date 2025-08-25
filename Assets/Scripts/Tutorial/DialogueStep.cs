@@ -11,6 +11,11 @@ public enum TutorialActions
     ShowSkipPopUp,
     ShowWhiteCircle,
     FlushCircle,
+    SpawnBug,
+    Breed,
+    EnemyWave,
+    Upgrade,
+    ShowTutorialEndPopUp,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
