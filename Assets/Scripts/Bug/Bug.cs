@@ -64,8 +64,9 @@ public class Bug : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));            
-            if (Vector3.Distance(new Vector3(mousePos.x, mousePos.y, 0), transform.position) < hitRange)
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));
+            Debug.Log(mousePos);
+            if (Mathf.Abs(transform.position.x - mousePos.x) < hitRange && Mathf.Abs(transform.position.y - mousePos.y) < hitRange)
             { 
                 StartCoroutine(HitBug());
             }
@@ -227,11 +228,11 @@ public class Bug : MonoBehaviour
         }
     }
 
-    private IEnumerator ShowBugKiller()
+    protected IEnumerator ShowBugKiller()
     {
         bugKiller = Instantiate(bugKillerPrefab);
-        Vector3 currentPos = this.gameObject.transform.position;
-        bugKiller.transform.position = new Vector3(currentPos.x + 0.3f, currentPos.y - 0.3f, currentPos.z);
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+        bugKiller.transform.position = new Vector3(mousePos.x + 0.3f, mousePos.y - 0.3f, transform.position.z);
         yield return new WaitForSeconds(0.1f);
         Destroy(bugKiller);
     }
@@ -271,5 +272,11 @@ public class Bug : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(transform.position, new Vector3(hitRange * 2,hitRange * 2));
     }
 }

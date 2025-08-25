@@ -37,45 +37,50 @@ public class ReviveBug : Bug
 
     protected override IEnumerator HitBug()
     {
-        yield return StartCoroutine(base.HitBug());
-        if(reviveCount > 0)
+        if (!isDie && !isHit)
         {
-            /*
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-            transform.GetChild(0).gameObject.SetActive(false);
-            sr.sprite = eggSprite;
-            //egg.SetActive(true);
-            //egg.transform.localRotation = transform.GetChild(0).localRotation;
-            yield return new WaitForSeconds(1.0f);
-            transform.GetChild(0).gameObject.SetActive(true);
-            //egg.SetActive(false);
-            sr.sprite = null;
-            */
+            SoundManager.Instance.PlayEffect("HitBug");
+            isHit = true;
+            yield return StartCoroutine(ShowBugKiller());
 
-            foreach (GameObject body in metalBodies)
+            if (reviveCount > 0)
             {
-                body.SetActive(false);
-            }
-            foreach (GameObject body in normalBodies)
-            {
-                body.SetActive(true);
-            }
-            ParticleSystem[] effects = fragEffect.GetComponentsInChildren<ParticleSystem>();
-            foreach (ParticleSystem effect in effects)
-            {
-                effect.Play();
-            }
-            yield return new WaitForSeconds(1.0f);
+                /*
+                SpriteRenderer sr = GetComponent<SpriteRenderer>();
+                transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                transform.GetChild(0).gameObject.SetActive(false);
+                sr.sprite = eggSprite;
+                //egg.SetActive(true);
+                //egg.transform.localRotation = transform.GetChild(0).localRotation;
+                yield return new WaitForSeconds(1.0f);
+                transform.GetChild(0).gameObject.SetActive(true);
+                //egg.SetActive(false);
+                sr.sprite = null;
+                */
 
-            reviveCount--;
-            isHit = false;
+                foreach (GameObject body in metalBodies)
+                {
+                    body.SetActive(false);
+                }
+                foreach (GameObject body in normalBodies)
+                {
+                    body.SetActive(true);
+                }
+                ParticleSystem[] effects = fragEffect.GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem effect in effects)
+                {
+                    effect.Play();
+                }
+                yield return new WaitForSeconds(1.0f);
+
+                reviveCount--;
+                isHit = false;
+            }
+            else
+            {
+                yield return StartCoroutine(KillBug());
+            }
         }
-        else
-        {
-            yield return StartCoroutine(KillBug());
-        }
-        
     }
 
     public override IEnumerator KillBug()
