@@ -818,8 +818,7 @@ public class Grid : MonoBehaviour
         // 벌레로 인한 죽음이면 그 벌레 제거
         if (cause == DeathCause.Bug && killer != null)
         {
-            Destroy(killer.gameObject);
-            killBugCount++;             // 있으면 통계 갱신
+            StartCoroutine(killer.KillBug());
             Debug.Log($"[Grid] 페트병 발동: 벌레 제거 + 식물 보호 (idx={idx})");
         }
         else
