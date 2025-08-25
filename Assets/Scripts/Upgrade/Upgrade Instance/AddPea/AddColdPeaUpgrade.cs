@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class AddColdPeaUpgrade : Upgrade
 {
-    public override string Name => "추위 식물 추가";
-    public override string Explanation => "추위에 강한 식물을 하나 추가합니다";
+    public override string Name => "추위 완두콩 추가";
+    public override string Explanation => "추위에 강한 완두콩을 하나 추가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_4");
     public override int MaxAmount => -1;
     public override int UnlockStage => 15;

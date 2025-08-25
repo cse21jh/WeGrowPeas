@@ -20,6 +20,7 @@ public class Peanut : Plant
     [SerializeField] private Image holdGaugeImage;
     [SerializeField] private GameObject holdGaugeCanvas;
 
+    private float peanutCopyProbability = 0.25f;
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = "¶¥Äá";
@@ -220,7 +221,7 @@ public class Peanut : Plant
 
     public void TrySpawnCopy()
     {
-        if (Random.Range(0, 100) < 75) // 25ÇÁ·Î È®·ü·Î ½ºÆù
+        if (Random.Range(0, 100) > 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25ÇÁ·Î È®·ü·Î ½ºÆù
             return;
         int spawnGridIdx = FindEmptyGridToCopy();
 
@@ -236,13 +237,13 @@ public class Peanut : Plant
     {
         switch (taste)
         {
-            case 0: return 90;
-            case 1: return 130;
-            case 2: return 160;
-            case 3: return 180;
-            case 4: return 200;
-            case 5: return 230;
-            case 6: return 270;
+            case 0: return 60 + grid.GetAdditionalPeanutGold();
+            case 1: return 100 + grid.GetAdditionalPeanutGold();
+            case 2: return 130 + grid.GetAdditionalPeanutGold();
+            case 3: return 150 + grid.GetAdditionalPeanutGold();
+            case 4: return 170 + grid.GetAdditionalPeanutGold();
+            case 5: return 200 + grid.GetAdditionalPeanutGold(); 
+            case 6: return 240 + grid.GetAdditionalPeanutGold();
         }
         return 0;
     }

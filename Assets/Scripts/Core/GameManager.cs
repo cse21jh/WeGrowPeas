@@ -32,6 +32,9 @@ public class SaveData
     public float ladybugSpawnProbability;
     public int additionalBugGold;
 
+    public float additionalPeanutCopyProbability;
+    public int additionalPeanutGold;
+
     public float additionalPestResistance;
 
     public int additionalInheritance;
@@ -250,6 +253,9 @@ public class GameManager : Singleton<GameManager>
         saveData.bugSpawnIntervalIncreasement = grid.BugSpawnIntervalIncreasement;
         saveData.ladybugSpawnProbability = grid.LadybugSpawnProbability;
         saveData.additionalBugGold = grid.AdditionalBugGold;
+
+        saveData.additionalPeanutGold = grid.AdditionalPeanutGold;
+        saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability;
 
         saveData.additionalPestResistance = grid.AdditionalPestResistance;
 

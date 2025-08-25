@@ -67,6 +67,9 @@ public class Grid : MonoBehaviour
     protected float ladybugSpawnProbability = 0f;
     protected int additionalBugGold = 0;
 
+    protected float additionalPeanutCopyProbability = 0f;
+    protected int additionalPeanutGold = 0;
+
     protected float additionalPestResistance = 0f;
 
     protected int additionalInheritance = 0;
@@ -81,6 +84,8 @@ public class Grid : MonoBehaviour
     public float BugSpawnIntervalIncreasement => bugSpawnIntervalIncreasement;
     public float LadybugSpawnProbability => ladybugSpawnProbability;
     public int AdditionalBugGold => additionalBugGold;
+    public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
+    public int AdditionalPeanutGold => additionalPeanutGold;
     public float AdditionalPestResistance => additionalPestResistance;
     public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
@@ -752,6 +757,9 @@ public class Grid : MonoBehaviour
         ladybugSpawnProbability = saveData.ladybugSpawnProbability;
         additionalBugGold = saveData.additionalBugGold;
 
+        additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability;
+        additionalPeanutGold = saveData.additionalPeanutGold;
+
         additionalPestResistance = saveData.additionalPestResistance;
 
         additionalInheritance = saveData.additionalInheritance;
@@ -788,6 +796,26 @@ public class Grid : MonoBehaviour
     public int GetAdditionalBugGold()
     {
         return additionalBugGold;
+    }
+
+    public void AddAdditionalPeanutGold(int value)
+    {
+        additionalPeanutGold += value;
+    }
+
+    public int GetAdditionalPeanutGold()
+    {
+        return additionalPeanutGold;
+    }
+
+    public void AddAdditionalPeanutCopyProbability(float value)
+    {
+        additionalPeanutCopyProbability += value;
+    }
+
+    public float GetAdditionalPeanutCopyProbability()
+    {
+        return additionalPeanutCopyProbability;
     }
 }
 

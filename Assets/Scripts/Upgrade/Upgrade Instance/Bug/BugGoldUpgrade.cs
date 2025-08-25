@@ -3,7 +3,7 @@ using UnityEngine;
 public class BugGoldUpgrade : Upgrade
 {
     public override string Name => "벌레가 주는 돈 증가";
-    public override string Explanation => "벌레의 주는 돈이 10 증가합니다";
+    public override string Explanation => "벌레가 주는 골드가 10 증가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
     public override int MaxAmount => 5;
     public override int UnlockStage => 10;

@@ -33,10 +33,17 @@ public class UpgradeManager : MonoBehaviour
         { typeof(BugSpeedUpgrade), () => new BugSpeedUpgrade()},
         { typeof(BugGoldUpgrade), () => new BugGoldUpgrade()},
         { typeof(BugFrequencyUpgrade), () => new BugFrequencyUpgrade()},
+        { typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
+        { typeof(AddWindPeanutUpgrade), () => new AddWindPeanutUpgrade()},
+        { typeof(AddFloodPeanutUpgrade), () => new AddFloodPeanutUpgrade()},
+        { typeof(AddPestPeanutUpgrade), () => new AddPestPeanutUpgrade()},
+        { typeof(AddColdPeanutUpgrade), () => new AddColdPeanutUpgrade()},
+        { typeof(AddHeavyRainPeanutUpgrade), () => new AddHeavyRainPeanutUpgrade()},
+        { typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},
+        { typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},
         // 아래는 디버깅용 
         { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
         { typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
-        { typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
 
     };
 
