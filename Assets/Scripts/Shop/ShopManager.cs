@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class ShopManager : Singleton<ShopManager>
 {
-    /*
     [SerializeField] private ShopUI shopUI;
+    [SerializeField] private int shopOpenDay = 2;
 
     public IEnumerator ShopPhase()
     {
         // 6일마다만 상점 오픈
-        if (GameManager.Instance.stage % 6 != 0)
+        if (GameManager.Instance.stage % shopOpenDay != 0)
             yield break;
 
         // UI 열기
@@ -22,5 +22,4 @@ public class ShopManager : Singleton<ShopManager>
         while (!closed)
             yield return null;
     }
-    */
 }

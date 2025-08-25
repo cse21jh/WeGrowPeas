@@ -160,7 +160,7 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitForSeconds(2.0f);
             yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
-            //yield return StartCoroutine(shopManager.ShopPhase());
+            yield return StartCoroutine(shopManager.ShopPhase());
         }
 
     }

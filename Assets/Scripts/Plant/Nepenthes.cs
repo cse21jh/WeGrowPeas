@@ -33,7 +33,7 @@ public class Nepenthes : Plant
     private const float HoldDuration = 0.7f;
 
     [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvas;
+    [SerializeField] private GameObject holdGaugeCanvasObj;
 
     protected void Update()
     {
@@ -45,7 +45,7 @@ public class Nepenthes : Plant
             if (holdTime >= HoldDuration && !isDragging)
             {
                 StartDragging();
-                holdGaugeCanvas.SetActive(false);
+                holdGaugeCanvasObj.SetActive(false);
             }
         }
 
@@ -63,7 +63,7 @@ public class Nepenthes : Plant
             isHolding = false;
             holdTime = 0f;
             holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvas.SetActive(false);
+            holdGaugeCanvasObj.SetActive(false);
         }
     }
 
@@ -74,7 +74,7 @@ public class Nepenthes : Plant
         holdTime = 0f;
         isHolding = true;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(true);
+        holdGaugeCanvasObj.SetActive(true);
     }
 
     private void OnMouseUp()
@@ -88,7 +88,7 @@ public class Nepenthes : Plant
         isHolding = false;
         holdTime = 0f;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(false);
+        holdGaugeCanvasObj.SetActive(false);
     }
 
     private void StartDragging()

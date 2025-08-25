@@ -5,6 +5,8 @@ using TMPro;
 using DG.Tweening.Core.Easing;
 using UnityEngine.Rendering;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEngine.UI;
+using System;
 
 public class ShopUI : MonoBehaviour
 {
@@ -19,6 +21,12 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private ItemData[] fixedItems = new ItemData[3]; // 고정 3종(비어있지 않게 세팅)
     [SerializeField] private List<RotationEntry> rotationPool;           // 로테이션 후보 리스트
     [SerializeField] private int rotationCount = 3;
+
+    [Header("Switch")]
+    [SerializeField] private GameObject panel;
+    [SerializeField] private Button closeButton;
+
+    public event Action OnShopClosed;
 
     // 생성된 슬롯들 (갱신 시 접근용)
     private readonly List<ItemSlot> slots = new();
@@ -48,6 +56,9 @@ public class ShopUI : MonoBehaviour
             ShowInfo = ShowInfo,
             ShowError = ShowError
         };
+
+        if (closeButton != null)
+            closeButton.onClick.AddListener(Close);
     }
 
     private void OnEnable()
@@ -184,7 +195,7 @@ public class ShopUI : MonoBehaviour
             int total = 0;
             foreach (var c in candidates) total += c.weight;
 
-            int r = Random.Range(0, total);
+            int r = UnityEngine.Random.Range(0, total);
             int acc = 0;
             int idx = -1;
             for (int i = 0; i < candidates.Count; i++)
@@ -208,5 +219,15 @@ public class ShopUI : MonoBehaviour
         public void ClearThisShop() => once.Clear();
     }
 
+    public void Open()
+    {
+        panel.SetActive(true);
+        Debug.Log("상점 오픈!");
+    }
 
+    public void Close()
+    {
+        panel.SetActive(false);
+        OnShopClosed?.Invoke();
+    }
 }

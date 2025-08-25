@@ -3,10 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
 public class ChiliPepperItemData : ItemData
 {
-    [Header("Pepper Settings")]
-    [Range(0f, 1f)]
-    public float neighborBaseResist = 0.8f; // 인접 4칸 기본 저항 취급(추후 훅 연결용)
-
     // 배치 확정 시 사용할 그리드 인덱스
     private int? pendingIndex;
 
@@ -68,9 +64,6 @@ public class ChiliPepperItemData : ItemData
         pendingIndex = idx.Value;
         return true;
     }
-
-    // ShopUI가 확인된 위치를 넘겨줄 때 호출되지만,
-    // 우리 쪽은 인덱스를 pending으로 들고 있으므로 별도 저장 불필요
     public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
@@ -88,10 +81,6 @@ public class ChiliPepperItemData : ItemData
 
         // 실제 배치
         ctx.Grid.AddChiliPepper(pendingIndex.Value);
-
-        // 인접 4칸 “기본 저항 80% 취급”은 현재 Grid API가 없으므로
-        // TODO: 아래 훅을 Grid/Plant 쪽에 추가하여 적용하는 것을 권장.
-        // ApplyNeighborRecessiveTrait(ctx, pendingIndex.Value, neighborBaseResist);
 
         pendingIndex = null;
     }

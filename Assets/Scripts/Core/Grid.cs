@@ -50,6 +50,9 @@ public class Grid : MonoBehaviour
     protected bool isShopOpen = false;
     protected bool shopCloseRequested = false;
 
+    [SerializeField] private GameObject petBottleMarkerPrefab; // 토양 위에 보여줄 마커(선택)
+    private HashSet<int> petBottleTiles = new HashSet<int>();
+    private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
 
     //저장 필요
     [HideInInspector] public int maxCol = 4;
@@ -779,6 +782,52 @@ public class Grid : MonoBehaviour
     public int GetAdditionalBugGold()
     {
         return additionalBugGold;
+    }
+
+    public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
+
+    public void PlacePetBottle(int idx)
+    {
+        if (petBottleTiles.Contains(idx)) return;
+
+        petBottleTiles.Add(idx);
+
+        // 시각화(선택)
+        if (petBottleMarkerPrefab != null)
+        {
+            var soilT = GetSoilTransform(idx);
+            var marker = Instantiate(petBottleMarkerPrefab, soilT.position, Quaternion.identity, soilT);
+            petMarkers[idx] = marker;
+        }
+
+        Debug.Log($"[Grid] 페트병 설치: idx={idx}");
+    }
+    public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
+    {
+        if (!petBottleTiles.Contains(idx)) return false;
+
+        // 1회성 보호 → 소모
+        petBottleTiles.Remove(idx);
+
+        if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+        {
+            Destroy(marker);
+            petMarkers.Remove(idx);
+        }
+
+        // 벌레로 인한 죽음이면 그 벌레 제거
+        if (cause == DeathCause.Bug && killer != null)
+        {
+            Destroy(killer.gameObject);
+            killBugCount++;             // 있으면 통계 갱신
+            Debug.Log($"[Grid] 페트병 발동: 벌레 제거 + 식물 보호 (idx={idx})");
+        }
+        else
+        {
+            Debug.Log($"[Grid] 페트병 발동: 식물 보호 (idx={idx})");
+        }
+
+        return true; // 죽음 방어 성공
     }
 }
 

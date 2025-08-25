@@ -85,7 +85,7 @@ public class Peanut : Plant
         return traits;
     }
 
-    public override void Die()
+    public override void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
         base.Die();
     }
