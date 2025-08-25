@@ -211,7 +211,7 @@ public abstract class Plant : MonoBehaviour
         {
             if (obj.name == str)
             {
-                obj.layer = LayerMask.NameToLayer("uiObjects"); // 레이어 변경하지 않음 - 즉, "uiObjects" 레이어로 변경
+                obj.layer = LayerMask.NameToLayer("UIObjects"); // 레이어 변경하지 않음 - 즉, "uiObjects" 레이어로 변경
             }
         }
 
