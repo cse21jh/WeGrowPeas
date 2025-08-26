@@ -41,6 +41,8 @@ public abstract class Plant : MonoBehaviour
 
     [SerializeField] protected Canvas holdCanvas;
 
+    [SerializeField] protected GameObject foamEffect;
+
 
 
 
@@ -312,5 +314,24 @@ public abstract class Plant : MonoBehaviour
     public int GetTaste()
     {
         return taste;
+    }
+
+
+    public void PlayFoamEffect()
+    {
+        if (foamEffect != null && !foamEffect.activeSelf)
+        {
+            foamEffect.SetActive(true);
+            DeactivateFoamEffectAfterDelay(6f);
+        }
+    }
+
+    private IEnumerator DeactivateFoamEffectAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (foamEffect != null && foamEffect.activeSelf)
+        {
+            foamEffect.SetActive(false);
+        }
     }
 }

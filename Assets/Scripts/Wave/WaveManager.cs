@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Cinemachine;
+using DG.Tweening;
 
 public class WaveManager : MonoBehaviour
 {
@@ -12,9 +13,16 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float shadowSpeed = 10f;
 
     [Space(10)]
-    [Header("웨이브 별 효과 관련")]
+    [Header("바람 효과 관련")]
     [SerializeField] private ParticleSystem[] windEffects;
     [SerializeField] private CinemachineVirtualCamera[] vcams;
+
+    [Space(10)]
+    [Header("홍수 효과 관련")]
+    [SerializeField] private GameObject floodEffect;
+    [SerializeField] private float floodStartPosX = 0;
+    [SerializeField] private float floodEndPosX = 10f;
+    [SerializeField] private Ease floodEase = Ease.InOutSine;
 
 
     public void StartWave(float duration, WaveType type)
@@ -69,6 +77,18 @@ public class WaveManager : MonoBehaviour
                 {
                     vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0f;
                 }
+                break;
+            case WaveType.Flood:
+                floodEffect.transform.position = new Vector3(floodStartPosX, floodEffect.transform.position.y, floodEffect.transform.position.z);
+                floodEffect.SetActive(true);
+                Plant[] plants = FindObjectsByType<Plant>(FindObjectsSortMode.None);
+                foreach (var plant in plants)
+                {
+                    plant.PlayFoamEffect();
+                }
+                DOTween.To(()=> floodEffect.transform.position.x, x => floodEffect.transform.position = new Vector3(x, floodEffect.transform.position.y, floodEffect.transform.position.z), floodEndPosX, waveDuration).SetEase(floodEase);
+                yield return new WaitForSeconds(waveDuration);
+                floodEffect.SetActive(false);
                 break;
             default:
                 yield return null;
