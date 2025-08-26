@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Net.NetworkInformation;
 
+public enum DeathCause { Generic, Bug, Flood, Cold, Other }
+
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
 public abstract class Plant : MonoBehaviour
@@ -137,8 +139,12 @@ public abstract class Plant : MonoBehaviour
         return g.resistance + g.additionalResistance;
     }
 
-    public virtual void Die()
+    public virtual void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
+        // 페트병이 막으면 true 리턴 → 사망 취소
+        if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
+            return;
+
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);

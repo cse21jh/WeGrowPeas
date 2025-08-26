@@ -1,15 +1,15 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
-public class ChiliPepperItemData : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Nepenthes", fileName = "NepenthesItemData")]
+public class NepenthesItemData : ItemData
 {
     // 배치 확정 시 사용할 그리드 인덱스
     private int? pendingIndex;
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추";
-        if (Price <= 0) Price = 1500;
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네팬더스";
+        if (Price <= 0) Price = 1000;
 
         IsStackable = false;
         InitialStock = 1;
@@ -64,6 +64,7 @@ public class ChiliPepperItemData : ItemData
         pendingIndex = idx.Value;
         return true;
     }
+
     public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
@@ -80,7 +81,7 @@ public class ChiliPepperItemData : ItemData
         }
 
         // 실제 배치
-        ctx.Grid.AddChiliPepper(pendingIndex.Value);
+        ctx.Grid.AddNepenthes(pendingIndex.Value);
 
         pendingIndex = null;
     }

@@ -1,23 +1,23 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
-public class ChiliPepperItemData : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/PET Bottle (페트병)", fileName = "PetBottleItemData")]
+public class PetBottleItemData : ItemData
 {
     // 배치 확정 시 사용할 그리드 인덱스
     private int? pendingIndex;
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추";
-        if (Price <= 0) Price = 1500;
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병";
+        if (Price <= 0) Price = 500;
 
-        IsStackable = false;
-        InitialStock = 1;
-        OnePerShopIfNotStackable = true;
+        // 상점당 3회
+        IsStackable = true;
+        InitialStock = 3;
+
+        OnePerShopIfNotStackable = false;
         FlowType = ShopFlowType.PlaceOnTile;
     }
-
-    public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
@@ -30,12 +30,7 @@ public class ChiliPepperItemData : ItemData
         return true;
     }
 
-    // 배치 모드 진입: 별도 준비 없음
-    public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
-    {
-        onReady?.Invoke();
-    }
-
+    // pos = 스크린 좌표 (Grid.GetGridIndexFromPosition 시그니처 기준)
     public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
     {
         reason = null;
@@ -45,7 +40,6 @@ public class ChiliPepperItemData : ItemData
             return false;
         }
 
-        // 스크린 좌표 → 그리드 인덱스
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
@@ -53,17 +47,22 @@ public class ChiliPepperItemData : ItemData
             return false;
         }
 
-        // 빈 칸인지 확인
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        // 식물 유무와 상관없이 설치 가능. 단, 이미 페트병이 있으면 불가
+        if (ctx.Grid.HasPetBottle(idx.Value))
         {
-            reason = "이미 식물이 있는 칸입니다";
+            reason = "이미 페트병이 있습니다";
             return false;
         }
 
-        // 문제 없으면 확정 후보 저장
         pendingIndex = idx.Value;
         return true;
     }
+
+    public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
+    {
+        onReady?.Invoke();
+    }
+
     public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
@@ -79,9 +78,7 @@ public class ChiliPepperItemData : ItemData
             return;
         }
 
-        // 실제 배치
-        ctx.Grid.AddChiliPepper(pendingIndex.Value);
-
+        ctx.Grid.PlacePetBottle(pendingIndex.Value);
         pendingIndex = null;
     }
 

@@ -180,7 +180,7 @@ public class Bug : MonoBehaviour
                 StartCoroutine(KillBug());
             }
             else
-                plant.Die();
+                plant.Die(DeathCause.Bug, this);
         }
     }
 

@@ -31,7 +31,7 @@ public class ChiliPepper : Plant
     private const float HoldDuration = 0.7f;
 
     [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvas;
+    [SerializeField] private GameObject holdGaugeCanvasObj;
 
     protected void Update()
     {
@@ -43,7 +43,7 @@ public class ChiliPepper : Plant
             if (holdTime >= HoldDuration && !isDragging)
             {
                 StartDragging();
-                holdGaugeCanvas.SetActive(false);
+                holdGaugeCanvasObj.SetActive(false);
             }
         }
 
@@ -61,7 +61,7 @@ public class ChiliPepper : Plant
             isHolding = false;
             holdTime = 0f;
             holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvas.SetActive(false);
+            holdGaugeCanvasObj.SetActive(false);
         }
     }
 
@@ -72,7 +72,7 @@ public class ChiliPepper : Plant
         holdTime = 0f;
         isHolding = true;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(true);
+        holdGaugeCanvasObj.SetActive(true);
     }
 
     private void OnMouseUp()
@@ -86,7 +86,7 @@ public class ChiliPepper : Plant
         isHolding = false;
         holdTime = 0f;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(false);
+        holdGaugeCanvasObj.SetActive(false);
     }
 
     private void StartDragging()
