@@ -33,6 +33,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float waveDuration = 1f;
     [SerializeField] private WaveManager waveManager;
 
+    [SerializeField] public WaveType setWave;    
+
     // 저장 필요
     private static readonly List<Wave> unlockedWave = new List<Wave>(); // 실제 저장 자체는 안 하지만, UnlockWaveAtOnce()로 불러오기 필요
 
@@ -52,6 +54,7 @@ public class EnemyController : MonoBehaviour
         lastWave = unlockedWave[0];
         currentWave = unlockedWave[0];
         nextWave = unlockedWave[0];
+        setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
     }
 
@@ -107,6 +110,7 @@ public class EnemyController : MonoBehaviour
     {
         lastWave = currentWave;
         currentWave = nextWave;
+        setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         int next = Random.Range(0, unlockedWave.Count);
         nextWave = unlockedWave[next];
@@ -224,7 +228,10 @@ public class EnemyController : MonoBehaviour
         foreach(var e in unlockedWave)
         {
             if (e.WaveType == saveData.curWaveType)
+            { 
                 currentWave = e;
+                setWave = currentWave.WaveType;
+            }
 
             if (e.WaveType == saveData.lastWaveType)
                 lastWave = e;
@@ -249,5 +256,11 @@ public class EnemyController : MonoBehaviour
             unlockedWave.Add(new ColdWave());
         if (stage + 1 >= 25)
             unlockedWave.Add(new HeavyRainWave());
+    }
+
+    private void OnValidate()
+    {
+        currentWave = GetWaveFromWaveType(setWave);
+        ShowNextWaveText();
     }
 }
