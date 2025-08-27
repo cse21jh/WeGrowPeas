@@ -15,7 +15,6 @@ public class Grid : MonoBehaviour
 
     List<Plant> plants = new List<Plant>();
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
-    
 
     protected bool isBreeding = false;
 
@@ -40,16 +39,8 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject breedSkipButton;
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
-
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
-
-    [Header("Shop")]
-    [SerializeField] protected GameObject shopRoot;
-    [SerializeField] protected CanvasGroup shopCanvas;
-
-    protected bool isShopOpen = false;
-    protected bool shopCloseRequested = false;
 
     [SerializeField] private GameObject petBottleMarkerPrefab; // 토양 위에 보여줄 마커(선택)
     private HashSet<int> petBottleTiles = new HashSet<int>();

@@ -23,6 +23,8 @@ public abstract class ItemData : ScriptableObject
     // 로테이션 후보 필터(웨이브 해금 등), 기본 true
     public virtual bool IsRotationUnlockOk(ShopContext ctx) => true;
 
+    public virtual int GetRotationWeight(ShopContext ctx) => 1;
+
     // 구매 가능 여부(이미 활성화 중인지, 잠금 해금 시기, 중복 금지 등)
     public abstract bool CanPurchase(ShopContext ctx, out string reason);
 
