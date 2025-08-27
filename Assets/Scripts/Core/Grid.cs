@@ -42,9 +42,20 @@ public class Grid : MonoBehaviour
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
-    [SerializeField] private GameObject petBottleMarkerPrefab; // 토양 위에 보여줄 마커(선택)
+    [SerializeField] private GameObject petBottleMarkerPrefab;
     private HashSet<int> petBottleTiles = new HashSet<int>();
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
+
+    [SerializeField] private GameObject fertilizerMarkerPrefab;
+    private const float FertilizerResistBonus = 0.05f; // +5%p
+
+    [System.Serializable]
+    private struct FertilizerSlot
+    {
+        public WaveType wave;
+        public GameObject marker;
+    }
+    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
 
     //저장 필요
     [HideInInspector] public int maxCol = 4;
@@ -371,6 +382,8 @@ public class Grid : MonoBehaviour
             }
         }
 
+        ApplyFertilizerIfAny(plant.gridIndex, plant);
+
         Destroy(plant.gameObject);
         return;
     }
@@ -662,6 +675,9 @@ public class Grid : MonoBehaviour
             // 대상 칸에 식물이 있는 경우: 서로 위치 교환
             Plant targetPlant = plantGrid[toIndex];
 
+            RemoveFertilizerIfAny(fromIndex, plant);
+            RemoveFertilizerIfAny(toIndex, targetPlant);
+
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
             targetPlant.SetGridIndex(fromIndex);
@@ -676,16 +692,22 @@ public class Grid : MonoBehaviour
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
+            ApplyFertilizerIfAny(toIndex, plant);
+            ApplyFertilizerIfAny(fromIndex, targetPlant);
+
             return true;
         }
         else
         {
+            RemoveFertilizerIfAny(fromIndex, plant);
+
             // 빈 칸이면 원래대로 심기
             plantGrid.Remove(fromIndex); // 원래 위치에서 제거
             plant.SetGridIndex(toIndex);
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
 
+            ApplyFertilizerIfAny(toIndex, plant);
             return true;
         }
     }
@@ -856,6 +878,61 @@ public class Grid : MonoBehaviour
         }
 
         return true; // 죽음 방어 성공
+    }
+
+    //-----전용 비료------
+    public bool HasFertilizerAt(int idx) => fertilizerTiles.ContainsKey(idx);
+
+    public bool TryPlaceFertilizer(int idx, WaveType wave)
+    {
+        if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있으면 불가
+
+        // 기록 + 마커 표시
+        var slot = new FertilizerSlot { wave = wave, marker = null };
+        if (fertilizerMarkerPrefab != null)
+        {
+            var soilT = GetSoilTransform(idx);
+            slot.marker = Instantiate(fertilizerMarkerPrefab, soilT.position, Quaternion.identity, soilT);
+            // (선택) wave별 색/아이콘 바꾸고 싶으면 여기서 처리
+        }
+        fertilizerTiles[idx] = slot;
+
+        // 현재 식물이 있으면 즉시 +5%p 적용
+        if (plantGrid.TryGetValue(idx, out var plant) && plant != null)
+            plant.AddAdditionalResistance(MapWaveToTrait(wave), +FertilizerResistBonus);
+
+        Debug.Log($"[Grid] Fertilizer placed: idx={idx}, wave={wave}");
+        return true;
+    }
+
+    // 새 식물이 타일에 들어왔을 때 호출(해당 타일에 비료가 있으면 +5%p)
+    private void ApplyFertilizerIfAny(int idx, Plant plant)
+    {
+        if (plant == null) return;
+        if (fertilizerTiles.TryGetValue(idx, out var slot))
+            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), +FertilizerResistBonus);
+    }
+
+    // 식물이 타일에서 나갈 때 호출(해당 타일에 비료가 있으면 -5%p)
+    private void RemoveFertilizerIfAny(int idx, Plant plant)
+    {
+        if (plant == null) return;
+        if (fertilizerTiles.TryGetValue(idx, out var slot))
+            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), -FertilizerResistBonus);
+    }
+
+    private CompleteTraitType MapWaveToTrait(WaveType w)
+    {
+        return w switch
+        {
+            WaveType.Aging => CompleteTraitType.NaturalDeath,
+            WaveType.Wind => CompleteTraitType.WindResistance,
+            WaveType.Flood => CompleteTraitType.FloodResistance,
+            WaveType.Pest => CompleteTraitType.PestResistance,
+            WaveType.Cold => CompleteTraitType.ColdResistance,
+            WaveType.HeavyRain => CompleteTraitType.HeavyRainResistance,
+            _ => CompleteTraitType.NaturalDeath
+        };
     }
 }
 
