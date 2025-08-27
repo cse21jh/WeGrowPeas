@@ -26,13 +26,13 @@ public class CameraManager : MonoBehaviour
     {
         int camIndex = (int)type;
         if(camIndex > 1) camIndex = 1;
-        cameras[(int) type].Priority = 10;
+        cameras[camIndex].Priority = 10;
         this.gameObject.GetComponent<CinemachineBrain>().m_DefaultBlend.m_Time = time; // Set the blend time for camera transitions
-        ActiveCamera = cameras[(int)type];
+        ActiveCamera = cameras[camIndex];
 
         foreach (CinemachineVirtualCamera cam in cameras)
         {
-            if (cam != cameras[(int)type])
+            if (cam != cameras[camIndex])
             {
                 cam.Priority = 0;
             }

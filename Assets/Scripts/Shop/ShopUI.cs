@@ -42,8 +42,11 @@ public class ShopUI : MonoBehaviour
     private ShopContext ctx;
     private ShopSession session;
 
+    private UIAnimationManager animationManager;
+
     private void Awake()
     {
+        animationManager = FindAnyObjectByType<UIAnimationManager>();
         session = new ShopSession();
         ctx = new ShopContext
         {
@@ -223,12 +226,14 @@ public class ShopUI : MonoBehaviour
     public void Open()
     {
         panel.SetActive(true);
+        animationManager.SwitchCameras(CameraManager.CameraType.Shop);
         Debug.Log("»óÁ¡ ¿ÀÇÂ!");
     }
 
     public void Close()
     {
         panel.SetActive(false);
+        animationManager.SwitchCameras(CameraManager.CameraType.Normal);
         OnShopClosed?.Invoke();
     }
 }

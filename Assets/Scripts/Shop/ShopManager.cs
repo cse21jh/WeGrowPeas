@@ -4,7 +4,7 @@ using UnityEngine;
 public class ShopManager : Singleton<ShopManager>
 {
     [SerializeField] private ShopUI shopUI;
-    [SerializeField] private int shopOpenDay = 6;
+    [SerializeField] private int shopOpenDay = 1;
 
     public IEnumerator ShopPhase()
     {
