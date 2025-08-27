@@ -1,10 +1,11 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using UnityEngine.UI;
-using Unity.VisualScripting;
 using System.Net.NetworkInformation;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
 
 public enum DeathCause { Generic, Bug, Flood, Cold, Other }
 
@@ -42,7 +43,7 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] protected Canvas holdCanvas;
 
     [SerializeField] protected GameObject foamEffect;
-
+    [SerializeField] protected SpriteRenderer[] snowRenderers;
 
 
 
@@ -332,6 +333,39 @@ public abstract class Plant : MonoBehaviour
         if (foamEffect != null && foamEffect.activeSelf)
         {
             foamEffect.SetActive(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        DOTween.Kill(this);
+    }
+
+    public void ShowSnow(float duration, Ease ease)
+    {
+        float meltAmount = 1.2f;
+
+        foreach (var sr in snowRenderers)
+        {
+            DOTween.To(() => meltAmount,
+               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               -0.2f,
+               duration)
+           .SetEase(ease).SetLink(sr.gameObject);
+        }
+    }
+
+    public void HideSnow(float duration, Ease ease)
+    {
+        float meltAmount = -0.2f;
+
+        foreach (var sr in snowRenderers)
+        {
+            DOTween.To(() => meltAmount,
+               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               1.2f,
+               duration)
+           .SetEase(ease).SetLink(sr.gameObject);
         }
     }
 }
