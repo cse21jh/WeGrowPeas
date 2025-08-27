@@ -55,6 +55,10 @@ public class Bug : MonoBehaviour
         Debug.Log(childMaterials.Length);
 
         speed = speed * (1f - grid.GetBugSpeedDecreasement());
+        float mul = ModManager.Instance
+        ? ModManager.Instance.GetMul(StatId.BugSpeedMul, -1)
+        : 1f;
+        speed = speed * mul;
 
         InitRandomPos();
         StartCoroutine(Moving());
