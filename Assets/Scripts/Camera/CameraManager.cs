@@ -24,6 +24,8 @@ public class CameraManager : MonoBehaviour
 
     public void SwitchCamera(CameraType type, float time = 0.5f)
     {
+        int camIndex = (int)type;
+        if(camIndex > 1) camIndex = 1;
         cameras[(int) type].Priority = 10;
         this.gameObject.GetComponent<CinemachineBrain>().m_DefaultBlend.m_Time = time; // Set the blend time for camera transitions
         ActiveCamera = cameras[(int)type];
