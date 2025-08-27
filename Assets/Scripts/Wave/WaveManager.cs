@@ -24,6 +24,16 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float floodEndPosX = 10f;
     [SerializeField] private Ease floodEase = Ease.InOutSine;
 
+    [Space(10)]
+    [Header("해충 효과 관련")]
+    [SerializeField] private GameObject grassHopper;
+    [SerializeField] private GameObject shadow;
+    [SerializeField] private GameObject dust;
+    [SerializeField] private float dustStartPosX = 0;
+    [SerializeField] private float dustEndPosX = 10f;
+    [SerializeField] private float dustMoveDuration = 1.5f;
+    [SerializeField] private Ease dustEase = Ease.InOutSine;
+
 
     public void StartWave(float duration, WaveType type)
     {
@@ -89,6 +99,17 @@ public class WaveManager : MonoBehaviour
                 DOTween.To(()=> floodEffect.transform.position.x, x => floodEffect.transform.position = new Vector3(x, floodEffect.transform.position.y, floodEffect.transform.position.z), floodEndPosX, waveDuration).SetEase(floodEase);
                 yield return new WaitForSeconds(waveDuration);
                 floodEffect.SetActive(false);
+                break;
+            case WaveType.Pest:
+                dust.transform.position = new Vector3(dustStartPosX, dust.transform.position.y, dust.transform.position.z);
+                grassHopper.SetActive(true);
+                shadow.SetActive(true);
+                dust.SetActive(true);
+                DOTween.To(() => dust.transform.position.x, x => dust.transform.position = new Vector3(x, dust.transform.position.y, dust.transform.position.z), dustEndPosX, dustMoveDuration).SetEase(dustEase);
+                yield return new WaitForSeconds(waveDuration);
+                grassHopper.SetActive(false);
+                shadow.SetActive(false);
+                dust.SetActive(false);
                 break;
             default:
                 yield return null;
