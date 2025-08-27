@@ -143,6 +143,7 @@ public class GameManager : Singleton<GameManager>
     private void StageUpdate()
     {
         stage++;
+        ModManager.Instance?.OnNewDay(stage);
         enemyController.UnlockWave(stage);
         upgradeManager.UnlockUpgrade(stage);
     }

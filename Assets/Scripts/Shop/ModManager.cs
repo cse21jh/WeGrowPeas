@@ -9,8 +9,10 @@ public enum StatId
 {
     BugSpeedMul = 1,             // 전체 벌레 속도 곱
     WaveWeightMul = 2,           // 웨이브별 가중치 곱 (param = (int)WaveType)
-    PriceMul = 3,                // 가격 곱 (param = 카테고리 등 필요시)
-    PlantResistAdd = 4,          // 식물 저항 가산 (param = (int)WaveType) 등
+    BugSpawnIntervalMul = 3,     // 스폰 간격에 곱 (0.5면 2배 빨리 스폰)
+    BreedingPhaseDurationMul = 4,// 교배 단계 시간에 곱 (2면 2배 길어짐)
+    BreedingAttemptsMul = 5,     // 교배 가능 횟수에 곱 (2면 2배)
+
 }
 
 [Serializable]

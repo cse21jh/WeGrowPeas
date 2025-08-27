@@ -36,7 +36,7 @@ public class ItemData_BugSpray : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        ModManager.Instance.AddTimedMultiplier(StatId.BugSpeedMul, param: -1, multiplier: 0.5f, durationDays: 6, sourceTag: "BugSpray");
+        ModManager.Instance.AddTimedMultiplier(StatId.BugSpeedMul, param: -1, multiplier: 1-reducePercent, durationDays: durationDays, sourceTag: "BugSpray");
     }
 
     public override void Cancel(ShopContext ctx) { }

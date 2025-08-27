@@ -131,11 +131,13 @@ public class Grid : MonoBehaviour
         breedObj2 = null;
 
         //int breedCount = 0;
+        int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+        float effectiveBugSpawnTimeInterval = BugSpawnTimeInterval * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
+        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
-        
-        Debug.Log(maxBreedTimer + "초 시작. 최대 교배 횟수는 " + maxBreedCount + "입니다");
-        UpdateBreedCountUI(maxBreedCount);
-        breedTimer = maxBreedTimer;
+        Debug.Log(effectiveMaxBreedTimer + "초 시작. 최대 교배 횟수는 " + effectiveMaxBreedCount + "입니다");
+        UpdateBreedCountUI(effectiveMaxBreedCount);
+        breedTimer = effectiveMaxBreedTimer;
         breedTimerUI.StartBreedingTimer();
 
         breedSkipButton.SetActive(true);
@@ -158,7 +160,7 @@ public class Grid : MonoBehaviour
                 enemyController.WaveSkip();
             }
 
-            if (lastBugSpawnTimeInterval > bugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement))
+            if (lastBugSpawnTimeInterval > effectiveBugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement))
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
@@ -193,7 +195,7 @@ public class Grid : MonoBehaviour
                     }
 
 
-                    if (canBreed && breedCount < maxBreedCount && isEqualPlant)
+                    if (canBreed && breedCount < effectiveMaxBreedCount && isEqualPlant)
                     {
                         GameObject childObj = null;
                         if (parent1.GetType() == typeof(Pea))
@@ -207,14 +209,14 @@ public class Grid : MonoBehaviour
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
-                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxBreedCount - breedCount) + "입니다");
+                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (effectiveMaxBreedCount - breedCount) + "입니다");
                             SoundManager.Instance.PlayEffect("Breed");
                             totalBreedCount++;
                             if (child.GetType() == typeof(Pea))
                                 totalPeaBreedcount++;
                             else if (child.GetType() == typeof(Peanut))
                                 totalPeanutBreedCount++;
-                            UpdateBreedCountUI(maxBreedCount - breedCount);
+                            UpdateBreedCountUI(effectiveMaxBreedCount - breedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
@@ -231,7 +233,7 @@ public class Grid : MonoBehaviour
                         }
 
                     }
-                    else if (breedCount >= maxBreedCount)
+                    else if (breedCount >= effectiveMaxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
                         SoundManager.Instance.PlayEffect("WrongSelect");
@@ -455,7 +457,8 @@ public class Grid : MonoBehaviour
 
     public float GetMaxBreedTimer()
     {
-        return maxBreedTimer;
+        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
+        return effectiveMaxBreedTimer;
     }
 
     public float GetBreedTimer()
