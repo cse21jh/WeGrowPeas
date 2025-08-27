@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
@@ -33,10 +34,22 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float waveDuration = 1f;
     [SerializeField] private WaveManager waveManager;
 
-    [SerializeField] public WaveType setWave;    
+    [SerializeField] public WaveType setWave;
 
-    // 저장 필요
-    private static readonly List<Wave> unlockedWave = new List<Wave>(); // 실제 저장 자체는 안 하지만, UnlockWaveAtOnce()로 불러오기 필요
+    [Header("Wave Weights")]
+    [SerializeField] private float defaultBaseWeight = 1f; // 기본 가중치
+
+    [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
+
+    private class SuppressionMod
+    {
+        public WaveType type;
+        public float multiplier;  // ex) 0.25 (= 75% 감소)
+        public int expireDay;
+    }
+    private readonly List<SuppressionMod> mods = new();
+
+    int CurrentDay => GameManager.Instance.stage;
 
     private Wave lastWave;
     private Wave currentWave;
@@ -45,15 +58,18 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        unlockedWave.Clear();
         waveKillCount = new int[6];
         SetWaveSkipCountText();
         HideWaveSkipButton();
-        unlockedWave.Add(new AgingWave());
+
+        InitBaseWeightsByStage(CurrentDay);
+
         noneWave = new NoneWave();
-        lastWave = unlockedWave[0];
-        currentWave = unlockedWave[0];
-        nextWave = unlockedWave[0];
+
+        lastWave = GetWaveFromWaveType(WaveType.Aging);
+        currentWave = lastWave;
+        nextWave = GetWaveFromWaveType(PickNextByWeight());
+
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
     }
@@ -106,15 +122,40 @@ public class EnemyController : MonoBehaviour
         FlushNextWaveText();
         yield return null;
     }
+
+    private void InitBaseWeightsByStage(int stage)
+    {
+        // 초기화
+        baseWeights[WaveType.Aging] = 1f; // 항상 가능
+        baseWeights[WaveType.Wind] = (stage + 1 >= 5) ? 1f : 0f;
+        baseWeights[WaveType.Flood] = (stage + 1 >= 10) ? 1f : 0f;
+        baseWeights[WaveType.Pest] = (stage + 1 >= 15) ? 1f : 0f;
+        baseWeights[WaveType.Cold] = (stage + 1 >= 20) ? 1f : 0f;
+        baseWeights[WaveType.HeavyRain] = (stage + 1 >= 25) ? 1f : 0f;
+        baseWeights[WaveType.None] = 0f; // 추첨 대상에서 제외
+    }
+
+    public void UnlockWave(int stage)
+    {
+        switch (stage + 1)
+        {
+            case 5: baseWeights[WaveType.Wind] = 1f; break;
+            case 10: baseWeights[WaveType.Flood] = 1f; break;
+            case 15: baseWeights[WaveType.Pest] = 1f; break;
+            case 20: baseWeights[WaveType.Cold] = 1f; break;
+            case 25: baseWeights[WaveType.HeavyRain] = 1f; break;
+        }
+    }
+
     public void SetNextWave()
     {
         lastWave = currentWave;
         currentWave = nextWave;
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
-        int next = Random.Range(0, unlockedWave.Count);
-        nextWave = unlockedWave[next];
-        return;
+
+        WaveType picked = PickNextByWeight();
+        nextWave = GetWaveFromWaveType(picked);
     }
 
     public void WaveSkip()
@@ -137,30 +178,6 @@ public class EnemyController : MonoBehaviour
             return true;
         else
             return false;
-    }
-
-    public void UnlockWave(int stage)
-    {
-        // wave 설정은 현 stage의 wave가 끝나고 다다음 wave를 설정할 때 waveUnlocked를 사용. unlock자체는 stage 입장 직전. 즉, 6 스테이지부터 바람이 뜨려면 4스테이지 스테이지 진입 전 언락 필요. 
-        switch (stage + 1)
-        {
-            case 5:
-                unlockedWave.Add(new WindWave());
-                break;
-            case 10:
-                unlockedWave.Add(new FloodWave());
-                break;
-            case 15:
-                unlockedWave.Add(new PestWave());
-                break;
-            case 20:
-                unlockedWave.Add(new ColdWave());
-                break;
-            case 25:
-                unlockedWave.Add(new HeavyRainWave());
-                break;
-        }
-        return;
     }
 
     public void ShowNextWaveText()
@@ -225,42 +242,82 @@ public class EnemyController : MonoBehaviour
 
     public void LoadEnemyController(SaveData saveData)
     {
-        foreach(var e in unlockedWave)
-        {
-            if (e.WaveType == saveData.curWaveType)
-            { 
-                currentWave = e;
-                setWave = currentWave.WaveType;
-            }
+        InitBaseWeightsByStage(GameManager.Instance.stage);
 
-            if (e.WaveType == saveData.lastWaveType)
-                lastWave = e;
+        currentWave = GetWaveFromWaveType(saveData.curWaveType);
+        setWave = currentWave.WaveType;
+        lastWave = GetWaveFromWaveType(saveData.lastWaveType);
+        nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
-            if (e.WaveType == saveData.nextWaveType)
-                nextWave = e;
-        }
         waveSkipCount = saveData.remainWaveSkipCount;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
-        LoadUnlockWaveAtOnce(GameManager.Instance.stage);
         ShowNextWaveText();
-    }
-    private void LoadUnlockWaveAtOnce(int stage)
-    {
-        if (stage + 1 >= 5)
-            unlockedWave.Add(new WindWave());
-        if (stage + 1 >= 10)
-            unlockedWave.Add(new FloodWave());
-        if (stage + 1 >= 15)
-            unlockedWave.Add(new PestWave());
-        if (stage + 1 >= 20)
-            unlockedWave.Add(new ColdWave());
-        if (stage + 1 >= 25)
-            unlockedWave.Add(new HeavyRainWave());
     }
 
     private void OnValidate()
     {
         currentWave = GetWaveFromWaveType(setWave);
         ShowNextWaveText();
+    }
+
+    // 팻말 효과
+
+    public void ApplySignPost(WaveType type, int durationDays = 4, float reducePercent = 0.75f)
+    {
+        float mul = Mathf.Clamp01(1f - reducePercent); // 0.25
+        mods.Add(new SuppressionMod
+        {
+            type = type,
+            multiplier = mul,
+            expireDay = CurrentDay + durationDays
+        });
+        Debug.Log($"[EnemyController] SignPost: {type} x{mul} until day<{CurrentDay + durationDays}>");
+    }
+
+    private void CleanupExpiredMods()
+    {
+        mods.RemoveAll(m => m.expireDay <= CurrentDay);
+    }
+
+    // ---------- 가중치 계산 & 추첨 ----------
+    private Dictionary<WaveType, float> BuildEffectiveWeights()
+    {
+        CleanupExpiredMods();
+
+        // 기본 가중치 복사
+        var map = new Dictionary<WaveType, float>(baseWeights);
+
+        foreach (var grp in mods.Where(m => m.expireDay > CurrentDay).GroupBy(m => m.type))
+        {
+            float mul = 1f;
+            foreach (var m in grp) mul *= m.multiplier;
+            map[grp.Key] = (map.TryGetValue(grp.Key, out var w) ? w : 0f) * mul;
+        }
+
+        // None은 뽑기 제외
+        map[WaveType.None] = 0f;
+        return map;
+    }
+
+    private WaveType PickNextByWeight()
+    {
+        var map = BuildEffectiveWeights();
+
+        // 합 계산
+        float sum = 0f;
+        foreach (var kv in map) sum += kv.Value;
+
+        // 전부 0인 경우 안전값
+        if (sum <= 0f)
+            return WaveType.Aging;
+
+        float r = Random.Range(0f, sum);
+        float acc = 0f;
+        foreach (var kv in map)
+        {
+            acc += kv.Value;
+            if (r <= acc) return kv.Key;
+        }
+        return WaveType.Aging; // 부동소수점 안전장치
     }
 }

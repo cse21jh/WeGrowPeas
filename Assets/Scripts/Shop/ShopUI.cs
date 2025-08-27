@@ -1,10 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using TMPro;
-using DG.Tweening.Core.Easing;
-using UnityEngine.Rendering;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine.UI;
 using System;
 
@@ -17,11 +13,6 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private ItemSlot itemSlotPrefab;
     [SerializeField] private TMP_Text footerText;       // 화면 하단 정보/에러 표기 텍스트
 
-    [Header("Config")]
-    [SerializeField] private ItemData[] fixedItems = new ItemData[3]; // 고정 3종(비어있지 않게 세팅)
-    [SerializeField] private List<RotationEntry> rotationPool;           // 로테이션 후보 리스트
-    [SerializeField] private int rotationCount = 3;
-
     [Header("Switch")]
     [SerializeField] private GameObject panel;
     [SerializeField] private Button closeButton;
@@ -31,29 +22,20 @@ public class ShopUI : MonoBehaviour
     // 생성된 슬롯들 (갱신 시 접근용)
     private readonly List<ItemSlot> slots = new();
 
-    [System.Serializable]
-    public class RotationEntry
-    {
-        public ItemData data;
-        public int weight = 1;     // 0이하면 무시
-        public int unlockDay = 0;  // 게임 진행 일수/턴 등과 비교해서 해금
-    }
-
     private ShopContext ctx;
     private ShopSession session;
 
+    private ShopManager shopManager;
     private UIAnimationManager animationManager;
 
     private void Awake()
     {
+        shopManager = ShopManager.Instance;
         animationManager = FindAnyObjectByType<UIAnimationManager>();
         session = new ShopSession();
         ctx = new ShopContext
         {
-            //Player = services.Player,
             Grid = services.Grid,
-            //Wave = services.Wave,
-            //Bugs = services.Bugs,
             Economy = services.Economy,
             Session = session,
             ShowInfo = ShowInfo,
@@ -67,8 +49,7 @@ public class ShopUI : MonoBehaviour
 
     private void OnEnable()
     {
-        BuildShop();
-        ClearInfo();
+        
     }
 
     public void BuildShop()
@@ -77,18 +58,19 @@ public class ShopUI : MonoBehaviour
         ClearChildren(rotationParent);
         slots.Clear();
 
+        // ShopManager에서 인벤토리 생성
+        var inv = shopManager.GenerateInventory(ctx, GameManager.Instance.stage);
 
-        // 상단: 고정 아이템 3개
-        for (int i = 0; i < 3 && i < fixedItems.Length; i++)
+        // 상단: 고정
+        for (int i = 0; i < inv.Fixed.Count; i++)
         {
-            var data = fixedItems[i];
+            var data = inv.Fixed[i];
             if (data == null) continue;
             MakeSlot(fixedParent, data);
         }
 
-        // 하단: 로테이션 아이템 3개(중복 없이)
-        var chosen = PickRotationUnique(rotationPool, rotationCount, GameManager.Instance.stage);
-        foreach (var data in chosen)
+        // 하단: 로테이션
+        foreach (var data in inv.Rotation)
             MakeSlot(rotationParent, data);
     }
 
@@ -151,6 +133,7 @@ public class ShopUI : MonoBehaviour
         },
         onError: (err) => ShowError(err ?? "구매 불가"));
     }
+
     private void TryChargeAndCommit(ItemData data, ItemSlot slot)
     {
         if (!services.Economy.HasGold(data.Price))
@@ -167,6 +150,7 @@ public class ShopUI : MonoBehaviour
         slot.OnPurchased(data.IsStackable ? 1 : int.MaxValue); // 스택형: 1 감소, 비스택형: 즉시 품절
         ShowInfo($"{data.DisplayName} 구매 완료");
     }
+
     public void ClearInfo()
     {
         if (footerText == null) return;
@@ -179,42 +163,9 @@ public class ShopUI : MonoBehaviour
             Destroy(parent.GetChild(i).gameObject);
     }
 
-    private List<ItemData> PickRotationUnique(List<RotationEntry> pool, int count, int currentDay)
-    {
-        var candidates = new List<RotationEntry>();
-        foreach (var e in pool)
-        {
-            if (e?.data == null) continue;
-            if (e.weight <= 0) continue;
-            if (currentDay < e.unlockDay) continue; // 해금 이전 제외
-            if (!e.data.IsRotationUnlockOk(ctx)) continue; // 효과 자체의 해금 조건(웨이브 해금 등)
-            candidates.Add(e);
-        }
-
-        var result = new List<ItemData>();
-        // 가중치 중복 없는 추출
-        for (int k = 0; k < count; k++)
-        {
-            if (candidates.Count == 0) break;
-            int total = 0;
-            foreach (var c in candidates) total += c.weight;
-
-            int r = UnityEngine.Random.Range(0, total);
-            int acc = 0;
-            int idx = -1;
-            for (int i = 0; i < candidates.Count; i++)
-            {
-                acc += candidates[i].weight;
-                if (r < acc) { idx = i; break; }
-            }
-            result.Add(candidates[idx].data);
-            candidates.RemoveAt(idx); // 중복 방지
-        }
-        return result;
-    }
-
     private void ShowInfo(string msg) { if (footerText) { footerText.color = Color.white; footerText.text = msg; } }
     private void ShowError(string msg) { if (footerText) { footerText.color = Color.red; footerText.text = msg; } }
+
     private class ShopSession
     {
         private HashSet<ItemData> once = new();
@@ -226,6 +177,8 @@ public class ShopUI : MonoBehaviour
     public void Open()
     {
         panel.SetActive(true);
+        BuildShop();
+        ClearInfo();
         animationManager.SwitchCameras(CameraManager.CameraType.Shop);
         Debug.Log("상점 오픈!");
     }
