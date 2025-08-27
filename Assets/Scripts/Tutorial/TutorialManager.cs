@@ -141,6 +141,7 @@ public class TutorialManager : MonoBehaviour
                 break;
 
             case TutorialActions.SpawnBug:
+                grid.SpawnTutorialBug();
                 break;
 
             case TutorialActions.Breed:
@@ -202,7 +203,7 @@ public class TutorialManager : MonoBehaviour
 
     public void ContinueTutorial()
     {
-        StartCoroutine(PlayTutorialSequence(step1));
+        StartCoroutine(PlayTutorialSequence(step2));
         skipPopup.SetActive(false);
     }
 

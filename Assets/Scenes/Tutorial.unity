@@ -30308,7 +30308,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB3D9\uD574\uBB3C\uACFC\uBC31\uB450\uC0B0\uC774\uB9C8\uB974\uACE0\uB2F3\uB3C4\uB85D\uD558\uB290\uB2D8\uC774\uBCF4\uC6B0\uD558\uC0AC\uC6B0\uB9AC\uB098\uB77C\uB9CC\uC138"
+  m_text: "\uACE7 \uD558\uB8E8\uAC00 \uC9C0\uB098\uAC11\uB2C8\uB2E4......"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3629fb0b870a1e84697164ec25102dc5, type: 2}
   m_sharedMaterial: {fileID: -3296111813810895173, guid: 3629fb0b870a1e84697164ec25102dc5, type: 2}
@@ -68161,6 +68161,8 @@ MonoBehaviour:
   waveSkipButton: {fileID: 620511508}
   waveSkipCountText: {fileID: 572322440}
   waveDuration: 1
+  waveManager: {fileID: 0}
+  setWave: 0
 --- !u!4 &415974145
 Transform:
   m_ObjectHideFlags: 0
@@ -172840,7 +172842,7 @@ GameObject:
   - component: {fileID: 1072018327}
   - component: {fileID: 1072018329}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: OriginalGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172889,6 +172891,7 @@ MonoBehaviour:
   gardenRenderer: {fileID: 506643017}
   shopRoot: {fileID: 0}
   shopCanvas: {fileID: 0}
+  petBottleMarkerPrefab: {fileID: 0}
   maxCol: 4
   killBugCount: 0
   totalBreedCount: 0
@@ -298726,7 +298729,7 @@ GameObject:
   - component: {fileID: 1880775744}
   - component: {fileID: 1880775742}
   m_Layer: 0
-  m_Name: Grid (1)
+  m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -298775,11 +298778,13 @@ MonoBehaviour:
   gardenRenderer: {fileID: 0}
   shopRoot: {fileID: 0}
   shopCanvas: {fileID: 0}
+  petBottleMarkerPrefab: {fileID: 0}
   maxCol: 4
   killBugCount: 0
   totalBreedCount: 0
   totalPeaBreedcount: 0
   totalPeanutBreedCount: 0
+  tutorialBug: {fileID: 3979688952226491961, guid: 6ff2184563927e24ca2fcb1504e3b426, type: 3}
 --- !u!4 &1880775743
 Transform:
   m_ObjectHideFlags: 0

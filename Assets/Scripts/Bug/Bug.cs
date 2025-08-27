@@ -56,6 +56,11 @@ public class Bug : MonoBehaviour
 
         speed = speed * (1f - grid.GetBugSpeedDecreasement());
 
+        InitBug();
+    }
+
+    protected virtual void InitBug()
+    {
         InitRandomPos();
         StartCoroutine(Moving());
     }

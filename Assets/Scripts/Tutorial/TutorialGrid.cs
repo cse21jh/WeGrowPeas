@@ -1,10 +1,13 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class TutorialGrid : Grid
 {
-    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    //public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+
+    [SerializeField] private GameObject tutorialBug;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected override void Start()
@@ -49,5 +52,21 @@ public class TutorialGrid : Grid
         pea.SetTrait(traits);
 
         AddPlantToGrid(pea);
+    }
+
+    public void SpawnTutorialBug()
+    {
+        StartCoroutine(TutorialBugSpawnRoutine());
+    }
+
+    private IEnumerator TutorialBugSpawnRoutine()
+    {
+        TutorialBug b = Instantiate(tutorialBug).GetComponent<TutorialBug>();
+
+        isBreeding = true;
+
+        yield return new WaitForSeconds(2.7f);
+        
+        b.StopMoving();
     }
 }
