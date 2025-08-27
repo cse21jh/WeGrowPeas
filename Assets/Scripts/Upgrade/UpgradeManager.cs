@@ -11,12 +11,12 @@ public class UpgradeManager : MonoBehaviour
     private static readonly Dictionary<Type, Func<Upgrade>> UpgradeInstance = new()
     {
         
-        { typeof(AddNaturalDeathPeaUpgrade), () => new AddNaturalDeathPeaUpgrade()},
-        { typeof(AddWindPeaUpgrade), () => new AddWindPeaUpgrade()},
-        { typeof(AddFloodPeaUpgrade), () => new AddFloodPeaUpgrade()},
-        { typeof(AddPestPeaUpgrade), () => new AddPestPeaUpgrade()},
-        { typeof(AddColdPeaUpgrade), () => new AddColdPeaUpgrade()},
-        { typeof(AddHeavyRainPeaUpgrade), () => new AddHeavyRainPeaUpgrade()},
+        { typeof(AddNaturalDeathPlantUpgrade), () => new AddNaturalDeathPlantUpgrade()},
+        { typeof(AddWindPlantUpgrade), () => new AddWindPlantUpgrade()},
+        { typeof(AddFloodPlantUpgrade), () => new AddFloodPlantUpgrade()},
+        { typeof(AddPestPlantUpgrade), () => new AddPestPlantUpgrade()},
+        { typeof(AddColdPlantUpgrade), () => new AddColdPlantUpgrade()},
+        { typeof(AddHeavyRainPlantUpgrade), () => new AddHeavyRainPlantUpgrade()},
         { typeof(NaturalDeathResistenceUpgrade), () => new NaturalDeathResistenceUpgrade()},
         { typeof(WindResistenceUpgrade), () => new WindResistenceUpgrade()},
         { typeof(FloodResistenceUpgrade), () => new FloodResistenceUpgrade()},
@@ -33,18 +33,18 @@ public class UpgradeManager : MonoBehaviour
         { typeof(BugSpeedUpgrade), () => new BugSpeedUpgrade()},
         { typeof(BugGoldUpgrade), () => new BugGoldUpgrade()},
         { typeof(BugFrequencyUpgrade), () => new BugFrequencyUpgrade()},
-        { typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
-        { typeof(AddWindPeanutUpgrade), () => new AddWindPeanutUpgrade()},
-        { typeof(AddFloodPeanutUpgrade), () => new AddFloodPeanutUpgrade()},
-        { typeof(AddPestPeanutUpgrade), () => new AddPestPeanutUpgrade()},
-        { typeof(AddColdPeanutUpgrade), () => new AddColdPeanutUpgrade()},
-        { typeof(AddHeavyRainPeanutUpgrade), () => new AddHeavyRainPeanutUpgrade()},
+        //{ typeof(AddNaturalDeathPeanutUpgrade), () => new AddNaturalDeathPeanutUpgrade()},
+        //{ typeof(AddWindPeanutUpgrade), () => new AddWindPeanutUpgrade()},
+        //{ typeof(AddFloodPeanutUpgrade), () => new AddFloodPeanutUpgrade()},
+        //{ typeof(AddPestPeanutUpgrade), () => new AddPestPeanutUpgrade()},
+        //{ typeof(AddColdPeanutUpgrade), () => new AddColdPeanutUpgrade()},
+        //{ typeof(AddHeavyRainPeanutUpgrade), () => new AddHeavyRainPeanutUpgrade()},
         { typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},
         { typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},
+        { typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},
         // 아래는 디버깅용 
         { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
         { typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
-
     };
 
     public GameObject upgradePanel;
@@ -60,6 +60,11 @@ public class UpgradeManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI rerollNum;
     [SerializeField] Slider upgradeTimeSlider;
+    
+    public List<GeneticTrait> addPeaTrait;
+    public List<GeneticTrait> addPeanutTrait;
+
+    public GameObject selectAddPeaOrPeanutButton;
 
     //저장 필요
     private Dictionary<Type, int> remainUpgrade = new();
@@ -86,15 +91,15 @@ public class UpgradeManager : MonoBehaviour
         switch(stage)
         {
             case 5:
-                randomUpgrade[0] = typeof(AddWindPeaUpgrade);  break;
+                randomUpgrade[0] = typeof(AddWindPlantUpgrade);  break;
             case 10:
-                randomUpgrade[0] = typeof(AddFloodPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
             case 15:
-                randomUpgrade[0] = typeof(AddPestPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
             case 20:
-                randomUpgrade[0] = typeof(AddColdPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
             case 25:
-                randomUpgrade[0] = typeof(AddHeavyRainPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
         }
         return;
     }
@@ -154,7 +159,10 @@ public class UpgradeManager : MonoBehaviour
         remainUpgrade[tmp]--;   
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
-        select = true;
+        if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)
+            selectAddPeaOrPeanutButton.SetActive(true);
+        else
+            select = true;
 
         for (int i = 0; i < randomUpgrade.Length; i++)
             randomUpgrade[i] = null;
@@ -215,6 +223,7 @@ public class UpgradeManager : MonoBehaviour
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
         Debug.Log("업그레이드 페이즈 종료");
         upgradePanel.SetActive(false);
+        selectAddPeaOrPeanutButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
         yield return null;
     }
@@ -287,16 +296,33 @@ public class UpgradeManager : MonoBehaviour
         switch (saveData.stage)
         {
             case 5:
-                randomUpgrade[0] = typeof(AddWindPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
             case 10:
-                randomUpgrade[0] = typeof(AddFloodPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
             case 15:
-                randomUpgrade[0] = typeof(AddPestPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
             case 20:
-                randomUpgrade[0] = typeof(AddColdPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
             case 25:
-                randomUpgrade[0] = typeof(AddHeavyRainPeaUpgrade); break;
+                randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
         }
         return;
+    }
+
+
+    public void AddPeaUgrade()
+    {
+        if(addPeaTrait != null)
+            GameManager.Instance.grid.AddPea(addPeaTrait);
+        addPeaTrait = null;
+        select = true;
+    }
+
+    public void AddPeanutUpgrade()
+    {
+        if(addPeanutTrait != null)
+            GameManager.Instance.grid.AddPeanut(addPeanutTrait);
+        addPeanutTrait = null;
+        select = true;
     }
 }
