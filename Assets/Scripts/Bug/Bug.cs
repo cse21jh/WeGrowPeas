@@ -187,9 +187,15 @@ public class Bug : MonoBehaviour
             {
                 economyManager.AddGold(100);
                 StartCoroutine(KillBug());
+                return;
             }
-            else
-                plant.Die(DeathCause.Bug, this);
+
+            if(grid.HasIceBlock())
+            {
+                grid.ActivateIceBlock();
+            }
+            
+            plant.Die(DeathCause.Bug, this);
         }
     }
 

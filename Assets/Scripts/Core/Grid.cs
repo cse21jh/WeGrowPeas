@@ -24,6 +24,8 @@ public class Grid : MonoBehaviour
 
     protected bool isBreedSkipButtonPressed = false;
 
+    protected bool isIceBlockOn = false;
+
     protected float breedTimer;
 
     [SerializeField] protected GameObject peaPrefab;
@@ -82,6 +84,7 @@ public class Grid : MonoBehaviour
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
+    protected bool hasIceBlock = false;
     public int MaxCol => maxCol;
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
@@ -943,6 +946,34 @@ public class Grid : MonoBehaviour
             _ => CompleteTraitType.NaturalDeath
         };
     }
+
+    public bool HasIceBlock()
+    {
+        return hasIceBlock;
+    }
+
+    public void BuyIceBlock()
+    {
+        hasIceBlock = true;
+    }
+
+    public void ActivateIceBlock()
+    {
+        hasIceBlock = false;
+        isIceBlockOn = true;
+    }
+
+    public bool IsIceBlockActivated()
+    {
+        return isIceBlockOn;
+    }
+
+    public void DeactivateIceBlock()
+    {
+        isIceBlockOn = false;
+    }
+
+
 }
 
 

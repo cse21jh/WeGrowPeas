@@ -86,7 +86,7 @@ public class EnemyController : MonoBehaviour
 
         yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
 
-        if (currentWave != noneWave)
+        if (currentWave != noneWave && !grid.IsIceBlockActivated())
         {
             for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
             {
@@ -108,8 +108,10 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
-        else
-            Debug.Log("오늘은 아무일도 일어나지 않았습니다");
+
+        if (grid.IsIceBlockActivated())
+            grid.DeactivateIceBlock();
+
         SetNextWave();
         FlushNextWaveText();
         yield return null;

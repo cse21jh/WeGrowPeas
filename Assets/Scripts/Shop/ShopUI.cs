@@ -49,7 +49,7 @@ public class ShopUI : MonoBehaviour
 
     private void OnEnable()
     {
-        
+
     }
 
     public void BuildShop()
