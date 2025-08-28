@@ -43,8 +43,8 @@ public class UpgradeManager : MonoBehaviour
         { typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},
         { typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},
         // 아래는 디버깅용 
-        { typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
-        { typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
+        //{ typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
+        //{ typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
     };
 
     public GameObject upgradePanel;
