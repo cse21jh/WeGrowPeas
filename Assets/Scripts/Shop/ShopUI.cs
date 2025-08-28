@@ -97,6 +97,12 @@ public class ShopUI : MonoBehaviour
             return;
         }
 
+        if ((data.Price > services.Economy.GetGold()))
+        {
+            ShowError("구매 불가");
+            return;
+        }
+
         // 효과 시작 → 플로우 분기
         data.StartEffect(ctx, onReady: () =>
         {
