@@ -37,5 +37,7 @@ public class DialogueStep : ScriptableObject
 
     public Vector3 whiteCirclePos = Vector3.zero;
 
+    public Vector2 whiteCircleSize = Vector2.zero;
+
     public NextTutorialSequence chainTo = NextTutorialSequence.None;
 }

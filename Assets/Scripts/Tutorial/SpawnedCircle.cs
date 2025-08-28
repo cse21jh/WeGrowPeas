@@ -1,3 +1,4 @@
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,7 +18,7 @@ public class SpawnedCircle : MonoBehaviour
         }
     }
 
-    public void ShowCircle(Vector3 worldPos)
+    public void ShowCircle(Vector3 worldPos, Vector2 size)
     {
         Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, worldPos);
 
@@ -26,7 +27,10 @@ public class SpawnedCircle : MonoBehaviour
             spawnArea, screenPos, null, out localPos);
 
         GameObject wcp = Instantiate(whiteCirclePrefab, spawnArea);
-        wcp.GetComponent<RectTransform>().anchoredPosition = localPos;
+
+        RectTransform rt = wcp.GetComponent<RectTransform>();
+        rt.anchoredPosition = localPos;
+        rt.sizeDelta = size;
     }
 
 

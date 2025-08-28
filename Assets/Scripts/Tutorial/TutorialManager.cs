@@ -138,7 +138,7 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.ShowWhiteCircle:
-                    spawnedCircle.ShowCircle(s.whiteCirclePos);
+                    spawnedCircle.ShowCircle(s.whiteCirclePos, s.whiteCircleSize);
                     break;
 
                 case TutorialActions.FlushCircle:
@@ -205,7 +205,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
     public void ContinueTutorial()
     {
-        StartCoroutine(PlayTutorialSequence(step3));
+        StartCoroutine(PlayTutorialSequence(step1));
         skipPopup.SetActive(false);
     }
 
