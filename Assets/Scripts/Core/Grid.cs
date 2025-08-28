@@ -454,7 +454,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public bool CheckGameOver()
+    public virtual bool CheckGameOver()
     {
         Plant plant;
         for (int idx = 0; idx < maxCol * 4; idx++)

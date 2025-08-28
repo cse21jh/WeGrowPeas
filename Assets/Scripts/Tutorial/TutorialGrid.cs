@@ -222,6 +222,10 @@ public class TutorialGrid : Grid
         child.SetTrait(childTrait);
     }
 
+    public override bool CheckGameOver()
+    {
+        return false;
+    }
     public override void RequestBreedSelect(GameObject clickedObject)
     {
         if (!isBreeding || (curBreedCount < 1))
