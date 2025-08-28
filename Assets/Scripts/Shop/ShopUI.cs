@@ -176,6 +176,7 @@ public class ShopUI : MonoBehaviour
 
     public void Open()
     {
+        session?.ClearThisShop();
         panel.SetActive(true);
         BuildShop();
         ClearInfo();
