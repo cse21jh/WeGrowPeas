@@ -11,11 +11,13 @@ public class TutorialGrid : Grid
 
     private bool isTBreeding = false;
     private int TMaxBreedCount = 1;
+    private int curBreedCount = 1;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected override void Start()
     {
         base.Start();
+        curBreedCount = TMaxBreedCount;
     }
 
     // Update is called once per frame
@@ -133,14 +135,15 @@ public class TutorialGrid : Grid
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
-                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (MaxBreedCount - breedCount) + "입니다");
+                            curBreedCount = TMaxBreedCount - breedCount;
+                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (curBreedCount) + "입니다");
                             SoundManager.Instance.PlayEffect("Breed");
-                            totalBreedCount++;
-                            if (child.GetType() == typeof(Pea))
+                            //totalBreedCount++;
+                            /*if (child.GetType() == typeof(Pea))
                                 totalPeaBreedcount++;
                             else if (child.GetType() == typeof(Peanut))
-                                totalPeanutBreedCount++;
-                            UpdateBreedCountUI(TMaxBreedCount - breedCount);
+                                totalPeanutBreedCount++;*/
+                            UpdateBreedCountUI(curBreedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
@@ -158,7 +161,7 @@ public class TutorialGrid : Grid
                         }
 
                     }
-                    else if (breedCount >= MaxBreedCount)
+                    else if (breedCount >= TMaxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
                         SoundManager.Instance.PlayEffect("WrongSelect");
@@ -217,5 +220,52 @@ public class TutorialGrid : Grid
         };
 
         child.SetTrait(childTrait);
+    }
+
+    public override void RequestBreedSelect(GameObject clickedObject)
+    {
+        if (!isBreeding || (curBreedCount < 1))
+            return;
+
+        Plant clickedPea = clickedObject.GetComponent<Plant>();
+        if (clickedPea == null) return;
+
+
+        if (breedObj1 == clickedObject)
+        {
+            // 부모 1 선택 취소
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            clickedPea.MakeDefaultSprite();
+            breedObj1 = null;
+        }
+        else if (breedObj2 == clickedObject)
+        {
+            // 부모 2 선택 취소
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            clickedPea.MakeDefaultSprite();
+            breedObj2 = null;
+        }
+        else if (breedObj1 == null && clickedPea.gridIndex == 0)
+        {
+            // 부모 1 선택
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            breedObj1 = clickedObject;
+            clickedPea.MakeSelectedSprite();
+        }
+        else if (breedObj2 == null && clickedPea.gridIndex == 1)
+        {
+            // 부모 2 선택
+            SoundManager.Instance.PlayEffect("SelectPlant");
+            breedObj2 = clickedObject;
+            clickedPea.MakeSelectedSprite();
+        }
+        else
+        {
+            // 이미 두 부모 선택됨
+            //SoundManager.Instance.PlayEffect("WrongSelect");
+            Debug.Log("이미 두 부모가 모두 선택된 상태");
+        }
+
+        breedButton.SetActive(breedObj1 != null && breedObj2 != null);
     }
 }

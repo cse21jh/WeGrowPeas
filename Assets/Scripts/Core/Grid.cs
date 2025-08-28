@@ -579,7 +579,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public void RequestBreedSelect(GameObject clickedObject)
+    public virtual void RequestBreedSelect(GameObject clickedObject)
     {
         if (!isBreeding)
             return;
