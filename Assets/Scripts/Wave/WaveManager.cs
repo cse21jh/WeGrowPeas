@@ -16,6 +16,7 @@ public class WaveManager : MonoBehaviour
     [Header("바람 효과 관련")]
     [SerializeField] private ParticleSystem[] windEffects;
     [SerializeField] private CinemachineVirtualCamera[] vcams;
+    [SerializeField] private float windStrength = 1f;
 
     [Space(10)]
     [Header("홍수 효과 관련")]
@@ -89,7 +90,7 @@ public class WaveManager : MonoBehaviour
                 }
                 foreach (var vcam in vcams)
                 {
-                    vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 1f;
+                    vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = windStrength;
                 }
 
 
