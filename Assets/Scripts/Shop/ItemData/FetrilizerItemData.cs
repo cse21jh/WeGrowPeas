@@ -34,6 +34,11 @@ public class ItemData_Fertilizer : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
+        if (!ctx.Grid.HasEmptyFetrilizerGrid())
+        {
+            reason = "설치할 수 있는 빈칸이 없습니다";
+            return false;
+        }
         reason = null;
         return true;
     }

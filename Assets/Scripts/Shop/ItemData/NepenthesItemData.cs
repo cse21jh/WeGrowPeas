@@ -26,6 +26,11 @@ public class NepenthesItemData : ItemData
             reason = "Grid 참조가 없습니다 (ShopContext.Grid 주입 필요)";
             return false;
         }
+        if (!ctx.Grid.HasEmptyGrid())
+        {
+            reason = "설치할 수 있는 빈칸이 없습니다";
+            return false;
+        }
         reason = null;
         return true;
     }

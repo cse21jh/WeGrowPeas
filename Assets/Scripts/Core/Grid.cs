@@ -969,7 +969,29 @@ public class Grid : MonoBehaviour
         // 얼방 UI 삭제
     }
 
+    public bool HasEmptyGrid()
+    {
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            if (!plantGrid.ContainsKey(idx))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public bool HasEmptyFetrilizerGrid()
+    {
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            if (!fertilizerTiles.ContainsKey(idx))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 
