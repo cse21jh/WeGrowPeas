@@ -90,7 +90,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
             economyManager.AddGold(plant.GetSellingPrice());
 
-            plant.Die();
+            plant.Die(DeathCause.Shovel);
 
             //Debug.Log("[Shovel] Raycast Hit: " + hit.collider.name);
         }

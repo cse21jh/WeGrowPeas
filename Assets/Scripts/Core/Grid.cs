@@ -869,6 +869,8 @@ public class Grid : MonoBehaviour
     {
         if (!petBottleTiles.Contains(idx)) return false;
 
+        if(cause == DeathCause.Shovel) return false;
+
         // 1회성 보호 → 소모
         petBottleTiles.Remove(idx);
 
