@@ -149,7 +149,7 @@ public class Pea : Plant
     }
     private void OnMouseDown()
     {
-        if (!grid.GetIsBreeding())
+        if (!grid.GetIsBreeding() || ClickRouter.Instance.IsBlockedByUI)
             return;
         holdTime = 0f;
         isHolding = true;
