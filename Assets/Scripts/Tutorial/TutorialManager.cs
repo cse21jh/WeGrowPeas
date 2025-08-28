@@ -10,6 +10,7 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private EnemyController enemyController;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private ShopManager shopManager;
+    [SerializeField] private GameObject shopUIPanel;
 
     [SerializeField] private TextMeshProUGUI textStage;
     [SerializeField] private Narration n;
@@ -161,6 +162,7 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.InitShop:
+                    OpenShop();
                     break;
 
                 case TutorialActions.ShowTutorialEndPopUp:
@@ -168,7 +170,7 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.ClosePanel:
-                    ClosePanel();
+                    FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
                     break;
 
             }
@@ -221,8 +223,10 @@ public class TutorialManager : Singleton<TutorialManager>
         enemyController.ShowNextWaveText();
     }
 
-    private void ClosePanel()
+    private void OpenShop()
     {
-        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
+        shopUIPanel.SetActive(true);
+        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Shop);
+
     }
 }
