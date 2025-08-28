@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class TutorialManager : MonoBehaviour
+public class TutorialManager : Singleton<TutorialManager>
 {
     [HideInInspector] public int tStage = 1;
 
@@ -81,7 +81,7 @@ public class TutorialManager : MonoBehaviour
             yield return WaitForTrigger(s);
 
             // 튜토리얼 내의 특정 액션 발생
-            if (s.action != TutorialActions.None)
+            if (s.actions[0] != TutorialActions.None)
             {
                 DoAction(s);
             }
@@ -108,6 +108,7 @@ public class TutorialManager : MonoBehaviour
             case DialogueTriggerType.NarrationClick:
                 // NarrationBox 클릭 신호를 기다림
                 yield return new WaitUntil(() => _narrationClickedThisFrame);
+                _narrationClickedThisFrame = false;
                 break;
 
             case DialogueTriggerType.KeyPress:
@@ -117,46 +118,50 @@ public class TutorialManager : MonoBehaviour
             case DialogueTriggerType.ObjectClick:
                 // 지정된 오브젝트를 클릭할 때까지 대기
                 yield return new WaitUntil(() =>
-                    _lastClickedObject != null && s.targetObject != null &&
-                    _lastClickedObject == s.targetObject
+                    _lastClickedObject != null && 
+                    _lastClickedObject.GetComponent<WhiteCircle>() != null
                 );
+                _lastClickedObject = null;
                 break;
         }
     }
 
     private void DoAction(DialogueStep s)
     {
-        switch (s.action)
+        for (int i = 0; i < s.actions.Length; i++)
         {
-            case TutorialActions.ShowSkipPopUp:
-                skipPopup.SetActive(true);
-                break;
+            switch (s.actions[i])
+            {
+                case TutorialActions.ShowSkipPopUp:
+                    skipPopup.SetActive(true);
+                    break;
 
-            case TutorialActions.ShowWhiteCircle:
-                spawnedCircle.ShowCircle(s.whiteCirclePos);
-                break;
+                case TutorialActions.ShowWhiteCircle:
+                    spawnedCircle.ShowCircle(s.whiteCirclePos);
+                    break;
 
-            case TutorialActions.FlushCircle:
-                spawnedCircle.FlushSpawnedCircleCanvas();
-                break;
+                case TutorialActions.FlushCircle:
+                    spawnedCircle.FlushSpawnedCircleCanvas();
+                    break;
 
-            case TutorialActions.SpawnBug:
-                grid.SpawnTutorialBug();
-                break;
+                case TutorialActions.SpawnBug:
+                    grid.SpawnTutorialBug();
+                    break;
 
-            case TutorialActions.Breed:
-                break;
+                case TutorialActions.Breed:
+                    break;
 
-            case TutorialActions.EnemyWave:
-                break;
+                case TutorialActions.EnemyWave:
+                    break;
 
-            case TutorialActions.Upgrade:
-                break;
+                case TutorialActions.Upgrade:
+                    break;
 
-            case TutorialActions.ShowTutorialEndPopUp:
-                tutorialEndPopup.SetActive(true);
-                break;
+                case TutorialActions.ShowTutorialEndPopUp:
+                    tutorialEndPopup.SetActive(true);
+                    break;
 
+            }
         }
     }
 
@@ -164,27 +169,12 @@ public class TutorialManager : MonoBehaviour
     public void OnNarrationBoxClicked()
     {
         _narrationClickedThisFrame = true;
-        // 같은 프레임에서 여러 신호가 섞이지 않게 다음 프레임에 자동 리셋(선택)
-        StartCoroutine(ResetNarrationClickNextFrame());
-    }
-
-    private IEnumerator ResetNarrationClickNextFrame()
-    {
-        yield return null;
-        _narrationClickedThisFrame = false;
     }
 
     /// <summary>특정 오브젝트(벌레/식물)의 EventTrigger/Button에서 OnClick에 연결</summary>
     public void OnObjectClicked(GameObject clicked)
     {
         _lastClickedObject = clicked;
-        // 필요시 다음 프레임에 리셋
-        StartCoroutine(ResetObjectClickNextFrame());
-    }
-    private IEnumerator ResetObjectClickNextFrame()
-    {
-        yield return null;
-        _lastClickedObject = null;
     }
 
     private DialogueStep[] ResolveSequence(NextTutorialSequence id)

@@ -11466,6 +11466,9 @@ MonoBehaviour:
   upgradePanel: {fileID: 2045264550}
   rerollNum: {fileID: 1917619652}
   upgradeTimeSlider: {fileID: 1950519608}
+  addPeaTrait: []
+  addPeanutTrait: []
+  selectAddPeaOrPeanutButton: {fileID: 0}
 --- !u!4 &66307782
 Transform:
   m_ObjectHideFlags: 0
@@ -48198,7 +48201,7 @@ Transform:
   m_GameObject: {fileID: 292344582}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.1, y: -3.9, z: 0}
+  m_LocalPosition: {x: -4.56, y: -1.25, z: 0}
   m_LocalScale: {x: 0.85, y: 0.85, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -68163,6 +68166,7 @@ MonoBehaviour:
   waveDuration: 1
   waveManager: {fileID: 0}
   setWave: 0
+  defaultBaseWeight: 1
 --- !u!4 &415974145
 Transform:
   m_ObjectHideFlags: 0
@@ -68430,7 +68434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931e66eeb6db7d843b78df39d24eb7a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiteCirclePrefab: {fileID: 0}
+  whiteCirclePrefab: {fileID: 409897769363296186, guid: 22a448ce251d1b64e9aa261654410aa0, type: 3}
 --- !u!1 &418946667
 GameObject:
   m_ObjectHideFlags: 0
@@ -172889,8 +172893,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 01cbd788e39bf664a881eb18902110e0, type: 3}
   - {fileID: 21300000, guid: abbd5b979fb3161479488a059019c832, type: 3}
   gardenRenderer: {fileID: 506643017}
-  shopRoot: {fileID: 0}
-  shopCanvas: {fileID: 0}
   petBottleMarkerPrefab: {fileID: 0}
   maxCol: 4
   killBugCount: 0
@@ -257738,7 +257740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931e66eeb6db7d843b78df39d24eb7a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiteCirclePrefab: {fileID: 6962819626267034685, guid: 85a645bbef206b34a9aa847bda0b41fb, type: 3}
+  whiteCirclePrefab: {fileID: 409897769363296186, guid: 22a448ce251d1b64e9aa261654410aa0, type: 3}
 --- !u!1 &1603194120
 GameObject:
   m_ObjectHideFlags: 0
@@ -298776,8 +298778,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 01cbd788e39bf664a881eb18902110e0, type: 3}
   - {fileID: 21300000, guid: abbd5b979fb3161479488a059019c832, type: 3}
   gardenRenderer: {fileID: 0}
-  shopRoot: {fileID: 0}
-  shopCanvas: {fileID: 0}
   petBottleMarkerPrefab: {fileID: 0}
   maxCol: 4
   killBugCount: 0
