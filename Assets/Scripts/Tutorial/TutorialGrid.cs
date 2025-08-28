@@ -65,7 +65,7 @@ public class TutorialGrid : Grid
     {
         TutorialBug b = Instantiate(tutorialBug).GetComponent<TutorialBug>();
 
-        isBreeding = true;
+        //isBreeding = true;
 
         yield return new WaitForSeconds(2.7f);
 
@@ -79,6 +79,8 @@ public class TutorialGrid : Grid
 
     private IEnumerator TutorialBreeding()
     {
+        Debug.Log("製馬馬馬馬");
+        isBreeding = true;
         isTBreeding = true;
         breedObj1 = null;
         breedObj2 = null;
@@ -90,11 +92,6 @@ public class TutorialGrid : Grid
         while (isTBreeding)
         {
             breedTimer -= Time.deltaTime;
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                SkipBreed();
-            }
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
@@ -150,6 +147,7 @@ public class TutorialGrid : Grid
                             breedObj1 = null;
                             breedObj2 = null;
                             DeactivateBreed();
+                            //isTBreeding = false;
                         }
                         else
                         {

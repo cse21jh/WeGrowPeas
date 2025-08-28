@@ -5,10 +5,25 @@ using UnityEngine;
 public class TutorialBug : Bug
 {
     private bool letMove = true;
+    public bool canCatchBug = false;
 
     protected override void Start()
     {
         base.Start();
+    }
+
+
+    protected override void Update()
+    {
+        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && canCatchBug /*&& grid.GetIsBreeding()*/)
+        {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+            Debug.Log(mousePos);
+            if (Mathf.Abs(transform.position.x - mousePos.x) < hitRange && Mathf.Abs(transform.position.y - mousePos.y) < hitRange)
+            {
+                StartCoroutine(HitBug());
+            }
+        }
     }
 
     protected override void InitBug()
@@ -26,7 +41,7 @@ public class TutorialBug : Bug
         {
             if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
                 FindNewTargetObj();
-            else if (grid.GetIsBreeding() && !isDie && !isHit)
+            else if (/*grid.GetIsBreeding() &&*/ !isDie && !isHit)
             {
                 Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
                 MoveToward(targetPos);

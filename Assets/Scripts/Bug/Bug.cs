@@ -69,7 +69,7 @@ public class Bug : MonoBehaviour
         StartCoroutine(Moving());
     }
 
-    protected void Update()
+    protected virtual void Update()
     {
         if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
         {

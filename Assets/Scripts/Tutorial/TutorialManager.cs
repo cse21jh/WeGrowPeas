@@ -173,6 +173,10 @@ public class TutorialManager : Singleton<TutorialManager>
                     FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
                     break;
 
+                case TutorialActions.EnableBugCatch:
+                    FindAnyObjectByType<TutorialBug>().canCatchBug = true;
+                    break;
+
             }
         }
     }

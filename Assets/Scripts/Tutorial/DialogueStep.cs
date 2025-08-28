@@ -18,6 +18,7 @@ public enum TutorialActions
     InitShop,
     ShowTutorialEndPopUp,
     ClosePanel,
+    EnableBugCatch,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
