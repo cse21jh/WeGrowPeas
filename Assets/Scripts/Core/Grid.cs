@@ -679,6 +679,12 @@ public class Grid : MonoBehaviour
 
         if (plantGrid.ContainsKey(toIndex))
         {
+            if (!HasBreedablePlantAt(toIndex)) // 옮기기 불가능한 식물의 경우
+            {
+                Transform originalSoil = GetSoilTransform(plant.gridIndex);
+                plant.transform.position = originalSoil.position;
+                return false;
+            }
             // 대상 칸에 식물이 있는 경우: 서로 위치 교환
             Plant targetPlant = plantGrid[toIndex];
 
