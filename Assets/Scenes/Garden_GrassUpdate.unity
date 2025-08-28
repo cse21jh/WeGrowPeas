@@ -109762,6 +109762,67 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &675273977
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.3881254
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.3392978
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 738010037162787004, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5643268807359755021, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_Name
+      value: Peanut
+      objectReference: {fileID: 0}
+    - target: {fileID: 5643268807359755021, guid: f338025394d14df488ce2f7895a63a54, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f338025394d14df488ce2f7895a63a54, type: 3}
 --- !u!1 &675526351
 GameObject:
   m_ObjectHideFlags: 0
@@ -190337,7 +190398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   economyManager: {fileID: 1891974902}
   peaPrefab: {fileID: 6114093203436464154, guid: 4c6a0f8f65286d64d836cdaca49f40dd, type: 3}
-  peanutPrefab: {fileID: 6114093203436464154, guid: 7e169128925c6d0459ed410c2311f0a7, type: 3}
+  peanutPrefab: {fileID: 5643268807359755021, guid: f338025394d14df488ce2f7895a63a54, type: 3}
   nepenthesPrefab: {fileID: 7123366062132582181, guid: 2dcd8e204861d494a9724080c786053d, type: 3}
   chiliPepperPrefab: {fileID: 7123366062132582181, guid: de5ab20a96b1a01429965676410b9b07, type: 3}
   disabledSoil:
@@ -314972,7 +315033,7 @@ MonoBehaviour:
   showDelay: 0.06
   moveDuration: 0.3
   moveEase: 4
-  fenceAnimSytle: 0
+  fenceAnimSytle: 1
   priceSign: {fileID: 2038041512}
 --- !u!114 &1912975211
 MonoBehaviour:
@@ -361495,3 +361556,4 @@ SceneRoots:
   - {fileID: 692799761}
   - {fileID: 1843401600}
   - {fileID: 1352802710}
+  - {fileID: 675273977}

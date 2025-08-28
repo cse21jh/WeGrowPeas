@@ -37,7 +37,7 @@ public class Pea : Plant
         StemController stem = GetComponentInChildren<StemController>();
         if (stem != null)
         {
-            stem.SetTraits(newTraits);
+            stem.SetTraits(newTraits, PlantType.Pea);
         }
         else
         {

@@ -18,7 +18,7 @@ public class Peanut : Plant
 
     //옮기기 게이지
     [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvas;
+    [SerializeField] private GameObject holdGaugeCanvasObj;
 
     private float peanutCopyProbability = 0.25f;
     public override void Init(int gridIndex, Grid grid)
@@ -36,17 +36,17 @@ public class Peanut : Plant
             additionalResistance.Add(g.traitType, 0f);
         }
 
-        /*
+        
         StemController stem = GetComponentInChildren<StemController>();
         if (stem != null)
         {
-            stem.SetTraits(newTraits);
+            stem.SetTraits(newTraits, PlantType.Peanut);
         }
         else
         {
             Debug.LogWarning("StemController not found in Plant");
         }
-        */
+        
     }
 
     protected void Update()
@@ -59,7 +59,7 @@ public class Peanut : Plant
             if (holdTime >= HoldDuration && !isDragging)
             {
                 StartDragging();
-                holdGaugeCanvas.SetActive(false);
+                holdGaugeCanvasObj.SetActive(false);
             }
         }
 
@@ -77,7 +77,7 @@ public class Peanut : Plant
             isHolding = false;
             holdTime = 0f;
             holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvas.SetActive(false);
+            holdGaugeCanvasObj.SetActive(false);
         }
     }
 
@@ -115,12 +115,15 @@ public class Peanut : Plant
 
         //UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
         FenceUIManager.Instance.SetFenceElements(1, this);
+        priceSign.gameObject.SetActive(true);
+        priceSign.SetPrice(GetSellingPrice());
     }
 
     protected void OnMouseExit()
     {
         //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
+        priceSign.gameObject.SetActive(false);
     }
 
     private void OnMouseDown()
@@ -130,7 +133,7 @@ public class Peanut : Plant
         holdTime = 0f;
         isHolding = true;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(true);
+        holdGaugeCanvasObj.SetActive(true);
     }
 
     private void OnMouseUp()
@@ -150,7 +153,7 @@ public class Peanut : Plant
         isHolding = false;
         holdTime = 0f;
         holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvas.SetActive(false);
+        holdGaugeCanvasObj.SetActive(false);
     }
 
     private void StartDragging()
