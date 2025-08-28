@@ -235,7 +235,7 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
-            grid.AddAdditionalPestResistance(0.0005f);
+            grid.AddAdditionalPestResistance(0.002f);
             isDie = true;
             economyManager.AddGold(gold + grid.GetAdditionalBugGold());
             yield return StartCoroutine(Vanish());

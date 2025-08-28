@@ -157,7 +157,7 @@ public class UpgradeManager : MonoBehaviour
             Debug.Log("업그레이드 존재 X");
             return;
         }
-        //remainUpgrade[tmp]--;   
+        remainUpgrade[tmp]--;   
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
         if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)

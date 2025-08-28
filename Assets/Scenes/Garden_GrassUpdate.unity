@@ -11004,7 +11004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upgradePanel: {fileID: 2045264550}
-  rerollNum: {fileID: 1917619652}
+  rerollNum: {fileID: 1743335595}
   upgradeTimeSlider: {fileID: 1950519608}
   addPeaTrait: []
   addPeanutTrait: []
@@ -289875,6 +289875,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1743335595 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2406532158185133467, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1743923573
 GameObject:
   m_ObjectHideFlags: 0
@@ -315280,17 +315291,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1917619652 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7400978210664737539, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1917800870
 GameObject:
   m_ObjectHideFlags: 0
@@ -361283,6 +361283,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 415974144}
+    - target: {fileID: 6820410927924129267, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 66307781}
+    - target: {fileID: 6820410927924129267, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Reroll
+      objectReference: {fileID: 0}
     - target: {fileID: 7353647225342676952, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
