@@ -59,7 +59,7 @@ public class SaveData
     public WaveType curWaveType;
     public WaveType nextWaveType;
     public int remainWaveSkipCount;
-    public int[] waveKillCount = new int[6];
+    public int[] waveKillCount = new int[7];
 
     //economyManager
     public int gold;

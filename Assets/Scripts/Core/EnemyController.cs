@@ -53,7 +53,7 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        waveKillCount = new int[6];
+        waveKillCount = new int[7];
         SetWaveSkipCountText();
         HideWaveSkipButton();
 
@@ -247,7 +247,7 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
         waveSkipCount = saveData.remainWaveSkipCount;
-        for(int i =0;i<6;i++)
+        for(int i =0;i<7;i++)
             waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
