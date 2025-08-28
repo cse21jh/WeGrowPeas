@@ -326,4 +326,46 @@ public class UpgradeManager : MonoBehaviour
         addPeanutTrait = null;
         select = true;
     }
+
+    public void TutorialUpgrade()
+    {
+        StartCoroutine(TUpgradePhase());
+    }
+
+    public IEnumerator TUpgradePhase()
+    {
+        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Upgrade);
+
+        Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
+        ClickRouter.Instance.IsBlockedByUI = true;
+        curRerollCount = maxRerollCount;
+        SetRerollCountUI(curRerollCount);
+
+        randomUpgrade[0] = typeof(AddFloodPlantUpgrade);
+        randomUpgrade[1] = typeof(AddSoilUpgrade);
+        randomUpgrade[2] = typeof(MaxBreedCountUpgrade);
+        SetRandomUpgrade();
+        upgradePanel.SetActive(true);
+        select = false;
+
+
+        /*float startTime = Time.time;
+        float endTime = startTime + upgradeTimer;
+        //int rerollCount = 0;
+
+        while (!select && (Time.time < endTime))
+        {
+            float timeRatio = Mathf.Clamp01((Time.time - startTime) / upgradeTimer);
+            UpgradeTimerUI(timeRatio);
+
+            yield return null;
+        }*/
+
+        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
+        Debug.Log("업그레이드 페이즈 종료");
+        upgradePanel.SetActive(false);
+        selectAddPeaOrPeanutButton.SetActive(false);
+        ClickRouter.Instance.IsBlockedByUI = false;
+        yield return null;
+    }
 }

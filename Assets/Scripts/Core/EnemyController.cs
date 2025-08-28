@@ -303,4 +303,45 @@ public class EnemyController : MonoBehaviour
         }
         return WaveType.Aging; // 부동소수점 안전장치
     }
+
+    public void TutorialWave()
+    {
+        StartCoroutine(TEnemyWaveCoroutine());
+    }
+
+    private IEnumerator TEnemyWaveCoroutine()
+    {
+        //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
+        Wave wave = currentWave;
+        Debug.Log("currentWave : " + currentWave);
+        SoundManager.Instance.PlayEffect(wave.WaveSoundString);
+
+        if (waveManager != null)
+        {
+            waveManager.StartWave(waveDuration, wave.WaveType);
+        }
+
+        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
+
+        if (currentWave != noneWave && !grid.IsIceBlockActivated())
+        {
+            for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+            {
+                if (grid.plantGrid.ContainsKey(idx))
+                {
+                    Plant plant = grid.plantGrid[idx];
+
+                    if (idx == 0 || idx == 2) plant.Die();
+                }
+            }
+        }
+
+        if (grid.IsIceBlockActivated())
+            grid.DeactivateIceBlock();
+
+        SetNextWave();
+        currentWave = GetWaveFromWaveType(WaveType.Aging);
+        //FlushNextWaveText();
+        yield return null;
+    }
 }

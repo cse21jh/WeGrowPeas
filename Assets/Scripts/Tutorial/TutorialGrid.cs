@@ -20,7 +20,7 @@ public class TutorialGrid : Grid
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void InitTGrid()
@@ -68,7 +68,7 @@ public class TutorialGrid : Grid
         isBreeding = true;
 
         yield return new WaitForSeconds(2.7f);
-        
+
         b.StopMoving();
     }
 
@@ -131,7 +131,7 @@ public class TutorialGrid : Grid
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
                         {
-                            Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), child);
+                            TBreed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), child);
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
@@ -211,6 +211,12 @@ public class TutorialGrid : Grid
 
     private void TBreed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
     {
+        List<GeneticTrait> childTrait = new List<GeneticTrait>
+        {
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f, 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
+        };
 
+        child.SetTrait(childTrait);
     }
 }

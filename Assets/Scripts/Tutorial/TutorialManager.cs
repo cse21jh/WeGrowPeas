@@ -153,9 +153,11 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.EnemyWave:
+                    ActivateWave();
                     break;
 
                 case TutorialActions.Upgrade:
+                    upgradeManager.TutorialUpgrade();
                     break;
 
                 case TutorialActions.ShowTutorialEndPopUp:
@@ -194,7 +196,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
     public void ContinueTutorial()
     {
-        StartCoroutine(PlayTutorialSequence(step2));
+        StartCoroutine(PlayTutorialSequence(step3));
         skipPopup.SetActive(false);
     }
 
@@ -202,5 +204,13 @@ public class TutorialManager : Singleton<TutorialManager>
     private void UpdateStageUI()
     {
         textStage.text = $"<sprite=0> STAGE {tStage}";
+    }
+
+    private void ActivateWave()
+    {
+        enemyController.TutorialWave();
+        tStage = 2;
+        UpdateStageUI();
+        enemyController.ShowNextWaveText();
     }
 }
