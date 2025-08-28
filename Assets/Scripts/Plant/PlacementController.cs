@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.UI; // CanvasGroup
 
 public class PlacementController : MonoBehaviour
@@ -12,6 +14,12 @@ public class PlacementController : MonoBehaviour
 
     [Header("Ghost")]
     [SerializeField] private float ghostInvalidAlpha = 0.4f;
+
+    [Header("Selection")]
+    [SerializeField] private LayerMask plantLayer = ~0; // Plant가 있는 레이어로 지정
+    [SerializeField] private float rayMaxDistance = 100f;
+
+    private Plant hovered;
 
     private Coroutine placingCo;
     private GameObject ghost;
@@ -138,11 +146,194 @@ public class PlacementController : MonoBehaviour
     }
 
     public void BeginPlantSelection(
+    System.Func<Plant, bool> validate,
+    System.Action<Plant> onConfirm,
+    System.Action onCancel)
+    {
+        // 진행 중인 배치/선택 종료
+        if (isPlacing) StopPlacementInternal();
+        placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
+    }
+
+    private IEnumerator PlantSelectionRoutine(
         System.Func<Plant, bool> validate,
         System.Action<Plant> onConfirm,
         System.Action onCancel)
     {
-        Debug.Log("식물 선택 모드 진입");
-        // 실제 구현: 마우스 오버/클릭한 Plant 전달
+        isPlacing = true;
+
+        // 1) Shop UI 입력 비활성
+        bool hadCanvas = shopCanvas != null;
+        bool prevInteractable = false, prevBlocks = false;
+        if (hadCanvas)
+        {
+            prevInteractable = shopCanvas.interactable;
+            prevBlocks = shopCanvas.blocksRaycasts;
+            shopCanvas.interactable = false;
+            shopCanvas.blocksRaycasts = false;
+        }
+
+        hovered = null;
+        Debug.Log("식물 선택 모드 진입 (좌클릭=확정, 우클릭/ESC=취소)");
+
+        while (true)
+        {
+            // UI 위에 있으면 하이라이트 해제 + 취소만 허용
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()
+                && (shopCanvas == null || shopCanvas.blocksRaycasts))
+            {
+                Hover(null);
+                if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+                {
+                    onCancel?.Invoke();
+                    break;
+                }
+                yield return null;
+                continue;
+            }
+
+
+
+            // 마우스 아래 식물 레이캐스트
+            Plant p = RaycastPlantUnderMouse();
+            Hover(p);
+
+            // 좌클릭 확정
+            if (Input.GetMouseButtonDown(0) && p != null)
+            {
+                bool ok = true;
+                try { ok = (validate == null) || validate(p); } catch { ok = false; }
+
+                if (ok)
+                {
+                    var cb = onConfirm;
+                    EndHover();
+                    // 정리 후 콜백
+                    if (hadCanvas)
+                    {
+                        shopCanvas.interactable = prevInteractable;
+                        shopCanvas.blocksRaycasts = prevBlocks;
+                    }
+                    isPlacing = false; placingCo = null;
+                    cb?.Invoke(p);
+                    yield break;
+                }
+                else
+                {
+                    Debug.Log("선택 불가한 식물입니다.");
+                }
+            }
+
+            // 우클릭/ESC 취소
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                onCancel?.Invoke();
+                break;
+            }
+
+            yield return null;
+        }
+
+        // 3) 정리
+        EndHover();
+        if (hadCanvas)
+        {
+            shopCanvas.interactable = prevInteractable;
+            shopCanvas.blocksRaycasts = prevBlocks;
+        }
+        isPlacing = false;
+        placingCo = null;
+    }
+
+    private Plant RaycastPlantUnderMouse()
+    {
+        var cam = worldCamera != null ? worldCamera : Camera.main;
+        if (!cam) return null;
+
+        // ① 3D 경로: BoxCollider(3D)용
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        const float MaxPickDist = 1000f;
+
+        // 트리거까지 포함해서 모두 맞춰봄(레이어 안 씀)
+        var hits3D = Physics.RaycastAll(ray, MaxPickDist, ~0, QueryTriggerInteraction.Collide);
+        if (hits3D != null && hits3D.Length > 0)
+        {
+            // 카메라에 가장 가까운(거리 가장 작은) Plant를 우선
+            float bestDist = float.PositiveInfinity;
+            Plant best = null;
+
+            foreach (var hit in hits3D)
+            {
+                var t = hit.transform;
+                var plant =
+                    t.GetComponent<Plant>() ??
+                    t.GetComponentInParent<Plant>() ??
+                    t.GetComponentInChildren<Plant>();
+
+                if (plant == null) continue;
+
+                if (hit.distance < bestDist)
+                {
+                    bestDist = hit.distance;
+                    best = plant;
+                }
+            }
+            if (best != null) return best;
+        }
+
+        // ② (백업) 그리드 기반: 해당 타일에 식물이 있으면 반환
+        int? idx = grid.GetGridIndexFromPosition(Input.mousePosition);
+        if (idx.HasValue)
+        {
+            grid.plantGrid.TryGetValue(idx.Value, out var p);
+            if (p) return p;
+        }
+
+        // ③ (백업) 2D 경로: 혼합 씬에서 2D 콜라이더도 있는 경우
+        Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
+        world.z = 0f;
+        Vector2 p2 = new Vector2(world.x, world.y);
+        var hits2D = Physics2D.OverlapPointAll(p2);
+        if (hits2D != null && hits2D.Length == 0)
+            hits2D = Physics2D.OverlapCircleAll(p2, 0.1f);
+
+        if (hits2D != null)
+        {
+            foreach (var h in hits2D)
+            {
+                var plant =
+                    h.GetComponent<Plant>() ??
+                    h.GetComponentInParent<Plant>() ??
+                    h.GetComponentInChildren<Plant>();
+                if (plant) return plant;
+            }
+        }
+
+        return null;
+    }
+
+    private void Hover(Plant p)
+    {
+        if (hovered == p) return;
+        // 이전 하이라이트 해제
+        if (hovered != null)
+        {
+            try { hovered.MakeDefaultSprite(); } catch { }
+        }
+        hovered = p;
+        // 새 하이라이트
+        if (hovered != null)
+        {
+            try { hovered.MakeSelectedSprite(); } catch { }
+        }
+    }
+
+    private void EndHover()
+    {
+        if (hovered != null)
+        {
+            try { hovered.MakeDefaultSprite(); } catch { }
+            hovered = null;
+        }
     }
 }

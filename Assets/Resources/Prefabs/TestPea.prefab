@@ -51,6 +51,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -99,10 +102,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesname: 
-  holdGaugeImage: {fileID: 0}
-  holdGaugeCanvas: {fileID: 0}
+  dissolveDuration: 1
+  vanishEffect: {fileID: 0}
+  appearEffect: {fileID: 0}
+  defaultLayerObj: []
+  uiobjLayerObj: []
+  priceSign: {fileID: 0}
+  holdCanvas: {fileID: 0}
+  foamEffect: {fileID: 0}
   deathFrames: []
   selectedSprite: []
+  holdGaugeImage: {fileID: 0}
+  holdGaugeCanvasObj: {fileID: 0}
 --- !u!65 &7295543520518876096
 BoxCollider:
   m_ObjectHideFlags: 0
