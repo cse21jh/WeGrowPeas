@@ -38,13 +38,13 @@ public class ItemData_SignPost : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        var enemy = UnityEngine.Object.FindFirstObjectByType<EnemyController>();
-        if (enemy == null)
-        {
-            Debug.LogError("[SignPost] EnemyController가 씬에 없습니다.");
-            return;
-        }
-        enemy.ApplySignPost(targetWave, durationDays, reducePercent);
+        ModManager.Instance.AddTimedMultiplier(
+            StatId.WaveWeightMul,
+            (int)targetWave,                 // 어떤 웨이브를 눌러줄지
+            1f - reducePercent,             // 75% 감소 -> multiplier 0.25f
+            durationDays,                   // 기본 4일 등
+            $"SignPost_{targetWave}"        // 추적용 태그
+        );
         ctx.ShowInfo?.Invoke($"{DisplayName} 사용 → {targetWave} {durationDays}일간 {(int)(reducePercent * 100)}% 감소");
     }
 

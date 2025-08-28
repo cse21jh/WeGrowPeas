@@ -41,14 +41,6 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
-    private class SuppressionMod
-    {
-        public WaveType type;
-        public float multiplier;  // ex) 0.25 (= 75% 감소)
-        public int expireDay;
-    }
-    private readonly List<SuppressionMod> mods = new();
-
     int CurrentDay => GameManager.Instance.stage;
 
     private Wave lastWave;
@@ -260,38 +252,22 @@ public class EnemyController : MonoBehaviour
         ShowNextWaveText();
     }
 
-    // 팻말 효과
-
-    public void ApplySignPost(WaveType type, int durationDays = 4, float reducePercent = 0.75f)
-    {
-        float mul = Mathf.Clamp01(1f - reducePercent); // 0.25
-        mods.Add(new SuppressionMod
-        {
-            type = type,
-            multiplier = mul,
-            expireDay = CurrentDay + durationDays
-        });
-        Debug.Log($"[EnemyController] SignPost: {type} x{mul} until day<{CurrentDay + durationDays}>");
-    }
-
-    private void CleanupExpiredMods()
-    {
-        mods.RemoveAll(m => m.expireDay <= CurrentDay);
-    }
-
     // ---------- 가중치 계산 & 추첨 ----------
     private Dictionary<WaveType, float> BuildEffectiveWeights()
     {
-        CleanupExpiredMods();
-
         // 기본 가중치 복사
         var map = new Dictionary<WaveType, float>(baseWeights);
 
-        foreach (var grp in mods.Where(m => m.expireDay > CurrentDay).GroupBy(m => m.type))
+        foreach (var t in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
         {
-            float mul = 1f;
-            foreach (var m in grp) mul *= m.multiplier;
-            map[grp.Key] = (map.TryGetValue(grp.Key, out var w) ? w : 0f) * mul;
+            if (t == WaveType.None) { map[t] = 0f; continue; }
+
+            float modMul = ModManager.Instance
+                ? ModManager.Instance.GetMul(StatId.WaveWeightMul, (int)t)
+                : 1f;
+
+            if (map.ContainsKey(t))
+                map[t] *= modMul;
         }
 
         // None은 뽑기 제외
