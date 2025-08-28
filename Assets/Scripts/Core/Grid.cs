@@ -391,9 +391,6 @@ public class Grid : MonoBehaviour
                 return;
             }
         }
-
-        ApplyFertilizerIfAny(plant.gridIndex, plant);
-
         Destroy(plant.gameObject);
         return;
     }
@@ -685,8 +682,6 @@ public class Grid : MonoBehaviour
             // 대상 칸에 식물이 있는 경우: 서로 위치 교환
             Plant targetPlant = plantGrid[toIndex];
 
-            RemoveFertilizerIfAny(fromIndex, plant);
-            RemoveFertilizerIfAny(toIndex, targetPlant);
 
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
@@ -702,14 +697,11 @@ public class Grid : MonoBehaviour
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
-            ApplyFertilizerIfAny(toIndex, plant);
-            ApplyFertilizerIfAny(fromIndex, targetPlant);
 
             return true;
         }
         else
         {
-            RemoveFertilizerIfAny(fromIndex, plant);
 
             // 빈 칸이면 원래대로 심기
             plantGrid.Remove(fromIndex); // 원래 위치에서 제거
@@ -717,7 +709,6 @@ public class Grid : MonoBehaviour
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
 
-            ApplyFertilizerIfAny(toIndex, plant);
             return true;
         }
     }
@@ -924,31 +915,15 @@ public class Grid : MonoBehaviour
             slot.marker = Instantiate(fertilizerMarkerPrefab, soilT.position, Quaternion.identity, soilT);
             // (선택) wave별 색/아이콘 바꾸고 싶으면 여기서 처리
         }
-        fertilizerTiles[idx] = slot;
-
-        // 현재 식물이 있으면 즉시 +5%p 적용
-        if (plantGrid.TryGetValue(idx, out var plant) && plant != null)
-            plant.AddAdditionalResistance(MapWaveToTrait(wave), +FertilizerResistBonus);
+        fertilizerTiles.Add(idx, slot);
+        if (plantGrid.TryGetValue(idx, out var plant) && plant != null && HasBreedablePlantAt(idx))
+            FenceUIManager.Instance.SetFenceElements(0, plant);
 
         Debug.Log($"[Grid] Fertilizer placed: idx={idx}, wave={wave}");
         return true;
     }
 
-    // 새 식물이 타일에 들어왔을 때 호출(해당 타일에 비료가 있으면 +5%p)
-    private void ApplyFertilizerIfAny(int idx, Plant plant)
-    {
-        if (plant == null) return;
-        if (fertilizerTiles.TryGetValue(idx, out var slot))
-            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), +FertilizerResistBonus);
-    }
 
-    // 식물이 타일에서 나갈 때 호출(해당 타일에 비료가 있으면 -5%p)
-    private void RemoveFertilizerIfAny(int idx, Plant plant)
-    {
-        if (plant == null) return;
-        if (fertilizerTiles.TryGetValue(idx, out var slot))
-            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), -FertilizerResistBonus);
-    }
 
     private CompleteTraitType MapWaveToTrait(WaveType w)
     {

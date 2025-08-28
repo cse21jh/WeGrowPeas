@@ -8,7 +8,7 @@ public class ChiliPepper : Plant
         speciesname = "∞Ì√ﬂ";
         base.Init(gridIndex, grid);
     }
-    protected override float GetResistanceValue(WaveType wave)
+    public override float GetResistanceValue(int order)
     {
         return 1f;
     }
