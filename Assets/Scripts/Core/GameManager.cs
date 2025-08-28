@@ -41,6 +41,7 @@ public class SaveData
     public float maxBreedTimer;
     public int maxBreedCount;
     public int breedCount;
+    public bool hasIceBlock;
     //public float remainBreedTime;
 
 
@@ -54,6 +55,7 @@ public class SaveData
     public WaveType curWaveType;
     public WaveType nextWaveType;
     public int remainWaveSkipCount;
+    public int[] waveKillCount = new int[6];
 
     //economyManager
     public int gold;
@@ -264,6 +266,8 @@ public class GameManager : Singleton<GameManager>
         saveData.maxBreedTimer = grid.MaxBreedTimer;
         saveData.maxBreedCount = grid.MaxBreedCount;
 
+        saveData.hasIceBlock = grid.HasIceBlock;
+
         //upgradeManager
         saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
         Dictionary<Type, int> remainUpgrade = upgradeManager.GetRemainUpgrade();
@@ -275,6 +279,7 @@ public class GameManager : Singleton<GameManager>
         }
         //enemyController
         saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
+        saveData.waveKillCount = enemyController.WaveKillCount;
         saveData.curWaveType = enemyController.CurrentWave.WaveType;
         saveData.nextWaveType = enemyController.NextWave.WaveType;
         saveData.lastWaveType = enemyController.LastWave.WaveType;

@@ -190,7 +190,7 @@ public class Bug : MonoBehaviour
                 return;
             }
 
-            if(grid.HasIceBlock())
+            if(grid.HasIceBlock)
             {
                 grid.ActivateIceBlock();
             }

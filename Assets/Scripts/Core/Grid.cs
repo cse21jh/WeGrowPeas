@@ -14,7 +14,7 @@ public class Grid : MonoBehaviour
     [SerializeField] protected EconomyManager economyManager;
 
     List<Plant> plants = new List<Plant>();
-    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    
 
     protected bool isBreeding = false;
 
@@ -45,7 +45,7 @@ public class Grid : MonoBehaviour
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
-    private HashSet<int> petBottleTiles = new HashSet<int>();
+    
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
 
     [SerializeField] private GameObject fertilizerMarkerPrefab;
@@ -60,6 +60,7 @@ public class Grid : MonoBehaviour
     private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
 
     //저장 필요
+    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
     public int killBugCount = 0;
     public int totalBreedCount = 0;
@@ -85,7 +86,8 @@ public class Grid : MonoBehaviour
     protected int breedCount = 0;
 
     protected bool hasIceBlock = false;
-    public int MaxCol => maxCol;
+    protected List<int> petBottleTiles = new List<int>();
+
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
     public float BugSpeedDecreasement => bugSpeedDecreasement;
@@ -99,6 +101,8 @@ public class Grid : MonoBehaviour
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
+    public bool HasIceBlock => hasIceBlock;
+    public List<int> PetBottleTiles => petBottleTiles;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -106,6 +110,7 @@ public class Grid : MonoBehaviour
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         //InitGrid();
         InitSoils();
+        plantGrid.Clear();
         breedButton.SetActive(false);
     }
 
@@ -787,6 +792,7 @@ public class Grid : MonoBehaviour
         additionalInheritance = saveData.additionalInheritance;
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
+        if (saveData.hasIceBlock) SetIceBlock();
         UpdateSoil();
     }
 
@@ -947,20 +953,17 @@ public class Grid : MonoBehaviour
         };
     }
 
-    public bool HasIceBlock()
-    {
-        return hasIceBlock;
-    }
-
-    public void BuyIceBlock()
+    public void SetIceBlock()
     {
         hasIceBlock = true;
+        // 얼방 가지고 있다는 UI
     }
 
     public void ActivateIceBlock()
     {
         hasIceBlock = false;
         isIceBlockOn = true;
+        // 얼방 작동한다는 UI
     }
 
     public bool IsIceBlockActivated()
@@ -971,6 +974,7 @@ public class Grid : MonoBehaviour
     public void DeactivateIceBlock()
     {
         isIceBlockOn = false;
+        // 얼방 UI 삭제
     }
 
 

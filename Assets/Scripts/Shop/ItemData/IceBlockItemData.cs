@@ -30,7 +30,7 @@ public class ItemData_IceBlock : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     { 
-        if(ctx.Grid.HasIceBlock())
+        if(ctx.Grid.HasIceBlock)
         {
             reason = "이미 냉각방패를 보유하고 있습니다";
             return false;
@@ -50,7 +50,7 @@ public class ItemData_IceBlock : ItemData
             Debug.LogError("[Fertilizer] Grid not found.");
             return;
         }
-        g.BuyIceBlock();
+        g.SetIceBlock();
         ctx.ShowInfo?.Invoke($"{DisplayName} 발동: 벌레에게 피해를 입을 시, 해당 웨이브 효과에 무적");
     }
 

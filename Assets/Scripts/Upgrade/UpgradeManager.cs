@@ -66,6 +66,7 @@ public class UpgradeManager : MonoBehaviour
 
     public GameObject selectAddPeaOrPeanutButton;
 
+
     //저장 필요
     private Dictionary<Type, int> remainUpgrade = new();
 

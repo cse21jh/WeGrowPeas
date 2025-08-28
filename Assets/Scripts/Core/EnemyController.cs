@@ -14,17 +14,8 @@ public class EnemyController : MonoBehaviour
     public Grid grid;    
 
     
-    public Wave CurrentWave => currentWave;
-    public Wave NextWave => nextWave;
-    public Wave LastWave => lastWave;
 
     private Wave noneWave;
-
-    private int waveSkipCount = 0;
-    public int WaveSkipCount => waveSkipCount;
-
-    private int[] waveKillCount;
-    public int[] WaveKillCount => waveKillCount;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
@@ -43,9 +34,21 @@ public class EnemyController : MonoBehaviour
 
     int CurrentDay => GameManager.Instance.stage;
 
+
+    // 아래 저장 필요
+    
     private Wave lastWave;
     private Wave currentWave;
     private Wave nextWave;
+    private int waveSkipCount = 0;
+    private int[] waveKillCount;
+    
+
+    public Wave CurrentWave => currentWave;
+    public Wave NextWave => nextWave;
+    public Wave LastWave => lastWave;
+    public int WaveSkipCount => waveSkipCount;
+    public int[] WaveKillCount => waveKillCount;
 
     // Start is called before the first frame update
     void Start()
@@ -244,6 +247,8 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
         waveSkipCount = saveData.remainWaveSkipCount;
+        for(int i =0;i<6;i++)
+            waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
     }
