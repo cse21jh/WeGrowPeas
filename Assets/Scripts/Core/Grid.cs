@@ -294,7 +294,7 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
-    private void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
+    protected void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
@@ -624,7 +624,7 @@ public class Grid : MonoBehaviour
         isBreedButtonPressed = true;
     }
 
-    private void DeactivateBreed()
+    protected void DeactivateBreed()
     {
         breedButton.SetActive(false);
         isBreedButtonPressed = false;
@@ -635,7 +635,7 @@ public class Grid : MonoBehaviour
         isBreedSkipButtonPressed = true;
     }
 
-    private void UpdateBreedCountUI(int count)
+    protected void UpdateBreedCountUI(int count)
     {
         breedCountUI.text = $"{count}°³";
     }

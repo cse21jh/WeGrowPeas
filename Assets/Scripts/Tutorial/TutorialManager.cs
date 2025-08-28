@@ -149,6 +149,7 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.Breed:
+                    grid.StartTutorialBreeding();
                     break;
 
                 case TutorialActions.EnemyWave:
