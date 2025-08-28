@@ -574,7 +574,7 @@ public class Grid : MonoBehaviour
 
     public void RequestBreedSelect(GameObject clickedObject)
     {
-        if (!isBreeding)        
+        if (!isBreeding)
             return;
 
         Plant clickedPea = clickedObject.GetComponent<Plant>();
@@ -753,7 +753,7 @@ public class Grid : MonoBehaviour
                 case "고추": obj = Instantiate(chiliPepperPrefab); break;
                 default: obj = Instantiate(peaPrefab); break;
             }
-            
+
             Plant plant = obj.GetComponent<Plant>();
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
@@ -882,6 +882,15 @@ public class Grid : MonoBehaviour
 
     //-----전용 비료------
     public bool HasFertilizerAt(int idx) => fertilizerTiles.ContainsKey(idx);
+
+    public bool HasBreedablePlantAt(int idx)
+    {
+        if (!plantGrid.ContainsKey(idx)) return false;
+
+        if (plantGrid[idx].GetType() == typeof(Pea) || plantGrid[idx].GetType() == typeof(Peanut))
+            return true;
+        return false;
+    }
 
     public bool TryPlaceFertilizer(int idx, WaveType wave)
     {

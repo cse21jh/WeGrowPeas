@@ -15,12 +15,12 @@ public class AddPestPlantUpgrade : Upgrade
         List<GeneticTrait> peaTrait = new List<GeneticTrait>
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.PestResistance, 0.5f , 1, 0.0f)
+            new GeneticTrait(CompleteTraitType.PestResistance, 0.5f , 1, GameManager.Instance.grid.GetAdditionalPestResistance())
         };
         List<GeneticTrait> peanutTrait = new List<GeneticTrait>
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.4f , 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.PestResistance, 0.4f , 1, 0.0f)
+            new GeneticTrait(CompleteTraitType.PestResistance, 0.4f , 1, GameManager.Instance.grid.GetAdditionalPestResistance())
         };
         GameManager.Instance.upgradeManager.addPeaTrait = peaTrait;
         GameManager.Instance.upgradeManager.addPeanutTrait = peanutTrait;
