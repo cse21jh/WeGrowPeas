@@ -39,7 +39,10 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     public void OnPointerUp(PointerEventData eventData)
     {
         if (!grid.GetIsBreeding())
+        {
+            shovelRectTransform.localPosition = initialPos;
             return;
+        }
         isDragging = false;
         UpdatePosition(eventData);
 
