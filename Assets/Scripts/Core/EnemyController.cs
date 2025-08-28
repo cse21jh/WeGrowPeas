@@ -32,7 +32,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
-    int CurrentDay => GameManager.Instance.stage;
+    //int CurrentDay => GameManager.Instance.stage;
 
 
     // 아래 저장 필요
@@ -57,7 +57,7 @@ public class EnemyController : MonoBehaviour
         SetWaveSkipCountText();
         HideWaveSkipButton();
 
-        InitBaseWeightsByStage(CurrentDay);
+        InitBaseWeightsByStage(1);
 
         noneWave = new NoneWave();
 
