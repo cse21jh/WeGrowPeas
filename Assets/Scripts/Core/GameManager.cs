@@ -210,6 +210,7 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitForSeconds(2.0f);
         GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount, enemyController.WaveKillCount);
         SceneLoader.Instance.LoadGameOverScene();
+        File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
