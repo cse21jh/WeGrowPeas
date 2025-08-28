@@ -42,6 +42,10 @@ public class SaveData
     public int maxBreedCount;
     public int breedCount;
     public bool hasIceBlock;
+    public List<int> perBottleTiles = new();
+
+    public List<int> fertilizerTiles = new();
+    public List<WaveType> fertilizerType = new();
     //public float remainBreedTime;
 
 
@@ -267,6 +271,12 @@ public class GameManager : Singleton<GameManager>
         saveData.maxBreedCount = grid.MaxBreedCount;
 
         saveData.hasIceBlock = grid.HasIceBlock;
+        saveData.perBottleTiles = grid.PetBottleTiles;
+        foreach(KeyValuePair<int,FertilizerSlot> fer in grid.GetFertilizerTiles())
+        {
+            saveData.fertilizerTiles.Add(fer.Key);
+            saveData.fertilizerType.Add(fer.Value.wave);
+        }
 
         //upgradeManager
         saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;

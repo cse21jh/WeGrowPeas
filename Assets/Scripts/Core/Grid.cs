@@ -7,6 +7,12 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public struct FertilizerSlot
+{
+    public WaveType wave;
+    public GameObject marker;
+}
 
 public class Grid : MonoBehaviour
 {
@@ -51,13 +57,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject fertilizerMarkerPrefab;
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
-    [System.Serializable]
-    private struct FertilizerSlot
-    {
-        public WaveType wave;
-        public GameObject marker;
-    }
-    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
+
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -87,6 +87,8 @@ public class Grid : MonoBehaviour
 
     protected bool hasIceBlock = false;
     protected List<int> petBottleTiles = new List<int>();
+
+    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
 
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
@@ -793,6 +795,10 @@ public class Grid : MonoBehaviour
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
         if (saveData.hasIceBlock) SetIceBlock();
+        foreach(var i in saveData.perBottleTiles)
+            PlacePetBottle(i);
+        for(int i = 0;i<saveData.fertilizerTiles.Count; i++)
+            TryPlaceFertilizer(saveData.fertilizerTiles[i], saveData.fertilizerType[i]);
         UpdateSoil();
     }
 
@@ -899,6 +905,11 @@ public class Grid : MonoBehaviour
         if (plantGrid[idx].GetType() == typeof(Pea) || plantGrid[idx].GetType() == typeof(Peanut))
             return true;
         return false;
+    }
+    
+    public Dictionary<int, FertilizerSlot> GetFertilizerTiles()
+    {
+        return fertilizerTiles;
     }
 
     public bool TryPlaceFertilizer(int idx, WaveType wave)
