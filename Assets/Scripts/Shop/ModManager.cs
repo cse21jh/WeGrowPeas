@@ -37,10 +37,15 @@ public class Mod
 
 public class ModManager : Singleton<ModManager>
 {
-    private readonly List<Mod> mods = new();
     private int nextId = 1;
 
     private int Day => GameManager.Instance.stage;
+
+
+    // 저장 필요
+    private readonly List<Mod> mods = new();
+
+    public List<Mod> Mods => mods;
 
     // -------- 등록/해제/만료 --------
     public int AddTimedMultiplier(StatId stat, int param, float multiplier, int durationDays, string sourceTag = null)
@@ -142,5 +147,13 @@ public class ModManager : Singleton<ModManager>
         }
 
         return bestOverride != null ? overrideValue : sum;
+    }
+
+    public void LoadModManager(SaveData saveData)
+    {
+        foreach (var m in saveData.mods)
+        {
+            Add(m);
+        }
     }
 }

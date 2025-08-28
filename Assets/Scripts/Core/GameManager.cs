@@ -64,6 +64,10 @@ public class SaveData
     //economyManager
     public int gold;
 
+
+    //ModManager
+    public List<Mod> mods = new();
+
     //환경설정 내용
     //GameRecordHolder에 저장될 내용
 }
@@ -89,6 +93,7 @@ public class GameManager : Singleton<GameManager>
     public UpgradeManager upgradeManager;
     public ShopManager shopManager;
     public EconomyManager economyManager;
+    public ModManager modManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -222,6 +227,7 @@ public class GameManager : Singleton<GameManager>
         upgradeManager.LoadUpgradeManager(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
+        modManager.LoadModManager(saveData);
         Debug.Log("불러옴");
     }
 
@@ -297,6 +303,8 @@ public class GameManager : Singleton<GameManager>
         //economyManager
         saveData.gold = economyManager.GetGold();
 
+        //modManager
+        saveData.mods = modManager.Mods;
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);
