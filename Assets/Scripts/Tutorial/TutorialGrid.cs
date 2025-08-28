@@ -10,6 +10,7 @@ public class TutorialGrid : Grid
     [SerializeField] private GameObject tutorialBug;
 
     private bool isTBreeding = false;
+    private int TMaxBreedCount = 1;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected override void Start()
@@ -118,7 +119,7 @@ public class TutorialGrid : Grid
                     }
 
 
-                    if (canBreed && breedCount < MaxBreedCount && isEqualPlant)
+                    if (canBreed && breedCount < TMaxBreedCount && isEqualPlant)
                     {
                         GameObject childObj = null;
                         if (parent1.GetType() == typeof(Pea))
@@ -139,7 +140,7 @@ public class TutorialGrid : Grid
                                 totalPeaBreedcount++;
                             else if (child.GetType() == typeof(Peanut))
                                 totalPeanutBreedCount++;
-                            UpdateBreedCountUI(MaxBreedCount - breedCount);
+                            UpdateBreedCountUI(TMaxBreedCount - breedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
