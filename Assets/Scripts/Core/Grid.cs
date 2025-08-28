@@ -360,9 +360,9 @@ public class Grid : MonoBehaviour
             float resistance = child.GetResistanceBasedOnGenetics(childGenetic);
 
             if (trait == CompleteTraitType.PestResistance)
-                resistance += additionalPestResistance;
-
-            childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
+                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
+            else
+                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
         child.SetTrait(childTrait);
     }
