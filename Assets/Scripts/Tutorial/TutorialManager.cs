@@ -9,7 +9,7 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private TutorialGrid grid;
     [SerializeField] private EnemyController enemyController;
     [SerializeField] private UpgradeManager upgradeManager;
-    //[SerializeField] private ShopManager shopManager;
+    [SerializeField] private ShopManager shopManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
     [SerializeField] private Narration n;
@@ -160,8 +160,15 @@ public class TutorialManager : Singleton<TutorialManager>
                     upgradeManager.TutorialUpgrade();
                     break;
 
+                case TutorialActions.InitShop:
+                    break;
+
                 case TutorialActions.ShowTutorialEndPopUp:
                     tutorialEndPopup.SetActive(true);
+                    break;
+
+                case TutorialActions.ClosePanel:
+                    ClosePanel();
                     break;
 
             }
@@ -212,5 +219,10 @@ public class TutorialManager : Singleton<TutorialManager>
         tStage = 2;
         UpdateStageUI();
         enemyController.ShowNextWaveText();
+    }
+
+    private void ClosePanel()
+    {
+        FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
     }
 }

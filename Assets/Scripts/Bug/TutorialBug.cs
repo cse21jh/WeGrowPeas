@@ -14,7 +14,7 @@ public class TutorialBug : Bug
     protected override void InitBug()
     {
         SetFixedPosition();
-        spawnEdge = 3;
+        spawnEdge = 1;
         StartCoroutine(Moving());
     }
 
@@ -48,7 +48,7 @@ public class TutorialBug : Bug
 
     private void SetFixedPosition()
     {
-        transform.position = new Vector3(-10.0f, -1.0f, 0);
+        transform.position = new Vector3(10.0f, -1.0f, 0);
     }
 
     public void StopMoving()

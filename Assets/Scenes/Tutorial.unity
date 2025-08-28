@@ -79345,7 +79345,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 320, y: -30.00003}
+  m_AnchoredPosition: {x: -325, y: -30}
   m_SizeDelta: {x: 150, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &468165663
@@ -92605,6 +92605,81 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &547591314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 547591315}
+  - component: {fileID: 547591317}
+  - component: {fileID: 547591316}
+  m_Layer: 5
+  m_Name: UpgradeBlocker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &547591315
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547591314}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5211471209038951977}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.0000076294, y: 0.21706}
+  m_SizeDelta: {x: 100, y: 350.57}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &547591316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547591314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &547591317
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547591314}
+  m_CullTransparentMesh: 1
 --- !u!1 &548223057
 GameObject:
   m_ObjectHideFlags: 0
@@ -231089,6 +231164,7 @@ MonoBehaviour:
   grid: {fileID: 1880775742}
   enemyController: {fileID: 415974144}
   upgradeManager: {fileID: 66307781}
+  shopManager: {fileID: 0}
   textStage: {fileID: 5778937528619821394}
   n: {fileID: 468165665}
   step0:
@@ -231142,7 +231218,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a7ed8bce103b7934e985469243bc06c4, type: 2}
   - {fileID: 11400000, guid: 6b41da29ee8ba7847b605222285d9866, type: 2}
   - {fileID: 11400000, guid: c42338d9b7189524389b7b10f591ab41, type: 2}
-  step4: []
+  step4:
+  - {fileID: 11400000, guid: 409d6e06cc72acf43812bd6875feeeca, type: 2}
+  - {fileID: 11400000, guid: 3c25a5cb7df1c794c84fee9e72e6cf48, type: 2}
+  - {fileID: 11400000, guid: e97f3582bb66c2141b9466df46aec806, type: 2}
+  - {fileID: 11400000, guid: f07360b70e171514dad241de03999b93, type: 2}
+  - {fileID: 11400000, guid: 5dfff372f74c0024cbafd1668f5a320c, type: 2}
+  - {fileID: 11400000, guid: 1afb1ce7b41be314b8ce9a35a69de329, type: 2}
+  - {fileID: 11400000, guid: d2f43b363a74a1c44b0b6af12777c6f6, type: 2}
+  - {fileID: 11400000, guid: 0f39b35f4145f46488d1d12cc64c4357, type: 2}
+  - {fileID: 11400000, guid: 9dcbc021975eedc479c3b689bccc1e34, type: 2}
   step5:
   - {fileID: 11400000, guid: d24fe32840b8ce1458893c00123a61f4, type: 2}
   - {fileID: 11400000, guid: 5ddf9cc65a5905b4e8f8b2fc4ed2defe, type: 2}
@@ -255296,6 +255381,7 @@ MonoBehaviour:
   upgradeManager: {fileID: 66307781}
   shopManager: {fileID: 0}
   economyManager: {fileID: 1891974902}
+  modManager: {fileID: 0}
   textStage: {fileID: 0}
 --- !u!4 &1461606228
 Transform:
@@ -375250,6 +375336,7 @@ RectTransform:
   - {fileID: 8973355460418487473}
   - {fileID: 8069150911567668920}
   - {fileID: 5930026575393001703}
+  - {fileID: 547591315}
   m_Father: {fileID: 7268073415460535444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

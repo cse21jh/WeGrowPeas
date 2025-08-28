@@ -157,7 +157,7 @@ public class UpgradeManager : MonoBehaviour
             Debug.Log("업그레이드 존재 X");
             return;
         }
-        remainUpgrade[tmp]--;   
+        //remainUpgrade[tmp]--;   
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
         if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)
@@ -349,17 +349,17 @@ public class UpgradeManager : MonoBehaviour
         select = false;
 
 
-        /*float startTime = Time.time;
+        float startTime = Time.time;
         float endTime = startTime + upgradeTimer;
         //int rerollCount = 0;
 
-        while (!select && (Time.time < endTime))
+        while (!select /*&& (Time.time < endTime)*/)
         {
-            float timeRatio = Mathf.Clamp01((Time.time - startTime) / upgradeTimer);
-            UpgradeTimerUI(timeRatio);
+            //float timeRatio = Mathf.Clamp01((Time.time - startTime) / upgradeTimer);
+            //UpgradeTimerUI(timeRatio);
 
             yield return null;
-        }*/
+        }
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
         Debug.Log("업그레이드 페이즈 종료");

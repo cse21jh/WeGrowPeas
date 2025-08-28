@@ -15,7 +15,9 @@ public enum TutorialActions
     Breed,
     EnemyWave,
     Upgrade,
+    InitShop,
     ShowTutorialEndPopUp,
+    ClosePanel,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
