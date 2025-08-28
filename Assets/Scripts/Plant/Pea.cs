@@ -49,6 +49,15 @@ public class Pea : Plant
     {
         if (isHolding)
         {
+            if (ClickRouter.Instance.IsBlockedByUI)
+            {
+                isDragging = false;
+                isHolding = false;
+                holdTime = 0f;
+                holdGaugeImage.fillAmount = 0f;
+                holdGaugeCanvasObj.SetActive(false);
+                grid.TryPlacePlant(this, Input.mousePosition);
+            }
             holdTime += Time.deltaTime;
             holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
 
@@ -60,7 +69,7 @@ public class Pea : Plant
         }
 
         if (isDragging)
-        {
+        {            
             if (!grid.GetIsBreeding())
                 grid.TryPlacePlant(this, Input.mousePosition);
             else

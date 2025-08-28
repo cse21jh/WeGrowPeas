@@ -1,3 +1,4 @@
+using Mono.Cecil.Cil;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,15 @@ public class Peanut : Plant
     {
         if (isHolding)
         {
+            if (ClickRouter.Instance.IsBlockedByUI)
+            {
+                isDragging = false;
+                isHolding = false;
+                holdTime = 0f;
+                holdGaugeImage.fillAmount = 0f;
+                holdGaugeCanvasObj.SetActive(false);
+                grid.TryPlacePlant(this, Input.mousePosition);
+            }
             holdTime += Time.deltaTime;
             holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
 
@@ -128,7 +138,7 @@ public class Peanut : Plant
 
     private void OnMouseDown()
     {
-        if (!grid.GetIsBreeding())
+        if (!grid.GetIsBreeding() || ClickRouter.Instance.IsBlockedByUI)
             return;
         holdTime = 0f;
         isHolding = true;
