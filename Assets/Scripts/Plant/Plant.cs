@@ -63,6 +63,8 @@ public abstract class Plant : MonoBehaviour
             childMaterials[i] = childSpriteRenderers[i].material; 
         }
 
+        HideSnow(0f, Ease.Linear);
+
         StartCoroutine(Appear());
     }
 
