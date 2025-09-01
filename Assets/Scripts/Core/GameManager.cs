@@ -44,7 +44,7 @@ public class SaveData
     public bool hasIceBlock;
     public List<int> perBottleTiles = new();
 
-    public List<int> fertilizerTiles = new();
+    public List<int> fertilizerColumns = new();
     public List<WaveType> fertilizerType = new();
     //public float remainBreedTime;
 
@@ -279,10 +279,10 @@ public class GameManager : Singleton<GameManager>
 
         saveData.hasIceBlock = grid.HasIceBlock;
         saveData.perBottleTiles = grid.PetBottleTiles;
-        foreach(KeyValuePair<int,FertilizerSlot> fer in grid.GetFertilizerTiles())
+        foreach(KeyValuePair<int,WaveType> fer in grid.GetFertilizerColumns())
         {
-            saveData.fertilizerTiles.Add(fer.Key);
-            saveData.fertilizerType.Add(fer.Value.wave);
+            saveData.fertilizerColumns.Add(fer.Key);
+            saveData.fertilizerType.Add(fer.Value);
         }
 
         //upgradeManager

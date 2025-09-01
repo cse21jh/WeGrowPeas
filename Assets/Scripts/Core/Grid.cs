@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
+
 //using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
-
-[System.Serializable]
-public struct FertilizerSlot
-{
-    public WaveType wave;
-    public GameObject marker;
-}
 
 public class Grid : MonoBehaviour
 {
@@ -88,7 +83,7 @@ public class Grid : MonoBehaviour
     protected bool hasIceBlock = false;
     protected List<int> petBottleTiles = new List<int>();
 
-    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
+    private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
@@ -794,8 +789,8 @@ public class Grid : MonoBehaviour
         if (saveData.hasIceBlock) SetIceBlock();
         foreach(var i in saveData.perBottleTiles)
             PlacePetBottle(i);
-        for(int i = 0;i<saveData.fertilizerTiles.Count; i++)
-            TryPlaceFertilizer(saveData.fertilizerTiles[i], saveData.fertilizerType[i]);
+        for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
+            TryPlaceFertilizer(saveData.fertilizerColumns[i], saveData.fertilizerType[i]);
         UpdateSoil();
     }
 
@@ -895,7 +890,7 @@ public class Grid : MonoBehaviour
     }
 
     //-----전용 비료------
-    public bool HasFertilizerAt(int idx) => fertilizerTiles.ContainsKey(idx);
+    public bool HasFertilizerAt(int idx) => fertilizerColumns.ContainsKey(GetCol(idx));
 
     public bool HasBreedablePlantAt(int idx)
     {
@@ -906,32 +901,57 @@ public class Grid : MonoBehaviour
         return false;
     }
     
-    public Dictionary<int, FertilizerSlot> GetFertilizerTiles()
+    public Dictionary<int, WaveType> GetFertilizerColumns()
     {
-        return fertilizerTiles;
+        return fertilizerColumns;
+    }
+
+    public WaveType GetFertilizerType (int idx)
+    {
+        return fertilizerColumns[GetCol(idx)];
     }
 
     public bool TryPlaceFertilizer(int idx, WaveType wave)
     {
         if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있으면 불가
 
-        // 기록 + 마커 표시
-        var slot = new FertilizerSlot { wave = wave, marker = null };
-        if (fertilizerMarkerPrefab != null)
-        {
-            var soilT = GetSoilTransform(idx);
-            slot.marker = Instantiate(fertilizerMarkerPrefab, soilT.position, Quaternion.identity, soilT);
-            // (선택) wave별 색/아이콘 바꾸고 싶으면 여기서 처리
-        }
-        fertilizerTiles.Add(idx, slot);
-        if (plantGrid.TryGetValue(idx, out var plant) && plant != null && HasBreedablePlantAt(idx))
-            FenceUIManager.Instance.SetFenceElements(0, plant);
+        int col = GetCol(idx);
 
-        Debug.Log($"[Grid] Fertilizer placed: idx={idx}, wave={wave}");
+        fertilizerColumns.Add(col, wave);
+
+        Transform soilColT = transform.GetChild(col);
+        var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
+
+        if (marker == null)
+        {
+            Debug.Log($"[Grid] No marker: col={col}, wave={wave}");
+            return false;
+        }
+        marker.SetFertilizer(wave);
+
+        Debug.Log($"[Grid] Fertilizer placed: col={col}, wave={wave}");
         return true;
     }
 
+    public void RemoveFertilizerAt(int col)
+    {
+        // SoilCol Transform 가져오기
+        Transform soilColT = transform.GetChild(col);
+        var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
 
+        if (marker != null && marker.IsOn)
+        {
+            if (fertilizerColumns.ContainsKey(col))
+            {
+                fertilizerColumns.Remove(col);
+            }
+
+            marker.RemoveFertilizer();
+            Debug.Log($"[Grid] Fertilizer removed at col={soilColT.GetSiblingIndex()}");
+        }
+    }
+
+    int GetCol(int index) => index / maxCol;
 
     private CompleteTraitType MapWaveToTrait(WaveType w)
     {
@@ -946,6 +966,8 @@ public class Grid : MonoBehaviour
             _ => CompleteTraitType.NaturalDeath
         };
     }
+
+    //-----얼음 방패------
 
     public void SetIceBlock()
     {
@@ -985,9 +1007,9 @@ public class Grid : MonoBehaviour
 
     public bool HasEmptyFetrilizerGrid()
     {
-        for (int idx = 0; idx < maxCol * 4; idx++)
+        for (int idx = 0; idx < maxCol; idx++)
         {
-            if (!fertilizerTiles.ContainsKey(idx))
+            if (!fertilizerColumns.ContainsKey(idx))
             {
                 return true;
             }

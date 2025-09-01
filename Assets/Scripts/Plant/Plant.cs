@@ -109,7 +109,7 @@ public abstract class Plant : MonoBehaviour
         float resistance = 0f;
         if(grid.HasFertilizerAt(gridIndex))
         {
-            if ((int)grid.GetFertilizerTiles()[gridIndex].wave == order)
+            if ((int)grid.GetFertilizerType(gridIndex) == order)
                 resistance += 0.05f;
         }
         bool checkChiliPepper = CheckChiliPepper();

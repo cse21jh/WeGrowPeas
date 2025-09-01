@@ -37,7 +37,7 @@ public class ItemData_GeneExtractor : ItemData
         if (!g) { reason = "Grid 없음"; return false; }
 
         // 최소 1칸 이상 빈 칸이 있어야 의미 있음
-        int maxSlots = g.MaxCol * 4;
+        int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
         if (empty <= 0) { reason = "빈 칸이 없습니다"; return false; }
 
@@ -86,7 +86,7 @@ public class ItemData_GeneExtractor : ItemData
         List<GeneticTrait> genes = selected.GetGeneticTrait(); // Plant에 이미 존재
 
         // 생성 가능한 수 = min(3, 빈 칸 수)
-        int maxSlots = g.MaxCol * 4;
+        int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
         int toSpawn = Mathf.Clamp(3, 0, empty); // 빈칸이 0~2면 그만큼만
 

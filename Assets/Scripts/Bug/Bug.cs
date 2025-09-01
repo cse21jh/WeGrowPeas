@@ -189,11 +189,6 @@ public class Bug : MonoBehaviour
                 StartCoroutine(KillBug());
                 return;
             }
-
-            if(grid.HasIceBlock)
-            {
-                grid.ActivateIceBlock();
-            }
             
             plant.Die(DeathCause.Bug, this);
         }

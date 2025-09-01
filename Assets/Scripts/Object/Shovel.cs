@@ -46,7 +46,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         isDragging = false;
         UpdatePosition(eventData);
 
-        TryDestroyPlantUnderMouse();
+        TryDestroyUnderMouse();
         shovelRectTransform.localPosition = initialPos;
     }
 
@@ -76,23 +76,36 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         }
     }
 
-    private void TryDestroyPlantUnderMouse()
+    private void TryDestroyUnderMouse()
     {
         Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
 
         if(Physics.Raycast(ray, out RaycastHit hit))
         {
+            Debug.Log($"[Shovel] Raycast Hit: {hit.collider.gameObject.name}");
+
+            // 1) 식물 제거
             Plant plant = hit.collider.GetComponent<Plant>();
+            if (plant != null)
+            {
+                SoundManager.Instance.PlayEffect("Shovel");
+                economyManager.AddGold(plant.GetSellingPrice());
+                plant.Die(DeathCause.Shovel);
+                return;
+            }
 
-            if (plant == null) return;
+            // 2) 비료 마커 제거
+            FertilizerMarker fertMarker = hit.collider.GetComponent<FertilizerMarker>();
+            if (fertMarker != null && fertMarker.IsOn)
+            {
+                SoundManager.Instance.PlayEffect("Shovel");
 
-            SoundManager.Instance.PlayEffect("Shovel");
+                int col = fertMarker.transform.parent.GetSiblingIndex();
 
-            economyManager.AddGold(plant.GetSellingPrice());
+                grid.RemoveFertilizerAt(col);
 
-            plant.Die(DeathCause.Shovel);
-
-            //Debug.Log("[Shovel] Raycast Hit: " + hit.collider.name);
+                return;
+            }
         }
     }
 }
