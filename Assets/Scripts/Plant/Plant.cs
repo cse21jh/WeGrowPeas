@@ -101,23 +101,26 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public virtual float GetResistanceValue(int order) // 아니면 (int)waveType 으로 넣기
+    public virtual float GetResistanceValue(int traitNum) // (int)waveType 혹은 (int)traitType으로 가능
     {
-        if (order >= traits.Count)
-            return 0.1f;
         float resistance = 0f;
-        if(grid.HasFertilizerAt(gridIndex))
+        foreach (var g in traits)
         {
-            if ((int)grid.GetFertilizerType(gridIndex) == order)
-                resistance += 0.05f;
+            if (traitNum == (int)g.traitType)
+            {
+                if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
+                {
+                    if ((int)grid.GetFertilizerColumns()[gridIndex/4] == traitNum)
+                        resistance += 0.05f;
+                }
+                if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
+                    resistance += 0.2f;
+                resistance += g.resistance + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
+                return resistance;
+            }
         }
-        bool checkChiliPepper = CheckChiliPepper();
-        GeneticTrait g = traits[order];
-        if(checkChiliPepper)
-            resistance += GetResistanceBasedOnGenetics(2) + g.additionalResistance;
-        else
-            resistance += g.resistance + g.additionalResistance;
-        return resistance;
+
+        return 0.1f; // 저항력 없는 경우 0.1 return
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)

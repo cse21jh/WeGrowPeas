@@ -45,7 +45,7 @@ public class FenceUIManager : MonoBehaviour
         for (int i = 0; i < Traits.Count; i++)
         {
             bool isTasteActive = i < taste;
-            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive, plant, i);
+            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive, plant);
         }
 
         for(int i = Traits.Count; i < fenceElements.Length; i++)
@@ -58,7 +58,7 @@ public class FenceUIManager : MonoBehaviour
                 additionalResistance = 0f,
                 genetics = 0
             };
-            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive, plant, i);
+            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive, plant);
         }
     }
 

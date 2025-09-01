@@ -39,10 +39,10 @@ public class FenceElementController : MonoBehaviour
     }
 
 
-    public void SetElement(int plantIndex, GeneticTrait trait, bool isTaste, Plant plant, int order)
+    public void SetElement(int plantIndex, GeneticTrait trait, bool isTaste, Plant plant)
     {
         Debug.Log($"SetElement called with trait: {trait.traitType}, isTaste: {isTaste}");
-        float surviveProb = plant.GetResistanceValue(order);
+        float surviveProb = plant.GetResistanceValue((int)trait.traitType);
         int dnaIndex = (int)trait.genetics;
 
         //√ ±‚»≠
