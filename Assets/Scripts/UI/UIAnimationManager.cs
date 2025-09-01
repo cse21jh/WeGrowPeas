@@ -44,6 +44,8 @@ public class UIAnimationManager : MonoBehaviour
 
             shop_targetPanel.DOAnchorPos(shop_panelTransformMoved.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
+
+            Debug.Log(shop_panelTransformMoved.ToString());
         }
     }
 

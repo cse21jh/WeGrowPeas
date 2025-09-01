@@ -49,7 +49,7 @@ public class ShopUI : MonoBehaviour
 
     private void OnEnable()
     {
-        
+
     }
 
     public void BuildShop()
@@ -94,6 +94,12 @@ public class ShopUI : MonoBehaviour
         if (!data.CanPurchase(ctx, out string why))
         {
             ShowError(why ?? "구매 불가");
+            return;
+        }
+
+        if ((data.Price > services.Economy.GetGold()))
+        {
+            ShowError("구매 불가");
             return;
         }
 
@@ -176,6 +182,7 @@ public class ShopUI : MonoBehaviour
 
     public void Open()
     {
+        session?.ClearThisShop();
         panel.SetActive(true);
         BuildShop();
         ClearInfo();

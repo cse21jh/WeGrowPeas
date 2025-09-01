@@ -17,7 +17,7 @@ public class ItemData_BugSpray : ItemData
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 퇴치 스프레이";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 스프레이";
         if (Price <= 0) Price = 500;
     }
 

@@ -60,11 +60,16 @@ public class Bug : MonoBehaviour
         : 1f;
         speed = speed * mul;
 
+        InitBug();
+    }
+
+    protected virtual void InitBug()
+    {
         InitRandomPos();
         StartCoroutine(Moving());
     }
 
-    protected void Update()
+    protected virtual void Update()
     {
         if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
         {
@@ -182,9 +187,15 @@ public class Bug : MonoBehaviour
             {
                 economyManager.AddGold(100);
                 StartCoroutine(KillBug());
+                return;
             }
-            else
-                plant.Die(DeathCause.Bug, this);
+
+            if(grid.HasIceBlock)
+            {
+                grid.ActivateIceBlock();
+            }
+            
+            plant.Die(DeathCause.Bug, this);
         }
     }
 
@@ -224,7 +235,7 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
-            grid.AddAdditionalPestResistance(0.0005f);
+            grid.AddAdditionalPestResistance(0.002f);
             isDie = true;
             economyManager.AddGold(gold + grid.GetAdditionalBugGold());
             yield return StartCoroutine(Vanish());

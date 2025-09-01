@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class EconomyManager : MonoBehaviour
 {
-    [SerializeField] private int gold = 5000;
+    
     [SerializeField] private TextMeshProUGUI CoinUI;
+
+    // 저장 필요
+    [SerializeField] private int gold = 0;
 
     public bool HasGold(int amount) => gold >= amount;
 

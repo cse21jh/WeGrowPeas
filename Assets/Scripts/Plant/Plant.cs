@@ -1,12 +1,14 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using UnityEngine.UI;
-using Unity.VisualScripting;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
 
-public enum DeathCause { Generic, Bug, Flood, Cold, Other }
+public enum DeathCause { Generic, Bug, Flood, Cold, Other,Shovel }
 
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
@@ -42,7 +44,7 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] protected Canvas holdCanvas;
 
     [SerializeField] protected GameObject foamEffect;
-
+    [SerializeField] protected SpriteRenderer[] snowRenderers;
 
 
 
@@ -60,6 +62,8 @@ public abstract class Plant : MonoBehaviour
         {
             childMaterials[i] = childSpriteRenderers[i].material; 
         }
+
+        HideSnow(0f, Ease.Linear);
 
         StartCoroutine(Appear());
     }
@@ -88,7 +92,7 @@ public abstract class Plant : MonoBehaviour
     public bool CanResist(WaveType wave) // if can't resist, Call Die()
     {
         int randomNumber = UnityEngine.Random.Range(0, 100);
-        if (randomNumber <= (int)(GetResistanceValue(wave) * 100))
+        if (randomNumber <= (int)(GetResistanceValue((int)wave) * 100))
         {
             return true;
         }
@@ -98,47 +102,23 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    protected virtual float GetResistanceValue(WaveType wave)
-    {
-        CompleteTraitType traitType = CompleteTraitType.None;
-        float defaultResistance = 0.1f;
-        switch(wave)
-        {
-            case WaveType.Wind: traitType = CompleteTraitType.WindResistance; break;
-            case WaveType.Flood: traitType = CompleteTraitType.FloodResistance; break;
-            case WaveType.Pest: traitType = CompleteTraitType.PestResistance; break;
-            case WaveType.Cold: traitType = CompleteTraitType.ColdResistance; break;
-            case WaveType.HeavyRain: traitType = CompleteTraitType.HeavyRainResistance; break;
-            case WaveType.Aging: traitType = CompleteTraitType.NaturalDeath; break;
-                // 특성 추가되면 추가
-        }
-        bool checkChiliPepper = CheckChiliPepper();
-
-        foreach(GeneticTrait g in traits)
-        {
-            if (g.traitType == traitType)
-            {
-                if(checkChiliPepper) // 주변에 고추가 있으면 열성 저항력 반환
-                    return GetResistanceBasedOnGenetics(2) + g.additionalResistance;
-                return g.resistance + g.additionalResistance;
-            }
-        }
-        
-        return defaultResistance;
-    }
-
-    public virtual float GetResistanceValueByOrder(int order)
+    public virtual float GetResistanceValue(int order) // 아니면 (int)waveType 으로 넣기
     {
         if (order >= traits.Count)
-            return 0f;
+            return 0.1f;
+        float resistance = 0f;
+        if(grid.HasFertilizerAt(gridIndex))
+        {
+            if ((int)grid.GetFertilizerTiles()[gridIndex].wave == order)
+                resistance += 0.05f;
+        }
         bool checkChiliPepper = CheckChiliPepper();
         GeneticTrait g = traits[order];
         if(checkChiliPepper)
-        {
-            return GetResistanceBasedOnGenetics(2) + g.additionalResistance;
-        }
-        
-        return g.resistance + g.additionalResistance;
+            resistance += GetResistanceBasedOnGenetics(2) + g.additionalResistance;
+        else
+            resistance += g.resistance + g.additionalResistance;
+        return resistance;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
@@ -332,6 +312,39 @@ public abstract class Plant : MonoBehaviour
         if (foamEffect != null && foamEffect.activeSelf)
         {
             foamEffect.SetActive(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        DOTween.Kill(this);
+    }
+
+    public void ShowSnow(float duration, Ease ease)
+    {
+        float meltAmount = 1.2f;
+
+        foreach (var sr in snowRenderers)
+        {
+            DOTween.To(() => meltAmount,
+               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               -0.2f,
+               duration)
+           .SetEase(ease).SetLink(sr.gameObject);
+        }
+    }
+
+    public void HideSnow(float duration, Ease ease)
+    {
+        float meltAmount = -0.2f;
+
+        foreach (var sr in snowRenderers)
+        {
+            DOTween.To(() => meltAmount,
+               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               1.2f,
+               duration)
+           .SetEase(ease).SetLink(sr.gameObject);
         }
     }
 }

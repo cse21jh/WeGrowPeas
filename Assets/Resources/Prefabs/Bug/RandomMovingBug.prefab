@@ -156,8 +156,8 @@ GameObject:
   - component: {fileID: 7377728899889839665}
   - component: {fileID: 1538269843699928241}
   - component: {fileID: -5664339543015887516}
-  - component: {fileID: 6294642669481588143}
   - component: {fileID: -9198716577709644386}
+  - component: {fileID: 6139907617117035622}
   m_Layer: 0
   m_Name: RandomMovingBug
   m_TagString: Untagged
@@ -175,7 +175,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.9, y: -0.55, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5648401568309093844}
@@ -264,27 +264,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!135 &6294642669481588143
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3979688952226491961}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.654822
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-9198716577709644386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,6 +280,29 @@ MonoBehaviour:
   hitRange: 0.35
   dissolveDuration: 1
   vanishEffect: {fileID: 8428304175217021898, guid: b4990911297e3684783505cdcbced834, type: 3}
+--- !u!136 &6139907617117035622
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3979688952226491961}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 10
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: -4.5}
 --- !u!1 &4488028051467166846
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,7 +15,10 @@ public enum TutorialActions
     Breed,
     EnemyWave,
     Upgrade,
+    InitShop,
     ShowTutorialEndPopUp,
+    ClosePanel,
+    EnableBugCatch,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
@@ -31,9 +34,11 @@ public class DialogueStep : ScriptableObject
     // ObjectClick 일 때만 사용 (이 오브젝트를 클릭해야 진행)
     public GameObject targetObject;
 
-    public TutorialActions action = TutorialActions.None;
+    public TutorialActions[] actions;
 
     public Vector3 whiteCirclePos = Vector3.zero;
+
+    public Vector2 whiteCircleSize = Vector2.zero;
 
     public NextTutorialSequence chainTo = NextTutorialSequence.None;
 }

@@ -440,7 +440,7 @@ GameObject:
   - component: {fileID: 7377728899889839665}
   - component: {fileID: 1538269843699928241}
   - component: {fileID: -5664339543015887516}
-  - component: {fileID: 6294642669481588143}
+  - component: {fileID: -4842416948255025626}
   - component: {fileID: -945410629647455719}
   m_Layer: 0
   m_Name: BigFastBug
@@ -459,7 +459,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.9, y: -0.55, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4025159785933568910}
@@ -548,8 +548,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!135 &6294642669481588143
-SphereCollider:
+--- !u!136 &-4842416948255025626
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -566,9 +566,11 @@ SphereCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.652776
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 10
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: -4.5}
 --- !u!114 &-945410629647455719
 MonoBehaviour:
   m_ObjectHideFlags: 0

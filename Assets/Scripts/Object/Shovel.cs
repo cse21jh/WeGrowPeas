@@ -29,12 +29,20 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     }
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!grid.GetIsBreeding())
+            return;
+
         isDragging = true;
         UpdatePosition(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!grid.GetIsBreeding())
+        {
+            shovelRectTransform.localPosition = initialPos;
+            return;
+        }
         isDragging = false;
         UpdatePosition(eventData);
 
@@ -44,6 +52,11 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!grid.GetIsBreeding())
+        {
+            shovelRectTransform.localPosition = initialPos;
+            return;
+        }
         if (isDragging)
         {
             UpdatePosition(eventData);
@@ -77,7 +90,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
             economyManager.AddGold(plant.GetSellingPrice());
 
-            plant.Die();
+            plant.Die(DeathCause.Shovel);
 
             //Debug.Log("[Shovel] Raycast Hit: " + hit.collider.name);
         }

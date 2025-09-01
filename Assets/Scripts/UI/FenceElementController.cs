@@ -42,7 +42,7 @@ public class FenceElementController : MonoBehaviour
     public void SetElement(int plantIndex, GeneticTrait trait, bool isTaste, Plant plant, int order)
     {
         Debug.Log($"SetElement called with trait: {trait.traitType}, isTaste: {isTaste}");
-        float surviveProb = plant.GetResistanceValueByOrder(order);
+        float surviveProb = plant.GetResistanceValue(order);
         int dnaIndex = (int)trait.genetics;
 
         //√ ±‚»≠

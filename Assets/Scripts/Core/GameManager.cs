@@ -41,6 +41,11 @@ public class SaveData
     public float maxBreedTimer;
     public int maxBreedCount;
     public int breedCount;
+    public bool hasIceBlock;
+    public List<int> perBottleTiles = new();
+
+    public List<int> fertilizerTiles = new();
+    public List<WaveType> fertilizerType = new();
     //public float remainBreedTime;
 
 
@@ -54,9 +59,14 @@ public class SaveData
     public WaveType curWaveType;
     public WaveType nextWaveType;
     public int remainWaveSkipCount;
+    public int[] waveKillCount = new int[7];
 
     //economyManager
     public int gold;
+
+
+    //ModManager
+    public List<Mod> mods = new();
 
     //환경설정 내용
     //GameRecordHolder에 저장될 내용
@@ -83,6 +93,7 @@ public class GameManager : Singleton<GameManager>
     public UpgradeManager upgradeManager;
     public ShopManager shopManager;
     public EconomyManager economyManager;
+    public ModManager modManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -164,10 +175,10 @@ public class GameManager : Singleton<GameManager>
         else if (!enemyController.IsLastWaveNone())
         {
             yield return new WaitForSeconds(2.0f);
-            yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
-            yield return StartCoroutine(shopManager.ShopPhase());
         }
+        yield return StartCoroutine(BreedEndRoutine());
+        yield return StartCoroutine(shopManager.ShopPhase());
 
     }
 
@@ -199,6 +210,7 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitForSeconds(2.0f);
         GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount, enemyController.WaveKillCount);
         SceneLoader.Instance.LoadGameOverScene();
+        File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
@@ -216,6 +228,7 @@ public class GameManager : Singleton<GameManager>
         upgradeManager.LoadUpgradeManager(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
+        modManager.LoadModManager(saveData);
         Debug.Log("불러옴");
     }
 
@@ -264,6 +277,14 @@ public class GameManager : Singleton<GameManager>
         saveData.maxBreedTimer = grid.MaxBreedTimer;
         saveData.maxBreedCount = grid.MaxBreedCount;
 
+        saveData.hasIceBlock = grid.HasIceBlock;
+        saveData.perBottleTiles = grid.PetBottleTiles;
+        foreach(KeyValuePair<int,FertilizerSlot> fer in grid.GetFertilizerTiles())
+        {
+            saveData.fertilizerTiles.Add(fer.Key);
+            saveData.fertilizerType.Add(fer.Value.wave);
+        }
+
         //upgradeManager
         saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
         Dictionary<Type, int> remainUpgrade = upgradeManager.GetRemainUpgrade();
@@ -275,6 +296,7 @@ public class GameManager : Singleton<GameManager>
         }
         //enemyController
         saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
+        saveData.waveKillCount = enemyController.WaveKillCount;
         saveData.curWaveType = enemyController.CurrentWave.WaveType;
         saveData.nextWaveType = enemyController.NextWave.WaveType;
         saveData.lastWaveType = enemyController.LastWave.WaveType;
@@ -282,6 +304,8 @@ public class GameManager : Singleton<GameManager>
         //economyManager
         saveData.gold = economyManager.GetGold();
 
+        //modManager
+        saveData.mods = modManager.Mods;
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);

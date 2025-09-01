@@ -3,9 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
+
+public enum PlantType
+{
+    Pea,
+    Peanut
+}
+
+
 public class StemController : MonoBehaviour
 {
     [SerializeField] private PeaSpriteController[] peaSprites;
+    [SerializeField] private PeanutSpriteController[] peanutSprites;
     [SerializeField] private Animator[] peaAnimators;
     [SerializeField] private float maxStartDelay = 0.1f; // 애니메이션 시작 지연 시간
     [SerializeField] private GameObject electricEffectPrefab;
@@ -45,20 +54,46 @@ public class StemController : MonoBehaviour
     }
 
 
-    public void SetTraits(List<GeneticTrait> traits)
+    public void SetTraits(List<GeneticTrait> traits, PlantType type = PlantType.Pea)
     {
-        for (int i = 0; i < traits.Count; i += 1)
+        switch (type)
         {
-            peaSprites[i].SetPeaSprite((int)traits[i].traitType);
+            case PlantType.Pea:
+                for (int i = 0; i < traits.Count; i += 1)
+                {
+                    peaSprites[i].SetPeaSprite((int)traits[i].traitType);
 
-            if (traits[i].traitType == CompleteTraitType.PestResistance)
-            {
-                GameObject effect = Instantiate(electricEffectPrefab, peaSprites[i].transform.position, Quaternion.identity);
-                effect.transform.SetParent(peaSprites[i].transform);
-                effect.transform.localPosition = Vector3.zero;
-                SpriteRenderer sr = effect.GetComponent<SpriteRenderer>();
-                sr.sortingOrder = peaSprites[i].GetComponent<SpriteRenderer>().sortingOrder + 2;
-            }
+                    if (traits[i].traitType == CompleteTraitType.PestResistance)
+                    {
+                        GameObject effect = Instantiate(electricEffectPrefab, peaSprites[i].transform.position, Quaternion.identity);
+                        effect.transform.SetParent(peaSprites[i].transform);
+                        effect.transform.localPosition = Vector3.zero;
+                        SpriteRenderer sr = effect.GetComponent<SpriteRenderer>();
+                        sr.sortingOrder = peaSprites[i].GetComponent<SpriteRenderer>().sortingOrder + 2;
+                    }
+                }
+
+                break;
+            case PlantType.Peanut:
+                for (int i = 0; i < traits.Count; i += 1)
+                {
+                    peanutSprites[i].SetPeanutSprite((int)traits[i].traitType);
+
+                    if (traits[i].traitType == CompleteTraitType.PestResistance)
+                    {
+                        GameObject effect = Instantiate(electricEffectPrefab, peanutSprites[i].transform.position, Quaternion.identity);
+                        effect.transform.SetParent(peanutSprites[i].transform);
+                        effect.transform.localPosition = Vector3.zero;
+                        SpriteRenderer sr = effect.GetComponent<SpriteRenderer>();
+                        sr.sortingOrder = peanutSprites[i].GetComponent<SpriteRenderer>().sortingOrder + 2;
+                    }
+                }
+
+                break;
+            default:
+                Debug.LogError("Unknown PlantType");
+                break;
         }
+        
     }
 }

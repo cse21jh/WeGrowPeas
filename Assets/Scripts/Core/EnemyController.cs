@@ -14,17 +14,8 @@ public class EnemyController : MonoBehaviour
     public Grid grid;    
 
     
-    public Wave CurrentWave => currentWave;
-    public Wave NextWave => nextWave;
-    public Wave LastWave => lastWave;
 
     private Wave noneWave;
-
-    private int waveSkipCount = 0;
-    public int WaveSkipCount => waveSkipCount;
-
-    private int[] waveKillCount;
-    public int[] WaveKillCount => waveKillCount;
 
     [SerializeField] TextMeshProUGUI nextWaveText;
 
@@ -41,20 +32,32 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
-    int CurrentDay => GameManager.Instance.stage;
+    //int CurrentDay => GameManager.Instance.stage;
 
+
+    // 아래 저장 필요
+    
     private Wave lastWave;
     private Wave currentWave;
     private Wave nextWave;
+    private int waveSkipCount = 0;
+    private int[] waveKillCount;
+    
+
+    public Wave CurrentWave => currentWave;
+    public Wave NextWave => nextWave;
+    public Wave LastWave => lastWave;
+    public int WaveSkipCount => waveSkipCount;
+    public int[] WaveKillCount => waveKillCount;
 
     // Start is called before the first frame update
     void Start()
     {
-        waveKillCount = new int[6];
+        waveKillCount = new int[7];
         SetWaveSkipCountText();
         HideWaveSkipButton();
 
-        InitBaseWeightsByStage(CurrentDay);
+        InitBaseWeightsByStage(1);
 
         noneWave = new NoneWave();
 
@@ -86,7 +89,7 @@ public class EnemyController : MonoBehaviour
 
         yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
 
-        if (currentWave != noneWave)
+        if (currentWave != noneWave && !grid.IsIceBlockActivated())
         {
             for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
             {
@@ -108,8 +111,10 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
-        else
-            Debug.Log("오늘은 아무일도 일어나지 않았습니다");
+
+        if (grid.IsIceBlockActivated())
+            grid.DeactivateIceBlock();
+
         SetNextWave();
         FlushNextWaveText();
         yield return null;
@@ -242,6 +247,8 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
         waveSkipCount = saveData.remainWaveSkipCount;
+        for(int i =0;i<7;i++)
+            waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
     }
@@ -295,5 +302,46 @@ public class EnemyController : MonoBehaviour
             if (r <= acc) return kv.Key;
         }
         return WaveType.Aging; // 부동소수점 안전장치
+    }
+
+    public void TutorialWave()
+    {
+        StartCoroutine(TEnemyWaveCoroutine());
+    }
+
+    private IEnumerator TEnemyWaveCoroutine()
+    {
+        //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
+        Wave wave = currentWave;
+        Debug.Log("currentWave : " + currentWave);
+        SoundManager.Instance.PlayEffect(wave.WaveSoundString);
+
+        if (waveManager != null)
+        {
+            waveManager.StartWave(waveDuration, wave.WaveType);
+        }
+
+        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
+
+        if (currentWave != noneWave && !grid.IsIceBlockActivated())
+        {
+            for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+            {
+                if (grid.plantGrid.ContainsKey(idx))
+                {
+                    Plant plant = grid.plantGrid[idx];
+
+                    if (idx == 0 || idx == 2) plant.Die();
+                }
+            }
+        }
+
+        if (grid.IsIceBlockActivated())
+            grid.DeactivateIceBlock();
+
+        SetNextWave();
+        currentWave = GetWaveFromWaveType(WaveType.Aging);
+        //FlushNextWaveText();
+        yield return null;
     }
 }

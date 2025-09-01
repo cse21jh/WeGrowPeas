@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using TMPro;
-using UnityEditor.UIElements;
+//using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public struct FertilizerSlot
+{
+    public WaveType wave;
+    public GameObject marker;
+}
 
 public class Grid : MonoBehaviour
 {
@@ -14,7 +20,7 @@ public class Grid : MonoBehaviour
     [SerializeField] protected EconomyManager economyManager;
 
     List<Plant> plants = new List<Plant>();
-    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    
 
     protected bool isBreeding = false;
 
@@ -23,6 +29,8 @@ public class Grid : MonoBehaviour
     protected bool isBreedButtonPressed = false;
 
     protected bool isBreedSkipButtonPressed = false;
+
+    protected bool isIceBlockOn = false;
 
     protected float breedTimer;
 
@@ -43,21 +51,16 @@ public class Grid : MonoBehaviour
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
-    private HashSet<int> petBottleTiles = new HashSet<int>();
+    
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
 
     [SerializeField] private GameObject fertilizerMarkerPrefab;
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
-    [System.Serializable]
-    private struct FertilizerSlot
-    {
-        public WaveType wave;
-        public GameObject marker;
-    }
-    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
+
 
     //저장 필요
+    public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
     public int killBugCount = 0;
     public int totalBreedCount = 0;
@@ -82,7 +85,11 @@ public class Grid : MonoBehaviour
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
-    public int MaxCol => maxCol;
+    protected bool hasIceBlock = false;
+    protected List<int> petBottleTiles = new List<int>();
+
+    private readonly Dictionary<int, FertilizerSlot> fertilizerTiles = new();
+
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
     public float BugSpeedDecreasement => bugSpeedDecreasement;
@@ -96,6 +103,8 @@ public class Grid : MonoBehaviour
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
+    public bool HasIceBlock => hasIceBlock;
+    public List<int> PetBottleTiles => petBottleTiles;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -103,6 +112,7 @@ public class Grid : MonoBehaviour
         enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
         //InitGrid();
         InitSoils();
+        plantGrid.Clear();
         breedButton.SetActive(false);
     }
 
@@ -294,7 +304,7 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
-    private void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
+    protected void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
@@ -350,9 +360,9 @@ public class Grid : MonoBehaviour
             float resistance = child.GetResistanceBasedOnGenetics(childGenetic);
 
             if (trait == CompleteTraitType.PestResistance)
-                resistance += additionalPestResistance;
-
-            childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
+                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
+            else
+                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
         child.SetTrait(childTrait);
     }
@@ -381,9 +391,6 @@ public class Grid : MonoBehaviour
                 return;
             }
         }
-
-        ApplyFertilizerIfAny(plant.gridIndex, plant);
-
         Destroy(plant.gameObject);
         return;
     }
@@ -447,7 +454,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public bool CheckGameOver()
+    public virtual bool CheckGameOver()
     {
         Plant plant;
         for (int idx = 0; idx < maxCol * 4; idx++)
@@ -572,9 +579,9 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public void RequestBreedSelect(GameObject clickedObject)
+    public virtual void RequestBreedSelect(GameObject clickedObject)
     {
-        if (!isBreeding)        
+        if (!isBreeding)
             return;
 
         Plant clickedPea = clickedObject.GetComponent<Plant>();
@@ -624,7 +631,7 @@ public class Grid : MonoBehaviour
         isBreedButtonPressed = true;
     }
 
-    private void DeactivateBreed()
+    protected void DeactivateBreed()
     {
         breedButton.SetActive(false);
         isBreedButtonPressed = false;
@@ -635,7 +642,7 @@ public class Grid : MonoBehaviour
         isBreedSkipButtonPressed = true;
     }
 
-    private void UpdateBreedCountUI(int count)
+    protected void UpdateBreedCountUI(int count)
     {
         breedCountUI.text = $"{count}개";
     }
@@ -672,11 +679,15 @@ public class Grid : MonoBehaviour
 
         if (plantGrid.ContainsKey(toIndex))
         {
+            if (!HasBreedablePlantAt(toIndex)) // 옮기기 불가능한 식물의 경우
+            {
+                Transform originalSoil = GetSoilTransform(plant.gridIndex);
+                plant.transform.position = originalSoil.position;
+                return false;
+            }
             // 대상 칸에 식물이 있는 경우: 서로 위치 교환
             Plant targetPlant = plantGrid[toIndex];
 
-            RemoveFertilizerIfAny(fromIndex, plant);
-            RemoveFertilizerIfAny(toIndex, targetPlant);
 
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
@@ -692,14 +703,11 @@ public class Grid : MonoBehaviour
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
-            ApplyFertilizerIfAny(toIndex, plant);
-            ApplyFertilizerIfAny(fromIndex, targetPlant);
 
             return true;
         }
         else
         {
-            RemoveFertilizerIfAny(fromIndex, plant);
 
             // 빈 칸이면 원래대로 심기
             plantGrid.Remove(fromIndex); // 원래 위치에서 제거
@@ -707,7 +715,6 @@ public class Grid : MonoBehaviour
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
 
-            ApplyFertilizerIfAny(toIndex, plant);
             return true;
         }
     }
@@ -753,7 +760,7 @@ public class Grid : MonoBehaviour
                 case "고추": obj = Instantiate(chiliPepperPrefab); break;
                 default: obj = Instantiate(peaPrefab); break;
             }
-            
+
             Plant plant = obj.GetComponent<Plant>();
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
@@ -784,6 +791,11 @@ public class Grid : MonoBehaviour
         additionalInheritance = saveData.additionalInheritance;
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
+        if (saveData.hasIceBlock) SetIceBlock();
+        foreach(var i in saveData.perBottleTiles)
+            PlacePetBottle(i);
+        for(int i = 0;i<saveData.fertilizerTiles.Count; i++)
+            TryPlaceFertilizer(saveData.fertilizerTiles[i], saveData.fertilizerType[i]);
         UpdateSoil();
     }
 
@@ -857,6 +869,8 @@ public class Grid : MonoBehaviour
     {
         if (!petBottleTiles.Contains(idx)) return false;
 
+        if(cause == DeathCause.Shovel) return false;
+
         // 1회성 보호 → 소모
         petBottleTiles.Remove(idx);
 
@@ -883,6 +897,20 @@ public class Grid : MonoBehaviour
     //-----전용 비료------
     public bool HasFertilizerAt(int idx) => fertilizerTiles.ContainsKey(idx);
 
+    public bool HasBreedablePlantAt(int idx)
+    {
+        if (!plantGrid.ContainsKey(idx)) return false;
+
+        if (plantGrid[idx].GetType() == typeof(Pea) || plantGrid[idx].GetType() == typeof(Peanut))
+            return true;
+        return false;
+    }
+    
+    public Dictionary<int, FertilizerSlot> GetFertilizerTiles()
+    {
+        return fertilizerTiles;
+    }
+
     public bool TryPlaceFertilizer(int idx, WaveType wave)
     {
         if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있으면 불가
@@ -895,31 +923,15 @@ public class Grid : MonoBehaviour
             slot.marker = Instantiate(fertilizerMarkerPrefab, soilT.position, Quaternion.identity, soilT);
             // (선택) wave별 색/아이콘 바꾸고 싶으면 여기서 처리
         }
-        fertilizerTiles[idx] = slot;
-
-        // 현재 식물이 있으면 즉시 +5%p 적용
-        if (plantGrid.TryGetValue(idx, out var plant) && plant != null)
-            plant.AddAdditionalResistance(MapWaveToTrait(wave), +FertilizerResistBonus);
+        fertilizerTiles.Add(idx, slot);
+        if (plantGrid.TryGetValue(idx, out var plant) && plant != null && HasBreedablePlantAt(idx))
+            FenceUIManager.Instance.SetFenceElements(0, plant);
 
         Debug.Log($"[Grid] Fertilizer placed: idx={idx}, wave={wave}");
         return true;
     }
 
-    // 새 식물이 타일에 들어왔을 때 호출(해당 타일에 비료가 있으면 +5%p)
-    private void ApplyFertilizerIfAny(int idx, Plant plant)
-    {
-        if (plant == null) return;
-        if (fertilizerTiles.TryGetValue(idx, out var slot))
-            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), +FertilizerResistBonus);
-    }
 
-    // 식물이 타일에서 나갈 때 호출(해당 타일에 비료가 있으면 -5%p)
-    private void RemoveFertilizerIfAny(int idx, Plant plant)
-    {
-        if (plant == null) return;
-        if (fertilizerTiles.TryGetValue(idx, out var slot))
-            plant.AddAdditionalResistance(MapWaveToTrait(slot.wave), -FertilizerResistBonus);
-    }
 
     private CompleteTraitType MapWaveToTrait(WaveType w)
     {
@@ -933,6 +945,54 @@ public class Grid : MonoBehaviour
             WaveType.HeavyRain => CompleteTraitType.HeavyRainResistance,
             _ => CompleteTraitType.NaturalDeath
         };
+    }
+
+    public void SetIceBlock()
+    {
+        hasIceBlock = true;
+        // 얼방 가지고 있다는 UI
+    }
+
+    public void ActivateIceBlock()
+    {
+        hasIceBlock = false;
+        isIceBlockOn = true;
+        // 얼방 작동한다는 UI
+    }
+
+    public bool IsIceBlockActivated()
+    {
+        return isIceBlockOn;
+    }
+
+    public void DeactivateIceBlock()
+    {
+        isIceBlockOn = false;
+        // 얼방 UI 삭제
+    }
+
+    public bool HasEmptyGrid()
+    {
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            if (!plantGrid.ContainsKey(idx))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool HasEmptyFetrilizerGrid()
+    {
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            if (!fertilizerTiles.ContainsKey(idx))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
