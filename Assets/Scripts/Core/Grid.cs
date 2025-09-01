@@ -674,7 +674,7 @@ public class Grid : MonoBehaviour
 
         if (plantGrid.ContainsKey(toIndex))
         {
-            if (!HasBreedablePlantAt(toIndex)) // 옮기기 불가능한 식물의 경우
+            if (!plantGrid[toIndex].CanMove()) // 옮기기 불가능한 식물의 경우
             {
                 Transform originalSoil = GetSoilTransform(plant.gridIndex);
                 plant.transform.position = originalSoil.position;
@@ -864,7 +864,7 @@ public class Grid : MonoBehaviour
     {
         if (!petBottleTiles.Contains(idx)) return false;
 
-        if(cause == DeathCause.Shovel) return false;
+        //if(cause == DeathCause.Shovel) return false;
 
         // 1회성 보호 → 소모
         petBottleTiles.Remove(idx);

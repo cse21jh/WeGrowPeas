@@ -4,20 +4,10 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 
-public class Pea : Plant
+public class Pea : MovablePlant
 {
     [SerializeField] private Sprite[] deathFrames;
     [SerializeField] private Sprite[] selectedSprite;
-
-    //이동을 위한 변수
-    private float holdTime = 0f;
-    private bool isHolding = false;
-    private bool isDragging = false;
-    private const float HoldDuration = 0.7f;
-
-    //옮기기 게이지
-    [SerializeField] private Image holdGaugeImage;
-    [SerializeField] private GameObject holdGaugeCanvasObj;
 
     public override void Init(int gridIndex, Grid grid)
     {
@@ -42,47 +32,6 @@ public class Pea : Plant
         else
         {
             Debug.LogWarning("StemController not found in Plant");
-        }
-    }
-
-    protected void Update()
-    {
-        if (isHolding)
-        {
-            if (ClickRouter.Instance.IsBlockedByUI)
-            {
-                isDragging = false;
-                isHolding = false;
-                holdTime = 0f;
-                holdGaugeImage.fillAmount = 0f;
-                holdGaugeCanvasObj.SetActive(false);
-                grid.TryPlacePlant(this, Input.mousePosition);
-            }
-            holdTime += Time.deltaTime;
-            holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
-
-            if (holdTime >= HoldDuration && !isDragging)
-            {
-                StartDragging();
-                holdGaugeCanvasObj.SetActive(false);
-            }
-        }
-
-        if (isDragging)
-        {            
-            if (!grid.GetIsBreeding())
-                grid.TryPlacePlant(this, Input.mousePosition);
-            else
-                FollowMouse();
-        }
-
-        if (!grid.GetIsBreeding())
-        {
-            isDragging = false;
-            isHolding = false;
-            holdTime = 0f;
-            holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvasObj.SetActive(false);
         }
     }
 
@@ -155,53 +104,6 @@ public class Pea : Plant
         //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
         priceSign.gameObject.SetActive(false);
-    }
-    private void OnMouseDown()
-    {
-        if (!grid.GetIsBreeding() || ClickRouter.Instance.IsBlockedByUI)
-            return;
-        holdTime = 0f;
-        isHolding = true;
-        holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvasObj.SetActive(true);
-    }
-
-    private void OnMouseUp()
-    {
-        if (isDragging)
-        {
-            grid.TryPlacePlant(this, Input.mousePosition);
-            FenceUIManager.Instance.SetFenceElements(0, this);
-        }
-        else
-        {
-            if (ClickRouter.Instance.IsBlockedByUI) return;
-            grid.RequestBreedSelect(this.gameObject);
-        }
-
-        isDragging = false;
-        isHolding = false;
-        holdTime = 0f;
-        holdGaugeImage.fillAmount = 0f;
-        holdGaugeCanvasObj.SetActive(false);
-    }
-
-    private void StartDragging()
-    {
-        Debug.Log("식물 들기 성공");
-        isDragging = true;
-
-        Vector3 pos = transform.position;
-        transform.position = new Vector3(pos.x, pos.y, pos.z - 0.1f);
-    }
-
-    private void FollowMouse()
-    {
-        Vector3 screenPos = Input.mousePosition;
-        screenPos.z = Camera.main.WorldToScreenPoint(transform.position).z;
-
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
-        transform.position = worldPos;
     }
 
     public override float GetResistanceBasedOnGenetics(int genetics)

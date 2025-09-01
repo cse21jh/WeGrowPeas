@@ -21,8 +21,6 @@ public abstract class Plant : MonoBehaviour
     public int gridIndex { get; private set; }
     protected int taste;
     
-    
-
     protected Grid grid;
 
 
@@ -46,6 +44,7 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] protected GameObject foamEffect;
     [SerializeField] protected SpriteRenderer[] snowRenderers;
 
+    public virtual bool IsMovable => false;
 
 
     public virtual void Init(int gridIndex, Grid grid)
@@ -346,5 +345,13 @@ public abstract class Plant : MonoBehaviour
                duration)
            .SetEase(ease).SetLink(sr.gameObject);
         }
+    }
+
+    public bool CanMove()
+    {
+        if (!IsMovable) return false;
+        // 칸에 페트병이 놓여있으면 이동 금지
+        if (grid != null && grid.HasPetBottle(gridIndex)) return false;
+        return true;
     }
 }
