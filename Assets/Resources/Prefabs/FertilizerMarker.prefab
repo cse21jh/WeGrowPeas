@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1779397656430517920}
   - component: {fileID: 4690890141264650891}
-  - component: {fileID: 1843227552164235388}
   m_Layer: 0
   m_Name: Icon
   m_TagString: Untagged
@@ -92,27 +91,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!65 &1843227552164235388
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2731896623100594435}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.5, y: 1.5000002, z: 0.2}
-  m_Center: {x: -0.0000009536743, y: -0.00000047683716, z: 0}
 --- !u!1 &6601208392194057071
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,6 +102,7 @@ GameObject:
   - component: {fileID: 3060880760572860262}
   - component: {fileID: 1964619559954757000}
   - component: {fileID: 6735945057746141957}
+  - component: {fileID: 5795158174346806622}
   m_Layer: 0
   m_Name: FertilizerMarker
   m_TagString: Untagged
@@ -185,3 +164,24 @@ MonoBehaviour:
     icon: {fileID: -1692220938, guid: 95cb65fb0b796c149bba8a883be0a000, type: 3}
   - waveType: 5
     icon: {fileID: 454211260, guid: 95cb65fb0b796c149bba8a883be0a000, type: 3}
+--- !u!65 &5795158174346806622
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6601208392194057071}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

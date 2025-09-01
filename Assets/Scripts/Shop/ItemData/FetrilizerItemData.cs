@@ -16,9 +16,8 @@ public class ItemData_Fertilizer : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.PlaceOnTile;
-        IsStackable = true;         // 상점 당 3회
-        InitialStock = 3;
-        OnePerShopIfNotStackable = false;
+        IsStackable = false;
+        OnePerShopIfNotStackable = true;
 
         if (string.IsNullOrEmpty(DisplayName))
             DisplayName = $"전용 비료: {targetWave}";

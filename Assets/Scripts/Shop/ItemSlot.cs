@@ -16,6 +16,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private ItemData effect;
     private ShopUI shop;            // 콜백용
     private int stock; // IsStackable이면 초기 n, 아니면 1
+    private int maxStock;
 
     public void Bind(ShopUI shopUI, ItemData eff)
     {
@@ -27,6 +28,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         priceText.text = $"{eff.Price} G";
 
         stock = eff.IsStackable ? Mathf.Max(1, eff.InitialStock) : 1;
+        maxStock = stock;
         Refresh();
 
         buyButton.onClick.RemoveAllListeners();
@@ -44,7 +46,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         if (countText != null)
         {
-            if (effect.IsStackable) { countText.gameObject.SetActive(true); countText.text = $"x{stock}"; }
+            if (effect.IsStackable) { countText.gameObject.SetActive(true); countText.text = $"{stock}/{maxStock}"; }
             else { countText.gameObject.SetActive(false); }
         }
         buyButton.interactable = stock > 0;
