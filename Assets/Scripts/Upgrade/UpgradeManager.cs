@@ -91,15 +91,15 @@ public class UpgradeManager : MonoBehaviour
         // stage 끝나고 나와야 하는 필수 업그레이드
         switch(stage)
         {
-            case 5:
+            case 3:
                 randomUpgrade[0] = typeof(AddWindPlantUpgrade);  break;
-            case 10:
+            case 8:
                 randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
-            case 15:
+            case 13:
                 randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
-            case 20:
+            case 18:
                 randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
-            case 25:
+            case 23:
                 randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
         }
         return;
@@ -296,15 +296,15 @@ public class UpgradeManager : MonoBehaviour
         // 필수 업그레이드가 있는 경우
         switch (saveData.stage)
         {
-            case 5:
+            case 3:
                 randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
-            case 10:
+            case 8:
                 randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
-            case 15:
+            case 13:
                 randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
-            case 20:
+            case 18:
                 randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
-            case 25:
+            case 23:
                 randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
         }
         return;

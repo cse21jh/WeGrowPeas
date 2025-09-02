@@ -29,20 +29,12 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!grid.GetIsBreeding())
-            return;
-
         isDragging = true;
         UpdatePosition(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (!grid.GetIsBreeding())
-        {
-            shovelRectTransform.localPosition = initialPos;
-            return;
-        }
         isDragging = false;
         UpdatePosition(eventData);
 
@@ -52,11 +44,6 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!grid.GetIsBreeding())
-        {
-            shovelRectTransform.localPosition = initialPos;
-            return;
-        }
         if (isDragging)
         {
             UpdatePosition(eventData);
@@ -88,10 +75,13 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
             Plant plant = hit.collider.GetComponent<Plant>();
             if (plant != null)
             {
-                SoundManager.Instance.PlayEffect("Shovel");
-                economyManager.AddGold(plant.GetSellingPrice());
-                plant.Die(DeathCause.Shovel);
-                return;
+                if (!plant.isDying)
+                {
+                    SoundManager.Instance.PlayEffect("Shovel");
+                    economyManager.AddGold(plant.GetSellingPrice());
+                    plant.Die(DeathCause.Shovel);
+                    return;
+                }
             }
 
             // 2) 비료 마커 제거

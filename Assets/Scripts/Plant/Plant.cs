@@ -23,6 +23,7 @@ public abstract class Plant : MonoBehaviour
     
     protected Grid grid;
 
+    public bool isDying = false;
 
     //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
@@ -128,7 +129,7 @@ public abstract class Plant : MonoBehaviour
         // 페트병이 막으면 true 리턴 → 사망 취소
         if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
             return;
-
+        isDying = true;
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
