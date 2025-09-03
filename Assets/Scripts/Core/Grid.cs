@@ -36,6 +36,7 @@ public class Grid : MonoBehaviour
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] protected GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] protected List<GameObject> bugPrefabs;
+    [SerializeField] protected GameObject ladybugPrefabs;
 
     [SerializeField] protected TimerUI breedTimerUI;
     [SerializeField] protected GameObject breedButton;
@@ -159,6 +160,8 @@ public class Grid : MonoBehaviour
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
+        if (GameManager.Instance.stage == 6)
+            lastBugSpawnTimeInterval = 0f;
 
         while (breedTimer > 0 && !isBreedSkipButtonPressed)
         {
@@ -643,9 +646,14 @@ public class Grid : MonoBehaviour
 
     private void SpawnRandomBug()
     {
-        int i = Random.Range(0, bugPrefabs.Count - 1);
+        int stage = GameManager.Instance.stage;
+        if (stage < 6) // 해충 웨이브 해금 전엔 등장 X
+            return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
-            i = bugPrefabs.Count - 1;
+        {
+            Instantiate(ladybugPrefabs);
+        }
+        int i = Random.Range(0, (((stage - 1) / 5) * 2) - 1); //벌레 해금 시기와 일치하도록 설정
         Instantiate(bugPrefabs[i]);
         return;
     }
