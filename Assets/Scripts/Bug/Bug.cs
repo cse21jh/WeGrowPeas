@@ -53,7 +53,7 @@ public class Bug : MonoBehaviour
         {
             childMaterials[i] = childSpriteRenderers[i].material;
         }
-        Debug.Log(childMaterials.Length);
+        //Debug.Log(childMaterials.Length);
 
         speed = speed * (1f - grid.GetBugSpeedDecreasement());
         float mul = ModManager.Instance
@@ -75,7 +75,7 @@ public class Bug : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));
-            Debug.Log(mousePos);
+            //Debug.Log(mousePos);
             if (Mathf.Abs(transform.position.x - mousePos.x) < hitRange && Mathf.Abs(transform.position.y - mousePos.y) < hitRange)
             { 
                 StartCoroutine(HitBug());

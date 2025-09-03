@@ -19,7 +19,7 @@ public class AnimDelayController : MonoBehaviour
     private IEnumerator AnimStart()
     {
         float delay = Random.Range(0f, maxDelay);
-        Debug.Log($"Animation will start after a delay of {delay} seconds.");
+        //Debug.Log($"Animation will start after a delay of {delay} seconds.");
         yield return new WaitForSeconds(delay);
         anim.SetTrigger("Start");
     }

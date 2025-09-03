@@ -8,7 +8,7 @@ public class PriceTagController : MonoBehaviour
 
     public void SetPrice(int price)
     {
-        Debug.Log(price);
+        //Debug.Log(price);
 
         if (priceText != null)
         {

@@ -128,7 +128,6 @@ public class Grid : MonoBehaviour
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
         };
-            Debug.Log(basicTrait);
             FenceUIManager.Instance.SetFenceElements(0, pea);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
@@ -380,7 +379,7 @@ public class Grid : MonoBehaviour
             if (!plantGrid.ContainsKey(idx))
             {
                 plant.Init(idx, this);
-                Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
+                //Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
                 Plantplant(plant);
 
                 return;

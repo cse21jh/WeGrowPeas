@@ -18,7 +18,7 @@ public class PriceSignController : MonoBehaviour
     public void SetPrice(int price)
     {
         anim.SetBool("isShow", true);
-        Debug.Log(price);
+        //Debug.Log(price);
 
         if (priceText != null)
         {
