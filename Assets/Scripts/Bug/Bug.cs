@@ -28,7 +28,8 @@ public class Bug : MonoBehaviour
     private GameObject WarningPrefab;
     private GameObject Warning;
 
-
+    protected bool eatingPlant = false;
+    protected float eatingTime = 1.0f;
 
     //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
@@ -191,6 +192,7 @@ public class Bug : MonoBehaviour
             }
             
             plant.Die(DeathCause.Bug, this);
+            eatingPlant = true;
         }
     }
 

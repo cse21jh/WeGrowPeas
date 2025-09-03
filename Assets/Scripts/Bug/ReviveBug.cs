@@ -24,6 +24,12 @@ public class ReviveBug : Bug
 
         while (true)
         {
+            if (eatingPlant)
+            {
+                yield return new WaitForSeconds(eatingTime);
+                eatingPlant = false;
+            }
+
             if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
                 FindNewTargetObj();
             else if (grid.GetIsBreeding() && !isDie && !isHit)

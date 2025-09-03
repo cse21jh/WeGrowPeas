@@ -24,6 +24,12 @@ public class RandomMovingBug : Bug
 
         while (true)
         {
+            if (eatingPlant)
+            {
+                yield return new WaitForSeconds(eatingTime);
+                eatingPlant = false;
+            }
+
             if (!grid.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;

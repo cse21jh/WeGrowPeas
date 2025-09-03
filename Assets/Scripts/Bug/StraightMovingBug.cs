@@ -18,6 +18,12 @@ public class StraightMovingBug : Bug
 
         while (distSelfToTarget > 0.5f)
         {
+            if (eatingPlant)
+            {
+                yield return new WaitForSeconds(eatingTime);
+                eatingPlant = false;
+            }
+
             if (!grid.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;
