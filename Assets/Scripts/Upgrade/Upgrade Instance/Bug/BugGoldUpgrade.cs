@@ -6,7 +6,7 @@ public class BugGoldUpgrade : Upgrade
     public override string Explanation => "벌레가 주는 골드가 10 증가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
     public override int MaxAmount => 5;
-    public override int UnlockStage => 10;
+    public override int UnlockStage => 11;
     public override int UpgradeId => 22;
     public override void OnSelectAction()
     {

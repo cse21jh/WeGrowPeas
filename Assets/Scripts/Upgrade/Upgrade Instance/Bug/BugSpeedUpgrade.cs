@@ -6,7 +6,7 @@ public class BugSpeedUpgrade : Upgrade
     public override string Explanation => "벌레의 속도가 10% 감소합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
     public override int MaxAmount => 3;
-    public override int UnlockStage => 10;
+    public override int UnlockStage => 11;
     public override int UpgradeId => 19;
     public override void OnSelectAction()
     {

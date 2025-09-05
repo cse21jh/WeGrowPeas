@@ -6,7 +6,7 @@ public class PeanutCopyUpgrade : Upgrade
     public override string Explanation => "¶¥ÄáÀÌ ÀÚ°¡¹ø½Ä ÇÒ È®·üÀÌ 2% Áõ°¡ÇÕ´Ï´Ù";
     public override Sprite Icon => Resources.Load<Sprite>("Sprites/Plant/Peanut/Peanut");
     public override int MaxAmount => 5;
-    public override int UnlockStage => 10;
+    public override int UnlockStage => 11;
     public override int UpgradeId => 29;
     public override void OnSelectAction()
     {

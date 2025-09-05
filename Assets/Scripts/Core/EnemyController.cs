@@ -11,9 +11,8 @@ using UnityEngine.UIElements;
 public class EnemyController : MonoBehaviour
 {
 
-    public Grid grid;    
+    public Grid grid;
 
-    
 
     private Wave noneWave;
 
@@ -124,23 +123,23 @@ public class EnemyController : MonoBehaviour
     {
         // 초기화
         baseWeights[WaveType.Aging] = 1f; // 항상 가능
-        baseWeights[WaveType.Wind] = (stage + 1 >= 5) ? 1f : 0f;
-        baseWeights[WaveType.Flood] = (stage + 1 >= 10) ? 1f : 0f;
-        baseWeights[WaveType.Pest] = (stage + 1 >= 15) ? 1f : 0f;
-        baseWeights[WaveType.Cold] = (stage + 1 >= 20) ? 1f : 0f;
-        baseWeights[WaveType.HeavyRain] = (stage + 1 >= 25) ? 1f : 0f;
+        baseWeights[WaveType.Pest] = (stage + 2 >= PestWave.UnlockStage) ? 1f : 0f;
+        baseWeights[WaveType.Wind] = (stage + 2 >= WindWave.UnlockStage) ? 1f : 0f;
+        baseWeights[WaveType.Flood] = (stage + 2 >= FloodWave.UnlockStage) ? 1f : 0f;
+        baseWeights[WaveType.HeavyRain] = (stage + 2 >= HeavyRainWave.UnlockStage) ? 1f : 0f;
+        baseWeights[WaveType.Cold] = (stage + 2 >= ColdWave.UnlockStage ) ? 1f : 0f;
         baseWeights[WaveType.None] = 0f; // 추첨 대상에서 제외
     }
 
     public void UnlockWave(int stage)
     {
-        switch (stage + 1)
+        switch (stage + 2)
         {
-            case 5: baseWeights[WaveType.Wind] = 1f; break;
-            case 10: baseWeights[WaveType.Flood] = 1f; break;
-            case 15: baseWeights[WaveType.Pest] = 1f; break;
-            case 20: baseWeights[WaveType.Cold] = 1f; break;
-            case 25: baseWeights[WaveType.HeavyRain] = 1f; break;
+            case PestWave.UnlockStage: baseWeights[WaveType.Pest] = 1f; break;
+            case WindWave.UnlockStage: baseWeights[WaveType.Wind] = 1f; break;
+            case FloodWave.UnlockStage: baseWeights[WaveType.Flood] = 1f; break;
+            case HeavyRainWave.UnlockStage: baseWeights[WaveType.HeavyRain] = 1f; break;
+            case ColdWave.UnlockStage: baseWeights[WaveType.Cold] = 1f; break;
         }
     }
 

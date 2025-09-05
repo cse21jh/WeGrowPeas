@@ -7,5 +7,5 @@ public class AgingWave : Wave
     public override WaveType WaveType => WaveType.Aging;
     public override string WaveDescription => "°ð ÇÏ·ç°¡ Áö³ª°©´Ï´Ù......";
     public override string WaveSoundString => "Aging";
-    public override int UnlockStage => 0;
+    public const int UnlockStage = 1;
 }

@@ -8,7 +8,7 @@ public class InheritanceUpgrade : Upgrade
     public override string Explanation => "형질이 1인 개체 교배 시, 우수한 형질이 나올 확률이 10% 증가합니다.";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_15");
     public override int MaxAmount => 2;
-    public override int UnlockStage => 10;
+    public override int UnlockStage => 11;
     public override int UpgradeId => 16;
     public override void OnSelectAction()
     {

@@ -8,7 +8,7 @@ public class ColdResistenceUpgrade : Upgrade
     public override string Explanation => "농장의 식물이 추위에 저항할 확률이 5% 증가합니다 (최대 15%)";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_10");
     public override int MaxAmount => -1;
-    public override int UnlockStage => 20;
+    public override int UnlockStage => ColdWave.UnlockStage;
     public override int UpgradeId => 11;
     public override void OnSelectAction()
     {

@@ -52,31 +52,31 @@ public class PeaSpriteController : MonoBehaviour
 
         switch (index)
         {
-            case 0:
+            case (int)CompleteTraitType.NaturalDeath:
                 spriteRenderer.sprite = peaSprites[1]; // 자연사 저항
                 accessoryRenderer.sprite = null;
                 break;
-            case 1:
+            case (int)CompleteTraitType.WindResistance:
                 spriteRenderer.sprite = peaSprites[7]; // 바람 저항
                 accessoryRenderer.sprite = null;
                 break;
-            case 2:
+            case (int)CompleteTraitType.FloodResistance:
                 spriteRenderer.sprite = peaSprites[0]; // 홍수 저항
                 accessoryRenderer.sprite = peaSprites[9];
                 break;
-            case 3:
+            case (int)CompleteTraitType.PestResistance:
                 spriteRenderer.sprite = peaSprites[0]; // 해충 저항
                 accessoryRenderer.sprite = peaSprites[4];
                 break;
-            case 4:
+            case (int)CompleteTraitType.ColdResistance:
                 spriteRenderer.sprite = peaSprites[0]; // 추위 저항
                 accessoryRenderer.sprite = peaSprites[5];
                 break;
-            case 5:
+            case (int)CompleteTraitType.HeavyRainResistance:
                 spriteRenderer.sprite = peaSprites[0]; // 폭우 저항
                 accessoryRenderer.sprite = peaSprites[6];
                 break;
-            case 6:
+            case (int)CompleteTraitType.None:
                 spriteRenderer.sprite = peaSprites[0]; // 기본
                 accessoryRenderer.sprite = null;
                 break;

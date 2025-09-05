@@ -5,11 +5,11 @@ using UnityEngine;
 public enum CompleteTraitType // 기존 형질
 {
     NaturalDeath,
+    PestResistance,
     WindResistance,
     FloodResistance,
-    PestResistance,
-    ColdResistance,
     HeavyRainResistance,
+    ColdResistance,
     None
 }
 
