@@ -23,6 +23,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private float waveDuration = 1f;
     [SerializeField] private WaveManager waveManager;
+    [SerializeField] private BreedTimerManager breedTimerManager;
 
     [SerializeField] public WaveType setWave;
 
@@ -80,8 +81,9 @@ public class EnemyController : MonoBehaviour
         Wave wave = currentWave;
         Debug.Log("현재 웨이브 종류 : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
+        breedTimerManager.SetTimer(wave.WaveType);
 
-        if(waveManager != null)
+        if (waveManager != null)
         {
             waveManager.StartWave(waveDuration, wave.WaveType);
         }

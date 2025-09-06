@@ -744,6 +744,10 @@ public class Grid : MonoBehaviour
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
     }
+    public void SetBreedTimerUI(TimerUI timerUI)
+    {
+        breedTimerUI = timerUI;
+    }
 
     public void LoadGrid(SaveData saveData)
     {
