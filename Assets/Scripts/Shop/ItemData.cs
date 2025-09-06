@@ -58,4 +58,5 @@ public class ShopContext
 
     public System.Action<string> ShowInfo;
     public System.Action<string> ShowError;
+    public System.Action<string> ShowGuide;
 }

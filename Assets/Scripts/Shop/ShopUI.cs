@@ -12,6 +12,7 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private Transform rotationParent;  // 트럭 하단 3개
     [SerializeField] private ItemSlot itemSlotPrefab;
     [SerializeField] private TMP_Text footerText;       // 화면 하단 정보/에러 표기 텍스트
+    [SerializeField] private TMP_Text guideText;
 
     [Header("Switch")]
     [SerializeField] private GameObject panel;
@@ -39,17 +40,13 @@ public class ShopUI : MonoBehaviour
             Economy = services.Economy,
             Session = session,
             ShowInfo = ShowInfo,
-            ShowError = ShowError
+            ShowError = ShowError,
+            ShowGuide = ShowGuide
         };
 
         if (closeButton != null)
             closeButton.onClick.AddListener(Close);
         panel.SetActive(false);
-    }
-
-    private void OnEnable()
-    {
-
     }
 
     public void BuildShop()
@@ -114,6 +111,7 @@ public class ShopUI : MonoBehaviour
 
                 case ShopFlowType.PlaceOnTile:
                     services.Placement.BeginTilePlacement(
+                        ctx,
                         validate: (pos) => data.ValidatePosition(ctx, pos, out _),
                         onConfirm: (pos) =>
                         {
@@ -126,6 +124,7 @@ public class ShopUI : MonoBehaviour
 
                 case ShopFlowType.SelectExistingPlant:
                     services.Placement.BeginPlantSelection(
+                        ctx,
                         validate: (plant) => data.ValidateTarget(ctx, plant, out _),
                         onConfirm: (plant) =>
                         {
@@ -172,6 +171,9 @@ public class ShopUI : MonoBehaviour
     private void ShowInfo(string msg) { if (footerText) { footerText.color = Color.white; footerText.text = msg; } }
     private void ShowError(string msg) { if (footerText) { footerText.color = Color.red; footerText.text = msg; } }
 
+    public void ShowGuide(string msg) { if (guideText) guideText.text = msg; }
+    public void ClearGuide() { if (guideText) guideText.text = ""; }
+
     private class ShopSession
     {
         private HashSet<ItemData> once = new();
@@ -186,6 +188,7 @@ public class ShopUI : MonoBehaviour
         panel.SetActive(true);
         BuildShop();
         ClearInfo();
+        ClearGuide();
         animationManager.SwitchCameras(CameraManager.CameraType.Shop);
         Debug.Log("상점 오픈!");
     }

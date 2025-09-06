@@ -25,13 +25,17 @@ public class PlacementController : MonoBehaviour
     private GameObject ghost;
     private bool isPlacing;
 
+    private ShopContext ctx;
+
     public void BeginTilePlacement(
+        ShopContext ctx,
         System.Func<Vector3, bool> validate,          // 인자: screenPos
         System.Action<Vector3> onConfirm,             // 인자: screenPos
         System.Action onCancel)
     {
         if (isPlacing) StopPlacementInternal();
 
+        this.ctx = ctx;
         placingCo = StartCoroutine(TilePlacementRoutine(validate, onConfirm, onCancel));
     }
 
@@ -60,6 +64,8 @@ public class PlacementController : MonoBehaviour
             ghost = Instantiate(ghostPrefab);
             ghostSr = ghost.GetComponentInChildren<SpriteRenderer>();
         }
+
+        ctx.ShowGuide?.Invoke("토양을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
 
         while (true)
         {
@@ -146,12 +152,14 @@ public class PlacementController : MonoBehaviour
     }
 
     public void BeginPlantSelection(
-    System.Func<Plant, bool> validate,
-    System.Action<Plant> onConfirm,
-    System.Action onCancel)
+        ShopContext ctx,
+        System.Func<Plant, bool> validate,
+        System.Action<Plant> onConfirm,
+        System.Action onCancel)
     {
         // 진행 중인 배치/선택 종료
         if (isPlacing) StopPlacementInternal();
+        this.ctx = ctx;
         placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
     }
 
@@ -174,7 +182,7 @@ public class PlacementController : MonoBehaviour
         }
 
         hovered = null;
-        Debug.Log("식물 선택 모드 진입 (좌클릭=확정, 우클릭/ESC=취소)");
+        ctx.ShowGuide?.Invoke("식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
 
         while (true)
         {
@@ -216,7 +224,7 @@ public class PlacementController : MonoBehaviour
                     }
                     isPlacing = false; placingCo = null;
                     cb?.Invoke(p);
-                    yield break;
+                    break;
                 }
                 else
                 {
@@ -243,6 +251,8 @@ public class PlacementController : MonoBehaviour
         }
         isPlacing = false;
         placingCo = null;
+
+        ctx.ShowGuide?.Invoke("");
     }
 
     private Plant RaycastPlantUnderMouse()
