@@ -16,7 +16,7 @@ public class PetBottleItemData : ItemData
         InitialStock = 3;
 
         OnePerShopIfNotStackable = false;
-        FlowType = ShopFlowType.PlaceOnTile;
+        FlowType = ShopFlowType.SelectExistingPlant;
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
@@ -30,31 +30,36 @@ public class PetBottleItemData : ItemData
         return true;
     }
 
-    // pos = 스크린 좌표 (Grid.GetGridIndexFromPosition 시그니처 기준)
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
     {
         reason = null;
+
         if (ctx == null || ctx.Grid == null)
         {
             reason = "Grid 참조가 없습니다";
             return false;
         }
-
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
+        if (target == null)
         {
-            reason = "유효한 토양이 아닙니다";
+            reason = "선택된 식물이 없습니다";
+            return false;
+        }
+        int idx = target.gridIndex;
+
+        // 이미 페트병 설치된 칸은 불가
+        if (ctx.Grid.HasPetBottle(idx))
+        {
+            reason = "이미 페트병이 설치된 칸입니다";
             return false;
         }
 
-        // 식물 유무와 상관없이 설치 가능. 단, 이미 페트병이 있으면 불가
-        if (ctx.Grid.HasPetBottle(idx.Value))
+        if(!target.IsMovable)
         {
-            reason = "이미 페트병이 있습니다";
+            reason = "유효한 식물이 아닙니다";
             return false;
         }
 
-        pendingIndex = idx.Value;
+        pendingIndex = idx;
         return true;
     }
 

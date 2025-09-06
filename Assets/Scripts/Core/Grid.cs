@@ -14,9 +14,6 @@ public class Grid : MonoBehaviour
     protected EnemyController enemyController;
     [SerializeField] protected EconomyManager economyManager;
 
-    List<Plant> plants = new List<Plant>();
-    
-
     protected bool isBreeding = false;
 
     protected GameObject breedObj1 = null;
