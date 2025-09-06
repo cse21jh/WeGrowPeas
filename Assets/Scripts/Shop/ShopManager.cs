@@ -16,6 +16,9 @@ public class ShopManager : Singleton<ShopManager>
     [SerializeField] private List<ItemData> rotationPool = new(); // 하단 로테이션 풀
     [SerializeField] private int rotationCount = 3;                    // 하단 슬롯 개수
 
+    // itemId → 구매 개수
+    private Dictionary<string, int> purchaseHistory = new Dictionary<string, int>();
+
     public class ShopInventory
     {
         public List<ItemData> Fixed = new();
@@ -49,6 +52,37 @@ public class ShopManager : Singleton<ShopManager>
         );
 
         return inv;
+    }
+
+    public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
+    {
+        error = null;
+
+        if (data == null)
+        {
+            error = "아이템 없음";
+            return false;
+        }
+
+        // 골드 체크
+        if (!ctx?.Economy?.HasGold(data.Price) ?? true)
+        {
+            error = "골드 부족";
+            return false;
+        }
+
+        // 결제
+        ctx.Economy.SpendGold(data.Price);
+
+        // 효과 확정 반영
+        data.Commit(ctx);
+
+        // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
+        var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
+        if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
+        else purchaseHistory[key] = 1;
+
+        return true;
     }
 
 

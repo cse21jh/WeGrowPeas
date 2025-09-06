@@ -215,14 +215,6 @@ public class PlacementController : MonoBehaviour
                 if (ok)
                 {
                     var cb = onConfirm;
-                    EndHover();
-                    // 정리 후 콜백
-                    if (hadCanvas)
-                    {
-                        shopCanvas.interactable = prevInteractable;
-                        shopCanvas.blocksRaycasts = prevBlocks;
-                    }
-                    isPlacing = false; placingCo = null;
                     cb?.Invoke(p);
                     break;
                 }

@@ -141,19 +141,13 @@ public class ShopUI : MonoBehaviour
 
     private void TryChargeAndCommit(ItemData data, ItemSlot slot)
     {
-        if (!services.Economy.HasGold(data.Price))
+
+        if (shopManager.TryPurchase(ctx, data, out var err))
         {
-            ShowError("구매 불가");
-            data.Cancel(ctx);
-            return;
+            if (!data.IsStackable) session.MarkBought(data);
+            slot.OnPurchased(data.IsStackable ? 1 : int.MaxValue);
+            ShowInfo($"{data.DisplayName} 구매 완료");
         }
-
-        services.Economy.SpendGold(data.Price);
-        data.Commit(ctx);
-
-        if (!data.IsStackable) session.MarkBought(data);
-        slot.OnPurchased(data.IsStackable ? 1 : int.MaxValue); // 스택형: 1 감소, 비스택형: 즉시 품절
-        ShowInfo($"{data.DisplayName} 구매 완료");
     }
 
     public void ClearInfo()
