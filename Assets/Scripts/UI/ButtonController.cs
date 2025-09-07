@@ -37,7 +37,7 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         buttonRect.DOKill(); // 기존 애니메이션 초기화
         buttonRect.DOScale(hoverScale, animationDuration).SetEase(easeType).SetUpdate(true);
-        buttonRect.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), animationDuration).SetEase(easeType).SetUpdate(true);
+        //buttonRect.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), animationDuration).SetEase(easeType).SetUpdate(true);
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         buttonRect.rotation = originalRotation;
     }
