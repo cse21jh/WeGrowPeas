@@ -649,6 +649,7 @@ public class Grid : MonoBehaviour
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
             Instantiate(ladybugPrefabs);
+            return;
         }
         int i = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count - 1)); //벌레 해금 시기와 일치하도록 설정
         Instantiate(bugPrefabs[i]);
