@@ -13,9 +13,8 @@ public static class GameRecordHolder
     public static int totalGoldEarned { get; private set; }
     public static int totalGoldSpend { get; private set; }
     public static int[] TotalWaveKilled { get; private set; }
-    public static string PopularItemName {  get; private set; }
-
-    //최다 판매 식물
+    public static string PopularItemName { get; private set; }
+    public static string MostSellPlantName { get; private set; }
 
     //기타 로그들
     public static int PlayerRank { get; private set; }
@@ -36,6 +35,7 @@ public static class GameRecordHolder
         PopularItemName = iName;
 
         CalculateRank();
+        CalculateMSP();
     }
 
     private static void CalculateRank()
@@ -60,5 +60,10 @@ public static class GameRecordHolder
             PlayerRank = 3;
             return;
         }
+    }
+
+    private static void CalculateMSP()
+    {
+        MostSellPlantName = (soldPeas >= soldPeanuts) ? "완두콩" : "땅콩";
     }
 }
