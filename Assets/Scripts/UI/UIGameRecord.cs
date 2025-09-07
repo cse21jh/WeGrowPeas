@@ -43,7 +43,7 @@ public class UIGameRecord : MonoBehaviour
 
     private void SetEndingMailContent()
     {
-        endingText.text = $"우리는 \"{GameRecordHolder.maxStageReached}\"일간 \"{endingTextDisc[GameRecordHolder.PlayerRank]}\"";
+        endingText.text = $"우리는 {GameRecordHolder.maxStageReached}일간 {endingTextDisc[GameRecordHolder.PlayerRank]}";
 
         pg1.text = $"총 \"{GameRecordHolder.maxStageReached}\"일을 버텼다!";
 
@@ -53,9 +53,17 @@ public class UIGameRecord : MonoBehaviour
             $"총 \"{GameRecordHolder.totalGoldEarned}\"골드를 벌었다!\n" +
             $"상점에서 \"{GameRecordHolder.totalGoldSpend}\"골드를 소모했다.";
 
-        pg3.text = $"우리 농장은 김준하의 눈빛에 취약했다…\n" +
-            $"상점에서 \"{GameRecordHolder.PopularItemName}\"를 애용했다.\n" +
-            $"사람들은 \"{GameRecordHolder.MostSellPlantName}\"을 가장 좋아하는 듯하다.";
+        if(GameRecordHolder.PopularItemName == null)
+        {
+            pg3.text = $"우리 농장은 {GameRecordHolder.MostKilledWave}에 취약했다…\n" +
+            $"사람들은 {GameRecordHolder.MostSellPlantName}을 가장 좋아하는 듯하다.";
+        }
+        else
+        {
+            pg3.text = $"우리 농장은 {GameRecordHolder.MostKilledWave}에 취약했다…\n" +
+            $"상점에서 {GameRecordHolder.PopularItemName}를 애용했다.\n" +
+            $"사람들은 {GameRecordHolder.MostSellPlantName}을 가장 좋아하는 듯하다.";
+        }
 
         pg4.text = "";
     }

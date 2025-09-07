@@ -12,7 +12,7 @@ public static class GameRecordHolder
     public static int TotalBugsKilled { get; private set; }
     public static int totalGoldEarned { get; private set; }
     public static int totalGoldSpend { get; private set; }
-    public static int[] TotalWaveKilled { get; private set; }
+    public static string MostKilledWave { get; private set; }
     public static string PopularItemName { get; private set; }
     public static string MostSellPlantName { get; private set; }
 
@@ -21,7 +21,7 @@ public static class GameRecordHolder
 
     
 
-    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, int[] killed, string iName)
+    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, string wName, string iName)
     {
         maxStageReached = stage - 1;
         TotalPeas = peas;
@@ -31,7 +31,7 @@ public static class GameRecordHolder
         TotalBugsKilled = bugs;
         totalGoldEarned = egold;
         totalGoldSpend = sgold;
-        TotalWaveKilled = (int[])killed.Clone();
+        MostKilledWave = wName;
         PopularItemName = iName;
 
         CalculateRank();

@@ -10,6 +10,15 @@ using UnityEngine.UIElements;
 
 public class EnemyController : MonoBehaviour
 {
+    private static readonly Dictionary<WaveType, Wave> waves = new Dictionary<WaveType, Wave>
+    {
+        { WaveType.Aging, new AgingWave() },
+        { WaveType.Pest, new PestWave() },
+        { WaveType.Wind, new WindWave() },
+        { WaveType.Flood, new FloodWave() },
+        { WaveType.HeavyRain, new HeavyRainWave() },
+        { WaveType.Cold, new ColdWave() }
+    };
 
     public Grid grid;
 
@@ -344,5 +353,14 @@ public class EnemyController : MonoBehaviour
         currentWave = GetWaveFromWaveType(WaveType.Aging);
         //FlushNextWaveText();
         yield return null;
+    }
+
+    public string GetMostKillWaveName()
+    {
+        int maxKills = waveKillCount.Max();
+        int waveIndex = waveKillCount.ToList().IndexOf(maxKills);
+
+        WaveType mostKillWaveType = (WaveType)waveIndex;
+        return waves[mostKillWaveType].WaveName;
     }
 }

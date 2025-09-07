@@ -16,6 +16,7 @@ public enum WaveType
 public abstract class Wave
 {
     public virtual WaveType WaveType=> WaveType.None;
+    public virtual string WaveName => null;
     public virtual string WaveDescription => null;
     public virtual string WaveSoundString => null;
 }
