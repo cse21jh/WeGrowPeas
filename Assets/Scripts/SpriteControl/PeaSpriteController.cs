@@ -85,7 +85,7 @@ public class PeaSpriteController : MonoBehaviour
                 break;
         }
 
-        if(index == 1)
+        if(index == (int)CompleteTraitType.WindResistance)
         {
             WindEffect.SetActive(true);
         }

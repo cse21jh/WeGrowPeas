@@ -81,7 +81,6 @@ public class EnemyController : MonoBehaviour
         Wave wave = currentWave;
         Debug.Log("현재 웨이브 종류 : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
-        breedTimerManager.SetTimer(wave.WaveType);
 
         if (waveManager != null)
         {
@@ -151,6 +150,7 @@ public class EnemyController : MonoBehaviour
         currentWave = nextWave;
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        breedTimerManager.SetTimer(currentWave.WaveType);
 
         WaveType picked = PickNextByWeight();
         nextWave = GetWaveFromWaveType(picked);
