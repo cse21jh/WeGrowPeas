@@ -124,16 +124,17 @@ public abstract class Plant : MonoBehaviour
         return 0.1f; // 저항력 없는 경우 0.1 return
     }
 
-    public virtual void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
+    public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
         // 페트병이 막으면 true 리턴 → 사망 취소
         if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
-            return;
+            return false;
         isDying = true;
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         Destroy(this.gameObject, dissolveDuration);
+        return true;
     }
 
     private IEnumerator Vanish()

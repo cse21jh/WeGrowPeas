@@ -73,16 +73,15 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
             // 1) 식물 제거
             Plant plant = hit.collider.GetComponent<Plant>();
-            if (plant != null)
+            if (plant != null && !plant.isDying)
             {
-                if (!plant.isDying)
+                SoundManager.Instance.PlayEffect("Shovel");                
+                if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
-                    SoundManager.Instance.PlayEffect("Shovel");
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
-                    plant.Die(DeathCause.Shovel);
-                    return;
                 }
+                return;
             }
 
             // 2) 비료 마커 제거

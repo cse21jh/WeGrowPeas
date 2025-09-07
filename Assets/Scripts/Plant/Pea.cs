@@ -67,9 +67,9 @@ public class Pea : MovablePlant
         // 저항력 계산 및 삽입 필요
     }*/
 
-    public override void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
+    public override bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
-        base.Die(cause, killer);
+        return base.Die(cause, killer);
     }
 
     public override void MakeSelectedSprite()

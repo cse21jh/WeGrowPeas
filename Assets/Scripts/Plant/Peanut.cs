@@ -43,9 +43,9 @@ public class Peanut : MovablePlant
         return traits;
     }
 
-    public override void Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
+    public override bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
-        base.Die(cause, killer);
+        return base.Die(cause, killer);
     }
 
     public override void MakeSelectedSprite()
