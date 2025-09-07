@@ -102,4 +102,13 @@ public class ShopManager : Singleton<ShopManager>
         while (!closed)
             yield return null;
     }
+
+    public string ReturnMostPurchasedItem()
+    {
+        if (purchaseHistory.Count == 0) return null;
+
+        var mostSold = purchaseHistory.OrderByDescending(item => item.Value).First();
+
+        return mostSold.Key;
+    }
 }

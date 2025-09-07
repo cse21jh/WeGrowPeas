@@ -78,6 +78,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
                 if (!plant.isDying)
                 {
                     SoundManager.Instance.PlayEffect("Shovel");
+                    economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
                     plant.Die(DeathCause.Shovel);
                     return;

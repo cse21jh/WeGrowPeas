@@ -208,7 +208,7 @@ public class GameManager : Singleton<GameManager>
     public IEnumerator GameOver()
     {
         yield return new WaitForSeconds(2.0f);
-        GameRecordHolder.SaveRecord(stage, grid.totalBreedCount, grid.killBugCount, enemyController.WaveKillCount);
+        PassRecordToGameRecordHolder();
         SceneLoader.Instance.LoadGameOverScene();
         File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
@@ -318,5 +318,21 @@ public class GameManager : Singleton<GameManager>
     private string GetSavePath()
     {
         return Application.dataPath + "/UserData.json";
+    }
+
+    private void PassRecordToGameRecordHolder()
+    {
+        string itemName = shopManager.ReturnMostPurchasedItem();
+
+        GameRecordHolder.SaveRecord(stage,
+            grid.totalPeaBreedcount,
+            grid.totalPeanutBreedCount,
+            economyManager.PeaSellCount,
+            economyManager.PeanutSellCount,
+            grid.killBugCount,
+            economyManager.TotalGold,
+            economyManager.ConsumeGold,
+            enemyController.WaveKillCount,
+            itemName);
     }
 }

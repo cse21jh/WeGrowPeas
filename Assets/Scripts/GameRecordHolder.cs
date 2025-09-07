@@ -13,22 +13,27 @@ public static class GameRecordHolder
     public static int totalGoldEarned { get; private set; }
     public static int totalGoldSpend { get; private set; }
     public static int[] TotalWaveKilled { get; private set; }
-    
-    //가장 많이 산 아이템
+    public static string PopularItemName {  get; private set; }
 
     //최다 판매 식물
 
     //기타 로그들
-    public static string PlayerRank { get; private set; }
+    public static int PlayerRank { get; private set; }
 
     
 
-    public static void SaveRecord(int stage, int peas, int bugs, int[] killed)
+    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, int[] killed, string iName)
     {
         maxStageReached = stage - 1;
         TotalPeas = peas;
+        TotalPeanuts = peanuts;
+        soldPeas = speas;
+        soldPeanuts = speanuts;
         TotalBugsKilled = bugs;
+        totalGoldEarned = egold;
+        totalGoldSpend = sgold;
         TotalWaveKilled = (int[])killed.Clone();
+        PopularItemName = iName;
 
         CalculateRank();
     }
@@ -37,22 +42,22 @@ public static class GameRecordHolder
     {
         if (TotalPeas < 120)
         {
-            PlayerRank = "B";
+            PlayerRank = 0;
             return;
         }
         else if (TotalPeas < 200)
         {
-            PlayerRank = "A";
+            PlayerRank = 1;
             return;
         }
         else if (TotalPeas < 280)
         {
-            PlayerRank = "S";
+            PlayerRank = 2;
             return;
         }
         else
         {
-            PlayerRank = "SS";
+            PlayerRank = 3;
             return;
         }
     }
