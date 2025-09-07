@@ -55,8 +55,8 @@ public class ModManager : Singleton<ModManager>
             key = new ModKey(stat, param),
             op = ModOp.Multiply,
             value = Mathf.Max(0f, multiplier),
-            expireDay = Day + durationDays,
-            sourceTag = sourceTag
+            expireDay = Day + durationDays + 1,
+            sourceTag = sourceTag,
         });
 
     public int AddTimedAdditive(StatId stat, int param, float addValue, int durationDays, string sourceTag = null)
@@ -66,14 +66,16 @@ public class ModManager : Singleton<ModManager>
             key = new ModKey(stat, param),
             op = ModOp.Add,
             value = addValue,
-            expireDay = Day + durationDays,
-            sourceTag = sourceTag
+            expireDay = Day + durationDays + 1,
+            sourceTag = sourceTag,
         });
 
     public int Add(Mod m)
     {
         if (m.id == 0) m.id = nextId++;
         mods.Add(m);
+        if (m.sourceTag.Contains("SignPost"))
+            GameManager.Instance.enemyController.signPost.SetSignPost(m.key.param);
         return m.id;
     }
 
@@ -81,7 +83,15 @@ public class ModManager : Singleton<ModManager>
 
     public void OnNewDay(int day) // 하루 경과 시 호출
     {
-        mods.RemoveAll(m => m.expireDay <= day);
+        foreach(var m in mods.ToList())
+        {
+            if(m.expireDay <= day)
+            {
+                if (m.sourceTag.Contains("SignPost"))
+                    GameManager.Instance.enemyController.signPost.HideSignPost();
+                mods.Remove(m);
+            }
+        }
     }
 
     // -------- 조회(합성) --------

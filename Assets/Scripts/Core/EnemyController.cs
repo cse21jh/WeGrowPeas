@@ -36,6 +36,8 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] public WaveType setWave;
 
+    [SerializeField] public SignPostController signPost;
+
     [Header("Wave Weights")]
     [SerializeField] private float defaultBaseWeight = 1f; // 기본 가중치
 
@@ -125,7 +127,7 @@ public class EnemyController : MonoBehaviour
             grid.DeactivateIceBlock();
 
         SetNextWave();
-        FlushNextWaveText();
+        //FlushNextWaveText();
         yield return null;
     }
 
@@ -160,7 +162,7 @@ public class EnemyController : MonoBehaviour
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         breedTimerManager.SetTimer(currentWave.WaveType);
-
+        ShowNextWaveText();
         WaveType picked = PickNextByWeight();
         nextWave = GetWaveFromWaveType(picked);
     }
