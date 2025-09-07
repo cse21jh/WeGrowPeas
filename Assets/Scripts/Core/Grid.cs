@@ -959,7 +959,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    int GetCol(int index) => index / maxCol;
+    int GetCol(int index) => index / 4;
 
     private CompleteTraitType MapWaveToTrait(WaveType w)
     {
