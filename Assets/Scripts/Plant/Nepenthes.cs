@@ -1,13 +1,17 @@
+using DG.DemiLib;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 public class Nepenthes : Plant
 {
+    [SerializeField] private GameObject NepenthesPheromone;
+    [SerializeField] private float pheromoneSize = 4f;
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = "³×Ææµ¥½º";
         base.Init(gridIndex, grid);
+        NepenthesPheromone.transform.localScale = new Vector3(pheromoneSize, pheromoneSize, 1f);
     }
     public override float GetResistanceValue(int order)
     {
@@ -24,6 +28,10 @@ public class Nepenthes : Plant
         return 0;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, pheromoneSize/2);
+    }
 
-    
 }

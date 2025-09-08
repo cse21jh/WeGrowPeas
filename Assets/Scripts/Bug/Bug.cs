@@ -26,10 +26,12 @@ public class Bug : MonoBehaviour
     private GameObject bugKiller;
 
     private GameObject WarningPrefab;
-    private GameObject Warning;
+    private GameObject WarningSign;
 
     protected bool eatingPlant = false;
     protected float eatingTime = 1.0f;
+
+    protected Coroutine movingCoroutine;
 
     //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
@@ -67,7 +69,7 @@ public class Bug : MonoBehaviour
     protected virtual void InitBug()
     {
         InitRandomPos();
-        StartCoroutine(Moving());
+        StartCoroutine(Warning());
     }
 
     protected virtual void Update()
@@ -83,16 +85,42 @@ public class Bug : MonoBehaviour
         }
     }
 
-    protected virtual IEnumerator Moving()
-    {    
+    protected virtual IEnumerator Warning()
+    {
         ShowWarningSign();
         yield return new WaitForSeconds(1.0f);
         DestroyWarningSign();
+        movingCoroutine = StartCoroutine(Moving());
+    }
+
+    protected virtual IEnumerator Moving()
+    {
+        yield return null;
+    }
+
+    public virtual IEnumerator MoveToNepenthes(GameObject nepenthes)
+    {
+        StopCoroutine(movingCoroutine);
+        while(true)
+        {
+            if (!grid.GetIsBreeding() || isDie || isHit)
+            {
+                yield return null;
+                continue;
+            }
+            if (nepenthes == null)
+                break;
+            MoveToward(nepenthes.transform.position, speed - 0.5f);
+            yield return null;
+        }
+        // 벌레가 끌리던 중 네펜데스가 사라진 경우 다시 기존 루틴 시작
+        movingCoroutine = StartCoroutine(Moving());
+        yield return null;
     }
 
     private void ShowWarningSign()
     {
-        Warning = Instantiate(WarningPrefab);
+        WarningSign = Instantiate(WarningPrefab);
         Vector3 pos = this.transform.position;
 
         switch (spawnEdge)
@@ -110,14 +138,14 @@ public class Bug : MonoBehaviour
                 pos.x += 2f;
                 break;
         }
-        Warning.transform.position = pos;
+        WarningSign.transform.position = pos;
         return;
         
     }
 
     protected void DestroyWarningSign()
     {
-        Destroy(Warning);
+        Destroy(WarningSign);
     }
 
 

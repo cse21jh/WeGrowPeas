@@ -4908,6 +4908,73 @@ MonoBehaviour:
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &3103398703592996214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6502921693978530330}
+  - component: {fileID: 6490654865557035988}
+  - component: {fileID: 8701267878890044565}
+  m_Layer: 2
+  m_Name: PheromoneArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6502921693978530330
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3103398703592996214}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7039762080822850368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6490654865557035988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3103398703592996214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e619ff60a2a26e74facc580da717996d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nepenthes: {fileID: 2921442329764518691}
+--- !u!135 &8701267878890044565
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3103398703592996214}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4607520183290686388
 GameObject:
   m_ObjectHideFlags: 0
@@ -10040,6 +10107,7 @@ Transform:
   - {fileID: 7685963544071473593}
   - {fileID: 1413951754107009203}
   - {fileID: 7544033432224532130}
+  - {fileID: 6502921693978530330}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5398642121793501039
@@ -10131,6 +10199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesname: "\uB124\uD39C\uB370\uC2A4"
+  isDying: 0
   dissolveDuration: 0.7
   vanishEffect: {fileID: 8428304175217021898, guid: b4990911297e3684783505cdcbced834, type: 3}
   appearEffect: {fileID: 3614438125452465354, guid: b8ad1799ddcd6e242906ba26d02e5113, type: 3}
@@ -10141,6 +10210,8 @@ MonoBehaviour:
   foamEffect: {fileID: 1291638743406356370}
   snowRenderers:
   - {fileID: 5967051601588461932}
+  NepenthesPheromone: {fileID: 3103398703592996214}
+  pheromoneSize: 4
 --- !u!1 &7435105536543307973
 GameObject:
   m_ObjectHideFlags: 0

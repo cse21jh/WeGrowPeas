@@ -26,12 +26,6 @@ public class Ladybug : Bug
 
         while (true)
         {
-            if (eatingPlant)
-            {
-                yield return new WaitForSeconds(eatingTime);
-                eatingPlant = false;
-            }
-
             if (!grid.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;
@@ -66,7 +60,7 @@ public class Ladybug : Bug
 
     public IEnumerator KillFuckingBug(Bug bug)
     {
-        StopCoroutine(Moving());
+        StopCoroutine(movingCoroutine);
         StartCoroutine(CantHitForOneSecond());
         StartCoroutine(bug.CantHitForOneSecond());
         while (bug != null) // ¹ú·¹ ¾ø¾îÁö¸é Å»Ãâ
