@@ -10,6 +10,7 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [Header("Animation Settings")]
     [SerializeField] private float hoverScale = 1.1f; // 마우스 오버 시 크기
+    [SerializeField] private bool enableShake = false; // 흔들림 효과 활성화 여부
     [Range(0f, 1f), SerializeField] private float shakeStrength = 1f; // 흔들리는 정도
     private Vector3 originalScale; // 원래 크기
     private Quaternion originalRotation;
@@ -38,6 +39,12 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         buttonRect.DOKill(); // 기존 애니메이션 초기화
         buttonRect.DOScale(hoverScale, animationDuration).SetEase(easeType).SetUpdate(true);
         //buttonRect.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), animationDuration).SetEase(easeType).SetUpdate(true);
+
+        if (enableShake)
+        {
+            buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
+        }
+
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         buttonRect.rotation = originalRotation;
     }
