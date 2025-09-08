@@ -50,7 +50,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject fertilizerMarkerPrefab;
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
-
+    public List<Ladybug> ladybugs = new List<Ladybug>();
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -871,31 +871,26 @@ public class Grid : MonoBehaviour
     }
     public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
     {
-        if (!petBottleTiles.Contains(idx)) return false;
-
-        //if(cause == DeathCause.Shovel) return false;
-
-        // 1회성 보호 → 소모
-        petBottleTiles.Remove(idx);
-
-        if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+        if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // 웨이브나 삽에 의해 제거될 때, 페트병이 있는 경우
         {
-            Destroy(marker);
-            petMarkers.Remove(idx);
+            // 1회성 보호 → 소모
+            petBottleTiles.Remove(idx);
+
+            if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+            {
+                Destroy(marker);
+                petMarkers.Remove(idx);
+            }
+            return true;
+        }
+        
+        if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
+        {
+            StartCoroutine(ladybugs[0].KillFuckingBug(killer));
+            return true;
         }
 
-        // 벌레로 인한 죽음이면 그 벌레 제거
-        if (cause == DeathCause.Bug && killer != null)
-        {
-            StartCoroutine(killer.KillBug());
-            Debug.Log($"[Grid] 페트병 발동: 벌레 제거 + 식물 보호 (idx={idx})");
-        }
-        else
-        {
-            Debug.Log($"[Grid] 페트병 발동: 식물 보호 (idx={idx})");
-        }
-
-        return true; // 죽음 방어 성공
+        return false; // 죽음 방어 실패
     }
 
     //-----전용 비료------

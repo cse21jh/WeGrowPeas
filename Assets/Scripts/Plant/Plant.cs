@@ -8,8 +8,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum DeathCause { Generic, Bug, Flood, Cold, Other,Shovel }
-
+public enum DeathCause { Generic, Bug, Shovel, Other }
+// Generic은 보통 웨이브에 의해 죽는 경우
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
 public abstract class Plant : MonoBehaviour

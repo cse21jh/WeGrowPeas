@@ -196,7 +196,7 @@ public class Bug : MonoBehaviour
         }
     }
 
-    protected void MoveToward(Vector2 targetPos)
+    protected void MoveToward(Vector2 targetPos, float s = 0f)
     {
         Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
         float distanceToTarget2D = Vector2.Distance(currentPos, targetPos);
@@ -211,7 +211,7 @@ public class Bug : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees + rotationOffset);
         }
 
-        Vector2 newPosition2D = Vector2.MoveTowards(currentPos, targetPos, speed * Time.deltaTime);
+        Vector2 newPosition2D = Vector2.MoveTowards(currentPos, targetPos, ((s == 0) ? speed : s) * Time.deltaTime);
         transform.position = new Vector3(newPosition2D.x, newPosition2D.y, transform.position.z);
 
         return;
@@ -290,5 +290,12 @@ public class Bug : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawCube(transform.position, new Vector3(hitRange * 2,hitRange * 2));
+    }
+
+    public IEnumerator CantHitForOneSecond() // 이걸 키면 1초동안 벌레가 터치되지 않습니다..
+    {
+        isHit = true;
+        yield return new WaitForSeconds(1f);
+        isHit = false;
     }
 }
