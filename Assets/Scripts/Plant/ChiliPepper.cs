@@ -22,4 +22,15 @@ public class ChiliPepper : Plant
         return 500;
     }
 
+    protected void OnMouseEnter()
+    {
+        priceSign.gameObject.SetActive(true);
+        priceSign.SetPrice(GetSellingPrice());
+    }
+
+    protected void OnMouseExit()
+    {
+        priceSign.gameObject.SetActive(false);
+    }
+
 }
