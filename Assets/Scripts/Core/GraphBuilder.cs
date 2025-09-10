@@ -58,8 +58,8 @@ public class GraphBuilder : MonoBehaviour
     void BuildPlants()
     {
         string lineColorHex = "#618e32";
-        int xLabelFontSize = 10;
-        int yLabelFontSize = 10;
+        int xLabelFontSize = 8;
+        int yLabelFontSize = 8;
         
         var xAxis = plantChart.GetChartComponent<XAxis>();
         xAxis.type = Axis.AxisType.Value;
@@ -102,8 +102,8 @@ public class GraphBuilder : MonoBehaviour
     void BuildGold()
     {
         string lineColorHex = "#f1cf30";
-        int xLabelFontSize = 10;
-        int yLabelFontSize = 10;
+        int xLabelFontSize = 8;
+        int yLabelFontSize = 8;
 
         var xAxis = goldChart.GetChartComponent<XAxis>();
         xAxis.type = Axis.AxisType.Value;
@@ -145,8 +145,7 @@ public class GraphBuilder : MonoBehaviour
 
     void BuildWaves()
     {
-        int xLabelFontSize = 10;
-        int yLabelFontSize = 10;
+        int xLabelFontSize = 8;
 
         var xAxis = waveChart.GetChartComponent<XAxis>();
         xAxis.type = Axis.AxisType.Value;
@@ -159,7 +158,6 @@ public class GraphBuilder : MonoBehaviour
 
         var yAxis = waveChart.GetChartComponent<YAxis>();
         yAxis.type = Axis.AxisType.Value;
-        yAxis.axisLabel.textStyle.fontSize = yLabelFontSize;
         yAxis.minMaxType = Axis.AxisMinMaxType.Default;
 
         waveChart.RemoveData();
