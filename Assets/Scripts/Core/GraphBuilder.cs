@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+Ôªøusing System.Collections.Generic;
 using System;
 using UnityEngine;
 using XCharts;
 using XCharts.Runtime;
+using UnityEditor.Build;
 
 [Serializable] public class PlayerRecordForGraph
 {
@@ -15,11 +16,24 @@ public class GraphBuilder : MonoBehaviour
 {
     [SerializeField] private LineChart plantChart;
     [SerializeField] private LineChart goldChart;
-    [SerializeField] private ScatterChart waveChart;
-    [SerializeField] private Font customFont;
+    [SerializeField] private LineChart waveChart;
 
     private PlayerRecordForGraph data;
-    
+
+    private static readonly string[] WaveNames =
+    {
+        "ÏûêÏó∞ÏÇ¨", "Ìï¥Ï∂©", "Î∞îÎûå", "ÌôçÏàò", "Ìè≠Ïö∞", "ÌïúÌåå"
+    };
+
+    private Color[] colors = {
+        ColorUtility.TryParseHtmlString("#fccf4e", out var c0) ? c0 : Color.white,
+        ColorUtility.TryParseHtmlString("#b6b53a", out var c1) ? c1 : Color.white,
+        ColorUtility.TryParseHtmlString("#d6e6eb", out var c2) ? c2 : Color.white,
+        ColorUtility.TryParseHtmlString("#469696", out var c3) ? c3 : Color.white,
+        ColorUtility.TryParseHtmlString("#629ab7", out var c4) ? c4 : Color.white,
+        ColorUtility.TryParseHtmlString("#746d80", out var c5) ? c5 : Color.white
+    };
+
     void Start()
     {
         data = new PlayerRecordForGraph
@@ -31,13 +45,14 @@ public class GraphBuilder : MonoBehaviour
 
         for (int i = 0; i < 40; i++)
         {
-            data.survivedPlants.Add(UnityEngine.Random.Range(5, 20));   // øπ: Ωƒπ∞ ª˝¡∏ ºˆ
-            data.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));    // øπ: ∞ÒµÂ ºˆ¿Õ
-            data.waveEachDay.Add(UnityEngine.Random.Range(1, 10));      // øπ: ø˛¿Ã∫Í π¯»£
+            data.survivedPlants.Add(UnityEngine.Random.Range(5, 20));   // Ïòà: ÏãùÎ¨º ÏÉùÏ°¥ Ïàò
+            data.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));    // Ïòà: Í≥®Îìú ÏàòÏùµ
+            data.waveEachDay.Add(UnityEngine.Random.Range(0, 6));      // Ïòà: Ïõ®Ïù¥Î∏å Î≤àÌò∏
         }
 
         BuildPlants();
         BuildGold();
+        BuildWaves();
     }
 
     void BuildPlants()
@@ -45,8 +60,6 @@ public class GraphBuilder : MonoBehaviour
         string lineColorHex = "#618e32";
         int xLabelFontSize = 10;
         int yLabelFontSize = 10;
-
-        var chartGrid = plantChart.GetChartComponent<GridCoord>();
         
         var xAxis = plantChart.GetChartComponent<XAxis>();
         xAxis.type = Axis.AxisType.Value;
@@ -56,7 +69,6 @@ public class GraphBuilder : MonoBehaviour
         xAxis.min = 0;
         xAxis.max = data.survivedPlants.Count;
         xAxis.interval = 5;
-
 
         var yAxis = plantChart.GetChartComponent<YAxis>();
         yAxis.type = Axis.AxisType.Value;
@@ -93,8 +105,6 @@ public class GraphBuilder : MonoBehaviour
         int xLabelFontSize = 10;
         int yLabelFontSize = 10;
 
-        var chartGrid = goldChart.GetChartComponent<GridCoord>();
-
         var xAxis = goldChart.GetChartComponent<XAxis>();
         xAxis.type = Axis.AxisType.Value;
         xAxis.show = true;
@@ -103,7 +113,6 @@ public class GraphBuilder : MonoBehaviour
         xAxis.min = 0;
         xAxis.max = data.earnedGolds.Count;
         xAxis.interval = 5;
-
 
         var yAxis = goldChart.GetChartComponent<YAxis>();
         yAxis.type = Axis.AxisType.Value;
@@ -136,20 +145,43 @@ public class GraphBuilder : MonoBehaviour
 
     void BuildWaves()
     {
-        /*chartWaves.title.show = false;
-        chartWaves.grid.SetDefault();
+        int xLabelFontSize = 10;
+        int yLabelFontSize = 10;
 
-        chartWaves.xAxis0.type = Axis.AxisType.Category;   // 0~47
-        chartWaves.yAxis0.type = Axis.AxisType.Value;      // ø˛¿Ã∫Í π¯»£
-        chartWaves.RemoveData();
+        var xAxis = waveChart.GetChartComponent<XAxis>();
+        xAxis.type = Axis.AxisType.Value;
+        xAxis.show = true;
+        xAxis.axisLabel.show = true;
+        xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
+        xAxis.min = 0;
+        xAxis.max = data.waveEachDay.Count;
+        xAxis.interval = 5;
 
-        var s = chartWaves.AddSerie<Scatter>("Waves");
-        s.symbol.size = 6;
-        for (int d = 0; d < data.waveEachDay.Count; d++)
+        var yAxis = waveChart.GetChartComponent<YAxis>();
+        yAxis.type = Axis.AxisType.Value;
+        yAxis.axisLabel.textStyle.fontSize = yLabelFontSize;
+        yAxis.minMaxType = Axis.AxisMinMaxType.Default;
+
+        waveChart.RemoveData();
+
+        var tooltip = waveChart.GetChartComponent<Tooltip>();
+
+        for (int w = 0; w <= 5; w++)
         {
-            // ∞∞¿∫ ≥Ø ø©∑Ø ø˛¿Ã∫Í∏¶ ¡° ø©∑Ø ∞≥∑Œ ¬Ô∞Ì ΩÕ¿∏∏È AddSerie∏¶ ¡æ∫∞/≥≠¿Ãµµ∫∞∑Œ ≥™¥≤º≠ π›∫π
-            chartWaves.AddData(0, d, data.waveEachDay[d]);
-        }*/
-    }
+            var s = waveChart.AddSerie<Line>();
+            s.lineStyle.show = false;
+            s.symbol.show = true;
+            s.symbol.size = 3;
+            s.symbol.type = SymbolType.Circle;
+            s.itemStyle.color = colors[w];
 
+            for (int day = 0; day < data.waveEachDay.Count; day++)
+            {
+                if (data.waveEachDay[day] == w)
+                {
+                    s.AddXYData(day + 1, w);
+                }
+            }
+        }
+    }
 }
