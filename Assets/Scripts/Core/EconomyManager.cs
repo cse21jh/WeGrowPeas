@@ -20,6 +20,15 @@ public class EconomyManager : MonoBehaviour
     public int TotalGold => totalGold;
     public int ConsumeGold => consumeGold;
 
+    private void Start()
+    {
+        peaSellCount = 0;
+        peanutSellCount = 0;
+        totalGold = 0;
+        consumeGold = 0;
+        earnedGoldToday = 0;
+    }
+
     public bool HasGold(int amount) => gold >= amount;
 
     public void SpendGold(int amount)
