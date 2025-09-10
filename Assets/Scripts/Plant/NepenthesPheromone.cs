@@ -6,7 +6,7 @@ public class NepenthesPheromone : MonoBehaviour
     protected void OnTriggerEnter(Collider obj)
     {
         Bug bug = obj.GetComponent<Bug>();
-        if (bug != null)
+        if (bug != null && !nepenthes.isDying)
         {
             if (bug.GetType() != typeof(Ladybug))
             {

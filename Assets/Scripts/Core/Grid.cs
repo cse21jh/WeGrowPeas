@@ -644,8 +644,8 @@ public class Grid : MonoBehaviour
     private void SpawnRandomBug()
     {
         int stage = GameManager.Instance.stage;
-        //if (stage < 6) // 해충 웨이브 해금 전엔 등장 X
-          //  return;
+        if (stage < 6) // 해충 웨이브 해금 전엔 등장 X
+            return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
             Instantiate(ladybugPrefabs);

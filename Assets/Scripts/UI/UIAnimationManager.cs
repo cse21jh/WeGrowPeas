@@ -10,9 +10,12 @@ public class UIAnimationManager : MonoBehaviour
     [SerializeField] private RectTransform shop_targetPanel;
     [SerializeField] private RectTransform shop_panelTransformOrigin;
     [SerializeField] private RectTransform shop_panelTransformMoved;
+    [SerializeField] private RectTransform newspaper_targetPanel;
+    [SerializeField] private RectTransform newspaper_panelTransformOrigin;
+    [SerializeField] private RectTransform newspaper_panelTransformMoved;
     [SerializeField] private Ease panelEase;
     [SerializeField] private float panelMoveDuration = 0.5f;
-
+    [SerializeField] private Newspaper newspaper;
 
     public void SwitchCameras(CameraManager.CameraType type)
     {
@@ -49,8 +52,15 @@ public class UIAnimationManager : MonoBehaviour
         }
     }
 
+    public void ShowNewspaper()
+    {
+        newspaper.UpdateNewspaper();
+        newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformMoved.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
+    }
 
-
-
+    public void HideNewspaper()
+    {
+        newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformOrigin.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
+    }
 
 }
