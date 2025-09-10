@@ -48,14 +48,16 @@ public class UIAnimationManager : MonoBehaviour
             shop_targetPanel.DOAnchorPos(shop_panelTransformMoved.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
 
+            ShowNewspaper();
+
             Debug.Log(shop_panelTransformMoved.ToString());
         }
     }
 
     public void ShowNewspaper()
     {
-        newspaper.UpdateNewspaper();
-        newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformMoved.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
+        if(newspaper.UpdateNewspaper())
+            newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformMoved.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
     }
 
     public void HideNewspaper()

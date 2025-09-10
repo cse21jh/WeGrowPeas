@@ -163087,12 +163087,12 @@ MonoBehaviour:
   shop_targetPanel: {fileID: 24405967}
   shop_panelTransformOrigin: {fileID: 1769195293}
   shop_panelTransformMoved: {fileID: 279814179}
-  newspaper_targetPanel: {fileID: 0}
-  newspaper_panelTransformOrigin: {fileID: 0}
-  newspaper_panelTransformMoved: {fileID: 0}
+  newspaper_targetPanel: {fileID: 2025351977}
+  newspaper_panelTransformOrigin: {fileID: 836528321}
+  newspaper_panelTransformMoved: {fileID: 1649936705}
   panelEase: 4
   panelMoveDuration: 0.5
-  newspaper: {fileID: 4472167833932565133}
+  newspaper: {fileID: 2133825453}
 --- !u!1 &826165267
 GameObject:
   m_ObjectHideFlags: 0
@@ -165541,6 +165541,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!224 &836528321 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3186363933524548507, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &839407505
 GameObject:
   m_ObjectHideFlags: 0
@@ -306510,6 +306515,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!224 &1649936705 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8670359848921732993, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1650020568
 GameObject:
   m_ObjectHideFlags: 0
@@ -372100,6 +372110,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!224 &2025351977 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3154962489278719901, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2027269152
 GameObject:
   m_ObjectHideFlags: 0
@@ -398889,6 +398904,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2133825453 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8474383691067113982, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629f7ef0db2160749a59ac648b10c9fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2135247160
 GameObject:
   m_ObjectHideFlags: 0
@@ -401921,6 +401947,14 @@ PrefabInstance:
       propertyPath: placement
       value: 
       objectReference: {fileID: 1681304835}
+    - target: {fileID: 5269216013685167124, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 825755752}
+    - target: {fileID: 5269216013685167124, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: HideNewspaper
+      objectReference: {fileID: 0}
     - target: {fileID: 5493438673493825283, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 3
@@ -401984,6 +402018,10 @@ PrefabInstance:
     - target: {fileID: 6025597461403611470, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -575
+      objectReference: {fileID: 0}
+    - target: {fileID: 6096952717438558789, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 6319188458812168964, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_IsActive
@@ -402072,6 +402110,18 @@ PrefabInstance:
     - target: {fileID: 7086590713959260328, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7190084086095283338, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7190084086095283338, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7190084086095283338, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 298
       objectReference: {fileID: 0}
     - target: {fileID: 7268073415677314412, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_Pivot.x
@@ -402451,17 +402501,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fee458bb24ae1847b5b490a431f1681, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4472167833932565133 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9123676627701540293, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 629f7ef0db2160749a59ac648b10c9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &7207195570579950298
