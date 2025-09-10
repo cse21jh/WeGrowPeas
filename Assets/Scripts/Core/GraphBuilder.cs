@@ -158,7 +158,10 @@ public class GraphBuilder : MonoBehaviour
 
         var yAxis = waveChart.GetChartComponent<YAxis>();
         yAxis.type = Axis.AxisType.Value;
+        //yAxis.boundaryGap = true;
         yAxis.minMaxType = Axis.AxisMinMaxType.Default;
+        //yAxis.data.Clear();
+        //yAxis.data.AddRange(new List<string> { "자연사", "해충", "바람", "홍수", "폭우", "한파" });
 
         waveChart.RemoveData();
 
