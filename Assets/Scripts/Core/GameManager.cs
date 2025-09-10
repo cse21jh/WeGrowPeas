@@ -146,6 +146,7 @@ public class GameManager : Singleton<GameManager>
         {
             UpdateStageUI();
             yield return StartCoroutine(StartStage());
+            economyManager.PushEarnedGold();
             StageUpdate();
             SaveGame();
         }
@@ -166,7 +167,6 @@ public class GameManager : Singleton<GameManager>
         yield return StartCoroutine(grid.Breeding());
 
         yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
-        //enemyController.EnemyWave();
 
         gameOver = grid.CheckGameOver();
 
@@ -175,6 +175,7 @@ public class GameManager : Singleton<GameManager>
         else if (!enemyController.IsLastWaveNone())
         {
             yield return new WaitForSeconds(2.0f);
+            PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
             yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
         }        

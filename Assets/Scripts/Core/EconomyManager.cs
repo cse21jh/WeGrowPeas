@@ -16,6 +16,7 @@ public class EconomyManager : MonoBehaviour
 
     private int totalGold = 0;
     private int consumeGold = 0;
+    private int earnedGoldToday = 0;
     public int TotalGold => totalGold;
     public int ConsumeGold => consumeGold;
 
@@ -33,6 +34,7 @@ public class EconomyManager : MonoBehaviour
     {
         gold += amount;
         totalGold += amount;
+        earnedGoldToday += amount;
         UpdateCoinUI(gold);
         Debug.Log($"°ñµå {amount} È¹µæ ¡æ ÇÕ°è {gold}");
     }
@@ -65,5 +67,11 @@ public class EconomyManager : MonoBehaviour
             peanutSellCount++;
             return;
         }
+    }
+
+    public void PushEarnedGold()
+    {
+        PlayerRecordForGraph.SetEG(earnedGoldToday);
+        earnedGoldToday = 0;
     }
 }

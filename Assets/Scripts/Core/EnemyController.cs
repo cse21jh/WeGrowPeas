@@ -91,6 +91,7 @@ public class EnemyController : MonoBehaviour
         //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
         Wave wave = currentWave;
         Debug.Log("현재 웨이브 종류 : " + currentWave);
+        PlayerRecordForGraph.SetWED((int)wave.WaveType);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
         if (waveManager != null)

@@ -48,7 +48,7 @@ public class UIGameRecord : MonoBehaviour
         pg1.text = $"총 \"{GameRecordHolder.maxStageReached}\"일을 버텼다!";
 
         pg2.text = $"\"{GameRecordHolder.TotalPeas}\"개의 완두콩 중 \"{GameRecordHolder.soldPeas}\"개를 판매했다.\n" +
-            $"\"{GameRecordHolder.TotalPeanuts}\"개의 땅콩 중 \"{GameRecordHolder.soldPeanuts}\"개를 판매했다.\n" +
+            /*$"\"{GameRecordHolder.TotalPeanuts}\"개의 땅콩 중 \"{GameRecordHolder.soldPeanuts}\"개를 판매했다.\n" +*/
             $"벌레는 \"{GameRecordHolder.TotalBugsKilled}\"마리 잡았다.\n" +
             $"총 \"{GameRecordHolder.totalGoldEarned}\"골드를 벌었다!\n" +
             $"상점에서 \"{GameRecordHolder.totalGoldSpend}\"골드를 소모했다.";
@@ -61,7 +61,7 @@ public class UIGameRecord : MonoBehaviour
         else
         {
             pg3.text = $"우리 농장은 {GameRecordHolder.MostKilledWave}에 취약했다…\n" +
-            $"상점에서 {GameRecordHolder.PopularItemName}를 애용했다.\n" +
+            $"상점에서 {GameRecordHolder.PopularItemName}을/를 애용했다.\n" +
             $"사람들은 {GameRecordHolder.MostSellPlantName}을 가장 좋아하는 듯하다.";
         }
 

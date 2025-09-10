@@ -1,15 +1,31 @@
 ﻿using System.Collections.Generic;
 using System;
 using UnityEngine;
-using XCharts;
 using XCharts.Runtime;
-using UnityEditor.Build;
 
-[Serializable] public class PlayerRecordForGraph
+public static class PlayerRecordForGraph
 {
-    public List<int> survivedPlants;
-    public List<int> earnedGolds;
-    public List<int> waveEachDay;
+    public static List<int> survivedPlants { get; private set; }
+    public static List<int> earnedGolds { get; private set; }
+    public static List<int> waveEachDay { get; private set; }
+
+    static PlayerRecordForGraph()
+    {
+        survivedPlants = new List<int>();
+        earnedGolds = new List<int>();
+        waveEachDay = new List<int>();
+    }
+
+    public static void ClearAll()
+    {
+        survivedPlants.Clear();
+        earnedGolds.Clear();
+        waveEachDay.Clear();
+    }
+
+    public static void SetSP(int n) => survivedPlants.Add(n);
+    public static void SetEG(int n) => earnedGolds.Add(n);
+    public static void SetWED(int n) => waveEachDay.Add(n);
 }
 
 public class GraphBuilder : MonoBehaviour
@@ -18,7 +34,7 @@ public class GraphBuilder : MonoBehaviour
     [SerializeField] private LineChart goldChart;
     [SerializeField] private LineChart waveChart;
 
-    private PlayerRecordForGraph data;
+    //private PlayerRecordForGraph data;
 
     private static readonly string[] WaveNames =
     {
@@ -36,7 +52,7 @@ public class GraphBuilder : MonoBehaviour
 
     void Start()
     {
-        data = new PlayerRecordForGraph
+        /*data = new PlayerRecordForGraph
         {
             survivedPlants = new List<int>(),
             earnedGolds = new List<int>(),
@@ -48,7 +64,7 @@ public class GraphBuilder : MonoBehaviour
             data.survivedPlants.Add(UnityEngine.Random.Range(5, 20));   // 예: 식물 생존 수
             data.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));    // 예: 골드 수익
             data.waveEachDay.Add(UnityEngine.Random.Range(0, 6));      // 예: 웨이브 번호
-        }
+        }*/
 
         BuildPlants();
         BuildGold();
@@ -67,7 +83,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.show = true;
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.min = 0;
-        xAxis.max = data.survivedPlants.Count;
+        xAxis.max = PlayerRecordForGraph.survivedPlants.Count;
         xAxis.interval = 5;
 
         var yAxis = plantChart.GetChartComponent<YAxis>();
@@ -95,8 +111,8 @@ public class GraphBuilder : MonoBehaviour
             s.itemStyle.color = lineColor;
         }
 
-        for (int d = 0; d < data.survivedPlants.Count; d++)
-            plantChart.AddData(0, d+1, data.survivedPlants[d]);
+        for (int d = 0; d < PlayerRecordForGraph.survivedPlants.Count; d++)
+            plantChart.AddData(0, d+1, PlayerRecordForGraph.survivedPlants[d]);
     }
 
     void BuildGold()
@@ -111,7 +127,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.show = true;
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.min = 0;
-        xAxis.max = data.earnedGolds.Count;
+        xAxis.max = PlayerRecordForGraph.earnedGolds.Count;
         xAxis.interval = 5;
 
         var yAxis = goldChart.GetChartComponent<YAxis>();
@@ -139,8 +155,8 @@ public class GraphBuilder : MonoBehaviour
             s.itemStyle.color = lineColor;
         }
 
-        for (int d = 0; d < data.earnedGolds.Count; d++)
-            goldChart.AddData(0, d+1, data.earnedGolds[d]);
+        for (int d = 0; d < PlayerRecordForGraph.earnedGolds.Count; d++)
+            goldChart.AddData(0, d+1, PlayerRecordForGraph.earnedGolds[d]);
     }
 
     void BuildWaves()
@@ -153,7 +169,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.show = true;
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.min = 0;
-        xAxis.max = data.waveEachDay.Count;
+        xAxis.max = PlayerRecordForGraph.waveEachDay.Count;
         xAxis.interval = 5;
 
         var yAxis = waveChart.GetChartComponent<YAxis>();
@@ -176,9 +192,9 @@ public class GraphBuilder : MonoBehaviour
             s.symbol.type = SymbolType.Circle;
             s.itemStyle.color = colors[w];
 
-            for (int day = 0; day < data.waveEachDay.Count; day++)
+            for (int day = 0; day < PlayerRecordForGraph.waveEachDay.Count; day++)
             {
-                if (data.waveEachDay[day] == w)
+                if (PlayerRecordForGraph.waveEachDay[day] == w)
                 {
                     s.AddXYData(day + 1, w);
                 }
