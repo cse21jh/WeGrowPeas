@@ -189,8 +189,9 @@ public class ShopUI : MonoBehaviour
 
     public void Close()
     {
-        panel.SetActive(false);
+        //panel.SetActive(false);
         animationManager.SwitchCameras(CameraManager.CameraType.Normal);
+        Debug.Log("상점 종료!");
         OnShopClosed?.Invoke();
     }
 }

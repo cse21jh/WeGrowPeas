@@ -222,6 +222,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
+        FindAnyObjectByType<UIAnimationManager>().ResetShopPanelPosition();
         Debug.Log("업그레이드 페이즈 종료");
         upgradePanel.SetActive(false);
         selectAddPeaOrPeanutButton.SetActive(false);

@@ -13,6 +13,9 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private TMP_Text countText; // 스택형일 때만 사용
     [SerializeField] private Button buyButton;
 
+    [SerializeField] private Animator leftAnim;
+    [SerializeField] private Animator rightAnim;
+
     private ItemData effect;
     private ShopUI shop;            // 콜백용
     private int stock; // IsStackable이면 초기 n, 아니면 1
@@ -50,6 +53,9 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             else { countText.gameObject.SetActive(false); }
         }
         buyButton.interactable = stock > 0;
+
+        leftAnim.SetBool("isOpen", stock > 0);
+        rightAnim.SetBool("isOpen", stock > 0);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
