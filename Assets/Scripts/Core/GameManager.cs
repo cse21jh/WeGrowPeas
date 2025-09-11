@@ -176,6 +176,9 @@ public class GameManager : Singleton<GameManager>
         {
             yield return new WaitForSeconds(2.0f);
             PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+
+            if (stage == 40) yield return StartCoroutine(ClearNormalMode());
+
             yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());
         }        
@@ -215,6 +218,17 @@ public class GameManager : Singleton<GameManager>
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
+    }
+
+    private IEnumerator ClearNormalMode()
+    {
+        yield return new WaitForSeconds(2.0f);
+        PassRecordToGameRecordHolder();
+        SceneLoader.Instance.LoadGameOverScene();
+        //File.Delete(GetSavePath());
+        //Time.timeScale = 0.0f;
+        SaveGame();
+        Debug.Log("40일 동안 생존하였습니다. YEAH!");
     }
 
     private void LoadGame()
