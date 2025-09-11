@@ -3,6 +3,11 @@ using UnityEngine;
 public class NepenthesPheromone : MonoBehaviour
 {
     [SerializeField] private Nepenthes nepenthes;
+
+    private void Start()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+    }
     protected void OnTriggerEnter(Collider obj)
     {
         Bug bug = obj.GetComponent<Bug>();
