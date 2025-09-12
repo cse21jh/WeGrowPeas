@@ -17,6 +17,7 @@ public class AddWindPlantUpgrade : Upgrade
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
             new GeneticTrait(CompleteTraitType.WindResistance, 0.5f , 1, 0.0f)
         };
+        /*
         List<GeneticTrait> peanutTrait = new List<GeneticTrait>
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.4f , 1, 0.0f),
@@ -24,6 +25,8 @@ public class AddWindPlantUpgrade : Upgrade
         };
         GameManager.Instance.upgradeManager.addPeaTrait = peaTrait;
         GameManager.Instance.upgradeManager.addPeanutTrait = peanutTrait;
+        */ // ∂•ƒ·¥‹¿∫ ∫π±Õ«“ ∞Õ¿‘¥œ¥Ÿ
+        GameManager.Instance.grid.AddPea(peaTrait);
         Debug.Log(Explanation);
     }
 }
