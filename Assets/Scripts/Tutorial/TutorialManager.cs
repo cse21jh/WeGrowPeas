@@ -15,6 +15,8 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private TextMeshProUGUI textStage;
     [SerializeField] private Narration n;
 
+    [SerializeField] private GameObject shovel;
+
     [Header("Sequences")]
     [SerializeField] private DialogueStep[] step0;
     [SerializeField] private DialogueStep[] step1;
@@ -175,6 +177,10 @@ public class TutorialManager : Singleton<TutorialManager>
 
                 case TutorialActions.EnableBugCatch:
                     FindAnyObjectByType<TutorialBug>().canCatchBug = true;
+                    break;
+
+                case TutorialActions.EnableShovel:
+                    shovel.SetActive(true);
                     break;
 
             }

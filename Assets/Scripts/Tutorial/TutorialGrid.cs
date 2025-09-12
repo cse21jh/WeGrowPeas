@@ -70,7 +70,7 @@ public class TutorialGrid : Grid
 
         //isBreeding = true;
 
-        yield return new WaitForSeconds(2.7f);
+        yield return new WaitForSeconds(1.75f);
 
         b.StopMoving();
     }
