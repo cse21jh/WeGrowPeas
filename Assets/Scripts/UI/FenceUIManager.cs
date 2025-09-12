@@ -26,6 +26,11 @@ public class FenceUIManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        HideFenceElements();
+    }
+
 
     public void SetFenceElements(int plantIndex, Plant plant)
     {
