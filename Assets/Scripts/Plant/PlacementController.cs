@@ -134,6 +134,9 @@ public class PlacementController : MonoBehaviour
         }
         isPlacing = false;
         placingCo = null;
+        ctx.ShowGuide?.Invoke("");
+
+        yield return null;
     }
 
     public void StopPlacementInternal()
@@ -196,7 +199,7 @@ public class PlacementController : MonoBehaviour
                     onCancel?.Invoke();
                     break;
                 }
-                yield return null;
+
                 continue;
             }
 
@@ -245,6 +248,8 @@ public class PlacementController : MonoBehaviour
         placingCo = null;
 
         ctx.ShowGuide?.Invoke("");
+
+        yield return null;
     }
 
     private Plant RaycastPlantUnderMouse()
