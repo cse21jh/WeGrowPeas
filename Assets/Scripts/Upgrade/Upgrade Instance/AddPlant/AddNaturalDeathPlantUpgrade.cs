@@ -16,12 +16,15 @@ public class AddNaturalDeathPlantUpgrade : Upgrade
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f , 2, 0.0f),
         };
+        /*
         List<GeneticTrait> peanutTrait = new List<GeneticTrait>
         {
             new GeneticTrait(CompleteTraitType.NaturalDeath, 0.7f , 2, 0.0f),
         };
         GameManager.Instance.upgradeManager.addPeaTrait = peaTrait;
         GameManager.Instance.upgradeManager.addPeanutTrait = peanutTrait;
+        */ // ¶¥Äá´ÜÀº º¹±ÍÇÒ °ÍÀÔ´Ï´Ù
+        GameManager.Instance.grid.AddPea(peaTrait);
         Debug.Log(Explanation);
     }
 }

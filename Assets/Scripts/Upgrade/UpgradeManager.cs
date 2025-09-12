@@ -39,9 +39,9 @@ public class UpgradeManager : MonoBehaviour
         //{ typeof(AddPestPeanutUpgrade), () => new AddPestPeanutUpgrade()},
         //{ typeof(AddColdPeanutUpgrade), () => new AddColdPeanutUpgrade()},
         //{ typeof(AddHeavyRainPeanutUpgrade), () => new AddHeavyRainPeanutUpgrade()},
-        { typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},
-        { typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},
-        { typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},
+        //{ typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},  땅콩의 부활을 기다린다..
+        //{ typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},  땅콩의 부활을 기다린다..
+        //{ typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},  땅콩의 부활을 기다린다..
         // 아래는 디버깅용 
         //{ typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
         //{ typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
@@ -160,11 +160,13 @@ public class UpgradeManager : MonoBehaviour
         remainUpgrade[tmp]--;   
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
         Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
+        /*
         if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)
             selectAddPeaOrPeanutButton.SetActive(true);
         else
             select = true;
-
+        */  // 땅콩의 부활을 기다린다... 
+        select = true;
         for (int i = 0; i < randomUpgrade.Length; i++)
             randomUpgrade[i] = null;
 

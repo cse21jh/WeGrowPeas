@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public enum GameStartType
@@ -24,6 +25,9 @@ public static class GameStartContext
 
 public class UIClickEvent : MonoBehaviour
 {
+    [SerializeField] private Button continueEndlessButton;
+    [SerializeField] private GameObject restartPopup;
+
     public void OnClick_StartNewGame()
     {
         GameStartContext.SetStartType(GameStartType.NewGame);
@@ -66,5 +70,20 @@ public class UIClickEvent : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    public void OnClick_OpenGameOverPopup()
+    {
+        if (GameStartContext.StartType == GameStartType.GameOver)
+        {
+            continueEndlessButton.gameObject.SetActive(false);
+        }
+
+        restartPopup.SetActive(true);
+    }
+
+    public void OnClick_CloseGameOverPopup()
+    {
+        restartPopup.SetActive(false);
     }
 }
