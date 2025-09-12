@@ -973,9 +973,9 @@ public class Grid : MonoBehaviour
 
     //-----얼음 방패------
 
-    public void SetIceBlock()
+    public void SetIceBlock(bool value = true)
     {
-        hasIceBlock = true;
+        hasIceBlock = value;
         // 얼방 가지고 있다는 UI
     }
 
@@ -995,6 +995,22 @@ public class Grid : MonoBehaviour
     {
         isIceBlockOn = false;
         // 얼방 UI 삭제
+    }
+
+    public int GetLivingPlantCount()
+    {
+        int count = 0;
+        Plant plant;
+        for (int idx = 0; idx < maxCol * 4; idx++)
+        {
+            plant = null;
+            plantGrid.TryGetValue(idx, out plant);
+            if (plant == null)
+                continue;
+            if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
+                count++;
+        }
+        return count;
     }
 
     public bool HasEmptyGrid()

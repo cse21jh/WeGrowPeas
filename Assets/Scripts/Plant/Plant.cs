@@ -129,6 +129,13 @@ public abstract class Plant : MonoBehaviour
         // 페트병이 막으면 true 리턴 → 사망 취소
         if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
             return false;
+
+        int alive = grid.GetLivingPlantCount();
+        if (alive <= 2 && grid != null && grid.HasIceBlock || grid.IsIceBlockActivated())
+        {
+            grid.ActivateIceBlock();
+            return false; // 살아있는 식물이 2개 이하이고 얼음 블록이 있으면 죽지 않음
+        }
         isDying = true;
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();

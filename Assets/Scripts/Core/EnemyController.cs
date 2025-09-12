@@ -101,7 +101,7 @@ public class EnemyController : MonoBehaviour
 
         yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
 
-        if (currentWave != noneWave && !grid.IsIceBlockActivated())
+        if (currentWave != noneWave)
         {
             for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
             {
@@ -336,7 +336,7 @@ public class EnemyController : MonoBehaviour
 
         yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
 
-        if (currentWave != noneWave && !grid.IsIceBlockActivated())
+        if (currentWave != noneWave)
         {
             for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
             {

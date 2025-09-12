@@ -86,11 +86,14 @@ public class ShopManager : Singleton<ShopManager>
     }
 
 
-    public IEnumerator ShopPhase()
+    public IEnumerator ShopPhase(Grid grid)
     {
         // n일마다만 상점 오픈
         if (GameManager.Instance.stage % shopOpenDay != 0)
             yield break;
+
+        //얼음 방패 초기화
+        grid.SetIceBlock(false);
 
         // UI 열기
         shopUI.Open();
