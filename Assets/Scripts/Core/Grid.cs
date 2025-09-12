@@ -863,7 +863,7 @@ public class Grid : MonoBehaviour
         if (petBottleMarkerPrefab != null)
         {
             var soilT = GetSoilTransform(idx);
-            var marker = Instantiate(petBottleMarkerPrefab, soilT.position, Quaternion.identity, soilT);
+            var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity, soilT);
             petMarkers[idx] = marker;
         }
 
