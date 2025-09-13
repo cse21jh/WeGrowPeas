@@ -5,7 +5,7 @@ using UnityEngine;
 public class AddWindPlantUpgrade : Upgrade
 {
     public override string Name => "바람 식물 추가";
-    public override string Explanation => "바람에 강한 식물을 하나 추가합니다";
+    public override string Explanation => "바람 저항력이 있는 식물을 하나 추가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_1");
     public override int MaxAmount => -1;
     public override int UnlockStage => WindWave.UnlockStage - 5;
