@@ -19,6 +19,7 @@ public class Newspaper : MonoBehaviour
     [SerializeField] private GameObject iconDescription;
     [SerializeField] private GameObject bigIconDescription;
     [SerializeField] private GameObject TMI;
+    [SerializeField] private GameObject line;
 
     private List<GameObject> articleList = new List<GameObject>();
 
@@ -58,8 +59,10 @@ public class Newspaper : MonoBehaviour
             MakeTitle(data.waveTitle);
             yPos -= 10f;
             MakeIconDescription(data.waveDescription, data.waveIcon, bigIconDescription); 
-            yPos -= 50f;// 얘는 설명 많아서 카운트 하나 더
+            yPos -= 40f;
         }
+
+        MakeLine(new Vector3(xPos, yPos + 10f, 0f));
 
         if (data.bugTitle != null)
         {
@@ -87,7 +90,7 @@ public class Newspaper : MonoBehaviour
         xPos = 130f;
         yPos = -130f;
 
-        if(newspaperAdditionalData != null)
+        if (newspaperAdditionalData != null)
         {
             string text = newspaperAdditionalData.TMI[Random.Range(0, newspaperAdditionalData.TMI.Count)];
             MakeDescription(text, TMI);
@@ -107,7 +110,7 @@ public class Newspaper : MonoBehaviour
 
     private void MakeDescription(string text, GameObject prefab)
     {
-        GameObject tmp = Instantiate(description, this.transform);
+        GameObject tmp = Instantiate(prefab, this.transform);
         articleList.Add(tmp);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponent<TextMeshProUGUI>().text = text;
@@ -121,6 +124,14 @@ public class Newspaper : MonoBehaviour
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponentInChildren<TextMeshProUGUI>().text = text;
         tmp.GetComponentInChildren<Image>().sprite = sprite;
+        yPos -= yInterval;
+    }
+
+    private void MakeLine(Vector3 pos)
+    {
+        GameObject tmp = Instantiate(line, this.transform);
+        articleList.Add(tmp);
+        tmp.GetComponent<RectTransform>().anchoredPosition = pos;        
         yPos -= yInterval;
     }
 
