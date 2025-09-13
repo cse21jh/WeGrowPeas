@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -34,11 +35,18 @@ public class LetterController : MonoBehaviour
 
     private void OnMouseDown()
     {
+        TransitionController.instance.Transition_Out();
+
         //여기에 엔딩씬으로 넘어가는 코드 작성
-
-
+        StartCoroutine(EndScene(1.1f));
 
         Debug.Log("Letter Clicked!");
+    }
+
+    private IEnumerator EndScene(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneLoader.Instance.LoadGameOverScene();
     }
 
     public void StartEndLetter()

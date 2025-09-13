@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 
 public class UIAnimationManager : MonoBehaviour
 {
@@ -29,12 +30,20 @@ public class UIAnimationManager : MonoBehaviour
     [SerializeField] private float panelMoveDuration = 0.5f;
     [SerializeField] private float shopPanelMoveDuration = 2.0f;
     [SerializeField] private Newspaper newspaper;
+    [SerializeField] private float endingDelay = 5f;
 
     public void SwitchCameras(CameraManager.CameraType type)
     {
         foreach (var camManager in camManagers)
         {
-            camManager.SwitchCamera(type, panelMoveDuration);
+            if(type != CameraManager.CameraType.Ending)
+            {
+                camManager.SwitchCamera(type, panelMoveDuration);
+            }
+            else
+            {
+                StartCoroutine(SwitchCamDelay(endingDelay, camManager, type));
+            }
         }
 
         if (type == CameraManager.CameraType.Normal)
@@ -72,8 +81,15 @@ public class UIAnimationManager : MonoBehaviour
         else if (type == CameraManager.CameraType.Ending)
         {
             FindAnyObjectByType<LetterController>().StartEndLetter();
-
         }
+    }
+
+    private IEnumerator SwitchCamDelay(float delay, CameraManager camManger, CameraManager.CameraType type)
+    {
+        yield return new WaitForSeconds(delay);
+
+        camManger.SwitchCamera(type, panelMoveDuration);
+        FindAnyObjectByType<UIFadeController>().FadeOut();
     }
 
     public void ResetShopPanelPosition()

@@ -10,13 +10,22 @@ public class SceneLoader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Awake()
@@ -50,5 +59,21 @@ public class SceneLoader : MonoBehaviour
     public void LoadGameOverScene()
     {
         SceneManager.LoadScene("GameOverScene");
+    }
+
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log($"{scene.name} ¾À ·ÎµåµÊ (¸ðµå: {mode})");
+        if(scene.name == "GameOverScene")
+        {
+            StartCoroutine(Transition(1.0f));
+        }
+    }
+
+    private IEnumerator Transition(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        FindAnyObjectByType<TransitionController>().Transition_In();
     }
 }
