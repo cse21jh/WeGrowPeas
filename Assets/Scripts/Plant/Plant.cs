@@ -140,6 +140,7 @@ public abstract class Plant : MonoBehaviour
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
+        grid.CheckBreedButtonBeforeDie(this.gameObject);
         Destroy(this.gameObject, dissolveDuration);
         return true;
     }

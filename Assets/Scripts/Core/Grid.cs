@@ -620,6 +620,14 @@ public class Grid : MonoBehaviour
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
     }
 
+    public void CheckBreedButtonBeforeDie(GameObject plant)
+    {
+        if(breedObj1 == plant || breedObj2 == plant)
+        {
+            breedButton.SetActive(false);
+        }
+    }
+
     public void ActivateBreed()
     {
         isBreedButtonPressed = true;
