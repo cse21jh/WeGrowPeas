@@ -59,10 +59,10 @@ public class Newspaper : MonoBehaviour
             MakeTitle(data.waveTitle);
             yPos -= 10f;
             MakeIconDescription(data.waveDescription, data.waveIcon, bigIconDescription); 
-            yPos -= 40f;
+            yPos -= 30f;
         }
 
-        MakeLine(new Vector3(xPos, yPos + 10f, 0f));
+        MakeLine(new Vector3(xPos, yPos, 0f));
 
         if (data.bugTitle != null)
         {
@@ -87,7 +87,7 @@ public class Newspaper : MonoBehaviour
             }
         }
 
-        xPos = 130f;
+        xPos = 135f;
         yPos = -130f;
 
         if (newspaperAdditionalData != null)
