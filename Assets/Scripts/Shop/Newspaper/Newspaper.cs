@@ -11,24 +11,26 @@ public class Newspaper : MonoBehaviour
     [SerializeField]
     private List<NewspaperData> newspaperData = new List<NewspaperData>();
 
+    [SerializeField]
+    private NewspaperAdditionalData newspaperAdditionalData;
+
     [SerializeField] private GameObject title;
     [SerializeField] private GameObject description;
     [SerializeField] private GameObject iconDescription;
-
-    private int pageCount = 0; // 신문 우측으로 넘어가는 트리거. 8개 좌측에 들어갔으면, 이후 우측으로 전환
-    private int maxPageCount = 9;
+    [SerializeField] private GameObject bigIconDescription;
+    [SerializeField] private GameObject TMI;
 
 
     // 설명들 UI들 까는 위치
-    private float xPos = -145f;
-    private float yPos = 95f;
+    private float xPos = -140f;
+    private float yPos = 70f;
 
-    // 설명들 간의 간격
+    // 설명들 간의 기본 간격
     private float yInterval = 30f;
 
     // 설명들 좌측 깔리는 첫위치
-    private float xLeftPos = -145f;
-    private float yLeftPos = 95f;
+    private float xLeftPos = -140f;
+    private float yLeftPos = 70f;
 
     // 설명들 우측으로 넘어갔을 때의 첫 위치
     private float xRightPos = 130f;
@@ -52,95 +54,70 @@ public class Newspaper : MonoBehaviour
         // 웨이브 설명
         if (data.waveTitle != null)
         {
-            MakeTitle(data.waveTitle);            
-            MakeDescription(data.waveDescription); 
-            yPos -= 30f;// 얘는 설명 많아서 카운트 하나 더
-            pageCount++;
-        }
-
-        if(data.upgradeTitle !=null)
-        {
-            MakeTitle(data.upgradeTitle);
-            for(int i = 0; i < data.upgradeDescription.Count; i++ )
-            {
-                MakeIconDescription(data.upgradeDescription[i], data.upgradeIcon[i]);
-            }
+            MakeTitle(data.waveTitle);
+            yPos -= 10f;
+            MakeIconDescription(data.waveDescription, data.waveIcon, bigIconDescription); 
+            yPos -= 50f;// 얘는 설명 많아서 카운트 하나 더
         }
 
         if (data.bugTitle != null)
         {
             MakeTitle(data.bugTitle);
+            MakeDescription(data.additionalBugDescription, description);
             for (int i = 0; i < data.bugDescription.Count; i++)
             {
-                MakeIconDescription(data.bugDescription[i], data.bugIcon[i]);
+                MakeIconDescription(data.bugDescription[i], data.bugIcon[i],iconDescription);
             }
         }
 
-        if (data.itemTitle!= null)
+        xPos = xRightPos;
+        yPos = yRightPos;
+
+        if (data.upgradeTitle !=null)
         {
-            MakeTitle(data.itemTitle);
-            for (int i = 0; i < data.itemDescription.Count; i++)
+            MakeTitle(data.upgradeTitle);
+            yPos -= 10f;
+            for(int i = 0; i < data.upgradeDescription.Count; i++ )
             {
-                MakeIconDescription(data.itemDescription[i], data.itemIcon[i]);
+                MakeIconDescription(data.upgradeDescription[i], data.upgradeIcon[i],iconDescription);
             }
         }
 
-        if (data.additionalTitle != null)
+        xPos = 130f;
+        yPos = -130f;
+
+        if(newspaperAdditionalData != null)
         {
-            MakeTitle(data.additionalTitle);
-            for (int i = 0; i < data.additionalDescription.Count; i++)
-            {
-                MakeDescription(data.additionalDescription[i]);
-            }
+            //string text = newspaperAdditionalData.TMI[Random.Range(0, newspaperAdditionalData.TMI.Count)];
+            string text = newspaperAdditionalData.TMI[6];
+            MakeDescription(text, TMI);
         }
 
-        pageCount = 0;
         return true;
     }
 
     private void MakeTitle(string text)
     {
-        if (pageCount >= maxPageCount - 1) // 제목은 붙어있도록
-        {
-            pageCount = -9999;
-            xPos = xRightPos;
-            yPos = yRightPos;
-        }
         GameObject tmp = Instantiate(title, this.transform);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponent<TextMeshProUGUI>().text = text;
         yPos -= yInterval;
-        pageCount++;
     }
 
-    private void MakeDescription(string text)
+    private void MakeDescription(string text, GameObject prefab)
     {
-        if (pageCount >= maxPageCount)
-        {
-            pageCount = -9999;
-            xPos = xRightPos;
-            yPos = yRightPos;
-        }
         GameObject tmp = Instantiate(description, this.transform);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponent<TextMeshProUGUI>().text = text;
         yPos -= yInterval;
-        pageCount++;
     }
 
-    private void MakeIconDescription(string text, Sprite sprite)
+    private void MakeIconDescription(string text, Sprite sprite, GameObject prefab)
     {
-        if (pageCount >= maxPageCount)
-        {
-            pageCount = -9999;
-            xPos = xRightPos;
-            yPos = yRightPos;
-        }
-        GameObject tmp = Instantiate(iconDescription, this.transform);
+        GameObject tmp = Instantiate(prefab, this.transform);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponentInChildren<TextMeshProUGUI>().text = text;
         tmp.GetComponentInChildren<Image>().sprite = sprite;
         yPos -= yInterval;
-        pageCount++;
     }
 }
