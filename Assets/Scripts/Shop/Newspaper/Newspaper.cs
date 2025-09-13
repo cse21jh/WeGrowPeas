@@ -20,6 +20,7 @@ public class Newspaper : MonoBehaviour
     [SerializeField] private GameObject bigIconDescription;
     [SerializeField] private GameObject TMI;
 
+    private List<GameObject> articleList = new List<GameObject>();
 
     // 설명들 UI들 까는 위치
     private float xPos = -140f;
@@ -88,8 +89,7 @@ public class Newspaper : MonoBehaviour
 
         if(newspaperAdditionalData != null)
         {
-            //string text = newspaperAdditionalData.TMI[Random.Range(0, newspaperAdditionalData.TMI.Count)];
-            string text = newspaperAdditionalData.TMI[6];
+            string text = newspaperAdditionalData.TMI[Random.Range(0, newspaperAdditionalData.TMI.Count)];
             MakeDescription(text, TMI);
         }
 
@@ -99,6 +99,7 @@ public class Newspaper : MonoBehaviour
     private void MakeTitle(string text)
     {
         GameObject tmp = Instantiate(title, this.transform);
+        articleList.Add(tmp);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponent<TextMeshProUGUI>().text = text;
         yPos -= yInterval;
@@ -107,6 +108,7 @@ public class Newspaper : MonoBehaviour
     private void MakeDescription(string text, GameObject prefab)
     {
         GameObject tmp = Instantiate(description, this.transform);
+        articleList.Add(tmp);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponent<TextMeshProUGUI>().text = text;
         yPos -= yInterval;
@@ -115,9 +117,19 @@ public class Newspaper : MonoBehaviour
     private void MakeIconDescription(string text, Sprite sprite, GameObject prefab)
     {
         GameObject tmp = Instantiate(prefab, this.transform);
+        articleList.Add(tmp);
         tmp.GetComponent<RectTransform>().anchoredPosition = new Vector3(xPos, yPos, 0f);
         tmp.GetComponentInChildren<TextMeshProUGUI>().text = text;
         tmp.GetComponentInChildren<Image>().sprite = sprite;
         yPos -= yInterval;
+    }
+
+    public void ClearArticle()
+    {
+        for (int i = 0; i < articleList.Count; i++)
+        {
+            Destroy(articleList[i]);
+        }
+        articleList.Clear();
     }
 }

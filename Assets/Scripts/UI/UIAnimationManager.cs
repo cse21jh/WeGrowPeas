@@ -81,12 +81,13 @@ public class UIAnimationManager : MonoBehaviour
     public void ShowNewspaper()
     {
         if (newspaper.UpdateNewspaper())
-            newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformMoved.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
+            newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformMoved.anchoredPosition, panelMoveDuration).SetEase(panelEase);
     }
 
     public void HideNewspaper()
     {
-        newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformOrigin.anchoredPosition, panelMoveDuration).SetEase(panelEase); ;
+        newspaper_targetPanel.DOAnchorPos(newspaper_panelTransformOrigin.anchoredPosition, panelMoveDuration).SetEase(panelEase);
+        newspaper.ClearArticle();
     }
 
 }
