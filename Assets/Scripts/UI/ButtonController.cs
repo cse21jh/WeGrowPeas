@@ -17,6 +17,8 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private float animationDuration = 0.2f; // 애니메이션 지속 시간
     [SerializeField] private Ease easeType; // 애니메이션 이징
 
+    [SerializeField] private GameObject onMouseIcon;
+
 
     void Start()
     {
@@ -45,6 +47,11 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
             buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         }
 
+        if(onMouseIcon != null)
+        {
+            onMouseIcon.SetActive(true);
+        }
+
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         buttonRect.rotation = originalRotation;
     }
@@ -54,6 +61,12 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
         // 마우스가 버튼을 떠났을 때
         buttonRect.DOKill(); // 기존 애니메이션 초기화
         buttonRect.DOScale(originalScale, animationDuration).SetEase(easeType).SetUpdate(true);
+
+        if (onMouseIcon != null)
+        {
+            onMouseIcon.SetActive(false);
+        }
+
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         buttonRect.rotation = originalRotation;
     }
