@@ -69,6 +69,11 @@ public class UIAnimationManager : MonoBehaviour
 
             Debug.Log(shop_panelTransformMoved.ToString());
         }
+        else if (type == CameraManager.CameraType.Ending)
+        {
+            FindAnyObjectByType<LetterController>().StartEndLetter();
+
+        }
     }
 
     public void ResetShopPanelPosition()
