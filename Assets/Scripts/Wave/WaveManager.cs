@@ -61,6 +61,7 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator WaveEffect(WaveType type)
     {
+        float t;
         switch (type)
         {
             case WaveType.Aging:
@@ -95,8 +96,12 @@ public class WaveManager : MonoBehaviour
                     vcam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_FrequencyGain = windFrequency;
                 }
 
-
-                yield return new WaitForSeconds(waveDuration);
+                t = 0f;
+                while (t < waveDuration)
+                {
+                    t += Time.deltaTime;
+                    yield return null;
+                }
 
 
                 foreach (var windEffect in windEffects)
@@ -117,7 +122,13 @@ public class WaveManager : MonoBehaviour
                     plant.PlayFoamEffect();
                 }
                 DOTween.To(()=> floodEffect.transform.position.x, x => floodEffect.transform.position = new Vector3(x, floodEffect.transform.position.y, floodEffect.transform.position.z), floodEndPosX, waveDuration).SetEase(floodEase);
-                yield return new WaitForSeconds(waveDuration);
+                
+                t = 0f;
+                while (t < waveDuration)
+                {
+                    t += Time.deltaTime;
+                    yield return null;
+                }
                 floodEffect.SetActive(false);
                 break;
             case WaveType.Pest:
@@ -126,7 +137,12 @@ public class WaveManager : MonoBehaviour
                 shadow.SetActive(true);
                 dust.SetActive(true);
                 DOTween.To(() => dust.transform.position.x, x => dust.transform.position = new Vector3(x, dust.transform.position.y, dust.transform.position.z), dustEndPosX, dustMoveDuration).SetEase(dustEase);
-                yield return new WaitForSeconds(waveDuration);
+                t = 0f;
+                while (t < waveDuration)
+                {
+                    t += Time.deltaTime;
+                    yield return null;
+                }
                 grassHopper.SetActive(false);
                 shadow.SetActive(false);
                 dust.SetActive(false);
@@ -151,7 +167,12 @@ public class WaveManager : MonoBehaviour
                    .SetEase(snowEase);
                 }
 
-                yield return new WaitForSeconds(waveDuration);
+                t = 0f;
+                while (t < waveDuration)
+                {
+                    t += Time.deltaTime;
+                    yield return null;
+                }
 
                 foreach (var plant in plantsSnow)
                 {
@@ -209,5 +230,10 @@ public class WaveManager : MonoBehaviour
         {
             StartCoroutine(Lightning());
         }
+    }
+
+    public void SkipWaveEffect()
+    {
+        waveDuration = 0f;
     }
 }

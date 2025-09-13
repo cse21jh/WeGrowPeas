@@ -99,7 +99,20 @@ public class EnemyController : MonoBehaviour
             waveManager.StartWave(waveDuration, wave.WaveType);
         }
 
-        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
+        float t = 0f;
+        float waveD = waveDuration;
+        while (t < waveD)
+        {
+            t += Time.deltaTime;
+            yield return null;
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                float tmp;
+                tmp = waveDuration;
+                waveD= 0f;
+                waveManager.SkipWaveEffect();
+            }
+        }        
 
         if (currentWave != noneWave)
         {

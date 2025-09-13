@@ -1036,6 +1036,20 @@ public class Grid : MonoBehaviour
         }
         return false;
     }
+
+    public void AddSuperPea()
+    {
+        List<GeneticTrait> peaTrait = new List<GeneticTrait>
+        {
+            new GeneticTrait(CompleteTraitType.NaturalDeath, 1f , 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.PestResistance, 1f , 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.WindResistance, 1f , 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.FloodResistance, 1f , 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.HeavyRainResistance, 1f , 2, 0.0f),
+            new GeneticTrait(CompleteTraitType.ColdResistance, 1f , 2, 0.0f)
+        };
+        AddPea(peaTrait);        
+    }
 }
 
 
