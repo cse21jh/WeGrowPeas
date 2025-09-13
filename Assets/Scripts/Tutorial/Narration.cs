@@ -27,7 +27,7 @@ public class Narration : MonoBehaviour
 
     public void AddLine(string text)
     {
-        Debug.Log("AddLine");
+        //Debug.Log("AddLine");
 
         if (textBoxPrefab == null || narrationBoxContent == null) return;
 

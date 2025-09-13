@@ -43,14 +43,17 @@ public class UIAnimationManager : MonoBehaviour
                 .SetEase(panelEase);
 
             shop_targetPanel.DOAnchorPos(shop_panelTransformFinish.anchoredPosition, shopPanelMoveDuration)
-                .SetEase(panelEase);
+                .SetEase(panelEase).OnComplete(() =>
+                {
+                    shop_targetPanel.anchoredPosition = new Vector2(shop_panelTransformOrigin.anchoredPosition.x, shop_panelTransformOrigin.anchoredPosition.y);
+                });
         }
         else if (type == CameraManager.CameraType.Upgrade)
         {
             upgrade_targetPanel.DOAnchorPos(upgrade_panelTransformMoved.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
 
-            shop_targetPanel.DOAnchorPos(shop_panelTransformFinish.anchoredPosition, panelMoveDuration)
+            shop_targetPanel.DOAnchorPos(shop_panelTransformOrigin.anchoredPosition, panelMoveDuration)
                 .SetEase(panelEase);
         }
         else if (type == CameraManager.CameraType.Shop)

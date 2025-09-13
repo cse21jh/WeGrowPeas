@@ -17,7 +17,7 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private float animationDuration = 0.2f; // 애니메이션 지속 시간
     [SerializeField] private Ease easeType; // 애니메이션 이징
 
-    [SerializeField] private GameObject onMouseIcon;
+    [SerializeField] private RectTransform onMouseIcon;
 
 
     void Start()
@@ -49,7 +49,8 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         if(onMouseIcon != null)
         {
-            onMouseIcon.SetActive(true);
+            onMouseIcon.gameObject.SetActive(true);
+            onMouseIcon.DOScale(hoverScale, animationDuration).SetEase(easeType).SetUpdate(true);
         }
 
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
@@ -64,7 +65,8 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         if (onMouseIcon != null)
         {
-            onMouseIcon.SetActive(false);
+            onMouseIcon.gameObject.SetActive(false);
+            onMouseIcon.DOScale(new Vector3(0,0,0), animationDuration).SetEase(easeType).SetUpdate(true);
         }
 
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
