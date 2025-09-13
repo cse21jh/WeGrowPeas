@@ -21,6 +21,18 @@ public class StemController : MonoBehaviour
 
     [SerializeField] private bool isDebugMode = false;
 
+    [Space(10)]
+    [Header("Gold Effect")]
+    [SerializeField] private bool isDebugGold = false;
+    [SerializeField] private SpriteRenderer stem;
+    [SerializeField] private SpriteRenderer left_back;
+    [SerializeField] private SpriteRenderer left_front;
+    [SerializeField] private SpriteRenderer right_back;
+    [SerializeField] private SpriteRenderer right_front;
+    [SerializeField] private GameObject goldCrown;
+    [SerializeField] private Sprite[] normalSprites;    // 0: stem, 1: left_back, 2: left_front, 3: right_back, 4: right_front
+    [SerializeField] private Sprite[] goldSprites;      // 0: stem, 1: left_back, 2: left_front, 3: right_back, 4: right_front
+
 
     private void Start()
     {
@@ -95,5 +107,32 @@ public class StemController : MonoBehaviour
                 break;
         }
         
+    }
+
+    public void SetGold(bool isGold)
+    {
+        if (isGold)
+        {
+            stem.sprite = goldSprites[0];
+            left_back.sprite = goldSprites[1];
+            left_front.sprite = goldSprites[2];
+            right_back.sprite = goldSprites[3];
+            right_front.sprite = goldSprites[4];
+            goldCrown.SetActive(true);
+        }
+        else
+        {
+            stem.sprite = normalSprites[0];
+            left_back.sprite = normalSprites[1];
+            left_front.sprite = normalSprites[2];
+            right_back.sprite = normalSprites[3];
+            right_front.sprite = normalSprites[4];
+            goldCrown.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
+        SetGold(isDebugGold);
     }
 }
