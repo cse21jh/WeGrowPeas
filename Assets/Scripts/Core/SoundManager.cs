@@ -9,6 +9,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioSource BgmPlayer;
     public AudioSource EffectPlayer;
 
+    public AudioSource FlexibleEffectPlayer;
     public float BGMVolume { get; set; }
     public float EffectVolume { get; set; }
 
@@ -29,6 +30,10 @@ public class SoundManager : Singleton<SoundManager>
         BgmTempObject.transform.SetParent(gameObject.transform);
         BgmPlayer = BgmTempObject.AddComponent<AudioSource>();
 
+        GameObject FexibleEffectTempObject = new GameObject("FlexibleEffect");
+        FexibleEffectTempObject.transform.SetParent(gameObject.transform);
+        FlexibleEffectPlayer = FexibleEffectTempObject.AddComponent<AudioSource>();
+
         foreach (AudioClip audioclip in EffectAudioClips)
         {
             EffectSoundDictionary.Add(audioclip.name, audioclip);
@@ -36,6 +41,7 @@ public class SoundManager : Singleton<SoundManager>
 
         BGMVolume = 0.05f;
         EffectVolume = 0.3f;
+        
 
         EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/Effect/SelectPlant"));
         EffectSoundDictionary.Add("Breed", Resources.Load<AudioClip>("Audio/Effect/Breed"));
@@ -50,8 +56,12 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("Cold", Resources.Load<AudioClip>("Audio/Wave/Cold"));
         EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
 
+        EffectSoundDictionary.Add("Tractor", Resources.Load<AudioClip>("Audio/Tractor"));
+
         EffectSoundDictionary.Add("Farm", Resources.Load<AudioClip>("Audio/BGM/BGM"));
         EffectSoundDictionary.Add("StartScene", Resources.Load<AudioClip>("Audio/BGM/StartSceneBGM"));
+
+        
 
         PlayBgm("StartScene");
     }
@@ -59,6 +69,37 @@ public class SoundManager : Singleton<SoundManager>
     public void PlayEffect(string name)
     {
         EffectPlayer.PlayOneShot(EffectSoundDictionary[name], EffectVolume);
+    }
+
+    public IEnumerator PlayEffectLouder(string name, float time)
+    {
+        FlexibleEffectPlayer.volume = 0f;
+        FlexibleEffectPlayer.clip = EffectSoundDictionary[name];
+        FlexibleEffectPlayer.Play();
+        float t = 0f;
+        while(t < time)
+        {
+            t += Time.deltaTime;
+            FlexibleEffectPlayer.volume += (Time.deltaTime / time) * EffectVolume;
+            yield return null;
+        }
+        FlexibleEffectPlayer.Stop();
+
+    }
+
+    public IEnumerator StopEffectSmaller(string name, float time)
+    {
+        FlexibleEffectPlayer.volume = EffectVolume;
+        FlexibleEffectPlayer.clip = EffectSoundDictionary[name];
+        FlexibleEffectPlayer.Play();
+        float t = 0f;
+        while (t < time)
+        {
+            t += Time.deltaTime;
+            FlexibleEffectPlayer.volume -= (Time.deltaTime / time) * EffectVolume;
+            yield return null;
+        }
+        FlexibleEffectPlayer.Stop();
     }
 
     public void PlayBgm(string name)
@@ -86,6 +127,7 @@ public class SoundManager : Singleton<SoundManager>
     {
         EffectVolume = EffectVolumeSlider.value;
         EffectPlayer.volume = EffectVolumeSlider.value;
+        FlexibleEffectPlayer.volume = EffectVolumeSlider.value;
     }
 
 }
