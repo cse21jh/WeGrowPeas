@@ -40,17 +40,17 @@ public static class GameRecordHolder
 
     private static void CalculateRank()
     {
-        if (TotalPeas < 120)
+        if (TotalPeas < 80)
         {
             PlayerRank = 0;
             return;
         }
-        else if (TotalPeas < 200)
+        else if (TotalPeas < 120)
         {
             PlayerRank = 1;
             return;
         }
-        else if (TotalPeas < 280)
+        else if (TotalPeas < 160)
         {
             PlayerRank = 2;
             return;
