@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using System.Runtime.CompilerServices;
 
 public class ShopUI : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class ShopUI : MonoBehaviour
 
     private ShopManager shopManager;
     private UIAnimationManager animationManager;
+
+    private bool isClosing = false;
 
     private void Awake()
     {
@@ -178,6 +181,7 @@ public class ShopUI : MonoBehaviour
 
     public void Open()
     {
+        isClosing = false;
         session?.ClearThisShop();
         panel.SetActive(true);
         BuildShop();
@@ -190,10 +194,14 @@ public class ShopUI : MonoBehaviour
 
     public void Close()
     {
-        //panel.SetActive(false);
-        StartCoroutine(SoundManager.Instance.StopEffectSmaller("Tractor", 3f));
-        animationManager.SwitchCameras(CameraManager.CameraType.Normal);
-        Debug.Log("상점 종료!");
-        OnShopClosed?.Invoke();
+        if (!isClosing)
+        {
+            //panel.SetActive(false);
+            isClosing = true;
+            StartCoroutine(SoundManager.Instance.StopEffectSmaller("Tractor", 3f));
+            animationManager.SwitchCameras(CameraManager.CameraType.Normal);
+            Debug.Log("상점 종료!");
+            OnShopClosed?.Invoke();
+        }
     }
 }
