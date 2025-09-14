@@ -21,6 +21,7 @@ public class PlacementController : MonoBehaviour
 
     [Header("Shovel")]
     [SerializeField] private Shovel shovel;
+    [SerializeField] private ButtonController shovelButton;
 
     private Plant hovered;
 
@@ -49,6 +50,7 @@ public class PlacementController : MonoBehaviour
     {
         isPlacing = true;
         shovel.IsEnabled = false;
+        shovelButton.enabled = false;
 
         // 1) Shop UI 클릭 비활성 (화면은 보이되, 입력은 통과)
         bool hadCanvas = shopCanvas != null;
@@ -141,6 +143,7 @@ public class PlacementController : MonoBehaviour
         ctx.ShowGuide?.Invoke("");
 
         shovel.IsEnabled = true;
+        shovelButton.enabled = true;
 
         yield return null;
     }
@@ -179,6 +182,7 @@ public class PlacementController : MonoBehaviour
     {
         isPlacing = true;
         shovel.IsEnabled = false;
+        shovelButton.enabled = false;
 
         // 1) Shop UI 입력 비활성
         bool hadCanvas = shopCanvas != null;
@@ -256,6 +260,7 @@ public class PlacementController : MonoBehaviour
 
         ctx.ShowGuide?.Invoke("");
         shovel.IsEnabled = true;
+        shovelButton.enabled = true;
 
         yield return null;
     }

@@ -809,7 +809,7 @@ public class Grid : MonoBehaviour
         foreach(var i in saveData.perBottleTiles)
             PlacePetBottle(i);
         for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
-            TryPlaceFertilizer(saveData.fertilizerColumns[i], saveData.fertilizerType[i]);
+            TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
         UpdateSoil();
     }
 

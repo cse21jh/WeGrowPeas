@@ -9913,6 +9913,7 @@ GameObject:
   - component: {fileID: 3459781404393120205}
   - component: {fileID: 6199753071556481239}
   - component: {fileID: 8092485910829514798}
+  - component: {fileID: 1988331936237454887}
   m_Layer: 0
   m_Name: Peanut
   m_TagString: Untagged
@@ -9954,6 +9955,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesname: "\uB545\uCF69"
+  isDying: 0
   dissolveDuration: 1
   vanishEffect: {fileID: 8428304175217021898, guid: b4990911297e3684783505cdcbced834, type: 3}
   appearEffect: {fileID: 1845074002434938180}
@@ -9973,10 +9975,10 @@ MonoBehaviour:
   - {fileID: 7882026572964781495}
   - {fileID: 6801389412006919217}
   - {fileID: 7679987289730365684}
-  deathFrames: []
-  selectedSprite: []
   holdGaugeImage: {fileID: 207327698982860251}
   holdGaugeCanvasObj: {fileID: 7893356779225707738}
+  deathFrames: []
+  selectedSprite: []
 --- !u!65 &6199753071556481239
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10010,6 +10012,19 @@ SortingGroup:
   m_SortingLayer: 4
   m_SortingOrder: 50
   m_SortAtRoot: 0
+--- !u!114 &1988331936237454887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5643268807359755021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd25b7b63c3fd534caaef952cfc2a8a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: 1
 --- !u!1 &5819080825423496267
 GameObject:
   m_ObjectHideFlags: 0

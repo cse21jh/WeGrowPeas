@@ -1,22 +1,30 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum CursorType
+{
+    Default,
+    Clickable,
+    Clicked,
+}
+
 public class CursorManager : MonoBehaviour
 {
     public static CursorManager Instance;
 
-    public enum CursorType
-    {
-        Default,
-        Clickable,
-        Clicked,
-    }
 
 
     public Image cursorImage;   // 인스펙터에서 할당
     public Vector2 offset;      // 커서 중심 위치 조정용 (예: (16, -16))
 
-    [SerializeField] private Sprite[] cursorSprites; // 커서 이미지 배열
+
+    [System.Serializable]
+    public struct CursorData
+    {
+        public CursorType type;
+        public Sprite sprite;
+    }
+    public CursorData[] cursors;
 
 
     private void Awake()
@@ -45,11 +53,11 @@ public class CursorManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            SetCursorSprite(CursorType.Clicked);
+            SetCursor(CursorType.Clicked);
         }
         if(Input.GetMouseButtonUp(0))
         {
-            SetCursorSprite(CursorType.Default);
+            SetCursor(CursorType.Default);
         }
     }
 
@@ -60,19 +68,15 @@ public class CursorManager : MonoBehaviour
         cursorImage.enabled = hasFocus; // UI 커서 이미지 숨김/표시
     }
 
-    public void SetCursorSprite(CursorType type)
+    public void SetCursor(CursorType type)
     {
-        switch (type)
+        foreach (var c in cursors)
         {
-            case CursorType.Default:
-                cursorImage.sprite = cursorSprites[0];
-                break;
-            case CursorType.Clickable:
-                cursorImage.sprite = cursorSprites[1];
-                break;
-            case CursorType.Clicked:
-                cursorImage.sprite = cursorSprites[2];
-                break;
+            if (c.type == type)
+            {
+                cursorImage.sprite = c.sprite;
+                return;
+            }
         }
     }
 }
