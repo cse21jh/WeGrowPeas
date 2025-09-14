@@ -7,7 +7,7 @@ public class BreedTimerManager : MonoBehaviour
     [SerializeField] private GameObject[] timers;
     [SerializeField] private TimerUI[] timerUIs;
 
-    private void Start()
+    private void Awake()
     {
         grid = FindAnyObjectByType<Grid>();
         if(grid == null)

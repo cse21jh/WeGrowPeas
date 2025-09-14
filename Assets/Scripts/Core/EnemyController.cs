@@ -277,6 +277,7 @@ public class EnemyController : MonoBehaviour
             waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
+        breedTimerManager.SetTimer(currentWave.WaveType);
     }
 
     private void OnValidate()
