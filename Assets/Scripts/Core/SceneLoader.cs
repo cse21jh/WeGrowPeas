@@ -44,6 +44,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadStartScene()
     {
         SceneManager.LoadScene("StartScene");
+        Time.timeScale = 1f;
     }
 
     public void LoadTutorialScene()
@@ -70,7 +71,7 @@ public class SceneLoader : MonoBehaviour
 
     private IEnumerator Transition(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
         FindAnyObjectByType<TransitionController>().Transition_In();
     }
 }

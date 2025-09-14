@@ -31,7 +31,7 @@ public class UIClickEvent : MonoBehaviour
 
     private IEnumerator DelayAction(float delay, Action action)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
         action?.Invoke();
     }
 
@@ -84,8 +84,10 @@ public class UIClickEvent : MonoBehaviour
     {
         //GameEvents.RequestSaveGame();
         TransitionController.instance.Transition_Out();
+        //SceneLoader.Instance?.LoadStartScene();
         StartCoroutine(DelayAction(1.1f, () =>
         {
+            Debug.Log("Save And Return Main");
             SceneLoader.Instance?.LoadStartScene();
         }));
     }

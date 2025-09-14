@@ -14,12 +14,22 @@ public class TransitionController : MonoBehaviour
 
     [SerializeField] private bool isFinished = false;
 
+    [Space(10)]
+    [Header("Debug")]
+    [SerializeField] private bool isDebug = false;
+    [SerializeField] private float debugRadius = 0f;
+
     private void Awake()
     {
         if (instance == null)
+        {
             instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else
+        {
             Destroy(gameObject);
+        }
     }
 
     private void Start()
@@ -32,6 +42,7 @@ public class TransitionController : MonoBehaviour
         }
         */
     }
+
 
     /// <summary>
     /// 점점 밝아지는 트랜지션.
