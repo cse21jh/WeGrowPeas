@@ -19,6 +19,9 @@ public class PlacementController : MonoBehaviour
     [SerializeField] private LayerMask plantLayer = ~0; // Plant가 있는 레이어로 지정
     [SerializeField] private float rayMaxDistance = 100f;
 
+    [Header("Shovel")]
+    [SerializeField] private Shovel shovel;
+
     private Plant hovered;
 
     private Coroutine placingCo;
@@ -45,6 +48,7 @@ public class PlacementController : MonoBehaviour
         System.Action onCancel)
     {
         isPlacing = true;
+        shovel.IsEnabled = false;
 
         // 1) Shop UI 클릭 비활성 (화면은 보이되, 입력은 통과)
         bool hadCanvas = shopCanvas != null;
@@ -136,6 +140,8 @@ public class PlacementController : MonoBehaviour
         placingCo = null;
         ctx.ShowGuide?.Invoke("");
 
+        shovel.IsEnabled = true;
+
         yield return null;
     }
 
@@ -172,6 +178,7 @@ public class PlacementController : MonoBehaviour
         System.Action onCancel)
     {
         isPlacing = true;
+        shovel.IsEnabled = false;
 
         // 1) Shop UI 입력 비활성
         bool hadCanvas = shopCanvas != null;
@@ -248,6 +255,7 @@ public class PlacementController : MonoBehaviour
         placingCo = null;
 
         ctx.ShowGuide?.Invoke("");
+        shovel.IsEnabled = true;
 
         yield return null;
     }
