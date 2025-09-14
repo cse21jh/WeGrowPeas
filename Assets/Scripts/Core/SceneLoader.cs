@@ -65,10 +65,7 @@ public class SceneLoader : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log($"{scene.name} ¾À ·ÎµåµÊ (¸ðµå: {mode})");
-        if(scene.name == "GameOverScene")
-        {
-            StartCoroutine(Transition(1.0f));
-        }
+        StartCoroutine(Transition(1.0f));
     }
 
     private IEnumerator Transition(float delay)

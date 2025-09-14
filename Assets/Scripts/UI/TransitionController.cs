@@ -24,11 +24,13 @@ public class TransitionController : MonoBehaviour
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name != "GameOverScene")
+        /*
+        if (SceneManager.GetActiveScene().name == "StartScene 1")
         {
             transitionMat.SetFloat("_Radius", 1.5f);
             isFinished = true;
         }
+        */
     }
 
     /// <summary>
