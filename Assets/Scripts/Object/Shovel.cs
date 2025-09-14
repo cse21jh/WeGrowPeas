@@ -16,6 +16,8 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
     private Vector2 initialPos;
 
+    public bool IsEnabled { get; set; } = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,12 +31,14 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     }
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!IsEnabled) return;
         isDragging = true;
         UpdatePosition(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!IsEnabled) return;
         isDragging = false;
         UpdatePosition(eventData);
 
@@ -44,6 +48,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!IsEnabled) return;
         if (isDragging)
         {
             UpdatePosition(eventData);
