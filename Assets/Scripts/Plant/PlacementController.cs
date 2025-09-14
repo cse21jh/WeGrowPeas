@@ -284,8 +284,10 @@ public class PlacementController : MonoBehaviour
 
             foreach (var hit in hits3D)
             {
+                if (hit.transform.GetComponent<NepenthesPheromone>() != null)
+                    continue;
                 var t = hit.transform;
-                var plant =
+                    var plant =
                     t.GetComponent<Plant>() ??
                     t.GetComponentInParent<Plant>() ??
                     t.GetComponentInChildren<Plant>();
