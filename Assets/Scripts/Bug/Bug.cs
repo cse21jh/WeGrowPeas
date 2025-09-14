@@ -89,7 +89,7 @@ public class Bug : MonoBehaviour
     {
         ShowWarningSign();
         yield return new WaitForSeconds(1.0f);
-        DestroyWarningSign();
+        DestroyWarningSign(2.0f);
         movingCoroutine = StartCoroutine(Moving());
     }
 
@@ -143,9 +143,9 @@ public class Bug : MonoBehaviour
         
     }
 
-    protected void DestroyWarningSign()
+    protected void DestroyWarningSign(float delay)
     {
-        Destroy(WarningSign);
+        Destroy(WarningSign, delay);
     }
 
 
