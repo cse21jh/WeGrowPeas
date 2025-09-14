@@ -62,6 +62,10 @@ public class EconomyManager : MonoBehaviour
     {
         gold = saveData.gold;
         UpdateCoinUI(gold);
+        peaSellCount = saveData.sellCount[0];
+        peanutSellCount = saveData.sellCount[1];
+        totalGold = saveData.totalGold;
+        consumeGold = saveData.consumeGold;
     }
 
     public void AddSellCount(string plantName)

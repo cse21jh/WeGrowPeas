@@ -6,6 +6,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Linq;
 
 [System.Serializable]
 public class SaveData
@@ -63,10 +64,21 @@ public class SaveData
 
     //economyManager
     public int gold;
+    public int[] sellCount = new int[2];
+    public int totalGold;
+    public int consumeGold;
 
+    //shopManager
+    public List<string> itemName = new();
+    public List<int> itemPurchaseCount = new();
 
     //ModManager
     public List<Mod> mods = new();
+
+    //PlayerRecordForGraph
+    public List<int> survivedPlants = new();
+    public List<int> earnedGolds = new();
+    public List<int> waveEachDay = new();
 
     //환경설정 내용
     //GameRecordHolder에 저장될 내용
@@ -114,6 +126,7 @@ public class GameManager : Singleton<GameManager>
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
                 grid.InitGrid();
+                PlayerRecordForGraph.ClearAll();
                 StageUpdate();
                 break;
 
@@ -248,7 +261,9 @@ public class GameManager : Singleton<GameManager>
         upgradeManager.LoadUpgradeManager(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
+        shopManager.LoadShopManager(saveData);
         modManager.LoadModManager(saveData);
+        PlayerRecordForGraph.SetDataFromLoad(saveData);
         Debug.Log("불러옴");
     }
 
@@ -323,11 +338,28 @@ public class GameManager : Singleton<GameManager>
 
         //economyManager
         saveData.gold = economyManager.GetGold();
+        saveData.sellCount[0] = economyManager.PeaSellCount;
+        saveData.sellCount[1] = economyManager.PeanutSellCount;
+        saveData.totalGold = economyManager.TotalGold;
+        saveData.consumeGold = economyManager.ConsumeGold;
+
+        //shopManager
+        Dictionary<string, int> pHistory = shopManager.PurchaseHistory;
+        foreach(KeyValuePair<string, int> p in pHistory)
+        {
+            saveData.itemName.Add(p.Key);
+            saveData.itemPurchaseCount.Add(p.Value);
+        }
 
         //modManager
         saveData.mods = modManager.Mods;
 
-        string json = JsonUtility.ToJson(saveData, true);
+        //PlayerRecordForGraph
+        saveData.survivedPlants = PlayerRecordForGraph.survivedPlants;
+        saveData.earnedGolds = PlayerRecordForGraph.earnedGolds;
+        saveData.waveEachDay = PlayerRecordForGraph.waveEachDay;
+
+    string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);
 
         GameStartContext.SetStartType(GameStartType.ContinueGame);

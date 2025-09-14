@@ -18,6 +18,7 @@ public class ShopManager : Singleton<ShopManager>
 
     // itemId → 구매 개수
     private Dictionary<string, int> purchaseHistory = new Dictionary<string, int>();
+    public Dictionary<string, int> PurchaseHistory => purchaseHistory;
 
     public class ShopInventory
     {
@@ -113,5 +114,15 @@ public class ShopManager : Singleton<ShopManager>
         var mostSold = purchaseHistory.OrderByDescending(item => item.Value).First();
 
         return mostSold.Key;
+    }
+
+    public void LoadShopManager(SaveData saveData)
+    {
+        for(int i = 0; i < saveData.itemName.Count; i++)
+        {
+            var key = saveData.itemName[i];
+
+            purchaseHistory[key] = saveData.itemPurchaseCount[i];
+        }
     }
 }

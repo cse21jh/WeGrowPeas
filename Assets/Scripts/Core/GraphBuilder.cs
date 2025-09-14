@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using XCharts.Runtime;
+using UnityEditor;
 
 public static class PlayerRecordForGraph
 {
@@ -26,6 +27,13 @@ public static class PlayerRecordForGraph
     public static void SetSP(int n) => survivedPlants.Add(n);
     public static void SetEG(int n) => earnedGolds.Add(n);
     public static void SetWED(int n) => waveEachDay.Add(n);
+
+    public static void SetDataFromLoad(SaveData saveData)
+    {
+        survivedPlants = saveData.survivedPlants;
+        earnedGolds = saveData.earnedGolds;
+        waveEachDay = saveData.waveEachDay;
+    }
 }
 
 public class GraphBuilder : MonoBehaviour
