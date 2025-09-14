@@ -12,6 +12,8 @@ public class WaveManager : MonoBehaviour
     [SerializeField] ShadowLoop[] shadowLoops;
     [SerializeField] private float shadowSpeed = 10f;
 
+    [SerializeField] GameObject waveEffectSkipButton;
+
     [Space(10)]
     [Header("바람 효과 관련")]
     [SerializeField] private ParticleSystem[] windEffects;
@@ -62,6 +64,7 @@ public class WaveManager : MonoBehaviour
     private IEnumerator WaveEffect(WaveType type)
     {
         float t;
+        waveEffectSkipButton.SetActive(true);
         switch (type)
         {
             case WaveType.Aging:
@@ -214,6 +217,7 @@ public class WaveManager : MonoBehaviour
                 yield return null;
                 break;
         }
+        waveEffectSkipButton.SetActive(false);
     }
 
     private IEnumerator Lightning()
@@ -234,6 +238,6 @@ public class WaveManager : MonoBehaviour
 
     public void SkipWaveEffect()
     {
-        waveDuration = 0f;
+        waveDuration = 0f;        
     }
 }
