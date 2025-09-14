@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 
+[ExecuteInEditMode]
 public class TransitionController : MonoBehaviour
 {
     public static TransitionController instance;
@@ -41,6 +42,14 @@ public class TransitionController : MonoBehaviour
             isFinished = true;
         }
         */
+    }
+
+    private void Update()
+    {
+        if (isDebug)
+        {
+            transitionMat.SetFloat("_Radius", debugRadius);
+        }
     }
 
 
