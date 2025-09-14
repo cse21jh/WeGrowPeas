@@ -24,7 +24,7 @@ public static class GameRecordHolder
     public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, string wName, string iName)
     {
         maxStageReached = GameStartContext.StartType == GameStartType.GameOver ? stage - 1 : stage;
-        TotalPeas = peas;
+        TotalPeas = peas + 2;
         TotalPeanuts = peanuts;
         soldPeas = speas;
         soldPeanuts = speanuts;
