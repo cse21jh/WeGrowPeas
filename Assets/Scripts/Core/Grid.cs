@@ -47,7 +47,6 @@ public class Grid : MonoBehaviour
     
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
 
-    [SerializeField] private GameObject fertilizerMarkerPrefab;
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
     public List<Ladybug> ladybugs = new List<Ladybug>();
