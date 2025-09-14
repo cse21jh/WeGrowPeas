@@ -28,6 +28,7 @@ public class TutorialManager : Singleton<TutorialManager>
     [Header("Popup")]
     [SerializeField] private GameObject skipPopup;
     [SerializeField] private GameObject tutorialEndPopup;
+    [SerializeField] private GameObject breedGraph;
 
     [Header("White Circle Area")]
     [SerializeField] private SpawnedCircle spawnedCircle;
@@ -142,6 +143,7 @@ public class TutorialManager : Singleton<TutorialManager>
             switch (s.actions[i])
             {
                 case TutorialActions.ShowSkipPopUp:
+                    //Time.timeScale = 0.0f;
                     skipPopup.SetActive(true);
                     break;
 
@@ -189,6 +191,10 @@ public class TutorialManager : Singleton<TutorialManager>
                     shovel.SetActive(true);
                     break;
 
+                case TutorialActions.ShowBreedGraph:
+                    breedGraph.SetActive(true);
+                    break;
+
             }
         }
     }
@@ -228,6 +234,12 @@ public class TutorialManager : Singleton<TutorialManager>
     {
         StartCoroutine(PlayTutorialSequence(step1));
         skipPopup.SetActive(false);
+        //Time.timeScale = 1.0f;
+    }
+
+    public void CloseBreedGraph()
+    {
+        breedGraph.SetActive(false);
     }
 
 

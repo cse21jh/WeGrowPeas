@@ -365,7 +365,17 @@ public class EnemyController : MonoBehaviour
         if (grid.IsIceBlockActivated())
             grid.DeactivateIceBlock();
 
-        SetNextWave();
+        //SetNextWave();
+        //breedTimerManager 쪽 null reference issue로 부득이하게 함수 복사해서 사용
+        lastWave = currentWave;
+        currentWave = nextWave;
+        setWave = currentWave.WaveType;
+        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        //breedTimerManager.SetTimer(currentWave.WaveType);
+        ShowNextWaveText();
+        WaveType picked = PickNextByWeight();
+        nextWave = GetWaveFromWaveType(picked);
+
         currentWave = GetWaveFromWaveType(WaveType.Aging);
         //FlushNextWaveText();
         yield return null;

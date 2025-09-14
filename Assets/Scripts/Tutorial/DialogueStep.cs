@@ -20,6 +20,7 @@ public enum TutorialActions
     ClosePanel,
     EnableBugCatch,
     EnableShovel,
+    ShowBreedGraph,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
