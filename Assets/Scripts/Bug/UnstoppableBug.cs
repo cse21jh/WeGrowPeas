@@ -83,7 +83,7 @@ public class UnstoppableBug : Bug
 
     private float MoveTowards(float current, float target)
     {
-        float step = 1 / 255f;
+        float step = 5 / 255f;
 
         if (current < target)
         {
