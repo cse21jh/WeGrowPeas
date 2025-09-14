@@ -1,4 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
+using UnityEngine.UI;
 
 public class NepenthesPheromone : MonoBehaviour
 {
@@ -20,4 +24,11 @@ public class NepenthesPheromone : MonoBehaviour
         }
         return;
     }
+
+    
+    public void OnMouseEnter()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+    }
+    
 }
