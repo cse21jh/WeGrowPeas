@@ -28,6 +28,8 @@ public class TransitionController : MonoBehaviour
             if (Application.isPlaying)
             {
                 DontDestroyOnLoad(gameObject);
+
+                transitionMat.SetFloat("_Radius", 1.5f);
             }
         }
         else
