@@ -38,6 +38,9 @@ public class Newspaper : MonoBehaviour
     private float xRightPos = 130f;
     private float yRightPos = 150f;
 
+    // 이미 빌드되었는지 여부
+    private bool _isBuilt = false;
+
     public bool UpdateNewspaper()
     {
         NewspaperData data = null; 
@@ -49,6 +52,9 @@ public class Newspaper : MonoBehaviour
 
         if (data == null) // 신문 데이터 없으면 아예 신문이 뜨지 않도록
             return false;
+
+        if (_isBuilt) return true;
+        _isBuilt = true;
 
         xPos = xLeftPos;
         yPos = yLeftPos;
@@ -137,6 +143,7 @@ public class Newspaper : MonoBehaviour
 
     public void ClearArticle()
     {
+        _isBuilt = false;
         for (int i = 0; i < articleList.Count; i++)
         {
             Destroy(articleList[i]);
