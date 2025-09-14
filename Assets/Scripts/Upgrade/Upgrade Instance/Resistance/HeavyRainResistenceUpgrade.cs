@@ -6,7 +6,7 @@ public class HeavyRainResistenceUpgrade : Upgrade
 {
     public override string Name => "폭우 저항 확률 증가";
     public override string Explanation => "농장의 식물이 폭우에 저항할 확률이 5% 증가합니다 (최대 15%)";
-    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_11");
+    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_17");
     public override int MaxAmount => -1;
     public override int UnlockStage => HeavyRainWave.UnlockStage;
     public override int UpgradeId => 12;

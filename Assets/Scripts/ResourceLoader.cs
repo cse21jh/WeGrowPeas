@@ -14,7 +14,7 @@ public static class ResourceLoader
         // 최초 한 번만 LoadAll
         if (spriteCache.Count == 0)
         {
-            var sprites = Resources.LoadAll<Sprite>("UpgradeIcons");
+            var sprites = Resources.LoadAll<Sprite>("Sprites/UI/UpgradeIcons/upgradeIconsSheet");
             foreach (var sprite in sprites)
             {
                 spriteCache[sprite.name] = sprite;

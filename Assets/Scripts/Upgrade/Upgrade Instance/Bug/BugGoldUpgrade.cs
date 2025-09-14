@@ -4,7 +4,7 @@ public class BugGoldUpgrade : Upgrade
 {
     public override string Name => "¹ú·¹°¡ ÁÖ´Â µ· Áõ°¡";
     public override string Explanation => "¹ú·¹°¡ ÁÖ´Â °ñµå°¡ 10 Áõ°¡ÇÕ´Ï´Ù";
-    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_9");
+    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_25");
     public override int MaxAmount => 5;
     public override int UnlockStage => 11;
     public override int UpgradeId => 22;

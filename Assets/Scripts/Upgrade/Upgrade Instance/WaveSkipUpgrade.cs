@@ -6,7 +6,7 @@ public class WaveSkipUpgrade : Upgrade
 {
     public override string Name => "웨이브 스킵 횟수 증가";
     public override string Explanation => "웨이브 스킵 가능 횟수가 1회 증가합니다";
-    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("UpgradeIcons_17");
+    public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_23");
     public override int MaxAmount => -1;
     public override int UnlockStage => 16;
     public override int UpgradeId => 18;

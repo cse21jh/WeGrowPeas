@@ -131,7 +131,6 @@ public class Grid : MonoBehaviour
             //plants.Add(pea);
             AddPlantToGrid(pea);            
         }
-        AddSuperPea();
     }
 
     public IEnumerator Breeding()
