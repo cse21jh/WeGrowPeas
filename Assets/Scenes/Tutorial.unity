@@ -47935,6 +47935,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRange: {x: 2, y: 2}
   originPos: {x: -128.9, y: -0.9}
+  minDistance: 0.1
 --- !u!95 &238928927
 Animator:
   serializedVersion: 7
@@ -76864,6 +76865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRange: {x: 8, y: 8}
   originPos: {x: -1.3, y: 1}
+  minDistance: 0.1
 --- !u!95 &385187934
 Animator:
   serializedVersion: 7
@@ -121559,6 +121561,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRange: {x: 8, y: 8}
   originPos: {x: -1.3, y: 1}
+  minDistance: 0.1
 --- !u!95 &605013008
 Animator:
   serializedVersion: 7
@@ -128227,6 +128230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRange: {x: 2, y: 2}
   originPos: {x: -1.799934, y: 7.2}
+  minDistance: 0.1
 --- !u!95 &643021083
 Animator:
   serializedVersion: 7
@@ -339543,7 +339547,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1542916757
 RectTransform:
   m_ObjectHideFlags: 0
@@ -361744,6 +361748,7 @@ MonoBehaviour:
   bigIconDescription: {fileID: 0}
   TMI: {fileID: 0}
   line: {fileID: 0}
+  blocker: {fileID: 0}
 --- !u!1 &1627236070
 GameObject:
   m_ObjectHideFlags: 0
@@ -453779,6 +453784,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRange: {x: 8, y: 8}
   originPos: {x: -1.3, y: 1}
+  minDistance: 0.1
 --- !u!95 &2115268780
 Animator:
   serializedVersion: 7
