@@ -33,6 +33,7 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private SpawnedCircle spawnedCircle;
 
     private bool _narrationClickedThisFrame = false;
+    private bool _breedSuccess = false;
     private GameObject _lastClickedObject = null;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -126,6 +127,11 @@ public class TutorialManager : Singleton<TutorialManager>
                 );
                 _lastClickedObject = null;
                 break;
+
+            case DialogueTriggerType.BreedSuccess:
+                yield return new WaitUntil(() => _breedSuccess);
+                _breedSuccess = false;
+                break;
         }
     }
 
@@ -197,6 +203,11 @@ public class TutorialManager : Singleton<TutorialManager>
     public void OnObjectClicked(GameObject clicked)
     {
         _lastClickedObject = clicked;
+    }
+
+    public void OnBreedSucess()
+    {
+        _breedSuccess = true;
     }
 
     private DialogueStep[] ResolveSequence(NextTutorialSequence id)

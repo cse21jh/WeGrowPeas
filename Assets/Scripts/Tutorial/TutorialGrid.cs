@@ -88,7 +88,7 @@ public class TutorialGrid : Grid
         breedObj1 = null;
         breedObj2 = null;
 
-        breedSkipButton.SetActive(true);
+        //breedSkipButton.SetActive(true);
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
@@ -98,6 +98,8 @@ public class TutorialGrid : Grid
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
+                TutorialManager.Instance.OnBreedSucess();
+
                 if (breedObj1 != null && breedObj2 != null) // 교배 버튼 등으로 추후 수정
                 {
                     Plant parent1 = breedObj1.GetComponent<Plant>();
