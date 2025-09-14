@@ -180,9 +180,11 @@ public class GameManager : Singleton<GameManager>
             PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
 
             if (stage == endStage) yield return StartCoroutine(ClearNormalMode());
-
-            yield return StartCoroutine(BreedEndRoutine());
-            yield return StartCoroutine(upgradeManager.UpgradePhase());
+            else
+            {
+                yield return StartCoroutine(BreedEndRoutine());
+                yield return StartCoroutine(upgradeManager.UpgradePhase());
+            }
         }        
         yield return StartCoroutine(shopManager.ShopPhase(grid));
 
@@ -224,6 +226,7 @@ public class GameManager : Singleton<GameManager>
 
     private IEnumerator ClearNormalMode()
     {
+        Time.timeScale = 0.0f;
         yield return new WaitForSeconds(2.0f);
         PassRecordToGameRecordHolder();
 
