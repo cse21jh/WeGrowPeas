@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIGameRecord : MonoBehaviour
 {
@@ -10,11 +11,14 @@ public class UIGameRecord : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textPea;
     [SerializeField] private TextMeshProUGUI textBug;*/
 
+    [SerializeField] private Image peaEmotionUI;
     private TextMeshProUGUI endingText, pg1, pg2, pg3, pg4;
+
+    private Sprite[] peaEmotionSprite;
 
     private string[] endingTextDisc = new string[4]
     {
-        "살아남는 데는 성공했지만, 식량 확보가 보장되지 않는다고 판단되어 다른 대안을 탐색하러 떠났다…",
+        "살아남는 데는 성공했지만, 식량 확보가 보장되지 않는다고 판단되어 다른 대안을 탐색하러 떠났다….",
         "안정적인 환경에서 생산이 빠른 좋은 식량으로 평가받아 환경적인 변화가 크게 없는 일부 지역에서 쓰이게 되었다.",
         "다양한 환경에서 괜찮은 생산량을 보여 주었기에 비상시에 사용될 대체식품으로 각광받으며 좋은 먹거리가 되었다.",
         "뛰어난 적응성과 번식 속도를 입증해 전세계에 확산되었고, 이후 인류의 핵심적인 식량이 되었다!"
@@ -23,12 +27,8 @@ public class UIGameRecord : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*textStage.text = $"<sprite=0> 총 \"{GameRecordHolder.maxStageReached}\"라운드를 버텨 냈습니다.";
-        textPea.text = $"<sprite=8> 총 \"{GameRecordHolder.TotalPeas}\"마리의 완두콩을 키웠습니다.";
-        textBug.text = $"<sprite=10> 총 \"{GameRecordHolder.TotalBugsKilled}\"마리의 벌레를 잡았습니다.";
         
-        //Debug.Log($"{GameRecordHolder.maxStageReached}, {GameRecordHolder.TotalPeas}, {GameRecordHolder.TotalBugsKilled}");*/
-
+        peaEmotionSprite = Resources.LoadAll<Sprite>("Sprites/UI/peaFace_1-sheet");
         var texts = GetComponentsInChildren<TextMeshProUGUI>(true);
 
         endingText = texts.FirstOrDefault(t => t.name == "EndingText");
@@ -37,9 +37,32 @@ public class UIGameRecord : MonoBehaviour
         pg3 = texts.FirstOrDefault(t => t.name == "PG3");
         pg4 = texts.FirstOrDefault(t => t.name == "PG4");
 
+        SetPeaEmotion();
         SetEndingMailContent();
     }
         
+    private void SetPeaEmotion()
+    {
+        switch (GameRecordHolder.PlayerRank)
+        {
+            case 0:
+                peaEmotionUI.sprite = peaEmotionSprite[3];
+                break;
+
+            case 1:
+                peaEmotionUI.sprite = peaEmotionSprite[2];
+                break;
+
+            case 2:
+                peaEmotionUI.sprite = peaEmotionSprite[1];
+                break;
+
+            case 3:
+                peaEmotionUI.sprite = peaEmotionSprite[0];
+                break;
+        }
+    }
+
 
     private void SetEndingMailContent()
     {
@@ -55,7 +78,7 @@ public class UIGameRecord : MonoBehaviour
 
         if(GameRecordHolder.PopularItemName == null)
         {
-            pg3.text = $"우리 농장은 {GameRecordHolder.MostKilledWave}에 취약했다…\n" +
+            pg3.text = $"우리 농장은 {GameRecordHolder.MostKilledWave}에 취약했다….\n" +
             $"사람들은 {GameRecordHolder.MostSellPlantName}을 가장 좋아하는 듯하다.";
         }
         else
