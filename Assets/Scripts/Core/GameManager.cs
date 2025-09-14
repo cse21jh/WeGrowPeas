@@ -227,7 +227,9 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator GameOver()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.0f);
+        TransitionController.instance.Transition_Out();
+        yield return new WaitForSeconds(1.0f);
         PassRecordToGameRecordHolder();
         SceneLoader.Instance.LoadGameOverScene();
         File.Delete(GetSavePath());
