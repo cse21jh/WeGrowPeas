@@ -36,18 +36,6 @@ public class StemController : MonoBehaviour
 
     private void Start()
     {
-        if (isDebugMode)
-        {
-            SetTraits(new List<GeneticTrait> { 
-                new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0f),
-                new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0f),
-                new GeneticTrait(CompleteTraitType.FloodResistance, 0.5f, 1, 0f),
-                new GeneticTrait(CompleteTraitType.PestResistance, 0.5f, 1, 0f),
-                new GeneticTrait(CompleteTraitType.ColdResistance, 0.5f, 1, 0f),
-                new GeneticTrait(CompleteTraitType.HeavyRainResistance, 0.5f, 1, 0f),
-            });
-        }
-
         StartCoroutine(StartPodAnim());
     }
 
@@ -106,10 +94,25 @@ public class StemController : MonoBehaviour
                 Debug.LogError("Unknown PlantType");
                 break;
         }
-        
+        SetGold(CheckGold(traits));
     }
 
-    public void SetGold(bool isGold)
+    private bool CheckGold(List<GeneticTrait> traits)
+    {
+        int i = 0;
+        foreach(var t in traits)
+        {
+            if (t.genetics == 2)
+                i++;
+        }
+
+        if (i == 6)
+            return true;
+
+        return false;
+    }
+
+    private void SetGold(bool isGold)
     {
         if (isGold)
         {
@@ -131,8 +134,4 @@ public class StemController : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        SetGold(isDebugGold);
-    }
 }

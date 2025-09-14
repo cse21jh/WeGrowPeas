@@ -97,7 +97,7 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] private TextMeshProUGUI textStage;
 
-    [SerializeField] private int debugEndStage = 40;
+    [SerializeField] private int endStage = 40;
 
     // Start is called before the first frame update
     void Start()
@@ -179,7 +179,7 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitForSeconds(2.0f);
             PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
 
-            if (stage == debugEndStage) yield return StartCoroutine(ClearNormalMode());
+            if (stage == endStage) yield return StartCoroutine(ClearNormalMode());
 
             yield return StartCoroutine(BreedEndRoutine());
             yield return StartCoroutine(upgradeManager.UpgradePhase());

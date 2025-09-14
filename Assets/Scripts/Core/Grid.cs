@@ -129,9 +129,9 @@ public class Grid : MonoBehaviour
             FenceUIManager.Instance.SetFenceElements(0, pea);
             pea.SetTrait(basicTrait);
             //plants.Add(pea);
-            AddPlantToGrid(pea);
-
+            AddPlantToGrid(pea);            
         }
+        AddSuperPea();
     }
 
     public IEnumerator Breeding()
