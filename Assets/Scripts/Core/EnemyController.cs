@@ -226,7 +226,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = waveSkipCount.ToString() + "회";
+        waveSkipCountText.text = "추가 스킵 "+ waveSkipCount.ToString() + "회";
         return;
     }
 
