@@ -142,8 +142,8 @@ PlayerSettings:
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1
   preloadedAssets:
-  - {fileID: 11400000, guid: 4df58c69e96d2f74c91489c225a70779, type: 2}
-  - {fileID: 11400000, guid: 46f438909b2d6ca439b38255f44ca8ca, type: 2}
+  - {fileID: 11400000, guid: 7b5acc9ab79ccf047a8642de2239a0c4, type: 2}
+  - {fileID: 11400000, guid: d04b0816f04cb4742af95526b9c3b670, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -287,7 +287,14 @@ PlayerSettings:
   AndroidAppBundleSizeToValidate: 150
   AndroidReportGooglePlayAppDependencies: 1
   androidSymbolsSizeThreshold: 800
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 8f5099fa7cdd1e8479e7ba487a1d4b90, type: 3}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: iPhone
     m_Icons:
