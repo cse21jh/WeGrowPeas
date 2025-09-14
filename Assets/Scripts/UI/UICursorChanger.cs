@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -5,15 +6,34 @@ public class UICursorChanger : MonoBehaviour, ICursorHover, IPointerEnterHandler
 {
     [SerializeField] private CursorType cursorType = CursorType.Default;
 
+    [SerializeField] private bool isMouseOver = false;
+
     public CursorType GetCursorType() => cursorType;
+
+    
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isMouseOver = false;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        CursorManager.Instance.SetCursor(cursorType);
+        isMouseOver = true;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    private void Update()
     {
-        CursorManager.Instance.SetCursor(CursorType.Default);
+        if (isMouseOver)
+        {
+            CursorManager.Instance.SetCursor(cursorType);
+            if (Input.GetMouseButton(0))
+            {
+                CursorManager.Instance.SetCursor(CursorType.Clicked);
+            }
+        }
+        else
+        {
+            CursorManager.Instance.SetCursor(CursorType.Default);
+        }
     }
 }

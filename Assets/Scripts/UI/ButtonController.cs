@@ -34,14 +34,17 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
 
     private void OnDisable()
     {
-        // 버튼이 비활성화될 때 원래 상태로 복원
-        buttonRect.DOKill(); // 기존 애니메이션 초기화
-        buttonRect.localScale = originalScale;
-        buttonRect.rotation = originalRotation;
-        if (onMouseIcon != null)
+        if (buttonRect != null)
         {
-            onMouseIcon.gameObject.SetActive(false);
-            onMouseIcon.localScale = new Vector3(0, 0, 0);
+            // 버튼이 비활성화될 때 원래 상태로 복원
+            buttonRect.DOKill(); // 기존 애니메이션 초기화
+            buttonRect.localScale = originalScale;
+            buttonRect.rotation = originalRotation;
+            if (onMouseIcon != null)
+            {
+                onMouseIcon.gameObject.SetActive(false);
+                onMouseIcon.localScale = new Vector3(0, 0, 0);
+            }
         }
     }
 
@@ -74,6 +77,16 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
 
         //buttonRect.DOShakeRotation(animationDuration, 10 * shakeStrength, (int)(50 * shakeStrength), 90, false).SetUpdate(true);
         buttonRect.rotation = originalRotation;
+    }
+
+
+    private void OnMouseOver()
+    {
+        CursorManager.Instance.SetCursor(cursorType);
+        if (Input.GetMouseButton(0))
+        {
+            CursorManager.Instance.SetCursor(CursorType.Clicked);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)

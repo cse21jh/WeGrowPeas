@@ -6,9 +6,14 @@ public class CursorChanger : MonoBehaviour
 
     public CursorType GetCursorType() => cursorType;
 
-    void OnMouseEnter()
+
+    private void OnMouseOver()
     {
         CursorManager.Instance.SetCursor(cursorType);
+        if (Input.GetMouseButton(0))
+        {
+            CursorManager.Instance.SetCursor(CursorType.Clicked);
+        }
     }
 
     void OnMouseExit()
