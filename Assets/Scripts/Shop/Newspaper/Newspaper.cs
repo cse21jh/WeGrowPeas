@@ -20,6 +20,7 @@ public class Newspaper : MonoBehaviour
     [SerializeField] private GameObject bigIconDescription;
     [SerializeField] private GameObject TMI;
     [SerializeField] private GameObject line;
+    [SerializeField] private GameObject blocker;
 
     private List<GameObject> articleList = new List<GameObject>();
 
@@ -55,6 +56,7 @@ public class Newspaper : MonoBehaviour
 
         if (_isBuilt) return true;
         _isBuilt = true;
+        blocker.SetActive(true);
 
         xPos = xLeftPos;
         yPos = yLeftPos;
@@ -144,6 +146,7 @@ public class Newspaper : MonoBehaviour
     public void ClearArticle()
     {
         _isBuilt = false;
+        blocker.SetActive(false);
         for (int i = 0; i < articleList.Count; i++)
         {
             Destroy(articleList[i]);
