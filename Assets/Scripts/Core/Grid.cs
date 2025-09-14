@@ -465,6 +465,7 @@ public class Grid : MonoBehaviour
     public void AddMaxBreedTimer(int time)
     {
         maxBreedTimer += time;
+        breedTimerUI.UpdateMaxTimerCount();
         return;
     }
 

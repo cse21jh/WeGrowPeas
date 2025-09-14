@@ -39,26 +39,32 @@ public class BreedTimerManager : MonoBehaviour
         {
             case WaveType.Aging:
                 timers[0].SetActive(true);
+                timerUIs[0].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[0]);
                 break;
             case WaveType.Wind:
                 timers[1].SetActive(true);
+                timerUIs[1].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[1]);
                 break;
             case WaveType.Flood:
                 timers[2].SetActive(true);
+                timerUIs[2].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[2]);
                 break;
             case WaveType.Pest:
                 timers[3].SetActive(true);
+                timerUIs[3].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[3]);
                 break;
             case WaveType.Cold:
                 timers[4].SetActive(true);
+                timerUIs[4].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[4]);
                 break;
             case WaveType.HeavyRain:
                 timers[5].SetActive(true);
+                timerUIs[5].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[5]);
                 break;
             default:

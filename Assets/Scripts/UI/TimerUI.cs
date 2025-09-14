@@ -40,10 +40,17 @@ public class TimerUI : MonoBehaviour
         if (countdownRoutine != null)
         {
             textTimer.text = $"{maxBreedingTime}s";
-            breedTimerController.SetFill(1f);
+            breedTimerController.SetFill(1f);                       
             textTimer.color = Color.black;
             StopCoroutine(countdownRoutine);
         }
+    }
+
+    public void UpdateMaxTimerCount()
+    {
+        textTimer.text = $"{(int)GameManager.Instance.grid.GetMaxBreedTimer()}s";
+        breedTimerController.SetFill(1f);
+        textTimer.color = Color.black;
     }
 
     private IEnumerator BreedingCountdown()
