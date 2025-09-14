@@ -9,6 +9,7 @@ public class UILookController : MonoBehaviour
     [SerializeField] private Vector2 moveRange = Vector2.zero;
     [SerializeField] private Vector2 originPos = Vector2.zero;
 
+    [SerializeField] private float minDistance = 0.1f; // 최소 거리 임계값
 
     private void Awake()
     {
@@ -23,19 +24,38 @@ public class UILookController : MonoBehaviour
 
     private void LookTowardMouse()
     {
+        /*
         Vector2 mousePos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             Input.mousePosition,
-            canvas.worldCamera, // Overlay면 null 가능
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
             out mousePos);
 
-        // 현재 UI 오브젝트의 로컬 좌표
+        // 마우스 - 타겟 거리 (local 좌표 기준)
         Vector2 dir = mousePos - (Vector2)target.localPosition;
 
-        dir.Normalize();
-        dir = new Vector2(dir.x * moveRange.x, dir.y * moveRange.y);
+        // 거리 제한
+        dir = Vector2.ClampMagnitude(dir, Mathf.Max(moveRange.x, moveRange.y));
 
+        // dead zone 처리 (너무 가까우면 0으로)
+        //if (Mathf.Abs(dir.x) < minDistance) dir.x = 0f;
+        //if (Mathf.Abs(dir.y) < minDistance) dir.y = 0f;
+
+        // 최종 위치 적용
         target.anchoredPosition = originPos + dir;
+        */
+
+
+        Vector2 mousePos = Input.mousePosition;
+        Vector2 targetPos = (Vector2)target.position;
+
+        Vector2 dir = mousePos - targetPos; // 월드 좌표 기준 방향 벡터 계산
+        dir = Vector2.ClampMagnitude(dir, Mathf.Max(moveRange.x, moveRange.y)); // 거리 제한
+
+        if (Mathf.Abs(dir.x) < minDistance) dir.x = 0f;
+        if (Mathf.Abs(dir.y) < minDistance) dir.y = 0f;
+
+        target.localPosition = (Vector2)originPos + dir; // 최종 위치 적용
     }
 }
