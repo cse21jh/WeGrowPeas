@@ -59,6 +59,7 @@ public class TutorialBug : Bug
     public override IEnumerator KillBug()
     {
         yield return StartCoroutine(base.KillBug());
+        TutorialManager.Instance.OnCatchBug();
     }
 
     private void SetFixedPosition()

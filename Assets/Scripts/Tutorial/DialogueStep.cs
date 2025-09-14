@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public enum DialogueTriggerType { NarrationClick, KeyPress, ObjectClick, BreedSuccess }
+public enum DialogueTriggerType { NarrationClick, KeyPress, ObjectClick, BreedSuccess, CatchBug }
 
 public enum NextTutorialSequence { None, Step0, Step1, Step2, Step3, Step4, Step5 }
 

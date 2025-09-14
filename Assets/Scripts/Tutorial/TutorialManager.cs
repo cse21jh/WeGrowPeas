@@ -35,6 +35,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
     private bool _narrationClickedThisFrame = false;
     private bool _breedSuccess = false;
+    private bool _catchBug = false;
     private GameObject _lastClickedObject = null;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -133,6 +134,11 @@ public class TutorialManager : Singleton<TutorialManager>
                 yield return new WaitUntil(() => _breedSuccess);
                 _breedSuccess = false;
                 break;
+
+            case DialogueTriggerType.CatchBug:
+                yield return new WaitUntil(() => _catchBug);
+                _catchBug = false;
+                break;
         }
     }
 
@@ -214,6 +220,11 @@ public class TutorialManager : Singleton<TutorialManager>
     public void OnBreedSucess()
     {
         _breedSuccess = true;
+    }
+
+    public void OnCatchBug()
+    {
+        _catchBug = true;
     }
 
     private DialogueStep[] ResolveSequence(NextTutorialSequence id)
