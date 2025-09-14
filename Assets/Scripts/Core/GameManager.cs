@@ -174,18 +174,17 @@ public class GameManager : Singleton<GameManager>
 
         if (gameOver)
             yield return StartCoroutine(GameOver());
-        else if (!enemyController.IsLastWaveNone())
-        {
-            yield return new WaitForSeconds(2.0f);
-            PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
 
-            if (stage == endStage) yield return StartCoroutine(ClearNormalMode());
-            else
-            {
-                yield return StartCoroutine(BreedEndRoutine());
-                yield return StartCoroutine(upgradeManager.UpgradePhase());
-            }
-        }        
+        yield return new WaitForSeconds(2.0f);
+        PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+
+        if (stage == endStage) yield return StartCoroutine(ClearNormalMode());
+
+        yield return StartCoroutine(BreedEndRoutine());
+
+        if (!enemyController.IsLastWaveNone())
+            yield return StartCoroutine(upgradeManager.UpgradePhase());            
+        
         yield return StartCoroutine(shopManager.ShopPhase(grid));
 
     }
@@ -223,11 +222,9 @@ public class GameManager : Singleton<GameManager>
         GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
     }
-
+     
     private IEnumerator ClearNormalMode()
     {
-        Time.timeScale = 0.0f;
-        yield return new WaitForSeconds(2.0f);
         PassRecordToGameRecordHolder();
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Ending);
@@ -235,6 +232,8 @@ public class GameManager : Singleton<GameManager>
         //Time.timeScale = 0.0f;
         SaveGame();
         Debug.Log("40일 동안 생존하였습니다. YEAH!");
+        while(true)
+            yield return null;
     }
 
     private void LoadGame()
