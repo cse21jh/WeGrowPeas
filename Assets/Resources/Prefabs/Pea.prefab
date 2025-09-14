@@ -5343,6 +5343,7 @@ GameObject:
   - component: {fileID: 1857886757595617691}
   - component: {fileID: -2370402638131573238}
   - component: {fileID: 8357357269774700914}
+  - component: {fileID: 1836485550066286683}
   m_Layer: 0
   m_Name: Pea
   m_TagString: Untagged
@@ -5384,6 +5385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesname: 
+  isDying: 0
   dissolveDuration: 1
   vanishEffect: {fileID: 8428304175217021898, guid: b4990911297e3684783505cdcbced834, type: 3}
   appearEffect: {fileID: 3614438125452465354, guid: b8ad1799ddcd6e242906ba26d02e5113, type: 3}
@@ -5403,6 +5405,8 @@ MonoBehaviour:
   - {fileID: 9125246725699519209}
   - {fileID: 7464777610050257006}
   - {fileID: 705191046069470517}
+  holdGaugeImage: {fileID: 3347204854813344309}
+  holdGaugeCanvasObj: {fileID: 8789008305294630661}
   deathFrames:
   - {fileID: -1698807952, guid: c635eee2a5bf18b42b680feb2ac67503, type: 3}
   - {fileID: 294223702, guid: c635eee2a5bf18b42b680feb2ac67503, type: 3}
@@ -5410,8 +5414,6 @@ MonoBehaviour:
   selectedSprite:
   - {fileID: 21300000, guid: 2f804d1d0f16df64992026711672a3a3, type: 3}
   - {fileID: 21300000, guid: d103942726be2324dab1ac8efc20032c, type: 3}
-  holdGaugeImage: {fileID: 3347204854813344309}
-  holdGaugeCanvasObj: {fileID: 8789008305294630661}
 --- !u!65 &-2370402638131573238
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5445,6 +5447,19 @@ SortingGroup:
   m_SortingLayer: 4
   m_SortingOrder: 50
   m_SortAtRoot: 0
+--- !u!114 &1836485550066286683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6114093203436464154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd25b7b63c3fd534caaef952cfc2a8a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: 1
 --- !u!1 &6695553341205495468
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandler, IPointerExitHandler
 {
     private RectTransform buttonRect;
 
@@ -18,6 +18,10 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private Ease easeType; // 애니메이션 이징
 
     [SerializeField] private RectTransform onMouseIcon;
+
+    [SerializeField] private CursorType cursorType = CursorType.Clickable;
+
+    public CursorType GetCursorType() => cursorType;
 
 
     void Start()
@@ -50,6 +54,7 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerEnter(PointerEventData eventData)
     {
         // 마우스가 버튼 위에 올려졌을 때
+        CursorManager.Instance.SetCursor(cursorType);
 
 
         buttonRect.DOKill(); // 기존 애니메이션 초기화
@@ -74,6 +79,7 @@ public class ButtonController : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerExit(PointerEventData eventData)
     {
         // 마우스가 버튼을 떠났을 때
+        CursorManager.Instance.SetCursor(CursorType.Default);
         buttonRect.DOKill(); // 기존 애니메이션 초기화
         buttonRect.DOScale(originalScale, animationDuration).SetEase(easeType).SetUpdate(true);
 
