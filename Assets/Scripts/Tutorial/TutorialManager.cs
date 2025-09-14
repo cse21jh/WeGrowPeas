@@ -222,7 +222,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
     private void UpdateStageUI()
     {
-        textStage.text = $"<sprite=0> STAGE {tStage}";
+        textStage.text = $"<sprite=0> Day {tStage}";
     }
 
     private void ActivateWave()

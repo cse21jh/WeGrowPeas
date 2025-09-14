@@ -190,7 +190,7 @@ public class GameManager : Singleton<GameManager>
 
     private void UpdateStageUI()
     {
-        textStage.text = $"스테이지 {stage}";
+        textStage.text = $"<sprite=0> Day {stage}";
     }
 
     public IEnumerator BreedEndRoutine()
