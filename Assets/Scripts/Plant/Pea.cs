@@ -122,13 +122,13 @@ public class Pea : MovablePlant
     {
         switch (taste)
         {
-            case 0: return 90;
-            case 1: return 130;
-            case 2: return 160;
-            case 3: return 180;
-            case 4: return 200;
-            case 5: return 230;
-            case 6: return 270;
+            case 0: return (int)(90 * (1f + (0.2f * GetResistWaveCount())));
+            case 1: return (int)(130 * (1f + (0.2f * GetResistWaveCount())));
+            case 2: return (int)(160 * (1f + (0.2f * GetResistWaveCount())));
+            case 3: return (int)(180 * (1f + (0.2f * GetResistWaveCount())));
+            case 4: return (int)(200 * (1f + (0.2f * GetResistWaveCount())));
+            case 5: return (int)(230 * (1f + (0.2f * GetResistWaveCount())));
+            case 6: return (int)(270 * (1f + (0.2f * GetResistWaveCount())));
         }
         return 0;
     }

@@ -150,13 +150,13 @@ public class Peanut : MovablePlant
     {
         switch (taste)
         {
-            case 0: return 60 + grid.GetAdditionalPeanutGold();
-            case 1: return 100 + grid.GetAdditionalPeanutGold();
-            case 2: return 130 + grid.GetAdditionalPeanutGold();
-            case 3: return 150 + grid.GetAdditionalPeanutGold();
-            case 4: return 170 + grid.GetAdditionalPeanutGold();
-            case 5: return 200 + grid.GetAdditionalPeanutGold(); 
-            case 6: return 240 + grid.GetAdditionalPeanutGold();
+            case 0: return (int)((60 + grid.GetAdditionalPeanutGold()) * (1f + (0.2f * GetResistWaveCount())));
+            case 1: return (int)((100 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 2: return (int)((130 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 3: return (int)((150 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 4: return (int)((170 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 5: return (int)((200 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 6: return (int)((240 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
         }
         return 0;
     }

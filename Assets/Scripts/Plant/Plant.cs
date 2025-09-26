@@ -21,8 +21,10 @@ public abstract class Plant : MonoBehaviour
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
     protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     public int gridIndex { get; private set; }
-    protected int taste;
-    
+    protected int taste;    
+    protected int resistWaveCount = 0;
+
+
     protected Grid grid;
 
     public bool isDying = false;
@@ -50,6 +52,8 @@ public abstract class Plant : MonoBehaviour
     public virtual bool IsMovable => false;
 
     protected int plantID = -1;
+
+    protected float bonusGoldRatio = 0.2f; // 웨이브를 버틸 수록 추가되는 골드 비율
 
     public virtual void Init(int gridIndex, Grid grid)
     {
@@ -375,6 +379,7 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void ResistWave(WaveType waveType)
     {
+        resistWaveCount++;
         for (int i = 0; i < Wave.NumberOfWave; i++)
         {
             if ((int)waveType != i)
@@ -385,6 +390,12 @@ public abstract class Plant : MonoBehaviour
                     ChangeResistance(i, -0.05f);
             }
         }
+        if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
+        {
+            FenceUIManager.Instance.SetFenceElements(plantID, this);
+            priceSign.SetPrice(GetSellingPrice());
+        }
+
     }
 
     private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록
@@ -400,8 +411,6 @@ public abstract class Plant : MonoBehaviour
                     var = 0.1f;
 
                 traits[i] = new GeneticTrait((CompleteTraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
-                if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
-                    FenceUIManager.Instance.SetFenceElements(plantID, this);
                 return true;
                 // 여기서 황금 판단 내려서 황금 벗기기?
             }
@@ -412,5 +421,15 @@ public abstract class Plant : MonoBehaviour
     public int GetPlantID()
     {
         return plantID;
+    }
+
+    public int GetResistWaveCount()
+    {
+        return resistWaveCount;
+    }
+
+    public void SetResistWaveCount(int val)
+    {
+        resistWaveCount = val;
     }
 }

@@ -779,7 +779,7 @@ public class Grid : MonoBehaviour
             plant.SetTrait(item.traits);
             plant.SetAdditionalResistances(item.additionalResistance);
             plant.SetTaste(item.taste);
-
+            plant.SetResistWaveCount(item.resistWaveCount);
             Plantplant(plant);
         }
         maxCol = saveData.maxCol;
