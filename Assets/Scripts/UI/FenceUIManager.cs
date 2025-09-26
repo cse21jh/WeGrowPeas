@@ -20,6 +20,8 @@ public class FenceUIManager : MonoBehaviour
 
     [SerializeField] private PriceSignController priceSign;
 
+    private int showingPlantGridIndex = -1;
+
 
     private void Awake()
     {
@@ -35,6 +37,8 @@ public class FenceUIManager : MonoBehaviour
     public void SetFenceElements(int plantIndex, Plant plant)
     {
         priceSign.SetPrice(plant.GetSellingPrice());
+
+        showingPlantGridIndex = plant.gridIndex;
 
         StartCoroutine(ShowUI());
         /*
@@ -69,6 +73,7 @@ public class FenceUIManager : MonoBehaviour
 
     public void HideFenceElements()
     {
+        showingPlantGridIndex = -1;
         priceSign.HidePrice();
         StartCoroutine(HideUI());
 
@@ -149,5 +154,12 @@ public class FenceUIManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public bool CheckFenceIsShowingMe(int gridNum)
+    {
+        if(showingPlantGridIndex == gridNum) return true;
+
+        return false;
     }
 }

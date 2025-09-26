@@ -7,6 +7,7 @@ public class ChiliPepper : Plant
     {
         speciesname = "∞Ì√ﬂ";
         base.Init(gridIndex, grid);
+        plantID = 3;
     }
     public override float GetResistanceValue(int order)
     {
@@ -17,6 +18,10 @@ public class ChiliPepper : Plant
         return 1f;
     }
 
+    public override void ResistWave(WaveType waveType)
+    {
+        return;
+    }
     public override int GetSellingPrice()
     {
         return 500;

@@ -125,6 +125,7 @@ public class EnemyController : MonoBehaviour
                     if (plant.CanResist(wave.WaveType))
                     {
                         Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
+                        plant.ResistWave(wave.WaveType);
                     }
                     else
                     {

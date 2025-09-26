@@ -11,6 +11,7 @@ public class Nepenthes : Plant
     {
         speciesname = "³×Ææµ¥½º";
         base.Init(gridIndex, grid);
+        plantID = 2;
         NepenthesPheromone.transform.localScale = new Vector3(pheromoneSize, pheromoneSize, 1f);
     }
     public override float GetResistanceValue(int order)
@@ -23,6 +24,10 @@ public class Nepenthes : Plant
         return 1f;
     }
 
+    public override void ResistWave(WaveType waveType)
+    {
+        return;
+    }
     public override int GetSellingPrice()
     {
         return 0;

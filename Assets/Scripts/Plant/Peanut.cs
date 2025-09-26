@@ -15,6 +15,7 @@ public class Peanut : MovablePlant
     {
         speciesname = "¶¥Äá";
         base.Init(gridIndex, grid);
+        plantID = 1;
     }
 
     public override void SetTrait(List<GeneticTrait> newTraits)
@@ -71,7 +72,7 @@ public class Peanut : MovablePlant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         //UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(1, this);
+        FenceUIManager.Instance.SetFenceElements(plantID, this);
         priceSign.gameObject.SetActive(true);
         priceSign.SetPrice(GetSellingPrice());
     }

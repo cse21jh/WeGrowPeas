@@ -79,7 +79,7 @@ public abstract class MovablePlant : Plant
         if (isDragging)
         {
             grid.TryPlacePlant(this, Input.mousePosition);
-            FenceUIManager.Instance.SetFenceElements(0, this);
+            FenceUIManager.Instance.SetFenceElements(plantID, this);
         }
         else
         {

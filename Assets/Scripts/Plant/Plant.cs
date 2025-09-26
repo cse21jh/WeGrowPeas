@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public enum DeathCause { Generic, Bug, Shovel, Other }
 // Generic은 보통 웨이브에 의해 죽는 경우
@@ -47,6 +49,7 @@ public abstract class Plant : MonoBehaviour
 
     public virtual bool IsMovable => false;
 
+    protected int plantID = -1;
 
     public virtual void Init(int gridIndex, Grid grid)
     {
@@ -141,6 +144,8 @@ public abstract class Plant : MonoBehaviour
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         grid.CheckBreedButtonBeforeDie(this.gameObject);
+        if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
+            FenceUIManager.Instance.HideFenceElements();
         Destroy(this.gameObject, dissolveDuration);
         return true;
     }
@@ -366,5 +371,46 @@ public abstract class Plant : MonoBehaviour
         // 칸에 페트병이 놓여있으면 이동 금지
         if (grid != null && grid.HasPetBottle(gridIndex)) return false;
         return true;
+    }
+
+    public virtual void ResistWave(WaveType waveType)
+    {
+        for (int i = 0; i < Wave.NumberOfWave; i++)
+        {
+            if ((int)waveType != i)
+            {
+                if (GameManager.Instance.stage > 31)
+                    ChangeResistance(i, -0.1f);
+                else
+                    ChangeResistance(i, -0.05f);
+            }
+        }
+    }
+
+    private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록
+    {
+        for (int i = 0; i < traits.Count; i++)
+        {
+            if ((int)traits[i].traitType == traitNum)
+            {
+                float var = traits[i].resistance;
+                var += amount;
+
+                if (var < 0.1f)
+                    var = 0.1f;
+
+                traits[i] = new GeneticTrait((CompleteTraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
+                if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
+                    FenceUIManager.Instance.SetFenceElements(plantID, this);
+                return true;
+                // 여기서 황금 판단 내려서 황금 벗기기?
+            }
+        }
+        return false;
+    }
+
+    public int GetPlantID()
+    {
+        return plantID;
     }
 }

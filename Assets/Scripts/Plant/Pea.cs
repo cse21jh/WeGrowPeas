@@ -13,6 +13,7 @@ public class Pea : MovablePlant
     {
         speciesname = "¿ÏµÎÄá";
         base.Init(gridIndex, grid);
+        plantID = 0;
     }
 
     public override void SetTrait(List<GeneticTrait> newTraits)
@@ -94,7 +95,7 @@ public class Pea : MovablePlant
         //if (ClickRouter.Instance.IsBlockedByUI) return;
 
         //UIPlantStat.Instance.ShowInfo(speciesname, traits, this);
-        FenceUIManager.Instance.SetFenceElements(0, this);
+        FenceUIManager.Instance.SetFenceElements(plantID, this);
         priceSign.gameObject.SetActive(true);
         priceSign.SetPrice(GetSellingPrice());
     }
