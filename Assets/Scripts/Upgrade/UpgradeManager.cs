@@ -25,7 +25,7 @@ public class UpgradeManager : MonoBehaviour
         { typeof(HeavyRainResistenceUpgrade), () => new HeavyRainResistenceUpgrade()},
         { typeof(AddSoilUpgrade), () => new AddSoilUpgrade()},
         { typeof(BreedTimerUpgrade), () => new BreedTimerUpgrade()},
-        { typeof(MaxBreedCountUpgrade), () => new MaxBreedCountUpgrade()},
+        //{ typeof(MaxBreedCountUpgrade), () => new MaxBreedCountUpgrade()},
         { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
         { typeof(MaxRerollCountUpgrade), () => new MaxRerollCountUpgrade()},
         { typeof(WaveSkipUpgrade), () => new WaveSkipUpgrade()},
