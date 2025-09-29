@@ -346,7 +346,7 @@ public class UpgradeManager : MonoBehaviour
 
         randomUpgrade[0] = typeof(AddFloodPlantUpgrade);
         randomUpgrade[1] = typeof(AddSoilUpgrade);
-        randomUpgrade[2] = typeof(MaxBreedCountUpgrade);
+        randomUpgrade[2] = typeof(NaturalDeathResistenceUpgrade);
         SetRandomUpgrade();
         upgradePanel.SetActive(true);
         select = false;
