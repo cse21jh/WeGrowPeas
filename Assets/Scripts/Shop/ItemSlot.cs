@@ -28,7 +28,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         iconImage.sprite = eff.Icon;
         nameText.text = eff.DisplayName;
-        priceText.text = $"{eff.Price} G";
+        priceText.text = $"{eff.GetDisplayPrice()} G";
 
         stock = eff.IsStackable ? Mathf.Max(1, eff.InitialStock) : 1;
         maxStock = stock;
@@ -38,10 +38,11 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         buyButton.onClick.AddListener(() => shop.OnClickBuy(effect, this));
     }
 
-    public void OnPurchased(int delta)
+    public void OnPurchased()
     {
-        // delta=1이면 1개 소모, 매우 큰 값이면 즉시 0
-        stock = Mathf.Max(0, stock - (delta >= int.MaxValue ? stock : delta));
+        if (effect.IsStackable)
+            stock = Mathf.Max(0, stock - 1);
+
         Refresh();
     }
 
@@ -54,6 +55,8 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
         buyButton.interactable = stock > 0;
 
+        priceText.text = $"{effect.GetDisplayPrice()} G";
+
         leftAnim.SetBool("isOpen", stock > 0);
         rightAnim.SetBool("isOpen", stock > 0);
     }
@@ -61,7 +64,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (shop == null || effect == null) return;
-        shop.SendMessage("ShowInfo", $"{effect.DisplayName}\n{effect.Description}\n가격: {effect.Price} G");
+        shop.SendMessage("ShowInfo", $"{effect.DisplayName}\n{effect.Description}\n가격: {effect.GetDisplayPrice()} G");
     }
 
     public void OnPointerExit(PointerEventData eventData)

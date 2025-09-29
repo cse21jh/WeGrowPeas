@@ -97,7 +97,7 @@ public class ShopUI : MonoBehaviour
             return;
         }
 
-        if ((data.Price > services.Economy.GetGold()))
+        if ((data.GetDisplayPrice() > services.Economy.GetGold()))
         {
             ShowError("구매 불가");
             return;
@@ -148,7 +148,7 @@ public class ShopUI : MonoBehaviour
         if (shopManager.TryPurchase(ctx, data, out var err))
         {
             if (!data.IsStackable) session.MarkBought(data);
-            slot.OnPurchased(data.IsStackable ? 1 : int.MaxValue);
+            slot.OnPurchased();
             ShowInfo($"{data.DisplayName} 구매 완료");
         }
     }

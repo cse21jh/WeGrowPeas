@@ -66,14 +66,14 @@ public class ShopManager : Singleton<ShopManager>
         }
 
         // 골드 체크
-        if (!ctx?.Economy?.HasGold(data.Price) ?? true)
+        if (!ctx?.Economy?.HasGold(data.GetDisplayPrice()) ?? true)
         {
             error = "골드 부족";
             return false;
         }
 
         // 결제
-        ctx.Economy.SpendGold(data.Price);
+        ctx.Economy.SpendGold(data.GetDisplayPrice());
 
         // 효과 확정 반영
         data.Commit(ctx);
