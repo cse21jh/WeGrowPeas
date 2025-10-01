@@ -247,6 +247,7 @@ public class GameManager : Singleton<GameManager>
         //File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
         SaveGame();
+        GameStartContext.SetStartType(GameStartType.ContinueGame);
         Debug.Log("40일 동안 생존하였습니다. YEAH!");
         while(true)
             yield return null;
