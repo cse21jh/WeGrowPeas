@@ -410,9 +410,14 @@ public abstract class Plant : MonoBehaviour
                 if (var < 0.1f)
                     var = 0.1f;
 
+                StemController stem = GetComponentInChildren<StemController>();
+                if (stem != null)
+                {
+                    if (stem.IsGold() && var <= 0.5f)
+                        stem.SetGold(false);
+                }
                 traits[i] = new GeneticTrait((CompleteTraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
-                return true;
-                // 여기서 황금 판단 내려서 황금 벗기기?
+                return true;                
             }
         }
         return false;

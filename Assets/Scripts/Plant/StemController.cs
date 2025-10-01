@@ -23,7 +23,7 @@ public class StemController : MonoBehaviour
 
     [Space(10)]
     [Header("Gold Effect")]
-    [SerializeField] private bool isDebugGold = false;
+    [SerializeField] private bool isGold = false;
     [SerializeField] private SpriteRenderer stem;
     [SerializeField] private SpriteRenderer left_back;
     [SerializeField] private SpriteRenderer left_front;
@@ -102,19 +102,19 @@ public class StemController : MonoBehaviour
         int i = 0;
         foreach(var t in traits)
         {
-            if (t.genetics == 2)
+            if (t.genetics == 2 && t.resistance > 0.5f)
                 i++;
         }
 
         if (i == 6)
-            return true;
+            return isGold = true;
 
-        return false;
+        return isGold = false;
     }
 
-    private void SetGold(bool isGold)
+    public void SetGold(bool isG)
     {
-        if (isGold)
+        if (isG)
         {
             stem.sprite = goldSprites[0];
             left_back.sprite = goldSprites[1];
@@ -122,6 +122,7 @@ public class StemController : MonoBehaviour
             right_back.sprite = goldSprites[3];
             right_front.sprite = goldSprites[4];
             goldCrown.SetActive(true);
+            isGold = true;
         }
         else
         {
@@ -131,7 +132,12 @@ public class StemController : MonoBehaviour
             right_back.sprite = normalSprites[3];
             right_front.sprite = normalSprites[4];
             goldCrown.SetActive(false);
+            isGold = false;
         }
     }
 
+    public bool IsGold()
+    {
+        return isGold;
+    }
 }
