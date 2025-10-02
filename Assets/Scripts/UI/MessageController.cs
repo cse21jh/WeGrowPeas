@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 public class MessageController : MonoBehaviour
 {
@@ -17,19 +18,21 @@ public class MessageController : MonoBehaviour
 
     private GameObject currentPeaMessage;
 
-    public void AddMessage(MessageSenderType sender, string messageContent)
+    public void AddMessage(MessageSenderType sender, string messageContent, string bonusMessageContent = "", Action act1 = null, Action act2 = null)
     {
         Debug.Log(sender + ": " + messageContent);
 
         if (sender == MessageSenderType.player)
         {
             selectionPrefab = Instantiate(selectionPrefab, chatContent);
-            selectionPrefab.GetComponent<SelectionBoxController>().SetText("ÁÁ¾Æ!", "½È¾î!");
+            selectionPrefab.GetComponent<SelectionBoxController>().SetText(messageContent, bonusMessageContent, act1, act2);
         }
         else
         {
             currentPeaMessage = Instantiate(messagePrefab, chatContent);
             currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText(messageContent);
         }
+
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
     }
 }

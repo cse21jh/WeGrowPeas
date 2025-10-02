@@ -14,8 +14,11 @@ public class TutorialManager : Singleton<TutorialManager>
 
     [SerializeField] private TextMeshProUGUI textStage;
     [SerializeField] private Narration n;
+    [SerializeField] private MessageController mc;
 
     [SerializeField] private GameObject shovel;
+
+    [SerializeField] private Transform canvasTransform;
 
     [Header("Sequences")]
     [SerializeField] private DialogueStep[] step0;
@@ -26,8 +29,8 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private DialogueStep[] step5;
 
     [Header("Popup")]
-    [SerializeField] private GameObject skipPopup;
-    [SerializeField] private GameObject tutorialEndPopup;
+    //[SerializeField] private GameObject skipPopup;
+    //[SerializeField] private GameObject tutorialEndPopup;
     [SerializeField] private GameObject breedGraph;
 
     [Header("White Circle Area")]
@@ -74,6 +77,7 @@ public class TutorialManager : Singleton<TutorialManager>
     {
         if (seq == null || seq.Length == 0) yield break;
 
+        /*
         n.Flush();
 
         for (int i = 0; i < seq.Length; i++)
@@ -83,6 +87,34 @@ public class TutorialManager : Singleton<TutorialManager>
 
             // 대사 출력
             n.AddLine(s.text);
+
+            // 트리거 대기
+            yield return WaitForTrigger(s);
+
+            // 튜토리얼 내의 특정 액션 발생
+            if (s.actions[0] != TutorialActions.None)
+            {
+                DoAction(s);
+            }
+
+            // 다음 step으로 넘어가는 상황
+            if (s.chainTo != NextTutorialSequence.None)
+            {
+                var next = ResolveSequence(s.chainTo);
+                if (next != null && next.Length > 0)
+                    yield return PlayTutorialSequence(next);
+                yield break;
+            }
+        }
+        */
+
+        for (int i = 0; i < seq.Length; i++)
+        {
+            var s = seq[i];
+            if (s == null) continue;
+
+            // 대사 출력
+            mc.AddMessage(MessageController.MessageSenderType.pea, s.text);
 
             // 트리거 대기
             yield return WaitForTrigger(s);
@@ -151,7 +183,11 @@ public class TutorialManager : Singleton<TutorialManager>
             {
                 case TutorialActions.ShowSkipPopUp:
                     //Time.timeScale = 0.0f;
-                    skipPopup.SetActive(true);
+                    //skipPopup.SetActive(true);
+
+                    //튜토리얼을 스킵할래?
+                    mc.AddMessage(MessageController.MessageSenderType.player, "괜찮아!", "응! 들어볼래.", 
+                        FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame, FindAnyObjectByType<TutorialManager>().ContinueTutorial);
                     break;
 
                 case TutorialActions.ShowWhiteCircle:
@@ -183,7 +219,9 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.ShowTutorialEndPopUp:
-                    tutorialEndPopup.SetActive(true);
+                    //tutorialEndPopup.SetActive(true);
+
+                    mc.AddMessage(MessageController.MessageSenderType.player, "좋아! 가보자!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
                     break;
 
                 case TutorialActions.ClosePanel:
@@ -199,7 +237,9 @@ public class TutorialManager : Singleton<TutorialManager>
                     break;
 
                 case TutorialActions.ShowBreedGraph:
-                    breedGraph.SetActive(true);
+                    Instantiate(breedGraph, canvasTransform);
+
+
                     break;
 
                 case TutorialActions.ShowResistanceChange:
@@ -215,6 +255,14 @@ public class TutorialManager : Singleton<TutorialManager>
 
     /// <summary>NarrationBox의 EventTrigger/Button에서 OnClick에 연결</summary>
     public void OnNarrationBoxClicked()
+    {
+        _narrationClickedThisFrame = true;
+    }
+
+    /// <summary>
+    /// MessageBox의 EventTrigger/Button에서 OnClick에 연결
+    /// </summary>
+    public void OnMessageBoxClicked()
     {
         _narrationClickedThisFrame = true;
     }
@@ -252,14 +300,17 @@ public class TutorialManager : Singleton<TutorialManager>
     public void ContinueTutorial()
     {
         StartCoroutine(PlayTutorialSequence(step1));
-        skipPopup.SetActive(false);
+        //skipPopup.SetActive(false);
+
         //Time.timeScale = 1.0f;
     }
 
+    /*
     public void CloseBreedGraph()
     {
         breedGraph.SetActive(false);
     }
+    */
 
 
     private void UpdateStageUI()
