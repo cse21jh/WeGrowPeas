@@ -186,8 +186,8 @@ public class TutorialManager : Singleton<TutorialManager>
                     //skipPopup.SetActive(true);
 
                     //Æ©Åä¸®¾óÀ» ½ºÅµÇÒ·¡?
-                    mc.AddMessage(MessageController.MessageSenderType.player, "±¦Âú¾Æ!", "ÀÀ! µé¾îº¼·¡.", 
-                        FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame, FindAnyObjectByType<TutorialManager>().ContinueTutorial);
+                    mc.AddMessage(MessageController.MessageSenderType.player, "ÀÀ! µé¾îº¼·¡.", "±¦Âú¾Æ!",
+                       FindAnyObjectByType<TutorialManager>().ContinueTutorial, FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
                     break;
 
                 case TutorialActions.ShowWhiteCircle:
