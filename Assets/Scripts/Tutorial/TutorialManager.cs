@@ -32,6 +32,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
     [Header("White Circle Area")]
     [SerializeField] private SpawnedCircle spawnedCircle;
+    [SerializeField] private GameObject rc;
 
     private bool _narrationClickedThisFrame = false;
     private bool _breedSuccess = false;
@@ -199,6 +200,10 @@ public class TutorialManager : Singleton<TutorialManager>
 
                 case TutorialActions.ShowBreedGraph:
                     breedGraph.SetActive(true);
+                    break;
+
+                case TutorialActions.ShowResistanceChange:
+                    rc.SetActive(true);
                     break;
 
             }
