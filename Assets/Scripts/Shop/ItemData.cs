@@ -47,15 +47,7 @@ public abstract class ItemData : ScriptableObject
 
     public int GetDisplayPrice()
     {
-        if (this is IDynamicPricedItem dyn)
-            return dyn.GetCurrentPrice();
         return Price;
-    }
-
-    public void NotifyPurchased()
-    {
-        if (this is IDynamicPricedItem dyn)
-            dyn.OnPurchased();
     }
 }
 
