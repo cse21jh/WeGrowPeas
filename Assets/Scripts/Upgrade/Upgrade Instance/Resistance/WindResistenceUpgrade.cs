@@ -12,7 +12,7 @@ public class WindResistenceUpgrade : Upgrade
     public override int UpgradeId => 8;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.WindResistance, 0.05f);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.WindResistance, 0.05f, true);
         Debug.Log(Explanation);
     }
 }
