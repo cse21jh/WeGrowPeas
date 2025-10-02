@@ -127,6 +127,7 @@ public class GameManager : Singleton<GameManager>
             case GameStartType.NewGame:
                 Debug.Log("ªı ∞‘¿”");
                 grid.InitGrid();
+                economyManager.InitEconomyManager();
                 PlayerRecordForGraph.ClearAll();
                 StageUpdate();
                 break;

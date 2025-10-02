@@ -22,6 +22,11 @@ public class EconomyManager : MonoBehaviour
 
     private void Start()
     {
+       
+    }
+
+    public void InitEconomyManager()
+    {
         peaSellCount = 0;
         peanutSellCount = 0;
         totalGold = 0;
