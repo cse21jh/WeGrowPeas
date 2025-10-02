@@ -406,9 +406,9 @@ public abstract class Plant : MonoBehaviour
         }
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {
-            FenceUIManager.Instance.SetFenceElements(plantID, this);
-            priceSign.SetPrice(GetSellingPrice());
+            FenceUIManager.Instance.SetFenceElements(plantID, this);            
         }
+        priceSign.SetPrice(GetSellingPrice());
     }
 
     private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록
