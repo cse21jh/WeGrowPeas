@@ -131,7 +131,8 @@ public class EnemyController : MonoBehaviour
                     {
                         waveKillCount[(int)currentWave.WaveType] += 1;
                         Debug.Log(idx + "번째 식물이 죽었습니다");
-                        plant.Die();
+                        if (!plant.Die())
+                            plant.ResistWave(wave.WaveType);
                     }
 
                 }
