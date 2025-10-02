@@ -1,14 +1,13 @@
 using UnityEngine;
-using System;
 
-[CreateAssetMenu(fileName = "BreedCountItem", menuName = "Items/Breed/Max Count +1")]
-public class BreedCountItemData : ItemData
+[CreateAssetMenu(fileName = "AddSoilItem", menuName = "Items/Grid/Add Soil")]
+public class AddSoilItemData : ItemData
 {
-    [Header("Pricing (exponential)")]
+    [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;
-    [SerializeField] private float factor = 2f;
+    [SerializeField] private int maxPurchase = 4; // 밭은 4회까지만
 
-    private int purchaseCount = 0; // 무제한
+    private int purchaseCount = 0;
 
     private void OnValidate()
     {
@@ -24,14 +23,20 @@ public class BreedCountItemData : ItemData
 
     private void UpdatePrice()
     {
-        double priceD = basePrice * Math.Pow(factor, purchaseCount);
-        if (priceD > int.MaxValue) Price = int.MaxValue;
-        else Price = (int)priceD;
+        if (purchaseCount < maxPurchase)
+            Price = basePrice * (purchaseCount + 1); // 1000,2000,3000,4000
+        else
+            Price = int.MaxValue; // 더 못 삼
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        reason = null; // 무제한 가능
+        if (purchaseCount >= maxPurchase)
+        {
+            reason = "최대 구매 횟수에 도달했습니다.";
+            return false;
+        }
+        reason = null;
         return true;
     }
 
@@ -46,7 +51,7 @@ public class BreedCountItemData : ItemData
             return;
         }
 
-        ctx.Grid.AddMaxBreedCount(1);
+        ctx.Grid.AddSoil();
 
         purchaseCount++;
         UpdatePrice();
