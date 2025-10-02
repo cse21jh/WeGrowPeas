@@ -85,6 +85,9 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         // 상자 애니메이션(닫힘 처리)
         if (leftAnim) leftAnim.SetBool("isOpen", shouldOpen);
         if (rightAnim) rightAnim.SetBool("isOpen", shouldOpen);
+
+        iconImage.gameObject.SetActive(shouldOpen);
+        nameText.gameObject.SetActive(shouldOpen);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
