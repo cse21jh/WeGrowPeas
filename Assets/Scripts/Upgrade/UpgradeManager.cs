@@ -23,7 +23,7 @@ public class UpgradeManager : MonoBehaviour
         //{ typeof(PestResistenceUpgrade), () => new PestResistenceUpgrade()},
         { typeof(ColdResistenceUpgrade), () => new ColdResistenceUpgrade()},
         { typeof(HeavyRainResistenceUpgrade), () => new HeavyRainResistenceUpgrade()},
-        { typeof(AddSoilUpgrade), () => new AddSoilUpgrade()},
+        //{ typeof(AddSoilUpgrade), () => new AddSoilUpgrade()},
         { typeof(BreedTimerUpgrade), () => new BreedTimerUpgrade()},
         //{ typeof(MaxBreedCountUpgrade), () => new MaxBreedCountUpgrade()},
         { typeof(InheritanceUpgrade), () => new InheritanceUpgrade()},
