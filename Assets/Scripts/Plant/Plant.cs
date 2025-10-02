@@ -83,7 +83,6 @@ public abstract class Plant : MonoBehaviour
     public void SetTaste(int val)
     {
         taste = val;
-        priceSign.SetPrice(GetSellingPrice());
     }
 
     public virtual List<GeneticTrait> GetGeneticTrait()
@@ -450,6 +449,7 @@ public abstract class Plant : MonoBehaviour
     public void SetResistWaveCount(int val)
     {
         resistWaveCount = val;
+        priceSign.SetPrice(GetSellingPrice());
     }
 
     public void ShowPriceSign()
