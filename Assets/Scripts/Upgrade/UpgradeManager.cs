@@ -299,16 +299,16 @@ public class UpgradeManager : MonoBehaviour
         // 필수 업그레이드가 있는 경우
         switch (saveData.stage)
         {
-            case 3:
-                randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
-            case 8:
-                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
-            case 13:
+            case PestWave.UnlockStage - 3:
                 randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
-            case 18:
-                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
-            case 23:
+            case WindWave.UnlockStage - 3:
+                randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
+            case FloodWave.UnlockStage - 3:
+                randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
+            case HeavyRainWave.UnlockStage - 3:
                 randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
+            case ColdWave.UnlockStage - 3:
+                randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
         }
         return;
     }
