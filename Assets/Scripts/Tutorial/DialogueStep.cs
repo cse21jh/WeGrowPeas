@@ -22,6 +22,7 @@ public enum TutorialActions
     EnableShovel,
     ShowBreedGraph,
     ShowResistanceChange,
+    DeactiveResistanceChange,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]

@@ -206,6 +206,9 @@ public class TutorialManager : Singleton<TutorialManager>
                     rc.SetActive(true);
                     break;
 
+                case TutorialActions.DeactiveResistanceChange:
+                    rc.SetActive(false);
+                    break;
             }
         }
     }
