@@ -5,7 +5,6 @@ using UnityEngine;
 public class AddSoilItemData : ItemData
 {
     private string purchaseKey = "농장 확장";
-    private Dictionary<string, int> purchaseHistory;
 
     [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;
@@ -14,27 +13,27 @@ public class AddSoilItemData : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
-        UpdatePrice();
+        Price = basePrice;
     }
 
-    private void OnEnable()
-    {
-        purchaseHistory = ShopManager.Instance.PurchaseHistory;
-        purchaseHistory[purchaseKey] = 0;
-        UpdatePrice();
-    }
 
-    private void UpdatePrice()
+    private void UpdatePrice(ShopContext ctx)
     {
-        if (purchaseHistory[purchaseKey] < maxPurchase)
-            Price = basePrice * (purchaseHistory[purchaseKey] + 1); // 1000,2000,3000,4000
+        if (ctx.Shop.PurchaseHistory.ContainsKey(purchaseKey) == false)
+            ctx.Shop.PurchaseHistory[purchaseKey] = 1;
+
+        if (ctx.Shop.PurchaseHistory[purchaseKey] < maxPurchase)
+            Price = basePrice * (ctx.Shop.PurchaseHistory[purchaseKey] + 1); // 1000,2000,3000,4000
         else
             Price = int.MaxValue; // 더 못 삼
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (purchaseHistory[purchaseKey] >= maxPurchase)
+        if (ctx.Shop.PurchaseHistory.ContainsKey(purchaseKey) == false)
+            ctx.Shop.PurchaseHistory[purchaseKey] = 0;
+
+        if (ctx.Shop.PurchaseHistory[purchaseKey] >= maxPurchase)
         {
             reason = "최대 구매 횟수에 도달했습니다.";
             return false;
@@ -56,7 +55,6 @@ public class AddSoilItemData : ItemData
 
         ctx.Grid.AddSoil();
 
-        purchaseHistory[purchaseKey]++;
-        UpdatePrice();
+        UpdatePrice(ctx);
     }
 }

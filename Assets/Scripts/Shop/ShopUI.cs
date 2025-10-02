@@ -42,6 +42,7 @@ public class ShopUI : MonoBehaviour
             Grid = services.Grid,
             Economy = services.Economy,
             Session = session,
+            Shop = shopManager,
             ShowInfo = ShowInfo,
             ShowError = ShowError,
             ShowGuide = ShowGuide

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 public class BreedCountItemData : ItemData
 {
     private string purchaseKey = "교배 횟수 증가";
-    private Dictionary<string, int> purchaseHistory;
 
     [Header("Pricing (exponential)")]
     [SerializeField] private int basePrice = 1000;
@@ -15,19 +14,14 @@ public class BreedCountItemData : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
-        UpdatePrice();
+        Price = basePrice;
     }
 
-    private void OnEnable()
+    private void UpdatePrice(ShopContext ctx)
     {
-        purchaseHistory = ShopManager.Instance.PurchaseHistory;
-        purchaseHistory[purchaseKey] = 0;
-        UpdatePrice();
-    }
-
-    private void UpdatePrice()
-    {
-        double priceD = basePrice * Math.Pow(factor, purchaseHistory[purchaseKey]);
+        if (ctx.Shop.PurchaseHistory.ContainsKey(purchaseKey) == false)
+            ctx.Shop.PurchaseHistory[purchaseKey] = 1;
+        double priceD = basePrice * Math.Pow(factor, (ctx.Shop.PurchaseHistory[purchaseKey]));
         if (priceD > int.MaxValue) Price = int.MaxValue;
         else Price = (int)priceD;
     }
@@ -51,7 +45,6 @@ public class BreedCountItemData : ItemData
 
         ctx.Grid.AddMaxBreedCount(1);
 
-        purchaseHistory[purchaseKey]++;
-        UpdatePrice();
+        UpdatePrice(ctx);
     }
 }

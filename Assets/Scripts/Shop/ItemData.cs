@@ -59,6 +59,7 @@ public class ShopContext
     //public WaveManager Wave;
     //public BugManager Bugs;
     public EconomyManager Economy;
+    public ShopManager Shop;
     public object Session; // 필요하면 인터페이스로 확장
 
     public System.Action<string> ShowInfo;
