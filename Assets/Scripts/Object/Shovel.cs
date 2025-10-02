@@ -33,6 +33,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     {
         if (!IsEnabled) return;
         isDragging = true;
+        grid.ShowAllPriceSign();
         UpdatePosition(eventData);
     }
 
@@ -43,12 +44,17 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         UpdatePosition(eventData);
 
         TryDestroyUnderMouse();
+        grid.HideAllPriceSign();
         shovelRectTransform.localPosition = initialPos;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!IsEnabled) return;
+        if (!IsEnabled)
+        {
+            grid.HideAllPriceSign();
+            return;
+        }
         if (isDragging)
         {
             UpdatePosition(eventData);

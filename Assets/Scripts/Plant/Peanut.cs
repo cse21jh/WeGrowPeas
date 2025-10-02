@@ -81,7 +81,8 @@ public class Peanut : MovablePlant
     {
         //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
-        priceSign.gameObject.SetActive(false);
+        if(!grid.showingAllPrice)
+            priceSign.gameObject.SetActive(false);
     }
 
     public override float GetResistanceBasedOnGenetics(int genetics)
