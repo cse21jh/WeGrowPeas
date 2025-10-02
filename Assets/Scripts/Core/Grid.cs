@@ -497,7 +497,7 @@ public class Grid : MonoBehaviour
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                plant.AddAdditionalResistance(traitType, value);
+                plant.AddAdditionalResistanceByUpgrade(traitType, value);
             }
         }
         return;

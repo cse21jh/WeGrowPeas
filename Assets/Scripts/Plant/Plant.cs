@@ -21,7 +21,7 @@ public abstract class Plant : MonoBehaviour
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
     protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     public int gridIndex { get; private set; }
-    protected int taste;    
+    protected int taste;
     protected int resistWaveCount = 0;
 
 
@@ -67,7 +67,7 @@ public abstract class Plant : MonoBehaviour
         childMaterials = new Material[childSpriteRenderers.Length];
         for (int i = 0; i < childSpriteRenderers.Length; i++)
         {
-            childMaterials[i] = childSpriteRenderers[i].material; 
+            childMaterials[i] = childSpriteRenderers[i].material;
         }
 
         HideSnow(0f, Ease.Linear);
@@ -118,13 +118,13 @@ public abstract class Plant : MonoBehaviour
             {
                 if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
                 {
-                    if ((int)grid.GetFertilizerColumns()[gridIndex/4] == traitNum)
+                    if ((int)grid.GetFertilizerColumns()[gridIndex / 4] == traitNum)
                         resistance += 0.05f;
                 }
                 if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
                     resistance += 0.2f;
                 resistance += g.resistance + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
-                return resistance;
+                return resistance = resistance >= 1f ? 1f : resistance;
             }
         }
 
@@ -166,7 +166,7 @@ public abstract class Plant : MonoBehaviour
 
             float lerpedDissolve = Mathf.Lerp(0f, 1.1f, elapsedTime / dissolveDuration);
 
-            for(int i = 0; i < childMaterials.Length; i++)
+            for (int i = 0; i < childMaterials.Length; i++)
             {
                 childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
             }
@@ -231,15 +231,21 @@ public abstract class Plant : MonoBehaviour
     }
 
 
-    public void AddAdditionalResistance(CompleteTraitType traitType, float value)
+    public void AddAdditionalResistanceByUpgrade(CompleteTraitType traitType, float value)
     {
         for (int i = 0; i < traits.Count; i++)
         {
             if (traits[i].traitType == traitType)
             {
-                traits[i] = new GeneticTrait(traitType, traits[i].resistance, traits[i].genetics, traits[i].additionalResistance + value);
+                traits[i] = new GeneticTrait(traitType, GetResistanceBasedOnGenetics(traits[i].genetics), traits[i].genetics, traits[i].additionalResistance + value);
 
-                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, traits[i].resistance, traits[i].genetics, 0.15f);
+                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, GetResistanceBasedOnGenetics(traits[i].genetics), traits[i].genetics, 0.15f);
+
+                if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
+                {
+                    FenceUIManager.Instance.SetFenceElements(plantID, this);
+                    priceSign.SetPrice(GetSellingPrice());
+                }
 
                 return;
             }
@@ -249,7 +255,7 @@ public abstract class Plant : MonoBehaviour
     public void SetAdditionalResistances(List<float> additionalResistances)
     {
         int i = 0;
-        foreach(var a in additionalResistances)
+        foreach (var a in additionalResistances)
         {
             additionalResistance[traits[i].traitType] = a;
             i++;
@@ -260,11 +266,11 @@ public abstract class Plant : MonoBehaviour
     public virtual List<float> GetAdditionalResistances()
     {
         var list = new List<float>();
-        foreach(var a in additionalResistance.Values)
+        foreach (var a in additionalResistance.Values)
         {
             list.Add(a);
         }
-        return list;   
+        return list;
     }
 
     public abstract float GetResistanceBasedOnGenetics(int genetics);
@@ -395,7 +401,6 @@ public abstract class Plant : MonoBehaviour
             FenceUIManager.Instance.SetFenceElements(plantID, this);
             priceSign.SetPrice(GetSellingPrice());
         }
-
     }
 
     private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록
@@ -417,7 +422,7 @@ public abstract class Plant : MonoBehaviour
                         stem.SetGold(false);
                 }
                 traits[i] = new GeneticTrait((CompleteTraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
-                return true;                
+                return true;
             }
         }
         return false;
