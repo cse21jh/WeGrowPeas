@@ -360,6 +360,7 @@ public class EnemyController : MonoBehaviour
                     Plant plant = grid.plantGrid[idx];
 
                     if (idx == 0 || idx == 2) plant.Die();
+                    else plant.ResistWave(wave.WaveType);
                 }
             }
         }
