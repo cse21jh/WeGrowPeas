@@ -12,7 +12,7 @@ public class NaturalDeathResistenceUpgrade : Upgrade
     public override int UpgradeId => 7;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.NaturalDeath, 0.05f);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.NaturalDeath, 0.05f, true);
         Debug.Log(Explanation);
     }
 }

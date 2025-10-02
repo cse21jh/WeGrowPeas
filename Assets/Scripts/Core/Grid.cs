@@ -492,14 +492,14 @@ public class Grid : MonoBehaviour
         return maxCol;
     }
 
-    public void AddAdditionalResistanceInGrid(CompleteTraitType traitType, float value)
+    public void AddAdditionalResistanceInGrid(CompleteTraitType traitType, float value, bool byUpgrade = false)
     {
         for (int idx = 0; idx < GetMaxCol() * 4; idx++) // grid에 있는 식물들 저항력 증가
         {
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                plant.AddAdditionalResistanceByUpgrade(traitType, value);
+                plant.AddAdditionalResistance(traitType, value, byUpgrade);
             }
         }
         return;

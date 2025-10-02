@@ -231,15 +231,20 @@ public abstract class Plant : MonoBehaviour
     }
 
 
-    public void AddAdditionalResistanceByUpgrade(CompleteTraitType traitType, float value)
+    public void AddAdditionalResistance(CompleteTraitType traitType, float value, bool byUpgrade = false)
     {
         for (int i = 0; i < traits.Count; i++)
         {
             if (traits[i].traitType == traitType)
             {
-                traits[i] = new GeneticTrait(traitType, GetResistanceBasedOnGenetics(traits[i].genetics), traits[i].genetics, traits[i].additionalResistance + value);
+                float resistance = traits[i].resistance;
 
-                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, GetResistanceBasedOnGenetics(traits[i].genetics), traits[i].genetics, 0.15f);
+                if (byUpgrade)
+                    resistance = GetResistanceBasedOnGenetics(traits[i].genetics);
+
+                traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, traits[i].additionalResistance + value);
+
+                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, 0.15f);
 
                 if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
                 {
