@@ -111,7 +111,10 @@ public class ShopManager : Singleton<ShopManager>
     {
         if (purchaseHistory.Count == 0) return null;
 
-        var mostSold = purchaseHistory.OrderByDescending(item => item.Value).First();
+        var mostSold = purchaseHistory
+        .Where(item => item.Key != "³óÀå È®Àå" && item.Key != "±³¹è È½¼ö Áõ°¡")
+        .OrderByDescending(item => item.Value)
+        .FirstOrDefault();
 
         return mostSold.Key;
     }
