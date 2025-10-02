@@ -27,7 +27,6 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         isDragging = true;
 
-        // 클릭한 지점과 패널 위치의 차이를 "Canvas 좌표 기준"으로 저장
         RectTransform canvasRect = canvas.transform as RectTransform;
 
         Vector2 localPointerPos;
@@ -47,14 +46,25 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         RectTransform canvasRect = canvas.transform as RectTransform;
 
+        // 먼저 마우스 위치를 Canvas 화면 크기 안으로 Clamp
+        Vector2 clampedScreenPos = eventData.position;
+
+        float minX = 0f;
+        float maxX = Screen.width;
+        float minY = 0f;
+        float maxY = Screen.height;
+
+        clampedScreenPos.x = Mathf.Clamp(clampedScreenPos.x, minX, maxX);
+        clampedScreenPos.y = Mathf.Clamp(clampedScreenPos.y, minY, maxY);
+
+        // 이제 Clamp된 마우스 좌표를 이용해서 패널 이동
         Vector2 localPointerPos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect,
-            eventData.position,
+            clampedScreenPos, // ← 제한된 마우스 좌표
             eventData.pressEventCamera,
             out localPointerPos))
         {
-            // 마우스 좌표 - 처음 눌렀을 때의 오프셋 = 새 패널 위치
             rectTransform.localPosition = localPointerPos - pointerOffset;
         }
     }
