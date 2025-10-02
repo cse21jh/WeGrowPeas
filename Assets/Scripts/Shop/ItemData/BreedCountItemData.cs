@@ -1,14 +1,16 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "BreedCountItem", menuName = "Items/Breed/Max Count +1")]
 public class BreedCountItemData : ItemData
 {
+    private string purchaseKey = "교배 횟수 증가";
+    private Dictionary<string, int> purchaseHistory;
+
     [Header("Pricing (exponential)")]
     [SerializeField] private int basePrice = 1000;
     [SerializeField] private float factor = 2f;
-
-    private int purchaseCount = 0; // 무제한
 
     private void OnValidate()
     {
@@ -18,13 +20,14 @@ public class BreedCountItemData : ItemData
 
     private void OnEnable()
     {
-        purchaseCount = 0;
+        purchaseHistory = ShopManager.Instance.PurchaseHistory;
+        purchaseHistory[purchaseKey] = 0;
         UpdatePrice();
     }
 
     private void UpdatePrice()
     {
-        double priceD = basePrice * Math.Pow(factor, purchaseCount);
+        double priceD = basePrice * Math.Pow(factor, purchaseHistory[purchaseKey]);
         if (priceD > int.MaxValue) Price = int.MaxValue;
         else Price = (int)priceD;
     }
@@ -48,7 +51,7 @@ public class BreedCountItemData : ItemData
 
         ctx.Grid.AddMaxBreedCount(1);
 
-        purchaseCount++;
+        purchaseHistory[purchaseKey]++;
         UpdatePrice();
     }
 }

@@ -1,13 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AddSoilItem", menuName = "Items/Grid/Add Soil")]
 public class AddSoilItemData : ItemData
 {
+    private string purchaseKey = "농장 확장";
+    private Dictionary<string, int> purchaseHistory;
+
     [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;
     [SerializeField] private int maxPurchase = 4; // 밭은 4회까지만
-
-    private int purchaseCount = 0;
 
     private void OnValidate()
     {
@@ -17,21 +19,22 @@ public class AddSoilItemData : ItemData
 
     private void OnEnable()
     {
-        purchaseCount = 0;
+        purchaseHistory = ShopManager.Instance.PurchaseHistory;
+        purchaseHistory[purchaseKey] = 0;
         UpdatePrice();
     }
 
     private void UpdatePrice()
     {
-        if (purchaseCount < maxPurchase)
-            Price = basePrice * (purchaseCount + 1); // 1000,2000,3000,4000
+        if (purchaseHistory[purchaseKey] < maxPurchase)
+            Price = basePrice * (purchaseHistory[purchaseKey] + 1); // 1000,2000,3000,4000
         else
             Price = int.MaxValue; // 더 못 삼
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (purchaseCount >= maxPurchase)
+        if (purchaseHistory[purchaseKey] >= maxPurchase)
         {
             reason = "최대 구매 횟수에 도달했습니다.";
             return false;
@@ -53,7 +56,7 @@ public class AddSoilItemData : ItemData
 
         ctx.Grid.AddSoil();
 
-        purchaseCount++;
+        purchaseHistory[purchaseKey]++;
         UpdatePrice();
     }
 }

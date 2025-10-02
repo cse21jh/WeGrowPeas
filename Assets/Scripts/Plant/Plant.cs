@@ -69,7 +69,7 @@ public abstract class Plant : MonoBehaviour
         {
             childMaterials[i] = childSpriteRenderers[i].material;
         }
-
+        priceSign.SetPrice(GetSellingPrice());
         HideSnow(0f, Ease.Linear);
 
         StartCoroutine(Appear());
@@ -390,7 +390,7 @@ public abstract class Plant : MonoBehaviour
         {
             if ((int)waveType != i)
             {
-                if (GameManager.Instance != null && GameManager.Instance.stage > 31)
+                if (GameManager.Instance != null && GameManager.Instance.stage > 25)
                     ChangeResistance(i, -0.1f);
                 else
                     ChangeResistance(i, -0.05f);
@@ -441,5 +441,15 @@ public abstract class Plant : MonoBehaviour
     public void SetResistWaveCount(int val)
     {
         resistWaveCount = val;
+    }
+
+    public void ShowPriceSign()
+    {
+        priceSign.gameObject.SetActive(true);
+    }
+
+    public void HidePriceSign()
+    {
+        priceSign.gameObject.SetActive(false);
     }
 }

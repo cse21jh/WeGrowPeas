@@ -49,7 +49,9 @@ public class Grid : MonoBehaviour
 
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
-    public List<Ladybug> ladybugs = new List<Ladybug>();
+    public bool showingAllPrice = false;
+
+    public List<Ladybug> ladybugs = new List<Ladybug>();   
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -783,6 +785,7 @@ public class Grid : MonoBehaviour
             Plantplant(plant);
         }
         maxCol = saveData.maxCol;
+        UpdateSoil();
         killBugCount = saveData.killBugCount;
         totalBreedCount = saveData.totalBreedCount;
         totalPeaBreedcount = saveData.totalPeaBreedcount;
@@ -809,7 +812,6 @@ public class Grid : MonoBehaviour
             PlacePetBottle(i);
         for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
             TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
-        UpdateSoil();
     }
 
     public void AddBugSpeedDcreasement(float value)
@@ -1058,6 +1060,23 @@ public class Grid : MonoBehaviour
             new GeneticTrait(CompleteTraitType.ColdResistance, 1f , 2, 0.0f)
         };
         AddPea(peaTrait);        
+    }
+
+    public void ShowAllPriceSign()
+    {
+        showingAllPrice = true;
+        foreach(var p in plantGrid)
+        {
+            p.Value.ShowPriceSign();
+        }
+    }
+    public void HideAllPriceSign()
+    {
+        showingAllPrice = false;
+        foreach (var p in plantGrid)
+        {
+            p.Value.HidePriceSign();
+        }
     }
 }
 
