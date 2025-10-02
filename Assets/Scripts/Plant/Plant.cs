@@ -390,7 +390,7 @@ public abstract class Plant : MonoBehaviour
         {
             if ((int)waveType != i)
             {
-                if (GameManager.Instance != null && GameManager.Instance.stage > 31)
+                if (GameManager.Instance != null && GameManager.Instance.stage > 25)
                     ChangeResistance(i, -0.1f);
                 else
                     ChangeResistance(i, -0.05f);
