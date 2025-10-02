@@ -10,7 +10,7 @@ public class ItemData_BugSpray : ItemData
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
-    [Min(0)] public int rotationWeight = 8;
+    [Min(0)] public int rotationWeight = 4;
 
     private void OnValidate()
     {

@@ -3,6 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
 public class ChiliPepperItemData : ItemData
 {
+    [Header("Rotation")]
+    [Min(0)] public int rotationWeight = 4;
+
     // 배치 확정 시 사용할 그리드 인덱스
     private int? pendingIndex;
 
@@ -18,6 +21,8 @@ public class ChiliPepperItemData : ItemData
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
+
+    public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
