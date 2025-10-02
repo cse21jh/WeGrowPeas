@@ -62,6 +62,7 @@ public class GraphBuilder : MonoBehaviour
 
     void Start()
     {
+        top = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
 
         /*for (int i = 0; i < 112; i++)
         {

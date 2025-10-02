@@ -9,8 +9,10 @@ using UnityEngine.UI;
 
 public enum GameStartType
 {
+    None,
     NewGame,
     ContinueGame,
+    ContinueAfterEnding,
     GameOver
 }
 
@@ -49,12 +51,14 @@ public class UIClickEvent : MonoBehaviour
     {
         string path = Application.dataPath + "/UserData.json";
 
-        if(File.Exists(path) && GameStartContext.StartType != GameStartType.GameOver)
+        GetGameStartTypeFromSave();
+
+        if (File.Exists(path) && GameStartContext.StartType != GameStartType.GameOver)
         {
             TransitionController.instance.Transition_Out();
             StartCoroutine(DelayAction(1.1f, () =>
             {
-                GameStartContext.SetStartType(GameStartType.ContinueGame);
+                //GameStartContext.SetStartType(GameStartType.ContinueGame);
                 SceneLoader.Instance?.LoadGardenScene();
             }));
         }
@@ -114,5 +118,13 @@ public class UIClickEvent : MonoBehaviour
     public void OnClick_CloseGameOverPopup()
     {
         restartPopup.SetActive(false);
+    }
+
+    private void GetGameStartTypeFromSave()
+    {
+        string json = File.ReadAllText(Application.dataPath + "/UserData.json");
+        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+        GameStartContext.SetStartType(saveData.gst);
     }
 }

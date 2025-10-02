@@ -80,6 +80,9 @@ public class SaveData
     public List<int> earnedGolds = new();
     public List<int> waveEachDay = new();
 
+    //GameStartType
+    public GameStartType gst = GameStartType.None;
+
     //환경설정 내용
     //GameRecordHolder에 저장될 내용
 }
@@ -135,6 +138,12 @@ public class GameManager : Singleton<GameManager>
             case GameStartType.ContinueGame:
                 Debug.Log("이어하기");
                 LoadGame();
+                break;
+
+            case GameStartType.ContinueAfterEnding:
+                Debug.Log("40일 엔딩 보고 이어하기");
+                LoadGame();
+                stage++;
                 break;
         }
 
@@ -250,8 +259,8 @@ public class GameManager : Singleton<GameManager>
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Ending);
         //File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
+        GameStartContext.SetStartType(GameStartType.ContinueAfterEnding);
         SaveGame();
-        GameStartContext.SetStartType(GameStartType.ContinueGame);
         Debug.Log("40일 동안 생존하였습니다. YEAH!");
         while(true)
             yield return null;
@@ -368,7 +377,10 @@ public class GameManager : Singleton<GameManager>
         saveData.earnedGolds = PlayerRecordForGraph.earnedGolds;
         saveData.waveEachDay = PlayerRecordForGraph.waveEachDay;
 
-    string json = JsonUtility.ToJson(saveData, true);
+        //GameStartType
+        saveData.gst = GameStartContext.StartType;
+
+        string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);
 
         GameStartContext.SetStartType(GameStartType.ContinueGame);
