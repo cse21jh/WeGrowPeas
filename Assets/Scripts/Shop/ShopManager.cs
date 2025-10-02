@@ -75,13 +75,13 @@ public class ShopManager : Singleton<ShopManager>
         // 결제
         ctx.Economy.SpendGold(data.GetDisplayPrice());
 
-        // 효과 확정 반영
-        data.Commit(ctx);
-
         // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
         var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
+
+        // 효과 확정 반영
+        data.Commit(ctx);
 
         return true;
     }

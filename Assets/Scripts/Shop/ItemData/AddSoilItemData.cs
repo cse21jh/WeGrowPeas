@@ -19,9 +19,6 @@ public class AddSoilItemData : ItemData
 
     private void UpdatePrice(ShopContext ctx)
     {
-        if (ctx.Shop.PurchaseHistory.ContainsKey(purchaseKey) == false)
-            ctx.Shop.PurchaseHistory[purchaseKey] = 1;
-
         if (ctx.Shop.PurchaseHistory[purchaseKey] < maxPurchase)
             Price = basePrice * (ctx.Shop.PurchaseHistory[purchaseKey] + 1); // 1000,2000,3000,4000
         else

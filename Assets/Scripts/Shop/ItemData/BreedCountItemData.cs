@@ -19,8 +19,6 @@ public class BreedCountItemData : ItemData
 
     private void UpdatePrice(ShopContext ctx)
     {
-        if (ctx.Shop.PurchaseHistory.ContainsKey(purchaseKey) == false)
-            ctx.Shop.PurchaseHistory[purchaseKey] = 1;
         double priceD = basePrice * Math.Pow(factor, (ctx.Shop.PurchaseHistory[purchaseKey]));
         if (priceD > int.MaxValue) Price = int.MaxValue;
         else Price = (int)priceD;
