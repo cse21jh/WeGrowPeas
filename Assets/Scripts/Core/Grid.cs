@@ -677,7 +677,7 @@ public class Grid : MonoBehaviour
         int? targetIndex = GetGridIndexFromPosition(screenPosition);
 
         // 토양 감지 실패
-        if (!targetIndex.HasValue)
+        if (!targetIndex.HasValue || plant.isDying)
         {
             // 원래 위치로 되돌리기
             Transform originalSoil = GetSoilTransform(plant.gridIndex);

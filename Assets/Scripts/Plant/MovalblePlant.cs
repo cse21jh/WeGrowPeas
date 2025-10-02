@@ -48,7 +48,7 @@ public abstract class MovablePlant : Plant
 
         if (isDragging)
         {
-            if (!grid.GetIsBreeding())
+            if (!grid.GetIsBreeding() || isDying)
                 grid.TryPlacePlant(this, Input.mousePosition);
             else
                 FollowMouse();
