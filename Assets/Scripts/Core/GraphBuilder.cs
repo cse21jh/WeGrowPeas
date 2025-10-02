@@ -63,12 +63,12 @@ public class GraphBuilder : MonoBehaviour
     void Start()
     {
 
-        for (int i = 0; i < 112; i++)
+        /*for (int i = 0; i < 112; i++)
         {
             PlayerRecordForGraph.survivedPlants.Add(UnityEngine.Random.Range(5, 20));
             PlayerRecordForGraph.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));
             PlayerRecordForGraph.waveEachDay.Add(UnityEngine.Random.Range(0, 6));
-        }
+        }*/
 
         LoadChart();
     }
