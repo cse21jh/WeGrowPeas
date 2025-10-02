@@ -386,9 +386,12 @@ public abstract class Plant : MonoBehaviour
     public virtual void ResistWave(WaveType waveType)
     {
         resistWaveCount++;
+        int fertilizer = -1;
+        if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 저항력 감소가 되지 않습니다
+            fertilizer = (int)grid.GetFertilizerColumns()[gridIndex / 4];
         for (int i = 0; i < Wave.NumberOfWave; i++)
         {
-            if ((int)waveType != i)
+            if ((int)waveType != i && fertilizer != i)
             {
                 if (GameManager.Instance != null && GameManager.Instance.stage > 25)
                     ChangeResistance(i, -0.1f);
