@@ -198,7 +198,7 @@ public class GraphBuilder : MonoBehaviour
 
         var tooltip = waveChart.GetChartComponent<Tooltip>();
 
-        for (int w = 0; w <= 5; w++)
+        /*for (int w = 0; w <= 5; w++)
         {
             var s = waveChart.AddSerie<Line>();
             s.lineStyle.show = false;
@@ -214,6 +214,22 @@ public class GraphBuilder : MonoBehaviour
                     s.AddXYData(day + 1, w);
                 }
             }
+        }*/
+
+        for (int day = bottom; day < top; day++)
+        {
+            int w = PlayerRecordForGraph.waveEachDay[day];
+
+            if (PlayerRecordForGraph.waveEachDay[day] == 6) continue;
+
+            var s = waveChart.AddSerie<Line>();
+            s.lineStyle.show = false;
+            s.symbol.show = true;
+            s.symbol.size = 3;
+            s.symbol.type = SymbolType.Circle;
+            s.itemStyle.color = colors[w];
+
+            s.AddXYData(day + 1, w);
         }
     }
 

@@ -162,7 +162,6 @@ public class GameManager : Singleton<GameManager>
         {
             UpdateStageUI();
             yield return StartCoroutine(StartStage());
-            economyManager.PushEarnedGold();
             StageUpdate();
             SaveGame();
         }
@@ -192,7 +191,11 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
 
-        if (stage == endStage) yield return StartCoroutine(ClearNormalMode());
+        if (stage == endStage)
+        {
+            economyManager.PushEarnedGold();
+            yield return StartCoroutine(ClearNormalMode());
+        }
 
         yield return StartCoroutine(BreedEndRoutine());
 
@@ -200,7 +203,7 @@ public class GameManager : Singleton<GameManager>
             yield return StartCoroutine(upgradeManager.UpgradePhase());            
         
         yield return StartCoroutine(shopManager.ShopPhase(grid));
-
+        economyManager.PushEarnedGold();
     }
 
     private void UpdateStageUI()
