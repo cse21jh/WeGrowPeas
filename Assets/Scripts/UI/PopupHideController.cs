@@ -32,6 +32,7 @@ public class PopupHideController : MonoBehaviour
 
     public void MinimizePanel()
     {
+        minimizedPanel.localPosition = maximizedPanel.localPosition;
         // 전체 패널 축소
         maximizedPanel.DOScale(Vector3.zero, duration)
             .SetEase(ease)
@@ -48,6 +49,7 @@ public class PopupHideController : MonoBehaviour
 
     public void MaximizePanel()
     {
+        maximizedPanel.localPosition = minimizedPanel.localPosition;
         // 핸들 축소
         minimizedPanel.DOScale(Vector3.zero, duration)
             .SetEase(ease)
