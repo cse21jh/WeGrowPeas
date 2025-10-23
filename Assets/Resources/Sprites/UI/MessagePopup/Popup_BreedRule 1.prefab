@@ -719,6 +719,7 @@ GameObject:
   - component: {fileID: 6093927228073278845}
   - component: {fileID: 4650484733960859767}
   - component: {fileID: 3603902352088934832}
+  - component: {fileID: 3791539010046855125}
   m_Layer: 5
   m_Name: MinimizedPopup
   m_TagString: Untagged
@@ -799,6 +800,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handleArea: {fileID: 6885854506667063949}
+--- !u!114 &3791539010046855125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5795011780933316406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 671262d5cf6b99043871119492c3e05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6347441288783137268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,7 +1160,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7314934580369926021}
+      - m_Target: {fileID: 3791539010046855125}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: ClosePopup
         m_Mode: 1
