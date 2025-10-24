@@ -76,6 +76,7 @@ public class Pea : MovablePlant
     public override void MakeSelectedSprite()
     {
         base.MakeSelectedSprite();
+        FenceUIManager.Instance.ToggleOn(plantID, this);
         /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[1];
@@ -85,6 +86,7 @@ public class Pea : MovablePlant
     public override void MakeDefaultSprite()
     {
         base.MakeDefaultSprite();
+        FenceUIManager.Instance.ToggleOff(plantID, this);
         /*
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.sprite = selectedSprite[0];

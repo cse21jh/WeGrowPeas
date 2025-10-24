@@ -23,6 +23,16 @@ public class FenceUIManager : MonoBehaviour
     private int showingPlantGridIndex = -1;
 
 
+    [Space(10)]
+    [Header("Toggle Debug")]
+    [SerializeField] private bool isToggleOn = false;
+    [SerializeField] private int savedPlantIndex = -1;
+    [SerializeField] private Plant savedPlant = null;
+
+    [SerializeField] private int savedPlantIndex_stack = -1;
+    [SerializeField] private Plant savedPlant_stack = null;
+
+
     private void Awake()
     {
         Instance = this;
@@ -33,9 +43,62 @@ public class FenceUIManager : MonoBehaviour
         HideFenceElements();
     }
 
+    #region 토글 기능 관련
+    private void SaveData(int plantIndex, Plant plant)
+    {
+        if(savedPlant != null)
+        {
+            savedPlantIndex_stack = savedPlantIndex;
+            savedPlant_stack = savedPlant;
+        }
+
+        savedPlantIndex = plantIndex;
+        savedPlant = plant;
+    }
+
+    private void DeleteData(Plant plant)
+    {
+        Debug.Log(plant + " " + savedPlant + " " + savedPlant_stack);
+
+        if (savedPlant == plant)
+        {
+            savedPlant = savedPlant_stack;
+            savedPlantIndex = savedPlantIndex_stack;
+
+            savedPlant_stack = null;
+            savedPlantIndex_stack = -1;
+        }
+        else if(savedPlant_stack == plant)
+        {
+            savedPlant_stack = null;
+            savedPlantIndex_stack = -1;
+        }
+    }
+
+    public void ToggleOn(int plantIndex, Plant plant)
+    {
+        SaveData(plantIndex, plant);
+
+        SetFenceElements(plantIndex, plant);
+    }
+
+    public void ToggleOff(int plantIndex, Plant plant)
+    {
+        DeleteData(plant);
+
+        if(savedPlant == null)
+        {
+            HideFenceElements();
+        }
+    }
+
+    #endregion
+
 
     public void SetFenceElements(int plantIndex, Plant plant)
     {
+        //if (isToggleOn) return;
+
         priceSign.SetPrice(plant.GetSellingPrice());
 
         showingPlantGridIndex = plant.gridIndex;
@@ -83,6 +146,11 @@ public class FenceUIManager : MonoBehaviour
             element.gameObject.SetActive(false);
         }
         */
+
+        if(isToggleOn && savedPlant != null)
+        {
+            SetFenceElements(savedPlantIndex, savedPlant);
+        }
     }
 
     private IEnumerator ShowUI()

@@ -49,6 +49,8 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] protected GameObject foamEffect;
     [SerializeField] protected SpriteRenderer[] snowRenderers;
 
+    public virtual bool IsSelected { get; set; } = false;
+
     public virtual bool IsMovable => false;
 
     protected int plantID = -1;
@@ -197,11 +199,13 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void MakeSelectedSprite()
     {
+        IsSelected = true;
         ChangeLayerOfAllChild(gameObject, "Outline"); // "Outline" 레이어로 변경
     }
 
     public virtual void MakeDefaultSprite()
     {
+        IsSelected = false;
         ChangeLayerOfAllChild(gameObject, "Default"); // "Default" 레이어로 변경
     }
 
