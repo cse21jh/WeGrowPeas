@@ -25,7 +25,7 @@ public class SettingUI : MonoBehaviour
     {
         if (SettingPanel == null)
             return;
-        SettingPanel.SetActive(true);
+        SettingPanel.SetActive(true);        
         Time.timeScale = 0;
         ClickRouter.Instance.IsBlockedByUI = true;
         return;
@@ -51,5 +51,10 @@ public class SettingUI : MonoBehaviour
             ShowSettingPanel();
         return;
     }   
+
+    public void PlayButtonClickSound()
+    {
+        SoundManager.Instance.PlayEffect("Button");
+    }
 
 }

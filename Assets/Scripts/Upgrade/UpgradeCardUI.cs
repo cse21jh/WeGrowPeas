@@ -24,6 +24,7 @@ public class UpgradeCardUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        SoundManager.Instance.PlayEffect("Button");
         upgradeManager.SelectUpgrade(slotIndex);
     }
 
