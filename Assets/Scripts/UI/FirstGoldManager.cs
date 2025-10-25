@@ -12,9 +12,18 @@ public class FirstGoldManager : MonoBehaviour
             return;
 
         isFirstGold = true;
+        Time.timeScale = 0f;
         popup.SetActive(true);
         popupHideController.MaximizePanel();
     }
 
+    public void TimeContinues()
+    {
+        Time.timeScale = 1f;
+    }
 
+    public void TimeStops()
+    {
+        Time.timeScale = 0f;
+    }
 }

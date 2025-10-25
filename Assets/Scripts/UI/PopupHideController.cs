@@ -44,8 +44,8 @@ public class PopupHideController : MonoBehaviour
                 // 핸들 등장
                 minimizedPanel.gameObject.SetActive(true);
                 minimizedPanel.localScale = Vector3.zero;
-                minimizedPanel.DOScale(minPanelOriginalScale, duration).SetEase(ease);
-            });
+                minimizedPanel.DOScale(minPanelOriginalScale, duration).SetEase(ease).SetUpdate(true);
+            }).SetUpdate(true);
     }
 
     public void MaximizePanel()
@@ -62,7 +62,7 @@ public class PopupHideController : MonoBehaviour
                 // 전체 패널 복원
                 maximizedPanel.gameObject.SetActive(true);
                 maximizedPanel.localScale = Vector3.zero;
-                maximizedPanel.DOScale(maxPanelOriginalScale, duration).SetEase(ease);
-            });
+                maximizedPanel.DOScale(maxPanelOriginalScale, duration).SetEase(ease).SetUpdate(true);
+            }).SetUpdate(true);
     }
 }
