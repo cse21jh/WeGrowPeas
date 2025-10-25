@@ -107786,6 +107786,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f335ae22aafbaf4cbd5852ddaf16992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &530993964 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4020738838594061016, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+  m_PrefabInstance: {fileID: 4472167833932565131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530993956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e09dd0f5d08c7e04a9512099d25cf6c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &531950079
 GameObject:
   m_ObjectHideFlags: 0
@@ -141636,7 +141647,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shopUI: {fileID: 1833145416}
-  shopOpenDay: 5
+  shopOpenDay: 1
   fixedItems:
   - {fileID: 11400000, guid: 345b5c95b81676a4bb37f9526408484e, type: 2}
   - {fileID: 11400000, guid: 48dd461a4c641b24597dfe5dc8267e84, type: 2}
@@ -378072,7 +378083,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CoinUI: {fileID: 515010951}
-  gold: 1000
+  gold: 500000
 --- !u!4 &1891974903
 Transform:
   m_ObjectHideFlags: 0
@@ -435487,12 +435498,40 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 415974144}
     - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 825755752}
     - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 530993964}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: HideNewspaper
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PlayButtonClickSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UIClickEvent, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1662864531030675227, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1721906391520566310, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_text

@@ -107,6 +107,7 @@ public class ShopUI : MonoBehaviour
         // 효과 시작 → 플로우 분기
         data.StartEffect(ctx, onReady: () =>
         {
+            SoundManager.Instance.PlayEffect("Button");
             switch (data.FlowType)
             {
                 case ShopFlowType.Instant:
