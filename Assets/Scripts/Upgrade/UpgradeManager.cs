@@ -60,7 +60,8 @@ public class UpgradeManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI rerollNum;
     [SerializeField] Slider upgradeTimeSlider;
-    
+    [SerializeField] TextMeshProUGUI upgradeTimerText;
+
     public List<GeneticTrait> addPeaTrait;
     public List<GeneticTrait> addPeanutTrait;
 
@@ -258,6 +259,7 @@ public class UpgradeManager : MonoBehaviour
     private void UpgradeTimerUI(float timeRatio)
     {
         upgradeTimeSlider.value = timeRatio;
+        upgradeTimerText.text = Mathf.CeilToInt(upgradeTimer * (1 - timeRatio)).ToString() + "√  ≥≤¿Ω...";
     }
 
     public Dictionary<Type, int> GetRemainUpgrade()
