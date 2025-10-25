@@ -57,14 +57,24 @@ public class PriceSignController : MonoBehaviour
     {
         if (tasteDisplayMode)
         {
+            tasteDisplay_text.SetActive(true);
+            tasteDisplay_icon.SetActive(false);
             tasteText.text = taste.ToString() + "/6";
         }
         else
         {
-            for(int i = 0; i < tasteStars.Length; i++)
+            tasteDisplay_text.SetActive(false);
+            tasteDisplay_icon.SetActive(true);
+            for (int i = 0; i < tasteStars.Length; i++)
             {
                 tasteStars[i].SetActive(i < taste);
             }
         }
+    }
+
+    public void HideTaste()
+    {
+        tasteDisplay_icon.SetActive(false);
+        tasteDisplay_text.SetActive(false);
     }
 }

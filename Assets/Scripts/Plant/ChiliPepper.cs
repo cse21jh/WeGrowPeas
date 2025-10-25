@@ -29,12 +29,15 @@ public class ChiliPepper : Plant
 
     protected void OnMouseEnter()
     {
+        FindAnyObjectByType<PriceSignController>().HideTaste();
+        FindAnyObjectByType<PriceSignController>().SetPrice(GetSellingPrice());
         priceSign.gameObject.SetActive(true);
         priceSign.SetPrice(GetSellingPrice());
     }
 
     protected void OnMouseExit()
     {
+        FindAnyObjectByType<PriceSignController>().HidePrice();
         priceSign.gameObject.SetActive(false);
     }
 
