@@ -193,10 +193,10 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
 
-        gameOver = grid.CheckGameOver();
+        //gameOver = grid.CheckGameOver();
 
-        if (gameOver)
-            yield return StartCoroutine(GameOver());
+        //if (gameOver)
+        //    yield return StartCoroutine(GameOver());
 
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
@@ -241,6 +241,9 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator GameOver()
     {
+        //Debug.Log("게임오버");
+        PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+        economyManager.PushEarnedGold();
         yield return new WaitForSeconds(1.0f);
         TransitionController.instance.Transition_Out();
         yield return new WaitForSeconds(1.0f);

@@ -24,10 +24,13 @@ public class UIGameRecord : MonoBehaviour
         "뛰어난 적응성과 번식 속도를 입증해 전세계에 확산되었고, 이후 인류의 핵심적인 식량이 되었다!"
     };
 
+    private int recordStage = 0;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        recordStage = (GameStartContext.StartType == GameStartType.GameOver) ? GameRecordHolder.maxStageReached - 1 : GameRecordHolder.maxStageReached;
+
         peaEmotionSprite = Resources.LoadAll<Sprite>("Sprites/UI/peaFace_1-sheet");
         var texts = GetComponentsInChildren<TextMeshProUGUI>(true);
 
@@ -66,9 +69,9 @@ public class UIGameRecord : MonoBehaviour
 
     private void SetEndingMailContent()
     {
-        endingText.text = $"우리는 {GameRecordHolder.maxStageReached}일간 {endingTextDisc[GameRecordHolder.PlayerRank]}";
+        endingText.text = $"우리는 {recordStage}일간 {endingTextDisc[GameRecordHolder.PlayerRank]}";
 
-        pg1.text = $"총 \"{GameRecordHolder.maxStageReached}\"일을 버텼다!";
+        pg1.text = $"총 \"{recordStage}\"일을 버텼다!";
 
         pg2.text = $"\"{GameRecordHolder.TotalPeas}\"개의 완두콩 중 \"{GameRecordHolder.soldPeas}\"개를 판매했다.\n" +
             /*$"\"{GameRecordHolder.TotalPeanuts}\"개의 땅콩 중 \"{GameRecordHolder.soldPeanuts}\"개를 판매했다.\n" +*/

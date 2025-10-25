@@ -62,7 +62,7 @@ public class GraphBuilder : MonoBehaviour
 
     void Start()
     {
-        top = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
+        //top = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
 
         /*for (int i = 0; i < 112; i++)
         {
@@ -83,6 +83,8 @@ public class GraphBuilder : MonoBehaviour
 
     private void BuildPlants()
     {
+        top = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
+
         string lineColorHex = "#618e32";
         int xLabelFontSize = 8;
         int yLabelFontSize = 8;
@@ -129,6 +131,8 @@ public class GraphBuilder : MonoBehaviour
 
     private void BuildGold()
     {
+        top = PlayerRecordForGraph.earnedGolds.Count > 40 ? 40 : PlayerRecordForGraph.earnedGolds.Count;
+
         string lineColorHex = "#f1cf30";
         int xLabelFontSize = 8;
         int yLabelFontSize = 8;
@@ -175,6 +179,8 @@ public class GraphBuilder : MonoBehaviour
 
     private void BuildWaves()
     {
+        top = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
+
         int xLabelFontSize = 8;
 
         var xAxis = waveChart.GetChartComponent<XAxis>();
