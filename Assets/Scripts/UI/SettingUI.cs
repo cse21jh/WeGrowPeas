@@ -50,11 +50,9 @@ public class SettingUI : MonoBehaviour
         else
             ShowSettingPanel();
         return;
-    }   
-
+    }
     public void PlayButtonClickSound()
     {
         SoundManager.Instance.PlayEffect("Button");
     }
-
 }

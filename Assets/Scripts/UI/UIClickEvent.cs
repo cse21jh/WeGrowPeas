@@ -127,4 +127,8 @@ public class UIClickEvent : MonoBehaviour
 
         GameStartContext.SetStartType(saveData.gst);
     }
+    public void PlayButtonClickSound()
+    {
+        SoundManager.Instance.PlayEffect("Button");
+    }
 }
