@@ -70732,6 +70732,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 4020738838812965664}
+        m_TargetAssemblyTypeName: UIClickEvent, Assembly-CSharp
+        m_MethodName: PlayButtonClickSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &312184976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167141,6 +167153,18 @@ MonoBehaviour:
       - m_Target: {fileID: 6775367521431195928}
         m_TargetAssemblyTypeName: SettingUI, Assembly-CSharp
         m_MethodName: HideSettingPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 4020738838812965664}
+        m_TargetAssemblyTypeName: UIClickEvent, Assembly-CSharp
+        m_MethodName: PlayButtonClickSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -405753,6 +405777,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: MessagePanels 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 6775367521431195928}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PlayButtonClickSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: SettingUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230421601289017576, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 2535644057905886893, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -405765,6 +405817,34 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4020738838812965664}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayButtonClickSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIClickEvent, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3046675386082619606, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4361901721500980442, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -405776,6 +405856,34 @@ PrefabInstance:
     - target: {fileID: 4775839117080788728, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 4020738838812965664}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PlayButtonClickSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UIClickEvent, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6516495351247890607, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6669022856797538463, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
       propertyPath: m_Pivot.x
@@ -405856,6 +405964,34 @@ PrefabInstance:
     - target: {fileID: 6669022856797538463, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4020738838812965664}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayButtonClickSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIClickEvent, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8858130820579696496, guid: 7fe6f685e52f7814296a5239ca44e744, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -437006,6 +437142,7 @@ MonoBehaviour:
   petBottleMarkerPrefab: {fileID: 8364664605164439072, guid: 0b93d8a10e93165429c404b4238687f8, type: 3}
   showingAllPrice: 0
   ladybugs: []
+  isDraggingShovel: 0
   maxCol: 4
   killBugCount: 0
   totalBreedCount: 0
@@ -443321,6 +443458,11 @@ MonoBehaviour:
   moveEase: 4
   fenceAnimSytle: 1
   priceSign: {fileID: 2038041512}
+  isToggleOn: 0
+  savedPlantIndex: -1
+  savedPlant: {fileID: 0}
+  savedPlantIndex_stack: -1
+  savedPlant_stack: {fileID: 0}
 --- !u!114 &1912975211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468079,6 +468221,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   priceText: {fileID: 199431258}
+  tasteDisplayMode: 1
+  tasteDisplay_text: {fileID: 0}
+  tasteDisplay_icon: {fileID: 0}
+  tasteText: {fileID: 0}
+  tasteStars: []
 --- !u!1 &2039148176
 GameObject:
   m_ObjectHideFlags: 0
@@ -500850,6 +500997,18 @@ MonoBehaviour:
       - m_Target: {fileID: 6775367521431195928}
         m_TargetAssemblyTypeName: SettingUI, Assembly-CSharp
         m_MethodName: ToggleSettingPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 4020738838812965664}
+        m_TargetAssemblyTypeName: UIClickEvent, Assembly-CSharp
+        m_MethodName: PlayButtonClickSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
