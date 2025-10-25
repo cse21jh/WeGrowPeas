@@ -107,8 +107,10 @@ public class StemController : MonoBehaviour
         }
 
         if (i == 6)
+        {
+            FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
             return isGold = true;
-
+        }
         return isGold = false;
     }
 
