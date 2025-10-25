@@ -193,10 +193,10 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
 
-        //gameOver = grid.CheckGameOver();
+        gameOver = grid.CheckGameOver();
 
-        //if (gameOver)
-        //    yield return StartCoroutine(GameOver());
+        if (gameOver)
+            yield return null;
 
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
