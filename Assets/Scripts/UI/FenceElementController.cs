@@ -30,6 +30,7 @@ public class FenceElementController : MonoBehaviour
 
     private void Start()
     {
+        star.gameObject.SetActive(false);
     }
 
     public void SetLightActive(bool isActive, WaveType type)
@@ -186,7 +187,7 @@ public class FenceElementController : MonoBehaviour
                 break;
         }
 
-        star.gameObject.SetActive(isTaste);
+        //star.gameObject.SetActive(isTaste);
     }
 
 

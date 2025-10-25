@@ -113,7 +113,10 @@ public class FenceUIManager : MonoBehaviour
 
         List<GeneticTrait> Traits = plant.GetGeneticTrait();
         int taste = plant.GetTaste();
-        //Debug.Log($"SetFenceElements called with {Traits.Count} traits." + Traits);
+        FindAnyObjectByType<PriceSignController>().ShowTaste(taste);
+
+
+        //이제 여기서 Taste 관리 안 함
         for (int i = 0; i < Traits.Count; i++)
         {
             bool isTasteActive = i < taste;
