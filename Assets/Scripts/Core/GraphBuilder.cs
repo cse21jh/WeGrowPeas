@@ -43,7 +43,9 @@ public class GraphBuilder : MonoBehaviour
     [SerializeField] private LineChart waveChart;
 
     private int bottom = 0;
-    private int top = 40;
+    private int ptop = 40;
+    private int gtop = 40;
+    private int wtop = 40;
     private int countPerPage = 40;
 
     private static readonly string[] WaveNames =
@@ -62,14 +64,16 @@ public class GraphBuilder : MonoBehaviour
 
     void Start()
     {
-        //top = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
-
         /*for (int i = 0; i < 112; i++)
         {
             PlayerRecordForGraph.survivedPlants.Add(UnityEngine.Random.Range(5, 20));
             PlayerRecordForGraph.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));
             PlayerRecordForGraph.waveEachDay.Add(UnityEngine.Random.Range(0, 6));
         }*/
+
+        ptop = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
+        gtop = PlayerRecordForGraph.earnedGolds.Count > 40 ? 40 : PlayerRecordForGraph.earnedGolds.Count;
+        wtop = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
 
         LoadChart();
     }
@@ -83,8 +87,6 @@ public class GraphBuilder : MonoBehaviour
 
     private void BuildPlants()
     {
-        top = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
-
         string lineColorHex = "#618e32";
         int xLabelFontSize = 8;
         int yLabelFontSize = 8;
@@ -96,7 +98,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.minMaxType = Axis.AxisMinMaxType.Custom;
         xAxis.min = bottom + 1;
-        xAxis.max = top;
+        xAxis.max = ptop;
         xAxis.interval = 5;
         xAxis.data.Clear();
 
@@ -125,14 +127,12 @@ public class GraphBuilder : MonoBehaviour
             s.itemStyle.color = lineColor;
         }
 
-        for (int d = bottom; d < top; d++)
+        for (int d = bottom; d < ptop; d++)
             plantChart.AddData(0, d+1, PlayerRecordForGraph.survivedPlants[d]);
     }
 
     private void BuildGold()
     {
-        top = PlayerRecordForGraph.earnedGolds.Count > 40 ? 40 : PlayerRecordForGraph.earnedGolds.Count;
-
         string lineColorHex = "#f1cf30";
         int xLabelFontSize = 8;
         int yLabelFontSize = 8;
@@ -144,7 +144,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.minMaxType = Axis.AxisMinMaxType.Custom;
         xAxis.min = bottom + 1;
-        xAxis.max = top;
+        xAxis.max = gtop;
         xAxis.interval = 5;
         xAxis.data.Clear();
 
@@ -173,14 +173,12 @@ public class GraphBuilder : MonoBehaviour
             s.itemStyle.color = lineColor;
         }
 
-        for (int d = bottom; d < top; d++)
+        for (int d = bottom; d < gtop; d++)
             goldChart.AddData(0, d+1, PlayerRecordForGraph.earnedGolds[d]);
     }
 
     private void BuildWaves()
     {
-        top = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
-
         int xLabelFontSize = 8;
 
         var xAxis = waveChart.GetChartComponent<XAxis>();
@@ -190,7 +188,7 @@ public class GraphBuilder : MonoBehaviour
         xAxis.axisLabel.textStyle.fontSize = xLabelFontSize;
         xAxis.minMaxType = Axis.AxisMinMaxType.Custom;
         xAxis.min = bottom + 1;
-        xAxis.max = top;
+        xAxis.max = wtop;
         xAxis.interval = 5;
         xAxis.data.Clear();
 
@@ -223,7 +221,7 @@ public class GraphBuilder : MonoBehaviour
             }
         }*/
 
-        for (int day = bottom; day < top; day++)
+        for (int day = bottom; day < wtop; day++)
         {
             int w = PlayerRecordForGraph.waveEachDay[day];
 
@@ -245,17 +243,21 @@ public class GraphBuilder : MonoBehaviour
         if (bottom <= 0) return;
 
         bottom = Math.Max(0, bottom - countPerPage);
-        top = bottom + countPerPage;
+        ptop = bottom + countPerPage;
+        gtop = bottom + countPerPage;
+        wtop = bottom + countPerPage;
 
         LoadChart();
     }
 
     public void MoveNext()
     {
-        if (top >= PlayerRecordForGraph.survivedPlants.Count) return;
+        if (ptop >= PlayerRecordForGraph.survivedPlants.Count) return;
 
         bottom = bottom + countPerPage;
-        top = Math.Min(top + countPerPage, PlayerRecordForGraph.survivedPlants.Count);
+        ptop = Math.Min(ptop + countPerPage, PlayerRecordForGraph.survivedPlants.Count);
+        gtop = Math.Min(gtop + countPerPage, PlayerRecordForGraph.earnedGolds.Count);
+        wtop = Math.Min(wtop + countPerPage, PlayerRecordForGraph.waveEachDay.Count);
 
         LoadChart();
     }
