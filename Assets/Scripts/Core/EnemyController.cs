@@ -53,7 +53,8 @@ public class EnemyController : MonoBehaviour
     private Wave nextWave;
     private int waveSkipCount = 0;
     private int[] waveKillCount;
-    
+
+    private bool isWaveSkipped = false;
 
     public Wave CurrentWave => currentWave;
     public Wave NextWave => nextWave;
@@ -100,17 +101,14 @@ public class EnemyController : MonoBehaviour
         }
 
         float t = 0f;
-        float waveD = waveDuration;
-        while (t < waveD)
+        isWaveSkipped = false;
+        while (t < waveDuration && !isWaveSkipped)
         {
             t += Time.deltaTime;
             yield return null;
             if (Input.GetKeyDown(KeyCode.S))
             {
-                float tmp;
-                tmp = waveDuration;
-                waveD= 0f;
-                waveManager.SkipWaveEffect();
+                SkipWaveEffect();                
             }
         }        
 
@@ -392,5 +390,11 @@ public class EnemyController : MonoBehaviour
 
         WaveType mostKillWaveType = (WaveType)waveIndex;
         return waves[mostKillWaveType].WaveName;
+    }
+
+    public void SkipWaveEffect()
+    {
+        isWaveSkipped = true;
+        waveManager.SkipWaveEffect();
     }
 }
