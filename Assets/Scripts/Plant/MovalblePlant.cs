@@ -15,7 +15,9 @@ public abstract class MovablePlant : Plant
     [SerializeField] private Image holdGaugeImage;
     [SerializeField] private GameObject holdGaugeCanvasObj;
 
-    public override bool IsMovable => true;
+    private bool isReallyMovable = true;
+
+    public override bool IsMovable => isReallyMovable;
 
     public override void Init(int gridIndex, Grid grid)
     {
@@ -110,5 +112,10 @@ public abstract class MovablePlant : Plant
 
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
         transform.position = worldPos;
+    }
+
+    public void SetMovable(bool value)
+    {
+        isReallyMovable = value;
     }
 }

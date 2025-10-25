@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 public class TutorialManager : Singleton<TutorialManager>
 {
@@ -249,6 +250,18 @@ public class TutorialManager : Singleton<TutorialManager>
                 case TutorialActions.DeactiveResistanceChange:
                     rc.SetActive(false);
                     break;
+
+                case TutorialActions.PlantToggleOn:
+                    FenceToggleOn(s.plantToggleIndex);
+                    break;
+
+                case TutorialActions.MakeMovable:
+                    grid.MakeMovable();
+                    break;
+
+                case TutorialActions.MakeAllUnmovable:
+                    grid.MakeAllUnmovable();
+                    break;
             }
         }
     }
@@ -330,6 +343,15 @@ public class TutorialManager : Singleton<TutorialManager>
     {
         shopUIPanel.SetActive(true);
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Shop);
+
+    }
+
+    private void FenceToggleOn(int index)
+    {
+        if (grid.plantGrid.ContainsKey(index))
+            FenceUIManager.Instance.ToggleOn(0, grid.plantGrid[index]);
+        else
+            FenceUIManager.Instance.ToggleOn(0, grid.plantGrid.First().Value);
 
     }
 }

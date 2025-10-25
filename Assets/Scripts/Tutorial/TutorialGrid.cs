@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 public class TutorialGrid : Grid
 {
@@ -31,22 +32,22 @@ public class TutorialGrid : Grid
         SpawnTPea(new List<GeneticTrait> {
         new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
         new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 0, 0.0f)
-    });
+        });
 
         SpawnTPea(new List<GeneticTrait> {
         new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
         new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
-    });
+        });
 
         SpawnTPea(new List<GeneticTrait> {
         new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 0, 0.0f),
         new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
-    });
+        });
 
         SpawnTPea(new List<GeneticTrait> {
         new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 0, 0.0f),
         new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 2, 0.0f)
-    });
+        });
     }
 
     private void SpawnTPea(List<GeneticTrait> traits)
@@ -55,6 +56,7 @@ public class TutorialGrid : Grid
 
         var pea = p.GetComponent<Pea>();
         pea.SetTrait(traits);
+        pea.SetMovable(false);
 
         AddPlantToGrid(pea);
     }
@@ -151,6 +153,8 @@ public class TutorialGrid : Grid
                             breedObj1 = null;
                             breedObj2 = null;
                             DeactivateBreed();
+                            Pea newPea = child.GetComponent<Pea>();
+                            newPea.SetMovable(false);
                             TutorialManager.Instance.OnBreedSucess();
                             //isTBreeding = false;
                         }
@@ -272,5 +276,25 @@ public class TutorialGrid : Grid
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
+    }
+
+    public void MakeMovable()
+    {
+        Pea movablePea = plantGrid[4].GetComponent<Pea>();
+
+        bool targetValue = !movablePea.IsMovable;
+
+        movablePea.SetMovable(targetValue);
+    }
+
+    public void MakeAllUnmovable()
+    {
+        foreach(var peas in plantGrid)
+        {
+            if(peas.Value is Pea p)
+            {
+                p.SetMovable(false);
+            }
+        }
     }
 }

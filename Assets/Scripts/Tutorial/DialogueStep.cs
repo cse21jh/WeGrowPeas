@@ -23,6 +23,9 @@ public enum TutorialActions
     ShowBreedGraph,
     ShowResistanceChange,
     DeactiveResistanceChange,
+    PlantToggleOn,
+    MakeMovable,
+    MakeAllUnmovable,
 }
 
 [CreateAssetMenu(menuName = "Tutorial/Dialogue Step")]
@@ -43,6 +46,8 @@ public class DialogueStep : ScriptableObject
     public Vector3 whiteCirclePos = Vector3.zero;
 
     public Vector2 whiteCircleSize = Vector2.zero;
+
+    public int plantToggleIndex = 0;
 
     public NextTutorialSequence chainTo = NextTutorialSequence.None;
 }
