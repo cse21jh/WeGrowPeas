@@ -44,6 +44,7 @@ public abstract class ItemData : ScriptableObject
     // 최종 확정에 필요한 외부 입력 보관
     public virtual void SetPlacedPosition(Vector3 worldPos) { }
     public virtual void SetSelectedPlant(Plant plant) { }
+    public virtual void InitializePrice(ShopContext ctx) { }
 
     public int GetDisplayPrice()
     {

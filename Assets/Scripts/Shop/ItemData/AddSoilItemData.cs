@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AddSoilItem", menuName = "Items/Grid/Add Soil")]
@@ -52,5 +53,15 @@ public class AddSoilItemData : ItemData
         ctx.Grid.AddSoil();
 
         UpdatePrice(ctx);
+    }
+    public override void InitializePrice(ShopContext ctx)
+    {
+        int i;
+        if (!ctx.Shop.PurchaseHistory.TryGetValue(purchaseKey, out i))
+            i = 0;
+        if (i < maxPurchase)
+            Price = basePrice * (i + 1); // 1000,2000,3000,4000
+        else
+            Price = int.MaxValue; // ´õ ¸ø »ï
     }
 }

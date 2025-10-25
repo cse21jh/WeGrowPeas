@@ -33,7 +33,13 @@ public class ShopManager : Singleton<ShopManager>
 
         // 상단: 고정
         foreach (var it in fixedItems)
-            if (it) inv.Fixed.Add(it);
+        { 
+            if (it)
+            {
+                inv.Fixed.Add(it);
+                it.InitializePrice(ctx);
+            }
+        }
 
         // 하단: 로테이션 (ItemData가 해금/가중치 제공)
         var candidates = new List<ItemData>();

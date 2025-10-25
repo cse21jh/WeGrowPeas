@@ -44,4 +44,14 @@ public class BreedCountItemData : ItemData
 
         UpdatePrice(ctx);
     }
+
+    public override void InitializePrice(ShopContext ctx)
+    {
+        int i;
+        if (!ctx.Shop.PurchaseHistory.TryGetValue(purchaseKey, out i))
+            i = 0;
+        double priceD = basePrice * Math.Pow(factor, i);
+        if (priceD > int.MaxValue) Price = int.MaxValue;
+        else Price = (int)priceD;
+    } 
 }
