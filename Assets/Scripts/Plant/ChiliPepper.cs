@@ -38,7 +38,8 @@ public class ChiliPepper : Plant
     protected void OnMouseExit()
     {
         FindAnyObjectByType<PriceSignController>().HidePrice();
-        priceSign.gameObject.SetActive(false);
+        if (!grid.showingAllPrice)
+            priceSign.gameObject.SetActive(false);
     }
 
 }
