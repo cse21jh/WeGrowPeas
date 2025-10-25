@@ -28,10 +28,12 @@ public class SelectionBoxController : MonoBehaviour
         selectionBox1.GetComponent<Button>().onClick.AddListener(() =>
         {
             onClickAction1?.Invoke();
+            SoundManager.Instance.PlayEffect("Button");
         });
         selectionBox2.GetComponent<Button>().onClick.AddListener(() =>
         {
             onClickAction2?.Invoke();
+            SoundManager.Instance.PlayEffect("Button");
         });
 
         if (sel2 == "")

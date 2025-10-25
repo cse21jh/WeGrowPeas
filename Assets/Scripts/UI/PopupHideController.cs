@@ -32,6 +32,7 @@ public class PopupHideController : MonoBehaviour
 
     public void MinimizePanel()
     {
+        SoundManager.Instance.PlayEffect("Button");
         minimizedPanel.localPosition = maximizedPanel.localPosition;
         // 전체 패널 축소
         maximizedPanel.DOScale(Vector3.zero, duration)
@@ -39,7 +40,7 @@ public class PopupHideController : MonoBehaviour
             .OnComplete(() =>
             {
                 maximizedPanel.gameObject.SetActive(false);
-
+                
                 // 핸들 등장
                 minimizedPanel.gameObject.SetActive(true);
                 minimizedPanel.localScale = Vector3.zero;
@@ -49,6 +50,7 @@ public class PopupHideController : MonoBehaviour
 
     public void MaximizePanel()
     {
+        SoundManager.Instance.PlayEffect("Button");
         maximizedPanel.localPosition = minimizedPanel.localPosition;
         // 핸들 축소
         minimizedPanel.DOScale(Vector3.zero, duration)
@@ -56,7 +58,7 @@ public class PopupHideController : MonoBehaviour
             .OnComplete(() =>
             {
                 minimizedPanel.gameObject.SetActive(false);
-
+                
                 // 전체 패널 복원
                 maximizedPanel.gameObject.SetActive(true);
                 maximizedPanel.localScale = Vector3.zero;
