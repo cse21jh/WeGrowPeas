@@ -13,7 +13,6 @@ public class AddSoilItemData : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
-        Price = basePrice;
     }
 
 

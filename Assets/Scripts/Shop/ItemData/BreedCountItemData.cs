@@ -14,7 +14,6 @@ public class BreedCountItemData : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
-        Price = basePrice;
     }
 
     private void UpdatePrice(ShopContext ctx)
