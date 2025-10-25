@@ -51,7 +51,9 @@ public class Grid : MonoBehaviour
 
     public bool showingAllPrice = false;
 
-    public List<Ladybug> ladybugs = new List<Ladybug>();   
+    public List<Ladybug> ladybugs = new List<Ladybug>();
+
+    public bool isDraggingShovel = false;
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();

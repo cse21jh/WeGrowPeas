@@ -66,7 +66,7 @@ public abstract class MovablePlant : Plant
 
     private void OnMouseDown()
     {
-        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI)
+        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel)
             return;
         holdTime = 0f;
         isHolding = true;
@@ -83,7 +83,7 @@ public abstract class MovablePlant : Plant
         }
         else
         {
-            if (ClickRouter.Instance.IsBlockedByUI) return;
+            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel) return;
             grid.RequestBreedSelect(this.gameObject);
         }
 

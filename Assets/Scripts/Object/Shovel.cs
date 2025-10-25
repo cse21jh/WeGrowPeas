@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+public class Shovel : MonoBehaviour, IPointerDownHandler
 {
     [SerializeField] private Canvas canvas;
     [SerializeField] private Grid grid;
@@ -27,27 +27,36 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
     // Update is called once per frame
     void Update()
     {
-    
+        if(isDragging)
+        {
+            if(!IsEnabled)
+            {
+                ResetShovel();
+                return;
+            }
+
+            UpdatePosition();
+
+        }
     }
     public void OnPointerDown(PointerEventData eventData)
     {
         if (!IsEnabled) return;
-        isDragging = true;
-        grid.ShowAllPriceSign();
-        UpdatePosition(eventData);
+
+        if (isDragging) // »ðÀ» µé°í ÀÖ´Â °æ¿ì
+        {
+            TryDestroyUnderMouse(); // ¹º°¡ ÆÈ°Å³ª »ðÀ» Ã³À½ À§Ä¡·Î ÀÌµ¿
+        }
+        else // »ð µé±â ½ÃÀÛ
+        {
+            grid.isDraggingShovel = true;
+            isDragging = true;
+            grid.ShowAllPriceSign();
+            UpdatePosition();
+        }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (!IsEnabled) return;
-        isDragging = false;
-        UpdatePosition(eventData);
-
-        TryDestroyUnderMouse();
-        grid.HideAllPriceSign();
-        shovelRectTransform.localPosition = initialPos;
-    }
-
+    /*
     public void OnDrag(PointerEventData eventData)
     {
         if (!IsEnabled)
@@ -67,6 +76,20 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
+            canvas.worldCamera,
+            out localPos))
+        {
+            shovelRectTransform.localPosition = localPos;
+        }
+    }
+    */
+
+    private void UpdatePosition()
+    {
+        Vector2 localPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            Input.mousePosition,
             canvas.worldCamera,
             out localPos))
         {
@@ -108,5 +131,16 @@ public class Shovel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDr
                 return;
             }
         }
+
+        // 3) ¸Ç¶¥ Å¬¸¯
+        ResetShovel();
+    }
+
+    private void ResetShovel()
+    {
+        isDragging = false;
+        grid.HideAllPriceSign();
+        grid.isDraggingShovel = false;
+        shovelRectTransform.localPosition = initialPos;
     }
 }
