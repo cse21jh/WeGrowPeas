@@ -8,5 +8,5 @@ public class ColdWave : Wave
     public override string WaveName => "추위";
     public override string WaveDescription => "기온이 떨어지고 있습니다.....";
     public override string WaveSoundString => "Cold";
-    public const int UnlockStage = 26;
+    public const int UnlockStage = 16;
 }

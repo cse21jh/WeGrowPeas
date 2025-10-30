@@ -8,7 +8,7 @@ public class AddFloodPlantUpgrade : Upgrade
     public override string Explanation => "홍수 저항력이 있는 식물을 하나 추가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_3");
     public override int MaxAmount => -1;
-    public override int UnlockStage => FloodWave.UnlockStage - 5;
+    public override int UnlockStage => FloodWave.UnlockStage - 3;
     public override int UpgradeId => 3;
     public override void OnSelectAction()
     {

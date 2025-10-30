@@ -6,7 +6,7 @@ public class BugFrequencyUpgrade : Upgrade
     public override string Explanation => "벌레의 등장 간격이 10% 증가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_24");
     public override int MaxAmount => 3;
-    public override int UnlockStage => 26;
+    public override int UnlockStage => 16;
     public override int UpgradeId => 21;
     public override void OnSelectAction()
     {

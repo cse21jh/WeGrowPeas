@@ -8,5 +8,5 @@ public class PestWave : Wave
     public override string WaveName => "해충";
     public override string WaveDescription => "불길한 날개소리가 들립니다......";
     public override string WaveSoundString => "Pest";
-    public const int UnlockStage = 6;
+    public const int UnlockStage = 4;
 }

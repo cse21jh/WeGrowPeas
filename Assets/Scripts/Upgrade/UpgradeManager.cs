@@ -92,15 +92,15 @@ public class UpgradeManager : MonoBehaviour
         // stage 끝나고 나와야 하는 필수 업그레이드
         switch(stage)
         {
-            case PestWave.UnlockStage - 3:
+            case PestWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
-            case WindWave.UnlockStage - 3:
+            case WindWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
-            case FloodWave.UnlockStage - 3:
+            case FloodWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
-            case HeavyRainWave.UnlockStage - 3:
+            case HeavyRainWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;            
-            case ColdWave.UnlockStage - 3:
+            case ColdWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
         }
         return;
@@ -301,15 +301,15 @@ public class UpgradeManager : MonoBehaviour
         // 필수 업그레이드가 있는 경우
         switch (saveData.stage)
         {
-            case PestWave.UnlockStage - 3:
+            case PestWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddPestPlantUpgrade); break;
-            case WindWave.UnlockStage - 3:
+            case WindWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddWindPlantUpgrade); break;
-            case FloodWave.UnlockStage - 3:
+            case FloodWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddFloodPlantUpgrade); break;
-            case HeavyRainWave.UnlockStage - 3:
+            case HeavyRainWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddHeavyRainPlantUpgrade); break;
-            case ColdWave.UnlockStage - 3:
+            case ColdWave.UnlockStage - 2:
                 randomUpgrade[0] = typeof(AddColdPlantUpgrade); break;
         }
         return;

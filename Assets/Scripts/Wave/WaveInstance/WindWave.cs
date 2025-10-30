@@ -8,5 +8,5 @@ public class WindWave : Wave
     public override string WaveName => "바람";
     public override string WaveDescription => "거센 바람이 몰아칩니다......";
     public override string WaveSoundString => "Wind";
-    public const int UnlockStage = 11;
+    public const int UnlockStage = 7;
 }

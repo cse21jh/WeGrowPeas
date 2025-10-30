@@ -8,5 +8,5 @@ public class FloodWave : Wave
     public override string WaveName => "È«¼ö";
     public override string WaveDescription => "È«¼ö°¡ µ¤ÃÄ¿É´Ï´Ù......";
     public override string WaveSoundString => "Flood";
-    public const int UnlockStage = 16;
+    public const int UnlockStage = 10;
 }

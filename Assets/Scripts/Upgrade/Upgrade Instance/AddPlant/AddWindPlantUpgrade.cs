@@ -8,7 +8,7 @@ public class AddWindPlantUpgrade : Upgrade
     public override string Explanation => "바람 저항력이 있는 식물을 하나 추가합니다";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_2");
     public override int MaxAmount => -1;
-    public override int UnlockStage => WindWave.UnlockStage - 5;
+    public override int UnlockStage => WindWave.UnlockStage - 3;
     public override int UpgradeId => 2;
     public override void OnSelectAction()
     {

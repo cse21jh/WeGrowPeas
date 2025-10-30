@@ -78,7 +78,7 @@ public class Grid : MonoBehaviour
 
     protected int additionalInheritance = 0;
     protected float maxBreedTimer = 30.0f;
-    protected int maxBreedCount = 4;
+    protected int maxBreedCount = 5;
     protected int breedCount = 0;
 
     protected bool hasIceBlock = false;
@@ -655,14 +655,14 @@ public class Grid : MonoBehaviour
     private void SpawnRandomBug()
     {
         int stage = GameManager.Instance.stage;
-        if (stage < 6) // 해충 웨이브 해금 전엔 등장 X
+        if (stage < PestWave.UnlockStage) // 해충 웨이브 해금 전엔 등장 X
             return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
             Instantiate(ladybugPrefabs);
             return;
         }
-        int i = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
+        int i = Random.Range(0, Mathf.Min(((((stage - 1) / 3) * 2) - 1),bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
         Instantiate(bugPrefabs[i]);
         return;
     }
