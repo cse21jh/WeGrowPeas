@@ -77,7 +77,7 @@ public class Grid : MonoBehaviour
     protected float additionalPestResistance = 0f;
 
     protected int additionalInheritance = 0;
-    protected float maxBreedTimer = 30.0f;
+    protected float maxBreedTimer = 40.0f;
     protected int maxBreedCount = 5;
     protected int breedCount = 0;
 
