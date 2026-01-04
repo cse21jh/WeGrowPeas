@@ -115,20 +115,25 @@ public class FenceUIManager : MonoBehaviour
         int taste = plant.GetTaste();
         FindAnyObjectByType<PriceSignController>().ShowTaste(taste);
 
-
+        int tmp = 0;
         //이제 여기서 Taste 관리 안 함
         for (int i = 0; i < Traits.Count; i++)
         {
+            if ((int)Traits[i].traitType >= (int)TraitType.Drought)
+            {
+                break;
+            }
             bool isTasteActive = i < taste;
             fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive, plant);
+            tmp++;
         }
 
-        for(int i = Traits.Count; i < fenceElements.Length; i++)
+        for(int i = tmp; i < fenceElements.Length; i++)
         {
             bool isTasteActive = i < taste;
             GeneticTrait defaultTrait = new GeneticTrait
             {
-                traitType = CompleteTraitType.None,
+                traitType = TraitType.None,
                 resistance = 0f,
                 additionalResistance = 0f,
                 genetics = 0

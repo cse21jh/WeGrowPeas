@@ -13,7 +13,7 @@ public class ChiliPepper : Plant
     {
         return 1f;
     }
-    public override float GetResistanceBasedOnGenetics(int genetics)
+    public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
         return 1f;
     }

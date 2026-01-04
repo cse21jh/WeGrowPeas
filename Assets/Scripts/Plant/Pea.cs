@@ -18,13 +18,8 @@ public class Pea : MovablePlant
 
     public override void SetTrait(List<GeneticTrait> newTraits)
     {
-        traits = newTraits;
-
-        foreach (GeneticTrait g in traits)
-        {
-            additionalResistance.Add(g.traitType, 0f);
-        }
-
+        base.SetTrait(newTraits);
+        
         StemController stem = GetComponentInChildren<StemController>();
         if (stem != null)
         {
@@ -110,13 +105,25 @@ public class Pea : MovablePlant
             priceSign.gameObject.SetActive(false);
     }
 
-    public override float GetResistanceBasedOnGenetics(int genetics)
+    public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
-        switch (genetics)
+        if ((int)traitType >= (int)TraitType.HeavyRain) // 대응 형질이 있는 경우, 1개면 저항력 60
         {
-            case 0: return 0.5f;
-            case 1: return 0.5f;
-            case 2: return 0.8f;
+            switch (genetics)
+            {
+                case 0: return 0.5f;
+                case 1: return 0.65f;
+                case 2: return 0.8f;
+            }
+        }
+        else
+        {
+            switch (genetics)
+            {
+                case 0: return 0.5f;
+                case 1: return 0.5f;
+                case 2: return 0.8f;
+            }
         }
         return 0.1f;
     }

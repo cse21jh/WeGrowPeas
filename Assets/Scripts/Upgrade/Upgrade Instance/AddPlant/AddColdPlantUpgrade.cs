@@ -14,8 +14,8 @@ public class AddColdPlantUpgrade : Upgrade
     {
         List<GeneticTrait> peaTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.ColdResistance, 0.5f , 1, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 0.5f , 1, 0.0f),
+            new GeneticTrait(TraitType.Cold, 0.5f , 1, 0.0f)
         };
         /*
         List<GeneticTrait> peanutTrait = new List<GeneticTrait>

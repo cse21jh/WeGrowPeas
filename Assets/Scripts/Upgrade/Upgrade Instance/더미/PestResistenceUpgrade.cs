@@ -12,7 +12,7 @@ public class PestResistenceUpgrade : Upgrade
     public override int UpgradeId => 10;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.PestResistance, 0.05f);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(TraitType.Pest, 0.05f);
         Debug.Log(Explanation);
     }
 }

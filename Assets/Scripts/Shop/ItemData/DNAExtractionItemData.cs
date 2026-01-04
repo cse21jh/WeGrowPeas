@@ -63,10 +63,10 @@ public class ItemData_Extraction : ItemData
             foreach(var r in plant.GetGeneticTrait())
             {
                 int genetics = UnityEngine.Random.Range(0, 3);
-                if(r.traitType == CompleteTraitType.PestResistance)
-                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(genetics), genetics, g.GetAdditionalPestResistance()));
+                if(r.traitType == TraitType.Pest)
+                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.GetAdditionalPestResistance()));
                 else
-                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(genetics), genetics, 0.0f));
+                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
             }
 
             if (plant.GetType() == typeof(Pea))

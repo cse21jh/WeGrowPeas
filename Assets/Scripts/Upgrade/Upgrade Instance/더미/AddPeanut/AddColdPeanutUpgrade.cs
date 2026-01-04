@@ -14,8 +14,8 @@ public class AddColdPeanutUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.4f , 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.ColdResistance, 0.4f , 1, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 0.4f , 1, 0.0f),
+            new GeneticTrait(TraitType.Cold, 0.4f , 1, 0.0f)
         };
         GameManager.Instance.grid.AddPeanut(trait);
         Debug.Log(Explanation);

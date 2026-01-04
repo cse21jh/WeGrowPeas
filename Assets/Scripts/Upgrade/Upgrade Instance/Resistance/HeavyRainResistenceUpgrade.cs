@@ -12,7 +12,7 @@ public class HeavyRainResistenceUpgrade : Upgrade
     public override int UpgradeId => 12;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.HeavyRainResistance, 0.05f, true);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(TraitType.HeavyRain, 0.05f, true);
         Debug.Log(Explanation);
     }
 }

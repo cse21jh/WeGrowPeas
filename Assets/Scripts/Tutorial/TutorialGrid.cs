@@ -30,23 +30,23 @@ public class TutorialGrid : Grid
     public void InitTGrid()
     {
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
-        new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 0, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.5f, 0, 0.0f)
         });
 
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
-        new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.5f, 1, 0.0f)
         });
 
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 0, 0.0f),
-        new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.5f, 1, 0.0f)
         });
 
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 0, 0.0f),
-        new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 2, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.5f, 2, 0.0f)
         });
     }
 
@@ -220,8 +220,8 @@ public class TutorialGrid : Grid
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.8f, 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.WindResistance, 0.5f, 1, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 0.8f, 2, 0.0f),
+            new GeneticTrait(TraitType.Wind, 0.5f, 1, 0.0f)
         };
 
         child.SetTrait(childTrait);

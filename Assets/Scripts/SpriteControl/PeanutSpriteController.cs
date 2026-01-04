@@ -50,31 +50,47 @@ public class PeanutSpriteController : MonoBehaviour
 
         switch (index)
         {
-            case (int)CompleteTraitType.NaturalDeath:
+            case (int)TraitType.NaturalDeath:
                 spriteRenderer.sprite = peanutSprites[1]; // 자연사 저항
                 accessoryRenderer.sprite = null;
                 break;
-            case (int)CompleteTraitType.WindResistance:
+            case (int)TraitType.Wind:
                 spriteRenderer.sprite = peanutSprites[7]; // 바람 저항
                 accessoryRenderer.sprite = null;
                 break;
-            case (int)CompleteTraitType.FloodResistance:
+            case (int)TraitType.Flood:
                 spriteRenderer.sprite = peanutSprites[0]; // 홍수 저항
                 accessoryRenderer.sprite = peanutSprites[9];
                 break;
-            case (int)CompleteTraitType.PestResistance:
+            case (int)TraitType.Pest:
                 spriteRenderer.sprite = peanutSprites[0]; // 해충 저항
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
-            case (int)CompleteTraitType.ColdResistance:
+            case (int)TraitType.Cold:
                 spriteRenderer.sprite = peanutSprites[0]; // 추위 저항
                 accessoryRenderer.sprite = peanutSprites[5];
                 break;
-            case (int)CompleteTraitType.HeavyRainResistance:
+            case (int)TraitType.HeavyRain:
                 spriteRenderer.sprite = peanutSprites[0]; // 폭우 저항
                 accessoryRenderer.sprite = peanutSprites[6];
                 break;
-            case (int)CompleteTraitType.None:
+            case (int)TraitType.Drought:
+                spriteRenderer.sprite = peanutSprites[1]; // 가뭄 저항 유전자 2개 (폭우 0개) 
+                accessoryRenderer.sprite = peanutSprites[4];
+                break;
+            case (int)TraitType.Heat:
+                spriteRenderer.sprite = peanutSprites[1]; // 더위 저항 유전자 2개 (추위 0개)
+                accessoryRenderer.sprite = peanutSprites[4];
+                break;
+            case (int)TraitType.None + 1:
+                spriteRenderer.sprite = peanutSprites[7]; // 폭우 가뭄 반반
+                accessoryRenderer.sprite = peanutSprites[4];
+                break;
+            case (int)TraitType.None + 2:
+                spriteRenderer.sprite = peanutSprites[7]; // 추위 더위 반반
+                accessoryRenderer.sprite = peanutSprites[4];
+                break;
+            case (int)TraitType.None:
                 spriteRenderer.sprite = peanutSprites[0]; // 기본
                 accessoryRenderer.sprite = null;
                 break;

@@ -14,8 +14,8 @@ public class AddWindPeanutUpgrade : Upgrade
     {
         List<GeneticTrait> trait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.4f, 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.WindResistance, 0.4f, 1, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 0.4f, 1, 0.0f),
+            new GeneticTrait(TraitType.Wind, 0.4f, 1, 0.0f)
         };
         GameManager.Instance.grid.AddPeanut(trait);
         Debug.Log(Explanation);

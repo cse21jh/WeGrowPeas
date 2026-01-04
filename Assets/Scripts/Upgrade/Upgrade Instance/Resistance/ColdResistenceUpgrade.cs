@@ -12,7 +12,7 @@ public class ColdResistenceUpgrade : Upgrade
     public override int UpgradeId => 11;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.ColdResistance, 0.05f, true);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(TraitType.Cold, 0.05f, true);
         Debug.Log(Explanation);
     }
 }

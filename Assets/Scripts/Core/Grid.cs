@@ -127,7 +127,9 @@ public class Grid : MonoBehaviour
             Pea pea = obj.GetComponent<Pea>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f, 1, 0.0f),
+            new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
+            new GeneticTrait(TraitType.HeavyRain, 0.65f, 1, 0.0f),
+            new GeneticTrait(TraitType.Cold, 0.65f, 1, 0.0f),
         };
             FenceUIManager.Instance.SetFenceElements(0, pea);
             pea.SetTrait(basicTrait);
@@ -304,10 +306,10 @@ public class Grid : MonoBehaviour
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
-        foreach (CompleteTraitType trait in System.Enum.GetValues(typeof(CompleteTraitType)))
+        foreach (TraitType trait in System.Enum.GetValues(typeof(TraitType)))
         {
-            if (trait == CompleteTraitType.None)
-                break;
+            if (trait == TraitType.None || trait == TraitType.Drought || trait == TraitType.Heat)
+                break; // 가뭄, 더위에 대한 형질은 SetTrait에서 삽입해줌.따로따로 교배 로직을 거치면 이상하게 나옴. 
 
             int p1Trait;
             int p2Trait;
@@ -353,9 +355,9 @@ public class Grid : MonoBehaviour
                 default: break;
             }
 
-            float resistance = child.GetResistanceBasedOnGenetics(childGenetic);
+            float resistance = child.GetResistanceBasedOnGenetics(trait, childGenetic);
 
-            if (trait == CompleteTraitType.PestResistance)
+            if (trait == TraitType.Pest)
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
             else
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
@@ -494,7 +496,7 @@ public class Grid : MonoBehaviour
         return maxCol;
     }
 
-    public void AddAdditionalResistanceInGrid(CompleteTraitType traitType, float value, bool byUpgrade = false)
+    public void AddAdditionalResistanceInGrid(TraitType traitType, float value, bool byUpgrade = false)
     {
         for (int idx = 0; idx < GetMaxCol() * 4; idx++) // grid에 있는 식물들 저항력 증가
         {
@@ -512,7 +514,7 @@ public class Grid : MonoBehaviour
         additionalPestResistance += value;
         if (additionalPestResistance > 0.15f)
             additionalPestResistance = 0.15f;
-        AddAdditionalResistanceInGrid(CompleteTraitType.PestResistance, value);
+        AddAdditionalResistanceInGrid(TraitType.Pest, value);
     }
 
     public float GetAdditionalPestResistance()
@@ -781,7 +783,6 @@ public class Grid : MonoBehaviour
             Plant plant = obj.GetComponent<Plant>();
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
-            plant.SetAdditionalResistances(item.additionalResistance);
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
             Plantplant(plant);
@@ -970,17 +971,17 @@ public class Grid : MonoBehaviour
 
     int GetCol(int index) => index / 4;
 
-    private CompleteTraitType MapWaveToTrait(WaveType w)
+    private TraitType MapWaveToTrait(WaveType w)
     {
         return w switch
         {
-            WaveType.Aging => CompleteTraitType.NaturalDeath,
-            WaveType.Wind => CompleteTraitType.WindResistance,
-            WaveType.Flood => CompleteTraitType.FloodResistance,
-            WaveType.Pest => CompleteTraitType.PestResistance,
-            WaveType.Cold => CompleteTraitType.ColdResistance,
-            WaveType.HeavyRain => CompleteTraitType.HeavyRainResistance,
-            _ => CompleteTraitType.NaturalDeath
+            WaveType.Aging => TraitType.NaturalDeath,
+            WaveType.Wind => TraitType.Wind,
+            WaveType.Flood => TraitType.Flood,
+            WaveType.Pest => TraitType.Pest,
+            WaveType.Cold => TraitType.Cold,
+            WaveType.HeavyRain => TraitType.HeavyRain,
+            _ => TraitType.NaturalDeath
         };
     }
 
@@ -1054,12 +1055,12 @@ public class Grid : MonoBehaviour
     {
         List<GeneticTrait> peaTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 1f , 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.PestResistance, 1f , 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.WindResistance, 1f , 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.FloodResistance, 1f , 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.HeavyRainResistance, 1f , 2, 0.0f),
-            new GeneticTrait(CompleteTraitType.ColdResistance, 1f , 2, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Pest, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Wind, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Flood, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.HeavyRain, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Cold, 1f , 2, 0.0f)
         };
         AddPea(peaTrait);        
     }

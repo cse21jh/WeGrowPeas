@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Android.Types;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
@@ -61,9 +62,46 @@ public class StemController : MonoBehaviour
             case PlantType.Pea:
                 for (int i = 0; i < traits.Count; i += 1)
                 {
+                    if ((int)traits[i].traitType >= (int)TraitType.Drought)
+                        continue; // 가뭄, 더위는 폭우, 추위 판단 할 때 같이
+
+                    if (traits[i].traitType == TraitType.HeavyRain) // 홍수는 유전자 개수 따라서 스프라이트 다르게
+                    {
+                        switch(traits[i].genetics)
+                        {
+                            case 0:
+                                peaSprites[i].SetPeaSprite((int)TraitType.Drought);
+                                break;
+                            case 1:
+                                peaSprites[i].SetPeaSprite((int)TraitType.None+1);
+                                break;
+                            case 2:
+                                peaSprites[i].SetPeaSprite((int)traits[i].traitType);
+                                break;
+                        }
+                        continue;
+                    }
+
+                    if (traits[i].traitType == TraitType.Cold) // 추위는 유전자 개수 따라서 스프라이트 다르게
+                    {
+                        switch (traits[i].genetics)
+                        {
+                            case 0:
+                                peaSprites[i].SetPeaSprite((int)TraitType.Heat);
+                                break;
+                            case 1:
+                                peaSprites[i].SetPeaSprite((int)TraitType.None + 2);
+                                break;
+                            case 2:
+                                peaSprites[i].SetPeaSprite((int)traits[i].traitType);
+                                break;
+                        }
+                        continue;
+                    }
+
                     peaSprites[i].SetPeaSprite((int)traits[i].traitType);
 
-                    if (traits[i].traitType == CompleteTraitType.PestResistance)
+                    if (traits[i].traitType == TraitType.Pest)
                     {
                         GameObject effect = Instantiate(electricEffectPrefab, peaSprites[i].transform.position, Quaternion.identity);
                         effect.transform.SetParent(peaSprites[i].transform);
@@ -77,9 +115,45 @@ public class StemController : MonoBehaviour
             case PlantType.Peanut:
                 for (int i = 0; i < traits.Count; i += 1)
                 {
+                    if ((int)traits[i].traitType >= (int)TraitType.Drought)
+                        continue; // 가뭄, 더위는 폭우, 추위 판단 할 때 같이
+
+                    if (traits[i].traitType == TraitType.HeavyRain) // 홍수는 유전자 개수 따라서 스프라이트 다르게
+                    {
+                        switch (traits[i].genetics)
+                        {
+                            case 0:
+                                peanutSprites[i].SetPeanutSprite((int)TraitType.Drought);
+                                break;
+                            case 1:
+                                peanutSprites[i].SetPeanutSprite((int)TraitType.None + 1);
+                                break;
+                            case 2:
+                                peanutSprites[i].SetPeanutSprite((int)traits[i].traitType);
+                                break;
+                        }
+                        continue;
+                    }
+
+                    if (traits[i].traitType == TraitType.Cold) // 추위는 유전자 개수 따라서 스프라이트 다르게
+                    {
+                        switch (traits[i].genetics)
+                        {
+                            case 0:
+                                peanutSprites[i].SetPeanutSprite((int)TraitType.Heat);
+                                break;
+                            case 1:
+                                peanutSprites[i].SetPeanutSprite((int)TraitType.None + 2);
+                                break;
+                            case 2:
+                                peanutSprites[i].SetPeanutSprite((int)traits[i].traitType);
+                                break;
+                        }
+                        continue;
+                    }
                     peanutSprites[i].SetPeanutSprite((int)traits[i].traitType);
 
-                    if (traits[i].traitType == CompleteTraitType.PestResistance)
+                    if (traits[i].traitType == TraitType.Pest)
                     {
                         GameObject effect = Instantiate(electricEffectPrefab, peanutSprites[i].transform.position, Quaternion.identity);
                         effect.transform.SetParent(peanutSprites[i].transform);

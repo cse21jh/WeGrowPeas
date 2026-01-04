@@ -93,7 +93,6 @@ public class PlantData
     public string speciesname;
     public List<GeneticTrait> traits = new List<GeneticTrait>();
     public int gridIndex;
-    public List<float> additionalResistance = new List<float>();
     public int taste;
     public int resistWaveCount;
 }
@@ -303,7 +302,6 @@ public class GameManager : Singleton<GameManager>
                 speciesname = p.speciesname,
                 traits = p.GetGeneticTrait(),
                 gridIndex = p.gridIndex,
-                additionalResistance = p.GetAdditionalResistances(),
                 taste = p.GetTaste(),
                 resistWaveCount = p.GetResistWaveCount()
             };

@@ -14,8 +14,8 @@ public class AddHeavyRainPlantUpgrade : Upgrade
     {
         List<GeneticTrait> peaTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(CompleteTraitType.NaturalDeath, 0.5f , 1, 0.0f),
-            new GeneticTrait(CompleteTraitType.HeavyRainResistance, 0.5f , 1, 0.0f)
+            new GeneticTrait(TraitType.NaturalDeath, 0.5f , 1, 0.0f),
+            new GeneticTrait(TraitType.HeavyRain, 0.5f , 1, 0.0f)
         };
         /*
         List<GeneticTrait> peanutTrait = new List<GeneticTrait>

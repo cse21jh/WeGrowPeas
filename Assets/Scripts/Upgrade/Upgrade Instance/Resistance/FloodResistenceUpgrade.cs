@@ -12,7 +12,7 @@ public class FloodResistenceUpgrade : Upgrade
     public override int UpgradeId => 9;
     public override void OnSelectAction()
     {
-        GameManager.Instance.grid.AddAdditionalResistanceInGrid(CompleteTraitType.FloodResistance, 0.05f, true);
+        GameManager.Instance.grid.AddAdditionalResistanceInGrid(TraitType.Flood, 0.05f, true);
         Debug.Log(Explanation);
     }
 }

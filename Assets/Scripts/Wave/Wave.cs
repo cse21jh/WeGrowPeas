@@ -20,5 +20,5 @@ public abstract class Wave
     public virtual string WaveDescription => null;
     public virtual string WaveSoundString => null;
     
-    public static int NumberOfWave = 6;
+    public static int NumberOfWave = 8;
 }

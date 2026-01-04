@@ -52,31 +52,47 @@ public class PeaSpriteController : MonoBehaviour
 
         switch (index)
         {
-            case (int)CompleteTraitType.NaturalDeath:
+            case (int)TraitType.NaturalDeath:
                 spriteRenderer.sprite = peaSprites[1]; // 자연사 저항
                 accessoryRenderer.sprite = null;
                 break;
-            case (int)CompleteTraitType.WindResistance:
-                spriteRenderer.sprite = peaSprites[7]; // 바람 저항
-                accessoryRenderer.sprite = null;
-                break;
-            case (int)CompleteTraitType.FloodResistance:
-                spriteRenderer.sprite = peaSprites[0]; // 홍수 저항
-                accessoryRenderer.sprite = peaSprites[9];
-                break;
-            case (int)CompleteTraitType.PestResistance:
+            case (int)TraitType.Pest:
                 spriteRenderer.sprite = peaSprites[0]; // 해충 저항
                 accessoryRenderer.sprite = peaSprites[4];
                 break;
-            case (int)CompleteTraitType.ColdResistance:
-                spriteRenderer.sprite = peaSprites[0]; // 추위 저항
-                accessoryRenderer.sprite = peaSprites[5];
+            case (int)TraitType.Wind:
+                spriteRenderer.sprite = peaSprites[7]; // 바람 저항
+                accessoryRenderer.sprite = null;
                 break;
-            case (int)CompleteTraitType.HeavyRainResistance:
-                spriteRenderer.sprite = peaSprites[0]; // 폭우 저항
+            case (int)TraitType.Flood:
+                spriteRenderer.sprite = peaSprites[0]; // 홍수 저항
+                accessoryRenderer.sprite = peaSprites[9];
+                break;
+            case (int)TraitType.HeavyRain:
+                spriteRenderer.sprite = peaSprites[0]; // 폭우 저항 유전자 2개
                 accessoryRenderer.sprite = peaSprites[6];
                 break;
-            case (int)CompleteTraitType.None:
+            case (int)TraitType.Cold:
+                spriteRenderer.sprite = peaSprites[0]; // 추위 저항 유전자 2개
+                accessoryRenderer.sprite = peaSprites[5];
+                break;
+            case (int)TraitType.Drought:
+                spriteRenderer.sprite = peaSprites[1]; // 가뭄 저항 유전자 2개 (폭우 0개) 
+                accessoryRenderer.sprite = peaSprites[4]; 
+                break;
+            case (int)TraitType.Heat:
+                spriteRenderer.sprite = peaSprites[1]; // 더위 저항 유전자 2개 (추위 0개)
+                accessoryRenderer.sprite = peaSprites[4];
+                break;
+            case (int)TraitType.None + 1:
+                spriteRenderer.sprite = peaSprites[7]; // 폭우 가뭄 반반
+                accessoryRenderer.sprite = peaSprites[4];
+                break;
+            case (int)TraitType.None + 2:
+                spriteRenderer.sprite = peaSprites[7]; // 추위 더위 반반
+                accessoryRenderer.sprite = peaSprites[4];
+                break;
+            case (int)TraitType.None:
                 spriteRenderer.sprite = peaSprites[0]; // 기본
                 accessoryRenderer.sprite = null;
                 break;
@@ -85,7 +101,7 @@ public class PeaSpriteController : MonoBehaviour
                 break;
         }
 
-        if(index == (int)CompleteTraitType.WindResistance)
+        if(index == (int)TraitType.Wind)
         {
             WindEffect.SetActive(true);
         }

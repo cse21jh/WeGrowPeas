@@ -2,11 +2,13 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.LowLevelPhysics;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -19,7 +21,6 @@ public abstract class Plant : MonoBehaviour
     //저장이 필요한 값들
     public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
-    protected Dictionary<CompleteTraitType, float> additionalResistance = new Dictionary<CompleteTraitType, float>();
     public int gridIndex { get; private set; }
     protected int taste;
     protected int resistWaveCount = 0;
@@ -80,6 +81,42 @@ public abstract class Plant : MonoBehaviour
     public virtual void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
+        
+        EnsurePairedTraitExists(TraitType.HeavyRain, TraitType.Drought);
+        EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
+    }
+
+    private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // 대응 형질 넣어주는 
+    {
+        bool hasTraitA = traits.Any(t => t.traitType == traitA);
+        bool hasTraitB = traits.Any(t => t.traitType == traitB);
+
+        
+        // 둘 다 있거나 둘 다 없으면 스탑
+        if (hasTraitA && hasTraitB || !hasTraitA && !hasTraitB)
+        {
+            return;
+        }
+
+        // 하나만 존재하는 경우 반대 형질 넣어줘야 함
+        if (hasTraitA) // A만 존재
+        {
+            GeneticTrait existingTrait = traits.First(t => t.traitType == traitA);
+            int genetics = existingTrait.genetics;
+
+            GeneticTrait newTraitB = new GeneticTrait(traitB, GetResistanceBasedOnGenetics(traitB, 2 - genetics), 2 - genetics, 0f);
+
+            traits.Add(newTraitB);
+        }
+        else // B만 존재
+        {
+            GeneticTrait existingTrait = traits.First(t => t.traitType == traitB);
+            int genetics = existingTrait.genetics;
+
+            GeneticTrait newTraitA = new GeneticTrait(traitA, GetResistanceBasedOnGenetics(traitA, 2 - genetics), 2 - genetics, 0f);
+
+            traits.Add(newTraitA);
+        }
     }
 
     public void SetTaste(int val)
@@ -235,7 +272,7 @@ public abstract class Plant : MonoBehaviour
     }
 
 
-    public void AddAdditionalResistance(CompleteTraitType traitType, float value, bool byUpgrade = false)
+    public void AddAdditionalResistance(TraitType traitType, float value, bool byUpgrade = false)
     {
         for (int i = 0; i < traits.Count; i++)
         {
@@ -244,7 +281,7 @@ public abstract class Plant : MonoBehaviour
                 float resistance = traits[i].resistance;
 
                 if (byUpgrade)
-                    resistance = GetResistanceBasedOnGenetics(traits[i].genetics);
+                    resistance = GetResistanceBasedOnGenetics(traitType, traits[i].genetics);
 
                 traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, traits[i].additionalResistance + value);
 
@@ -261,28 +298,7 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public void SetAdditionalResistances(List<float> additionalResistances)
-    {
-        int i = 0;
-        foreach (var a in additionalResistances)
-        {
-            additionalResistance[traits[i].traitType] = a;
-            i++;
-        }
-        return;
-    }
-
-    public virtual List<float> GetAdditionalResistances()
-    {
-        var list = new List<float>();
-        foreach (var a in additionalResistance.Values)
-        {
-            list.Add(a);
-        }
-        return list;
-    }
-
-    public abstract float GetResistanceBasedOnGenetics(int genetics);
+    public abstract float GetResistanceBasedOnGenetics(TraitType traitType, int genetics);
 
     public abstract int GetSellingPrice();
 
@@ -415,7 +431,7 @@ public abstract class Plant : MonoBehaviour
         priceSign.SetPrice(GetSellingPrice());
     }
 
-    private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록
+    private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
     {
         for (int i = 0; i < traits.Count; i++)
         {
@@ -433,7 +449,7 @@ public abstract class Plant : MonoBehaviour
                     if (stem.IsGold() && var <= 0.5f)
                         stem.SetGold(false);
                 }
-                traits[i] = new GeneticTrait((CompleteTraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
+                traits[i] = new GeneticTrait((TraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
                 return true;
             }
         }

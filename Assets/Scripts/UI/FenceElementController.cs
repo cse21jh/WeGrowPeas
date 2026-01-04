@@ -62,7 +62,7 @@ public class FenceElementController : MonoBehaviour
         {
             switch (trait.traitType)
             {
-                case CompleteTraitType.NaturalDeath:
+                case TraitType.NaturalDeath:
                     peas[1].SetActive(true);
                     elementName.text = peaNames[1];
                     if(currentWaveType == WaveType.Aging)
@@ -70,7 +70,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
-                case CompleteTraitType.WindResistance:
+                case TraitType.Wind:
                     peas[2].SetActive(true);
                     elementName.text = peaNames[2];
                     if (currentWaveType == WaveType.Wind)
@@ -78,7 +78,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
-                case CompleteTraitType.FloodResistance:
+                case TraitType.Flood:
                     peas[3].SetActive(true);
                     elementName.text = peaNames[3];
                     if (currentWaveType == WaveType.Flood)
@@ -86,7 +86,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
-                case CompleteTraitType.PestResistance:
+                case TraitType.Pest:
                     peas[4].SetActive(true);
                     elementName.text = peaNames[4];
                     if (currentWaveType == WaveType.Pest)
@@ -94,7 +94,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
-                case CompleteTraitType.ColdResistance:
+                case TraitType.Cold:
                     peas[5].SetActive(true);
                     elementName.text = peaNames[5];
                     if (currentWaveType == WaveType.Cold)
@@ -102,7 +102,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
-                case CompleteTraitType.HeavyRainResistance:
+                case TraitType.HeavyRain:
                     peas[6].SetActive(true);
                     elementName.text = peaNames[6];
                     if (currentWaveType == WaveType.HeavyRain)
@@ -121,27 +121,27 @@ public class FenceElementController : MonoBehaviour
         {
             switch (trait.traitType)
             {
-                case CompleteTraitType.NaturalDeath:
+                case TraitType.NaturalDeath:
                     peanuts[1].SetActive(true);
                     elementName.text = peanutNames[1];
                     break;
-                case CompleteTraitType.WindResistance:
+                case TraitType.Wind:
                     peanuts[2].SetActive(true);
                     elementName.text = peanutNames[2];
                     break;
-                case CompleteTraitType.FloodResistance:
+                case TraitType.Flood:
                     peanuts[3].SetActive(true);
                     elementName.text = peanutNames[3];
                     break;
-                case CompleteTraitType.PestResistance:
+                case TraitType.Pest:
                     peanuts[4].SetActive(true);
                     elementName.text = peanutNames[4];
                     break;
-                case CompleteTraitType.ColdResistance:
+                case TraitType.Cold:
                     peanuts[5].SetActive(true);
                     elementName.text = peanutNames[5];
                     break;
-                case CompleteTraitType.HeavyRainResistance:
+                case TraitType.HeavyRain:
                     peanuts[6].SetActive(true);
                     elementName.text = peanutNames[6];
                     break;
@@ -165,8 +165,20 @@ public class FenceElementController : MonoBehaviour
         }
 
 
-            surviveProbability.gameObject.SetActive(true);
-        surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%";
+        surviveProbability.gameObject.SetActive(true);
+
+        if (trait.traitType == TraitType.HeavyRain)
+        {
+            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Drought) * 100f) .ToString("F0") + "%";
+        }
+        else if(trait.traitType == TraitType.Cold)
+        {
+            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Heat) * 100f).ToString("F0") + "%";
+        }
+        else
+        {
+            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%";
+        }
 
 
         dnaImages[0].gameObject.SetActive(true);
