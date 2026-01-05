@@ -13,6 +13,7 @@ public class PeaSpriteController : MonoBehaviour
     [SerializeField] private SpriteRenderer accessoryRenderer;
 
     [SerializeField] private GameObject WindEffect;
+    [SerializeField] private GameObject SweatEffect;
 
     private void Start()
     {
@@ -77,20 +78,24 @@ public class PeaSpriteController : MonoBehaviour
                 accessoryRenderer.sprite = peaSprites[5];
                 break;
             case (int)TraitType.Drought:
-                spriteRenderer.sprite = peaSprites[1]; // 가뭄 저항 유전자 2개 (폭우 0개) 
-                accessoryRenderer.sprite = peaSprites[4]; 
+                spriteRenderer.sprite = peaSprites[2]; // 가뭄 저항 유전자 2개 (폭우 0개) 
+                accessoryRenderer.sprite = null; 
                 break;
             case (int)TraitType.Heat:
-                spriteRenderer.sprite = peaSprites[1]; // 더위 저항 유전자 2개 (추위 0개)
-                accessoryRenderer.sprite = peaSprites[4];
+                spriteRenderer.sprite = peaSprites[0]; // 더위 저항 유전자 2개 (추위 0개)
+                accessoryRenderer.sprite = peaSprites[3];
+                //땀 이펙트
+                SweatEffect.SetActive(true);
                 break;
             case (int)TraitType.None + 1:
-                spriteRenderer.sprite = peaSprites[7]; // 폭우 가뭄 반반
-                accessoryRenderer.sprite = peaSprites[4];
+                spriteRenderer.sprite = peaSprites[2]; // 폭우 가뭄 반반
+                accessoryRenderer.sprite = peaSprites[6];
                 break;
             case (int)TraitType.None + 2:
-                spriteRenderer.sprite = peaSprites[7]; // 추위 더위 반반
-                accessoryRenderer.sprite = peaSprites[4];
+                spriteRenderer.sprite = peaSprites[0]; // 추위 더위 반반
+                accessoryRenderer.sprite = peaSprites[5];
+                //땀 이펙트
+                SweatEffect.SetActive(true);
                 break;
             case (int)TraitType.None:
                 spriteRenderer.sprite = peaSprites[0]; // 기본
@@ -110,6 +115,15 @@ public class PeaSpriteController : MonoBehaviour
             WindEffect.SetActive(false);
         }
 
+
+        if(index == (int)TraitType.Heat || index == (int)TraitType.None + 2)
+        {
+            SweatEffect.SetActive(true);
+        }
+        else
+        {
+            SweatEffect.SetActive(false);
+        }
     }
 
 
