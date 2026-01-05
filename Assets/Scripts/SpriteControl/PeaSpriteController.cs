@@ -119,6 +119,7 @@ public class PeaSpriteController : MonoBehaviour
         if(index == (int)TraitType.Heat || index == (int)TraitType.None + 2)
         {
             SweatEffect.SetActive(true);
+            Debug.Log("Sweat Effect Activated");
         }
         else
         {

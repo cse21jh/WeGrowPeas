@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Cinemachine;
 using DG.Tweening;
+using System.Runtime.InteropServices;
 
 public class WaveManager : MonoBehaviour
 {
@@ -46,6 +47,16 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private Ease snowEase = Ease.InOutSine;
 
     [Space(10)]
+    [Header("더위 효과 관련")]
+    [SerializeField] private Light2D heatLight;
+    [SerializeField] private GameObject heatEffect;
+    [SerializeField] private SpriteRenderer heatDistortionSprite;
+    [SerializeField] private Color heatDistortionColor;
+    [SerializeField] private float heatDuration = 1.5f;
+    [SerializeField] private Ease heatEase = Ease.InOutSine;
+
+
+    [Space(10)]
     [Header("폭우 효과 관련")]
     [SerializeField] private ParticleSystem rainEffect;
     [SerializeField] private GameObject lightningEffect;
@@ -53,6 +64,15 @@ public class WaveManager : MonoBehaviour
     [SerializeField, Range(0f, 10f)] private float maxLightningInterval = 3f;
     [SerializeField] private int lightningIndex = 0;
     [SerializeField] private int lightningCount = 4;
+
+    [Space(10)]
+    [Header("가뭄 효과 관련")]
+    [SerializeField] private GameObject[] grassObjects;
+    [SerializeField] private GameObject droughtEffect;
+    [SerializeField] private Material grassMat;
+    [SerializeField] private float dissolveDuration = 1.5f;
+    [SerializeField] private Ease dissolveEase = Ease.InOutSine;
+
 
 
     public void StartWave(float duration, WaveType type)
@@ -213,44 +233,68 @@ public class WaveManager : MonoBehaviour
                 lightningIndex = lightningCount; // Stop further lightning
                 StopCoroutine(Lightning());
                 break;
-            case WaveType.Drought: // 임시로 폭우와 동일한 이펙트 삽입
-                rainEffect.Play();
-                lightningIndex = 0;
-                StartCoroutine(Lightning());
+            case WaveType.Drought:
 
-                float r = 0f;
-                while (r < waveDuration)
+                droughtEffect.SetActive(true);
+
+                float dissolveAmount = 0f;
+                DOTween.To(() => dissolveAmount,
+                   x => { dissolveAmount = x; grassMat.SetFloat("_DissolveAmount", x); },
+                   1f,
+                   dissolveDuration)
+               .SetEase(dissolveEase);
+
+                float droughtHeatAmount = 1f;
+                DOTween.To(() => droughtHeatAmount,
+                   x => { droughtHeatAmount = x; heatLight.intensity = x; },
+                   1.5f,
+                   heatDuration)
+               .SetEase(heatEase);
+
+                float elapsed_drought = 0f;
+                while (elapsed_drought < waveDuration)
                 {
-                    r += Time.deltaTime;
-                    lcController.UpdateType(LightColorType.Rain);
-                    lcController.time = Mathf.Clamp01(r / waveDuration);
+                    elapsed_drought += Time.deltaTime;
+                    lcController.UpdateType(LightColorType.Drought);
+                    lcController.time = Mathf.Clamp01(elapsed_drought / waveDuration);
                     yield return null;
                 }
                 lcController.time = 1f; // Ensure it ends exactly at 1
 
-                rainEffect.Stop();
-                lightningIndex = lightningCount; // Stop further lightning
-                StopCoroutine(Lightning());
+                dissolveAmount = 1f;
+                DOTween.To(() => dissolveAmount,
+                   x => { dissolveAmount = x; grassMat.SetFloat("_DissolveAmount", x); },
+                   0f,
+                   dissolveDuration)
+               .SetEase(dissolveEase);
+
+                droughtHeatAmount = 1.5f;
+                DOTween.To(() => droughtHeatAmount,
+                   x => { droughtHeatAmount = x; heatLight.intensity = x; },
+                   1f,
+                   heatDuration)
+               .SetEase(heatEase);
+
+                droughtEffect.SetActive(false);
+
                 break;                
-            case WaveType.Heat: // 임시로 추위와 동일한 이펙트 삽입
-                Plant[] p = FindObjectsByType<Plant>(FindObjectsSortMode.None);
+            case WaveType.Heat:
 
-                foreach (var plant in p)
-                {
-                    plant.ShowSnow(snowDuration, snowEase);
-                }
+                heatEffect.SetActive(true);
+                float distortionAmount = 0f;
+                DOTween.To(() => distortionAmount,
+                   x => { distortionAmount = x; heatDistortionSprite.color = new Color(heatDistortionColor.r, heatDistortionColor.g, heatDistortionColor.b, x); },
+                   1f,
+                   heatDuration)
+               .SetEase(heatEase);
 
+                float heatAmount = 1f;
+                DOTween.To(() => heatAmount,
+                   x => { heatAmount = x; heatLight.intensity = x; },
+                   3f,
+                   heatDuration)
+               .SetEase(heatEase);
 
-                snowEffect.Play();
-                foreach (var mat in snowMats)
-                {
-                    float meltAmount = 1.2f;
-                    DOTween.To(() => meltAmount,
-                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
-                       -0.2f,
-                       snowDuration)
-                   .SetEase(snowEase);
-                }
 
                 t = 0f;
                 while (t < waveDuration)
@@ -259,22 +303,22 @@ public class WaveManager : MonoBehaviour
                     yield return null;
                 }
 
-                foreach (var plant in p)
-                {
-                    plant.HideSnow(snowDuration, snowEase);
-                }
 
-                foreach (var mat in snowMats)
-                {
-                    float meltAmount = -0.2f;
-                    DOTween.To(() => meltAmount,
-                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
-                       1.2f,
-                       snowDuration)
-                   .SetEase(snowEase);
-                }
+                heatAmount = 3f;
+                DOTween.To(() => heatAmount,
+                   x => { heatAmount = x; heatLight.intensity = x; },
+                   1f,
+                   heatDuration)
+               .SetEase(heatEase);
 
-                snowEffect.Stop();
+                distortionAmount = 1f;
+                DOTween.To(() => distortionAmount,
+                   x => { distortionAmount = x; heatDistortionSprite.color = new Color(heatDistortionColor.r, heatDistortionColor.g, heatDistortionColor.b, x); },
+                   0f,
+                   heatDuration)
+               .SetEase(heatEase);
+                heatEffect.SetActive(false);
+
                 break;
             default:
                 yield return null;
