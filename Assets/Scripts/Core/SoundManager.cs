@@ -57,6 +57,8 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("Pest", Resources.Load<AudioClip>("Audio/Wave/Pest"));
         EffectSoundDictionary.Add("Cold", Resources.Load<AudioClip>("Audio/Wave/Cold"));
         EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
+        EffectSoundDictionary.Add("Heat", Resources.Load<AudioClip>("Audio/Wave/Heat")); // 추위와 동일한 임시 사운드 삽입해둠
+        EffectSoundDictionary.Add("Drought", Resources.Load<AudioClip>("Audio/Wave/Drought")); // 폭우와 동일한 임시 사운드 삽입해둠
 
         EffectSoundDictionary.Add("Tractor", Resources.Load<AudioClip>("Audio/Tractor"));
 

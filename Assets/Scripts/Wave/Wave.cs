@@ -10,6 +10,8 @@ public enum WaveType
     Flood,
     HeavyRain,
     Cold,
+    Drought,
+    Heat,
     None
 }
 

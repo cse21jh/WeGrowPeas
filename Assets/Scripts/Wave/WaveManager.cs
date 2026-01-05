@@ -213,6 +213,69 @@ public class WaveManager : MonoBehaviour
                 lightningIndex = lightningCount; // Stop further lightning
                 StopCoroutine(Lightning());
                 break;
+            case WaveType.Drought: // 임시로 폭우와 동일한 이펙트 삽입
+                rainEffect.Play();
+                lightningIndex = 0;
+                StartCoroutine(Lightning());
+
+                float r = 0f;
+                while (r < waveDuration)
+                {
+                    r += Time.deltaTime;
+                    lcController.UpdateType(LightColorType.Rain);
+                    lcController.time = Mathf.Clamp01(r / waveDuration);
+                    yield return null;
+                }
+                lcController.time = 1f; // Ensure it ends exactly at 1
+
+                rainEffect.Stop();
+                lightningIndex = lightningCount; // Stop further lightning
+                StopCoroutine(Lightning());
+                break;                
+            case WaveType.Heat: // 임시로 추위와 동일한 이펙트 삽입
+                Plant[] p = FindObjectsByType<Plant>(FindObjectsSortMode.None);
+
+                foreach (var plant in p)
+                {
+                    plant.ShowSnow(snowDuration, snowEase);
+                }
+
+
+                snowEffect.Play();
+                foreach (var mat in snowMats)
+                {
+                    float meltAmount = 1.2f;
+                    DOTween.To(() => meltAmount,
+                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
+                       -0.2f,
+                       snowDuration)
+                   .SetEase(snowEase);
+                }
+
+                t = 0f;
+                while (t < waveDuration)
+                {
+                    t += Time.deltaTime;
+                    yield return null;
+                }
+
+                foreach (var plant in p)
+                {
+                    plant.HideSnow(snowDuration, snowEase);
+                }
+
+                foreach (var mat in snowMats)
+                {
+                    float meltAmount = -0.2f;
+                    DOTween.To(() => meltAmount,
+                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
+                       1.2f,
+                       snowDuration)
+                   .SetEase(snowEase);
+                }
+
+                snowEffect.Stop();
+                break;
             default:
                 yield return null;
                 break;

@@ -128,8 +128,6 @@ public class Grid : MonoBehaviour
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
         {
             new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
-            new GeneticTrait(TraitType.HeavyRain, 0.65f, 1, 0.0f),
-            new GeneticTrait(TraitType.Cold, 0.65f, 1, 0.0f),
         };
             FenceUIManager.Instance.SetFenceElements(0, pea);
             pea.SetTrait(basicTrait);

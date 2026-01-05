@@ -17,7 +17,9 @@ public class EnemyController : MonoBehaviour
         { WaveType.Wind, new WindWave() },
         { WaveType.Flood, new FloodWave() },
         { WaveType.HeavyRain, new HeavyRainWave() },
-        { WaveType.Cold, new ColdWave() }
+        { WaveType.Cold, new ColdWave() },
+        { WaveType.Drought, new DroughtWave() },
+        { WaveType.Heat, new HeatWave() }
     };
 
     public Grid grid;
@@ -145,7 +147,7 @@ public class EnemyController : MonoBehaviour
         yield return null;
     }
 
-    private void InitBaseWeightsByStage(int stage)
+    private void InitBaseWeightsByStage(int stage) // 첫 시작, 불러오기 용 웨이브 해금
     {
         // 초기화
         baseWeights[WaveType.Aging] = 1f; // 항상 가능
@@ -154,18 +156,20 @@ public class EnemyController : MonoBehaviour
         baseWeights[WaveType.Flood] = (stage + 2 >= FloodWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.HeavyRain] = (stage + 2 >= HeavyRainWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Cold] = (stage + 2 >= ColdWave.UnlockStage ) ? 1f : 0f;
+        baseWeights[WaveType.Drought] = (stage + 2 >= DroughtWave.UnlockStage) ? 1f : 0f;
+        baseWeights[WaveType.Heat] = (stage + 2 >= HeatWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.None] = 0f; // 추첨 대상에서 제외
     }
 
-    public void UnlockWave(int stage)
+    public void UnlockWave(int stage) // 매 스테이지 지날 때 해금 용 
     {
         switch (stage + 2)
         {
             case PestWave.UnlockStage: baseWeights[WaveType.Pest] = 1f; break;
             case WindWave.UnlockStage: baseWeights[WaveType.Wind] = 1f; break;
             case FloodWave.UnlockStage: baseWeights[WaveType.Flood] = 1f; break;
-            case HeavyRainWave.UnlockStage: baseWeights[WaveType.HeavyRain] = 1f; break;
-            case ColdWave.UnlockStage: baseWeights[WaveType.Cold] = 1f; break;
+            case HeavyRainWave.UnlockStage: baseWeights[WaveType.HeavyRain] = 1f; baseWeights[WaveType.Drought] = 1f; break;
+            case ColdWave.UnlockStage: baseWeights[WaveType.Cold] = 1f; baseWeights[WaveType.Heat] = 1f; break;            
         }
     }
 
@@ -259,6 +263,8 @@ public class EnemyController : MonoBehaviour
             WaveType.Pest => new PestWave(),
             WaveType.Cold => new ColdWave(),
             WaveType.HeavyRain => new HeavyRainWave(),
+            WaveType.Drought => new DroughtWave(),
+            WaveType.Heat => new HeatWave(),
             WaveType.None => new NoneWave(),
         };
     }
