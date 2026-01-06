@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -31,7 +31,7 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject nepenthesPrefab;
     [SerializeField] protected GameObject chiliPepperPrefab;
     //[SerializeField] private GameObject soilPrefab;
-    [SerializeField] protected GameObject[] disabledSoil; // 4°³ ÀÌ»óÀÇ ¿­ÀÌ Ãß°¡µÉ ¶§ È°¼ºÈ­µÇ´Â Åä¾çµé
+    [SerializeField] protected GameObject[] disabledSoil; // 4ê°œ ì´ìƒì˜ ì—´ì´ ì¶”ê°€ë  ë•Œ í™œì„±í™”ë˜ëŠ” í† ì–‘ë“¤
     [SerializeField] protected List<GameObject> bugPrefabs;
     [SerializeField] protected GameObject ladybugPrefabs;
 
@@ -40,8 +40,8 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject breedSkipButton;
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
-    [SerializeField] protected Sprite[] gardenSprites; // Á¤¿ø ¹è°æ ½ºÇÁ¶óÀÌÆ®µé
-    [SerializeField] protected SpriteRenderer gardenRenderer; // Á¤¿ø ¹è°æ ½ºÇÁ¶óÀÌÆ® ·»´õ·¯
+    [SerializeField] protected Sprite[] gardenSprites; // ì •ì› ë°°ê²½ ìŠ¤í”„ë¼ì´íŠ¸ë“¤
+    [SerializeField] protected SpriteRenderer gardenRenderer; // ì •ì› ë°°ê²½ ìŠ¤í”„ë¼ì´íŠ¸ ë Œë”ëŸ¬
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
     
@@ -55,7 +55,7 @@ public class Grid : MonoBehaviour
 
     public bool isDraggingShovel = false;
 
-    //ÀúÀå ÇÊ¿ä
+    //ì €ì¥ í•„ìš”
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
     public int killBugCount = 0;
@@ -98,7 +98,7 @@ public class Grid : MonoBehaviour
     public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
-    public int BreedCount => breedCount; // ½ºÅ×ÀÌÁö ´ÜÀ§ ÀúÀåÀÌ¶ó ¾ÆÁ÷ ¤¡¤º
+    public int BreedCount => breedCount; // ìŠ¤í…Œì´ì§€ ë‹¨ìœ„ ì €ì¥ì´ë¼ ì•„ì§ ã„±ã…Š
     public bool HasIceBlock => hasIceBlock;
     public List<int> PetBottleTiles => petBottleTiles;
 
@@ -138,9 +138,9 @@ public class Grid : MonoBehaviour
 
     public IEnumerator Breeding()
     {
-        //breedTimer ¸¸Å­ µ¿¾È ¾Æ·¡ °úÁ¤ ¹İº¹ ÁøÇà °¡´É
+        //breedTimer ë§Œí¼ ë™ì•ˆ ì•„ë˜ ê³¼ì • ë°˜ë³µ ì§„í–‰ ê°€ëŠ¥
 
-        //±³¹èÇÒ ºÎ¸ğ ¿ÏµÎÄá µÎ °³ ¼±ÅÃ
+        //êµë°°í•  ë¶€ëª¨ ì™„ë‘ì½© ë‘ ê°œ ì„ íƒ
         isBreeding = true;
         breedObj1 = null;
         breedObj2 = null;
@@ -150,7 +150,10 @@ public class Grid : MonoBehaviour
         float effectiveBugSpawnTimeInterval = BugSpawnTimeInterval * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
         float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
-        Debug.Log(effectiveMaxBreedTimer + "ÃÊ ½ÃÀÛ. ÃÖ´ë ±³¹è È½¼ö´Â " + effectiveMaxBreedCount + "ÀÔ´Ï´Ù");
+        //ì„ì‹œ ì•ŒëŒ
+        bool _warned15s = false;
+
+        Debug.Log(effectiveMaxBreedTimer + "ì´ˆ ì‹œì‘. ìµœëŒ€ êµë°° íšŸìˆ˜ëŠ” " + effectiveMaxBreedCount + "ì…ë‹ˆë‹¤");
         UpdateBreedCountUI(effectiveMaxBreedCount);
         breedTimer = effectiveMaxBreedTimer;
         breedTimerUI.StartBreedingTimer();
@@ -166,6 +169,20 @@ public class Grid : MonoBehaviour
         {
             lastBugSpawnTimeInterval += Time.deltaTime;
             breedTimer -= Time.deltaTime;
+
+            if (breedTimer < 15f && !_warned15s)
+            {
+                _warned15s = true;
+
+                PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = "ì›¨ì´ë¸Œê°€ ì–¼ë§ˆë‚¨ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤",
+                        message = "ì¡°ì‹¬í•˜ì„¸ìš”.",
+                        duration = 5f
+                    }
+                );
+            }
 
             if (Input.GetKeyDown(KeyCode.S))
             {
@@ -189,14 +206,14 @@ public class Grid : MonoBehaviour
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
-                if (breedObj1 != null && breedObj2 != null) // ±³¹è ¹öÆ° µîÀ¸·Î ÃßÈÄ ¼öÁ¤
+                if (breedObj1 != null && breedObj2 != null) // êµë°° ë²„íŠ¼ ë“±ìœ¼ë¡œ ì¶”í›„ ìˆ˜ì •
                 {
                     Plant parent1 = breedObj1.GetComponent<Plant>();
                     Plant parent2 = breedObj2.GetComponent<Plant>();
-                    //ÀÚ½Ä ¿ÏµÎÄá ÇüÁú °è»ê ÈÄ Instantiate
+                    //ìì‹ ì™„ë‘ì½© í˜•ì§ˆ ê³„ì‚° í›„ Instantiate
 
                     bool canBreed = false;
-                    for (int idx = 0; idx < maxCol * 4; idx++) // ºó Ä­ÀÌ ÀÖ´Â°¡
+                    for (int idx = 0; idx < maxCol * 4; idx++) // ë¹ˆ ì¹¸ì´ ìˆëŠ”ê°€
                     {
                         if (!plantGrid.ContainsKey(idx))
                         {
@@ -206,7 +223,7 @@ public class Grid : MonoBehaviour
                     }
 
                     bool isEqualPlant = false;
-                    if ((parent1.GetType() == parent2.GetType())) // ÃßÈÄ ¾ÆÁ¾ ±³¹è°¡ »ı±ä´Ù¸é ÀÌ°÷°ú ±³¹è ·ÎÁ÷ ¼öÁ¤À»...
+                    if ((parent1.GetType() == parent2.GetType())) // ì¶”í›„ ì•„ì¢… êµë°°ê°€ ìƒê¸´ë‹¤ë©´ ì´ê³³ê³¼ êµë°° ë¡œì§ ìˆ˜ì •ì„...
                     {
                         isEqualPlant = true;
                     }
@@ -226,7 +243,7 @@ public class Grid : MonoBehaviour
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
-                            Debug.Log("ÀÚ½Ä »ı¼º ¼º°ø. ³²Àº ±³¹è È½¼ö´Â " + (effectiveMaxBreedCount - breedCount) + "ÀÔ´Ï´Ù");
+                            Debug.Log("ìì‹ ìƒì„± ì„±ê³µ. ë‚¨ì€ êµë°° íšŸìˆ˜ëŠ” " + (effectiveMaxBreedCount - breedCount) + "ì…ë‹ˆë‹¤");
                             SoundManager.Instance.PlayEffect("Breed");
                             totalBreedCount++;
                             if (child.GetType() == typeof(Pea))
@@ -244,7 +261,7 @@ public class Grid : MonoBehaviour
                         }
                         else
                         {
-                            Debug.Log("ÀÚ½Ä »ı¼º¿¡ ¿À·ù ¹ß»ı");
+                            Debug.Log("ìì‹ ìƒì„±ì— ì˜¤ë¥˜ ë°œìƒ");
                             Destroy(childObj);
                             isBreedButtonPressed = false;
                         }
@@ -252,19 +269,19 @@ public class Grid : MonoBehaviour
                     }
                     else if (breedCount >= effectiveMaxBreedCount)
                     {
-                        Debug.Log("ÃÖ´ë ±³¹è È½¼ö ÃÊ°ú");
+                        Debug.Log("ìµœëŒ€ êµë°° íšŸìˆ˜ ì´ˆê³¼");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
                     else if (isEqualPlant)
                     {
-                        Debug.Log("µÎ Á¾ÀÌ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù");
+                        Debug.Log("ë‘ ì¢…ì´ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
                     else
                     {
-                        Debug.Log("Å°¿ï °ø°£ÀÌ ºÎÁ·ÇÕ´Ï´Ù");
+                        Debug.Log("í‚¤ìš¸ ê³µê°„ì´ ë¶€ì¡±í•©ë‹ˆë‹¤");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
@@ -273,13 +290,13 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("¾ÆÁ÷ µÎ ÄáÀ» ¸ğµÎ ¼±ÅÃÇÏÁö ¾Ê¾Ò½À´Ï´Ù");
+                    Debug.Log("ì•„ì§ ë‘ ì½©ì„ ëª¨ë‘ ì„ íƒí•˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤");
                     isBreedButtonPressed = false;
                 }
             }
             else
             {
-                isBreedButtonPressed = false; // ¹ö±×·Î ÀÎÇØ Breed ¹öÆ°ÀÌ È°¼ºÈ­µÈ »óÅÂ¿¡¼­ ¹öÆ° ¸ÕÀú ´©¸£¸é ±³¹è°¡ ¹Ù·Î µÇ´ø Çö»ó ¼öÁ¤
+                isBreedButtonPressed = false; // ë²„ê·¸ë¡œ ì¸í•´ Breed ë²„íŠ¼ì´ í™œì„±í™”ëœ ìƒíƒœì—ì„œ ë²„íŠ¼ ë¨¼ì € ëˆ„ë¥´ë©´ êµë°°ê°€ ë°”ë¡œ ë˜ë˜ í˜„ìƒ ìˆ˜ì •
             }
 
             yield return null;
@@ -290,12 +307,12 @@ public class Grid : MonoBehaviour
 
         breedTimerUI.StopTimer();
         breedCount = 0;
-        Debug.Log("±³¹è ÆäÀÌÁî Á¾·á");
+        Debug.Log("êµë°° í˜ì´ì¦ˆ ì¢…ë£Œ");
         breedButton.SetActive(false);
         enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
-        //GardenGrid ¸®·Îµå
+        //GardenGrid ë¦¬ë¡œë“œ
 
         yield return null;
     }
@@ -307,7 +324,7 @@ public class Grid : MonoBehaviour
         foreach (TraitType trait in System.Enum.GetValues(typeof(TraitType)))
         {
             if (trait == TraitType.None || trait == TraitType.Drought || trait == TraitType.Heat)
-                break; // °¡¹³, ´õÀ§¿¡ ´ëÇÑ ÇüÁúÀº SetTrait¿¡¼­ »ğÀÔÇØÁÜ.µû·Îµû·Î ±³¹è ·ÎÁ÷À» °ÅÄ¡¸é ÀÌ»óÇÏ°Ô ³ª¿È. 
+                break; // ê°€ë­„, ë”ìœ„ì— ëŒ€í•œ í˜•ì§ˆì€ SetTraitì—ì„œ ì‚½ì…í•´ì¤Œ.ë”°ë¡œë”°ë¡œ êµë°° ë¡œì§ì„ ê±°ì¹˜ë©´ ì´ìƒí•˜ê²Œ ë‚˜ì˜´. 
 
             int p1Trait;
             int p2Trait;
@@ -363,7 +380,7 @@ public class Grid : MonoBehaviour
         child.SetTrait(childTrait);
     }
 
-    protected void AddPlantToGrid(Plant plant, int grididx = -1) // ÀÌ¹Ì ¿ÀºêÁ§Æ®·Î ¸¸µé¾îÁø ½Ä¹° ±×¸®µå¿¡ Ãß°¡. grididx¿¡ ¼ıÀÚ »ğÀÔ ½Ã ÇØ´ç À§Ä¡¿¡ ½Ä¹° ½É¾îÁÜ
+    protected void AddPlantToGrid(Plant plant, int grididx = -1) // ì´ë¯¸ ì˜¤ë¸Œì íŠ¸ë¡œ ë§Œë“¤ì–´ì§„ ì‹ë¬¼ ê·¸ë¦¬ë“œì— ì¶”ê°€. grididxì— ìˆ«ì ì‚½ì… ì‹œ í•´ë‹¹ ìœ„ì¹˜ì— ì‹ë¬¼ ì‹¬ì–´ì¤Œ
     {
         if (grididx != -1)
         {
@@ -496,7 +513,7 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalResistanceInGrid(TraitType traitType, float value, bool byUpgrade = false)
     {
-        for (int idx = 0; idx < GetMaxCol() * 4; idx++) // grid¿¡ ÀÖ´Â ½Ä¹°µé ÀúÇ×·Â Áõ°¡
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++) // gridì— ìˆëŠ” ì‹ë¬¼ë“¤ ì €í•­ë ¥ ì¦ê°€
         {
             if (plantGrid.ContainsKey(idx))
             {
@@ -532,7 +549,7 @@ public class Grid : MonoBehaviour
         //GameObject obj = Instantiate(soilPrefab, this.transform);
         //obj.transform.localPosition = new Vector3(1.7f * (maxCol-1), 0f, 0f);
 
-        gardenRenderer.sprite = gardenSprites[maxCol - 4]; // Á¤¿ø ¹è°æ ½ºÇÁ¶óÀÌÆ® º¯°æ
+        gardenRenderer.sprite = gardenSprites[maxCol - 4]; // ì •ì› ë°°ê²½ ìŠ¤í”„ë¼ì´íŠ¸ ë³€ê²½
 
         disabledSoil[maxCol - 5].SetActive(true);
 
@@ -554,7 +571,7 @@ public class Grid : MonoBehaviour
             return;
         for (int i = 5; i <= maxCol; i++)
         {
-            gardenRenderer.sprite = gardenSprites[i - 4]; // Á¤¿ø ¹è°æ ½ºÇÁ¶óÀÌÆ® º¯°æ
+            gardenRenderer.sprite = gardenSprites[i - 4]; // ì •ì› ë°°ê²½ ìŠ¤í”„ë¼ì´íŠ¸ ë³€ê²½
             disabledSoil[i - 5].SetActive(true);
         }
     }
@@ -587,37 +604,37 @@ public class Grid : MonoBehaviour
 
         if (breedObj1 == clickedObject)
         {
-            // ºÎ¸ğ 1 ¼±ÅÃ Ãë¼Ò
+            // ë¶€ëª¨ 1 ì„ íƒ ì·¨ì†Œ
             SoundManager.Instance.PlayEffect("SelectPlant");
             clickedPea.MakeDefaultSprite();
             breedObj1 = null;
         }
         else if (breedObj2 == clickedObject)
         {
-            // ºÎ¸ğ 2 ¼±ÅÃ Ãë¼Ò
+            // ë¶€ëª¨ 2 ì„ íƒ ì·¨ì†Œ
             SoundManager.Instance.PlayEffect("SelectPlant");
             clickedPea.MakeDefaultSprite();
             breedObj2 = null;
         }
         else if (breedObj1 == null)
         {
-            // ºÎ¸ğ 1 ¼±ÅÃ
+            // ë¶€ëª¨ 1 ì„ íƒ
             SoundManager.Instance.PlayEffect("SelectPlant");
             breedObj1 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else if (breedObj2 == null)
         {
-            // ºÎ¸ğ 2 ¼±ÅÃ
+            // ë¶€ëª¨ 2 ì„ íƒ
             SoundManager.Instance.PlayEffect("SelectPlant");
             breedObj2 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else
         {
-            // ÀÌ¹Ì µÎ ºÎ¸ğ ¼±ÅÃµÊ
+            // ì´ë¯¸ ë‘ ë¶€ëª¨ ì„ íƒë¨
             SoundManager.Instance.PlayEffect("WrongSelect");
-            Debug.Log("ÀÌ¹Ì µÎ ºÎ¸ğ°¡ ¸ğµÎ ¼±ÅÃµÈ »óÅÂ");
+            Debug.Log("ì´ë¯¸ ë‘ ë¶€ëª¨ê°€ ëª¨ë‘ ì„ íƒëœ ìƒíƒœ");
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
@@ -649,20 +666,20 @@ public class Grid : MonoBehaviour
 
     protected void UpdateBreedCountUI(int count)
     {
-        breedCountUI.text = $"{count}°³";
+        breedCountUI.text = $"{count}ê°œ";
     }
 
     private void SpawnRandomBug()
     {
         int stage = GameManager.Instance.stage;
-        if (stage < 6) // ÇØÃæ ¿şÀÌºê ÇØ±İ Àü¿£ µîÀå X
+        if (stage < 6) // í•´ì¶© ì›¨ì´ë¸Œ í•´ê¸ˆ ì „ì—” ë“±ì¥ X
             return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
             Instantiate(ladybugPrefabs);
             return;
         }
-        int i = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count)); //¹ú·¹ ÇØ±İ ½Ã±â¿Í ÀÏÄ¡ÇÏµµ·Ï ¼³Á¤
+        int i = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count)); //ë²Œë ˆ í•´ê¸ˆ ì‹œê¸°ì™€ ì¼ì¹˜í•˜ë„ë¡ ì„¤ì •
         Instantiate(bugPrefabs[i]);
         return;
     }
@@ -678,10 +695,10 @@ public class Grid : MonoBehaviour
     {
         int? targetIndex = GetGridIndexFromPosition(screenPosition);
 
-        // Åä¾ç °¨Áö ½ÇÆĞ
+        // í† ì–‘ ê°ì§€ ì‹¤íŒ¨
         if (!targetIndex.HasValue || plant.isDying)
         {
-            // ¿ø·¡ À§Ä¡·Î µÇµ¹¸®±â
+            // ì›ë˜ ìœ„ì¹˜ë¡œ ë˜ëŒë¦¬ê¸°
             Transform originalSoil = GetSoilTransform(plant.gridIndex);
             plant.transform.position = originalSoil.position;
             return false;
@@ -692,27 +709,27 @@ public class Grid : MonoBehaviour
 
         if (plantGrid.ContainsKey(toIndex))
         {
-            if (!plantGrid[toIndex].CanMove()) // ¿Å±â±â ºÒ°¡´ÉÇÑ ½Ä¹°ÀÇ °æ¿ì
+            if (!plantGrid[toIndex].CanMove()) // ì˜®ê¸°ê¸° ë¶ˆê°€ëŠ¥í•œ ì‹ë¬¼ì˜ ê²½ìš°
             {
                 Transform originalSoil = GetSoilTransform(plant.gridIndex);
                 plant.transform.position = originalSoil.position;
                 return false;
             }
-            // ´ë»ó Ä­¿¡ ½Ä¹°ÀÌ ÀÖ´Â °æ¿ì: ¼­·Î À§Ä¡ ±³È¯
+            // ëŒ€ìƒ ì¹¸ì— ì‹ë¬¼ì´ ìˆëŠ” ê²½ìš°: ì„œë¡œ ìœ„ì¹˜ êµí™˜
             Plant targetPlant = plantGrid[toIndex];
 
 
-            // ¼­·Î gridIndex ¹Ù²Ù±â
+            // ì„œë¡œ gridIndex ë°”ê¾¸ê¸°
             plant.SetGridIndex(toIndex);
             targetPlant.SetGridIndex(fromIndex);
 
-            // À§Ä¡ ¹Ù²Ù±â
+            // ìœ„ì¹˜ ë°”ê¾¸ê¸°
             Transform fromSoil = GetSoilTransform(fromIndex);
             Transform toSoil = GetSoilTransform(toIndex);
             plant.transform.position = toSoil.position;
             targetPlant.transform.position = fromSoil.position;
 
-            // plantGrid ¾÷µ¥ÀÌÆ®
+            // plantGrid ì—…ë°ì´íŠ¸
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
@@ -722,8 +739,8 @@ public class Grid : MonoBehaviour
         else
         {
 
-            // ºó Ä­ÀÌ¸é ¿ø·¡´ë·Î ½É±â
-            plantGrid.Remove(fromIndex); // ¿ø·¡ À§Ä¡¿¡¼­ Á¦°Å
+            // ë¹ˆ ì¹¸ì´ë©´ ì›ë˜ëŒ€ë¡œ ì‹¬ê¸°
+            plantGrid.Remove(fromIndex); // ì›ë˜ ìœ„ì¹˜ì—ì„œ ì œê±°
             plant.SetGridIndex(toIndex);
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
@@ -771,10 +788,10 @@ public class Grid : MonoBehaviour
             GameObject obj;
             switch (item.speciesname)
             {
-                case "¿ÏµÎÄá": obj = Instantiate(peaPrefab); break;
-                case "¶¥Äá": obj = Instantiate(peanutPrefab); break;
-                case "³×Ææµ¥½º": obj = Instantiate(nepenthesPrefab); break;
-                case "°íÃß": obj = Instantiate(chiliPepperPrefab); break;
+                case "ì™„ë‘ì½©": obj = Instantiate(peaPrefab); break;
+                case "ë•…ì½©": obj = Instantiate(peanutPrefab); break;
+                case "ë„¤íœë°ìŠ¤": obj = Instantiate(nepenthesPrefab); break;
+                case "ê³ ì¶”": obj = Instantiate(chiliPepperPrefab); break;
                 default: obj = Instantiate(peaPrefab); break;
             }
 
@@ -871,7 +888,7 @@ public class Grid : MonoBehaviour
 
         petBottleTiles.Add(idx);
 
-        // ½Ã°¢È­(¼±ÅÃ)
+        // ì‹œê°í™”(ì„ íƒ)
         if (petBottleMarkerPrefab != null)
         {
             var soilT = GetSoilTransform(idx);
@@ -879,13 +896,13 @@ public class Grid : MonoBehaviour
             petMarkers[idx] = marker;
         }
 
-        Debug.Log($"[Grid] ÆäÆ®º´ ¼³Ä¡: idx={idx}");
+        Debug.Log($"[Grid] í˜íŠ¸ë³‘ ì„¤ì¹˜: idx={idx}");
     }
     public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
     {
-        if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // ¿şÀÌºê³ª »ğ¿¡ ÀÇÇØ Á¦°ÅµÉ ¶§, ÆäÆ®º´ÀÌ ÀÖ´Â °æ¿ì
+        if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // ì›¨ì´ë¸Œë‚˜ ì‚½ì— ì˜í•´ ì œê±°ë  ë•Œ, í˜íŠ¸ë³‘ì´ ìˆëŠ” ê²½ìš°
         {
-            // 1È¸¼º º¸È£ ¡æ ¼Ò¸ğ
+            // 1íšŒì„± ë³´í˜¸ â†’ ì†Œëª¨
             petBottleTiles.Remove(idx);
 
             if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
@@ -896,16 +913,16 @@ public class Grid : MonoBehaviour
             return true;
         }
         
-        if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // ¹ú·¹·Î ÀÎÇÑ Á×À½ÀÎµ¥, ÇÊµå¿¡ ÀÍÃæÀÌ ÀÖ´Â °æ¿ì
+        if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // ë²Œë ˆë¡œ ì¸í•œ ì£½ìŒì¸ë°, í•„ë“œì— ìµì¶©ì´ ìˆëŠ” ê²½ìš°
         {
             StartCoroutine(ladybugs[0].KillFuckingBug(killer));
             return true;
         }
 
-        return false; // Á×À½ ¹æ¾î ½ÇÆĞ
+        return false; // ì£½ìŒ ë°©ì–´ ì‹¤íŒ¨
     }
 
-    //-----Àü¿ë ºñ·á------
+    //-----ì „ìš© ë¹„ë£Œ------
     public bool HasFertilizerAt(int idx) => fertilizerColumns.ContainsKey(GetCol(idx));
 
     public bool HasBreedablePlantAt(int idx)
@@ -929,7 +946,7 @@ public class Grid : MonoBehaviour
 
     public bool TryPlaceFertilizer(int idx, WaveType wave)
     {
-        if (HasFertilizerAt(idx)) return false; // ÀÌ¹Ì ´Ù¸¥ Àü¿ë ºñ·á°¡ ÀÖÀ¸¸é ºÒ°¡
+        if (HasFertilizerAt(idx)) return false; // ì´ë¯¸ ë‹¤ë¥¸ ì „ìš© ë¹„ë£Œê°€ ìˆìœ¼ë©´ ë¶ˆê°€
 
         int col = GetCol(idx);
 
@@ -951,7 +968,7 @@ public class Grid : MonoBehaviour
 
     public void RemoveFertilizerAt(int col)
     {
-        // SoilCol Transform °¡Á®¿À±â
+        // SoilCol Transform ê°€ì ¸ì˜¤ê¸°
         Transform soilColT = transform.GetChild(col);
         var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
 
@@ -983,19 +1000,19 @@ public class Grid : MonoBehaviour
         };
     }
 
-    //-----¾óÀ½ ¹æÆĞ------
+    //-----ì–¼ìŒ ë°©íŒ¨------
 
     public void SetIceBlock(bool value = true)
     {
         hasIceBlock = value;
-        // ¾ó¹æ °¡Áö°í ÀÖ´Ù´Â UI
+        // ì–¼ë°© ê°€ì§€ê³  ìˆë‹¤ëŠ” UI
     }
 
     public void ActivateIceBlock()
     {
         hasIceBlock = false;
         isIceBlockOn = true;
-        // ¾ó¹æ ÀÛµ¿ÇÑ´Ù´Â UI
+        // ì–¼ë°© ì‘ë™í•œë‹¤ëŠ” UI
     }
 
     public bool IsIceBlockActivated()
@@ -1006,7 +1023,7 @@ public class Grid : MonoBehaviour
     public void DeactivateIceBlock()
     {
         isIceBlockOn = false;
-        // ¾ó¹æ UI »èÁ¦
+        // ì–¼ë°© UI ì‚­ì œ
     }
 
     public int GetLivingPlantCount()
