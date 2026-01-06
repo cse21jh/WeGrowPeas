@@ -1,6 +1,6 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
-using Unity.Android.Types;
+//using Unity.Android.Types;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
@@ -17,7 +17,7 @@ public class StemController : MonoBehaviour
     [SerializeField] private PeaSpriteController[] peaSprites;
     [SerializeField] private PeanutSpriteController[] peanutSprites;
     [SerializeField] private Animator[] peaAnimators;
-    [SerializeField] private float maxStartDelay = 0.1f; // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ Áö¿¬ ½Ã°£
+    [SerializeField] private float maxStartDelay = 0.1f; // ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘ ì§€ì—° ì‹œê°„
     [SerializeField] private GameObject electricEffectPrefab;
 
     [SerializeField] private bool isDebugMode = false;
@@ -63,9 +63,9 @@ public class StemController : MonoBehaviour
                 for (int i = 0; i < traits.Count; i += 1)
                 {
                     if ((int)traits[i].traitType >= (int)TraitType.Drought)
-                        continue; // °¡¹³, ´õÀ§´Â Æø¿ì, ÃßÀ§ ÆÇ´Ü ÇÒ ¶§ °°ÀÌ
+                        continue; // ê°€ë­„, ë”ìœ„ëŠ” í­ìš°, ì¶”ìœ„ íŒë‹¨ í•  ë•Œ ê°™ì´
 
-                    if (traits[i].traitType == TraitType.HeavyRain) // È«¼ö´Â À¯ÀüÀÚ °³¼ö µû¶ó¼­ ½ºÇÁ¶óÀÌÆ® ´Ù¸£°Ô
+                    if (traits[i].traitType == TraitType.HeavyRain) // í™ìˆ˜ëŠ” ìœ ì „ì ê°œìˆ˜ ë”°ë¼ì„œ ìŠ¤í”„ë¼ì´íŠ¸ ë‹¤ë¥´ê²Œ
                     {
                         switch(traits[i].genetics)
                         {
@@ -82,7 +82,7 @@ public class StemController : MonoBehaviour
                         continue;
                     }
 
-                    if (traits[i].traitType == TraitType.Cold) // ÃßÀ§´Â À¯ÀüÀÚ °³¼ö µû¶ó¼­ ½ºÇÁ¶óÀÌÆ® ´Ù¸£°Ô
+                    if (traits[i].traitType == TraitType.Cold) // ì¶”ìœ„ëŠ” ìœ ì „ì ê°œìˆ˜ ë”°ë¼ì„œ ìŠ¤í”„ë¼ì´íŠ¸ ë‹¤ë¥´ê²Œ
                     {
                         switch (traits[i].genetics)
                         {
@@ -116,9 +116,9 @@ public class StemController : MonoBehaviour
                 for (int i = 0; i < traits.Count; i += 1)
                 {
                     if ((int)traits[i].traitType >= (int)TraitType.Drought)
-                        continue; // °¡¹³, ´õÀ§´Â Æø¿ì, ÃßÀ§ ÆÇ´Ü ÇÒ ¶§ °°ÀÌ
+                        continue; // ê°€ë­„, ë”ìœ„ëŠ” í­ìš°, ì¶”ìœ„ íŒë‹¨ í•  ë•Œ ê°™ì´
 
-                    if (traits[i].traitType == TraitType.HeavyRain) // È«¼ö´Â À¯ÀüÀÚ °³¼ö µû¶ó¼­ ½ºÇÁ¶óÀÌÆ® ´Ù¸£°Ô
+                    if (traits[i].traitType == TraitType.HeavyRain) // í™ìˆ˜ëŠ” ìœ ì „ì ê°œìˆ˜ ë”°ë¼ì„œ ìŠ¤í”„ë¼ì´íŠ¸ ë‹¤ë¥´ê²Œ
                     {
                         switch (traits[i].genetics)
                         {
@@ -135,7 +135,7 @@ public class StemController : MonoBehaviour
                         continue;
                     }
 
-                    if (traits[i].traitType == TraitType.Cold) // ÃßÀ§´Â À¯ÀüÀÚ °³¼ö µû¶ó¼­ ½ºÇÁ¶óÀÌÆ® ´Ù¸£°Ô
+                    if (traits[i].traitType == TraitType.Cold) // ì¶”ìœ„ëŠ” ìœ ì „ì ê°œìˆ˜ ë”°ë¼ì„œ ìŠ¤í”„ë¼ì´íŠ¸ ë‹¤ë¥´ê²Œ
                     {
                         switch (traits[i].genetics)
                         {

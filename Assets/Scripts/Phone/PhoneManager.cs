@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,31 +9,30 @@ public class PhoneManager : MonoBehaviour
     [Serializable]
     public class AppEntry
     {
-        public string displayName;
-        public BasePhoneApp appRoot;
+        public AppKey key;
+        public string displayName;   // (ì„ íƒ) ìƒë‹¨ íƒ€ì´í‹€ìš©
+        public GameObject prefab;    // ì•± í”„ë¦¬íŒ¹
     }
 
-    [Header("Apps (Fixed in Scene)")]
+    [Header("Apps (prefab, created once at startup)")]
     [SerializeField] private List<AppEntry> apps = new();
 
     [Header("UI Roots")]
-    [SerializeField] private GameObject phoneRoot;   // Æù ÀüÃ¼ ·çÆ®
-    [SerializeField] private GameObject homePanel;   // È¨ ÆĞ³Î(½ºÅ©¸³Æ® ¾øÀ½)
-    [SerializeField] private PhoneTopBar topBar;     // »ó´Ü¹Ù
+    [SerializeField] private GameObject phoneRoot;   // í° ì „ì²´ ë£¨íŠ¸ (ì—´ê³ /ë‹«ê¸°)
+    [SerializeField] private GameObject homePanel;   // í™ˆ íŒ¨ë„(ê³ ì • UI)
+    [SerializeField] private Transform appContainer; // ì•± ì¸ìŠ¤í„´ìŠ¤ ë¶€ëª¨(ë¹ˆ RectTransform)
+    [SerializeField] private PhoneTopBar topBar;     // (ì„ íƒ) ì œëª©/ë’¤ë¡œ/í™ˆ
 
     [Header("Input")]
     [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
 
-    private BasePhoneApp _currentApp;
+    private readonly Dictionary<AppKey, GameObject> _instances = new();
+    private AppKey? _current = null;
     private bool _isOpen;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
         if (phoneRoot != null) phoneRoot.SetActive(false);
@@ -42,21 +41,10 @@ public class PhoneManager : MonoBehaviour
 
     private void Start()
     {
-        // ¾Û 1È¸ ÃÊ±âÈ­ + ºñÈ°¼º
-        for (int i = 0; i < apps.Count; i++)
-        {
-            var e = apps[i];
-            if (e == null || e.appRoot == null) continue;
+        CreateAllAppsOnce();
 
-            e.appRoot.gameObject.SetActive(false);
-            e.appRoot.OnCreate(this);
-        }
-
-        // È¨µµ ½ÃÀÛÀº ÄÑµĞ »óÅÂ·Î ÁØºñ (ÆùÀÌ ´İÇôÀÖÀ¸¸é ¾È º¸ÀÓ)
         if (homePanel != null) homePanel.SetActive(true);
 
-        // ³í¸® »óÅÂ´Â HomeÀ¸·Î
-        _currentApp = null;
         RefreshTopBar();
     }
 
@@ -64,6 +52,41 @@ public class PhoneManager : MonoBehaviour
     {
         if (Input.GetKeyDown(toggleKey))
             Toggle();
+    }
+
+    private void CreateAllAppsOnce()
+    {
+        if (appContainer == null)
+        {
+            Debug.LogError("[Phone] appContainer is not assigned.");
+            return;
+        }
+
+        _instances.Clear();
+
+        for (int i = 0; i < apps.Count; i++)
+        {
+            var e = apps[i];
+            if (e == null) continue;
+
+            if (e.prefab == null)
+            {
+                Debug.LogWarning($"[Phone] Missing prefab for {e.key}");
+                continue;
+            }
+
+            if (_instances.ContainsKey(e.key))
+            {
+                Debug.LogWarning($"[Phone] Duplicate AppKey: {e.key}");
+                continue;
+            }
+
+            var go = Instantiate(e.prefab, appContainer);
+            go.name = $"App_{e.key}";
+            go.SetActive(false);
+
+            _instances.Add(e.key, go);
+        }
     }
 
     public void Toggle() => SetOpen(!_isOpen);
@@ -78,39 +101,48 @@ public class PhoneManager : MonoBehaviour
     public void OpenHome()
     {
         EnsureOpen();
+
         HideCurrentApp();
+        _current = null;
 
         if (homePanel != null) homePanel.SetActive(true);
-
         RefreshTopBar();
     }
 
-    public void OpenApp(BasePhoneApp app)
+    public void OpenApp(AppKey key)
     {
-        if (app == null) return;
-
         EnsureOpen();
+
+        if (!_instances.TryGetValue(key, out var go) || go == null)
+        {
+            Debug.LogWarning($"[Phone] App instance not found: {key}");
+            return;
+        }
 
         if (homePanel != null) homePanel.SetActive(false);
 
-        if (_currentApp != null && _currentApp != app)
-        {
-            _currentApp.OnHide();
-            _currentApp.gameObject.SetActive(false);
-        }
+        HideCurrentApp();
 
-        _currentApp = app;
-        _currentApp.gameObject.SetActive(true);
-        _currentApp.OnShow();
+        go.SetActive(true);
+        _current = key;
 
         RefreshTopBar();
     }
 
     public void HandleBack()
     {
-        // ¾ÛÀÌ¸é È¨À¸·Î, È¨ÀÌ¸é Æù ´İ±â
-        if (_currentApp != null) OpenHome();
+        // ì•±ì´ë©´ í™ˆìœ¼ë¡œ, í™ˆì´ë©´ í° ë‹«ê¸°
+        if (_current.HasValue) OpenHome();
         else SetOpen(false);
+    }
+
+    private void HideCurrentApp()
+    {
+        if (!_current.HasValue) return;
+
+        var key = _current.Value;
+        if (_instances.TryGetValue(key, out var go) && go != null)
+            go.SetActive(false);
     }
 
     private void EnsureOpen()
@@ -118,44 +150,41 @@ public class PhoneManager : MonoBehaviour
         if (!_isOpen) SetOpen(true);
     }
 
-    private void HideCurrentApp()
-    {
-        if (_currentApp == null) return;
-
-        _currentApp.OnHide();
-        _currentApp.gameObject.SetActive(false);
-        _currentApp = null;
-    }
-
     private void RefreshTopBar()
     {
         if (topBar == null) return;
 
-        if (_currentApp == null)
+        if (!_current.HasValue)
         {
-            topBar.SetTitle("ÇÚµåÆù");
+            topBar.SetTitle("í•¸ë“œí°");
+            return;
         }
-        else
-        {
-            string title = _currentApp.Title;
-            if (string.IsNullOrEmpty(title))
-            {
-                var entry = FindEntry(_currentApp);
-                title = entry != null ? entry.displayName : "¾Û";
-            }
 
-            topBar.SetTitle(title);
-        }
-    }
+        // íƒ€ì´í‹€: ì—”íŠ¸ë¦¬ displayName ìš°ì„ , ì—†ìœ¼ë©´ enum ì´ë¦„
+        var key = _current.Value;
+        string title = null;
 
-    private AppEntry FindEntry(BasePhoneApp app)
-    {
         for (int i = 0; i < apps.Count; i++)
         {
             var e = apps[i];
-            if (e != null && e.appRoot == app)
-                return e;
+            if (e != null && e.key == key)
+            {
+                title = e.displayName;
+                break;
+            }
         }
-        return null;
+
+        if (string.IsNullOrEmpty(title)) title = key.ToString();
+
+        topBar.SetTitle(title);
     }
+}
+
+
+public enum AppKey
+{
+    Weather,
+    Shop,
+    Quest,
+    News,
 }
