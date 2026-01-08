@@ -56,6 +56,7 @@ public class SaveData
     public List<int> remainUpgradeCount = new();
 
     //enemyController
+    public Season currentSeason;
     public WaveType lastWaveType;
     public WaveType curWaveType;
     public WaveType nextWaveType;
@@ -349,6 +350,7 @@ public class GameManager : Singleton<GameManager>
             saveData.remainUpgradeCount.Add(u.Value);
         }
         //enemyController
+        saveData.currentSeason = enemyController.CurrentSeason;
         saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
         saveData.waveKillCount = enemyController.WaveKillCount;
         saveData.curWaveType = enemyController.CurrentWave.WaveType;

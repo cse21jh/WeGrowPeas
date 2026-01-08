@@ -138,7 +138,7 @@ public class UpgradeManager : MonoBehaviour
         {
             if (randomUpgrade[i] != null)
             {
-                Debug.Log($"업그레이드 슬롯 {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
+                //Debug.Log($"업그레이드 슬롯 {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
                 Upgrade randUpgrade = UpgradeInstance[randomUpgrade[i]]();
                 upgradeCards[i].Set(randUpgrade, i, this);
             }
@@ -160,7 +160,7 @@ public class UpgradeManager : MonoBehaviour
         }
         remainUpgrade[tmp]--;   
         UpgradeInstance[tmp]().OnSelectAction(); // 실제 업그레이드 작동. 각 upgrade에서 선언해둠. 
-        Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
+        //Debug.Log($"업그레이드 : {UpgradeInstance[tmp]().Name}");
         /*
         if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)
             selectAddPeaOrPeanutButton.SetActive(true);
@@ -177,7 +177,7 @@ public class UpgradeManager : MonoBehaviour
     {
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Upgrade);
 
-        Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
+        // Debug.Log("업그레이드 페이즈 시작. 리롤 가능 횟수는 " + maxRerollCount + " 입니다");
         ClickRouter.Instance.IsBlockedByUI = true;
         curRerollCount = maxRerollCount;
         SetRerollCountUI(curRerollCount);
@@ -226,7 +226,7 @@ public class UpgradeManager : MonoBehaviour
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
         FindAnyObjectByType<UIAnimationManager>().ResetShopPanelPosition();
-        Debug.Log("업그레이드 페이즈 종료");
+        //Debug.Log("업그레이드 페이즈 종료");
         upgradePanel.SetActive(false);
         selectAddPeaOrPeanutButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;

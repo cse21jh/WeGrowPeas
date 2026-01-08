@@ -7,6 +7,14 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
+public enum Season
+{
+    Spring,
+    Summer,
+    Fall,
+    Winter,
+}
+
 
 public class EnemyController : MonoBehaviour
 {
@@ -27,6 +35,8 @@ public class EnemyController : MonoBehaviour
 
     private Wave noneWave;
 
+    [SerializeField] TextMeshProUGUI tempSeasonText;
+
     [SerializeField] TextMeshProUGUI nextWaveText;
 
     [SerializeField] private GameObject waveSkipButton;
@@ -45,11 +55,14 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
+
+
     //int CurrentDay => GameManager.Instance.stage;
 
 
     // 아래 저장 필요
-    
+    private Season currentSeason = Season.Spring; // 스테이지로 계산해서 불러옴
+
     private Wave lastWave;
     private Wave currentWave;
     private Wave nextWave;
@@ -58,6 +71,7 @@ public class EnemyController : MonoBehaviour
 
     private bool isWaveSkipped = false;
 
+    public Season CurrentSeason => currentSeason;
     public Wave CurrentWave => currentWave;
     public Wave NextWave => nextWave;
     public Wave LastWave => lastWave;
@@ -93,7 +107,7 @@ public class EnemyController : MonoBehaviour
     {
         //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
         Wave wave = currentWave;
-        Debug.Log("현재 웨이브 종류 : " + currentWave);
+        // Debug.Log("현재 웨이브 종류 : " + currentWave);
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
@@ -124,13 +138,13 @@ public class EnemyController : MonoBehaviour
 
                     if (plant.CanResist(wave.WaveType))
                     {
-                        Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
+                        // Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
                         plant.ResistWave(wave.WaveType);
                     }
                     else
                     {
                         waveKillCount[(int)currentWave.WaveType] += 1;
-                        Debug.Log(idx + "번째 식물이 죽었습니다");
+                        // Debug.Log(idx + "번째 식물이 죽었습니다");
                         if (!plant.Die())
                             plant.ResistWave(wave.WaveType);
                     }
@@ -142,7 +156,8 @@ public class EnemyController : MonoBehaviour
         if (grid.IsIceBlockActivated())
             grid.DeactivateIceBlock();
 
-        SetNextWave();
+        SetNextSeason(); 
+        SetNextWave(); // 계절 바뀐 후, 다음날의 계절을 받아야 실제 
         //FlushNextWaveText();
         yield return null;
     }
@@ -183,6 +198,45 @@ public class EnemyController : MonoBehaviour
         ShowNextWaveText();
         WaveType picked = PickNextByWeight();
         nextWave = GetWaveFromWaveType(picked);
+    }
+
+    public void SetNextSeason()
+    {
+        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage + 1);
+        if (currentSeason != nextSeason)
+            SetSeason(nextSeason);
+        return;
+    }
+
+    public Season GetSeasonByStage(int stage)
+    {
+        return (Season)(((stage - 1) / 5) % 4);
+    }
+
+    public Season GetSeason()
+    {
+        return currentSeason;
+    }
+
+    public void SetSeason(Season season)
+    {
+        // 계절의 변동이 일어날 때, 계절에 변경이 필요한 요소들 해당 위치에서 변경
+        switch (season)
+        {
+            case Season.Spring:
+                tempSeasonText.text = "봄";
+                break;
+            case Season.Summer:
+                tempSeasonText.text = "여름";
+                break;
+            case Season.Fall:
+                tempSeasonText.text = "가을";
+                break;
+            case Season.Winter:
+                tempSeasonText.text = "겨울";
+                break;
+        }
+        currentSeason = season;
     }
 
     public void WaveSkip()
@@ -271,7 +325,7 @@ public class EnemyController : MonoBehaviour
 
     public void LoadEnemyController(SaveData saveData)
     {
-        InitBaseWeightsByStage(GameManager.Instance.stage);
+        InitBaseWeightsByStage(saveData.stage);
 
         currentWave = GetWaveFromWaveType(saveData.curWaveType);
         setWave = currentWave.WaveType;
@@ -284,6 +338,9 @@ public class EnemyController : MonoBehaviour
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
         breedTimerManager.SetTimer(currentWave.WaveType);
+
+        SetSeason(saveData.currentSeason);
+        
     }
 
     private void OnValidate()
@@ -297,6 +354,27 @@ public class EnemyController : MonoBehaviour
     {
         // 기본 가중치 복사
         var map = new Dictionary<WaveType, float>(baseWeights);
+
+        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 계절별로 안 나오는 가중치 0으로 만들기
+        switch(nextSeason)
+        {
+            case Season.Spring:
+                map[WaveType.Cold] = 0;
+                map[WaveType.HeavyRain] = 0;
+                break;
+            case Season.Summer:
+                map[WaveType.Cold] = 0;
+                map[WaveType.Drought] = 0;
+                break;
+            case Season.Fall:
+                map[WaveType.Heat] = 0;
+                map[WaveType.Drought] = 0;
+                break;
+            case Season.Winter:
+                map[WaveType.Heat] = 0;
+                map[WaveType.HeavyRain] = 0;
+                break;
+        }
 
         foreach (var t in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
         {

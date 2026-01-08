@@ -58,7 +58,7 @@ public class FenceUIManager : MonoBehaviour
 
     private void DeleteData(Plant plant)
     {
-        Debug.Log(plant + " " + savedPlant + " " + savedPlant_stack);
+        // Debug.Log(plant + " " + savedPlant + " " + savedPlant_stack);
 
         if (savedPlant == plant)
         {

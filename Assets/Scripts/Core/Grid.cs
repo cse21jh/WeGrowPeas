@@ -153,7 +153,7 @@ public class Grid : MonoBehaviour
         //임시 알람
         bool _warned15s = false;
 
-        Debug.Log(effectiveMaxBreedTimer + "초 시작. 최대 교배 횟수는 " + effectiveMaxBreedCount + "입니다");
+        //Debug.Log(effectiveMaxBreedTimer + "초 시작. 최대 교배 횟수는 " + effectiveMaxBreedCount + "입니다");
         UpdateBreedCountUI(effectiveMaxBreedCount);
         breedTimer = effectiveMaxBreedTimer;
         breedTimerUI.StartBreedingTimer();
@@ -307,7 +307,7 @@ public class Grid : MonoBehaviour
 
         breedTimerUI.StopTimer();
         breedCount = 0;
-        Debug.Log("교배 페이즈 종료");
+        // Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
         enemyController.HideWaveSkipButton();
         isBreeding = false;

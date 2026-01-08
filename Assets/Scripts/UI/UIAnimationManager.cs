@@ -96,7 +96,7 @@ public class UIAnimationManager : MonoBehaviour
     {
         DOTween.Kill(shop_targetPanel); // Kill any ongoing tweens on the target panel
         shop_targetPanel.anchoredPosition = new Vector2(shop_panelTransformOrigin.anchoredPosition.x, shop_panelTransformOrigin.anchoredPosition.y); // Reset position before moving
-        Debug.Log(shop_targetPanel.anchoredPosition.ToString() + shop_panelTransformOrigin.anchoredPosition.ToString());
+        //Debug.Log(shop_targetPanel.anchoredPosition.ToString() + shop_panelTransformOrigin.anchoredPosition.ToString());
     }
 
     public void ShowNewspaper()
