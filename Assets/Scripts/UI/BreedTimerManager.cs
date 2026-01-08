@@ -68,14 +68,14 @@ public class BreedTimerManager : MonoBehaviour
                 grid.SetBreedTimerUI(timerUIs[5]);
                 break;
             case WaveType.Drought:
-                timers[5].SetActive(true);
-                timerUIs[5].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[5]);
+                timers[6].SetActive(true);
+                timerUIs[6].UpdateMaxTimerCount();
+                grid.SetBreedTimerUI(timerUIs[6]);
                 break;
             case WaveType.Heat:
-                timers[4].SetActive(true);
-                timerUIs[4].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[4]);
+                timers[7].SetActive(true);
+                timerUIs[7].UpdateMaxTimerCount();
+                grid.SetBreedTimerUI(timerUIs[7]);
                 break;
             default:
                 Debug.LogWarning("Unhandled wave type: " + type);
