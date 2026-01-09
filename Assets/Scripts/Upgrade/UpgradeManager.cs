@@ -270,6 +270,7 @@ public class UpgradeManager : MonoBehaviour
         phoneTimerUI.SetActive(false);
         skipPhoneTimeButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
+        skipPhoneTime = false;
         yield return null;
     }
     private void PhoneTimerUI(float timeRatio)
