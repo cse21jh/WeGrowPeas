@@ -11,4 +11,7 @@ public static class GameEvents
     {
         OnSaveGameRequested?.Invoke();
     }
+
+    public static event Action OnBugKilled;
+    public static void RaiseBugKilled () => OnBugKilled?.Invoke();
 }

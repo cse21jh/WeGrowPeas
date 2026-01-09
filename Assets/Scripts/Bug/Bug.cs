@@ -262,6 +262,7 @@ public class Bug : MonoBehaviour
             grid.killBugCount++;
             grid.AddAdditionalPestResistance(0.002f);
             isDie = true;
+            GameEvents.RaiseBugKilled();
             economyManager.AddGold(gold + grid.GetAdditionalBugGold());
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);

@@ -46,7 +46,7 @@ public class RequestManager : MonoBehaviour
         GrantRewardsForCompleted();
     }
 
-    private void StartNewCycle(int startRound)
+    public void StartNewCycle(int startRound)
     {
         cycleEndRound = startRound + cycle - 1;
 
@@ -82,6 +82,7 @@ public class RequestManager : MonoBehaviour
 
             req.OnChanged += HandleRequestChanged;
             req.Start();
+            Debug.Log(data.requestDefinition);
             activeReq.Add(req);
         }
     }
@@ -92,7 +93,7 @@ public class RequestManager : MonoBehaviour
 
         return typeCode switch
         {
-            //"000" => new KillBugRequest(data),
+            "000" => new KillBugRequest(data),
 
             _ => null
         };
@@ -105,14 +106,14 @@ public class RequestManager : MonoBehaviour
 
     private void GrantRewardsForCompleted()
     {
-        foreach (var req in activeReq)
+        /*foreach (var req in activeReq)
         {
             if (!req.IsCompleted) continue;
             if (rewardGranted.Contains(req)) continue;
 
             req.GrantRewardOnce();
             rewardGranted.Add(req);
-        }
+        }*/
     }
 
     private void ClearActive()

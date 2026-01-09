@@ -110,6 +110,7 @@ public class GameManager : Singleton<GameManager>
     public ShopManager shopManager;
     public EconomyManager economyManager;
     public ModManager modManager;
+    public RequestManager requestManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -188,6 +189,8 @@ public class GameManager : Singleton<GameManager>
     IEnumerator StartStage()
     {
         enemyController.ShowNextWaveText();
+
+        if (stage % 5 == 4) requestManager.StartNewCycle(stage);
 
         yield return StartCoroutine(grid.Breeding());
 

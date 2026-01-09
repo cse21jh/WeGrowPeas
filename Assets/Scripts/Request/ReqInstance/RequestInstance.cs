@@ -8,6 +8,8 @@ public abstract class RequestInstance
 
     public event Action<RequestInstance> OnChanged;
 
+    private bool rewardGranted;
+
     protected RequestInstance(RequestScriptable data)
     {
         Data = data;
@@ -16,17 +18,19 @@ public abstract class RequestInstance
     public virtual void Start()
     {
         IsCompleted = false;
+        rewardGranted = false;
         RaiseChanged();
     }
 
     public virtual void Stop() { }
 
-    public abstract string GetProgressText();
+    //public abstract string GetProgressText();
 
     protected void CompleteOnce()
     {
         if (IsCompleted) return;
         IsCompleted = true;
+        GrantRewardOnce();
         RaiseChanged();
     }
 
@@ -35,8 +39,12 @@ public abstract class RequestInstance
     public virtual void GrantRewardOnce()
     {
         if (!IsCompleted) return;
+        if (rewardGranted) return;
+
+        rewardGranted = true;
 
         //GameManager.Instance?.questToken += Data.rewardTokens;
+        Debug.Log("퀘스트를 클리어했습니다!");
     }
 
 
