@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
@@ -9,15 +9,15 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text priceText;
-    [SerializeField] private TMP_Text countText; // ½ºÅÃÇüÀÏ ¶§¸¸ »ç¿ë
+    [SerializeField] private TMP_Text countText; // ìŠ¤íƒí˜•ì¼ ë•Œë§Œ ì‚¬ìš©
     [SerializeField] private Button buyButton;
 
     [SerializeField] private Animator leftAnim;
     [SerializeField] private Animator rightAnim;
 
     private ItemData effect;
-    private ShopUI shop;            // Äİ¹é¿ë
-    private int stock;              // IsStackableÀÌ¸é ÃÊ±â n, ¾Æ´Ï¸é 1
+    private ShopUI shop;            // ì½œë°±ìš©
+    private int stock;              // IsStackableì´ë©´ ì´ˆê¸° n, ì•„ë‹ˆë©´ 1
     private int maxStock;
 
     public void Bind(ShopUI shopUI, ItemData eff)
@@ -31,7 +31,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         stock = eff.IsStackable ? Mathf.Max(1, eff.InitialStock) : 1;
         maxStock = stock;
 
-        // ¹öÆ° ¸®½º³Ê °»½Å
+        // ë²„íŠ¼ ë¦¬ìŠ¤ë„ˆ ê°±ì‹ 
         if (buyButton)
         {
             buyButton.onClick.RemoveAllListeners();
@@ -43,10 +43,10 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPurchased()
     {
-        // ºñ½ºÅÃÇüµµ ±¸¸Å Á÷ÈÄ ½½·Ô ´İÈ÷µµ·Ï 0 Ã³¸®
+        // ë¹„ìŠ¤íƒí˜•ë„ êµ¬ë§¤ ì§í›„ ìŠ¬ë¡¯ ë‹«íˆë„ë¡ 0 ì²˜ë¦¬
         if (effect.IsStackable) stock = Mathf.Max(0, stock - 1);
         else if (effect.OnePerShopIfNotStackable) stock = 0;
-        else if (effect.Price == int.MaxValue) stock = 0; // °¡°İÇ¥ ¶¼±â Á¶°ÇÀÌ¸é 0
+        else if (effect.Price == int.MaxValue) stock = 0; // ê°€ê²©í‘œ ë–¼ê¸° ì¡°ê±´ì´ë©´ 0
         
         Refresh();
     }
@@ -54,11 +54,11 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private void Refresh()
     {
         int displayPrice = effect.GetDisplayPrice();
-        bool priceHidden = (displayPrice == int.MaxValue);    // °¡°İÇ¥ ¶¼±â Á¶°Ç
+        bool priceHidden = (displayPrice == int.MaxValue);    // ê°€ê²©í‘œ ë–¼ê¸° ì¡°ê±´
         bool soldOutByStock = (stock <= 0);
         bool shouldOpen = !(priceHidden || soldOutByStock);
 
-        // ¼ö·® UI
+        // ìˆ˜ëŸ‰ UI
         if (countText)
         {
             if (effect.IsStackable)
@@ -72,17 +72,17 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             }
         }
 
-        // °¡°İ UI (int.MaxValue¸é °¡°İÇ¥¸¦ ¾Æ¿¹ ¼û±è)
+        // ê°€ê²© UI (int.MaxValueë©´ ê°€ê²©í‘œë¥¼ ì•„ì˜ˆ ìˆ¨ê¹€)
         if (priceText)
         {
             priceText.gameObject.SetActive(!priceHidden);
             if (!priceHidden) priceText.text = $"{displayPrice} G";
         }
 
-        // ±¸¸Å ¹öÆ°
+        // êµ¬ë§¤ ë²„íŠ¼
         if (buyButton) buyButton.interactable = shouldOpen;
 
-        // »óÀÚ ¾Ö´Ï¸ŞÀÌ¼Ç(´İÈû Ã³¸®)
+        // ìƒì ì• ë‹ˆë©”ì´ì…˜(ë‹«í˜ ì²˜ë¦¬)
         if (leftAnim) leftAnim.SetBool("isOpen", shouldOpen);
         if (rightAnim) rightAnim.SetBool("isOpen", shouldOpen);
 
@@ -96,7 +96,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         int displayPrice = effect.GetDisplayPrice();
         bool priceHidden = (displayPrice == int.MaxValue);
-        string priceLine = priceHidden ? "" : $"\n°¡°İ: {displayPrice} G";
+        string priceLine = priceHidden ? "" : $"\nê°€ê²©: {displayPrice} G";
 
         shop.SendMessage("ShowInfo", $"{effect.DisplayName}\n{effect.Description}{priceLine}");
     }
@@ -104,6 +104,6 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerExit(PointerEventData eventData)
     {
         if (shop == null) return;
-        shop.SendMessage("ShowInfo", ""); // ÇÏ´Ü Á¤º¸ Áö¿ì±â
+        shop.SendMessage("ShowInfo", ""); // í•˜ë‹¨ ì •ë³´ ì§€ìš°ê¸°
     }
 }

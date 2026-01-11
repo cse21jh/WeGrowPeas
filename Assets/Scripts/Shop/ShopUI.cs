@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -8,20 +8,16 @@ using System.Runtime.CompilerServices;
 public class ShopUI : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private ShopServices services;
-    [SerializeField] private Transform fixedParent;     // Æ®·° »ó´Ü 3°³
-    [SerializeField] private Transform rotationParent;  // Æ®·° ÇÏ´Ü 3°³
+    [SerializeField] private Transform itemsParent;     // ëª¨ë“  ìŠ¬ë¡¯ì„ ë„£ì„ í†µí•© ë¶€ëª¨
     [SerializeField] private ItemSlot itemSlotPrefab;
-    [SerializeField] private TMP_Text footerText;       // È­¸é ÇÏ´Ü Á¤º¸/¿¡·¯ Ç¥±â ÅØ½ºÆ®
-    [SerializeField] private TMP_Text guideText;
+    [SerializeField] private TMP_Text footerText;       // í™”ë©´ í•˜ë‹¨ ì •ë³´/ì—ëŸ¬ í‘œê¸° í…ìŠ¤íŠ¸
 
-    [Header("Switch")]
-    [SerializeField] private GameObject panel;
-    [SerializeField] private Button closeButton;
+    // auto-resolved services
+    private Grid grid;
+    private EconomyManager economy;
+    private PlacementController placement;
 
-    public event Action OnShopClosed;
-
-    // »ı¼ºµÈ ½½·Ôµé (°»½Å ½Ã Á¢±Ù¿ë)
+    // ìƒì„±ëœ ìŠ¬ë¡¯ë“¤ (ê°±ì‹  ì‹œ ì ‘ê·¼ìš©)
     private readonly List<ItemSlot> slots = new();
 
     private ShopContext ctx;
@@ -30,49 +26,58 @@ public class ShopUI : MonoBehaviour
     private ShopManager shopManager;
     private UIAnimationManager animationManager;
 
-    private bool isClosing = false;
-
     private void Awake()
     {
         shopManager = ShopManager.Instance;
         animationManager = FindAnyObjectByType<UIAnimationManager>();
         session = new ShopSession();
+        // Resolve services: prefer GameManager singletons, fallback to scene lookups
+        if (GameManager.Instance != null)
+        {
+            grid = GameManager.Instance.grid;
+            economy = GameManager.Instance.economyManager;
+        }
+        else
+        {
+            grid = FindAnyObjectByType<Grid>();
+            economy = FindAnyObjectByType<EconomyManager>();
+        }
+
+        // PlacementController has no global singleton â€” try common locations first
+        var placementObj = GameObject.Find("PlacementController");
+        if (placementObj != null) placement = placementObj.GetComponent<PlacementController>();
+        if (placement == null) placement = FindAnyObjectByType<PlacementController>();
         ctx = new ShopContext
         {
-            Grid = services.Grid,
-            Economy = services.Economy,
+            Grid = grid,
+            Economy = economy,
             Session = session,
             Shop = shopManager,
             ShowInfo = ShowInfo,
             ShowError = ShowError,
-            ShowGuide = ShowGuide
         };
 
-        if (closeButton != null)
-            closeButton.onClick.AddListener(Close);
-        panel.SetActive(false);
+        BuildShop();
     }
 
     public void BuildShop()
     {
-        ClearChildren(fixedParent);
-        ClearChildren(rotationParent);
+        ClearChildren(itemsParent);
         slots.Clear();
 
-        // ShopManager¿¡¼­ ÀÎº¥Åä¸® »ı¼º
+        // ShopManagerì—ì„œ ì¸ë²¤í† ë¦¬ ìƒì„±
         var inv = shopManager.GenerateInventory(ctx, GameManager.Instance.stage);
 
-        // »ó´Ü: °íÁ¤
+        // ê³ ì • + ë¡œí…Œì´ì…˜ ëª¨ë‘ í†µí•© ë¶€ëª¨ì— ìƒì„±
         for (int i = 0; i < inv.Fixed.Count; i++)
         {
             var data = inv.Fixed[i];
             if (data == null) continue;
-            MakeSlot(fixedParent, data);
+            MakeSlot(itemsParent, data);
         }
 
-        // ÇÏ´Ü: ·ÎÅ×ÀÌ¼Ç
         foreach (var data in inv.Rotation)
-            MakeSlot(rotationParent, data);
+            MakeSlot(itemsParent, data);
     }
 
     private void MakeSlot(Transform parent, ItemData data)
@@ -84,27 +89,27 @@ public class ShopUI : MonoBehaviour
 
     public void OnClickBuy(ItemData data, ItemSlot slot)
     {
-        // »óÁ¡ ¼¼¼Ç 1È¸ Á¦ÇÑ Ã³¸®
+        // ìƒì  ì„¸ì…˜ 1íšŒ ì œí•œ ì²˜ë¦¬
         if (data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data))
         {
-            ShowError("±¸¸Å ºÒ°¡");
+            ShowError("êµ¬ë§¤ ë¶ˆê°€");
             return;
         }
 
-        // ±¸¸Å °¡´É Ã¼Å© (Áßº¹ »óÅÂ/ÇØ±İ µî)
+        // êµ¬ë§¤ ê°€ëŠ¥ ì²´í¬ (ì¤‘ë³µ ìƒíƒœ/í•´ê¸ˆ ë“±)
         if (!data.CanPurchase(ctx, out string why))
         {
-            ShowError(why ?? "±¸¸Å ºÒ°¡");
+            ShowError(why ?? "êµ¬ë§¤ ë¶ˆê°€");
             return;
         }
 
-        if ((data.GetDisplayPrice() > services.Economy.GetGold()))
+        if (data.GetDisplayPrice() > (economy != null ? economy.GetGold() : 0))
         {
-            ShowError("±¸¸Å ºÒ°¡");
+            ShowError("êµ¬ë§¤ ë¶ˆê°€");
             return;
         }
 
-        // È¿°ú ½ÃÀÛ ¡æ ÇÃ·Î¿ì ºĞ±â
+        // íš¨ê³¼ ì‹œì‘ â†’ í”Œë¡œìš° ë¶„ê¸°
         data.StartEffect(ctx, onReady: () =>
         {
             SoundManager.Instance.PlayEffect("Button");
@@ -115,7 +120,7 @@ public class ShopUI : MonoBehaviour
                     break;
 
                 case ShopFlowType.PlaceOnTile:
-                    services.Placement.BeginTilePlacement(
+                    placement?.BeginTilePlacement(
                         ctx,
                         validate: (pos) => data.ValidatePosition(ctx, pos, out _),
                         onConfirm: (pos) =>
@@ -128,7 +133,7 @@ public class ShopUI : MonoBehaviour
                     break;
 
                 case ShopFlowType.SelectExistingPlant:
-                    services.Placement.BeginPlantSelection(
+                    placement?.BeginPlantSelection(
                         ctx,
                         validate: (plant) => data.ValidateTarget(ctx, plant, out _),
                         onConfirm: (plant) =>
@@ -141,7 +146,7 @@ public class ShopUI : MonoBehaviour
                     break;
             }
         },
-        onError: (err) => ShowError(err ?? "±¸¸Å ºÒ°¡"));
+        onError: (err) => ShowError(err ?? "êµ¬ë§¤ ë¶ˆê°€"));
     }
 
     private void TryChargeAndCommit(ItemData data, ItemSlot slot)
@@ -151,7 +156,7 @@ public class ShopUI : MonoBehaviour
         {
             if (!data.IsStackable) session.MarkBought(data);
             slot.OnPurchased();
-            ShowInfo($"{data.DisplayName} ±¸¸Å ¿Ï·á");
+            ShowInfo($"{data.DisplayName} êµ¬ë§¤ ì™„ë£Œ");
         }
     }
 
@@ -167,11 +172,22 @@ public class ShopUI : MonoBehaviour
             Destroy(parent.GetChild(i).gameObject);
     }
 
-    private void ShowInfo(string msg) { if (footerText) { footerText.color = Color.white; footerText.text = msg; } }
-    private void ShowError(string msg) { if (footerText) { footerText.color = Color.red; footerText.text = msg; } }
+    private void ShowInfo(string msg)
+    {
+        if (footerText == null) return;
+        footerText.color = Color.white;
+        footerText.text = msg;
+    }
 
-    public void ShowGuide(string msg) { if (guideText) guideText.text = msg; }
-    public void ClearGuide() { if (guideText) guideText.text = ""; }
+    private void ShowError(string msg)
+    {
+        PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
+        {
+            title = "Error",
+            message = msg,
+            duration = 3.5f
+        });
+    }
 
     private class ShopSession
     {
@@ -179,31 +195,5 @@ public class ShopUI : MonoBehaviour
         public bool WasBought(ItemData e) => once.Contains(e);
         public void MarkBought(ItemData e) => once.Add(e);
         public void ClearThisShop() => once.Clear();
-    }
-
-    public void Open()
-    {
-        isClosing = false;
-        session?.ClearThisShop();
-        panel.SetActive(true);
-        BuildShop();
-        ClearInfo();
-        ClearGuide();
-        StartCoroutine(SoundManager.Instance.PlayEffectLouder("Tractor", 2.5f));
-        animationManager.SwitchCameras(CameraManager.CameraType.Shop);
-        Debug.Log("»óÁ¡ ¿ÀÇÂ!");
-    }
-
-    public void Close()
-    {
-        if (!isClosing)
-        {
-            //panel.SetActive(false);
-            isClosing = true;
-            StartCoroutine(SoundManager.Instance.StopEffectSmaller("Tractor", 3f));
-            animationManager.SwitchCameras(CameraManager.CameraType.Normal);
-            Debug.Log("»óÁ¡ Á¾·á!");
-            OnShopClosed?.Invoke();
-        }
     }
 }

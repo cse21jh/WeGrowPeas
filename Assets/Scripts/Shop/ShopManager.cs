@@ -1,22 +1,16 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class ShopManager : Singleton<ShopManager>
 {
-    [Header("UI")]
-    [SerializeField] private ShopUI shopUI;
-
-    [Header("Open Rule")]
-    [SerializeField] private int shopOpenDay = 1; // nÀÏ¸¶´Ù ¿ÀÇÂ
-
     [Header("Inventory (Serialized here)")]
-    [SerializeField] private ItemData[] fixedItems = new ItemData[3];  // »ó´Ü °íÁ¤ 3Á¾
-    [SerializeField] private List<ItemData> rotationPool = new(); // ÇÏ´Ü ·ÎÅ×ÀÌ¼Ç Ç®
-    [SerializeField] private int rotationCount = 3;                    // ÇÏ´Ü ½½·Ô °³¼ö
+    [SerializeField] private ItemData[] fixedItems = new ItemData[4];  // ìƒë‹¨ ê³ ì • 4ì¢…
+    [SerializeField] private List<ItemData> rotationPool = new(); // í•˜ë‹¨ ë¡œí…Œì´ì…˜ í’€
+    [SerializeField] private int rotationCount = 4;                    // í•˜ë‹¨ ìŠ¬ë¡¯ ê°œìˆ˜
 
-    // itemId ¡æ ±¸¸Å °³¼ö
+    // itemId â†’ êµ¬ë§¤ ê°œìˆ˜
     private Dictionary<string, int> purchaseHistory = new Dictionary<string, int>();
     public Dictionary<string, int> PurchaseHistory => purchaseHistory;
 
@@ -26,12 +20,12 @@ public class ShopManager : Singleton<ShopManager>
         public List<ItemData> Rotation = new();
     }
 
-    // ShopUI°¡ È£ÃâÇØ ¾²´Â ÁøÀÔÁ¡: ÇöÀç ½ºÅ×ÀÌÁö/ÄÁÅØ½ºÆ®·Î ÀÎº¥Åä¸® »ı¼º
+    // ShopUIê°€ í˜¸ì¶œí•´ ì“°ëŠ” ì§„ì…ì : í˜„ì¬ ìŠ¤í…Œì´ì§€/ì»¨í…ìŠ¤íŠ¸ë¡œ ì¸ë²¤í† ë¦¬ ìƒì„±
     public ShopInventory GenerateInventory(ShopContext ctx, int currentDay)
     {
         var inv = new ShopInventory();
 
-        // »ó´Ü: °íÁ¤
+        // ìƒë‹¨: ê³ ì •
         foreach (var it in fixedItems)
         { 
             if (it)
@@ -41,17 +35,17 @@ public class ShopManager : Singleton<ShopManager>
             }
         }
 
-        // ÇÏ´Ü: ·ÎÅ×ÀÌ¼Ç (ItemData°¡ ÇØ±İ/°¡ÁßÄ¡ Á¦°ø)
+        // í•˜ë‹¨: ë¡œí…Œì´ì…˜ (ItemDataê°€ í•´ê¸ˆ/ê°€ì¤‘ì¹˜ ì œê³µ)
         var candidates = new List<ItemData>();
-        foreach (var it in rotationPool) // ÀÌÁ¦ rotationPoolÀº List<ItemData>
+        foreach (var it in rotationPool) // ì´ì œ rotationPoolì€ List<ItemData>
         {
             if (!it) continue;
-            if (!it.IsRotationUnlockOk(ctx)) continue;           // ÇØ±İ Á¶°Ç(°¢ ¾ÆÀÌÅÛ¿¡¼­ override)
-            if (it.GetRotationWeight(ctx) <= 0) continue;        // °¡ÁßÄ¡ 0 ÀÌÇÏ´Â Á¦¿Ü
+            if (!it.IsRotationUnlockOk(ctx)) continue;           // í•´ê¸ˆ ì¡°ê±´(ê° ì•„ì´í…œì—ì„œ override)
+            if (it.GetRotationWeight(ctx) <= 0) continue;        // ê°€ì¤‘ì¹˜ 0 ì´í•˜ëŠ” ì œì™¸
             candidates.Add(it);
         }
 
-        // °¡ÁßÄ¡ ±â¹İ Áßº¹ ¾øÀÌ N°³ ÃßÃ· (WeightedRandom À¯Æ¿ »ç¿ë ½Ã)
+        // ê°€ì¤‘ì¹˜ ê¸°ë°˜ ì¤‘ë³µ ì—†ì´ Nê°œ ì¶”ì²¨ (WeightedRandom ìœ í‹¸ ì‚¬ìš© ì‹œ)
         inv.Rotation = Game.Util.WeightedRandom.PickWithoutReplacement(
             candidates,
             it => Mathf.Max(0, it.GetRotationWeight(ctx)),
@@ -67,50 +61,29 @@ public class ShopManager : Singleton<ShopManager>
 
         if (data == null)
         {
-            error = "¾ÆÀÌÅÛ ¾øÀ½";
+            error = "ì•„ì´í…œ ì—†ìŒ";
             return false;
         }
 
-        // °ñµå Ã¼Å©
+        // ê³¨ë“œ ì²´í¬
         if (!ctx?.Economy?.HasGold(data.GetDisplayPrice()) ?? true)
         {
-            error = "°ñµå ºÎÁ·";
+            error = "ê³¨ë“œ ë¶€ì¡±";
             return false;
         }
 
-        // °áÁ¦
+        // ê²°ì œ
         ctx.Economy.SpendGold(data.GetDisplayPrice());
 
-        // È÷½ºÅä¸®(Á¾·ùº° °³¼ö Áı°è) : ÀÌ¸§(or asset name) ±âÁØ
+        // íˆìŠ¤í† ë¦¬(ì¢…ë¥˜ë³„ ê°œìˆ˜ ì§‘ê³„) : ì´ë¦„(or asset name) ê¸°ì¤€
         var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
 
-        // È¿°ú È®Á¤ ¹İ¿µ
+        // íš¨ê³¼ í™•ì • ë°˜ì˜
         data.Commit(ctx);
 
         return true;
-    }
-
-
-    public IEnumerator ShopPhase(Grid grid)
-    {
-        // nÀÏ¸¶´Ù¸¸ »óÁ¡ ¿ÀÇÂ
-        if (GameManager.Instance.stage % shopOpenDay != 0)
-            yield break;
-
-        //¾óÀ½ ¹æÆĞ ÃÊ±âÈ­
-        grid.SetIceBlock(false);
-
-        // UI ¿­±â
-        shopUI.Open();
-
-        // UI¿¡¼­ ´İÈú ¶§±îÁö ´ë±â
-        bool closed = false;
-        shopUI.OnShopClosed += () => closed = true;
-
-        while (!closed)
-            yield return null;
     }
 
     public string ReturnMostPurchasedItem()
@@ -118,7 +91,7 @@ public class ShopManager : Singleton<ShopManager>
         if (purchaseHistory.Count == 0) return null;
 
         var mostSold = purchaseHistory
-        .Where(item => item.Key != "³óÀå È®Àå" && item.Key != "±³¹è È½¼ö Áõ°¡")
+        .Where(item => item.Key != "ë†ì¥ í™•ì¥" && item.Key != "êµë°° íšŸìˆ˜ ì¦ê°€")
         .OrderByDescending(item => item.Value)
         .FirstOrDefault();
 

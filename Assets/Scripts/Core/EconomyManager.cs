@@ -6,7 +6,7 @@ public class EconomyManager : MonoBehaviour
     
     [SerializeField] private TextMeshProUGUI CoinUI;
 
-    // ÀúÀå ÇÊ¿ä
+    // ì €ì¥ í•„ìš”
     [SerializeField] private int gold = 0;
 
     private int peaSellCount = 0;
@@ -41,7 +41,7 @@ public class EconomyManager : MonoBehaviour
         gold -= amount;
         consumeGold += amount;
         UpdateCoinUI(gold);
-        Debug.Log($"°ñµå {amount} »ç¿ë ¡æ ³²Àº {gold}");
+        Debug.Log($"ê³¨ë“œ {amount} ì‚¬ìš© â†’ ë‚¨ì€ {gold}");
     }
 
     public void AddGold(int amount)
@@ -50,7 +50,7 @@ public class EconomyManager : MonoBehaviour
         totalGold += amount;
         earnedGoldToday += amount;
         UpdateCoinUI(gold);
-        Debug.Log($"°ñµå {amount} È¹µæ ¡æ ÇÕ°è {gold}");
+        Debug.Log($"ê³¨ë“œ {amount} íšë“ â†’ í•©ê³„ {gold}");
     }
 
     private void UpdateCoinUI(int val)
@@ -75,12 +75,12 @@ public class EconomyManager : MonoBehaviour
 
     public void AddSellCount(string plantName)
     {
-        if(plantName == "¿ÏµÎÄá")
+        if(plantName == "ì™„ë‘ì½©")
         {
             peaSellCount++;
             return;
         }
-        else if(plantName == "¶¥Äá")
+        else if(plantName == "ë•…ì½©")
         {
             peanutSellCount++;
             return;
