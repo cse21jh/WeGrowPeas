@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BreedTimerUpgrade : Upgrade
 {
-    public override string Name => "±³¹è ½Ã°£ Áõ°¡";
-    public override string Explanation => "±³¹è °¡´É ½Ã°£ÀÌ 10ÃÊ Áõ°¡ÇÕ´Ï´Ù";
+    public override string Name => "êµë°° ì‹œê°„ ì¦ê°€";
+    public override string Explanation => "êµë°° ê°€ëŠ¥ ì‹œê°„ì´ 10ì´ˆ ì¦ê°€í•©ë‹ˆë‹¤";
     public override Sprite Icon => ResourceLoader.LoadUpgradeIcon("upgradeIconsSheet_19");
     public override int MaxAmount => 2;
     public override int UnlockStage => 1;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "BreedCountItem", menuName = "Items/Breed/Max Count +1")]
 public class BreedCountItemData : ItemData
 {
-    private string purchaseKey = "±³¹è È½¼ö Áõ°¡";
+    private string purchaseKey = "êµë°° íšŸìˆ˜ ì¦ê°€";
 
     [Header("Pricing (exponential)")]
     [SerializeField] private int basePrice = 1000;
@@ -25,7 +25,7 @@ public class BreedCountItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        reason = null; // ¹«Á¦ÇÑ °¡´É
+        reason = null; // ë¬´ì œí•œ ê°€ëŠ¥
         return true;
     }
 
@@ -36,7 +36,7 @@ public class BreedCountItemData : ItemData
     {
         if (ctx?.Grid == null)
         {
-            Debug.Log("±×¸®µå°¡ ¾ø½À´Ï´Ù.");
+            Debug.Log("ê·¸ë¦¬ë“œê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
