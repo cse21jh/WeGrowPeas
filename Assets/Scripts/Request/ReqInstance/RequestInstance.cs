@@ -8,7 +8,7 @@ public abstract class RequestInstance
 
     public event Action<RequestInstance> OnChanged;
 
-    private bool rewardGranted;
+    protected bool rewardGranted;
 
     protected RequestInstance(RequestScriptable data)
     {
@@ -47,6 +47,6 @@ public abstract class RequestInstance
         Debug.Log("퀘스트를 클리어했습니다!");
     }
 
-
-
+    public abstract RequestInstanceSaveData ToSaveData();
+    public abstract void LoadFromSaveData(RequestInstanceSaveData data);
 }

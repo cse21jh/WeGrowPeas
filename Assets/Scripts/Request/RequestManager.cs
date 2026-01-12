@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
+public class RequestInstanceSaveData
+{
+    public string requestId;
+    public string typeCode;
+    public int progressCount; // 진행도 관련
+    public bool isCompleted;
+    public bool isRewardGranted;
+}
+
 public class RequestManager : MonoBehaviour
 {
     public int cycle = 5;
-    public int requestNum = 6;
+    public int requestNum = 1;
 
     [SerializeField] private List<RequestScriptable> requestPool = new();
 
@@ -15,7 +25,8 @@ public class RequestManager : MonoBehaviour
 
     private readonly HashSet<RequestInstance> rewardGranted = new();
 
-    private int cycleEndRound;
+    private int cycleEndRound = -1;
+    public int CycleEndRound => cycleEndRound;
 
     public event Action OnBoardUpdated;
 
@@ -126,5 +137,47 @@ public class RequestManager : MonoBehaviour
 
         activeReq.Clear();
         rewardGranted.Clear();
+    }
+
+    public List<RequestInstanceSaveData> getSaveData()
+    {
+        var data = new List<RequestInstanceSaveData> { new RequestInstanceSaveData() };
+
+        if (activeReq.Count == 0) return data;
+
+        foreach (var req in activeReq) data.Add(req.ToSaveData());
+
+        return data;
+    }
+
+    public void LoadRequstManager(SaveData saveData)
+    {
+        ClearActive();
+
+        cycleEndRound = saveData.cycleEndRound;
+
+        if (saveData.activeRequests.Count == 0) return;
+
+        foreach (var reqSave in saveData.activeRequests)
+        {
+            var scriptable = FindScriptableById(reqSave.requestId);
+            if (scriptable == null) continue;
+
+            var instance = CreateInstanceById(scriptable);
+            if (instance == null) continue;
+
+            instance.OnChanged += HandleRequestChanged;
+            instance.Start();
+            instance.LoadFromSaveData(reqSave);
+
+            activeReq.Add(instance);
+        }
+
+        OnBoardUpdated?.Invoke();
+    }
+
+    private RequestScriptable FindScriptableById(string id)
+    {
+        return requestPool.FirstOrDefault(p => p != null && p.requestId == id);
     }
 }

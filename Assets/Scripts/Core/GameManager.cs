@@ -76,6 +76,10 @@ public class SaveData
     //ModManager
     public List<Mod> mods = new();
 
+    //RequestManager
+    public int cycleEndRound;
+    public List<RequestInstanceSaveData> activeRequests = new();
+
     //PlayerRecordForGraph
     public List<int> survivedPlants = new();
     public List<int> earnedGolds = new();
@@ -289,6 +293,7 @@ public class GameManager : Singleton<GameManager>
         economyManager.LoadEconomyManager(saveData);
         shopManager.LoadShopManager(saveData);
         modManager.LoadModManager(saveData);
+        requestManager.LoadRequestManager(saveData);
         PlayerRecordForGraph.SetDataFromLoad(saveData);
         Debug.Log("ºÒ·¯¿È");
     }
@@ -380,6 +385,10 @@ public class GameManager : Singleton<GameManager>
 
         //modManager
         saveData.mods = modManager.Mods;
+
+        //RequestManager
+        saveData.cycleEndRound = requestManager.CycleEndRound;
+        saveData.activeRequests = requestManager.getSaveData();
 
         //PlayerRecordForGraph
         saveData.survivedPlants = PlayerRecordForGraph.survivedPlants;

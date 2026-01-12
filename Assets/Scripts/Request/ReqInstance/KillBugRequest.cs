@@ -1,3 +1,4 @@
+using Palmmedia.ReportGenerator.Core.CodeAnalysis;
 using UnityEngine;
 
 public class KillBugRequest : RequestInstance
@@ -43,10 +44,31 @@ public class KillBugRequest : RequestInstance
 
         return difficulty switch
         {
-            0 => 1,
-            1 => 2,
-            2 => 3,
+            1 => 10,
+            2 => 20,
+            3 => 30,
             _ => 10,
         };
+    }
+
+    public override RequestInstanceSaveData ToSaveData()
+    {
+        return new RequestInstanceSaveData
+        {
+            requestId = Data.requestId,
+            typeCode = Data.requestId.Substring(0, 3),
+            progressCount = currentCount,
+            isCompleted = IsCompleted,
+            isRewardGranted = rewardGranted
+        };
+    }
+
+    public override void LoadFromSaveData(RequestInstanceSaveData data)
+    {
+        currentCount = data.progressCount;
+        IsCompleted = data.isCompleted;
+        rewardGranted = data.isRewardGranted;
+
+        RaiseChanged();
     }
 }
