@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class PhoneManager : MonoBehaviour
 {
@@ -14,19 +15,22 @@ public class PhoneManager : MonoBehaviour
         public GameObject prefab;    // 앱 프리팹
     }
 
-    [Header("Apps (prefab, created once at startup)")]
-    [SerializeField] private List<AppEntry> apps = new();
+    //[Header("Apps (prefab, created once at startup)")]
+    //[SerializeField] private List<AppEntry> apps = new();
 
     [Header("UI Roots")]
     [SerializeField] private GameObject phoneRoot;   // 폰 전체 루트 (열고/닫기)
+    [SerializeField] private GameObject phoneBtn;    // 폰 열기 버튼
     [SerializeField] private GameObject homePanel;   // 홈 패널(고정 UI)
     [SerializeField] private Transform appContainer; // 앱 인스턴스 부모(빈 RectTransform)
     [SerializeField] private PhoneTopBar topBar;     // (선택) 제목/뒤로/홈
 
+    [SerializeField] private PanelTranstionController transitionController;
+
     [Header("Input")]
     [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
 
-    private readonly Dictionary<AppKey, GameObject> _instances = new();
+    //private readonly Dictionary<AppKey, GameObject> _instances = new();
     private AppKey? _current = null;
     private bool _isOpen;
 
@@ -41,17 +45,83 @@ public class PhoneManager : MonoBehaviour
 
     private void Start()
     {
-        CreateAllAppsOnce();
+        //CreateAllAppsOnce();
 
-        if (homePanel != null) homePanel.SetActive(true);
+        //if (homePanel != null) homePanel.SetActive(true);
 
-        RefreshTopBar();
+        //RefreshTopBar();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(toggleKey))
             Toggle();
+    }
+
+    public void Toggle() => SetOpen(!_isOpen);
+
+    public void SetOpen(bool open)
+    {
+        _isOpen = open;
+        if (phoneRoot != null) phoneRoot.SetActive(open);
+        phoneBtn.SetActive(!open);
+        //if (open) RefreshTopBar();
+    }
+
+    public void OpenHome()
+    {
+        _current = null;
+
+        transitionController.TransitionToIndex(0);
+        //RefreshTopBar();
+    }
+
+    public void OpenApp(AppKey key)
+    {
+        /*
+        EnsureOpen();
+
+        if (!_instances.TryGetValue(key, out var go) || go == null)
+        {
+            Debug.LogWarning($"[Phone] App instance not found: {key}");
+            return;
+        }
+
+        if (homePanel != null) homePanel.SetActive(false);
+
+        HideCurrentApp();
+
+        go.SetActive(true);
+        _current = key;
+        */
+
+        //RefreshTopBar();
+
+        transitionController.TransitionToIndex((int)key + 1);
+        _current = key;
+    }
+
+    /*
+
+    public void HandleBack()
+    {
+        // 앱이면 홈으로, 홈이면 폰 닫기
+        if (_current.HasValue) OpenHome();
+        else SetOpen(false);
+    }
+
+    private void EnsureOpen()
+    {
+        if (!_isOpen) SetOpen(true);
+    }
+
+    private void HideCurrentApp()
+    {
+        if (!_current.HasValue) return;
+
+        var key = _current.Value;
+        if (_instances.TryGetValue(key, out var go) && go != null)
+            go.SetActive(false);
     }
 
     private void CreateAllAppsOnce()
@@ -89,67 +159,6 @@ public class PhoneManager : MonoBehaviour
         }
     }
 
-    public void Toggle() => SetOpen(!_isOpen);
-
-    public void SetOpen(bool open)
-    {
-        _isOpen = open;
-        if (phoneRoot != null) phoneRoot.SetActive(open);
-        if (open) RefreshTopBar();
-    }
-
-    public void OpenHome()
-    {
-        EnsureOpen();
-
-        HideCurrentApp();
-        _current = null;
-
-        if (homePanel != null) homePanel.SetActive(true);
-        RefreshTopBar();
-    }
-
-    public void OpenApp(AppKey key)
-    {
-        EnsureOpen();
-
-        if (!_instances.TryGetValue(key, out var go) || go == null)
-        {
-            Debug.LogWarning($"[Phone] App instance not found: {key}");
-            return;
-        }
-
-        if (homePanel != null) homePanel.SetActive(false);
-
-        HideCurrentApp();
-
-        go.SetActive(true);
-        _current = key;
-
-        RefreshTopBar();
-    }
-
-    public void HandleBack()
-    {
-        // 앱이면 홈으로, 홈이면 폰 닫기
-        if (_current.HasValue) OpenHome();
-        else SetOpen(false);
-    }
-
-    private void HideCurrentApp()
-    {
-        if (!_current.HasValue) return;
-
-        var key = _current.Value;
-        if (_instances.TryGetValue(key, out var go) && go != null)
-            go.SetActive(false);
-    }
-
-    private void EnsureOpen()
-    {
-        if (!_isOpen) SetOpen(true);
-    }
-
     private void RefreshTopBar()
     {
         if (topBar == null) return;
@@ -178,6 +187,7 @@ public class PhoneManager : MonoBehaviour
 
         topBar.SetTitle(title);
     }
+    */
 }
 
 
