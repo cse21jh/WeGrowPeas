@@ -150,7 +150,7 @@ public class RequestManager : MonoBehaviour
         return data;
     }
 
-    public void LoadRequstManager(SaveData saveData)
+    public void LoadRequestManager(SaveData saveData)
     {
         ClearActive();
 
