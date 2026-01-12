@@ -89438,6 +89438,7 @@ MonoBehaviour:
   waveDuration: 5
   waveManager: {fileID: 1843401599}
   breedTimerManager: {fileID: 4472167833932565132}
+  weatherApp: {fileID: 0}
   setWave: 3
   signPost: {fileID: 1617776421}
   defaultBaseWeight: 1
@@ -141035,7 +141036,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -5.906}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -80, y: -70}
+  m_AnchoredPosition: {x: -80, y: -35}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &665985896
@@ -379298,7 +379299,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -5.906}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -80, y: -70}
+  m_AnchoredPosition: {x: -80, y: -35}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1837193509
@@ -449031,11 +449032,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 202.8
+      value: 202.79999
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_SizeDelta.y
       value: 404.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -449067,11 +449076,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 239
+      value: 296
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -17
+      value: -28
       objectReference: {fileID: 0}
     - target: {fileID: 160950553239858372, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
