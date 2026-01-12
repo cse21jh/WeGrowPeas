@@ -481,4 +481,14 @@ public abstract class Plant : MonoBehaviour
     {
         priceSign.gameObject.SetActive(false);
     }
+
+    public bool HasTrait(WaveType wave)
+    {
+        for(int i = 0; i < traits.Count; i++)
+        {
+            if ((int)traits[i].traitType == (int)wave)
+                return true;
+        }
+        return false;
+    }
 }

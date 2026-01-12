@@ -771,7 +771,7 @@ public class Grid : MonoBehaviour
     private void Plantplant(Plant plant)
     {
         plantGrid[plant.gridIndex] = plant;
-
+        enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
     }
@@ -1095,6 +1095,24 @@ public class Grid : MonoBehaviour
         {
             p.Value.HidePriceSign();
         }
+    }
+
+    public int CountNoTraitPlant(WaveType wave)
+    {
+        int count = 0;
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++)
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                Plant plant = plantGrid[idx];
+
+                if (!plant.HasTrait(wave))
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }
 

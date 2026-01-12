@@ -46,6 +46,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private BreedTimerManager breedTimerManager;
 
+    [SerializeField] private WeatherApp weatherApp;
+
     [SerializeField] public WaveType setWave;
 
     [SerializeField] public SignPostController signPost;
@@ -55,7 +57,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
-
+    private bool isWaveSkipped = false;
 
     //int CurrentDay => GameManager.Instance.stage;
 
@@ -69,7 +71,9 @@ public class EnemyController : MonoBehaviour
     private int waveSkipCount = 0;
     private int[] waveKillCount;
 
-    private bool isWaveSkipped = false;
+    private List<WaveType> stageWaveRecord = new List<WaveType>(); // 스테이지별 웨이브, 킬 기록들 >> 일기예보에서 사용하기 위함
+    private List<int> stageKillRecord = new List<int>();
+    private List<int> stageNoTraitRecord = new List<int>();
 
     public Season CurrentSeason => currentSeason;
     public Wave CurrentWave => currentWave;
@@ -77,11 +81,17 @@ public class EnemyController : MonoBehaviour
     public Wave LastWave => lastWave;
     public int WaveSkipCount => waveSkipCount;
     public int[] WaveKillCount => waveKillCount;
+    public List<WaveType> StageWaveRecord => stageWaveRecord;
+    public List<int> StageKillRecord => stageKillRecord;
+    public List<int> StageNoTraitRecord => stageNoTraitRecord;
 
     // Start is called before the first frame update
     void Start()
     {
         waveKillCount = new int[7];
+        stageWaveRecord.Add(WaveType.Aging);
+        stageKillRecord.Add(0);
+        stageNoTraitRecord.Add(0);
         SetWaveSkipCountText();
         HideWaveSkipButton();
 
@@ -109,7 +119,7 @@ public class EnemyController : MonoBehaviour
         Wave wave = currentWave;
         // Debug.Log("현재 웨이브 종류 : " + currentWave);
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
-        SoundManager.Instance.PlayEffect(wave.WaveSoundString);
+        SoundManager.Instance.PlayEffect(wave.WaveSoundString);        
 
         if (waveManager != null)
         {
@@ -126,7 +136,11 @@ public class EnemyController : MonoBehaviour
             {
                 SkipWaveEffect();                
             }
-        }        
+        }
+
+        stageWaveRecord.Add(currentWave.WaveType);
+        stageKillRecord.Add(0);
+        stageNoTraitRecord.Add(grid.CountNoTraitPlant(currentWave.WaveType));
 
         if (currentWave != noneWave)
         {
@@ -144,6 +158,7 @@ public class EnemyController : MonoBehaviour
                     else
                     {
                         waveKillCount[(int)currentWave.WaveType] += 1;
+                        stageKillRecord[GameManager.Instance.stage]++;
                         // Debug.Log(idx + "번째 식물이 죽었습니다");
                         if (!plant.Die())
                             plant.ResistWave(wave.WaveType);
@@ -158,6 +173,10 @@ public class EnemyController : MonoBehaviour
 
         SetNextSeason(); 
         SetNextWave(); // 계절 바뀐 후, 다음날의 계절을 받아야 실제 
+
+        int stage = GameManager.Instance.stage;
+        if(weatherApp != null)
+            weatherApp.LoadNextDay(stage, lastWave, currentWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
         //FlushNextWaveText();
         yield return null;
     }
@@ -247,6 +266,8 @@ public class EnemyController : MonoBehaviour
             waveSkipCount--;
             SetWaveSkipCountText();            
             ShowNextWaveText();
+            if (weatherApp != null)
+                weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, 0);
         }
         if(waveSkipCount <= 0)
             HideWaveSkipButton();
@@ -341,6 +362,17 @@ public class EnemyController : MonoBehaviour
 
         SetSeason(saveData.currentSeason);
         
+        stageWaveRecord = saveData.stageWaveRecord;
+        stageKillRecord = saveData.stageKillRecord;
+        stageNoTraitRecord = saveData.stageNoTraitRecord;
+        if (weatherApp != null)
+        {
+            int count = grid.CountNoTraitPlant(currentWave.WaveType);
+            for (int i = 1; i < stageWaveRecord.Count; i++)
+            {
+                weatherApp.LoadNextDay(i, waves[stageWaveRecord[i]], currentWave, stageNoTraitRecord[i], count, stageKillRecord[i]);
+            }
+        }
     }
 
     private void OnValidate()
@@ -480,5 +512,11 @@ public class EnemyController : MonoBehaviour
     {
         isWaveSkipped = true;
         waveManager.SkipWaveEffect();
+    }
+
+    public void UpdateCurrentWaveAlarm()
+    {
+        if (weatherApp != null)
+            weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, grid.CountNoTraitPlant(currentWave.WaveType));
     }
 }

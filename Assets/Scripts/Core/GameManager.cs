@@ -62,6 +62,9 @@ public class SaveData
     public WaveType nextWaveType;
     public int remainWaveSkipCount;
     public int[] waveKillCount = new int[7];
+    public List<WaveType> stageWaveRecord = new();
+    public List<int> stageKillRecord = new();
+    public List<int> stageNoTraitRecord = new();
 
     //economyManager
     public int gold;
@@ -367,6 +370,9 @@ public class GameManager : Singleton<GameManager>
         saveData.curWaveType = enemyController.CurrentWave.WaveType;
         saveData.nextWaveType = enemyController.NextWave.WaveType;
         saveData.lastWaveType = enemyController.LastWave.WaveType;
+        saveData.stageKillRecord = enemyController.StageKillRecord;
+        saveData.stageWaveRecord = enemyController.StageWaveRecord;
+        saveData.stageNoTraitRecord = enemyController.StageNoTraitRecord;
 
         //economyManager
         saveData.gold = economyManager.GetGold();
