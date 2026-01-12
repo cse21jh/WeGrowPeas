@@ -39,4 +39,12 @@ public class CameraManager : MonoBehaviour
             }
         }
     }
+
+    public void SwitchFollowTarget(Transform target)
+    {
+        foreach (CinemachineVirtualCamera cam in cameras)
+        {
+            cam.Follow = target;
+        }
+    }
 }

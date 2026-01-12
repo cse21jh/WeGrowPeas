@@ -34,6 +34,8 @@ public class PanelTranstionController : MonoBehaviour
 
     private void TransitionIn(RectTransform panel)
     {
+        panel.DOKill();
+
         panel.localScale = new Vector3(0f, 0f, 1f);
         panel.gameObject.SetActive(true);
         panel.DOScale(new Vector3(1f, 1f, 1f), transitionDuration).SetEase(transitionEase);
@@ -41,6 +43,8 @@ public class PanelTranstionController : MonoBehaviour
 
     private void TransitionOut(RectTransform panel)
     {
+        panel.DOKill();
+
         panel.localScale = new Vector3(1f, 1f, 1f);
         panel.DOScale(new Vector3(0f, 0f, 0f), transitionDuration).SetEase(transitionEase);
     }
@@ -49,18 +53,18 @@ public class PanelTranstionController : MonoBehaviour
 
     public void TransitionToIndex(int index)
     {
-        for(int i = 0; i < panels.Length; i++)
+        if(index == 0)
         {
-            if(i == index)
-            {
-                TransitionIn(panels[i]);
-                //isPanelActive[i] = true;
-            }
-            else
+            for(int i = 1; i < panels.Length; i++)
             {
                 TransitionOut(panels[i]);
-                //isPanelActive[i] = false;
             }
+            TransitionIn(panels[0]);
+        }
+        else
+        {
+            TransitionOut(panels[0]);
+            TransitionIn(panels[index]);
         }
     }
 }

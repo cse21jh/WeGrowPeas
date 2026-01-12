@@ -5,6 +5,9 @@ using System.Collections;
 public class UIAnimationManager : MonoBehaviour
 {
     [SerializeField] public CameraManager[] camManagers;
+    [SerializeField] private GameObject[] camFollowTargets;
+    [SerializeField] private bool isFollowingPhoneMode = false;
+
     [Space(10)]
     [Header("Upgrade Panel")]
     [SerializeField] private RectTransform upgrade_targetPanel;
@@ -31,6 +34,18 @@ public class UIAnimationManager : MonoBehaviour
     [SerializeField] private float shopPanelMoveDuration = 2.0f;
     [SerializeField] private Newspaper newspaper;
     [SerializeField] private float endingDelay = 5f;
+
+    public void SwitchFollowTarget()
+    {
+        foreach (var camManager in camManagers)
+        {
+            if (isFollowingPhoneMode)
+                camManager.SwitchFollowTarget(camFollowTargets[0].transform);
+            else
+                camManager.SwitchFollowTarget(camFollowTargets[1].transform);
+        }
+        isFollowingPhoneMode = !isFollowingPhoneMode;
+    }
 
     public void SwitchCameras(CameraManager.CameraType type)
     {
