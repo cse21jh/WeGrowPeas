@@ -13,7 +13,7 @@ public class RequestInstanceSaveData
     public bool isRewardGranted;
 }
 
-public class RequestManager : MonoBehaviour
+public class RequestManager : Singleton<ShopManager>
 {
     public int cycle = 5;
     public int requestNum = 1;
