@@ -21,6 +21,7 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        FindAnyObjectByType<RequestUI>().OnClickShowPopup();        // 얘도 RequestUI.cs에서 Bind 해주면 거기에 따라서 다시 바꿔야 함
         Debug.Log("퀘스트 아이템을 클릭했습니다. 그러나 아무 일도 일어나지 않음......");
     }
 }
