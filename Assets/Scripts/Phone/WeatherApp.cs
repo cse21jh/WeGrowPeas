@@ -1,18 +1,26 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Cinemachine;
 
 public class WeatherApp : MonoBehaviour
 {
     [SerializeField] TMP_Text stageText;
     [SerializeField] TMP_Text waveText;
     [SerializeField] TMP_Text dangerousPlantText;
-    [SerializeField] Image waveImage;
 
     [SerializeField] private GameObject pastWeatherPrefab;
     [SerializeField] private GameObject pastWeatherKillPrefab;
 
-    [SerializeField] private Transform scrollViewContent;    
+    [SerializeField] private Transform scrollViewContent;
+
+
+    [Space(10)]
+    [Header("Wave Properties")]
+    [SerializeField] private Image currentWavePanel;
+    [SerializeField] private Image waveImage;
+    [SerializeField] private Color[] waveColors; // 웨이브 타입별 색상 배열
+
 
     public void LoadNextDay(int stage, Wave lastWave, Wave currentWave, int lastDangerousPlantCount, int currentDangerousPlantCount, int dieCount)
     {
@@ -33,9 +41,11 @@ public class WeatherApp : MonoBehaviour
         else
         {
             stageText.text = stage.ToString() + "일차";
-            waveText.text = wave.WaveName + "웨이브가 지나갈 예정입니다!";
+            waveText.text = wave.WaveName + "웨이브가 지나갈 예정입니다.";
             dangerousPlantText.text = wave.WaveName + "저항이 없는 식물 " + dangerousPlantCount.ToString() + "개";
             // 웨이브 이미지 삽입 필요
+
+            currentWavePanel.color = waveColors[(int)wave.WaveType];
         }
     }
 
