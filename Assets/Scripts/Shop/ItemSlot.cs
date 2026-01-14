@@ -35,7 +35,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         if (buyButton)
         {
             buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(() => shop.OnClickBuy(effect, this));
+            buyButton.onClick.AddListener(() => shop.OnClickShowPopup(effect, this));
         }
 
         Refresh();
@@ -98,12 +98,12 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         bool priceHidden = (displayPrice == int.MaxValue);
         string priceLine = priceHidden ? "" : $"\n가격: {displayPrice} G";
 
-        shop.SendMessage("ShowInfo", $"{effect.DisplayName}\n{effect.Description}{priceLine}");
+        //shop.SendMessage("ShowInfo", $"{effect.DisplayName}\n{effect.Description}{priceLine}");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (shop == null) return;
-        shop.SendMessage("ShowInfo", ""); // 하단 정보 지우기
+        //shop.SendMessage("ShowInfo", ""); // 하단 정보 지우기
     }
 }

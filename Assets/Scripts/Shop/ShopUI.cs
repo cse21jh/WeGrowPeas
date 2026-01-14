@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using System.Runtime.CompilerServices;
+using DG.Tweening;
 
 public class ShopUI : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private Transform itemsParent;     // 모든 슬롯을 넣을 통합 부모
     [SerializeField] private ItemSlot itemSlotPrefab;
     [SerializeField] private TMP_Text footerText;       // 화면 하단 정보/에러 표기 텍스트
+    [SerializeField] private RectTransform popupParent;  // 팝업 UI 부모
 
     // auto-resolved services
     private Grid grid;
@@ -53,7 +55,7 @@ public class ShopUI : MonoBehaviour
             Economy = economy,
             Session = session,
             Shop = shopManager,
-            ShowInfo = ShowInfo,
+            //ShowInfo = ShowInfo,
             ShowError = ShowError,
         };
 
@@ -85,6 +87,21 @@ public class ShopUI : MonoBehaviour
         var slot = Instantiate(itemSlotPrefab, parent);
         slot.Bind(this, data);
         slots.Add(slot);
+    }
+
+    public void OnClickShowPopup(ItemData data, ItemSlot slot)
+    {
+        popupParent.gameObject.SetActive(true);
+        popupParent.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
+        popupParent.GetComponent<ShopPopupController>().SetItemInfo(data, this, slot);
+    }
+
+    public void OnClickHidePopup()
+    {
+        popupParent.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
+        {
+            popupParent.gameObject.SetActive(false);
+        });
     }
 
     public void OnClickBuy(ItemData data, ItemSlot slot)
@@ -156,14 +173,8 @@ public class ShopUI : MonoBehaviour
         {
             if (!data.IsStackable) session.MarkBought(data);
             slot.OnPurchased();
-            ShowInfo($"{data.DisplayName} 구매 완료");
+            //ShowInfo($"{data.DisplayName} 구매 완료");
         }
-    }
-
-    public void ClearInfo()
-    {
-        if (footerText == null) return;
-        footerText.text = "";
     }
 
     private static void ClearChildren(Transform parent)
@@ -172,12 +183,20 @@ public class ShopUI : MonoBehaviour
             Destroy(parent.GetChild(i).gameObject);
     }
 
+    /*
+    public void ClearInfo()
+    {
+        if (footerText == null) return;
+        footerText.text = "";
+    }
+
     private void ShowInfo(string msg)
     {
         if (footerText == null) return;
         footerText.color = Color.white;
         footerText.text = msg;
     }
+    */
 
     private void ShowError(string msg)
     {
