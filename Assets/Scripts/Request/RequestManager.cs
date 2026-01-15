@@ -13,10 +13,10 @@ public class RequestInstanceSaveData
     public bool isRewardGranted;
 }
 
-public class RequestManager : Singleton<ShopManager>
+public class RequestManager : Singleton<RequestManager>
 {
     public int cycle = 5;
-    public int requestNum = 1;
+    public int requestNum = 3;
 
     [SerializeField] private List<RequestScriptable> requestPool = new();
 
@@ -80,6 +80,7 @@ public class RequestManager : Singleton<ShopManager>
 
         while (picked.Count < requestNum && safety-- > 0)
         {
+            Debug.Log("Äù½ºÆ® »Ì±â");
             var cand = valid[rng.Next(valid.Count)];
 
             if (picked.Any(x => x.requestId == cand.requestId)) continue;

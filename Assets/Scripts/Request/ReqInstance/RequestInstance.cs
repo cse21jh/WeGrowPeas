@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class RequestInstance
 {
     public RequestScriptable Data { get; }
+
     public bool IsCompleted { get; protected set; }
 
     public event Action<RequestInstance> OnChanged;

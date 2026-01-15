@@ -14,9 +14,9 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
     {
         //퀘스트 내용에 따라 UI를 set 하는 함수
 
-        title.text = "퀘스트 제목입니다";
-        reward.text = "내 마음대로 1000만 골드";
-        progress.text = "0/10";
+        title.text = request.Data.requestDefinition;
+        reward.text = "보상 - " + request.Data.reward + "골드";
+        progress.text = "0/1000";
     }
 
     public void OnPointerClick(PointerEventData eventData)

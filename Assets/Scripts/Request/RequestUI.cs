@@ -4,8 +4,23 @@ using DG.Tweening;
 
 public class RequestUI : MonoBehaviour
 {
-   [SerializeField] private RectTransform popupParent;  // ÆË¾÷ UI ºÎ¸ð
+    [SerializeField] private Transform questItemContentParent;
+    [SerializeField] private GameObject questItem;
+    [SerializeField] private RectTransform popupParent;  // ÆË¾÷ UI ºÎ¸ð
 
+    private void OnEnable()
+    {
+        if (RequestManager.Instance != null)
+            RequestManager.Instance.OnBoardUpdated += Refresh;
+
+        Refresh();
+    }
+
+    private void OnDisable()
+    {
+        if (RequestManager.Instance != null)
+            RequestManager.Instance.OnBoardUpdated -= Refresh;
+    }
 
     public void OnClickShowPopup()
     {
@@ -20,5 +35,35 @@ public class RequestUI : MonoBehaviour
         {
             popupParent.gameObject.SetActive(false);
         });
+    }
+
+    public void Refresh()
+    {
+        Debug.Log("Äù½ºÆ® ¸®ÇÁ·¹½Ã");
+
+        //if (RequestManager.Instance == null || questItemContentParent == null || questItem == null)
+        //return;
+
+        ClearRequestContent();
+
+        var reqs = RequestManager.Instance.ActiveReq;
+        int spawnCount = reqs.Count;
+
+        Debug.Log(spawnCount);
+
+        for (int i = 0; i < spawnCount; i++)
+        {
+            Debug.Log("ÇÁ¸®ÆÕ ºÙÀÌ±â");
+            var item = Instantiate(questItem, questItemContentParent);
+            var card = item.GetComponent<RequestCard>();
+
+            card.Set(reqs[i]);
+        }
+    }
+
+    private void ClearRequestContent()
+    {
+        for (int i = questItemContentParent.childCount - 1; i >= 0; i--)
+            Destroy(questItemContentParent.GetChild(i).gameObject);
     }
 }

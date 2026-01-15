@@ -110,6 +110,7 @@ public class GameManager : Singleton<GameManager>
 {
     [HideInInspector] public int stage = 0;
     private bool gameOver = false;
+    public int requestCycle = 2;
 
     public Grid grid;
     public EnemyController enemyController;
@@ -197,7 +198,7 @@ public class GameManager : Singleton<GameManager>
     {
         enemyController.ShowNextWaveText();
 
-        if (stage % 5 == 4) requestManager.StartNewCycle(stage);
+        if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
 
         yield return StartCoroutine(grid.Breeding());
 
