@@ -45,7 +45,7 @@ public abstract class RequestInstance
         rewardGranted = true;
 
         //GameManager.Instance?.questToken += Data.rewardTokens;
-        Debug.Log("퀘스트를 클리어했습니다!");
+        Debug.Log("보상 획득 완료");
     }
 
     public abstract RequestInstanceSaveData ToSaveData();

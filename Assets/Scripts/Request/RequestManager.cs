@@ -80,7 +80,6 @@ public class RequestManager : Singleton<RequestManager>
 
         while (picked.Count < requestNum && safety-- > 0)
         {
-            Debug.Log("Äù½ºÆ® »Ì±â");
             var cand = valid[rng.Next(valid.Count)];
 
             if (picked.Any(x => x.requestId == cand.requestId)) continue;
@@ -94,7 +93,6 @@ public class RequestManager : Singleton<RequestManager>
 
             req.OnChanged += HandleRequestChanged;
             req.Start();
-            Debug.Log(data.requestDefinition);
             activeReq.Add(req);
         }
     }

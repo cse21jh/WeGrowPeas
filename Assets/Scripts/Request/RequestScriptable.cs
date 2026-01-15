@@ -5,7 +5,6 @@ public enum RequestDifficulty { Easy, Normal, Hard }
 [CreateAssetMenu(menuName = "Request/RequestItem")]
 public class RequestScriptable : ScriptableObject
 {
-    //[Header()]
     public string requestId;
 
     public string npcName;
@@ -14,6 +13,8 @@ public class RequestScriptable : ScriptableObject
 
     public int reward;
 
-    [TextArea] public string requestDefinition;
+    [TextArea] public string requestTitle;
+
+    [TextArea] public string requestDescription;
     
 }

@@ -10,18 +10,24 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] private TextMeshProUGUI reward;
     [SerializeField] private TextMeshProUGUI progress; //텍스트 말고 다른 걸로 대체될 수도
 
-    public void Set(RequestInstance request)
+    private RequestInstance RI;
+    private RequestUI owner;
+
+    public void Set(RequestInstance request, RequestUI ownerUI)
     {
         //퀘스트 내용에 따라 UI를 set 하는 함수
 
-        title.text = request.Data.requestDefinition;
+        RI = request;
+        owner = ownerUI;
+
+        title.text = request.Data.requestTitle;
         reward.text = "보상 - " + request.Data.reward + "골드";
         progress.text = request.GetProgressText();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        FindAnyObjectByType<RequestUI>().OnClickShowPopup();        // 얘도 RequestUI.cs에서 Bind 해주면 거기에 따라서 다시 바꿔야 함
-        Debug.Log("퀘스트 아이템을 클릭했습니다. 그러나 아무 일도 일어나지 않음......");
+        owner.SetPopupRequestInfo(RI);
+        FindAnyObjectByType<RequestUI>().OnClickShowPopup();
     }
 }
