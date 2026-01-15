@@ -9,8 +9,7 @@ public class RequestInstanceSaveData
     public string requestId;
     public string typeCode;
     public int progressCount; // 진행도 관련
-    public bool isCompleted;
-    public bool isRewardGranted;
+    public int state;
 }
 
 public class RequestManager : Singleton<RequestManager>

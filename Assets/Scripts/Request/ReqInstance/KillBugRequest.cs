@@ -63,16 +63,14 @@ public class KillBugRequest : RequestInstance
             requestId = Data.requestId,
             typeCode = Data.requestId.Substring(0, 3),
             progressCount = currentCount,
-            isCompleted = IsCompleted,
-            isRewardGranted = rewardGranted
+            state = (int)State,
         };
     }
 
     public override void LoadFromSaveData(RequestInstanceSaveData data)
     {
         currentCount = data.progressCount;
-        IsCompleted = data.isCompleted;
-        rewardGranted = data.isRewardGranted;
+        State = (RequestState)data.state;
 
         RaiseChanged();
     }
