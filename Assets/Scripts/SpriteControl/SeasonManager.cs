@@ -19,7 +19,7 @@ public class SeasonManager : MonoBehaviour
             ChangeToSeason(currentSeason);
         }
 
-        Debug.Log(grassMat.GetFloat("_Dryness"));
+        //Debug.Log(grassMat.GetFloat("_Dryness"));
     }
 
 
