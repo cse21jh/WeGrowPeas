@@ -1,12 +1,15 @@
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 
 public class RequestUI : MonoBehaviour
 {
     [SerializeField] private Transform questItemContentParent;
     [SerializeField] private GameObject questItem;
     [SerializeField] private RectTransform popupParent;  // 팝업 UI 부모
+
+    [SerializeField] private TextMeshProUGUI nullText;
 
     private RequestInstance currentRI; // 팝업을 위해, 지금 클릭된 퀘스트에 대한 정보를 저장.
     public RequestInstance CurrentRI => currentRI;
@@ -49,6 +52,16 @@ public class RequestUI : MonoBehaviour
 
         var reqs = RequestManager.Instance.ActiveReq;
         int spawnCount = reqs.Count;
+
+        if (spawnCount == 0)
+        {
+            nullText.gameObject.SetActive(true);
+            return;
+        }
+        else
+        {
+            nullText.gameObject.SetActive(false);
+        }
 
         for (int i = 0; i < spawnCount; i++)
         {
