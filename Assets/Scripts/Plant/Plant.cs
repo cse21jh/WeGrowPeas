@@ -44,7 +44,8 @@ public abstract class Plant : MonoBehaviour
 
 
     [SerializeField] protected PriceTagController priceSign;
-
+    [SerializeField] protected StemController stemController;
+    
     [SerializeField] protected Canvas holdCanvas;
 
     [SerializeField] protected GameObject foamEffect;
@@ -67,6 +68,7 @@ public abstract class Plant : MonoBehaviour
         holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+        stemController = GetComponentInChildren<StemController>();
         childMaterials = new Material[childSpriteRenderers.Length];
         for (int i = 0; i < childSpriteRenderers.Length; i++)
         {
@@ -285,12 +287,15 @@ public abstract class Plant : MonoBehaviour
 
                 traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, traits[i].additionalResistance + value);
 
-                if (traits[i].additionalResistance >= 0.15f) traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, 0.15f);
+                if (stemController != null)
+                {
+                    if(stemController.CheckGold(traits))
+                        stemController.SetGold(true);
+                }
 
                 if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
                 {
                     FenceUIManager.Instance.SetFenceElements(plantID, this);
-                    priceSign.SetPrice(GetSellingPrice());
                 }
 
                 return;
@@ -411,22 +416,33 @@ public abstract class Plant : MonoBehaviour
     public virtual void ResistWave(WaveType waveType)
     {
         resistWaveCount++;
+
+        bool isGold = false;
+        if (stemController != null) //황금 완두콩이면 저항력 감소 아예 X
+        {
+            isGold = stemController.IsGold();
+        }
+
         int fertilizer = -1;
         if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 저항력 감소가 되지 않습니다
             fertilizer = (int)grid.GetFertilizerColumns()[gridIndex / 4];
-        for (int i = 0; i < Wave.NumberOfWave; i++)
+
+        if (!isGold)
         {
-            if ((int)waveType != i && fertilizer != i)
+            for (int i = 0; i < Wave.NumberOfWave; i++)
             {
-                if (GameManager.Instance != null && GameManager.Instance.stage > 25)
-                    ChangeResistance(i, -0.1f);
-                else
-                    ChangeResistance(i, -0.05f);
+                if ((int)waveType != i && fertilizer != i)
+                {
+                    if (GameManager.Instance != null && GameManager.Instance.stage > 25)
+                        ChangeResistance(i, -0.1f);
+                    else
+                        ChangeResistance(i, -0.05f);
+                }
             }
         }
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {
-            FenceUIManager.Instance.SetFenceElements(plantID, this);            
+            FenceUIManager.Instance.SetFenceElements(plantID, this);
         }
         priceSign.SetPrice(GetSellingPrice());
     }
@@ -443,13 +459,12 @@ public abstract class Plant : MonoBehaviour
                 if (var < 0.1f)
                     var = 0.1f;
 
-                StemController stem = GetComponentInChildren<StemController>();
-                if (stem != null)
-                {
-                    if (stem.IsGold() && var <= 0.5f)
-                        stem.SetGold(false);
-                }
                 traits[i] = new GeneticTrait((TraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
+                if (stemController != null)
+                {
+                    if (stemController.CheckGold(traits))
+                        stemController.SetGold(true);
+                }
                 return true;
             }
         }

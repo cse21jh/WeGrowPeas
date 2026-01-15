@@ -169,23 +169,17 @@ public class StemController : MonoBehaviour
                 break;
         }
         SetGold(CheckGold(traits));
-    }
+    } 
 
-    private bool CheckGold(List<GeneticTrait> traits)
+    public bool CheckGold(List<GeneticTrait> traits)
     {
-        int i = 0;
         foreach(var t in traits)
         {
-            if (t.genetics == 2 && t.resistance > 0.5f)
-                i++;
+            if (t.resistance + t.additionalResistance < 0.7999f) //부동소수점 이슈로 임시로 이렇게 처리하겠습니다 ㅎ
+                return  isGold = false;
         }
-
-        if (i == 6)
-        {
-            FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
-            return isGold = true;
-        }
-        return isGold = false;
+        FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
+        return isGold = true;        
     }
 
     public void SetGold(bool isG)

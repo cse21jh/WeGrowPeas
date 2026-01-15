@@ -1075,7 +1075,9 @@ public class Grid : MonoBehaviour
             new GeneticTrait(TraitType.Wind, 1f , 2, 0.0f),
             new GeneticTrait(TraitType.Flood, 1f , 2, 0.0f),
             new GeneticTrait(TraitType.HeavyRain, 1f , 2, 0.0f),
-            new GeneticTrait(TraitType.Cold, 1f , 2, 0.0f)
+            new GeneticTrait(TraitType.Cold, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Drought, 1f , 2, 0.0f),
+            new GeneticTrait(TraitType.Heat, 1f , 2, 0.0f)
         };
         AddPea(peaTrait);        
     }
