@@ -25,7 +25,7 @@ public abstract class RequestInstance
 
     public virtual void Stop() { }
 
-    //public abstract string GetProgressText();
+    public abstract string GetProgressText();
 
     protected void CompleteOnce()
     {

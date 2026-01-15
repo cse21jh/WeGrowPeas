@@ -16,7 +16,7 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
 
         title.text = request.Data.requestDefinition;
         reward.text = "º¸»ó - " + request.Data.reward + "°ñµå";
-        progress.text = "0/1000";
+        progress.text = request.GetProgressText();
     }
 
     public void OnPointerClick(PointerEventData eventData)

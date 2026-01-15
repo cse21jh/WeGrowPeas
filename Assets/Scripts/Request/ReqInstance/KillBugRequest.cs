@@ -25,6 +25,11 @@ public class KillBugRequest : RequestInstance
         GameEvents.OnBugKilled -= HandleBugKilled;
     }
 
+    public override string GetProgressText()
+    {
+        return currentCount + "/" + requiredCount;
+    }
+
     private void HandleBugKilled()
     {
         if (IsCompleted) return;
