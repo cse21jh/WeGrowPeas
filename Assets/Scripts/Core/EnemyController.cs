@@ -8,11 +8,11 @@ using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 public enum Season
-{
-    Spring,
+{    
     Summer,
     Fall,
     Winter,
+    Spring,
 }
 
 
@@ -88,7 +88,7 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        waveKillCount = new int[7];
+        waveKillCount = new int[Wave.NumberOfWave];
         stageWaveRecord.Add(WaveType.Aging);
         stageKillRecord.Add(0);
         stageNoTraitRecord.Add(0);
