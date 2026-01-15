@@ -26,7 +26,7 @@ public class RequestUI : MonoBehaviour
     {
         popupParent.gameObject.SetActive(true);
         popupParent.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
-        //popupParent.GetComponent<ShopPopupController>().SetItemInfo(data, this, slot);
+        popupParent.GetComponent<QuestPopupController>().SetItemInfo(this);
     }
 
     public void OnClickHidePopup()
