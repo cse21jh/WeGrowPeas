@@ -107,4 +107,18 @@ public class ShopManager : Singleton<ShopManager>
             purchaseHistory[key] = saveData.itemPurchaseCount[i];
         }
     }
+
+    /// <summary>
+    /// 특정 아이템의 구매 횟수를 반환합니다.
+    /// </summary>
+    /// <param name="data">구매 횟수를 확인할 아이템 데이터</param>
+    /// <returns>구매 횟수, 아이템이 없거나 구매 이력이 없으면 0을 반환</returns>
+    public int GetItemPurchaseCount(ItemData data)
+    {
+        if (data == null) return 0;
+
+        // TryPurchase와 동일한 키 생성 방식 사용
+        var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
+        return purchaseHistory.ContainsKey(key) ? purchaseHistory[key] : 0;
+    }
 }

@@ -1,6 +1,7 @@
 // Assets/Scripts/Shop/Items/ItemData_Adrenaline.cs
 using UnityEngine;
 using System;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "Item_Adrenaline", menuName = "Shop/Item/Adrenaline")]
 public class ItemData_Adrenaline : ItemData
@@ -48,12 +49,28 @@ public class ItemData_Adrenaline : ItemData
         // var sm = ShopManager.Instance;
         // if (sm) days *= Mathf.Max(1, sm.ShopOpenDay);
 
-        // 전역(param=-1)으로 3개 모드 등록
-        ModManager.Instance.AddTimedMultiplier(StatId.BugSpawnIntervalMul, -1, spawnIntervalMul, days, "Adrenaline_Spawn");
-        ModManager.Instance.AddTimedMultiplier(StatId.BreedingPhaseDurationMul, -1, breedingDurationMul, days, "Adrenaline_BreedTime");
-        ModManager.Instance.AddTimedMultiplier(StatId.BreedingAttemptsMul, -1, breedingAttemptsMul, days, "Adrenaline_BreedCount");
+        // 각 효과별로 기존 모드가 있으면 기간 연장, 없으면 새로 추가
+        ExtendOrAddMod("Adrenaline_Spawn", StatId.BugSpawnIntervalMul, spawnIntervalMul, days);
+        ExtendOrAddMod("Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
+        ExtendOrAddMod("Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
 
         ctx.ShowInfo?.Invoke($"{DisplayName} 발동: {days}일간 스폰×{(1f / spawnIntervalMul):0.#}, 교배시간×{breedingDurationMul:0.#}, 교배횟수×{breedingAttemptsMul:0.#}");
+    }
+
+    private void ExtendOrAddMod(string sourceTag, StatId stat, float multiplier, int days)
+    {
+        var existingMod = ModManager.Instance.Mods.FirstOrDefault(m => m.sourceTag == sourceTag);
+        
+        if (existingMod != null)
+        {
+            // 기존 모드가 있으면 기간을 더함
+            existingMod.expireDay += days;
+        }
+        else
+        {
+            // 새로운 모드 추가
+            ModManager.Instance.AddTimedMultiplier(stat, -1, multiplier, days, sourceTag);
+        }
     }
 
     public override void Cancel(ShopContext ctx) { }

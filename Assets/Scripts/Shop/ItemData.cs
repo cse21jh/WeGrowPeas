@@ -16,6 +16,8 @@ public abstract class ItemData : ScriptableObject
     public bool IsStackable = false;
     public int InitialStock = 1;
     public bool OnePerShopIfNotStackable = true;
+    [Tooltip("-1 = 무제한, 0 이상 = 게임 전체에서 최대 구매 횟수")]
+    public int MaxPurchaseCount = -1;
 
     [Header("Flow")]
     public ShopFlowType FlowType;
@@ -49,6 +51,19 @@ public abstract class ItemData : ScriptableObject
     public int GetDisplayPrice()
     {
         return Price;
+    }
+
+    // 게임 전체에서의 구매 횟수 조회
+    public int GetTotalPurchaseCount()
+    {
+        return ShopManager.Instance?.GetItemPurchaseCount(this) ?? 0;
+    }
+
+    // 게임 전체에서의 구매 가능 여부 (MaxPurchaseCount 체크)
+    public bool CanPurchaseByLimit()
+    {
+        if (MaxPurchaseCount < 0) return true; // -1 = 무제한
+        return GetTotalPurchaseCount() < MaxPurchaseCount;
     }
 }
 
