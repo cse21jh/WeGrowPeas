@@ -21,6 +21,11 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
         //breedTimerSlider.value = Mathf.Lerp(fillAmount, breedTimerSlider.value, smoothTime);
     }
 
+    public void SetFillImmediately(float fillAmount)
+    {
+        breedTimerSlider.value = fillAmount;
+    }
+
     private void FixedUpdate()
     {
         if (breedTimerSlider.value != targetFillAmount)

@@ -82,4 +82,17 @@ public class BreedTimerManager : MonoBehaviour
                 break;
         }
     }
+
+    public void SetPhoneTimer()
+    {
+        foreach (GameObject timer in timers)
+        {
+            timer.SetActive(false);
+        }
+
+        // 8번 칸에 추후 폰 타이머 UI 삽입하면 됨
+        timers[8].SetActive(true);
+        timerUIs[8].UpdatePhoneMaxTimerCount();
+        //GameManager.Instance.phoneManager.SetPhoneTimerUI(timerUIs[8]);
+    }
 }

@@ -139,7 +139,7 @@ public class Grid : MonoBehaviour
     public IEnumerator Breeding()
     {
         //breedTimer 만큼 동안 아래 과정 반복 진행 가능
-
+        enemyController.SetCurrentWaveTimer();
         //교배할 부모 완두콩 두 개 선택
         isBreeding = true;
         breedObj1 = null;

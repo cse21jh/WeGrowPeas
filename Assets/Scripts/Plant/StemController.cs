@@ -173,13 +173,19 @@ public class StemController : MonoBehaviour
 
     public bool CheckGold(List<GeneticTrait> traits)
     {
+        int n = 0;
         foreach(var t in traits)
         {
             if (t.resistance + t.additionalResistance < 0.7999f) //부동소수점 이슈로 임시로 이렇게 처리하겠습니다 ㅎ
                 return  isGold = false;
+            n++;
         }
-        FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
-        return isGold = true;        
+        if (n == (int)TraitType.None)
+        {
+            FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
+            return isGold = true;
+        }
+        return isGold = false;
     }
 
     public void SetGold(bool isG)

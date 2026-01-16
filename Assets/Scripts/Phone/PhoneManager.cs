@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class PhoneManager : MonoBehaviour
@@ -33,6 +36,18 @@ public class PhoneManager : MonoBehaviour
     //private readonly Dictionary<AppKey, GameObject> _instances = new();
     private AppKey? _current = null;
     private bool _isOpen;
+
+
+    //폰 페이즈 관련
+    private float maxPhoneTimer = 30.0f;
+    private float phoneTimer = 0;
+    private bool skipPhoneTime = false;
+    
+    [SerializeField] private GameObject skipPhoneTimeButton;
+    [SerializeField] private BreedTimerManager breedTimerManager;
+    [SerializeField] private TimerUI phoneTimerUI;
+    [SerializeField] TextMeshProUGUI phoneTimerText;    
+
 
     private void Awake()
     {
@@ -101,6 +116,71 @@ public class PhoneManager : MonoBehaviour
 
         transitionController.TransitionToIndex((int)key + 1);
         _current = key;
+    }
+
+    public IEnumerator PhonePhase()
+    {
+        ClickRouter.Instance.IsBlockedByUI = true;
+        SetPhoneTimer();
+        
+        skipPhoneTimeButton.SetActive(true);
+        phoneTimer = maxPhoneTimer;
+        phoneTimerUI.StartPhoneTimer();
+
+        bool _warned15s = false;
+        //int rerollCount = 0;
+
+        while (!skipPhoneTime && (phoneTimer > 0))
+        {
+            phoneTimer -= Time.deltaTime;
+
+            if (phoneTimer < 15f && !_warned15s)
+            {
+                _warned15s = true;
+
+                PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = "내일이 얼마남지 않았습니다",
+                        message = "또 힘내봅시다.",
+                        duration = 5f
+                    }
+                );
+            }
+
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                SkipPhoneTime();
+            }
+
+            yield return null;
+        }
+        phoneTimerUI.StopTimerByPhone();
+        skipPhoneTimeButton.SetActive(false);
+        ClickRouter.Instance.IsBlockedByUI = false;
+        skipPhoneTime = false;
+        yield return null;
+    }
+    
+    public void SetPhoneTimer()
+    {
+        breedTimerManager.SetPhoneTimer();
+        phoneTimerText.text = "자기 전에 핸드폰 봐야지...";
+    }
+
+    public void SetPhoneTimerUI(TimerUI timerUI)
+    {
+        phoneTimerUI = timerUI;
+    }
+
+    public float GetMaxPhoneTimer()
+    {
+        return maxPhoneTimer;
+    }
+
+    public void SkipPhoneTime()
+    {
+        skipPhoneTime = true;
     }
 
     /*

@@ -119,6 +119,7 @@ public class GameManager : Singleton<GameManager>
     public EconomyManager economyManager;
     public ModManager modManager;
     public RequestManager requestManager;
+    public PhoneManager phoneManager;
 
     [SerializeField] private TextMeshProUGUI textStage;
 
@@ -220,7 +221,7 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(BreedEndRoutine());
 
-        yield return StartCoroutine(upgradeManager.PhonePhase());
+        yield return StartCoroutine(phoneManager.PhonePhase());
         /*
         if (!enemyController.IsLastWaveNone())
             yield return StartCoroutine(upgradeManager.UpgradePhase());            

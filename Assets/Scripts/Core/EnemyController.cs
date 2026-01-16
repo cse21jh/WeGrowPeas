@@ -213,10 +213,14 @@ public class EnemyController : MonoBehaviour
         currentWave = nextWave;
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
-        breedTimerManager.SetTimer(currentWave.WaveType);
-        ShowNextWaveText();
         WaveType picked = PickNextByWeight();
         nextWave = GetWaveFromWaveType(picked);
+    }
+
+    public void SetCurrentWaveTimer()
+    {
+        breedTimerManager.SetTimer(currentWave.WaveType);
+        ShowNextWaveText();
     }
 
     public void SetNextSeason()
@@ -285,7 +289,7 @@ public class EnemyController : MonoBehaviour
     public void ShowNextWaveText()
     {
         nextWaveText.text = currentWave.WaveDescription;
-    }
+    }    
 
     private void FlushNextWaveText()
     {

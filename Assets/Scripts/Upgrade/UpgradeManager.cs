@@ -69,15 +69,7 @@ public class UpgradeManager : MonoBehaviour
 
 
 
-    // 임시 핸드폰 관련 추후 업그레이드 이전 완료되면 upgrade관련 이전하면서 하나의 스크립트로 병합
     
-    private float phoneTimer = 30.0f;
-    private bool skipPhoneTime = false;
-
-    [SerializeField] private GameObject phoneTimerUI;
-    [SerializeField] private GameObject skipPhoneTimeButton;
-    [SerializeField] Slider phoneTimeSlider;
-    [SerializeField] TextMeshProUGUI phoneTimerText;
 
     //저장 필요
     private Dictionary<Type, int> remainUpgrade = new();
@@ -242,46 +234,6 @@ public class UpgradeManager : MonoBehaviour
         selectAddPeaOrPeanutButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
         yield return null;
-    }
-
-    public IEnumerator PhonePhase()
-    {        
-        ClickRouter.Instance.IsBlockedByUI = true;        
-        
-        phoneTimerUI.SetActive(true);
-        skipPhoneTimeButton.SetActive(true);
-
-        float startTime = Time.time;
-        float endTime = startTime + phoneTimer;
-        //int rerollCount = 0;
-
-        while (!skipPhoneTime && (Time.time < endTime))
-        {            
-            float timeRatio = Mathf.Clamp01((Time.time - startTime) / phoneTimer);
-            PhoneTimerUI(timeRatio);
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                SkipPhoneTime();
-            }
-
-            yield return null;
-        }
-        phoneTimerUI.SetActive(false);
-        skipPhoneTimeButton.SetActive(false);
-        ClickRouter.Instance.IsBlockedByUI = false;
-        skipPhoneTime = false;
-        yield return null;
-    }
-    private void PhoneTimerUI(float timeRatio)
-    {
-        phoneTimeSlider.value = timeRatio;
-        phoneTimerText.text = Mathf.CeilToInt(phoneTimer * (1 - timeRatio)).ToString() + "초 남음...";
-    }
-
-    public void SkipPhoneTime()
-    {
-        skipPhoneTime = true;
     }
 
     public void AddMaxRerollCount(int count)
