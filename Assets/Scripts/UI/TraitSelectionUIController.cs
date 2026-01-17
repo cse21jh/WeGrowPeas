@@ -60,10 +60,16 @@ public class TraitSelectionUIController : MonoBehaviour
         foreach (Transform child in traitButtonParent)
             Destroy(child.gameObject);
 
-        // 모든 형질 타입에 대한 버튼 생성 (None 제외)
+        // 현재 스테이지 가져오기
+        int currentStage = GameManager.Instance != null ? GameManager.Instance.stage : 0;
+
+        // 모든 형질 타입에 대한 버튼 생성 (None 제외, 해금된 것만)
         foreach (TraitType traitType in System.Enum.GetValues(typeof(TraitType)))
         {
             if (traitType == TraitType.None) continue;
+            
+            // 해금 여부 확인
+            if (!IsTraitUnlocked(traitType, currentStage)) continue;
             
             var btnObj = Instantiate(traitButtonPrefab, traitButtonParent);
             var btn = btnObj.GetComponent<Button>();
@@ -86,6 +92,43 @@ public class TraitSelectionUIController : MonoBehaviour
                 
                 traitButtons[currentTrait] = btn;
             }
+        }
+    }
+
+    private bool IsTraitUnlocked(TraitType traitType, int currentStage)
+    {
+        // stage + 2 >= UnlockStage 조건으로 해금 여부 확인
+        // (EnemyController.InitBaseWeightsByStage 로직과 동일)
+        
+        switch (traitType)
+        {
+            case TraitType.NaturalDeath:
+                // Aging은 항상 해금
+                return true;
+                
+            case TraitType.Pest:
+                return (currentStage + 2) >= PestWave.UnlockStage;
+                
+            case TraitType.Wind:
+                return (currentStage + 2) >= WindWave.UnlockStage;
+                
+            case TraitType.Flood:
+                return (currentStage + 2) >= FloodWave.UnlockStage;
+                
+            case TraitType.HeavyRain:
+                return (currentStage + 2) >= HeavyRainWave.UnlockStage;
+                
+            case TraitType.Drought:
+                return (currentStage + 2) >= DroughtWave.UnlockStage;
+                
+            case TraitType.Cold:
+                return (currentStage + 2) >= ColdWave.UnlockStage;
+                
+            case TraitType.Heat:
+                return (currentStage + 2) >= HeatWave.UnlockStage;
+                
+            default:
+                return false;
         }
     }
 

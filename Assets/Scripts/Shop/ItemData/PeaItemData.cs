@@ -8,7 +8,6 @@ public class PeaItemData : ItemData
     [Min(0)] public int rotationWeight = 4;
 
     private List<GeneticTrait> pendingTraits;
-    private int? pendingGridIndex;
 
     private void OnEnable()
     {
@@ -18,7 +17,7 @@ public class PeaItemData : ItemData
         IsStackable = false;
         InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        FlowType = ShopFlowType.PlaceOnTile;
+        FlowType = ShopFlowType.Instant;  // 위치 선택 없이 즉시 설치
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
@@ -54,7 +53,7 @@ public class PeaItemData : ItemData
         traitSelectionUI.ShowTraitSelection(
             onConfirm: (selectedTraits) => {
                 pendingTraits = selectedTraits;
-                onReady?.Invoke(); // 형질 선택 후 onReady 호출 → PlaceOnTile 플로우 진행
+                onReady?.Invoke(); // 형질 선택 후 onReady 호출 → Instant 플로우로 즉시 설치
             },
             onCancel: () => {
                 pendingTraits = null;
@@ -63,38 +62,15 @@ public class PeaItemData : ItemData
         );
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
-    {
-        reason = null;
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
-            return false;
-        }
-
-        // 화면 좌표로 그리드 인덱스
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
-        {
-            reason = "유효하지 않은 위치입니다";
-            return false;
-        }
-
-        // 빈 칸인지 확인
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
-        {
-            reason = "이미 식물이 있는 칸입니다";
-            return false;
-        }
-
-        // 배치 인덱스 저장
-        pendingGridIndex = idx.Value;
-        return true;
+    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason) 
+    { 
+        reason = null; 
+        return true; 
     }
 
     public override void SetPlacedPosition(Vector3 worldPos) 
     { 
-        // 이미 ValidatePosition에서 pendingGridIndex에 저장됨
+        // 위치 선택 없음 - 사용 안 함
     }
 
     public override void Commit(ShopContext ctx)
@@ -114,23 +90,15 @@ public class PeaItemData : ItemData
             };
         }
 
-        if (pendingGridIndex.HasValue)
-        {
-            ctx.Grid.AddPea(pendingTraits, pendingGridIndex.Value);
-        }
-        else
-        {
-            ctx.Grid.AddPea(pendingTraits);
-        }
+        // grididx를 지정하지 않으면 Grid.AddPea가 자동으로 가장 빠른 빈 칸에 설치
+        ctx.Grid.AddPea(pendingTraits);
 
         // 초기화
         pendingTraits = null;
-        pendingGridIndex = null;
     }
 
     public override void Cancel(ShopContext ctx)
     {
         pendingTraits = null;
-        pendingGridIndex = null;
     }
 }
