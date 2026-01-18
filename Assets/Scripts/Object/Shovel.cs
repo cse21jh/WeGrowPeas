@@ -107,6 +107,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
 
             // 1) 식물 제거
             Plant plant = hit.collider.GetComponent<Plant>();
+            Plant target = plant;
             if (plant != null && !plant.isDying)
             {
                 SoundManager.Instance.PlayEffect("Shovel");                
@@ -114,7 +115,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 {
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
-                    GameEvents.RaisePeaSold();
+                    GameEvents.RaisePeaSold(target);
                 }
                 return;
             }

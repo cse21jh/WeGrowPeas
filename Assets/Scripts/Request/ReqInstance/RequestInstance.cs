@@ -36,6 +36,11 @@ public abstract class RequestInstance
 
     public abstract string GetProgressText();
 
+    public virtual string GetTitleText()
+    {
+        return Data.requestTitle;
+    }
+
     protected void CompleteOnce()
     {
         if (IsCompleted) return;

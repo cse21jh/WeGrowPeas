@@ -27,6 +27,6 @@ public static class GameEvents
     public static event Action OnDayPassedForRequest; //NoSellPea Àü¿ë
     public static void RaiseDayPassedForRequest() => OnDayPassedForRequest?.Invoke();
 
-    public static event Action OnPeaSold;
-    public static void RaisePeaSold() => OnPeaSold?.Invoke();
+    public static event Action<Plant> OnPeaSold;
+    public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
 }
