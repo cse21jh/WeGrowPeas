@@ -7,16 +7,16 @@ using UnityEngine.UI; // CanvasGroup
 public class PlacementController : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private Grid grid;                 // ³× Grid Å¬·¡½º
-    [SerializeField] private Camera worldCamera;        // º¸Åë Camera.main
-    [SerializeField] private CanvasGroup shopCanvas;    // ShopUI ·çÆ® CanvasGroup (¼±ÅÃ)
-    [SerializeField] private GameObject ghostPrefab;    // ¹èÄ¡ ¹Ì¸®º¸±â ÇÁ¸®ÆÕ(¼±ÅÃ)
+    [SerializeField] private Grid grid;                 // ë„¤ Grid í´ë˜ìŠ¤
+    [SerializeField] private Camera worldCamera;        // ë³´í†µ Camera.main
+    [SerializeField] private CanvasGroup shopCanvas;    // ShopUI ë£¨íŠ¸ CanvasGroup (ì„ íƒ)
+    [SerializeField] private GameObject ghostPrefab;    // ë°°ì¹˜ ë¯¸ë¦¬ë³´ê¸° í”„ë¦¬íŒ¹(ì„ íƒ)
 
     [Header("Ghost")]
     [SerializeField] private float ghostInvalidAlpha = 0.4f;
 
     [Header("Selection")]
-    [SerializeField] private LayerMask plantLayer = ~0; // Plant°¡ ÀÖ´Â ·¹ÀÌ¾î·Î ÁöÁ¤
+    [SerializeField] private LayerMask plantLayer = ~0; // Plantê°€ ìˆëŠ” ë ˆì´ì–´ë¡œ ì§€ì •
     [SerializeField] private float rayMaxDistance = 100f;
 
     [Header("Shovel")]
@@ -33,8 +33,8 @@ public class PlacementController : MonoBehaviour
 
     public void BeginTilePlacement(
         ShopContext ctx,
-        System.Func<Vector3, bool> validate,          // ÀÎÀÚ: screenPos
-        System.Action<Vector3> onConfirm,             // ÀÎÀÚ: screenPos
+        System.Func<Vector3, bool> validate,          // ì¸ì: screenPos
+        System.Action<Vector3> onConfirm,             // ì¸ì: screenPos
         System.Action onCancel)
     {
         if (isPlacing) StopPlacementInternal();
@@ -52,7 +52,7 @@ public class PlacementController : MonoBehaviour
         shovel.IsEnabled = false;
         shovelButton.enabled = false;
 
-        // 1) Shop UI Å¬¸¯ ºñÈ°¼º (È­¸éÀº º¸ÀÌµÇ, ÀÔ·ÂÀº Åë°ú)
+        // 1) Shop UI í´ë¦­ ë¹„í™œì„± (í™”ë©´ì€ ë³´ì´ë˜, ì…ë ¥ì€ í†µê³¼)
         bool hadCanvas = shopCanvas != null;
         bool prevInteractable = false, prevBlocks = false;
         if (hadCanvas)
@@ -63,7 +63,7 @@ public class PlacementController : MonoBehaviour
             shopCanvas.blocksRaycasts = false;
         }
 
-        // 2) °í½ºÆ® »ı¼º(ÀÖÀ¸¸é)
+        // 2) ê³ ìŠ¤íŠ¸ ìƒì„±(ìˆìœ¼ë©´)
         SpriteRenderer ghostSr = null;
         if (ghostPrefab != null)
         {
@@ -71,14 +71,14 @@ public class PlacementController : MonoBehaviour
             ghostSr = ghost.GetComponentInChildren<SpriteRenderer>();
         }
 
-        ctx.ShowGuide?.Invoke("Åä¾çÀ» ¼±ÅÃÇØÁÖ¼¼¿ä (ÁÂÅ¬¸¯=È®Á¤, ¿ìÅ¬¸¯/ESC=Ãë¼Ò)");
+        ctx.ShowGuide?.Invoke("í† ì–‘ì„ ì„ íƒí•´ì£¼ì„¸ìš” (ì¢Œí´ë¦­=í™•ì •, ìš°í´ë¦­/ESC=ì·¨ì†Œ)");
 
         while (true)
         {
-            // ÇöÀç ¸¶¿ì½º ½ºÅ©¸° ÁÂÇ¥
+            // í˜„ì¬ ë§ˆìš°ìŠ¤ ìŠ¤í¬ë¦° ì¢Œí‘œ
             Vector3 screenPos = Input.mousePosition;
 
-            // ±×¸®µå ÀÎµ¦½º Ã£±â(°í½ºÆ® À§Ä¡ ½º³À¿ë)
+            // ê·¸ë¦¬ë“œ ì¸ë±ìŠ¤ ì°¾ê¸°(ê³ ìŠ¤íŠ¸ ìœ„ì¹˜ ìŠ¤ëƒ…ìš©)
             int? idx = grid.GetGridIndexFromPosition(screenPos);
             if (idx.HasValue)
             {
@@ -87,7 +87,7 @@ public class PlacementController : MonoBehaviour
             }
             else
             {
-                // Åä¾çÀ» ¸ø Ã£À¸¸é °í½ºÆ®´Â ¸¶¿ì½º ¿ùµå À§Ä¡ µû¶ó°¨
+                // í† ì–‘ì„ ëª» ì°¾ìœ¼ë©´ ê³ ìŠ¤íŠ¸ëŠ” ë§ˆìš°ìŠ¤ ì›”ë“œ ìœ„ì¹˜ ë”°ë¼ê°
                 if (ghost != null)
                 {
                     var wp = worldCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 0f));
@@ -96,10 +96,10 @@ public class PlacementController : MonoBehaviour
                 }
             }
 
-            // À¯È¿¼º °Ë»ç (ItemData.ValidatePosition´Â screenPos¸¦ ±â´ë)
+            // ìœ íš¨ì„± ê²€ì‚¬ (ItemData.ValidatePositionëŠ” screenPosë¥¼ ê¸°ëŒ€)
             bool ok = validate?.Invoke(screenPos) ?? true;
 
-            // °í½ºÆ® »ö»ó/¾ËÆÄ·Î ÇÇµå¹é
+            // ê³ ìŠ¤íŠ¸ ìƒ‰ìƒ/ì•ŒíŒŒë¡œ í”¼ë“œë°±
             if (ghostSr != null)
             {
                 var c = ghostSr.color;
@@ -107,21 +107,21 @@ public class PlacementController : MonoBehaviour
                 ghostSr.color = c;
             }
 
-            // ÁÂÅ¬¸¯ È®Á¤
+            // ì¢Œí´ë¦­ í™•ì •
             if (Input.GetMouseButtonDown(0))
             {
                 if (ok)
                 {
-                    onConfirm?.Invoke(screenPos); // screen ÁÂÇ¥¸¦ ±×´ë·Î ³Ñ±è
+                    onConfirm?.Invoke(screenPos); // screen ì¢Œí‘œë¥¼ ê·¸ëŒ€ë¡œ ë„˜ê¹€
                     break;
                 }
                 else
                 {
-                    // À¯È¿ÇÏÁö ¾ÊÀ¸¸é ¹«½Ã (¿øÇÏ¸é ¿¡·¯ »ç¿îµå/ÇªÅÍ Ç¥±â È£Ãâ)
+                    // ìœ íš¨í•˜ì§€ ì•Šìœ¼ë©´ ë¬´ì‹œ (ì›í•˜ë©´ ì—ëŸ¬ ì‚¬ìš´ë“œ/í‘¸í„° í‘œê¸° í˜¸ì¶œ)
                 }
             }
 
-            // ¿ìÅ¬¸¯ or Esc Ãë¼Ò
+            // ìš°í´ë¦­ or Esc ì·¨ì†Œ
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 onCancel?.Invoke();
@@ -131,7 +131,7 @@ public class PlacementController : MonoBehaviour
             yield return null;
         }
 
-        // 3) Á¤¸®
+        // 3) ì •ë¦¬
         if (ghost != null) Destroy(ghost);
         if (hadCanvas)
         {
@@ -157,7 +157,7 @@ public class PlacementController : MonoBehaviour
         if (ghost != null) Destroy(ghost);
         if (shopCanvas != null)
         {
-            // ¾ÈÀüÇÏ°Ô ´Ù½Ã ÄÑÁÖ±â
+            // ì•ˆì „í•˜ê²Œ ë‹¤ì‹œ ì¼œì£¼ê¸°
             shopCanvas.interactable = true;
             shopCanvas.blocksRaycasts = true;
         }
@@ -169,7 +169,7 @@ public class PlacementController : MonoBehaviour
         System.Action<Plant> onConfirm,
         System.Action onCancel)
     {
-        // ÁøÇà ÁßÀÎ ¹èÄ¡/¼±ÅÃ Á¾·á
+        // ì§„í–‰ ì¤‘ì¸ ë°°ì¹˜/ì„ íƒ ì¢…ë£Œ
         if (isPlacing) StopPlacementInternal();
         this.ctx = ctx;
         placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
@@ -184,7 +184,7 @@ public class PlacementController : MonoBehaviour
         shovel.IsEnabled = false;
         shovelButton.enabled = false;
 
-        // 1) Shop UI ÀÔ·Â ºñÈ°¼º
+        // 1) Shop UI ì…ë ¥ ë¹„í™œì„±
         bool hadCanvas = shopCanvas != null;
         bool prevInteractable = false, prevBlocks = false;
         if (hadCanvas)
@@ -196,11 +196,11 @@ public class PlacementController : MonoBehaviour
         }
 
         hovered = null;
-        ctx.ShowGuide?.Invoke("½Ä¹°À» ¼±ÅÃÇØÁÖ¼¼¿ä (ÁÂÅ¬¸¯=È®Á¤, ¿ìÅ¬¸¯/ESC=Ãë¼Ò)");
+        ctx.ShowGuide?.Invoke("ì‹ë¬¼ì„ ì„ íƒí•´ì£¼ì„¸ìš” (ì¢Œí´ë¦­=í™•ì •, ìš°í´ë¦­/ESC=ì·¨ì†Œ)");
 
         while (true)
         {
-            // UI À§¿¡ ÀÖÀ¸¸é ÇÏÀÌ¶óÀÌÆ® ÇØÁ¦ + Ãë¼Ò¸¸ Çã¿ë
+            // UI ìœ„ì— ìˆìœ¼ë©´ í•˜ì´ë¼ì´íŠ¸ í•´ì œ + ì·¨ì†Œë§Œ í—ˆìš©
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()
                 && (shopCanvas == null || shopCanvas.blocksRaycasts))
             {
@@ -216,11 +216,11 @@ public class PlacementController : MonoBehaviour
 
 
 
-            // ¸¶¿ì½º ¾Æ·¡ ½Ä¹° ·¹ÀÌÄ³½ºÆ®
+            // ë§ˆìš°ìŠ¤ ì•„ë˜ ì‹ë¬¼ ë ˆì´ìºìŠ¤íŠ¸
             Plant p = RaycastPlantUnderMouse();
             Hover(p);
 
-            // ÁÂÅ¬¸¯ È®Á¤
+            // ì¢Œí´ë¦­ í™•ì •
             if (Input.GetMouseButtonDown(0) && p != null)
             {
                 bool ok = true;
@@ -234,11 +234,11 @@ public class PlacementController : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("¼±ÅÃ ºÒ°¡ÇÑ ½Ä¹°ÀÔ´Ï´Ù.");
+                    Debug.Log("ì„ íƒ ë¶ˆê°€í•œ ì‹ë¬¼ì…ë‹ˆë‹¤.");
                 }
             }
 
-            // ¿ìÅ¬¸¯/ESC Ãë¼Ò
+            // ìš°í´ë¦­/ESC ì·¨ì†Œ
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 onCancel?.Invoke();
@@ -248,7 +248,7 @@ public class PlacementController : MonoBehaviour
             yield return null;
         }
 
-        // 3) Á¤¸®
+        // 3) ì •ë¦¬
         EndHover();
         if (hadCanvas)
         {
@@ -270,15 +270,15 @@ public class PlacementController : MonoBehaviour
         var cam = worldCamera != null ? worldCamera : Camera.main;
         if (!cam) return null;
 
-        // ¨ç 3D °æ·Î: BoxCollider(3D)¿ë
+        // â‘  3D ê²½ë¡œ: BoxCollider(3D)ìš©
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         const float MaxPickDist = 1000f;
 
-        // Æ®¸®°Å±îÁö Æ÷ÇÔÇØ¼­ ¸ğµÎ ¸ÂÃçº½(·¹ÀÌ¾î ¾È ¾¸)
+        // íŠ¸ë¦¬ê±°ê¹Œì§€ í¬í•¨í•´ì„œ ëª¨ë‘ ë§ì¶°ë´„(ë ˆì´ì–´ ì•ˆ ì”€)
         var hits3D = Physics.RaycastAll(ray, MaxPickDist, ~0, QueryTriggerInteraction.Collide);
         if (hits3D != null && hits3D.Length > 0)
         {
-            // Ä«¸Ş¶ó¿¡ °¡Àå °¡±î¿î(°Å¸® °¡Àå ÀÛÀº) Plant¸¦ ¿ì¼±
+            // ì¹´ë©”ë¼ì— ê°€ì¥ ê°€ê¹Œìš´(ê±°ë¦¬ ê°€ì¥ ì‘ì€) Plantë¥¼ ìš°ì„ 
             float bestDist = float.PositiveInfinity;
             Plant best = null;
 
@@ -303,7 +303,7 @@ public class PlacementController : MonoBehaviour
             if (best != null) return best;
         }
 
-        // ¨è (¹é¾÷) ±×¸®µå ±â¹İ: ÇØ´ç Å¸ÀÏ¿¡ ½Ä¹°ÀÌ ÀÖÀ¸¸é ¹İÈ¯
+        // â‘¡ (ë°±ì—…) ê·¸ë¦¬ë“œ ê¸°ë°˜: í•´ë‹¹ íƒ€ì¼ì— ì‹ë¬¼ì´ ìˆìœ¼ë©´ ë°˜í™˜
         int? idx = grid.GetGridIndexFromPosition(Input.mousePosition);
         if (idx.HasValue)
         {
@@ -311,7 +311,7 @@ public class PlacementController : MonoBehaviour
             if (p) return p;
         }
 
-        // ¨é (¹é¾÷) 2D °æ·Î: È¥ÇÕ ¾À¿¡¼­ 2D Äİ¶óÀÌ´õµµ ÀÖ´Â °æ¿ì
+        // â‘¢ (ë°±ì—…) 2D ê²½ë¡œ: í˜¼í•© ì”¬ì—ì„œ 2D ì½œë¼ì´ë”ë„ ìˆëŠ” ê²½ìš°
         Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
         world.z = 0f;
         Vector2 p2 = new Vector2(world.x, world.y);
@@ -337,13 +337,13 @@ public class PlacementController : MonoBehaviour
     private void Hover(Plant p)
     {
         if (hovered == p) return;
-        // ÀÌÀü ÇÏÀÌ¶óÀÌÆ® ÇØÁ¦
+        // ì´ì „ í•˜ì´ë¼ì´íŠ¸ í•´ì œ
         if (hovered != null)
         {
             try { hovered.MakeDefaultSprite(); } catch { }
         }
         hovered = p;
-        // »õ ÇÏÀÌ¶óÀÌÆ®
+        // ìƒˆ í•˜ì´ë¼ì´íŠ¸
         if (hovered != null)
         {
             try { hovered.MakeSelectedSprite(); } catch { }

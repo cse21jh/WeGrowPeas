@@ -8,20 +8,20 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Image thumbnail;
     [SerializeField] private TextMeshProUGUI title;
     [SerializeField] private TextMeshProUGUI reward;
-    [SerializeField] private TextMeshProUGUI progress; //ÅØ½ºÆ® ¸»°í ´Ù¸¥ °É·Î ´ëÃ¼µÉ ¼öµµ
+    [SerializeField] private TextMeshProUGUI progress; //í…ìŠ¤íŠ¸ ë§ê³  ë‹¤ë¥¸ ê±¸ë¡œ ëŒ€ì²´ë  ìˆ˜ë„
 
     private RequestInstance RI;
     private RequestUI owner;
 
     public void Set(RequestInstance request, RequestUI ownerUI)
     {
-        //Äù½ºÆ® ³»¿ë¿¡ µû¶ó UI¸¦ set ÇÏ´Â ÇÔ¼ö
+        //í€˜ìŠ¤íŠ¸ ë‚´ìš©ì— ë”°ë¼ UIë¥¼ set í•˜ëŠ” í•¨ìˆ˜
 
         RI = request;
         owner = ownerUI;
 
         title.text = request.GetTitleText();
-        reward.text = "º¸»ó - " + request.Data.reward + "°ñµå";
+        reward.text = "ë³´ìƒ - " + request.Data.reward + "ê³¨ë“œ";
         progress.text = request.GetProgressText();
     }
 
