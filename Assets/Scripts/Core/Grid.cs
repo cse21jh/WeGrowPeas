@@ -73,6 +73,8 @@ public class Grid : MonoBehaviour
 
     protected float additionalPeanutCopyProbability = 0f;
     protected int additionalPeanutGold = 0;
+    protected int additionalPeaGold = 0;
+    protected float additionalPeaGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
 
     protected float additionalPestResistance = 0f;
 
@@ -94,6 +96,8 @@ public class Grid : MonoBehaviour
     public int AdditionalBugGold => additionalBugGold;
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
     public int AdditionalPeanutGold => additionalPeanutGold;
+    public int AdditionalPeaGold => additionalPeaGold;
+    public float AdditionalPeaGoldMultiplier => additionalPeaGoldMultiplier;
     public float AdditionalPestResistance => additionalPestResistance;
     public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
@@ -820,6 +824,8 @@ public class Grid : MonoBehaviour
 
         additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability;
         additionalPeanutGold = saveData.additionalPeanutGold;
+        additionalPeaGold = saveData.additionalPeaGold;
+        additionalPeaGoldMultiplier = saveData.additionalPeaGoldMultiplier;
 
         additionalPestResistance = saveData.additionalPestResistance;
 
@@ -870,6 +876,26 @@ public class Grid : MonoBehaviour
     public int GetAdditionalPeanutGold()
     {
         return additionalPeanutGold;
+    }
+
+    public void AddAdditionalPeaGold(int value)
+    {
+        additionalPeaGold += value;
+    }
+
+    public int GetAdditionalPeaGold()
+    {
+        return additionalPeaGold;
+    }
+
+    public void AddAdditionalPeaGoldMultiplier(float value)
+    {
+        additionalPeaGoldMultiplier += value;
+    }
+
+    public float GetAdditionalPeaGoldMultiplier()
+    {
+        return additionalPeaGoldMultiplier;
     }
 
     public void AddAdditionalPeanutCopyProbability(float value)

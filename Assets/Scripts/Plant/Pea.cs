@@ -11,7 +11,7 @@ public class Pea : MovablePlant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "¿ÏµÎÄá";
+        speciesname = "ï¿½Ïµï¿½ï¿½ï¿½";
         base.Init(gridIndex, grid);
         plantID = 0;
     }
@@ -54,13 +54,13 @@ public class Pea : MovablePlant
                 completeResistances[trait] = 0.5f;
         }
 
-        // ÀúÇ×·Â °è»ê ¹× »ðÀÔ ÇÊ¿ä. Áö±ÝÀº ·¯ÇÁÇÏ°Ô ¿­¼º ¸¸Á·ÇÏ¸é 0.9 ÀúÇ×·Â °¡Áöµµ·Ï
+        // ï¿½ï¿½ï¿½×·ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ 0.9 ï¿½ï¿½ï¿½×·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
 
     public override void InitializeIncompleteTrait(Dictionary<IncompleteTraitType, float> parent1, Dictionary<IncompleteTraitType, float> parent2)
     {
         base.InitializeIncompleteTrait(parent1, parent2);
-        // ÀúÇ×·Â °è»ê ¹× »ðÀÔ ÇÊ¿ä
+        // ï¿½ï¿½ï¿½×·ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½
     }*/
 
     public override bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
@@ -107,7 +107,7 @@ public class Pea : MovablePlant
 
     public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
-        if ((int)traitType >= (int)TraitType.HeavyRain) // ´ëÀÀ ÇüÁúÀÌ ÀÖ´Â °æ¿ì, 1°³¸é ÀúÇ×·Â 60
+        if ((int)traitType >= (int)TraitType.HeavyRain) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½, 1ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×·ï¿½ 60
         {
             switch (genetics)
             {
@@ -130,15 +130,16 @@ public class Pea : MovablePlant
 
     public override int GetSellingPrice()
     {
+        float multiplier = grid.GetAdditionalPeaGoldMultiplier();
         switch (taste)
         {
-            case 0: return (int)(90 * (1f + (0.2f * GetResistWaveCount())));
-            case 1: return (int)(130 * (1f + (0.2f * GetResistWaveCount())));
-            case 2: return (int)(160 * (1f + (0.2f * GetResistWaveCount())));
-            case 3: return (int)(180 * (1f + (0.2f * GetResistWaveCount())));
-            case 4: return (int)(200 * (1f + (0.2f * GetResistWaveCount())));
-            case 5: return (int)(230 * (1f + (0.2f * GetResistWaveCount())));
-            case 6: return (int)(270 * (1f + (0.2f * GetResistWaveCount())));
+            case 0: return (int)((90 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 1: return (int)((130 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 2: return (int)((160 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 3: return (int)((180 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 4: return (int)((200 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 5: return (int)((230 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 6: return (int)((270 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
         }
         return 0;
     }

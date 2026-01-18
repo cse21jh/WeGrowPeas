@@ -35,6 +35,8 @@ public class SaveData
 
     public float additionalPeanutCopyProbability;
     public int additionalPeanutGold;
+    public int additionalPeaGold;
+    public float additionalPeaGoldMultiplier;
 
     public float additionalPestResistance;
 
@@ -91,8 +93,8 @@ public class SaveData
     //GameStartType
     public GameStartType gst = GameStartType.None;
 
-    //È¯°æ¼³Á¤ ³»¿ë
-    //GameRecordHolder¿¡ ÀúÀåµÉ ³»¿ë
+    //È¯ï¿½æ¼³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //GameRecordHolderï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 }
 
 [System.Serializable]
@@ -138,7 +140,7 @@ public class GameManager : Singleton<GameManager>
         switch (GameStartContext.StartType)
         {
             case GameStartType.NewGame:
-                Debug.Log("»õ °ÔÀÓ");
+                Debug.Log("ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
                 grid.InitGrid();
                 economyManager.InitEconomyManager();
                 PlayerRecordForGraph.ClearAll();
@@ -146,12 +148,12 @@ public class GameManager : Singleton<GameManager>
                 break;
 
             case GameStartType.ContinueGame:
-                Debug.Log("ÀÌ¾îÇÏ±â");
+                Debug.Log("ï¿½Ì¾ï¿½ï¿½Ï±ï¿½");
                 LoadGame();
                 break;
 
             case GameStartType.ContinueAfterEnding:
-                Debug.Log("40ÀÏ ¿£µù º¸°í ÀÌ¾îÇÏ±â");
+                Debug.Log("40ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¾ï¿½ï¿½Ï±ï¿½");
                 LoadGame();
                 stage++;
                 break;
@@ -256,7 +258,7 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator GameOver()
     {
-        //Debug.Log("°ÔÀÓ¿À¹ö");
+        //Debug.Log("ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½");
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
         economyManager.PushEarnedGold();
         yield return new WaitForSeconds(1.0f);
@@ -279,7 +281,7 @@ public class GameManager : Singleton<GameManager>
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.ContinueAfterEnding);
         SaveGame();
-        Debug.Log("40ÀÏ µ¿¾È »ýÁ¸ÇÏ¿´½À´Ï´Ù. YEAH!");
+        Debug.Log("40ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½. YEAH!");
         while(true)
             yield return null;
     }
@@ -300,7 +302,7 @@ public class GameManager : Singleton<GameManager>
         modManager.LoadModManager(saveData);
         requestManager.LoadRequestManager(saveData);
         PlayerRecordForGraph.SetDataFromLoad(saveData);
-        Debug.Log("ºÒ·¯¿È");
+        Debug.Log("ï¿½Ò·ï¿½ï¿½ï¿½");
     }
 
     private void SaveGame()
@@ -340,6 +342,8 @@ public class GameManager : Singleton<GameManager>
         saveData.additionalBugGold = grid.AdditionalBugGold;
 
         saveData.additionalPeanutGold = grid.AdditionalPeanutGold;
+        saveData.additionalPeaGold = grid.AdditionalPeaGold;
+        saveData.additionalPeaGoldMultiplier = grid.AdditionalPeaGoldMultiplier;
         saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability;
 
         saveData.additionalPestResistance = grid.AdditionalPestResistance;
@@ -411,7 +415,7 @@ public class GameManager : Singleton<GameManager>
 
         GameStartContext.SetStartType(GameStartType.ContinueGame);
 
-        Debug.Log("ÀúÀåµÊ");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½");
     }
 
     private string GetSavePath()
