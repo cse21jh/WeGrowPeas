@@ -31,6 +31,9 @@ public class SaveData
     public float bugSpeedDecreasement;
     public float bugSpawnIntervalIncreasement;
     public float ladybugSpawnProbability;
+    public int maxLadybugCount;
+    public int additionalLadybugGoldPerUnit;
+    public float additionalLadybugResistancePerUnit;
     public int additionalBugGold;
 
     public float additionalPeanutCopyProbability;
@@ -253,6 +256,17 @@ public class GameManager : Singleton<GameManager>
         }
         for (int i = 0; i < peanutList.Count; i++)
             peanutList[i].TrySpawnCopy();
+        
+        // 무당벌레당 골드 지급 (웨이브 종료 시)
+        if (grid != null && grid.AdditionalLadybugGoldPerUnit > 0 && grid.ladybugs != null)
+        {
+            int ladybugGold = grid.ladybugs.Count * grid.AdditionalLadybugGoldPerUnit;
+            if (ladybugGold > 0)
+            {
+                economyManager.AddGold(ladybugGold);
+            }
+        }
+        
         yield return null;
     }
 
@@ -339,6 +353,9 @@ public class GameManager : Singleton<GameManager>
         saveData.bugSpeedDecreasement = grid.BugSpeedDecreasement;
         saveData.bugSpawnIntervalIncreasement = grid.BugSpawnIntervalIncreasement;
         saveData.ladybugSpawnProbability = grid.LadybugSpawnProbability;
+        saveData.maxLadybugCount = grid.MaxLadybugCount;
+        saveData.additionalLadybugGoldPerUnit = grid.AdditionalLadybugGoldPerUnit;
+        saveData.additionalLadybugResistancePerUnit = grid.AdditionalLadybugResistancePerUnit;
         saveData.additionalBugGold = grid.AdditionalBugGold;
 
         saveData.additionalPeanutGold = grid.AdditionalPeanutGold;

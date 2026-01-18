@@ -69,6 +69,9 @@ public class Grid : MonoBehaviour
     protected float bugSpeedDecreasement = 0f;
     protected float bugSpawnIntervalIncreasement = 0f;
     protected float ladybugSpawnProbability = 0f;
+    protected int maxLadybugCount = 0; // 최대 무당벌레 수 (0 = 무제한)
+    protected int additionalLadybugGoldPerUnit = 0; // 무당벌레당 골드 (웨이브 종료 시)
+    protected float additionalLadybugResistancePerUnit = 0f; // 무당벌레당 저항력 증가
     protected int additionalBugGold = 0;
 
     protected float additionalPeanutCopyProbability = 0f;
@@ -93,6 +96,9 @@ public class Grid : MonoBehaviour
     public float BugSpeedDecreasement => bugSpeedDecreasement;
     public float BugSpawnIntervalIncreasement => bugSpawnIntervalIncreasement;
     public float LadybugSpawnProbability => ladybugSpawnProbability;
+    public int MaxLadybugCount => maxLadybugCount;
+    public int AdditionalLadybugGoldPerUnit => additionalLadybugGoldPerUnit;
+    public float AdditionalLadybugResistancePerUnit => additionalLadybugResistancePerUnit;
     public int AdditionalBugGold => additionalBugGold;
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
     public int AdditionalPeanutGold => additionalPeanutGold;
@@ -681,6 +687,14 @@ public class Grid : MonoBehaviour
             return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
+            // 최대 무당벌레 수 제한 확인
+            if (maxLadybugCount > 0 && ladybugs.Count >= maxLadybugCount)
+            {
+                // 최대 수에 도달했으므로 일반 벌레 스폰
+                int bugIndex = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count));
+                Instantiate(bugPrefabs[bugIndex]);
+                return;
+            }
             Instantiate(ladybugPrefabs);
             return;
         }
@@ -820,6 +834,9 @@ public class Grid : MonoBehaviour
         bugSpeedDecreasement = saveData.bugSpeedDecreasement;
         bugSpawnIntervalIncreasement = saveData.bugSpawnIntervalIncreasement;
         ladybugSpawnProbability = saveData.ladybugSpawnProbability;
+        maxLadybugCount = saveData.maxLadybugCount;
+        additionalLadybugGoldPerUnit = saveData.additionalLadybugGoldPerUnit;
+        additionalLadybugResistancePerUnit = saveData.additionalLadybugResistancePerUnit;
         additionalBugGold = saveData.additionalBugGold;
 
         additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability;
@@ -857,6 +874,21 @@ public class Grid : MonoBehaviour
     public void AddLadybugSpawnProbability(float value)
     {
         ladybugSpawnProbability += value;
+    }
+
+    public void AddMaxLadybugCount(int value)
+    {
+        maxLadybugCount += value;
+    }
+
+    public void AddAdditionalLadybugGoldPerUnit(int value)
+    {
+        additionalLadybugGoldPerUnit += value;
+    }
+
+    public void AddAdditionalLadybugResistancePerUnit(float value)
+    {
+        additionalLadybugResistancePerUnit += value;
     }
 
     public void AddAdditionalBugGold(int value)

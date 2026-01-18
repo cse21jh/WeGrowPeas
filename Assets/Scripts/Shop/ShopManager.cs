@@ -7,12 +7,44 @@ public class ShopManager : Singleton<ShopManager>
 {
     [Header("Inventory (Serialized here)")]
     [SerializeField] private ItemData[] fixedItems = new ItemData[4];  // 상단 고정 4종
-    [SerializeField] private List<ItemData> rotationPool = new(); // 하단 로테이션 풀
+    [SerializeField] private List<ItemData> rotationPool = new(); // 하단 로테이션 풀 (자동으로 Rotation 폴더에서 로드됨)
     [SerializeField] private int rotationCount = 4;                    // 하단 슬롯 개수
 
     // itemId → 구매 개수
     private Dictionary<string, int> purchaseHistory = new Dictionary<string, int>();
     public Dictionary<string, int> PurchaseHistory => purchaseHistory;
+
+    void Awake()
+    {
+        LoadRotationItems();
+    }
+
+    /// <summary>
+    /// Resources/Data/Item Data/Rotation 폴더에서 모든 ItemData를 자동으로 로드하여 rotationPool에 추가합니다.
+    /// rotationPool이 비어있을 때만 자동으로 로드합니다.
+    /// </summary>
+    private void LoadRotationItems()
+    {
+        // rotationPool이 이미 설정되어 있으면 자동 로드하지 않음
+        if (rotationPool != null && rotationPool.Count > 0)
+        {
+            return;
+        }
+
+        // Resources 폴더 기준 상대 경로로 모든 ItemData 로드
+        ItemData[] items = Resources.LoadAll<ItemData>("Data/Item Data/Rotation");
+        
+        if (items != null && items.Length > 0)
+        {
+            rotationPool.Clear(); // 명확성을 위해 비움 (이미 비어있지만)
+            rotationPool.AddRange(items);
+            Debug.Log($"Rotation 아이템 {items.Length}개 자동 로드 완료");
+        }
+        else
+        {
+            Debug.LogWarning("Rotation 폴더에서 아이템을 찾을 수 없습니다. 경로를 확인해주세요: Resources/Data/Item Data/Rotation");
+        }
+    }
 
     public class ShopInventory
     {

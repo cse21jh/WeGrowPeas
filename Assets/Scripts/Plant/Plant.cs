@@ -164,6 +164,11 @@ public abstract class Plant : MonoBehaviour
                 }
                 if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
                     resistance += 0.2f;
+                // 무당벌레당 저항력 증가 (모든 형질에 적용)
+                if (grid != null && grid.ladybugs != null)
+                {
+                    resistance += grid.ladybugs.Count * grid.AdditionalLadybugResistancePerUnit;
+                }
                 resistance += g.resistance + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
                 return resistance = resistance >= 1f ? 1f : resistance;
             }
