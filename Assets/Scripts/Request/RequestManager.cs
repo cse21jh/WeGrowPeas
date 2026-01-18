@@ -10,6 +10,7 @@ public class RequestInstanceSaveData
     public string typeCode;
     public int progressCount; // 진행도 관련
     public int state;
+    public List<string> extraStrings;
 }
 
 public class RequestManager : Singleton<RequestManager>
@@ -104,9 +105,9 @@ public class RequestManager : Singleton<RequestManager>
         {
             //"000" => new KillBugRequest(data),
             //"001" => new PeaBreedingRequest(data),
-            "002" => new PeaSurviveRequest(data),
+            //"002" => new PeaSurviveRequest(data),
             //"003" => new NoSellPeaRequest(data),
-            //"004" => new BuyMerchRequest(data),
+            "004" => new BuyMerchRequest(data),
             //"005" => new SpendGoldRequest(data),
             //"006" => new SellSpecificPeaRequest(data),
 
