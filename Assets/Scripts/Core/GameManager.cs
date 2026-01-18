@@ -243,6 +243,8 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(BreedEndRoutine());
 
+        GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check
+
         yield return StartCoroutine(phoneManager.PhonePhase());
         /*
         if (!enemyController.IsLastWaveNone())

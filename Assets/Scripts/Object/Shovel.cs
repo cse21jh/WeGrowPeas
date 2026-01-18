@@ -114,6 +114,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 {
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
+                    GameEvents.RaisePeaSold();
                 }
                 return;
             }

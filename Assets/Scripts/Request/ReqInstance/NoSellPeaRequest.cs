@@ -1,15 +1,12 @@
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using UnityEngine;
 
-public class BuyMerchRequest : RequestInstance
+public class NoSellPeaRequest : RequestInstance
 {
     private int requiredCount;
     private int currentCount;
-    private HashSet<string> boughtItems = new HashSet<string>();
+    private bool isPeaSoldToday;
 
-    public BuyMerchRequest(RequestScriptable data) : base(data)
+    public NoSellPeaRequest(RequestScriptable data) : base(data)
     {
         requiredCount = SetDifficulty(data.requestId);
     }
@@ -18,15 +15,17 @@ public class BuyMerchRequest : RequestInstance
     {
         base.Start();
         currentCount = 0;
-        boughtItems.Clear();
+        isPeaSoldToday = false;
 
-        GameEvents.OnShopBought += HandleMerchBought;
+        GameEvents.OnDayPassedForRequest += HandleDayPassed;
+        GameEvents.OnPeaSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnShopBought -= HandleMerchBought;
+        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
+        GameEvents.OnPeaSold -= HandlePeaSold;
     }
 
     public override string GetProgressText()
@@ -34,18 +33,29 @@ public class BuyMerchRequest : RequestInstance
         return currentCount + "/" + requiredCount;
     }
 
-    private void HandleMerchBought(ItemData item)
+    private void HandleDayPassed()
     {
-        if (IsCompleted || IsFailed) return;
+        if (State != RequestState.InProgress) return;
 
-        bool isNewItem = boughtItems.Add(item.name);
-
-        if (!isNewItem) return;
-
-        currentCount = boughtItems.Count;
+        if (isPeaSoldToday)
+        {
+            isPeaSoldToday = false;
+            return;
+        }
+        else currentCount++;
 
         if (currentCount == requiredCount) CompleteOnce();
         else RaiseChanged();
+    }
+
+    private void HandlePeaSold()
+    {
+        if (IsCompleted || IsFailed) return;
+
+        currentCount = 0;
+        isPeaSoldToday = true;
+
+        RaiseChanged();
     }
 
     private int SetDifficulty(string requestId)
@@ -56,9 +66,9 @@ public class BuyMerchRequest : RequestInstance
 
         return difficulty switch
         {
-            1 => 5,
-            2 => 8,
-            3 => 11,
+            1 => 2,
+            2 => 3,
+            3 => 4,
             _ => 100,
         };
     }
@@ -71,7 +81,6 @@ public class BuyMerchRequest : RequestInstance
             typeCode = Data.requestId.Substring(0, 3),
             progressCount = currentCount,
             state = (int)State,
-            extraStrings = boughtItems.ToList(),
         };
     }
 
@@ -79,12 +88,7 @@ public class BuyMerchRequest : RequestInstance
     {
         currentCount = data.progressCount;
         State = (RequestState)data.state;
-
-        boughtItems.Clear();
-        if(data.extraStrings != null)
-        {
-            foreach (var names in data.extraStrings) boughtItems.Add(names);
-        }
+        isPeaSoldToday = false;
 
         RaiseChanged();
     }
