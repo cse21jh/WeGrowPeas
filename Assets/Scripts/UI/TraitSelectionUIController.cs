@@ -190,6 +190,7 @@ public class TraitSelectionUIController : MonoBehaviour
 
     /// <summary>
     /// 단일 선택 형질 버튼들을 생성합니다.
+    /// 일반 완두콩은 추위/더위, 폭우/가뭄을 쌍으로 표시합니다.
     /// </summary>
     private void CreateSingleTraitButtons()
     {
@@ -202,6 +203,9 @@ public class TraitSelectionUIController : MonoBehaviour
         // 현재 스테이지 가져오기
         int currentStage = GameManager.Instance != null ? GameManager.Instance.stage : 0;
 
+        // 이미 추가된 쌍 형질을 추적 (중복 방지)
+        HashSet<TraitType> processedPairs = new HashSet<TraitType>();
+
         // 모든 형질 타입에 대한 버튼 생성 (None 제외, 해금된 것만)
         foreach (TraitType traitType in System.Enum.GetValues(typeof(TraitType)))
         {
@@ -210,24 +214,84 @@ public class TraitSelectionUIController : MonoBehaviour
             // 해금 여부 확인
             if (!IsTraitUnlocked(traitType, currentStage)) continue;
             
-            var btnObj = Instantiate(traitButtonPrefab, traitButtonParent);
-            var btn = btnObj.GetComponent<Button>();
-            var btnText = btnObj.GetComponentInChildren<TMP_Text>();
+            // 쌍 형질 처리 (추위/더위, 폭우/가뭄)
+            if (traitType == TraitType.Cold || traitType == TraitType.Heat)
+            {
+                // 이미 처리했으면 스킵
+                if (processedPairs.Contains(TraitType.Cold) || processedPairs.Contains(TraitType.Heat))
+                    continue;
+                
+                processedPairs.Add(TraitType.Cold);
+                processedPairs.Add(TraitType.Heat);
+                
+                var btnObj = Instantiate(traitButtonPrefab, traitButtonParent);
+                var btn = btnObj.GetComponent<Button>();
+                var btnText = btnObj.GetComponentInChildren<TMP_Text>();
+                
+                if (btnText != null)
+                    btnText.text = "추위/더위";
+                
+                if (btn != null)
+                {
+                    btn.onClick.AddListener(() => {
+                        SelectPairedTrait(TraitType.Cold, TraitType.Heat);
+                        UpdateAllTraitButtonVisuals();
+                    });
+                    
+                    // Cold를 키로 사용 (시각적 업데이트용)
+                    traitButtons[TraitType.Cold] = btn;
+                }
+                continue;
+            }
             
-            if (btnText != null)
-                btnText.text = GetTraitDisplayName(traitType);
+            if (traitType == TraitType.HeavyRain || traitType == TraitType.Drought)
+            {
+                // 이미 처리했으면 스킵
+                if (processedPairs.Contains(TraitType.HeavyRain) || processedPairs.Contains(TraitType.Drought))
+                    continue;
+                
+                processedPairs.Add(TraitType.HeavyRain);
+                processedPairs.Add(TraitType.Drought);
+                
+                var btnObj = Instantiate(traitButtonPrefab, traitButtonParent);
+                var btn = btnObj.GetComponent<Button>();
+                var btnText = btnObj.GetComponentInChildren<TMP_Text>();
+                
+                if (btnText != null)
+                    btnText.text = "폭우/가뭄";
+                
+                if (btn != null)
+                {
+                    btn.onClick.AddListener(() => {
+                        SelectPairedTrait(TraitType.HeavyRain, TraitType.Drought);
+                        UpdateAllTraitButtonVisuals();
+                    });
+                    
+                    // HeavyRain을 키로 사용 (시각적 업데이트용)
+                    traitButtons[TraitType.HeavyRain] = btn;
+                }
+                continue;
+            }
             
-            if (btn != null)
+            // 일반 형질 (NaturalDeath, Pest, Wind, Flood)
+            var btnObj2 = Instantiate(traitButtonPrefab, traitButtonParent);
+            var btn2 = btnObj2.GetComponent<Button>();
+            var btnText2 = btnObj2.GetComponentInChildren<TMP_Text>();
+            
+            if (btnText2 != null)
+                btnText2.text = GetTraitDisplayName(traitType);
+            
+            if (btn2 != null)
             {
                 // 단일 선택 버튼으로 동작
                 TraitType currentTrait = traitType; // 클로저를 위한 로컬 변수
                 
-                btn.onClick.AddListener(() => {
+                btn2.onClick.AddListener(() => {
                     SelectSingleTrait(currentTrait);
                     UpdateAllTraitButtonVisuals();
                 });
                 
-                traitButtons[currentTrait] = btn;
+                traitButtons[currentTrait] = btn2;
             }
         }
     }
@@ -296,16 +360,53 @@ public class TraitSelectionUIController : MonoBehaviour
     }
 
     /// <summary>
+    /// 쌍 형질을 선택합니다 (추위/더위, 폭우/가뭄).
+    /// </summary>
+    private void SelectPairedTrait(TraitType traitA, TraitType traitB)
+    {
+        selectedTraits.Clear();
+        // 기본 저항력 0.5f, 유전자 0으로 둘 다 추가
+        selectedTraits.Add(new GeneticTrait(traitA, 0.5f, 0, 0.0f));
+        selectedTraits.Add(new GeneticTrait(traitB, 0.5f, 0, 0.0f));
+        
+        if (confirmButton != null)
+            confirmButton.interactable = true; // 선택 후 확인 버튼 활성화
+    }
+
+    /// <summary>
     /// 모든 형질 버튼의 시각적 상태를 업데이트합니다 (단일 선택용).
     /// </summary>
     private void UpdateAllTraitButtonVisuals()
     {
         if (selectedTraits.Count == 0) return;
         
-        TraitType selectedTraitType = selectedTraits[0].traitType;
+        // 선택된 형질 타입들 추출
+        HashSet<TraitType> selectedTypes = new HashSet<TraitType>();
+        foreach (var trait in selectedTraits)
+        {
+            selectedTypes.Add(trait.traitType);
+        }
+        
         foreach (var kvp in traitButtons)
         {
-            UpdateButtonVisual(kvp.Value, kvp.Key == selectedTraitType);
+            bool isSelected = false;
+            
+            // 쌍 형질 버튼 확인 (Cold 버튼은 Cold/Heat 둘 다 체크, HeavyRain 버튼은 HeavyRain/Drought 둘 다 체크)
+            if (kvp.Key == TraitType.Cold)
+            {
+                isSelected = selectedTypes.Contains(TraitType.Cold) || selectedTypes.Contains(TraitType.Heat);
+            }
+            else if (kvp.Key == TraitType.HeavyRain)
+            {
+                isSelected = selectedTypes.Contains(TraitType.HeavyRain) || selectedTypes.Contains(TraitType.Drought);
+            }
+            else
+            {
+                // 일반 형질은 정확히 일치하는지 확인
+                isSelected = selectedTypes.Contains(kvp.Key);
+            }
+            
+            UpdateButtonVisual(kvp.Value, isSelected);
         }
     }
 
