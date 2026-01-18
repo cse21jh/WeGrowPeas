@@ -130,6 +130,22 @@ public class Pea : MovablePlant
 
     public override int GetSellingPrice()
     {
+        if (grid == null)
+        {
+            // grid가 초기화되지 않은 경우 기본값 반환
+            switch (taste)
+            {
+                case 0: return 90;
+                case 1: return 130;
+                case 2: return 160;
+                case 3: return 180;
+                case 4: return 200;
+                case 5: return 230;
+                case 6: return 270;
+            }
+            return 0;
+        }
+
         float multiplier = grid.GetAdditionalPeaGoldMultiplier();
         switch (taste)
         {

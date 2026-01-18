@@ -6,19 +6,35 @@ using System;
 public class ItemData_SignPost : ItemData
 {
     [Header("SignPost")]
-    public WaveType targetWave = WaveType.Wind;     // ÀÌ ÆÖ¸»ÀÌ ¾ïÁ¦ÇÒ ¿şÀÌºê
-    [Range(0f, 1f)] public float reducePercent = 0.75f; // 75% °¨¼Ò ¡æ x0.25
-    [Min(1)] public int durationDays = 4;           // ´ÙÀ½ 4ÀÏ°£
+    [Range(0f, 1f)] public float reducePercent = 0.75f; // 75% ê°ì†Œ -> x0.25
+    [Min(1)] public int durationDays = 5;           // ë‹¤ìŒ 5ì¼ê°„
 
     [Header("Shop Appear Rules")]
-    [Min(1)] public int unlockStageDay = 5;         // (stage+1) >= unlockStageDay ºÎÅÍ µîÀå
-    [Min(0)] public int rotationWeight = 2;         // ·ÎÅ×ÀÌ¼Ç µîÀå °¡ÁßÄ¡
+    [Min(1)] public int unlockStageDay = 5;         // ì›¨ì´ë¸Œë³„ í•´ê¸ˆ ì‹œê¸°
+    [Min(0)] public int rotationWeight = 2;         // ë¡œí…Œì´ì…˜ í’€ ê°€ì¤‘ì¹˜
 
-    // ·ÎÅ×ÀÌ¼Ç ÈÄº¸ ÇÊÅÍ (ÇØ±İ ½ÃÁ¡ Ã¼Å©)
+    private WaveType? pendingWave = null;
+
+    private void OnEnable()
+    {
+        FlowType = ShopFlowType.Instant;
+        IsStackable = false;
+        InitialStock = 1;
+        OnePerShopIfNotStackable = true;
+        MaxPurchaseCount = -1; // ìµœëŒ€ êµ¬ë§¤ ì œí•œ ì—†ìŒ
+
+        if (string.IsNullOrEmpty(DisplayName))
+            DisplayName = "íŒ»ë§";
+        if (string.IsNullOrEmpty(Description))
+            Description = "ë‹¤ìŒ 5ì¼ê°„ ì„ íƒí•œ ì›¨ì´ë¸Œê°€ ë‚˜íƒ€ë‚  í™•ë¥ ì„ í¬ê²Œ ê°ì†Œì‹œí‚µë‹ˆë‹¤.";
+        if (Price <= 0) Price = 500;
+    }
+
+    // ë¡œí…Œì´ì…˜ í’€ í•´ê¸ˆ ì¡°ê±´ (í•´ê¸ˆ ì‹œê¸° ì²´í¬)
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;      // ÄÁÅØ½ºÆ®¿¡ stage°¡ ¾øÀ¸´Ï Àü¿ª »ç¿ë
-        return (stage + 1) >= unlockStageDay;
+        int stage = GameManager.Instance.stage;      // ì»¨í…ìŠ¤íŠ¸ì˜ stageë¥¼ ì‚¬ìš©í•´ì•¼ í•  ìˆ˜ë„ ìˆìŒ
+        return stage >= unlockStageDay;
     }
 
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -26,44 +42,60 @@ public class ItemData_SignPost : ItemData
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         reason = null;
-        // Ãß°¡ Á¦¾àÀÌ ÀÖÀ¸¸é ¿©±â¼­ Ã¼Å©(¿¹: ÀÌ¹Ì °°Àº ¿şÀÌºê¿¡ ÆÖ¸»ÀÌ °úµµÇÏ°Ô °É·È´ÂÁö µî)
+        // ì¶”ê°€ ê²€ì¦ì´ í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ ì²´í¬(ì˜ˆ: ì´ë¯¸ í•´ë‹¹ ì›¨ì´ë¸Œì— íŒ»ë§ì´ ì„¤ì •ë˜ì–´ ìˆëŠ”ì§€ ë“±)
         return true;
     }
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
-        // Áï½ÃÇüÀÌ¶ó ÁØºñ °úÁ¤ ¾øÀ½
-        onReady?.Invoke();
+        // í˜•ì§ˆ ì„ íƒ UIë¥¼ ì¬ì‚¬ìš©í•˜ì—¬ ì›¨ì´ë¸Œ ì„ íƒ UI í‘œì‹œ
+        var selectionUI = FindAnyObjectByType<TraitSelectionUIController>();
+        if (selectionUI == null)
+        {
+            onError?.Invoke("ì›¨ì´ë¸Œ ì„ íƒ UIë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤");
+            return;
+        }
+
+        selectionUI.ShowWaveSelection(
+            onConfirm: (selectedWave) => {
+                pendingWave = selectedWave;
+                onReady?.Invoke(); // ì›¨ì´ë¸Œ ì„ íƒ í›„ ì¦‰ì‹œ ì ìš©
+            },
+            onCancel: () => {
+                pendingWave = null;
+                onError?.Invoke("êµ¬ë§¤ ì·¨ì†Œ");
+            },
+            title: "íŒ»ë§: ì›¨ì´ë¸Œë¥¼ ì„ íƒí•˜ì„¸ìš”"
+        );
     }
 
     public override void Commit(ShopContext ctx)
     {
+        if (!pendingWave.HasValue)
+        {
+            Debug.LogError("[SignPost] Selected wave is null.");
+            return;
+        }
+
         ModManager.Instance.AddTimedMultiplier(
             StatId.WaveWeightMul,
-            (int)targetWave,                 // ¾î¶² ¿şÀÌºê¸¦ ´­·¯ÁÙÁö
-            1f - reducePercent,             // 75% °¨¼Ò -> multiplier 0.25f
-            durationDays,                   // ±âº» 4ÀÏ µî
-            $"SignPost_{targetWave}"        // ÃßÀû¿ë ÅÂ±×
+            (int)pendingWave.Value,                 // ì–´ë–¤ ì›¨ì´ë¸Œë¥¼ ê°ì†Œì‹œí‚¬ì§€
+            1f - reducePercent,             // 75% ê°ì†Œ -> multiplier 0.25f
+            durationDays,                   // ë‹¤ìŒ 5ì¼ê°„
+            $"SignPost_{pendingWave.Value}"        // ëª¨ë“œ ì†ŒìŠ¤ íƒœê·¸
         );
-        ctx.ShowInfo?.Invoke($"{DisplayName} »ç¿ë ¡æ {targetWave} {durationDays}ÀÏ°£ {(int)(reducePercent * 100)}% °¨¼Ò");
+        ctx.ShowInfo?.Invoke($"{DisplayName} ì ìš©: {pendingWave.Value} {durationDays}ì¼ê°„ {(int)(reducePercent * 100)}% ê°ì†Œ");
+        pendingWave = null;
     }
 
-    public override void Cancel(ShopContext ctx) { /* Áï½ÃÇü: Ãë¼Ò ¾øÀ½ */ }
+    public override void Cancel(ShopContext ctx) 
+    { 
+        pendingWave = null;
+    }
 
-    // Áï½ÃÇüÀÌ¹Ç·Î ¹èÄ¡/¼±ÅÃÇü API´Â »ç¿ëÇÏÁö ¾ÊÁö¸¸, ¾ÈÀüÇÏ°Ô °ÅºÎ¸¸ ÇØµÒ
+    // Instant íƒ€ì…ì´ë¯€ë¡œ ìœ„ì¹˜/ëŒ€ìƒ APIëŠ” ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
     public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason) { reason = null; return false; }
     public override void SetPlacedPosition(Vector3 worldPos) { }
     public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason) { reason = null; return false; }
     public override void SetSelectedPlant(Plant plant) { }
-
-    // ÀÎ½ºÆåÅÍ¿¡¼­ ½Ç¼ö ¹æÁö: Áï½ÃÇü/ºñ½ºÅÃ °­Á¦
-    private void OnValidate()
-    {
-        FlowType = ShopFlowType.Instant;
-        IsStackable = false;
-        if (string.IsNullOrEmpty(DisplayName))
-            DisplayName = $"ÆÖ¸»: {targetWave}";
-        if (Price <= 0)
-            Price = 1000;
-    }
 }

@@ -80,6 +80,8 @@ public class Grid : MonoBehaviour
     protected float nepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
 
     protected float weakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
+    protected float strongGeneticsResistanceBonus = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
+    protected float goldenGeneticsProbabilityBonus = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
 
     protected float additionalPeanutCopyProbability = 0f;
     protected int additionalPeanutGold = 0;
@@ -95,6 +97,14 @@ public class Grid : MonoBehaviour
 
     protected bool hasIceBlock = false;
     protected List<int> petBottleTiles = new List<int>();
+    protected Dictionary<int, int> petBottleBlockCount = new Dictionary<int, int>(); // 페트병 위치별 보호 횟수 (기본값 1, 재질 강화 시 증가)
+    protected int petBottleInitialStockBonus = 0; // 페트병 일일 최대 구매 횟수 보너스
+    protected int petBottlePriceReduction = 0; // 페트병 가격 감소량
+    protected float petBottleSpawnProbability = 0f; // 페트병 등장 확률 (rotation weight 증가로 구현)
+
+    protected int chiliPepperRangeLevel = 0; // 고추 영향 범위 레벨 (0: 가로 2칸, 1: 십자 4칸, 2: 대각선까지 8칸)
+    protected float chiliPepperSpawnProbability = 0f; // 고추 등장 확률 (rotation weight 증가로 구현)
+    protected float chiliPepperHealPercent = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
 
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
@@ -112,6 +122,8 @@ public class Grid : MonoBehaviour
     public float AdditionalNepenthesPheromoneSizeMultiplier => additionalNepenthesPheromoneSizeMultiplier;
     public float NepenthesSpawnProbability => nepenthesSpawnProbability;
     public float WeakGeneticsResistanceBonus => weakGeneticsResistanceBonus;
+    public float StrongGeneticsResistanceBonus => strongGeneticsResistanceBonus;
+    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
     public int AdditionalPeanutGold => additionalPeanutGold;
     public int AdditionalPeaGold => additionalPeaGold;
@@ -123,6 +135,13 @@ public class Grid : MonoBehaviour
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
     public bool HasIceBlock => hasIceBlock;
     public List<int> PetBottleTiles => petBottleTiles;
+    public int PetBottleInitialStockBonus => petBottleInitialStockBonus;
+    public int PetBottlePriceReduction => petBottlePriceReduction;
+    public float PetBottleSpawnProbability => petBottleSpawnProbability;
+    public int GetPetBottleBlockCountBonus() => petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0;
+    public int ChiliPepperRangeLevel => chiliPepperRangeLevel;
+    public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
+    public float ChiliPepperHealPercent => chiliPepperHealPercent;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -382,14 +401,22 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
+                case 1: 
+                    // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
+                    int p1Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
+                    childGenetic += (additionalInheritance + 50 + p1Bonus <= Random.Range(1, 101) ? 0 : 1); 
+                    break;
                 default: break;
             }
 
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: childGenetic += (additionalInheritance + 50 <= Random.Range(1, 101) ? 0 : 1); break;
+                case 1: 
+                    // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
+                    int p2Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
+                    childGenetic += (additionalInheritance + 50 + p2Bonus <= Random.Range(1, 101) ? 0 : 1); 
+                    break;
                 default: break;
             }
 
@@ -398,6 +425,12 @@ public class Grid : MonoBehaviour
             if (childGenetic != 0 && Mathf.Abs(resistance - 0.8f) > 0.01f)
             {
                 resistance += weakGeneticsResistanceBonus;
+                resistance = Mathf.Clamp(resistance, 0.1f, 1.0f);
+            }
+            // 강한 유전자 저항력 보너스 적용
+            if (childGenetic == 2 && Mathf.Abs(resistance - 0.8f) <= 0.01f)
+            {
+                resistance += strongGeneticsResistanceBonus;
                 resistance = Mathf.Clamp(resistance, 0.1f, 1.0f);
             }
 
@@ -447,6 +480,11 @@ public class Grid : MonoBehaviour
         {
             pea.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
         }
+        // 강한 유전자 저항력 보너스 적용
+        if (strongGeneticsResistanceBonus > 0f)
+        {
+            pea.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
+        }
         AddPlantToGrid(pea, grididx);
     }
 
@@ -459,6 +497,11 @@ public class Grid : MonoBehaviour
         if (weakGeneticsResistanceBonus > 0f)
         {
             peanut.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
+        }
+        // 강한 유전자 저항력 보너스 적용
+        if (strongGeneticsResistanceBonus > 0f)
+        {
+            peanut.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
         }
         AddPlantToGrid(peanut, grididx);
     }
@@ -871,6 +914,8 @@ public class Grid : MonoBehaviour
         additionalNepenthesPheromoneSizeMultiplier = saveData.additionalNepenthesPheromoneSizeMultiplier;
         nepenthesSpawnProbability = saveData.nepenthesSpawnProbability;
         weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
+        strongGeneticsResistanceBonus = saveData.strongGeneticsResistanceBonus;
+        goldenGeneticsProbabilityBonus = saveData.goldenGeneticsProbabilityBonus;
         
         // 네펜데스 페로몬 업데이트
         foreach (var plant in plantGrid.Values)
@@ -893,6 +938,23 @@ public class Grid : MonoBehaviour
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
         if (saveData.hasIceBlock) SetIceBlock();
+        
+        // 페트병 관련 변수 로드
+        petBottleInitialStockBonus = saveData.petBottleInitialStockBonus;
+        petBottlePriceReduction = saveData.petBottlePriceReduction;
+        petBottleSpawnProbability = saveData.petBottleSpawnProbability;
+        if (saveData.petBottleBlockCountBonus > 0)
+        {
+            if (!petBottleBlockCount.ContainsKey(-1))
+                petBottleBlockCount[-1] = 0;
+            petBottleBlockCount[-1] = saveData.petBottleBlockCountBonus;
+        }
+        
+        // 고추 관련 변수 로드
+        chiliPepperRangeLevel = saveData.chiliPepperRangeLevel;
+        chiliPepperSpawnProbability = saveData.chiliPepperSpawnProbability;
+        chiliPepperHealPercent = saveData.chiliPepperHealPercent;
+        
         foreach(var i in saveData.perBottleTiles)
             PlacePetBottle(i);
         for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
@@ -997,9 +1059,127 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public void AddStrongGeneticsResistanceBonus(float value)
+    {
+        strongGeneticsResistanceBonus += value;
+        // 기존 식물들에도 적용
+        ApplyStrongGeneticsResistanceBonusToExistingPlants(value);
+    }
+
+    private void ApplyStrongGeneticsResistanceBonusToExistingPlants(float bonus)
+    {
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++)
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                Plant plant = plantGrid[idx];
+                if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
+                {
+                    plant.IncreaseStrongGeneticsResistance(bonus);
+                }
+            }
+        }
+    }
+
+    public void AddGoldenGeneticsProbabilityBonus(float value)
+    {
+        goldenGeneticsProbabilityBonus += value;
+    }
+
     public void AddNepenthesSpawnProbability(float value)
     {
         nepenthesSpawnProbability += value;
+    }
+
+    public void AddPetBottleInitialStockBonus(int value)
+    {
+        petBottleInitialStockBonus += value;
+    }
+
+    public void AddPetBottlePriceReduction(int value)
+    {
+        petBottlePriceReduction += value;
+    }
+
+    public void AddPetBottleSpawnProbability(float value)
+    {
+        petBottleSpawnProbability += value;
+    }
+
+    public void AddPetBottleBlockCount(int value)
+    {
+        // 전체 페트병 보호 횟수 보너스 (새로 설치되는 페트병에 적용)
+        if (!petBottleBlockCount.ContainsKey(-1))
+            petBottleBlockCount[-1] = 0;
+        petBottleBlockCount[-1] += value;
+        
+        // 기존 페트병에도 보호 횟수 추가
+        foreach (var idx in petBottleTiles)
+        {
+            if (!petBottleBlockCount.ContainsKey(idx))
+                petBottleBlockCount[idx] = 0;
+            petBottleBlockCount[idx] += value;
+        }
+    }
+
+    public void AddChiliPepperRangeLevel(int value)
+    {
+        chiliPepperRangeLevel = Mathf.Min(2, chiliPepperRangeLevel + value); // 최대 2단계
+    }
+
+    public void AddChiliPepperSpawnProbability(float value)
+    {
+        chiliPepperSpawnProbability += value;
+    }
+
+    public void AddChiliPepperHealPercent(float value)
+    {
+        chiliPepperHealPercent += value;
+    }
+
+    /// <summary>
+    /// 고추 주변의 식물들을 반환합니다 (고추 제외)
+    /// </summary>
+    public List<Plant> GetPlantsNearChiliPepper(ChiliPepper chiliPepper)
+    {
+        List<Plant> nearbyPlants = new List<Plant>();
+        if (chiliPepper == null) return nearbyPlants;
+
+        int chiliIndex = chiliPepper.gridIndex;
+        int rangeLevel = chiliPepperRangeLevel;
+
+        // 0단계: 가로 2칸 (좌우)
+        CheckAndAddPlant(chiliIndex - 1, nearbyPlants);
+        CheckAndAddPlant(chiliIndex + 1, nearbyPlants);
+
+        // 1단계 이상: 십자 4칸 (상하 추가)
+        if (rangeLevel >= 1)
+        {
+            CheckAndAddPlant(chiliIndex - 4, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 4, nearbyPlants);
+        }
+
+        // 2단계: 대각선까지 8칸 (대각선 4칸 추가)
+        if (rangeLevel >= 2)
+        {
+            CheckAndAddPlant(chiliIndex - 5, nearbyPlants);
+            CheckAndAddPlant(chiliIndex - 3, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 3, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 5, nearbyPlants);
+        }
+
+        return nearbyPlants;
+    }
+
+    private void CheckAndAddPlant(int idx, List<Plant> list)
+    {
+        if (idx >= 0 && idx < maxCol * 4 && plantGrid.TryGetValue(idx, out Plant plant))
+        {
+            if (plant != null && !(plant is ChiliPepper))
+            {
+                list.Add(plant);
+            }
+        }
     }
 
     public int GetAdditionalBugGold()
@@ -1052,6 +1232,9 @@ public class Grid : MonoBehaviour
         if (petBottleTiles.Contains(idx)) return;
 
         petBottleTiles.Add(idx);
+        // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
+        int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
+        petBottleBlockCount[idx] = baseBlockCount;
 
         // 시각화(선택)
         if (petBottleMarkerPrefab != null)
@@ -1061,21 +1244,43 @@ public class Grid : MonoBehaviour
             petMarkers[idx] = marker;
         }
 
-        Debug.Log($"[Grid] 페트병 설치: idx={idx}");
+        Debug.Log($"[Grid] 페트병 설치: idx={idx}, 보호 횟수={baseBlockCount}");
     }
     public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
     {
         if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // 웨이브나 삽에 의해 제거될 때, 페트병이 있는 경우
         {
-            // 1회성 보호 → 소모
-            petBottleTiles.Remove(idx);
-
-            if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+            // 보호 횟수 확인
+            if (petBottleBlockCount.ContainsKey(idx) && petBottleBlockCount[idx] > 0)
             {
-                Destroy(marker);
-                petMarkers.Remove(idx);
+                petBottleBlockCount[idx]--;
+                if (petBottleBlockCount[idx] <= 0)
+                {
+                    // 보호 횟수 소진 → 페트병 제거
+                    petBottleTiles.Remove(idx);
+                    petBottleBlockCount.Remove(idx);
+
+                    if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+                    {
+                        Destroy(marker);
+                        petMarkers.Remove(idx);
+                    }
+                }
+                return true; // 보호 성공
             }
-            return true;
+            else
+            {
+                // 보호 횟수가 없으면 기존 로직대로 제거
+                petBottleTiles.Remove(idx);
+                petBottleBlockCount.Remove(idx);
+
+                if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
+                {
+                    Destroy(marker);
+                    petMarkers.Remove(idx);
+                }
+                return true;
+            }
         }
         
         if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우

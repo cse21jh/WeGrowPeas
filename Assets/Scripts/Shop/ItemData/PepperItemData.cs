@@ -1,17 +1,17 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (°íÃß)", fileName = "ChiliPepperItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (ï¿½ï¿½ï¿½ï¿½)", fileName = "ChiliPepperItemData")]
 public class ChiliPepperItemData : ItemData
 {
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4;
 
-    // ¹èÄ¡ È®Á¤ ½Ã »ç¿ëÇÒ ±×¸®µå ÀÎµ¦½º
+    // ï¿½ï¿½Ä¡ È®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
     private int? pendingIndex;
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "°íÃß";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ï¿½ï¿½ï¿½ï¿½";
         if (Price <= 0) Price = 1500;
 
         IsStackable = false;
@@ -22,25 +22,37 @@ public class ChiliPepperItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
+    public override int GetRotationWeight(ShopContext ctx)
+    {
+        // ê³ ì¶” ë“±ì¥ í™•ë¥  ì¦ê°€ ì ìš©
+        int baseWeight = rotationWeight;
+        if (ctx?.Grid != null)
+        {
+            float probabilityBonus = ctx.Grid.ChiliPepperSpawnProbability;
+            // í™•ë¥ ì„ ê°€ì¤‘ì¹˜ë¡œ ë³€í™˜ (ì˜ˆ: 0.02 = 2% -> ê°€ì¤‘ì¹˜ 2 ì¦ê°€)
+            int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
+            return baseWeight + weightBonus;
+        }
+        return baseWeight;
+    }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù (ShopContext.Grid ÁÖÀÔ ÇÊ¿ä)";
+            reason = "Grid ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ (ShopContext.Grid ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½)";
             return false;
         }
         if (!ctx.Grid.HasEmptyGrid())
         {
-            reason = "¼³Ä¡ÇÒ ¼ö ÀÖ´Â ºóÄ­ÀÌ ¾ø½À´Ï´Ù";
+            reason = "ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½Ä­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½";
             return false;
         }
         reason = null;
         return true;
     }
 
-    // ¹èÄ¡ ¸ğµå ÁøÀÔ: º°µµ ÁØºñ ¾øÀ½
+    // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ ï¿½ï¿½ï¿½ï¿½
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
     {
         onReady?.Invoke();
@@ -51,26 +63,26 @@ public class ChiliPepperItemData : ItemData
         reason = null;
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù";
+            reason = "Grid ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½";
             return false;
         }
 
-        // ½ºÅ©¸° ÁÂÇ¥ ¡æ ±×¸®µå ÀÎµ¦½º
+        // ï¿½ï¿½Å©ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
-            reason = "À¯È¿ÇÑ Åä¾çÀÌ ¾Æ´Õ´Ï´Ù";
+            reason = "ï¿½ï¿½È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Õ´Ï´ï¿½";
             return false;
         }
 
-        // ºó Ä­ÀÎÁö È®ÀÎ
+        // ï¿½ï¿½ Ä­ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "ÀÌ¹Ì ½Ä¹°ÀÌ ÀÖ´Â Ä­ÀÔ´Ï´Ù";
+            reason = "ï¿½Ì¹ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ Ä­ï¿½Ô´Ï´ï¿½";
             return false;
         }
 
-        // ¹®Á¦ ¾øÀ¸¸é È®Á¤ ÈÄº¸ ÀúÀå
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½
         pendingIndex = idx.Value;
         return true;
     }
@@ -80,16 +92,16 @@ public class ChiliPepperItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            ctx?.ShowError?.Invoke("Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù");
+            ctx?.ShowError?.Invoke("Grid ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
             return;
         }
         if (!pendingIndex.HasValue)
         {
-            ctx.ShowError?.Invoke("¹èÄ¡ À§Ä¡°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù");
+            ctx.ShowError?.Invoke("ï¿½ï¿½Ä¡ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½");
             return;
         }
 
-        // ½ÇÁ¦ ¹èÄ¡
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
         ctx.Grid.AddChiliPepper(pendingIndex.Value);
 
         pendingIndex = null;

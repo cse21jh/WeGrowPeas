@@ -40,6 +40,8 @@ public class SaveData
     public float additionalNepenthesPheromoneSizeMultiplier;
     public float nepenthesSpawnProbability;
     public float weakGeneticsResistanceBonus;
+    public float strongGeneticsResistanceBonus;
+    public float goldenGeneticsProbabilityBonus;
 
     public float additionalPeanutCopyProbability;
     public int additionalPeanutGold;
@@ -54,6 +56,14 @@ public class SaveData
     public int breedCount;
     public bool hasIceBlock;
     public List<int> perBottleTiles = new();
+    public int petBottleInitialStockBonus = 0;
+    public int petBottlePriceReduction = 0;
+    public float petBottleSpawnProbability = 0f;
+    public int petBottleBlockCountBonus = 0; // 페트병 보호 횟수 보너스 (전체)
+
+    public int chiliPepperRangeLevel = 0;
+    public float chiliPepperSpawnProbability = 0f;
+    public float chiliPepperHealPercent = 0f;
 
     public List<int> fertilizerColumns = new();
     public List<WaveType> fertilizerType = new();
@@ -271,6 +281,31 @@ public class GameManager : Singleton<GameManager>
                 economyManager.AddGold(ladybugGold);
             }
         }
+
+        // 치료형 캡사이신: 고추 주변 식물의 저항력 회복
+        if (grid != null && grid.ChiliPepperHealPercent > 0f)
+        {
+            foreach (var currentPlant in grid.plantGrid.Values)
+            {
+                if (currentPlant is ChiliPepper chiliPepper)
+                {
+                    var nearbyPlants = grid.GetPlantsNearChiliPepper(chiliPepper);
+                    foreach (var nearbyPlant in nearbyPlants)
+                    {
+                        // 모든 저항력을 회복 (구매 횟수 * 3%)
+                        var traits = nearbyPlant.GetGeneticTrait();
+                        for (int i = 0; i < traits.Count; i++)
+                        {
+                            float healAmount = grid.ChiliPepperHealPercent;
+                            float currentResistance = traits[i].resistance;
+                            float newResistance = Mathf.Clamp(currentResistance + healAmount, 0.1f, 1.0f);
+                            traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+                        }
+                        nearbyPlant.SetTrait(traits);
+                    }
+                }
+            }
+        }
         
         yield return null;
     }
@@ -367,6 +402,8 @@ public class GameManager : Singleton<GameManager>
         saveData.additionalNepenthesPheromoneSizeMultiplier = grid.AdditionalNepenthesPheromoneSizeMultiplier;
         saveData.nepenthesSpawnProbability = grid.NepenthesSpawnProbability;
         saveData.weakGeneticsResistanceBonus = grid.WeakGeneticsResistanceBonus;
+        saveData.strongGeneticsResistanceBonus = grid.StrongGeneticsResistanceBonus;
+        saveData.goldenGeneticsProbabilityBonus = grid.GoldenGeneticsProbabilityBonus;
 
         saveData.additionalPeanutGold = grid.AdditionalPeanutGold;
         saveData.additionalPeaGold = grid.AdditionalPeaGold;
@@ -381,6 +418,14 @@ public class GameManager : Singleton<GameManager>
 
         saveData.hasIceBlock = grid.HasIceBlock;
         saveData.perBottleTiles = grid.PetBottleTiles;
+        saveData.petBottleInitialStockBonus = grid.PetBottleInitialStockBonus;
+        saveData.petBottlePriceReduction = grid.PetBottlePriceReduction;
+        saveData.petBottleSpawnProbability = grid.PetBottleSpawnProbability;
+        // petBottleBlockCountBonus는 Grid에서 getter로 제공해야 함
+        saveData.petBottleBlockCountBonus = grid.GetPetBottleBlockCountBonus();
+        saveData.chiliPepperRangeLevel = grid.ChiliPepperRangeLevel;
+        saveData.chiliPepperSpawnProbability = grid.ChiliPepperSpawnProbability;
+        saveData.chiliPepperHealPercent = grid.ChiliPepperHealPercent;
         foreach(KeyValuePair<int,WaveType> fer in grid.GetFertilizerColumns())
         {
             saveData.fertilizerColumns.Add(fer.Key);

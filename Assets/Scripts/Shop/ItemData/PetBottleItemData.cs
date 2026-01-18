@@ -1,17 +1,20 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/PET Bottle (ÆäÆ®º´)", fileName = "PetBottleItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/PET Bottle (í˜íŠ¸ë³‘)", fileName = "PetBottleItemData")]
 public class PetBottleItemData : ItemData
 {
-    // ¹èÄ¡ È®Á¤ ½Ã »ç¿ëÇÒ ±×¸®µå ÀÎµ¦½º
+    [Header("Rotation")]
+    [Min(0)] public int rotationWeight = 4;
+
+    // ë°°ì¹˜ í™•ì • ì‹œ ì‚¬ìš©í•  ê·¸ë¦¬ë“œ ì¸ë±ìŠ¤
     private int? pendingIndex;
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ÆäÆ®º´";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "í˜íŠ¸ë³‘";
         if (Price <= 0) Price = 500;
 
-        // »óÁ¡´ç 3È¸
+        // ê¸°ë³¸ ì¬ê³  3íšŒ
         IsStackable = true;
         InitialStock = 3;
 
@@ -19,11 +22,58 @@ public class PetBottleItemData : ItemData
         FlowType = ShopFlowType.SelectExistingPlant;
     }
 
+    public override bool IsRotationUnlockOk(ShopContext ctx) => true;
+
+    public override int GetRotationWeight(ShopContext ctx)
+    {
+        // í˜íŠ¸ë³‘ ë“±ì¥ í™•ë¥  ì¦ê°€ ì ìš©
+        int baseWeight = rotationWeight;
+        if (ctx?.Grid != null)
+        {
+            float probabilityBonus = ctx.Grid.PetBottleSpawnProbability;
+            // í™•ë¥ ì„ ê°€ì¤‘ì¹˜ë¡œ ë³€í™˜ (ì˜ˆ: 0.02 = 2% -> ê°€ì¤‘ì¹˜ 2 ì¦ê°€)
+            int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
+            return baseWeight + weightBonus;
+        }
+        return baseWeight;
+    }
+
+    public override void InitializePrice(ShopContext ctx)
+    {
+        // ë™ì  ê°€ê²© ê³„ì‚° (ê¸°ë³¸ ê°€ê²© - ê°€ê²© ê°ì†ŒëŸ‰)
+        int basePrice = 500;
+        if (ctx?.Grid != null)
+        {
+            Price = Mathf.Max(1, basePrice - ctx.Grid.PetBottlePriceReduction);
+        }
+        else
+        {
+            Price = basePrice;
+        }
+
+        // ë™ì  ì¬ê³  ê³„ì‚° (ê¸°ë³¸ ì¬ê³  + ì¬ê³  ë³´ë„ˆìŠ¤)
+        int baseStock = 3;
+        if (ctx?.Grid != null)
+        {
+            InitialStock = baseStock + ctx.Grid.PetBottleInitialStockBonus;
+        }
+        else
+        {
+            InitialStock = baseStock;
+        }
+    }
+
+    public override int GetDisplayPrice()
+    {
+        // InitializePriceê°€ í˜¸ì¶œë˜ê¸° ì „ì—ëŠ” ê¸°ë³¸ ê°€ê²© ë°˜í™˜
+        return Price;
+    }
+
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù (ShopContext.Grid ÁÖÀÔ ÇÊ¿ä)";
+            reason = "Grid ê°ì²´ê°€ ì—†ìŠµë‹ˆë‹¤ (ShopContext.Grid ì£¼ì… í•„ìš”)";
             return false;
         }
         reason = null;
@@ -36,26 +86,26 @@ public class PetBottleItemData : ItemData
 
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù";
+            reason = "Grid ê°ì²´ê°€ ì—†ìŠµë‹ˆë‹¤";
             return false;
         }
         if (target == null)
         {
-            reason = "¼±ÅÃµÈ ½Ä¹°ÀÌ ¾ø½À´Ï´Ù";
+            reason = "ì„ íƒëœ ì‹ë¬¼ì´ ì—†ìŠµë‹ˆë‹¤";
             return false;
         }
         int idx = target.gridIndex;
 
-        // ÀÌ¹Ì ÆäÆ®º´ ¼³Ä¡µÈ Ä­Àº ºÒ°¡
+        // ì´ë¯¸ í˜íŠ¸ë³‘ì´ ìœ„ì¹˜í•œ ì¹¸ ë¶ˆê°€
         if (ctx.Grid.HasPetBottle(idx))
         {
-            reason = "ÀÌ¹Ì ÆäÆ®º´ÀÌ ¼³Ä¡µÈ Ä­ÀÔ´Ï´Ù";
+            reason = "ì´ë¯¸ í˜íŠ¸ë³‘ì´ ìœ„ì¹˜í•œ ì¹¸ì…ë‹ˆë‹¤";
             return false;
         }
 
         if(!target.IsMovable)
         {
-            reason = "À¯È¿ÇÑ ½Ä¹°ÀÌ ¾Æ´Õ´Ï´Ù";
+            reason = "ìœ íš¨í•œ ì‹ë¬¼ì´ ì•„ë‹™ë‹ˆë‹¤";
             return false;
         }
 
@@ -74,12 +124,12 @@ public class PetBottleItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            ctx?.ShowError?.Invoke("Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù");
+            ctx?.ShowError?.Invoke("Grid ê°ì²´ê°€ ì—†ìŠµë‹ˆë‹¤");
             return;
         }
         if (!pendingIndex.HasValue)
         {
-            ctx.ShowError?.Invoke("¹èÄ¡ À§Ä¡°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù");
+            ctx.ShowError?.Invoke("ìœ„ì¹˜ ì„ íƒì´ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
             return;
         }
 

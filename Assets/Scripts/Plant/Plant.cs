@@ -13,12 +13,12 @@ using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
 public enum DeathCause { Generic, Bug, Shovel, Other }
-// GenericÀº º¸Åë ¿şÀÌºê¿¡ ÀÇÇØ Á×´Â °æ¿ì
-// ÇüÁúÀÌ³ª ¿şÀÌºê Ãß°¡ ½Ã GetResistantValue ¹× ¹ø½Ä ½Ã Initialize Trait ¿¡¼­ ÀúÇ×·Â °è»ê Ãß°¡ ÇÊ¿ä.
+// Genericì€ ë³´í†µ ì›¨ì´ë¸Œì— ì˜í•´ ì£½ëŠ” ê²½ìš°
+// í˜•ì§ˆì´ë‚˜ ì›¨ì´ë¸Œ ì¶”ê°€ ì‹œ GetResistantValue ë° ë²ˆì‹ ì‹œ Initialize Trait ì—ì„œ ì €í•­ë ¥ ê³„ì‚° ì¶”ê°€ í•„ìš”.
 
 public abstract class Plant : MonoBehaviour
 {
-    //ÀúÀåÀÌ ÇÊ¿äÇÑ °ªµé
+    //ì €ì¥ì´ í•„ìš”í•œ ê°’ë“¤
     public string speciesname;
     protected List<GeneticTrait> traits = new List<GeneticTrait>();
     public int gridIndex { get; private set; }
@@ -30,8 +30,8 @@ public abstract class Plant : MonoBehaviour
 
     public bool isDying = false;
 
-    //°¢Á¾ È¿°ú °ü·Ã
-    [SerializeField] private float dissolveDuration = 1.0f; // ºĞÇØ ¾Ö´Ï¸ŞÀÌ¼Ç Áö¼Ó ½Ã°£
+    //ê°ì¢… íš¨ê³¼ ê´€ë ¨
+    [SerializeField] private float dissolveDuration = 1.0f; // ë¶„í•´ ì• ë‹ˆë©”ì´ì…˜ ì§€ì† ì‹œê°„
     private SpriteRenderer[] childSpriteRenderers;
     private Material[] childMaterials;
     private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
@@ -57,7 +57,7 @@ public abstract class Plant : MonoBehaviour
 
     protected int plantID = -1;
 
-    protected float bonusGoldRatio = 0.2f; // ¿şÀÌºê¸¦ ¹öÆ¿ ¼ö·Ï Ãß°¡µÇ´Â °ñµå ºñÀ²
+    protected float bonusGoldRatio = 0.2f; // ì›¨ì´ë¸Œë¥¼ ë²„í‹¸ ìˆ˜ë¡ ì¶”ê°€ë˜ëŠ” ê³¨ë“œ ë¹„ìœ¨
 
     public virtual void Init(int gridIndex, Grid grid)
     {
@@ -88,20 +88,20 @@ public abstract class Plant : MonoBehaviour
         EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
     }
 
-    private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // ´ëÀÀ ÇüÁú ³Ö¾îÁÖ´Â 
+    private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // ëŒ€ì‘ í˜•ì§ˆ ë„£ì–´ì£¼ëŠ” 
     {
         bool hasTraitA = traits.Any(t => t.traitType == traitA);
         bool hasTraitB = traits.Any(t => t.traitType == traitB);
 
         
-        // µÑ ´Ù ÀÖ°Å³ª µÑ ´Ù ¾øÀ¸¸é ½ºÅ¾
+        // ë‘˜ ë‹¤ ìˆê±°ë‚˜ ë‘˜ ë‹¤ ì—†ìœ¼ë©´ ìŠ¤íƒ‘
         if (hasTraitA && hasTraitB || !hasTraitA && !hasTraitB)
         {
             return;
         }
 
-        // ÇÏ³ª¸¸ Á¸ÀçÇÏ´Â °æ¿ì ¹İ´ë ÇüÁú ³Ö¾îÁà¾ß ÇÔ
-        if (hasTraitA) // A¸¸ Á¸Àç
+        // í•˜ë‚˜ë§Œ ì¡´ì¬í•˜ëŠ” ê²½ìš° ë°˜ëŒ€ í˜•ì§ˆ ë„£ì–´ì¤˜ì•¼ í•¨
+        if (hasTraitA) // Aë§Œ ì¡´ì¬
         {
             GeneticTrait existingTrait = traits.First(t => t.traitType == traitA);
             int genetics = existingTrait.genetics;
@@ -110,7 +110,7 @@ public abstract class Plant : MonoBehaviour
 
             traits.Add(newTraitB);
         }
-        else // B¸¸ Á¸Àç
+        else // Bë§Œ ì¡´ì¬
         {
             GeneticTrait existingTrait = traits.First(t => t.traitType == traitB);
             int genetics = existingTrait.genetics;
@@ -150,36 +150,36 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public virtual float GetResistanceValue(int traitNum) // (int)waveType È¤Àº (int)traitTypeÀ¸·Î °¡´É
+    public virtual float GetResistanceValue(int traitNum) // (int)waveType í˜¹ì€ (int)traitTypeìœ¼ë¡œ ê°€ëŠ¥
     {
         float resistance = 0f;
         foreach (var g in traits)
         {
             if (traitNum == (int)g.traitType)
             {
-                if (grid.HasFertilizerAt(gridIndex)) // ÇØ´ç Å¸ÀÔ¿¡ ÇØ´çÇÏ´Â ºñ·á°¡ ÀÖ´Ù¸é 0.05 ´õÇØÁÜ
+                if (grid.HasFertilizerAt(gridIndex)) // í•´ë‹¹ íƒ€ì…ì— í•´ë‹¹í•˜ëŠ” ë¹„ë£Œê°€ ìˆë‹¤ë©´ 0.05 ë”í•´ì¤Œ
                 {
                     if ((int)grid.GetFertilizerColumns()[gridIndex / 4] == traitNum)
                         resistance += 0.05f;
                 }
-                if (CheckChiliPepper() && g.genetics <= 1) // °íÃß°¡ ÁÖº¯¿¡ ÀÖ°í, ¿ì¼ºÀÎ °æ¿ì Ãß°¡ ÀúÇ×·Â 20 Á¦°ø
+                if (CheckChiliPepper() && g.genetics <= 1) // ê³ ì¶”ê°€ ì£¼ë³€ì— ìˆê³ , ìš°ì„±ì¸ ê²½ìš° ì¶”ê°€ ì €í•­ë ¥ 20 ì œê³µ
                     resistance += 0.2f;
-                // ¹«´ç¹ú·¹´ç ÀúÇ×·Â Áõ°¡ (¸ğµç ÇüÁú¿¡ Àû¿ë)
+                // ë¬´ë‹¹ë²Œë ˆë‹¹ ì €í•­ë ¥ ì¦ê°€ (ëª¨ë“  í˜•ì§ˆì— ì ìš©)
                 if (grid != null && grid.ladybugs != null)
                 {
                     resistance += grid.ladybugs.Count * grid.AdditionalLadybugResistancePerUnit;
                 }
-                resistance += g.resistance + g.additionalResistance; // ±âº» ÀúÇ×·Â°ú Ãß°¡ ÀúÇ×·Â(¾÷±×·¹ÀÌµå ¹× ¹ú·¹Àâ±â) ´õÇØÁÜ
+                resistance += g.resistance + g.additionalResistance; // ê¸°ë³¸ ì €í•­ë ¥ê³¼ ì¶”ê°€ ì €í•­ë ¥(ì—…ê·¸ë ˆì´ë“œ ë° ë²Œë ˆì¡ê¸°) ë”í•´ì¤Œ
                 return resistance = resistance >= 1f ? 1f : resistance;
             }
         }
 
-        return 0.1f; // ÀúÇ×·Â ¾ø´Â °æ¿ì 0.1 return
+        return 0.1f; // ì €í•­ë ¥ ì—†ëŠ” ê²½ìš° 0.1 return
     }
 
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
-        // ÆäÆ®º´ÀÌ ¸·À¸¸é true ¸®ÅÏ ¡æ »ç¸Á Ãë¼Ò
+        // í˜íŠ¸ë³‘ì´ ë§‰ìœ¼ë©´ true ë¦¬í„´ â†’ ì‚¬ë§ ì·¨ì†Œ
         if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
             return false;
 
@@ -187,7 +187,7 @@ public abstract class Plant : MonoBehaviour
         if (alive <= 2 && grid != null && grid.HasIceBlock || grid.IsIceBlockActivated())
         {
             grid.ActivateIceBlock();
-            return false; // »ì¾ÆÀÖ´Â ½Ä¹°ÀÌ 2°³ ÀÌÇÏÀÌ°í ¾óÀ½ ºí·ÏÀÌ ÀÖÀ¸¸é Á×Áö ¾ÊÀ½
+            return false; // ì‚´ì•„ìˆëŠ” ì‹ë¬¼ì´ 2ê°œ ì´í•˜ì´ê³  ì–¼ìŒ ë¸”ë¡ì´ ìˆìœ¼ë©´ ì£½ì§€ ì•ŠìŒ
         }
         isDying = true;
         StartCoroutine(Vanish());
@@ -244,13 +244,13 @@ public abstract class Plant : MonoBehaviour
     public virtual void MakeSelectedSprite()
     {
         IsSelected = true;
-        ChangeLayerOfAllChild(gameObject, "Outline"); // "Outline" ·¹ÀÌ¾î·Î º¯°æ
+        ChangeLayerOfAllChild(gameObject, "Outline"); // "Outline" ë ˆì´ì–´ë¡œ ë³€ê²½
     }
 
     public virtual void MakeDefaultSprite()
     {
         IsSelected = false;
-        ChangeLayerOfAllChild(gameObject, "Default"); // "Default" ·¹ÀÌ¾î·Î º¯°æ
+        ChangeLayerOfAllChild(gameObject, "Default"); // "Default" ë ˆì´ì–´ë¡œ ë³€ê²½
     }
 
     private void ChangeLayerOfAllChild(GameObject obj, string layerName)
@@ -261,14 +261,14 @@ public abstract class Plant : MonoBehaviour
         {
             if (obj.name == str)
             {
-                obj.layer = LayerMask.NameToLayer("Default"); // ·¹ÀÌ¾î º¯°æÇÏÁö ¾ÊÀ½ - Áï, "Default" ·¹ÀÌ¾î·Î º¯°æ
+                obj.layer = LayerMask.NameToLayer("Default"); // ë ˆì´ì–´ ë³€ê²½í•˜ì§€ ì•ŠìŒ - ì¦‰, "Default" ë ˆì´ì–´ë¡œ ë³€ê²½
             }
         }
         foreach (string str in uiobjLayerObj)
         {
             if (obj.name == str)
             {
-                obj.layer = LayerMask.NameToLayer("UIObjects"); // ·¹ÀÌ¾î º¯°æÇÏÁö ¾ÊÀ½ - Áï, "uiObjects" ·¹ÀÌ¾î·Î º¯°æ
+                obj.layer = LayerMask.NameToLayer("UIObjects"); // ë ˆì´ì–´ ë³€ê²½í•˜ì§€ ì•ŠìŒ - ì¦‰, "uiObjects" ë ˆì´ì–´ë¡œ ë³€ê²½
             }
         }
 
@@ -309,17 +309,34 @@ public abstract class Plant : MonoBehaviour
     }
 
     /// <summary>
-    /// ¾àÇÑ À¯ÀüÀÚ(¿­¼ºÀÌ ¾Æ´Ñ ÇüÁú, ÃÖÃÊ ÀúÇ×·Â 80%°¡ ¾Æ´Ñ ÇüÁú)ÀÇ ÃÖÃÊ ÀúÇ×·ÂÀ» Áõ°¡½ÃÅµ´Ï´Ù.
+    /// ì•½í•œ ìœ ì „ì(ì—´ì„±ì´ ì•„ë‹Œ í˜•ì§ˆ, ìµœì´ˆ ì €í•­ë ¥ 80%ê°€ ì•„ë‹Œ í˜•ì§ˆ)ì˜ ìµœì´ˆ ì €í•­ë ¥ì„ ì¦ê°€ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
     public void IncreaseWeakGeneticsResistance(float bonus)
     {
         for (int i = 0; i < traits.Count; i++)
         {
-            // ¿­¼ºÀÌ ¾Æ´Ï°í(genetics != 0) ÃÖÃÊ ÀúÇ×·ÂÀÌ 80%°¡ ¾Æ´Ñ(resistance != 0.8f) ÇüÁú
+            // ì—´ì„±ì´ ì•„ë‹ˆê³ (genetics != 0) ìµœì´ˆ ì €í•­ë ¥ì´ 80%ê°€ ì•„ë‹Œ(resistance != 0.8f) í˜•ì§ˆ
             if (traits[i].genetics != 0 && Mathf.Abs(traits[i].resistance - 0.8f) > 0.01f)
             {
                 float newResistance = traits[i].resistance + bonus;
-                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 »çÀÌ·Î Á¦ÇÑ
+                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 ì‚¬ì´ë¡œ ì œí•œ
+                traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+            }
+        }
+    }
+
+    /// <summary>
+    /// ê°•í•œ ìœ ì „ì(ìš°ì„±, ìµœì´ˆ ì €í•­ë ¥ 80%ì¸ í˜•ì§ˆ)ì˜ ìµœì´ˆ ì €í•­ë ¥ì„ ì¦ê°€ì‹œí‚µë‹ˆë‹¤.
+    /// </summary>
+    public void IncreaseStrongGeneticsResistance(float bonus)
+    {
+        for (int i = 0; i < traits.Count; i++)
+        {
+            // ìš°ì„±(genetics == 2)ì´ê³  ìµœì´ˆ ì €í•­ë ¥ì´ 80%ì¸(resistance == 0.8f) í˜•ì§ˆ
+            if (traits[i].genetics == 2 && Mathf.Abs(traits[i].resistance - 0.8f) <= 0.01f)
+            {
+                float newResistance = traits[i].resistance + bonus;
+                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 ì‚¬ì´ë¡œ ì œí•œ
                 traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
             }
         }
@@ -331,8 +348,13 @@ public abstract class Plant : MonoBehaviour
 
     public bool CheckChiliPepper()
     {
+        if (grid == null) return false;
+        
+        int rangeLevel = grid.ChiliPepperRangeLevel;
         Plant chiliPepper;
-        if ((gridIndex - 1) / 4 == gridIndex / 4) // À§Ä­
+        
+        // 0ë‹¨ê³„: ê°€ë¡œ 2ì¹¸ (ì¢Œìš°)
+        if ((gridIndex - 1) / 4 == gridIndex / 4) // ì™¼ìª½
         {
             if (grid.plantGrid.TryGetValue(gridIndex - 1, out chiliPepper))
             {
@@ -341,7 +363,7 @@ public abstract class Plant : MonoBehaviour
             }
         }
 
-        if ((gridIndex + 1) / 4 == gridIndex / 4) // ¾Æ·¡Ä­
+        if ((gridIndex + 1) / 4 == gridIndex / 4) // ì˜¤ë¥¸ìª½
         {
             if (grid.plantGrid.TryGetValue(gridIndex + 1, out chiliPepper))
             {
@@ -350,23 +372,72 @@ public abstract class Plant : MonoBehaviour
             }
         }
 
-        if ((gridIndex - 4) >= 0) // ¿ŞÂÊÄ­
+        // 1ë‹¨ê³„ ì´ìƒ: ì‹­ì 4ì¹¸ (ìƒí•˜ ì¶”ê°€)
+        if (rangeLevel >= 1)
         {
-            if (grid.plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
+            if ((gridIndex - 4) >= 0) // ìœ„ìª½
             {
-                if (chiliPepper.GetType() == typeof(ChiliPepper))
-                    return true;
+                if (grid.plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
+            }
+
+            if ((gridIndex + 4) < grid.GetMaxCol() * 4) // ì•„ë˜ìª½
+            {
+                if (grid.plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
             }
         }
 
-        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // ¿À¸¥ÂÊÄ­
+        // 2ë‹¨ê³„: ëŒ€ê°ì„ ê¹Œì§€ 8ì¹¸ (ëŒ€ê°ì„  4ì¹¸ ì¶”ê°€)
+        if (rangeLevel >= 2)
         {
-            if (grid.plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
+            // ì™¼ìª½ ìœ„ ëŒ€ê°ì„ 
+            if ((gridIndex - 5) >= 0 && (gridIndex - 5) / 4 == (gridIndex - 1) / 4)
             {
-                if (chiliPepper.GetType() == typeof(ChiliPepper))
-                    return true;
+                if (grid.plantGrid.TryGetValue(gridIndex - 5, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
+            }
+
+            // ì˜¤ë¥¸ìª½ ìœ„ ëŒ€ê°ì„ 
+            if ((gridIndex - 3) >= 0 && (gridIndex - 3) / 4 == (gridIndex - 1) / 4)
+            {
+                if (grid.plantGrid.TryGetValue(gridIndex - 3, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
+            }
+
+            // ì™¼ìª½ ì•„ë˜ ëŒ€ê°ì„ 
+            if ((gridIndex + 3) < grid.GetMaxCol() * 4 && (gridIndex + 3) / 4 == (gridIndex + 1) / 4)
+            {
+                if (grid.plantGrid.TryGetValue(gridIndex + 3, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
+            }
+
+            // ì˜¤ë¥¸ìª½ ì•„ë˜ ëŒ€ê°ì„ 
+            if ((gridIndex + 5) < grid.GetMaxCol() * 4 && (gridIndex + 5) / 4 == (gridIndex + 1) / 4)
+            {
+                if (grid.plantGrid.TryGetValue(gridIndex + 5, out chiliPepper))
+                {
+                    if (chiliPepper.GetType() == typeof(ChiliPepper))
+                        return true;
+                }
             }
         }
+        
         return false;
     }
 
@@ -430,7 +501,7 @@ public abstract class Plant : MonoBehaviour
     public bool CanMove()
     {
         if (!IsMovable) return false;
-        // Ä­¿¡ ÆäÆ®º´ÀÌ ³õ¿©ÀÖÀ¸¸é ÀÌµ¿ ±İÁö
+        // ì¹¸ì— í˜íŠ¸ë³‘ì´ ë†“ì—¬ìˆìœ¼ë©´ ì´ë™ ê¸ˆì§€
         if (grid != null && grid.HasPetBottle(gridIndex)) return false;
         return true;
     }
@@ -440,13 +511,13 @@ public abstract class Plant : MonoBehaviour
         resistWaveCount++;
 
         bool isGold = false;
-        if (stemController != null) //È²±İ ¿ÏµÎÄáÀÌ¸é ÀúÇ×·Â °¨¼Ò ¾Æ¿¹ X
+        if (stemController != null) //í™©ê¸ˆ ì™„ë‘ì½©ì´ë©´ ì €í•­ë ¥ ê°ì†Œ ì•„ì˜ˆ X
         {
             isGold = stemController.IsGold();
         }
 
         int fertilizer = -1;
-        if (grid.HasFertilizerAt(gridIndex)) // ÇØ´ç Å¸ÀÔ¿¡ ÇØ´çÇÏ´Â ºñ·á°¡ ÀÖ´Ù¸é ÀúÇ×·Â °¨¼Ò°¡ µÇÁö ¾Ê½À´Ï´Ù
+        if (grid.HasFertilizerAt(gridIndex)) // í•´ë‹¹ íƒ€ì…ì— í•´ë‹¹í•˜ëŠ” ë¹„ë£Œê°€ ìˆë‹¤ë©´ ì €í•­ë ¥ ê°ì†Œê°€ ë˜ì§€ ì•ŠìŠµë‹ˆë‹¤
             fertilizer = (int)grid.GetFertilizerColumns()[gridIndex / 4];
 
         if (!isGold)
@@ -469,7 +540,7 @@ public abstract class Plant : MonoBehaviour
         priceSign.SetPrice(GetSellingPrice());
     }
 
-    private bool ChangeResistance(int traitNum, float amount) // ±âº» ÀúÇ×·ÂÀÌ ¹Ù²ğ ¶§´Â ¹«Á¶°Ç ÇØ´ç ÇÔ¼ö¸¦ °ÅÄ¡µµ·Ï (Å¸ÀÔÀ» ³Ö¾î¼­ ÀÛµ¿)
+    private bool ChangeResistance(int traitNum, float amount) // ê¸°ë³¸ ì €í•­ë ¥ì´ ë°”ë€” ë•ŒëŠ” ë¬´ì¡°ê±´ í•´ë‹¹ í•¨ìˆ˜ë¥¼ ê±°ì¹˜ë„ë¡ (íƒ€ì…ì„ ë„£ì–´ì„œ ì‘ë™)
     {
         for (int i = 0; i < traits.Count; i++)
         {

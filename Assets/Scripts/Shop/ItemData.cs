@@ -16,58 +16,58 @@ public abstract class ItemData : ScriptableObject
     public bool IsStackable = false;
     public int InitialStock = 1;
     public bool OnePerShopIfNotStackable = true;
-    [Tooltip("-1 = ¹«Á¦ÇÑ, 0 ÀÌ»ó = °ÔÀÓ ÀüÃ¼¿¡¼­ ÃÖ´ë ±¸¸Å È½¼ö")]
+    [Tooltip("-1 = ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, 0 ï¿½Ì»ï¿½ = ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½")]
     public int MaxPurchaseCount = -1;
 
     [Header("Flow")]
     public ShopFlowType FlowType;
 
-    // ·ÎÅ×ÀÌ¼Ç ÈÄº¸ ÇÊÅÍ(¿þÀÌºê ÇØ±Ý µî), ±âº» true
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½Ìºï¿½ ï¿½Ø±ï¿½ ï¿½ï¿½), ï¿½âº» true
     public virtual bool IsRotationUnlockOk(ShopContext ctx) => true;
 
     public virtual int GetRotationWeight(ShopContext ctx) => 1;
 
-    // ±¸¸Å °¡´É ¿©ºÎ(ÀÌ¹Ì È°¼ºÈ­ ÁßÀÎÁö, Àá±Ý ÇØ±Ý ½Ã±â, Áßº¹ ±ÝÁö µî)
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½Ì¹ï¿½ È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½Ø±ï¿½ ï¿½Ã±ï¿½, ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)
     public abstract bool CanPurchase(ShopContext ctx, out string reason);
 
-    // ±¸¸Å ½ÃÀÛ(¹Ì¸®º¸±â/¼±ÅÃ ¸ðµå ÁøÀÔ µî)
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)
     public abstract void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError);
 
-    // È®Á¤(Commit) ½Ã ½ÇÁ¦ Àû¿ë(°ñµå Â÷°¨Àº ShopUI°¡ ¿©±â Á÷Àü¿¡)
+    // È®ï¿½ï¿½(Commit) ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ShopUIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
     public abstract void Commit(ShopContext ctx);
 
-    // Ãë¼Ò(¼±ÅÃ Ãë¼Ò/¹èÄ¡ Ãë¼Ò µî)
+    // ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½/ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ ï¿½ï¿½)
     public virtual void Cancel(ShopContext ctx) { }
 
-    // ¹èÄ¡/¼±ÅÃÇüÀÇ À¯È¿¼º °Ë»ç(Áï½ÃÇüÀº ÇÊ¿ä ¾øÀ½)
+    // ï¿½ï¿½Ä¡/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½ï¿½ï¿½ï¿½)
     public virtual bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason) { reason = null; return true; }
     public virtual bool ValidateTarget(ShopContext ctx, Plant target, out string reason) { reason = null; return true; }
 
-    // ÃÖÁ¾ È®Á¤¿¡ ÇÊ¿äÇÑ ¿ÜºÎ ÀÔ·Â º¸°ü
+    // ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½Üºï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½
     public virtual void SetPlacedPosition(Vector3 worldPos) { }
     public virtual void SetSelectedPlant(Plant plant) { }
     public virtual void InitializePrice(ShopContext ctx) { }
 
-    public int GetDisplayPrice()
+    public virtual int GetDisplayPrice()
     {
         return Price;
     }
 
-    // °ÔÀÓ ÀüÃ¼¿¡¼­ÀÇ ±¸¸Å È½¼ö Á¶È¸
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½ ï¿½ï¿½È¸
     public int GetTotalPurchaseCount()
     {
         return ShopManager.Instance?.GetItemPurchaseCount(this) ?? 0;
     }
 
-    // °ÔÀÓ ÀüÃ¼¿¡¼­ÀÇ ±¸¸Å °¡´É ¿©ºÎ (MaxPurchaseCount Ã¼Å©)
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (MaxPurchaseCount Ã¼Å©)
     public bool CanPurchaseByLimit()
     {
-        if (MaxPurchaseCount < 0) return true; // -1 = ¹«Á¦ÇÑ
+        if (MaxPurchaseCount < 0) return true; // -1 = ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         return GetTotalPurchaseCount() < MaxPurchaseCount;
     }
 }
 
-// ÁÖÀÔµÉ ·±Å¸ÀÓ ÄÁÅØ½ºÆ®
+// ï¿½ï¿½ï¿½Ôµï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½Ø½ï¿½Æ®
 public class ShopContext
 {
     //public PlayerManager Player;
@@ -76,7 +76,7 @@ public class ShopContext
     //public BugManager Bugs;
     public EconomyManager Economy;
     public ShopManager Shop;
-    public object Session; // ÇÊ¿äÇÏ¸é ÀÎÅÍÆäÀÌ½º·Î È®Àå
+    public object Session; // ï¿½Ê¿ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 
     public System.Action<string> ShowInfo;
     public System.Action<string> ShowError;
