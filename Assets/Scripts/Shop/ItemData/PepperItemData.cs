@@ -1,12 +1,11 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (����)", fileName = "ChiliPepperItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper (고추)", fileName = "ChiliPepperItemData")]
 public class ChiliPepperItemData : ItemData
 {
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4;
 
-    // ��ġ Ȯ�� �� ����� �׸��� �ε���
     private int? pendingIndex;
 
     private void OnEnable()

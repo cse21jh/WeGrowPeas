@@ -43,11 +43,11 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     {
         if (!IsEnabled) return;
 
-        if (isDragging) // »ğÀ» µé°í ÀÖ´Â °æ¿ì
+        if (isDragging) // ì‚½ì„ ë“¤ê³  ìˆëŠ” ê²½ìš°
         {
-            TryDestroyUnderMouse(); // ¹º°¡ ÆÈ°Å³ª »ğÀ» Ã³À½ À§Ä¡·Î ÀÌµ¿
+            TryDestroyUnderMouse(); // ë­”ê°€ íŒ”ê±°ë‚˜ ì‚½ì„ ì²˜ìŒ ìœ„ì¹˜ë¡œ ì´ë™
         }
-        else // »ğ µé±â ½ÃÀÛ
+        else // ì‚½ ë“¤ê¸° ì‹œì‘
         {
             grid.isDraggingShovel = true;
             isDragging = true;
@@ -105,12 +105,12 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
         {
             Debug.Log($"[Shovel] Raycast Hit: {hit.collider.gameObject.name}");
 
-            // 1) ½Ä¹° Á¦°Å
+            // 1) ì‹ë¬¼ ì œê±°
             Plant plant = hit.collider.GetComponent<Plant>();
             if (plant != null && !plant.isDying)
             {
                 SoundManager.Instance.PlayEffect("Shovel");                
-                if(plant.Die(DeathCause.Shovel)) // false¶ó¸é ÆäÆ®º´ Á¦°Å
+                if(plant.Die(DeathCause.Shovel)) // falseë¼ë©´ í˜íŠ¸ë³‘ ì œê±°
                 {
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
@@ -118,7 +118,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 return;
             }
 
-            // 2) ºñ·á ¸¶Ä¿ Á¦°Å
+            // 2) ë¹„ë£Œ ë§ˆì»¤ ì œê±°
             FertilizerMarker fertMarker = hit.collider.GetComponent<FertilizerMarker>();
             if (fertMarker != null && fertMarker.IsOn)
             {
@@ -130,9 +130,27 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
 
                 return;
             }
+
+            // 3) í™©ê¸ˆ ë¹„ë£Œ ì œê±°
+            // í† ì–‘ì—ì„œ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì™€ì„œ í™©ê¸ˆ ë¹„ë£Œê°€ ìˆëŠ”ì§€ í™•ì¸
+            Soil soil = hit.collider.GetComponent<Soil>();
+            if (soil != null)
+            {
+                int idx = soil.GridIndex;
+                if (grid.HasGoldSoil(idx))
+                {
+                    // ì‹ë¬¼ì´ ìˆëŠ” ê²½ìš° ì œê±° ë¶ˆê°€
+                    if (!grid.plantGrid.ContainsKey(idx))
+                    {
+                        SoundManager.Instance.PlayEffect("Shovel");
+                        grid.RemoveGoldSoil(idx);
+                        return;
+                    }
+                }
+            }
         }
 
-        // 3) ¸Ç¶¥ Å¬¸¯
+        // 4) ë§¨ë•… í´ë¦­
         ResetShovel();
     }
 

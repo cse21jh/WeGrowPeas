@@ -152,6 +152,12 @@ public abstract class Plant : MonoBehaviour
 
     public virtual float GetResistanceValue(int traitNum) // (int)waveType 혹은 (int)traitType으로 가능
     {
+        // 황금 비료에 심어진 식물은 모든 저항력 90%
+        if (grid != null && grid.HasGoldSoil(gridIndex))
+        {
+            return 0.9f;
+        }
+
         float resistance = 0f;
         foreach (var g in traits)
         {
@@ -503,6 +509,8 @@ public abstract class Plant : MonoBehaviour
         if (!IsMovable) return false;
         // 칸에 페트병이 놓여있으면 이동 금지
         if (grid != null && grid.HasPetBottle(gridIndex)) return false;
+        // 황금 비료에 심어진 식물은 이동 불가
+        if (grid != null && grid.HasGoldSoil(gridIndex)) return false;
         return true;
     }
 

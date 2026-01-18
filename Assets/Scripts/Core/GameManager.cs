@@ -65,6 +65,8 @@ public class SaveData
     public float chiliPepperSpawnProbability = 0f;
     public float chiliPepperHealPercent = 0f;
 
+    public List<int> goldSoilTiles = new();
+
     public List<int> fertilizerColumns = new();
     public List<WaveType> fertilizerType = new();
     //public float remainBreedTime;
@@ -426,6 +428,7 @@ public class GameManager : Singleton<GameManager>
         saveData.chiliPepperRangeLevel = grid.ChiliPepperRangeLevel;
         saveData.chiliPepperSpawnProbability = grid.ChiliPepperSpawnProbability;
         saveData.chiliPepperHealPercent = grid.ChiliPepperHealPercent;
+        saveData.goldSoilTiles = grid.GoldSoilTiles;
         foreach(KeyValuePair<int,WaveType> fer in grid.GetFertilizerColumns())
         {
             saveData.fertilizerColumns.Add(fer.Key);

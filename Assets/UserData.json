@@ -1,6 +1,21 @@
 {
-    "stage": 3,
-    "plantList": [],
+    "stage": 2,
+    "plantList": [
+        {
+            "speciesname": "완두콩",
+            "traits": [
+                {
+                    "traitType": 0,
+                    "resistance": 0.5,
+                    "genetics": 1,
+                    "additionalResistance": 0.0
+                }
+            ],
+            "gridIndex": 1,
+            "taste": 3,
+            "resistWaveCount": 1
+        }
+    ],
     "remainBreedCount": 0,
     "maxCol": 4,
     "killBugCount": 0,
@@ -8,13 +23,25 @@
     "totalPeaBreedcount": 0,
     "totalPeanutBreedCount": 0,
     "bugSpawnTimeInterval": 10.0,
-    "lastBugSpawnTimeInterval": 2.727447748184204,
+    "lastBugSpawnTimeInterval": 9.999061584472657,
     "bugSpeedDecreasement": 0.0,
     "bugSpawnIntervalIncreasement": 0.0,
     "ladybugSpawnProbability": 0.0,
+    "maxLadybugCount": 0,
+    "additionalLadybugGoldPerUnit": 0,
+    "additionalLadybugResistancePerUnit": 0.0,
     "additionalBugGold": 0,
+    "additionalNepenthesGold": 0,
+    "hasNepenthesPheromone": false,
+    "additionalNepenthesPheromoneSizeMultiplier": 0.0,
+    "nepenthesSpawnProbability": 0.0,
+    "weakGeneticsResistanceBonus": 0.0,
+    "strongGeneticsResistanceBonus": 0.0,
+    "goldenGeneticsProbabilityBonus": 0.0,
     "additionalPeanutCopyProbability": 0.0,
     "additionalPeanutGold": 0,
+    "additionalPeaGold": 0,
+    "additionalPeaGoldMultiplier": 0.20000000298023225,
     "additionalPestResistance": 0.0,
     "additionalInheritance": 0,
     "maxBreedTimer": 30.0,
@@ -22,6 +49,13 @@
     "breedCount": 0,
     "hasIceBlock": false,
     "perBottleTiles": [],
+    "petBottleInitialStockBonus": 0,
+    "petBottlePriceReduction": 0,
+    "petBottleSpawnProbability": 0.0,
+    "petBottleBlockCountBonus": 0,
+    "chiliPepperRangeLevel": 0,
+    "chiliPepperSpawnProbability": 0.0,
+    "chiliPepperHealPercent": 0.0,
     "fertilizerColumns": [],
     "fertilizerType": [],
     "remainUpgradeRerollCount": 0,
@@ -43,11 +77,24 @@
     "nextWaveType": 0,
     "remainWaveSkipCount": 0,
     "waveKillCount": [
-        2,
+        1,
         0,
         0,
         0,
         0,
+        0,
+        0,
+        0
+    ],
+    "stageWaveRecord": [
+        0,
+        0
+    ],
+    "stageKillRecord": [
+        0,
+        1
+    ],
+    "stageNoTraitRecord": [
         0,
         0
     ],
@@ -61,19 +108,24 @@
     "itemName": [],
     "itemPurchaseCount": [],
     "mods": [],
+    "cycleEndRound": -1,
+    "activeRequests": [
+        {
+            "requestId": "",
+            "typeCode": "",
+            "progressCount": 0,
+            "state": 0,
+            "extraStrings": []
+        }
+    ],
     "survivedPlants": [
-        1,
-        0,
-        0
+        1
     ],
     "earnedGolds": [
-        0,
-        0,
         0
     ],
     "waveEachDay": [
-        0,
         0
     ],
-    "gst": 2
+    "gst": 1
 }

@@ -44,8 +44,11 @@ public class Grid : MonoBehaviour
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
+    [SerializeField] private GameObject goldSoilMarkerPrefab;
     
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
+    protected List<int> goldSoilTiles = new List<int>(); // 황금 비료가 뿌려진 타일들
+    private Dictionary<int, GameObject> goldSoilMarkers = new Dictionary<int, GameObject>(); // 황금 비료 마커들
 
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
@@ -107,6 +110,8 @@ public class Grid : MonoBehaviour
     protected float chiliPepperHealPercent = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
 
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
+
+    public List<int> GoldSoilTiles => goldSoilTiles;
 
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
@@ -955,6 +960,10 @@ public class Grid : MonoBehaviour
         chiliPepperSpawnProbability = saveData.chiliPepperSpawnProbability;
         chiliPepperHealPercent = saveData.chiliPepperHealPercent;
         
+        // 황금 비료 로드
+        foreach(var i in saveData.goldSoilTiles)
+            TryPlaceGoldSoil(i);
+        
         foreach(var i in saveData.perBottleTiles)
             PlacePetBottle(i);
         for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
@@ -1226,6 +1235,47 @@ public class Grid : MonoBehaviour
         return additionalPeanutCopyProbability;
     }
     public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
+
+    public bool HasGoldSoil(int idx) => goldSoilTiles.Contains(idx);
+
+    public bool TryPlaceGoldSoil(int idx)
+    {
+        if (goldSoilTiles.Contains(idx))
+        {
+            return false; // 이미 황금 비료가 있는 칸
+        }
+        if (plantGrid.ContainsKey(idx))
+        {
+            return false; // 식물이 있는 칸에는 황금 비료를 뿌릴 수 없음
+        }
+
+        goldSoilTiles.Add(idx);
+
+        // 시각화 (황금색 마커)
+        if (goldSoilMarkerPrefab != null)
+        {
+            var soilT = GetSoilTransform(idx);
+            var marker = Instantiate(goldSoilMarkerPrefab, soilT.position, Quaternion.identity, soilT);
+            goldSoilMarkers[idx] = marker;
+        }
+
+        Debug.Log($"[Grid] 황금 비료 설치: idx={idx}");
+        return true;
+    }
+
+    public void RemoveGoldSoil(int idx)
+    {
+        if (goldSoilTiles.Contains(idx))
+        {
+            goldSoilTiles.Remove(idx);
+
+            if (goldSoilMarkers.TryGetValue(idx, out var marker) && marker != null)
+            {
+                Destroy(marker);
+                goldSoilMarkers.Remove(idx);
+            }
+        }
+    }
 
     public void PlacePetBottle(int idx)
     {
