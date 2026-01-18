@@ -190,10 +190,12 @@ public abstract class Plant : MonoBehaviour
             return false;
 
         int alive = grid.GetLivingPlantCount();
-        if (alive <= 2 && grid != null && grid.HasIceBlock || grid.IsIceBlockActivated())
+
+        // 냉각 방패: 식물이 1개 이하가 될 경우 1회에 한해 보호
+        if (alive <= 1 && grid != null && grid.HasCoolingShield && !grid.IsCoolingShieldActivated())
         {
-            grid.ActivateIceBlock();
-            return false; // 살아있는 식물이 2개 이하이고 얼음 블록이 있으면 죽지 않음
+            grid.SetCoolingShieldActivated();
+            return false; // 살아있는 식물이 1개 이하이고 냉각 방패가 있으면 죽지 않음
         }
         isDying = true;
         StartCoroutine(Vanish());

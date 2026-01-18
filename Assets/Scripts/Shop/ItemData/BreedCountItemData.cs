@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "BreedCountItem", menuName = "Items/Breed/Max Count +1")]
+[CreateAssetMenu(menuName = "Shop/Items/Breed Count Increase (교배 횟수 증가)", fileName = "BreedCountItemData")]
 public class BreedCountItemData : ItemData
 {
     private string purchaseKey = "교배 횟수 증가";

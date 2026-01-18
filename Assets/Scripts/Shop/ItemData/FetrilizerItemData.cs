@@ -1,8 +1,8 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "Item_Fertilizer", menuName = "Shop/Item/Fertilizer")]
-public class ItemData_Fertilizer : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Dedicated Fertilizer (전용 비료)", fileName = "FertilizerItemData")]
+public class FertilizerItemData : ItemData
 {
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1; // 웨이브별 해금 시기

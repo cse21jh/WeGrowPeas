@@ -9,10 +9,13 @@ using DG.Tweening;
 public class ShopUI : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private Transform itemsParent;     // 모든 슬롯을 넣을 통합 부모
+    [SerializeField] private Transform fixedItemsParent;     // 고정 아이템 슬롯 부모
+    [SerializeField] private Transform rotationItemsParent;  // 로테이션 아이템 슬롯 부모
     [SerializeField] private ItemSlot itemSlotPrefab;
     [SerializeField] private TMP_Text footerText;       // 화면 하단 정보/에러 표기 텍스트
     [SerializeField] private RectTransform popupParent;  // 팝업 UI 부모
+    [SerializeField] private Button rerollButton;        // 리롤 버튼
+    [SerializeField] private TMP_Text rerollButtonText;  // 리롤 버튼 텍스트 (무료 횟수 표시용)
 
     // auto-resolved services
     private Grid grid;
@@ -60,26 +63,36 @@ public class ShopUI : MonoBehaviour
         };
 
         BuildShop();
+        UpdateRerollButton();
     }
 
     public void BuildShop()
     {
-        ClearChildren(itemsParent);
+        // 고정 아이템과 로테이션 아이템을 각각 다른 부모에 배치
+        if (fixedItemsParent != null)
+            ClearChildren(fixedItemsParent);
+        if (rotationItemsParent != null)
+            ClearChildren(rotationItemsParent);
         slots.Clear();
 
         // ShopManager에서 인벤토리 생성
         var inv = shopManager.GenerateInventory(ctx, GameManager.Instance.stage);
 
-        // 고정 + 로테이션 모두 통합 부모에 생성
+        // 고정 아이템을 fixedItemsParent에 생성
         for (int i = 0; i < inv.Fixed.Count; i++)
         {
             var data = inv.Fixed[i];
             if (data == null) continue;
-            MakeSlot(itemsParent, data);
+            if (fixedItemsParent != null)
+                MakeSlot(fixedItemsParent, data);
         }
 
+        // 로테이션 아이템을 rotationItemsParent에 생성
         foreach (var data in inv.Rotation)
-            MakeSlot(itemsParent, data);
+        {
+            if (rotationItemsParent != null)
+                MakeSlot(rotationItemsParent, data);
+        }
     }
 
     private void MakeSlot(Transform parent, ItemData data)
@@ -206,6 +219,64 @@ public class ShopUI : MonoBehaviour
             message = msg,
             duration = 3.5f
         });
+    }
+
+    /// <summary>
+    /// 리롤 버튼을 클릭했을 때 호출됩니다.
+    /// </summary>
+    public void OnClickReroll()
+    {
+        const int rerollPrice = 500; // 리롤 가격
+
+        // 무료 리롤 횟수가 있으면 무료로 리롤
+        if (shopManager.UseReroll())
+        {
+            SoundManager.Instance.PlayEffect("Button");
+            session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
+            BuildShop();
+            UpdateRerollButton();
+            return;
+        }
+
+        // 무료 횟수가 없으면 골드 지불
+        if (economy != null && economy.HasGold(rerollPrice))
+        {
+            economy.SpendGold(rerollPrice);
+            SoundManager.Instance.PlayEffect("Button");
+            session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
+            BuildShop();
+            UpdateRerollButton();
+        }
+        else
+        {
+            ShowError("골드가 부족합니다.");
+        }
+    }
+
+    /// <summary>
+    /// 리롤 버튼 UI를 업데이트합니다 (무료 횟수 표시).
+    /// </summary>
+    private void UpdateRerollButton()
+    {
+        if (rerollButton == null) return;
+
+        int freeRerollCount = shopManager.DailyRerollCount;
+        
+        if (rerollButtonText != null)
+        {
+            if (freeRerollCount > 0)
+            {
+                rerollButtonText.text = $"리롤 (무료 {freeRerollCount}회)";
+            }
+            else
+            {
+                rerollButtonText.text = "리롤 (500골드)";
+            }
+        }
+
+        // 리롤 버튼 리스너 설정
+        rerollButton.onClick.RemoveAllListeners();
+        rerollButton.onClick.AddListener(OnClickReroll);
     }
 
     private class ShopSession

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "GoldenClockItem", menuName = "Shop/Item/Golden Clock")]
+[CreateAssetMenu(menuName = "Shop/Items/Golden Clock (황금 시계)", fileName = "GoldenClockItemData")]
 public class GoldenClockItemData : ItemData
 {
     private const string purchaseKey = "황금 시계";

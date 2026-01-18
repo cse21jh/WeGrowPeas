@@ -3,16 +3,16 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-[CreateAssetMenu(fileName = "Item_Adrenaline", menuName = "Shop/Item/Adrenaline")]
-public class ItemData_Adrenaline : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Adrenaline (ì•„ë“œë ˆë‚ ë¦°)", fileName = "AdrenalineItemData")]
+public class AdrenalineItemData : ItemData
 {
     [Header("Effect")]
-    [Min(1)] public int durationDays = 6;  // ¡°»óÁ¡ ºóµµ¡± µû¸¦ °Å¸é Commit¿¡¼­ ½ºÄÉÀÏ
-    [Tooltip("½ºÆù °£°Ý ¹è¼ö (0.5 = 2¹è ºóµµ)")]
+    [Min(1)] public int durationDays = 6;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½óµµ¡ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Å¸ï¿½ Commitï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (0.5 = 2ï¿½ï¿½ ï¿½ï¿½)")]
     [Range(0.05f, 2f)] public float spawnIntervalMul = 0.5f; // = 2x frequency
-    [Tooltip("±³¹è ´Ü°è ½Ã°£ ¹è¼ö (2 = 2¹è ±æ°Ô)")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ ï¿½Ü°ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ (2 = 2ï¿½ï¿½ ï¿½ï¿½ï¿½)")]
     [Range(0.1f, 5f)] public float breedingDurationMul = 2f;
-    [Tooltip("±³¹è °¡´É È½¼ö ¹è¼ö (2 = 2¹è)")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½ ï¿½ï¿½ï¿½ (2 = 2ï¿½ï¿½)")]
     [Range(1f, 5f)] public float breedingAttemptsMul = 2f;
 
     [Header("Rotation")]
@@ -25,7 +25,7 @@ public class ItemData_Adrenaline : ItemData
         IsStackable = false;
         OnePerShopIfNotStackable = true;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "¾Æµå·¹³¯¸°";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ï¿½Æµå·¹ï¿½ï¿½ï¿½ï¿½";
         if (Price <= 0) Price = 10000;
     }
 
@@ -44,17 +44,17 @@ public class ItemData_Adrenaline : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        // ¡°»óÁ¡ ºóµµ¸¦ µû¶ó 6ÀÏ¡± ÇØ¼®À» Á¤È®È÷ ÇÏ·Á¸é ¾Æ·¡Ã³·³ ÁÖ±â ½ºÄÉÀÏ:
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½óµµ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ 6ï¿½Ï¡ï¿½ ï¿½Ø¼ï¿½ï¿½ï¿½ ï¿½ï¿½È®ï¿½ï¿½ ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½Ã³ï¿½ï¿½ ï¿½Ö±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:
         int days = durationDays;
         // var sm = ShopManager.Instance;
         // if (sm) days *= Mathf.Max(1, sm.ShopOpenDay);
 
-        // °¢ È¿°úº°·Î ±âÁ¸ ¸ðµå°¡ ÀÖÀ¸¸é ±â°£ ¿¬Àå, ¾øÀ¸¸é »õ·Î Ãß°¡
+        // ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½â°£ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         ExtendOrAddMod("Adrenaline_Spawn", StatId.BugSpawnIntervalMul, spawnIntervalMul, days);
         ExtendOrAddMod("Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
         ExtendOrAddMod("Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} ¹ßµ¿: {days}ÀÏ°£ ½ºÆù¡¿{(1f / spawnIntervalMul):0.#}, ±³¹è½Ã°£¡¿{breedingDurationMul:0.#}, ±³¹èÈ½¼ö¡¿{breedingAttemptsMul:0.#}");
+        ctx.ShowInfo?.Invoke($"{DisplayName} ï¿½ßµï¿½: {days}ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{(1f / spawnIntervalMul):0.#}, ï¿½ï¿½ï¿½ï¿½Ã°ï¿½ï¿½ï¿½{breedingDurationMul:0.#}, ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½{breedingAttemptsMul:0.#}");
     }
 
     private void ExtendOrAddMod(string sourceTag, StatId stat, float multiplier, int days)
@@ -63,12 +63,12 @@ public class ItemData_Adrenaline : ItemData
         
         if (existingMod != null)
         {
-            // ±âÁ¸ ¸ðµå°¡ ÀÖÀ¸¸é ±â°£À» ´õÇÔ
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½â°£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             existingMod.expireDay += days;
         }
         else
         {
-            // »õ·Î¿î ¸ðµå Ãß°¡
+            // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
             ModManager.Instance.AddTimedMultiplier(stat, -1, multiplier, days, sourceTag);
         }
     }

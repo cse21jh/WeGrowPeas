@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AddSoilItem", menuName = "Items/Grid/Add Soil")]
+[CreateAssetMenu(menuName = "Shop/Items/Add Soil (ë†ì¥ í™•ì¥)", fileName = "AddSoilItemData")]
 public class AddSoilItemData : ItemData
 {
-    private string purchaseKey = "³óÀå È®Àå";
+    private string purchaseKey = "ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½";
 
     [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;
-    [SerializeField] private int maxPurchase = 4; // ¹çÀº 4È¸±îÁö¸¸
+    [SerializeField] private int maxPurchase = 4; // ï¿½ï¿½ï¿½ï¿½ 4È¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     private void OnValidate()
     {
@@ -22,7 +22,7 @@ public class AddSoilItemData : ItemData
         if (ctx.Shop.PurchaseHistory[purchaseKey] < maxPurchase)
             Price = basePrice * (ctx.Shop.PurchaseHistory[purchaseKey] + 1); // 1000,2000,3000,4000
         else
-            Price = int.MaxValue; // ´õ ¸ø »ï
+            Price = int.MaxValue; // ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
@@ -32,7 +32,7 @@ public class AddSoilItemData : ItemData
 
         if (ctx.Shop.PurchaseHistory[purchaseKey] >= maxPurchase)
         {
-            reason = "ÃÖ´ë ±¸¸Å È½¼ö¿¡ µµ´ŞÇß½À´Ï´Ù.";
+            reason = "ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.";
             return false;
         }
         reason = null;
@@ -46,7 +46,7 @@ public class AddSoilItemData : ItemData
     {
         if (ctx?.Grid == null)
         {
-            Debug.Log("±×¸®µå°¡ ¾ø½À´Ï´Ù.");
+            Debug.Log("ï¿½×¸ï¿½ï¿½å°¡ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             return;
         }
 
@@ -62,6 +62,6 @@ public class AddSoilItemData : ItemData
         if (i < maxPurchase)
             Price = basePrice * (i + 1); // 1000,2000,3000,4000
         else
-            Price = int.MaxValue; // ´õ ¸ø »ï
+            Price = int.MaxValue; // ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
     }
 }

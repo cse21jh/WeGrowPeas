@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Item_DNAExtraction", menuName = "Shop/Item/DNAExtraction")]
-public class ItemData_Extraction : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/DNA Extraction (DNA ì¶”ì¶œ)", fileName = "DNAExtractionItemData")]
+public class DNAExtractionItemData : ItemData
 {
     [Header("Effect")]
     [Min(1)] public int copyCount = 3;
-    [Tooltip("º¹»ç È½¼ö")]
+    [Tooltip("ï¿½ï¿½ï¿½ï¿½ È½ï¿½ï¿½")]
     
 
     [Header("Rotation")]
@@ -24,7 +24,7 @@ public class ItemData_Extraction : ItemData
         IsStackable = false;
         OnePerShopIfNotStackable = true;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "À¯ÀüÀÚ ÃßÃâ±â";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½";
         if (Price <= 0) Price = 1000;
     }
 
@@ -74,10 +74,10 @@ public class ItemData_Extraction : ItemData
             else if (plant.GetType() == typeof(Peanut))
                 g.AddPeanut(trait);
             else
-                Debug.Log("¹«¾ð°¡ Àß¸øµÊ");
+                Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ß¸ï¿½ï¿½ï¿½");
         }
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} ¹ßµ¿: µ¿ÀÏÇÑ À¯ÀüÀÚ¸¦ °¡Áø ¹«ÀÛÀ§ ½Ä¹°À» 3°³ Ãß°¡ÇÕ´Ï´Ù");
+        ctx.ShowInfo?.Invoke($"{DisplayName} ï¿½ßµï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ 3ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½");
     }
 
     public override void Cancel(ShopContext ctx)
@@ -85,17 +85,17 @@ public class ItemData_Extraction : ItemData
         selectedIdx = null;
     }
 
-    // === PlaceOnTile ÈÅ ===
+    // === PlaceOnTile ï¿½ï¿½ ===
     public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason)
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid ¾øÀ½"; return false; }
+        if (!g) { reason = "Grid ï¿½ï¿½ï¿½ï¿½"; return false; }
 
         int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = "Åä¾çÀÌ ¾Æ´Õ´Ï´Ù"; return false; }
+        if (!idx.HasValue) { reason = "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Õ´Ï´ï¿½"; return false; }
 
-        if (!g.HasBreedablePlantAt(idx.Value)) { reason = "º¹Á¦ °¡´É ½Ä¹°ÀÌ ¾ø½À´Ï´Ù"; return false; }
+        if (!g.HasBreedablePlantAt(idx.Value)) { reason = "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½"; return false; }
 
         return true;
     }

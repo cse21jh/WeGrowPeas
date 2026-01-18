@@ -14,6 +14,40 @@ public class ShopManager : Singleton<ShopManager>
     private Dictionary<string, int> purchaseHistory = new Dictionary<string, int>();
     public Dictionary<string, int> PurchaseHistory => purchaseHistory;
 
+    // 매일 무료 리롤 가능 횟수 (기본 0)
+    private int dailyRerollCount = 0;
+    public int DailyRerollCount => dailyRerollCount;
+
+    /// <summary>
+    /// 매일 상점 무료 리롤 가능 횟수를 추가합니다.
+    /// </summary>
+    public void AddDailyRerollCount(int count)
+    {
+        dailyRerollCount += count;
+    }
+
+    /// <summary>
+    /// 리롤을 사용합니다. 리롤 횟수가 남아있으면 true를 반환합니다.
+    /// </summary>
+    public bool UseReroll()
+    {
+        if (dailyRerollCount > 0)
+        {
+            dailyRerollCount--;
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 매일 초기화 시 호출 (GameManager에서 호출)
+    /// </summary>
+    public void ResetDailyRerollCount()
+    {
+        // 구매한 "상점 연락처" 아이템의 효과는 계속 유지되므로 리셋하지 않음
+        // dailyRerollCount는 게임 전체 동안 유지됨
+    }
+
     void Awake()
     {
         LoadRotationItems();

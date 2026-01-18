@@ -22,7 +22,6 @@ public class Grid : MonoBehaviour
 
     protected bool isBreedSkipButtonPressed = false;
 
-    protected bool isIceBlockOn = false;
 
     protected float breedTimer;
 
@@ -98,7 +97,8 @@ public class Grid : MonoBehaviour
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
-    protected bool hasIceBlock = false;
+    protected bool hasCoolingShield = false; // 냉각 방패 보유 여부
+    protected bool isCoolingShieldActivated = false; // 냉각 방패 활성화 여부 (1회 사용)
     protected List<int> petBottleTiles = new List<int>();
     protected Dictionary<int, int> petBottleBlockCount = new Dictionary<int, int>(); // 페트병 위치별 보호 횟수 (기본값 1, 재질 강화 시 증가)
     protected int petBottleInitialStockBonus = 0; // 페트병 일일 최대 구매 횟수 보너스
@@ -138,7 +138,7 @@ public class Grid : MonoBehaviour
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
-    public bool HasIceBlock => hasIceBlock;
+    public bool HasCoolingShield => hasCoolingShield;
     public List<int> PetBottleTiles => petBottleTiles;
     public int PetBottleInitialStockBonus => petBottleInitialStockBonus;
     public int PetBottlePriceReduction => petBottlePriceReduction;
@@ -942,7 +942,6 @@ public class Grid : MonoBehaviour
         additionalInheritance = saveData.additionalInheritance;
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
-        if (saveData.hasIceBlock) SetIceBlock();
         
         // 페트병 관련 변수 로드
         petBottleInitialStockBonus = saveData.petBottleInitialStockBonus;
@@ -1420,30 +1419,29 @@ public class Grid : MonoBehaviour
         };
     }
 
-    //-----얼음 방패------
-
-    public void SetIceBlock(bool value = true)
+    /// <summary>
+    /// 냉각 방패 활성화 (구매 시 호출)
+    /// </summary>
+    public void ActivateCoolingShield()
     {
-        hasIceBlock = value;
-        // 얼방 가지고 있다는 UI
+        hasCoolingShield = true;
     }
 
-    public void ActivateIceBlock()
+    /// <summary>
+    /// 냉각 방패가 활성화되었는지 확인 (1회 사용됨 여부)
+    /// </summary>
+    public bool IsCoolingShieldActivated()
     {
-        hasIceBlock = false;
-        isIceBlockOn = true;
-        // 얼방 작동한다는 UI
+        return isCoolingShieldActivated;
     }
 
-    public bool IsIceBlockActivated()
+    /// <summary>
+    /// 냉각 방패 사용 처리 (1회 사용)
+    /// </summary>
+    public void SetCoolingShieldActivated()
     {
-        return isIceBlockOn;
-    }
-
-    public void DeactivateIceBlock()
-    {
-        isIceBlockOn = false;
-        // 얼방 UI 삭제
+        isCoolingShieldActivated = true;
+        hasCoolingShield = false; // 사용 후 소멸
     }
 
     public int GetLivingPlantCount()

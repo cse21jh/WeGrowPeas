@@ -54,8 +54,7 @@ public class SaveData
     public float maxBreedTimer;
     public int maxBreedCount;
     public int breedCount;
-    public bool hasIceBlock;
-    public List<int> perBottleTiles = new();
+        public List<int> perBottleTiles = new();
     public int petBottleInitialStockBonus = 0;
     public int petBottlePriceReduction = 0;
     public float petBottleSpawnProbability = 0f;
@@ -420,7 +419,6 @@ public class GameManager : Singleton<GameManager>
         saveData.maxBreedTimer = grid.MaxBreedTimer;
         saveData.maxBreedCount = grid.MaxBreedCount;
 
-        saveData.hasIceBlock = grid.HasIceBlock;
         saveData.perBottleTiles = grid.PetBottleTiles;
         saveData.petBottleInitialStockBonus = grid.PetBottleInitialStockBonus;
         saveData.petBottlePriceReduction = grid.PetBottlePriceReduction;

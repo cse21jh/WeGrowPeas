@@ -2,26 +2,26 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "Item_GeneExtractor", menuName = "Shop/Item/Gene Extractor")]
-public class ItemData_GeneExtractor : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Gene Extractor (ìœ ì „ì ì¶”ì¶œê¸°)", fileName = "GeneExtractorItemData")]
+public class GeneExtractorItemData : ItemData
 {
     [Header("Rotation")]
-    [Min(1)] public int unlockStageDay = 1; // 1ÀÏÂ÷ºÎÅÍ µîÀå
+    [Min(1)] public int unlockStageDay = 1; // 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     [Min(0)] public int rotationWeight = 8;
 
-    private Plant selected; // »ç¿ëÀÚ°¡ ¼±ÅÃÇÑ ±âÁØ ½Ä¹°
+    private Plant selected; // ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½
 
     private void OnValidate()
     {
-        FlowType = ShopFlowType.SelectExistingPlant; // ½Ä¹° ¼±ÅÃ ÇÃ·Î¿ì
+        FlowType = ShopFlowType.SelectExistingPlant; // ï¿½Ä¹ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·Î¿ï¿½
         IsStackable = false;
         OnePerShopIfNotStackable = true;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "À¯ÀüÀÚ ÃßÃâ±â";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½";
         if (Price <= 0) Price = 1000;
     }
 
-    // ¦¡¦¡ ·ÎÅ×ÀÌ¼Ç ÈÄº¸ Á¶°Ç/°¡ÁßÄ¡ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½Äºï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         int stage = GameManager.Instance.stage;
@@ -29,34 +29,34 @@ public class ItemData_GeneExtractor : ItemData
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
 
-    // ¦¡¦¡ ±¸¸Å °¡´É¿©ºÎ(¹Ì¸®) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½É¿ï¿½ï¿½ï¿½(ï¿½Ì¸ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid ¾øÀ½"; return false; }
+        if (!g) { reason = "Grid ï¿½ï¿½ï¿½ï¿½"; return false; }
 
-        // ÃÖ¼Ò 1Ä­ ÀÌ»ó ºó Ä­ÀÌ ÀÖ¾î¾ß ÀÇ¹Ì ÀÖÀ½
+        // ï¿½Ö¼ï¿½ 1Ä­ ï¿½Ì»ï¿½ ï¿½ï¿½ Ä­ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ ï¿½Ç¹ï¿½ ï¿½ï¿½ï¿½ï¿½
         int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
-        if (empty <= 0) { reason = "ºó Ä­ÀÌ ¾ø½À´Ï´Ù"; return false; }
+        if (empty <= 0) { reason = "ï¿½ï¿½ Ä­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½"; return false; }
 
-        // ¼±ÅÃ ´ë»óÀÌ ÇÑ ±×·çµµ ¾ø´Ù¸é »ç¿ë ºÒ°¡
-        if (g.plantGrid.Count <= 0) { reason = "¼±ÅÃÇÒ ½Ä¹°ÀÌ ¾ø½À´Ï´Ù"; return false; }
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½×·çµµ ï¿½ï¿½ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
+        if (g.plantGrid.Count <= 0) { reason = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½"; return false; }
 
         return true;
     }
 
-    // ¦¡¦¡ ¼±ÅÃ ÇÃ·Î¿ì ÈÅ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·Î¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
-        // ShopUI°¡ BeginPlantSelectionÀ¸·Î À¯µµÇØ ÁÙ °Í ¡æ ¿©±â¼± ¹Ù·Î ok
+        // ShopUIï¿½ï¿½ BeginPlantSelectionï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½â¼± ï¿½Ù·ï¿½ ok
         onReady?.Invoke();
     }
 
     public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
     {
-        if (target == null) { reason = "½Ä¹°À» ¼±ÅÃÇÏ¼¼¿ä"; return false; }
+        if (target == null) { reason = "ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½"; return false; }
         reason = null;
         return true;
     }
@@ -66,12 +66,12 @@ public class ItemData_GeneExtractor : ItemData
         selected = plant;
     }
 
-    // ¦¡¦¡ Àû¿ë(È®Á¤) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(È®ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public override void Commit(ShopContext ctx)
     {
         if (!selected)
         {
-            ctx.ShowError?.Invoke("¼±ÅÃµÈ ½Ä¹°ÀÌ ¾ø½À´Ï´Ù");
+            ctx.ShowError?.Invoke("ï¿½ï¿½ï¿½Ãµï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
             return;
         }
 
@@ -82,19 +82,19 @@ public class ItemData_GeneExtractor : ItemData
             return;
         }
 
-        // ±âÁØ À¯Àü Á¤º¸ º¹»ç
-        List<GeneticTrait> genes = selected.GetGeneticTrait(); // Plant¿¡ ÀÌ¹Ì Á¸Àç
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        List<GeneticTrait> genes = selected.GetGeneticTrait(); // Plantï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        // »ı¼º °¡´ÉÇÑ ¼ö = min(3, ºó Ä­ ¼ö)
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ = min(3, ï¿½ï¿½ Ä­ ï¿½ï¿½)
         int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
-        int toSpawn = Mathf.Clamp(3, 0, empty); // ºóÄ­ÀÌ 0~2¸é ±×¸¸Å­¸¸
+        int toSpawn = Mathf.Clamp(3, 0, empty); // ï¿½ï¿½Ä­ï¿½ï¿½ 0~2ï¿½ï¿½ ï¿½×¸ï¿½Å­ï¿½ï¿½
 
         int spawned = 0;
         for (int i = 0; i < toSpawn; i++)
         {
-            // ¡°¹«ÀÛÀ§ ½Ä¹°¡±Àº À¯Àü ¼¼ÆÃÀÌ È®½ÇÇÑ Á¾À¸·Î Á¦ÇÑ (Pea/Peanut)
-            // (Nepenthes/ChiliPepper´Â SetTrait Èå¸§ÀÌ ´Ù¸¦ ¼ö ÀÖ¾î¿ä)
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (Pea/Peanut)
+            // (Nepenthes/ChiliPepperï¿½ï¿½ SetTrait ï¿½å¸§ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½)
             if (UnityEngine.Random.Range(0, 2) == 0)
                 g.AddPea(genes);
             else
@@ -104,11 +104,11 @@ public class ItemData_GeneExtractor : ItemData
         }
 
         if (spawned > 0)
-            ctx.ShowInfo?.Invoke($"{DisplayName}: {spawned}°³ »ı¼º ¿Ï·á");
+            ctx.ShowInfo?.Invoke($"{DisplayName}: {spawned}ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½");
         else
-            ctx.ShowError?.Invoke("ºó Ä­ÀÌ ¾ø¾î »ı¼ºµÇÁö ¾Ê¾Ò½À´Ï´Ù");
+            ctx.ShowError?.Invoke("ï¿½ï¿½ Ä­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò½ï¿½ï¿½Ï´ï¿½");
 
-        // Á¤¸®
+        // ï¿½ï¿½ï¿½ï¿½
         selected = null;
     }
 

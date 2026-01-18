@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "Item_BugFan", menuName = "Shop/Item/Bug Fan")]
+[CreateAssetMenu(menuName = "Shop/Items/Bug Fan (벌레 방해 선풍기)", fileName = "BugFanItemData")]
 public class BugFanItemData : ItemData
 {
     private string purchaseKey = "벌레 방해 선풍기";

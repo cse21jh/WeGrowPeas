@@ -2,8 +2,8 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "Item_SignPost", menuName = "Shop/Item/SignPost")]
-public class ItemData_SignPost : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Sign Post (팻말)", fileName = "SignPostItemData")]
+public class SignPostItemData : ItemData
 {
     [Header("SignPost")]
     [Range(0f, 1f)] public float reducePercent = 0.75f; // 75% 감소 -> x0.25

@@ -62,8 +62,7 @@ public class EnemyController : MonoBehaviour
     //int CurrentDay => GameManager.Instance.stage;
 
 
-    // 아래 저장 필요
-    private Season currentSeason = Season.Spring; // 스테이지로 계산해서 불러옴
+    private Season currentSeason = Season.Spring; // 세이브데이터에서 불러와야함
 
     private Wave lastWave;
     private Wave currentWave;
@@ -71,7 +70,7 @@ public class EnemyController : MonoBehaviour
     private int waveSkipCount = 0;
     private int[] waveKillCount;
 
-    private List<WaveType> stageWaveRecord = new List<WaveType>(); // 스테이지별 웨이브, 킬 기록들 >> 일기예보에서 사용하기 위함
+    private List<WaveType> stageWaveRecord = new List<WaveType>(); // 세이브데이터의 웨이브, 좀 더 확인 >> 엔딩조건 체크하기 위해 필요
     private List<int> stageKillRecord = new List<int>();
     private List<int> stageNoTraitRecord = new List<int>();
 
@@ -115,9 +114,9 @@ public class EnemyController : MonoBehaviour
 
     public IEnumerator EnemyWaveCoroutine()
     {
-        //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
+        //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
         Wave wave = currentWave;
-        // Debug.Log("현재 웨이브 종류 : " + currentWave);
+        // Debug.Log("현재 웨이브 타입 : " + currentWave);
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);        
 
@@ -152,7 +151,7 @@ public class EnemyController : MonoBehaviour
 
                     if (plant.CanResist(wave.WaveType))
                     {
-                        // Debug.Log(idx + "번째 식물이 웨이브를 버텼습니다");
+                        // Debug.Log(idx + "번째 식물이 웨이브를 버틸 수 있습니다");
                         plant.ResistWave(wave.WaveType);
                     }
                     else
@@ -169,11 +168,9 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        if (grid.IsIceBlockActivated())
-            grid.DeactivateIceBlock();
 
         SetNextSeason(); 
-        SetNextWave(); // 계절 바뀐 후, 다음날의 계절을 받아야 실제 
+        SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
 
         int stage = GameManager.Instance.stage;
         if(weatherApp != null)
@@ -182,10 +179,10 @@ public class EnemyController : MonoBehaviour
         yield return null;
     }
 
-    private void InitBaseWeightsByStage(int stage) // 첫 시작, 불러오기 용 웨이브 해금
+    private void InitBaseWeightsByStage(int stage) // 첫 게임, 불러온 후 웨이브 해금
     {
         // 초기화
-        baseWeights[WaveType.Aging] = 1f; // 항상 가능
+        baseWeights[WaveType.Aging] = 1f; // 항상 해금
         baseWeights[WaveType.Pest] = (stage + 2 >= PestWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Wind] = (stage + 2 >= WindWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Flood] = (stage + 2 >= FloodWave.UnlockStage) ? 1f : 0f;
@@ -193,10 +190,10 @@ public class EnemyController : MonoBehaviour
         baseWeights[WaveType.Cold] = (stage + 2 >= ColdWave.UnlockStage ) ? 1f : 0f;
         baseWeights[WaveType.Drought] = (stage + 2 >= DroughtWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Heat] = (stage + 2 >= HeatWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.None] = 0f; // 추첨 대상에서 제외
+        baseWeights[WaveType.None] = 0f; // 리롤 버튼에서 제외
     }
 
-    public void UnlockWave(int stage) // 매 스테이지 지날 때 해금 용 
+    public void UnlockWave(int stage) // 다음 스테이지에서 해금 될 웨이브 해금
     {
         switch (stage + 2)
         {
@@ -244,7 +241,7 @@ public class EnemyController : MonoBehaviour
 
     public void SetSeason(Season season)
     {
-        // 계절의 변동이 일어날 때, 계절에 변경이 필요한 요소들 해당 위치에서 변경
+        // 계절이 변경되었을 때, 계절에 맞는 텍스트를 해당 위치에 변경
         switch (season)
         {
             case Season.Spring:
@@ -386,13 +383,13 @@ public class EnemyController : MonoBehaviour
         ShowNextWaveText();
     }
 
-    // ---------- 가중치 계산 & 추첨 ----------
+    // ---------- 가중치 기반 & 리롤 ----------
     private Dictionary<WaveType, float> BuildEffectiveWeights()
     {
         // 기본 가중치 복사
         var map = new Dictionary<WaveType, float>(baseWeights);
 
-        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 계절별로 안 나오는 가중치 0으로 만들기
+        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
         switch(nextSeason)
         {
             case Season.Spring:
@@ -425,7 +422,7 @@ public class EnemyController : MonoBehaviour
                 map[t] *= modMul;
         }
 
-        // None은 뽑기 제외
+        // None은 항상 제외
         map[WaveType.None] = 0f;
         return map;
     }
@@ -434,11 +431,11 @@ public class EnemyController : MonoBehaviour
     {
         var map = BuildEffectiveWeights();
 
-        // 합 계산
+        // 총 합계
         float sum = 0f;
         foreach (var kv in map) sum += kv.Value;
 
-        // 전부 0인 경우 안전값
+        // 합계 0이면 자연사
         if (sum <= 0f)
             return WaveType.Aging;
 
@@ -449,7 +446,7 @@ public class EnemyController : MonoBehaviour
             acc += kv.Value;
             if (r <= acc) return kv.Key;
         }
-        return WaveType.Aging; // 부동소수점 안전장치
+        return WaveType.Aging; // 예외처리용 기본값
     }
 
     public void TutorialWave()
@@ -459,7 +456,7 @@ public class EnemyController : MonoBehaviour
 
     private IEnumerator TEnemyWaveCoroutine()
     {
-        //Debug.Log($"웨이브 디버깅 좀 하겟습니다 {unlockedWave.Count}");
+        //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
         Wave wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
@@ -469,7 +466,7 @@ public class EnemyController : MonoBehaviour
             waveManager.StartWave(waveDuration, wave.WaveType);
         }
 
-        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 재생 중 대기
+        yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 끝 날 때까지
 
         if (currentWave != noneWave)
         {
@@ -485,11 +482,9 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        if (grid.IsIceBlockActivated())
-            grid.DeactivateIceBlock();
 
         //SetNextWave();
-        //breedTimerManager 쪽 null reference issue로 부득이하게 함수 복사해서 사용
+        //breedTimerManager 의 null reference issue를 에디터에서 함수 분리해서 해결
         lastWave = currentWave;
         currentWave = nextWave;
         setWave = currentWave.WaveType;

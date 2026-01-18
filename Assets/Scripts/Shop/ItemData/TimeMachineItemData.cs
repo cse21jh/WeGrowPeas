@@ -1,8 +1,8 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "Item_TimeMachine", menuName = "Shop/Item/Time Machine")]
-public class ItemData_TimeMachine : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Time Machine (타임 머신)", fileName = "TimeMachineItemData")]
+public class TimeMachineItemData : ItemData
 {
     [Header("Effect")]
     [Min(1)] public int skipCount = 1;

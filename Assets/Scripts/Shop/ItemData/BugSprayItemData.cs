@@ -1,12 +1,12 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(fileName = "Item_BugSpray", menuName = "Shop/Item/Bug Spray")]
-public class ItemData_BugSpray : ItemData
+[CreateAssetMenu(menuName = "Shop/Items/Bug Spray (ë²Œë ˆ êµ¬ì œ ìŠ¤í”„ë ˆì´)", fileName = "BugSprayItemData")]
+public class BugSprayItemData : ItemData
 {
     [Header("Effect")]
-    [Range(0f, 1f)] public float reducePercent = 0.5f; // 50% °¨¼Ò
-    [Min(1)] public int durationDays = 6;             // ´ÙÀ½ 6ÀÏ°£ (»óÁ¡ ÁÖ±â °í·Á½Ã Commit¿¡¼­ ½ºÄÉÀÏ)
+    [Range(0f, 1f)] public float reducePercent = 0.5f; // 50% ï¿½ï¿½ï¿½ï¿½
+    [Min(1)] public int durationDays = 6;             // ï¿½ï¿½ï¿½ï¿½ 6ï¿½Ï°ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Commitï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
@@ -17,7 +17,7 @@ public class ItemData_BugSpray : ItemData
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "¹ú·¹ ½ºÇÁ·¹ÀÌ";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
         if (Price <= 0) Price = 500;
     }
 
