@@ -8,7 +8,7 @@ public class SellSpecificPeaRequest : RequestInstance
     private int requiredCount;
     private int currentCount;
     private int conditionType;
-    private string[] traitName = { "ÀÚ¿¬»ç", "ÇØÃæ", "¹Ù¶÷", "È«¼ö", "Æø¿ì", "ÃßÀ§", "°¡¹³", "´õÀ§" };
+    private string[] traitName = { "ìì—°ì‚¬", "í•´ì¶©", "ë°”ëŒ", "í™ìˆ˜", "í­ìš°", "ê°€ë­„", "ì¶”ìœ„", "ë”ìœ„" };
 
     public SellSpecificPeaRequest(RequestScriptable data) : base(data)
     {
@@ -44,14 +44,26 @@ public class SellSpecificPeaRequest : RequestInstance
     {
         if (IsCompleted || IsFailed) return;
 
-        //plantÀÇ trait¿Í conditionType ºñ±³
+        //plantì˜ traitì™€ conditionType ë¹„êµ
         List<GeneticTrait> traits = p.GetGeneticTrait();
-        if (traits[conditionType].genetics < 2) return;
+        Debug.Log("ìŒ" + conditionType);
 
-        currentCount++;
+        foreach (var g in traits)
+        {
+            Debug.Log("foreach");
+            if(conditionType == (int)g.traitType)
+            {
+                Debug.Log("hi " + g.genetics);
+                if (g.genetics == 2)
+                {
+                    currentCount++;
 
-        if (currentCount == requiredCount) CompleteOnce();
-        else RaiseChanged();
+                    if (currentCount == requiredCount) CompleteOnce();
+                    else RaiseChanged();
+                }
+                else return;
+            }
+        }
     }
 
     private int SetDifficulty(string requestId)
@@ -71,7 +83,11 @@ public class SellSpecificPeaRequest : RequestInstance
 
     private void SelectRandomTrait()
     {
-        conditionType = Random.Range((int)TraitType.NaturalDeath, (int)(TraitType.Heat) + 1);
+        //int curStage = GameManager.Instance.stage;
+        //conditionType = Random.Range((int)TraitType.NaturalDeath, (int)(TraitType.Heat) + 1);
+
+        //Dictionary<WaveType, float> d = GameManager.Instance.enemyController.BuildEffectiveWeights();
+        conditionType = GameManager.Instance.enemyController.PickTraitFromUnlockWave();
     }
 
     public override RequestInstanceSaveData ToSaveData()

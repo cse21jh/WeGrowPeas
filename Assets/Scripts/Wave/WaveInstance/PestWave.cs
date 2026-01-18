@@ -5,8 +5,8 @@ using UnityEngine;
 public class PestWave : Wave
 {
     public override WaveType WaveType => WaveType.Pest;
-    public override string WaveName => "����";
-    public override string WaveDescription => "�ұ��� �����Ҹ��� �鸳�ϴ�......";
+    public override string WaveName => "해충";
+    public override string WaveDescription => "불길한 날개짓 소리가 들립니다......";
     public override string WaveSoundString => "Pest";
     public const int UnlockStage = 6;
     

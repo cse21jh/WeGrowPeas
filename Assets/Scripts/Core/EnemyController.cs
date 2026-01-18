@@ -53,7 +53,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] public SignPostController signPost;
 
     [Header("Wave Weights")]
-    [SerializeField] private float defaultBaseWeight = 1f; // ±âº» °¡ÁßÄ¡
+    [SerializeField] private float defaultBaseWeight = 1f; // ê¸°ë³¸ ê°€ì¤‘ì¹˜
 
     [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
 
@@ -62,7 +62,7 @@ public class EnemyController : MonoBehaviour
     //int CurrentDay => GameManager.Instance.stage;
 
 
-    private Season currentSeason = Season.Spring; // ¼¼ÀÌºêµ¥ÀÌÅÍ¿¡¼­ ºÒ·¯¿Í¾ßÇÔ
+    private Season currentSeason = Season.Spring; // ì„¸ì´ë¸Œë°ì´í„°ì—ì„œ ë¶ˆëŸ¬ì™€ì•¼í•¨
 
     private Wave lastWave;
     private Wave currentWave;
@@ -70,7 +70,7 @@ public class EnemyController : MonoBehaviour
     private int waveSkipCount = 0;
     private int[] waveKillCount;
 
-    private List<WaveType> stageWaveRecord = new List<WaveType>(); // ¼¼ÀÌºêµ¥ÀÌÅÍÀÇ ¿şÀÌºê, Á» ´õ È®ÀÎ >> ¿£µùÁ¶°Ç Ã¼Å©ÇÏ±â À§ÇØ ÇÊ¿ä
+    private List<WaveType> stageWaveRecord = new List<WaveType>(); // ì„¸ì´ë¸Œë°ì´í„°ì˜ ì›¨ì´ë¸Œ, ì¢€ ë” í™•ì¸ >> ì—”ë”©ì¡°ê±´ ì²´í¬í•˜ê¸° ìœ„í•´ í•„ìš”
     private List<int> stageKillRecord = new List<int>();
     private List<int> stageNoTraitRecord = new List<int>();
 
@@ -114,9 +114,9 @@ public class EnemyController : MonoBehaviour
 
     public IEnumerator EnemyWaveCoroutine()
     {
-        //Debug.Log($"¿şÀÌºê »ı¼º ÇÒ ¶§ »ç¿ëÇÕ´Ï´Ù {unlockedWave.Count}");
+        //Debug.Log($"ì›¨ì´ë¸Œ ìƒì„± í•  ë•Œ ì‚¬ìš©í•©ë‹ˆë‹¤ {unlockedWave.Count}");
         Wave wave = currentWave;
-        // Debug.Log("ÇöÀç ¿şÀÌºê Å¸ÀÔ : " + currentWave);
+        // Debug.Log("í˜„ì¬ ì›¨ì´ë¸Œ íƒ€ì… : " + currentWave);
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);        
 
@@ -151,7 +151,7 @@ public class EnemyController : MonoBehaviour
 
                     if (plant.CanResist(wave.WaveType))
                     {
-                        // Debug.Log(idx + "¹øÂ° ½Ä¹°ÀÌ ¿şÀÌºê¸¦ ¹öÆ¿ ¼ö ÀÖ½À´Ï´Ù");
+                        // Debug.Log(idx + "ë²ˆì§¸ ì‹ë¬¼ì´ ì›¨ì´ë¸Œë¥¼ ë²„í‹¸ ìˆ˜ ìˆìŠµë‹ˆë‹¤");
                         plant.ResistWave(wave.WaveType);
                     }
                     else
@@ -159,7 +159,7 @@ public class EnemyController : MonoBehaviour
                         waveKillCount[(int)currentWave.WaveType] += 1;
                         stageKillRecord[GameManager.Instance.stage]++;
                         GameEvents.RaisePeaDied();
-                        // Debug.Log(idx + "¹øÂ° ½Ä¹°ÀÌ Á×¾ú½À´Ï´Ù");
+                        // Debug.Log(idx + "ë²ˆì§¸ ì‹ë¬¼ì´ ì£½ì—ˆìŠµë‹ˆë‹¤");
                         if (!plant.Die())
                             plant.ResistWave(wave.WaveType);
                     }
@@ -170,7 +170,7 @@ public class EnemyController : MonoBehaviour
 
 
         SetNextSeason(); 
-        SetNextWave(); // ´ÙÀ½ ¹Ù²ï ÈÄ, ÇÃ·¹ÀÌ¾î·¹ÄÚµå Á¤º¸¸¦ ¹Ş¾Æ¾ß ÇÔ
+        SetNextWave(); // ë‹¤ìŒ ë°”ë€ í›„, í”Œë ˆì´ì–´ë ˆì½”ë“œ ì •ë³´ë¥¼ ë°›ì•„ì•¼ í•¨
 
         int stage = GameManager.Instance.stage;
         if(weatherApp != null)
@@ -179,10 +179,10 @@ public class EnemyController : MonoBehaviour
         yield return null;
     }
 
-    private void InitBaseWeightsByStage(int stage) // Ã¹ °ÔÀÓ, ºÒ·¯¿Â ÈÄ ¿şÀÌºê ÇØ±İ
+    private void InitBaseWeightsByStage(int stage) // ì²« ê²Œì„, ë¶ˆëŸ¬ì˜¨ í›„ ì›¨ì´ë¸Œ í•´ê¸ˆ
     {
-        // ÃÊ±âÈ­
-        baseWeights[WaveType.Aging] = 1f; // Ç×»ó ÇØ±İ
+        // ì´ˆê¸°í™”
+        baseWeights[WaveType.Aging] = 1f; // í•­ìƒ í•´ê¸ˆ
         baseWeights[WaveType.Pest] = (stage + 2 >= PestWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Wind] = (stage + 2 >= WindWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Flood] = (stage + 2 >= FloodWave.UnlockStage) ? 1f : 0f;
@@ -190,10 +190,10 @@ public class EnemyController : MonoBehaviour
         baseWeights[WaveType.Cold] = (stage + 2 >= ColdWave.UnlockStage ) ? 1f : 0f;
         baseWeights[WaveType.Drought] = (stage + 2 >= DroughtWave.UnlockStage) ? 1f : 0f;
         baseWeights[WaveType.Heat] = (stage + 2 >= HeatWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.None] = 0f; // ¸®·Ñ ¹öÆ°¿¡¼­ Á¦¿Ü
+        baseWeights[WaveType.None] = 0f; // ë¦¬ë¡¤ ë²„íŠ¼ì—ì„œ ì œì™¸
     }
 
-    public void UnlockWave(int stage) // ´ÙÀ½ ½ºÅ×ÀÌÁö¿¡¼­ ÇØ±İ µÉ ¿şÀÌºê ÇØ±İ
+    public void UnlockWave(int stage) // ë‹¤ìŒ ìŠ¤í…Œì´ì§€ì—ì„œ í•´ê¸ˆ ë  ì›¨ì´ë¸Œ í•´ê¸ˆ
     {
         switch (stage + 2)
         {
@@ -241,20 +241,20 @@ public class EnemyController : MonoBehaviour
 
     public void SetSeason(Season season)
     {
-        // °èÀıÀÌ º¯°æµÇ¾úÀ» ¶§, °èÀı¿¡ ¸Â´Â ÅØ½ºÆ®¸¦ ÇØ´ç À§Ä¡¿¡ º¯°æ
+        // ê³„ì ˆì´ ë³€ê²½ë˜ì—ˆì„ ë•Œ, ê³„ì ˆì— ë§ëŠ” í…ìŠ¤íŠ¸ë¥¼ í•´ë‹¹ ìœ„ì¹˜ì— ë³€ê²½
         switch (season)
         {
             case Season.Spring:
-                tempSeasonText.text = "º½";
+                tempSeasonText.text = "ë´„";
                 break;
             case Season.Summer:
-                tempSeasonText.text = "¿©¸§";
+                tempSeasonText.text = "ì—¬ë¦„";
                 break;
             case Season.Fall:
-                tempSeasonText.text = "°¡À»";
+                tempSeasonText.text = "ê°€ì„";
                 break;
             case Season.Winter:
-                tempSeasonText.text = "°Ü¿ï";
+                tempSeasonText.text = "ê²¨ìš¸";
                 break;
         }
         currentSeason = season;
@@ -307,7 +307,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = "Ãß°¡ ½ºÅµ "+ waveSkipCount.ToString() + "È¸";
+        waveSkipCountText.text = "ì¶”ê°€ ìŠ¤í‚µ "+ waveSkipCount.ToString() + "íšŒ";
         return;
     }
 
@@ -383,13 +383,13 @@ public class EnemyController : MonoBehaviour
         ShowNextWaveText();
     }
 
-    // ---------- °¡ÁßÄ¡ ±â¹İ & ¸®·Ñ ----------
+    // ---------- ê°€ì¤‘ì¹˜ ê¸°ë°˜ & ë¦¬ë¡¤ ----------
     private Dictionary<WaveType, float> BuildEffectiveWeights()
     {
-        // ±âº» °¡ÁßÄ¡ º¹»ç
+        // ê¸°ë³¸ ê°€ì¤‘ì¹˜ ë³µì‚¬
         var map = new Dictionary<WaveType, float>(baseWeights);
 
-        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // ´ÙÀ½ ½ºÅ×ÀÌÁö°¡ ½ÃÀÛµÉ ¶§ °èÀı¿¡ ¸Â´Â °¡ÁßÄ¡ 0À¸·Î Á¦¿Ü
+        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // ë‹¤ìŒ ìŠ¤í…Œì´ì§€ê°€ ì‹œì‘ë  ë•Œ ê³„ì ˆì— ë§ëŠ” ê°€ì¤‘ì¹˜ 0ìœ¼ë¡œ ì œì™¸
         switch(nextSeason)
         {
             case Season.Spring:
@@ -422,7 +422,7 @@ public class EnemyController : MonoBehaviour
                 map[t] *= modMul;
         }
 
-        // NoneÀº Ç×»ó Á¦¿Ü
+        // Noneì€ í•­ìƒ ì œì™¸
         map[WaveType.None] = 0f;
         return map;
     }
@@ -431,11 +431,11 @@ public class EnemyController : MonoBehaviour
     {
         var map = BuildEffectiveWeights();
 
-        // ÃÑ ÇÕ°è
+        // ì´ í•©ê³„
         float sum = 0f;
         foreach (var kv in map) sum += kv.Value;
 
-        // ÇÕ°è 0ÀÌ¸é ÀÚ¿¬»ç
+        // í•©ê³„ 0ì´ë©´ ìì—°ì‚¬
         if (sum <= 0f)
             return WaveType.Aging;
 
@@ -446,7 +446,7 @@ public class EnemyController : MonoBehaviour
             acc += kv.Value;
             if (r <= acc) return kv.Key;
         }
-        return WaveType.Aging; // ¿¹¿ÜÃ³¸®¿ë ±âº»°ª
+        return WaveType.Aging; // ì˜ˆì™¸ì²˜ë¦¬ìš© ê¸°ë³¸ê°’
     }
 
     public void TutorialWave()
@@ -456,7 +456,7 @@ public class EnemyController : MonoBehaviour
 
     private IEnumerator TEnemyWaveCoroutine()
     {
-        //Debug.Log($"¿şÀÌºê »ı¼º ÇÒ ¶§ »ç¿ëÇÕ´Ï´Ù {unlockedWave.Count}");
+        //Debug.Log($"ì›¨ì´ë¸Œ ìƒì„± í•  ë•Œ ì‚¬ìš©í•©ë‹ˆë‹¤ {unlockedWave.Count}");
         Wave wave = currentWave;
         Debug.Log("currentWave : " + currentWave);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
@@ -466,7 +466,7 @@ public class EnemyController : MonoBehaviour
             waveManager.StartWave(waveDuration, wave.WaveType);
         }
 
-        yield return new WaitForSeconds(waveDuration); // ¿şÀÌºê ÀÌÆåÆ® ³¡ ³¯ ¶§±îÁö
+        yield return new WaitForSeconds(waveDuration); // ì›¨ì´ë¸Œ ì´í™íŠ¸ ë ë‚  ë•Œê¹Œì§€
 
         if (currentWave != noneWave)
         {
@@ -484,7 +484,7 @@ public class EnemyController : MonoBehaviour
 
 
         //SetNextWave();
-        //breedTimerManager ÀÇ null reference issue¸¦ ¿¡µğÅÍ¿¡¼­ ÇÔ¼ö ºĞ¸®ÇØ¼­ ÇØ°á
+        //breedTimerManager ì˜ null reference issueë¥¼ ì—ë””í„°ì—ì„œ í•¨ìˆ˜ ë¶„ë¦¬í•´ì„œ í•´ê²°
         lastWave = currentWave;
         currentWave = nextWave;
         setWave = currentWave.WaveType;
@@ -518,5 +518,12 @@ public class EnemyController : MonoBehaviour
     {
         if (weatherApp != null)
             weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, grid.CountNoTraitPlant(currentWave.WaveType));
+    }
+
+    public int PickTraitFromUnlockWave()
+    {
+        int traitType = (int)PickNextByWeight();
+
+        return traitType;
     }
 }
