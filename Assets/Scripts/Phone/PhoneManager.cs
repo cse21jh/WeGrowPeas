@@ -38,6 +38,8 @@ public class PhoneManager : MonoBehaviour
     private bool _isOpen;
 
 
+    public MessengerApp messengerApp;
+
     //폰 페이즈 관련
     private float maxPhoneTimer = 30.0f;
     private float phoneTimer = 0;
@@ -120,6 +122,7 @@ public class PhoneManager : MonoBehaviour
 
     public IEnumerator PhonePhase()
     {
+        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString());
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
         
