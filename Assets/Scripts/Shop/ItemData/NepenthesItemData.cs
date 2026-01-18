@@ -39,18 +39,7 @@ public class NepenthesItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 참조가 없습니다 (ShopContext.Grid 주입 필요)";
-            return false;
-        }
-        if (!ctx.Grid.HasEmptyGrid())
-        {
-            reason = "설치할 수 있는 빈칸이 없습니다";
-            return false;
-        }
-        reason = null;
-        return true;
+        return CheckHasEmptyGrid(ctx, out reason);
     }
 
     // 배치 모드 진입: 별도 준비 없음
@@ -61,20 +50,9 @@ public class NepenthesItemData : ItemData
 
     public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
     {
-        reason = null;
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 참조가 없습니다";
-            return false;
-        }
-
         // 스크린 좌표 → 그리드 인덱스
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
-        {
-            reason = "유효한 토양이 아닙니다";
+        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
             return false;
-        }
 
         // 빈 칸인지 확인
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
@@ -92,16 +70,10 @@ public class NepenthesItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 참조가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
-        if (!pendingIndex.HasValue)
-        {
-            ctx.ShowError?.Invoke("배치 위치가 유효하지 않습니다");
+        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
             return;
-        }
 
         // 실제 배치
         ctx.Grid.AddNepenthes(pendingIndex.Value);

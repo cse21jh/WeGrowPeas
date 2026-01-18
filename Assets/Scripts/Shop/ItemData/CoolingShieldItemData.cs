@@ -21,11 +21,8 @@ public class CoolingShieldItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx?.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
+        if (!ValidateGrid(ctx, out reason))
             return false;
-        }
 
         // 이미 구매했는지 확인
         if (ctx.Grid.HasCoolingShield)
@@ -34,14 +31,7 @@ public class CoolingShieldItemData : ItemData
             return false;
         }
 
-        if (!CanPurchaseByLimit())
-        {
-            reason = "최대 구매 횟수를 초과했습니다.";
-            return false;
-        }
-
-        reason = null;
-        return true;
+        return CheckMaxPurchaseLimit(out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -51,11 +41,8 @@ public class CoolingShieldItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
         ctx.Grid.ActivateCoolingShield();
         ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 이번 게임동안 식물이 1개 이하가 될 경우 1회 보호됩니다.");
     }

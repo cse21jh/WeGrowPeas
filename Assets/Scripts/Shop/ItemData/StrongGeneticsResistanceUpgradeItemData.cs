@@ -27,13 +27,7 @@ public class StrongGeneticsResistanceUpgradeItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (!CanPurchaseByLimit())
-        {
-            reason = "최대 구매 횟수를 초과했습니다.";
-            return false;
-        }
-        reason = null;
-        return true;
+        return CheckMaxPurchaseLimit(out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -43,11 +37,8 @@ public class StrongGeneticsResistanceUpgradeItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
         ctx.Grid.AddStrongGeneticsResistanceBonus(resistanceBonus);
     }
 

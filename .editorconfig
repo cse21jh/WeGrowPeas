@@ -3,6 +3,11 @@
 # top-most EditorConfig file
 root = true
 
+# Exclude Library and other generated folders
+[Library/**]
+charset = unset
+end_of_line = unset
+
 # All files
 [*]
 charset = utf-8

@@ -40,11 +40,8 @@ public class PetBottleSupplyIncreaseItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
         ctx.Grid.AddPetBottleInitialStockBonus(stockBonus);
     }
 

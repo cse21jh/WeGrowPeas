@@ -40,16 +40,8 @@ public class HighQualityPlantItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
+        if (!CheckHasEmptyGrid(ctx, out reason))
             return false;
-        }
-        if (!ctx.Grid.HasEmptyGrid())
-        {
-            reason = "배치할 수 있는 공간이 없습니다";
-            return false;
-        }
         
         // 현재 등장하는 웨이브가 있는지 확인
         if (GameManager.Instance == null || GameManager.Instance.enemyController == null)
@@ -120,11 +112,8 @@ public class HighQualityPlantItemData : ItemData
             return;
         }
 
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
 
         WaveType targetWave = pendingWave.Value;
         TraitType targetTrait = (TraitType)targetWave; // WaveType을 TraitType으로 변환

@@ -26,18 +26,7 @@ public class PeaItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다 (ShopContext.Grid 필요)";
-            return false;
-        }
-        if (!ctx.Grid.HasEmptyGrid())
-        {
-            reason = "배치할 수 있는 공간이 없습니다";
-            return false;
-        }
-        reason = null;
-        return true;
+        return CheckHasEmptyGrid(ctx, out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -75,11 +64,8 @@ public class PeaItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
 
         if (pendingTraits == null || pendingTraits.Count == 0)
         {

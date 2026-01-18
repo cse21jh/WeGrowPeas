@@ -38,20 +38,9 @@ public class GoldSoilItemData : ItemData
 
     public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
     {
-        reason = null;
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
-            return false;
-        }
-
         // 화면 좌표를 그리드 인덱스로 변환
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
-        {
-            reason = "유효한 위치가 아닙니다";
+        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
             return false;
-        }
 
         // 이미 황금 비료가 있는 칸인지 확인
         if (ctx.Grid.HasGoldSoil(idx.Value))
@@ -78,16 +67,10 @@ public class GoldSoilItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
-        if (!pendingIndex.HasValue)
-        {
-            ctx.ShowError?.Invoke("위치 선택이 유효하지 않습니다");
+        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
             return;
-        }
 
         if (!ctx.Grid.TryPlaceGoldSoil(pendingIndex.Value))
         {

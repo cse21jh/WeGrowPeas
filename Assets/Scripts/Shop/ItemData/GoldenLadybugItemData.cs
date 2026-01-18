@@ -37,15 +37,7 @@ public class GoldenLadybugItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        // 최대 구매 제한 확인
-        if (!CanPurchaseByLimit())
-        {
-            reason = "최대 구매 횟수를 초과했습니다.";
-            return false;
-        }
-
-        reason = null;
-        return true;
+        return CheckMaxPurchaseLimit(out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -55,11 +47,8 @@ public class GoldenLadybugItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
 
         // 웨이브 종료 시 무당벌레당 100골드 획득 (중첩 시 합적용)
         ctx.Grid.AddAdditionalLadybugGoldPerUnit(goldPerUnit);

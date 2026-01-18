@@ -24,13 +24,7 @@ public class ShopContactItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (!CanPurchaseByLimit())
-        {
-            reason = "최대 구매 횟수를 초과했습니다.";
-            return false;
-        }
-        reason = null;
-        return true;
+        return CheckMaxPurchaseLimit(out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -45,6 +39,7 @@ public class ShopContactItemData : ItemData
             ctx?.ShowError?.Invoke("ShopManager 객체가 없습니다");
             return;
         }
+
         ctx.Shop.AddDailyRerollCount(rerollBonus);
         ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 매일 무료 리롤 횟수 {rerollBonus}회 추가");
     }

@@ -28,24 +28,17 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx?.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
+        if (!ValidateGrid(ctx, out reason))
             return false;
-        }
+
         // 최대 레벨(2) 체크
         if (ctx.Grid.ChiliPepperRangeLevel >= 2)
         {
             reason = "이미 최대 범위 레벨에 도달했습니다.";
             return false;
         }
-        if (!CanPurchaseByLimit())
-        {
-            reason = "최대 구매 횟수를 초과했습니다.";
-            return false;
-        }
-        reason = null;
-        return true;
+
+        return CheckMaxPurchaseLimit(out reason);
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -55,11 +48,8 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
         ctx.Grid.AddChiliPepperRangeLevel(rangeLevelIncrease);
         ctx.Grid.AddChiliPepperSpawnProbability(probabilityIncrease);
     }

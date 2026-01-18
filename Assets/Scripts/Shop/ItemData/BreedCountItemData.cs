@@ -34,11 +34,8 @@ public class BreedCountItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            Debug.Log("그리드가 없습니다.");
+        if (!ValidateGrid(ctx, out _))
             return;
-        }
 
         ctx.Grid.AddMaxBreedCount(1);
 
