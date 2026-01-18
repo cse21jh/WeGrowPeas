@@ -74,6 +74,7 @@ public class ShopManager : Singleton<ShopManager>
 
         // 결제
         ctx.Economy.SpendGold(data.GetDisplayPrice());
+        GameEvents.RaiseShopBought(data);
 
         // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
         var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;

@@ -20,4 +20,7 @@ public static class GameEvents
 
     public static event Action OnPeaDied;
     public static void RaisePeaDied() => OnPeaDied?.Invoke();
+
+    public static event Action<ItemData> OnShopBought;
+    public static void RaiseShopBought(ItemData item) => OnShopBought?.Invoke(item);
 }
