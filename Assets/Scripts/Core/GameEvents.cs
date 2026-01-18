@@ -17,4 +17,7 @@ public static class GameEvents
 
     public static event Action OnPeaBreeded;
     public static void RaisePeaBreeded() => OnPeaBreeded?.Invoke();
+
+    public static event Action OnPeaDied;
+    public static void RaisePeaDied() => OnPeaDied?.Invoke();
 }

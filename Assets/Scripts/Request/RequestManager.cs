@@ -102,8 +102,13 @@ public class RequestManager : Singleton<RequestManager>
 
         return typeCode switch
         {
-            "000" => new KillBugRequest(data),
-            "001" => new PeaBreedingRequest(data),
+            //"000" => new KillBugRequest(data),
+            //"001" => new PeaBreedingRequest(data),
+            "002" => new PeaSurviveRequest(data),
+            //"003" => new NoSellPeaRequest(data),
+            //"004" => new BuyMerchRequest(data),
+            //"005" => new SpendGoldRequest(data),
+            //"006" => new SellSpecificPeaRequest(data),
 
             _ => null
         };

@@ -159,6 +159,7 @@ public class EnemyController : MonoBehaviour
                     {
                         waveKillCount[(int)currentWave.WaveType] += 1;
                         stageKillRecord[GameManager.Instance.stage]++;
+                        GameEvents.RaisePeaDied();
                         // Debug.Log(idx + "번째 식물이 죽었습니다");
                         if (!plant.Die())
                             plant.ResistWave(wave.WaveType);
