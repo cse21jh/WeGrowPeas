@@ -1,12 +1,16 @@
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using UnityEngine;
 
-public class NoSellPeaRequest : RequestInstance
+public class SellSpecificPeaRequest : RequestInstance
 {
     private int requiredCount;
     private int currentCount;
-    private bool isPeaSoldToday;
+    private int conditionType;
+    private string[] traitName = { "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위" };
 
-    public NoSellPeaRequest(RequestScriptable data) : base(data)
+    public SellSpecificPeaRequest(RequestScriptable data) : base(data)
     {
         requiredCount = SetDifficulty(data.requestId);
     }
@@ -15,17 +19,15 @@ public class NoSellPeaRequest : RequestInstance
     {
         base.Start();
         currentCount = 0;
-        isPeaSoldToday = false;
+        SelectRandomTrait();
 
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
-        GameEvents.OnPeaSold += HandlePeaSold;
+        GameEvents.OnPeaSold += HandleCheckType;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        GameEvents.OnPeaSold -= HandleCheckType;
     }
 
     public override string GetProgressText()
@@ -33,29 +35,23 @@ public class NoSellPeaRequest : RequestInstance
         return currentCount + "/" + requiredCount;
     }
 
-    private void HandleDayPassed()
+    public override string GetTitleText()
     {
-        if (State != RequestState.InProgress) return;
-
-        if (isPeaSoldToday)
-        {
-            isPeaSoldToday = false;
-            return;
-        }
-        else currentCount++;
-
-        if (currentCount == requiredCount) CompleteOnce();
-        else RaiseChanged();
+        return Data.requestTitle.Replace("{Trait}", traitName[conditionType]);
     }
 
-    private void HandlePeaSold(Plant p)
+    private void HandleCheckType(Plant p)
     {
         if (IsCompleted || IsFailed) return;
 
-        currentCount = 0;
-        isPeaSoldToday = true;
+        //plant의 trait와 conditionType 비교
+        List<GeneticTrait> traits = p.GetGeneticTrait();
+        if (traits[conditionType].genetics < 2) return;
 
-        RaiseChanged();
+        currentCount++;
+
+        if (currentCount == requiredCount) CompleteOnce();
+        else RaiseChanged();
     }
 
     private int SetDifficulty(string requestId)
@@ -66,11 +62,16 @@ public class NoSellPeaRequest : RequestInstance
 
         return difficulty switch
         {
-            1 => 2,
-            2 => 3,
-            3 => 4,
+            1 => 6,
+            2 => 9,
+            3 => 12,
             _ => 100,
         };
+    }
+
+    private void SelectRandomTrait()
+    {
+        conditionType = Random.Range((int)TraitType.NaturalDeath, (int)(TraitType.Heat) + 1);
     }
 
     public override RequestInstanceSaveData ToSaveData()
@@ -81,6 +82,7 @@ public class NoSellPeaRequest : RequestInstance
             typeCode = Data.requestId.Substring(0, 3),
             progressCount = currentCount,
             state = (int)State,
+            extraInt = conditionType,
         };
     }
 
@@ -88,7 +90,7 @@ public class NoSellPeaRequest : RequestInstance
     {
         currentCount = data.progressCount;
         State = (RequestState)data.state;
-        isPeaSoldToday = false;
+        conditionType = data.extraInt;
 
         RaiseChanged();
     }

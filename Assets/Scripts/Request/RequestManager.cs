@@ -8,9 +8,10 @@ public class RequestInstanceSaveData
 {
     public string requestId;
     public string typeCode;
-    public int progressCount; // ���൵ ����
+    public int progressCount; // 진행도 저장
     public int state;
-    public List<string> extraStrings;
+    public List<string> extraStrings; //buymerch
+    public int extraInt; //sellspecificpea
 }
 
 public class RequestManager : Singleton<RequestManager>
@@ -103,13 +104,13 @@ public class RequestManager : Singleton<RequestManager>
 
         return typeCode switch
         {
-            //"000" => new KillBugRequest(data),
-            //"001" => new PeaBreedingRequest(data),
-            //"002" => new PeaSurviveRequest(data),
-            //"003" => new NoSellPeaRequest(data),
+            "000" => new KillBugRequest(data),
+            "001" => new PeaBreedingRequest(data),
+            "002" => new PeaSurviveRequest(data),
+            "003" => new NoSellPeaRequest(data),
             "004" => new BuyMerchRequest(data),
-            //"005" => new SpendGoldRequest(data),
-            //"006" => new SellSpecificPeaRequest(data),
+            "005" => new SpendGoldRequest(data),
+            "006" => new SellSpecificPeaRequest(data),
 
             _ => null
         };

@@ -20,7 +20,7 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
         RI = request;
         owner = ownerUI;
 
-        title.text = request.Data.requestTitle;
+        title.text = request.GetTitleText();
         reward.text = "º¸»ó - " + request.Data.reward + "°ñµå";
         progress.text = request.GetProgressText();
     }
