@@ -17,6 +17,7 @@ public abstract class RequestInstance
     public bool IsCompleted => State == RequestState.Complete || State == RequestState.Granted;
     public bool rewardGranted => State == RequestState.Granted;
     public bool CanAcceptReward => State == RequestState.Complete;
+    public bool IsFailed => State == RequestState.Fail;
 
     public event Action<RequestInstance> OnChanged;
 

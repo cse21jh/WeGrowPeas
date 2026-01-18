@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class KillBugRequest : RequestInstance
+public class PeaBreedingRequest : RequestInstance
 {
     private int requiredCount;
     private int currentCount;
 
-    public KillBugRequest(RequestScriptable data) : base(data)
+    public PeaBreedingRequest(RequestScriptable data) : base(data)
     {
         requiredCount = SetDifficulty(data.requestId);
     }
@@ -15,13 +15,13 @@ public class KillBugRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnBugKilled += HandleBugKilled;
+        GameEvents.OnPeaBreeded += HandlePeaBreeded;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnBugKilled -= HandleBugKilled;
+        GameEvents.OnPeaBreeded -= HandlePeaBreeded;
     }
 
     public override string GetProgressText()
@@ -29,13 +29,12 @@ public class KillBugRequest : RequestInstance
         return currentCount + "/" + requiredCount;
     }
 
-    private void HandleBugKilled()
+    private void HandlePeaBreeded()
     {
         if (IsCompleted) return;
 
         currentCount++;
-        Debug.Log("현재 목표량 " + requiredCount + "까지 " + currentCount + "잡았습니다.");
-        
+
         if (currentCount == requiredCount) CompleteOnce();
         else RaiseChanged();
     }
@@ -48,10 +47,10 @@ public class KillBugRequest : RequestInstance
 
         return difficulty switch
         {
-            1 => 10,
+            1 => 15,
             2 => 20,
             3 => 30,
-            _ => 10,
+            _ => 100,
         };
     }
 

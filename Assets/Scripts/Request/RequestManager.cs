@@ -103,6 +103,7 @@ public class RequestManager : Singleton<RequestManager>
         return typeCode switch
         {
             "000" => new KillBugRequest(data),
+            "001" => new PeaBreedingRequest(data),
 
             _ => null
         };

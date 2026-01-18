@@ -243,6 +243,7 @@ public class Grid : MonoBehaviour
                             //plants.Add(child);
                             AddPlantToGrid(child);
                             breedCount++;
+                            GameEvents.RaisePeaBreeded();
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (effectiveMaxBreedCount - breedCount) + "입니다");
                             SoundManager.Instance.PlayEffect("Breed");
                             totalBreedCount++;
