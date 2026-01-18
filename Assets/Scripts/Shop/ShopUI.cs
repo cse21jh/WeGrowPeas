@@ -279,6 +279,16 @@ public class ShopUI : MonoBehaviour
         rerollButton.onClick.AddListener(OnClickReroll);
     }
 
+    /// <summary>
+    /// 매일 자동으로 상점을 리롤합니다 (GameManager에서 호출).
+    /// </summary>
+    public void DailyReroll()
+    {
+        session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
+        BuildShop();
+        UpdateRerollButton();
+    }
+
     private class ShopSession
     {
         private HashSet<ItemData> once = new();

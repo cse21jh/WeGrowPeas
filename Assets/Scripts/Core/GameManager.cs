@@ -214,6 +214,13 @@ public class GameManager : Singleton<GameManager>
         ModManager.Instance?.OnNewDay(stage);
         enemyController.UnlockWave(stage);
         upgradeManager.UnlockUpgrade(stage);
+        
+        // 매일 상점 자동 리롤
+        var shopUI = FindAnyObjectByType<ShopUI>();
+        if (shopUI != null)
+        {
+            shopUI.DailyReroll();
+        }
     }
 
     IEnumerator StartStage()

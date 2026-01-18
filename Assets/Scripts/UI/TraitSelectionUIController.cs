@@ -66,6 +66,47 @@ public class TraitSelectionUIController : MonoBehaviour
             titleText.text = "형질을 선택하세요";
     }
 
+    /// <summary>
+    /// 단일 형질 선택 UI를 표시합니다 (완두콩 구매 시 사용).
+    /// 형질을 하나만 선택할 수 있으며, 선택하지 않으면 확인이 불가능합니다.
+    /// </summary>
+    public void ShowSingleTraitSelection(
+        System.Action<List<GeneticTrait>> onConfirm,
+        System.Action onCancel)
+    {
+        currentMode = SelectionMode.Trait;
+        this.onTraitConfirmCallback = onConfirm;
+        this.onCancelCallback = onCancel;
+        selectedTraits.Clear();
+        selectedWave = null;
+        traitButtons.Clear();
+        waveButtons.Clear();
+        
+        if (popupParent != null)
+        {
+            popupParent.gameObject.SetActive(true);
+            popupParent.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
+        }
+        
+        CreateSingleTraitButtons();
+        
+        if (confirmButton != null)
+        {
+            confirmButton.onClick.RemoveAllListeners();
+            confirmButton.onClick.AddListener(OnTraitConfirm);
+            confirmButton.interactable = false; // 형질 선택 전에는 비활성화
+        }
+        
+        if (cancelButton != null)
+        {
+            cancelButton.onClick.RemoveAllListeners();
+            cancelButton.onClick.AddListener(OnCancel);
+        }
+
+        if (titleText != null)
+            titleText.text = "형질을 하나 선택하세요";
+    }
+
     public void ShowWaveSelection(
         System.Action<WaveType> onConfirm,
         System.Action onCancel,
@@ -147,6 +188,50 @@ public class TraitSelectionUIController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 단일 선택 형질 버튼들을 생성합니다.
+    /// </summary>
+    private void CreateSingleTraitButtons()
+    {
+        if (traitButtonParent == null || traitButtonPrefab == null) return;
+
+        // 기존 버튼 제거
+        foreach (Transform child in traitButtonParent)
+            Destroy(child.gameObject);
+
+        // 현재 스테이지 가져오기
+        int currentStage = GameManager.Instance != null ? GameManager.Instance.stage : 0;
+
+        // 모든 형질 타입에 대한 버튼 생성 (None 제외, 해금된 것만)
+        foreach (TraitType traitType in System.Enum.GetValues(typeof(TraitType)))
+        {
+            if (traitType == TraitType.None) continue;
+            
+            // 해금 여부 확인
+            if (!IsTraitUnlocked(traitType, currentStage)) continue;
+            
+            var btnObj = Instantiate(traitButtonPrefab, traitButtonParent);
+            var btn = btnObj.GetComponent<Button>();
+            var btnText = btnObj.GetComponentInChildren<TMP_Text>();
+            
+            if (btnText != null)
+                btnText.text = GetTraitDisplayName(traitType);
+            
+            if (btn != null)
+            {
+                // 단일 선택 버튼으로 동작
+                TraitType currentTrait = traitType; // 클로저를 위한 로컬 변수
+                
+                btn.onClick.AddListener(() => {
+                    SelectSingleTrait(currentTrait);
+                    UpdateAllTraitButtonVisuals();
+                });
+                
+                traitButtons[currentTrait] = btn;
+            }
+        }
+    }
+
     private bool IsTraitUnlocked(TraitType traitType, int currentStage)
     {
         // stage + 2 >= UnlockStage 조건으로 해금 여부 확인
@@ -197,12 +282,44 @@ public class TraitSelectionUIController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 단일 형질을 선택합니다 (기존 선택은 해제됨).
+    /// </summary>
+    private void SelectSingleTrait(TraitType traitType)
+    {
+        selectedTraits.Clear();
+        // 기본 저항력 0.5f, 유전자 0으로 추가
+        selectedTraits.Add(new GeneticTrait(traitType, 0.5f, 0, 0.0f));
+        
+        if (confirmButton != null)
+            confirmButton.interactable = true; // 선택 후 확인 버튼 활성화
+    }
+
+    /// <summary>
+    /// 모든 형질 버튼의 시각적 상태를 업데이트합니다 (단일 선택용).
+    /// </summary>
+    private void UpdateAllTraitButtonVisuals()
+    {
+        if (selectedTraits.Count == 0) return;
+        
+        TraitType selectedTraitType = selectedTraits[0].traitType;
+        foreach (var kvp in traitButtons)
+        {
+            UpdateButtonVisual(kvp.Value, kvp.Key == selectedTraitType);
+        }
+    }
+
     private void UpdateButtonVisual(Button btn, bool isSelected)
     {
         if (btn == null) return;
         
         var colors = btn.colors;
-        colors.normalColor = isSelected ? Color.green : Color.white;
+        Color targetColor = isSelected ? Color.green : Color.white;
+        colors.normalColor = targetColor;
+        colors.highlightedColor = targetColor;
+        colors.pressedColor = targetColor;
+        colors.selectedColor = targetColor;
+        colors.disabledColor = targetColor;
         btn.colors = colors;
     }
 
@@ -225,6 +342,14 @@ public class TraitSelectionUIController : MonoBehaviour
 
     private void OnTraitConfirm()
     {
+        // 단일 선택 모드에서는 형질이 선택되지 않았으면 확인 불가
+        // (확인 버튼이 비활성화되어 있으므로 일반적으로 호출되지 않지만, 안전장치로 확인)
+        if (selectedTraits == null || selectedTraits.Count == 0)
+        {
+            Debug.LogWarning("형질이 선택되지 않았습니다.");
+            return;
+        }
+
         if (popupParent != null)
         {
             popupParent.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>

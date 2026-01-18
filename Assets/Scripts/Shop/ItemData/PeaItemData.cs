@@ -50,7 +50,7 @@ public class PeaItemData : ItemData
             return;
         }
 
-        traitSelectionUI.ShowTraitSelection(
+        traitSelectionUI.ShowSingleTraitSelection(
             onConfirm: (selectedTraits) => {
                 pendingTraits = selectedTraits;
                 onReady?.Invoke(); // 형질 선택 후 onReady 호출 → Instant 플로우로 즉시 설치
