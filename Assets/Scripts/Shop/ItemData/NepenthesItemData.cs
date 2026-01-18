@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Shop/Items/Nepenthes", fileName = "NepenthesItemData")]
 public class NepenthesItemData : ItemData
@@ -6,41 +6,54 @@ public class NepenthesItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4;
 
-    // ¹èÄ¡ È®Á¤ ½Ã »ç¿ëÇÒ ±×¸®µå ÀÎµ¦½º
+    // ë°°ì¹˜ í™•ì • ì‹œ ì‚¬ìš©í•  ê·¸ë¦¬ë“œ ì¸ë±ìŠ¤
     private int? pendingIndex;
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "³×ÆÒ´õ½º";
-        if (Price <= 0) Price = 1000;
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "ë„¤íœë°ìŠ¤";
+        if (Price <= 0) Price = 1500;
 
         IsStackable = false;
         InitialStock = 1;
         OnePerShopIfNotStackable = true;
+        MaxPurchaseCount = -1; // ìµœëŒ€ êµ¬ë§¤ ì œí•œ ì—†ìŒ (X)
         FlowType = ShopFlowType.PlaceOnTile;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
+    public override int GetRotationWeight(ShopContext ctx)
+    {
+        // ë„¤íœë°ìŠ¤ ë“±ì¥ í™•ë¥  ì¦ê°€ ì ìš©
+        int baseWeight = rotationWeight;
+        if (ctx?.Grid != null)
+        {
+            float probabilityBonus = ctx.Grid.NepenthesSpawnProbability;
+            // í™•ë¥ ì„ ê°€ì¤‘ì¹˜ë¡œ ë³€í™˜ (ì˜ˆ: 0.01 = 1% -> ê°€ì¤‘ì¹˜ 1 ì¦ê°€)
+            int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
+            return baseWeight + weightBonus;
+        }
+        return baseWeight;
+    }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù (ShopContext.Grid ÁÖÀÔ ÇÊ¿ä)";
+            reason = "Grid ì°¸ì¡°ê°€ ì—†ìŠµë‹ˆë‹¤ (ShopContext.Grid ì£¼ì… í•„ìš”)";
             return false;
         }
         if (!ctx.Grid.HasEmptyGrid())
         {
-            reason = "¼³Ä¡ÇÒ ¼ö ÀÖ´Â ºóÄ­ÀÌ ¾ø½À´Ï´Ù";
+            reason = "ì„¤ì¹˜í•  ìˆ˜ ìˆëŠ” ë¹ˆì¹¸ì´ ì—†ìŠµë‹ˆë‹¤";
             return false;
         }
         reason = null;
         return true;
     }
 
-    // ¹èÄ¡ ¸ğµå ÁøÀÔ: º°µµ ÁØºñ ¾øÀ½
+    // ë°°ì¹˜ ëª¨ë“œ ì§„ì…: ë³„ë„ ì¤€ë¹„ ì—†ìŒ
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
     {
         onReady?.Invoke();
@@ -51,26 +64,26 @@ public class NepenthesItemData : ItemData
         reason = null;
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù";
+            reason = "Grid ì°¸ì¡°ê°€ ì—†ìŠµë‹ˆë‹¤";
             return false;
         }
 
-        // ½ºÅ©¸° ÁÂÇ¥ ¡æ ±×¸®µå ÀÎµ¦½º
+        // ìŠ¤í¬ë¦° ì¢Œí‘œ â†’ ê·¸ë¦¬ë“œ ì¸ë±ìŠ¤
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
-            reason = "À¯È¿ÇÑ Åä¾çÀÌ ¾Æ´Õ´Ï´Ù";
+            reason = "ìœ íš¨í•œ í† ì–‘ì´ ì•„ë‹™ë‹ˆë‹¤";
             return false;
         }
 
-        // ºó Ä­ÀÎÁö È®ÀÎ
+        // ë¹ˆ ì¹¸ì¸ì§€ í™•ì¸
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "ÀÌ¹Ì ½Ä¹°ÀÌ ÀÖ´Â Ä­ÀÔ´Ï´Ù";
+            reason = "ì´ë¯¸ ì‹ë¬¼ì´ ìˆëŠ” ì¹¸ì…ë‹ˆë‹¤";
             return false;
         }
 
-        // ¹®Á¦ ¾øÀ¸¸é È®Á¤ ÈÄº¸ ÀúÀå
+        // ë¬¸ì œ ì—†ìœ¼ë©´ í™•ì • í›„ë³´ ì €ì¥
         pendingIndex = idx.Value;
         return true;
     }
@@ -81,16 +94,16 @@ public class NepenthesItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            ctx?.ShowError?.Invoke("Grid ÂüÁ¶°¡ ¾ø½À´Ï´Ù");
+            ctx?.ShowError?.Invoke("Grid ì°¸ì¡°ê°€ ì—†ìŠµë‹ˆë‹¤");
             return;
         }
         if (!pendingIndex.HasValue)
         {
-            ctx.ShowError?.Invoke("¹èÄ¡ À§Ä¡°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù");
+            ctx.ShowError?.Invoke("ë°°ì¹˜ ìœ„ì¹˜ê°€ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
             return;
         }
 
-        // ½ÇÁ¦ ¹èÄ¡
+        // ì‹¤ì œ ë°°ì¹˜
         ctx.Grid.AddNepenthes(pendingIndex.Value);
 
         pendingIndex = null;

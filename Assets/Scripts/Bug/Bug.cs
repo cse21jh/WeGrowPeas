@@ -33,8 +33,8 @@ public class Bug : MonoBehaviour
 
     protected Coroutine movingCoroutine;
 
-    //°¢Á¾ È¿°ú °ü·Ã
-    [SerializeField] private float dissolveDuration = 1.0f; // ºÐÇØ ¾Ö´Ï¸ÞÀÌ¼Ç Áö¼Ó ½Ã°£
+    //ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    [SerializeField] private float dissolveDuration = 1.0f; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
     private SpriteRenderer[] childSpriteRenderers;
     private Material[] childMaterials;
     private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
@@ -113,7 +113,7 @@ public class Bug : MonoBehaviour
             MoveToward(nepenthes.transform.position, speed - 0.5f);
             yield return null;
         }
-        // ¹ú·¹°¡ ²ø¸®´ø Áß ³×Ææµ¥½º°¡ »ç¶óÁø °æ¿ì ´Ù½Ã ±âÁ¸ ·çÆ¾ ½ÃÀÛ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½æµ¥ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½
         movingCoroutine = StartCoroutine(Moving());
         yield return null;
     }
@@ -200,7 +200,7 @@ public class Bug : MonoBehaviour
             newTarget++;
         }
 
-        if(plant == null) // ¸ñÇ¥¸¦ Ã£Áö ¸øÇÔ (ÀÌ¹Ì ½Ä¹°ÀÌ ¾ø´Â °æ¿ì. °ÔÀÓ ¿À¹ö)
+        if(plant == null) // ï¿½ï¿½Ç¥ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ì¹ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         {
             Destroy(this.gameObject);
         }
@@ -214,7 +214,9 @@ public class Bug : MonoBehaviour
         {
             if (plant.GetType() == typeof(Nepenthes))
             {
-                economyManager.AddGold(100);
+                int baseGold = 100;
+                int additionalGold = grid != null ? grid.AdditionalNepenthesGold : 0;
+                economyManager.AddGold(baseGold + additionalGold);
                 StartCoroutine(KillBug());
                 return;
             }
@@ -321,7 +323,7 @@ public class Bug : MonoBehaviour
         Gizmos.DrawCube(transform.position, new Vector3(hitRange * 2,hitRange * 2));
     }
 
-    public IEnumerator CantHitForOneSecond() // ÀÌ°É Å°¸é 1ÃÊµ¿¾È ¹ú·¹°¡ ÅÍÄ¡µÇÁö ¾Ê½À´Ï´Ù..
+    public IEnumerator CantHitForOneSecond() // ï¿½Ì°ï¿½ Å°ï¿½ï¿½ 1ï¿½Êµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½..
     {
         isHit = true;
         yield return new WaitForSeconds(1f);

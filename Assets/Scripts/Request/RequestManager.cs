@@ -8,7 +8,7 @@ public class RequestInstanceSaveData
 {
     public string requestId;
     public string typeCode;
-    public int progressCount; // ÁøÇàµµ °ü·Ã
+    public int progressCount; // ï¿½ï¿½ï¿½àµµ ï¿½ï¿½ï¿½ï¿½
     public int state;
     public List<string> extraStrings;
 }
@@ -73,7 +73,7 @@ public class RequestManager : Singleton<RequestManager>
 
         if (valid.Count == 0) return;
 
-        // requestId Áßº¹ ¹æÁö
+        // requestId ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½
         var rng = new System.Random();
         var picked = new List<RequestScriptable>();
         int safety = 2000;

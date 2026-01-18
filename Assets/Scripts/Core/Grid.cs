@@ -74,6 +74,13 @@ public class Grid : MonoBehaviour
     protected float additionalLadybugResistancePerUnit = 0f; // 무당벌레당 저항력 증가
     protected int additionalBugGold = 0;
 
+    protected int additionalNepenthesGold = 0; // 네펜데스가 벌레 먹을 때 추가 골드
+    protected bool hasNepenthesPheromone = false; // 네펜데스 페로몬 활성화 여부
+    protected float additionalNepenthesPheromoneSizeMultiplier = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
+    protected float nepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
+
+    protected float weakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
+
     protected float additionalPeanutCopyProbability = 0f;
     protected int additionalPeanutGold = 0;
     protected int additionalPeaGold = 0;
@@ -100,6 +107,11 @@ public class Grid : MonoBehaviour
     public int AdditionalLadybugGoldPerUnit => additionalLadybugGoldPerUnit;
     public float AdditionalLadybugResistancePerUnit => additionalLadybugResistancePerUnit;
     public int AdditionalBugGold => additionalBugGold;
+    public int AdditionalNepenthesGold => additionalNepenthesGold;
+    public bool HasNepenthesPheromone => hasNepenthesPheromone;
+    public float AdditionalNepenthesPheromoneSizeMultiplier => additionalNepenthesPheromoneSizeMultiplier;
+    public float NepenthesSpawnProbability => nepenthesSpawnProbability;
+    public float WeakGeneticsResistanceBonus => weakGeneticsResistanceBonus;
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
     public int AdditionalPeanutGold => additionalPeanutGold;
     public int AdditionalPeaGold => additionalPeaGold;
@@ -382,6 +394,12 @@ public class Grid : MonoBehaviour
             }
 
             float resistance = child.GetResistanceBasedOnGenetics(trait, childGenetic);
+            // 약한 유전자 저항력 보너스 적용
+            if (childGenetic != 0 && Mathf.Abs(resistance - 0.8f) > 0.01f)
+            {
+                resistance += weakGeneticsResistanceBonus;
+                resistance = Mathf.Clamp(resistance, 0.1f, 1.0f);
+            }
 
             if (trait == TraitType.Pest)
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
@@ -424,6 +442,11 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(peaPrefab);
         Pea pea = obj.GetComponent<Pea>();
         pea.SetTrait(trait);
+        // 약한 유전자 저항력 보너스 적용
+        if (weakGeneticsResistanceBonus > 0f)
+        {
+            pea.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
+        }
         AddPlantToGrid(pea, grididx);
     }
 
@@ -432,6 +455,11 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(peanutPrefab);
         Peanut peanut = obj.GetComponent<Peanut>();
         peanut.SetTrait(trait);
+        // 약한 유전자 저항력 보너스 적용
+        if (weakGeneticsResistanceBonus > 0f)
+        {
+            peanut.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
+        }
         AddPlantToGrid(peanut, grididx);
     }
 
@@ -838,6 +866,21 @@ public class Grid : MonoBehaviour
         additionalLadybugGoldPerUnit = saveData.additionalLadybugGoldPerUnit;
         additionalLadybugResistancePerUnit = saveData.additionalLadybugResistancePerUnit;
         additionalBugGold = saveData.additionalBugGold;
+        additionalNepenthesGold = saveData.additionalNepenthesGold;
+        hasNepenthesPheromone = saveData.hasNepenthesPheromone;
+        additionalNepenthesPheromoneSizeMultiplier = saveData.additionalNepenthesPheromoneSizeMultiplier;
+        nepenthesSpawnProbability = saveData.nepenthesSpawnProbability;
+        weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
+        
+        // 네펜데스 페로몬 업데이트
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is Nepenthes nepenthes)
+            {
+                nepenthes.UpdatePheromone();
+                nepenthes.UpdatePheromoneSize();
+            }
+        }
 
         additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability;
         additionalPeanutGold = saveData.additionalPeanutGold;
@@ -894,6 +937,69 @@ public class Grid : MonoBehaviour
     public void AddAdditionalBugGold(int value)
     {
         additionalBugGold += value;
+    }
+
+    public void AddAdditionalNepenthesGold(int value)
+    {
+        additionalNepenthesGold += value;
+    }
+
+    public void SetNepenthesPheromoneEnabled(bool enabled)
+    {
+        hasNepenthesPheromone = enabled;
+        // 기존 네펜데스들의 페로몬 활성화/비활성화
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is Nepenthes nepenthes)
+            {
+                nepenthes.UpdatePheromone();
+            }
+        }
+    }
+
+    public void AddAdditionalNepenthesPheromoneSizeMultiplier(float value)
+    {
+        additionalNepenthesPheromoneSizeMultiplier += value;
+        // 기존 네펜데스들의 페로몬 크기 업데이트
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is Nepenthes nepenthes)
+            {
+                nepenthes.UpdatePheromoneSize();
+            }
+        }
+    }
+
+    public float GetEffectiveNepenthesPheromoneSizeMultiplier()
+    {
+        return 1f + additionalNepenthesPheromoneSizeMultiplier; // 0.2 = +20% = 1.2배
+    }
+
+    public void AddWeakGeneticsResistanceBonus(float value)
+    {
+        weakGeneticsResistanceBonus += value;
+        // 기존 식물들에도 적용
+        ApplyWeakGeneticsResistanceBonusToExistingPlants(value);
+    }
+
+    private void ApplyWeakGeneticsResistanceBonusToExistingPlants(float bonus)
+    {
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++)
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                Plant plant = plantGrid[idx];
+                if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
+                {
+                    plant.IncreaseWeakGeneticsResistance(bonus);
+                }
+            }
+        }
+    }
+
+    public void AddNepenthesSpawnProbability(float value)
+    {
+        nepenthesSpawnProbability += value;
     }
 
     public int GetAdditionalBugGold()

@@ -7,11 +7,11 @@ public class RequestUI : MonoBehaviour
 {
     [SerializeField] private Transform questItemContentParent;
     [SerializeField] private GameObject questItem;
-    [SerializeField] private RectTransform popupParent;  // ÆË¾÷ UI ºÎ¸ð
+    [SerializeField] private RectTransform popupParent;  // íŒì—… UI ë¶€ëª¨
 
     [SerializeField] private TextMeshProUGUI nullText;
 
-    private RequestInstance currentRI; // ÆË¾÷À» À§ÇØ, Áö±Ý Å¬¸¯µÈ Äù½ºÆ®¿¡ ´ëÇÑ Á¤º¸¸¦ ÀúÀå.
+    private RequestInstance currentRI; // íŒì—…ì„ ìœ„í•´, ì§€ê¸ˆ í´ë¦­ëœ í€˜ìŠ¤íŠ¸ì— ëŒ€í•œ ì •ë³´ë¥¼ ì €ìž¥.
     public RequestInstance CurrentRI => currentRI;
 
     private void OnEnable()

@@ -11,7 +11,7 @@ public class Pea : MovablePlant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "�ϵ���";
+        speciesname = "�ϵ���";
         base.Init(gridIndex, grid);
         plantID = 0;
     }
@@ -54,13 +54,13 @@ public class Pea : MovablePlant
                 completeResistances[trait] = 0.5f;
         }
 
-        // ���׷� ��� �� ���� �ʿ�. ������ �����ϰ� ���� �����ϸ� 0.9 ���׷� ��������
+        // ????? ??? ?? ???? ???. ?????? ??????? ???? ??????? 0.9 ????? ????????
     }
 
     public override void InitializeIncompleteTrait(Dictionary<IncompleteTraitType, float> parent1, Dictionary<IncompleteTraitType, float> parent2)
     {
         base.InitializeIncompleteTrait(parent1, parent2);
-        // ���׷� ��� �� ���� �ʿ�
+        // ????? ??? ?? ???? ???
     }*/
 
     public override bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
@@ -107,7 +107,7 @@ public class Pea : MovablePlant
 
     public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
-        if ((int)traitType >= (int)TraitType.HeavyRain) // ���� ������ �ִ� ���, 1���� ���׷� 60
+        if ((int)traitType >= (int)TraitType.HeavyRain) // ???? ?????? ??? ???, 1???? ????? 60
         {
             switch (genetics)
             {

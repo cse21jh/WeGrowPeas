@@ -35,6 +35,11 @@ public class SaveData
     public int additionalLadybugGoldPerUnit;
     public float additionalLadybugResistancePerUnit;
     public int additionalBugGold;
+    public int additionalNepenthesGold;
+    public bool hasNepenthesPheromone;
+    public float additionalNepenthesPheromoneSizeMultiplier;
+    public float nepenthesSpawnProbability;
+    public float weakGeneticsResistanceBonus;
 
     public float additionalPeanutCopyProbability;
     public int additionalPeanutGold;
@@ -96,8 +101,8 @@ public class SaveData
     //GameStartType
     public GameStartType gst = GameStartType.None;
 
-    //ȯ�漳�� ����
-    //GameRecordHolder�� ����� ����
+    //종료 시 저장
+    //GameRecordHolder에 저장할 내용
 }
 
 [System.Serializable]
@@ -143,7 +148,7 @@ public class GameManager : Singleton<GameManager>
         switch (GameStartContext.StartType)
         {
             case GameStartType.NewGame:
-                Debug.Log("�� ����");
+                Debug.Log("새 게임");
                 grid.InitGrid();
                 economyManager.InitEconomyManager();
                 PlayerRecordForGraph.ClearAll();
@@ -151,12 +156,12 @@ public class GameManager : Singleton<GameManager>
                 break;
 
             case GameStartType.ContinueGame:
-                Debug.Log("�̾��ϱ�");
+                Debug.Log("불러오기");
                 LoadGame();
                 break;
 
             case GameStartType.ContinueAfterEnding:
-                Debug.Log("40�� ���� ���� �̾��ϱ�");
+                Debug.Log("40일 이후 계속 불러오기");
                 LoadGame();
                 stage++;
                 break;
@@ -272,7 +277,7 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator GameOver()
     {
-        //Debug.Log("���ӿ���");
+        //Debug.Log("게임오버");
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
         economyManager.PushEarnedGold();
         yield return new WaitForSeconds(1.0f);
@@ -295,7 +300,7 @@ public class GameManager : Singleton<GameManager>
         //Time.timeScale = 0.0f;
         GameStartContext.SetStartType(GameStartType.ContinueAfterEnding);
         SaveGame();
-        Debug.Log("40�� ���� �����Ͽ����ϴ�. YEAH!");
+        Debug.Log("40일 클리어했습니다. YEAH!");
         while(true)
             yield return null;
     }
@@ -316,7 +321,7 @@ public class GameManager : Singleton<GameManager>
         modManager.LoadModManager(saveData);
         requestManager.LoadRequestManager(saveData);
         PlayerRecordForGraph.SetDataFromLoad(saveData);
-        Debug.Log("�ҷ���");
+        Debug.Log("불러옴");
     }
 
     private void SaveGame()
@@ -357,6 +362,11 @@ public class GameManager : Singleton<GameManager>
         saveData.additionalLadybugGoldPerUnit = grid.AdditionalLadybugGoldPerUnit;
         saveData.additionalLadybugResistancePerUnit = grid.AdditionalLadybugResistancePerUnit;
         saveData.additionalBugGold = grid.AdditionalBugGold;
+        saveData.additionalNepenthesGold = grid.AdditionalNepenthesGold;
+        saveData.hasNepenthesPheromone = grid.HasNepenthesPheromone;
+        saveData.additionalNepenthesPheromoneSizeMultiplier = grid.AdditionalNepenthesPheromoneSizeMultiplier;
+        saveData.nepenthesSpawnProbability = grid.NepenthesSpawnProbability;
+        saveData.weakGeneticsResistanceBonus = grid.WeakGeneticsResistanceBonus;
 
         saveData.additionalPeanutGold = grid.AdditionalPeanutGold;
         saveData.additionalPeaGold = grid.AdditionalPeaGold;
@@ -432,7 +442,7 @@ public class GameManager : Singleton<GameManager>
 
         GameStartContext.SetStartType(GameStartType.ContinueGame);
 
-        Debug.Log("�����");
+        Debug.Log("저장됨");
     }
 
     private string GetSavePath()

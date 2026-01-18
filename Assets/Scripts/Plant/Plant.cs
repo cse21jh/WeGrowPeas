@@ -308,6 +308,23 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질)의 최초 저항력을 증가시킵니다.
+    /// </summary>
+    public void IncreaseWeakGeneticsResistance(float bonus)
+    {
+        for (int i = 0; i < traits.Count; i++)
+        {
+            // 열성이 아니고(genetics != 0) 최초 저항력이 80%가 아닌(resistance != 0.8f) 형질
+            if (traits[i].genetics != 0 && Mathf.Abs(traits[i].resistance - 0.8f) > 0.01f)
+            {
+                float newResistance = traits[i].resistance + bonus;
+                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 사이로 제한
+                traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+            }
+        }
+    }
+
     public abstract float GetResistanceBasedOnGenetics(TraitType traitType, int genetics);
 
     public abstract int GetSellingPrice();

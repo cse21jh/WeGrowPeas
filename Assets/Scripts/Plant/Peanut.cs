@@ -13,7 +13,7 @@ public class Peanut : MovablePlant
     private float peanutCopyProbability = 0.25f;
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "¶¥Äá";
+        speciesname = "ë•…ì½©";
         base.Init(gridIndex, grid);
         plantID = 1;
     }
@@ -82,7 +82,7 @@ public class Peanut : MovablePlant
 
     public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
-        if ((int)traitType >= (int)TraitType.HeavyRain) // ´ëÀÀ ÇüÁúÀÌ ÀÖ´Â °æ¿ì, 1°³¸é ÀúÇ×·Â 60
+        if ((int)traitType >= (int)TraitType.HeavyRain) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½, 1ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×·ï¿½ 60
         {
             switch (genetics)
             {
@@ -106,28 +106,28 @@ public class Peanut : MovablePlant
     public int FindEmptyGridToCopy()
     {
         List<int> emptyGrid = new List<int>();
-        if ((gridIndex - 1) / 4 == gridIndex / 4) // À§Ä­
+        if ((gridIndex - 1) / 4 == gridIndex / 4) // ï¿½ï¿½Ä­
         {
             if (!grid.plantGrid.ContainsKey(gridIndex - 1))
                 emptyGrid.Add(gridIndex - 1);
 
         }
 
-        if ((gridIndex + 1) / 4 == gridIndex / 4) // ¾Æ·¡Ä­
+        if ((gridIndex + 1) / 4 == gridIndex / 4) // ï¿½Æ·ï¿½Ä­
         {
             if (!grid.plantGrid.ContainsKey(gridIndex + 1))
                 emptyGrid.Add(gridIndex + 1);
 
         }
 
-        if ((gridIndex - 4) >= 0) // ¿ÞÂÊÄ­
+        if ((gridIndex - 4) >= 0) // ï¿½ï¿½ï¿½ï¿½Ä­
         {
             if (!grid.plantGrid.ContainsKey(gridIndex - 4))
                 emptyGrid.Add(gridIndex - 4);
 
         }
 
-        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // ¿À¸¥ÂÊÄ­
+        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä­
         {
             if (!grid.plantGrid.ContainsKey(gridIndex + 4))
                 emptyGrid.Add(gridIndex + 4);
@@ -142,11 +142,11 @@ public class Peanut : MovablePlant
 
     public void TrySpawnCopy()
     {
-        if (Random.Range(0, 100) > 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25ÇÁ·Î È®·ü·Î ½ºÆù
+        if (Random.Range(0, 100) > 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             return;
         int spawnGridIdx = FindEmptyGridToCopy();
 
-        if (spawnGridIdx == -1) // ½ºÆùÇÒ ¼ö ÀÖ´Â À§Ä¡°¡ ¾øÀ½
+        if (spawnGridIdx == -1) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             return;
 
         List<GeneticTrait> copyTriats = traits.ToList();
