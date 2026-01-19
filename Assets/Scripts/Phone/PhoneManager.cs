@@ -381,6 +381,21 @@ public class PhoneManager : MonoBehaviour
                 break;
         }
     }
+
+    public void LoadPhoneManager(SaveData saveData)
+    {
+        MessengerProgress progress = new MessengerProgress();
+
+        for (int i = 0; i < saveData.chatPartners.Count; i++)
+        {
+            progress.conversationSeenIndices.Add(saveData.chatPartners[i], saveData.conversationSeenIndices[i]);
+        }
+        foreach (var r in saveData.activatedTriggers)
+        {
+            progress.activatedTriggers.Add(r);
+        }
+        messengerApp.SetProgress(progress);
+    }
 }
 
 

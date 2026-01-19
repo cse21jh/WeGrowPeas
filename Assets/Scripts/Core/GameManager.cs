@@ -113,6 +113,11 @@ public class SaveData
     //GameStartType
     public GameStartType gst = GameStartType.None;
 
+
+    //PhoneManager
+    public List<string> chatPartners = new();
+    public List<int> conversationSeenIndices = new();
+    public List<string> activatedTriggers = new();
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
 }
@@ -370,6 +375,7 @@ public class GameManager : Singleton<GameManager>
         shopManager.LoadShopManager(saveData);
         modManager.LoadModManager(saveData);
         requestManager.LoadRequestManager(saveData);
+        phoneManager.LoadPhoneManager(saveData);
         PlayerRecordForGraph.SetDataFromLoad(saveData);
         Debug.Log("불러옴");
     }
@@ -496,6 +502,18 @@ public class GameManager : Singleton<GameManager>
 
         //GameStartType
         saveData.gst = GameStartContext.StartType;
+
+        //PhoneManager
+        MessengerProgress progress = phoneManager.messengerApp.GetProgress();
+        foreach(KeyValuePair<string, int> p in progress.conversationSeenIndices)
+        {
+            saveData.chatPartners.Add(p.Key);
+            saveData.conversationSeenIndices.Add(p.Value);
+        }
+        foreach(var r in progress.activatedTriggers)
+        {
+            saveData.activatedTriggers.Add(r);
+        }
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);

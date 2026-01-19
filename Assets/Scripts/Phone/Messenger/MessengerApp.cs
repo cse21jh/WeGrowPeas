@@ -98,7 +98,7 @@ public class MessengerApp : MonoBehaviour
             // 대화 상대 목록이 열려있거나, 둘 다 닫혀있는 경우
             OpenchatPartnerList();
         }
-
+        ReportAlarmState();
     }
 
     public void ActivateTrigger(string triggerId)
@@ -396,5 +396,16 @@ public class MessengerApp : MonoBehaviour
     {
         progress.conversationSeenIndices[chat.chatPartner.chatPartnerName] = index;
         // TODO: SaveManager.Save(progress);
-    }    
+    }
+
+    public MessengerProgress GetProgress()
+    {
+        return progress;
+    }
+
+    public void SetProgress(MessengerProgress pro)
+    {
+        progress = pro;
+        UpdateMessenger();
+    }
 }
