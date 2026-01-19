@@ -15,6 +15,7 @@ public class HealthyLadybugItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "건강한 무당벌레";
         if (string.IsNullOrEmpty(Description)) Description = "무당벌레가 많을수록 모든 식물이 더 잘 살아남습니다.";
         if (Price <= 0) Price = 3000;
+        Rarity = ItemRarity.Special; // 특수 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -33,7 +34,7 @@ public class HealthyLadybugItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 2;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

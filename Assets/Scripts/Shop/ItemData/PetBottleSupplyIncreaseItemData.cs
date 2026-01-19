@@ -7,7 +7,7 @@ public class PetBottleSupplyIncreaseItemData : ItemData
     [SerializeField] private int stockBonus = 1; // 일일 최대 구매 횟수 +1
 
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 1;
+    [Min(0)] public int rotationWeight = 8;
 
     private string purchaseKey = "페트병 납품량 증가";
 
@@ -16,6 +16,7 @@ public class PetBottleSupplyIncreaseItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 납품량 증가";
         if (string.IsNullOrEmpty(Description)) Description = "페트병의 일일 최대 구매 횟수가 1 증가합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
         InitialStock = 1;

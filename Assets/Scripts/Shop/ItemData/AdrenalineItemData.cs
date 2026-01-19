@@ -17,7 +17,7 @@ public class AdrenalineItemData : ItemData
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
-    [Min(0)] public int rotationWeight = 2;
+    [Min(0)] public int rotationWeight = 1;
 
     private void OnValidate()
     {

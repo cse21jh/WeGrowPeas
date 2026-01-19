@@ -8,13 +8,14 @@ public class PetBottlePriceReductionItemData : ItemData
     [SerializeField] private float probabilityIncrease = 0.02f; // 등장 확률 2% 증가
 
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 1;
+    [Min(0)] public int rotationWeight = 4;
 
     private void OnEnable()
     {
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 원가 감소";
         if (string.IsNullOrEmpty(Description)) Description = "페트병의 가격이 100골드 감소합니다.";
         if (Price <= 0) Price = 1500;
+        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
         InitialStock = 1;

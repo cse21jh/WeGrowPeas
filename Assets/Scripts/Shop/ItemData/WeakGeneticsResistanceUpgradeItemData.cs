@@ -13,6 +13,7 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "약한 유전자 생존력 개선";
         if (string.IsNullOrEmpty(Description)) Description = "강하지 않은 웨이브에 대한 완두콩의 저항력을 증가시킵니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
         InitialStock = 1;
@@ -23,7 +24,7 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

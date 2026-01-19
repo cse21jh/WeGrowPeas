@@ -14,6 +14,7 @@ public class BugProcessingUpgradeItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 가공 기술 향상";
         if (string.IsNullOrEmpty(Description)) Description = "벌레의 기본 가격이 50골드 증가합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -36,7 +37,7 @@ public class BugProcessingUpgradeItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

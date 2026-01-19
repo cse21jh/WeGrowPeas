@@ -11,7 +11,7 @@ public class BugFanItemData : ItemData
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 11;
-    [Min(0)] public int rotationWeight = 3;
+    [Min(0)] public int rotationWeight = 8;
 
     [Header("Limit")]
     [Min(1)] public int maxTotalPurchase = 3;
@@ -22,6 +22,7 @@ public class BugFanItemData : ItemData
         IsStackable = false;
         OnePerShopIfNotStackable = true;
         InitialStock = 1;
+        Rarity = ItemRarity.Common; // 일반 등급
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 방해 선풍기";
         if (string.IsNullOrEmpty(Description)) Description = "벌레 이동속도 영구적으로 10% 감소 (중첩 시 합적용)";
         if (Price <= 0) Price = 500;

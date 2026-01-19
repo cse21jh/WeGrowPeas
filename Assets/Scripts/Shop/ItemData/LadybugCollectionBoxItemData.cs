@@ -15,6 +15,7 @@ public class LadybugCollectionBoxItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "무당벌레 채집통";
         if (string.IsNullOrEmpty(Description)) Description = "농장에 존재할 수 있는 무당벌레의 수가 1마리 증가합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -33,7 +34,7 @@ public class LadybugCollectionBoxItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 4;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

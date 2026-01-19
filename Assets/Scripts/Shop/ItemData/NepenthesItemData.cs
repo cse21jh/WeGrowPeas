@@ -4,7 +4,7 @@
 public class NepenthesItemData : ItemData
 {
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 4;
+    [Min(0)] public int rotationWeight = 8;
 
     // 배치 확정 시 사용할 그리드 인덱스
     private int? pendingIndex;
@@ -13,6 +13,7 @@ public class NepenthesItemData : ItemData
     {
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스";
         if (Price <= 0) Price = 1500;
+        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
         InitialStock = 1;

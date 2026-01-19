@@ -9,13 +9,14 @@ public class TimeMachineItemData : ItemData
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
-    [Min(0)] public int rotationWeight = 3;
+    [Min(0)] public int rotationWeight = 4;
 
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = true;
         OnePerShopIfNotStackable = false;
+        Rarity = ItemRarity.Rare; // 희귀 등급
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "타임 머신";
         if (Price <= 0) Price = 2000;
     }

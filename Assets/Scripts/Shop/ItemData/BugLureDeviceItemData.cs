@@ -14,6 +14,7 @@ public class BugLureDeviceItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 유도장치";
         if (string.IsNullOrEmpty(Description)) Description = "벌레가 더 자주 등장합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -36,7 +37,7 @@ public class BugLureDeviceItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

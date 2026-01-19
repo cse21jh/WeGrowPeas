@@ -4,7 +4,7 @@ using UnityEngine;
 public class ChiliPepperItemData : ItemData
 {
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 4;
+    [Min(0)] public int rotationWeight = 8;
 
     private int? pendingIndex;
 

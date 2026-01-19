@@ -8,13 +8,14 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
     [SerializeField] private float probabilityIncrease = 0.02f; // 등장 확률 2% 증가
 
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 1;
+    [Min(0)] public int rotationWeight = 4; // 매운 고추 (희귀)
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추 영향 범위 강화";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "매운 고추";
         if (string.IsNullOrEmpty(Description)) Description = "고추의 영향 범위를 증가시킵니다.";
         if (Price <= 0) Price = 1500;
+        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
         InitialStock = 1;

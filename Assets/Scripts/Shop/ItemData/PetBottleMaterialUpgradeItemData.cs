@@ -8,13 +8,14 @@ public class PetBottleMaterialUpgradeItemData : ItemData
     [SerializeField] private float probabilityIncrease = 0.03f; // 등장 확률 3% 증가
 
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 1;
+    [Min(0)] public int rotationWeight = 2;
 
     private void OnEnable()
     {
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 재질 강화";
         if (string.IsNullOrEmpty(Description)) Description = "페트병을 강하게 만들어 웨이브를 1회 더 막을 수 있게 해줍니다.";
         if (Price <= 0) Price = 3000;
+        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
         InitialStock = 1;

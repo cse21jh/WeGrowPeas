@@ -11,6 +11,7 @@ public class PeaMaturationUpgradeItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 숙성도 개선";
         if (string.IsNullOrEmpty(Description)) Description = "완두콩이 웨이브를 버틸 때마다 더 빠르게 비싸집니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -21,7 +22,7 @@ public class PeaMaturationUpgradeItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

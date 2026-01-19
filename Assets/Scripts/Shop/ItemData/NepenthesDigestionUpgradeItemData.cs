@@ -15,6 +15,7 @@ public class NepenthesDigestionUpgradeItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 소화액 개량";
         if (string.IsNullOrEmpty(Description)) Description = "네펜데스가 벌레를 먹을 때 80골드를 더 획득합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -33,7 +34,7 @@ public class NepenthesDigestionUpgradeItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

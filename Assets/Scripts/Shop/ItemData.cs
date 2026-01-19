@@ -4,6 +4,14 @@ using UnityEngine.Rendering;
 
 public enum ShopFlowType { Instant, PlaceOnTile, SelectExistingPlant }
 
+public enum ItemRarity
+{
+    Common = 8,      // 일반 등급 (가중치 8)
+    Rare = 4,        // 희귀 등급 (가중치 4)
+    Special = 2,     // 특수 등급 (가중치 2)
+    Legendary = 1    // 전설 등급 (가중치 1)
+}
+
 public abstract class ItemData : ScriptableObject
 {
     [Header("Meta")]
@@ -11,6 +19,9 @@ public abstract class ItemData : ScriptableObject
     public Sprite Icon;
     [TextArea] public string Description;
     public int Price;
+    
+    [Header("Rarity")]
+    public ItemRarity Rarity = ItemRarity.Common;
 
     [Header("Rule")]
     public bool IsStackable = false;

@@ -11,7 +11,7 @@ public class SignPostItemData : ItemData
 
     [Header("Shop Appear Rules")]
     [Min(1)] public int unlockStageDay = 5;         // 웨이브별 해금 시기
-    [Min(0)] public int rotationWeight = 2;         // 로테이션 풀 가중치
+    [Min(0)] public int rotationWeight = 8;         // 로테이션 풀 가중치
 
     private WaveType? pendingWave = null;
 
@@ -22,6 +22,7 @@ public class SignPostItemData : ItemData
         InitialStock = 1;
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = -1; // 최대 구매 제한 없음
+        Rarity = ItemRarity.Common; // 일반 등급
 
         if (string.IsNullOrEmpty(DisplayName))
             DisplayName = "팻말";

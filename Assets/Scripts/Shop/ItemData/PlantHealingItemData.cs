@@ -16,6 +16,7 @@ public class PlantHealingItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 치료제";
         if (string.IsNullOrEmpty(Description)) Description = "선택한 웨이브에 대응할 수 있는 모든 식물을 치료하고, 동시에 더 잘 버틸 수 있도록 도와줍니다.";
         if (Price <= 0) Price = 3000;
+        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
         InitialStock = 1;
@@ -32,7 +33,7 @@ public class PlantHealingItemData : ItemData
         return stage >= 1;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 2;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

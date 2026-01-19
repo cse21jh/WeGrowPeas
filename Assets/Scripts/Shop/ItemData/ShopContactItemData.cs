@@ -11,6 +11,7 @@ public class ShopContactItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "상점 연락처";
         if (string.IsNullOrEmpty(Description)) Description = "매일 상점의 물품을 무료로 갱신할 수 있는 기회를 추가로 얻습니다.";
         if (Price <= 0) Price = 2000;
+        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
         InitialStock = 1;
@@ -20,7 +21,7 @@ public class ShopContactItemData : ItemData
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 2;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

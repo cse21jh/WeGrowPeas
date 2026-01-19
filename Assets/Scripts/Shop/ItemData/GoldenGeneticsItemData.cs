@@ -13,6 +13,7 @@ public class GoldenGeneticsItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 유전자";
         if (string.IsNullOrEmpty(Description)) Description = "교배 시 금색 유전자가 나올 확률이 증가합니다.";
         if (Price <= 0) Price = 3000;
+        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
         InitialStock = 1;
@@ -23,7 +24,7 @@ public class GoldenGeneticsItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 4;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

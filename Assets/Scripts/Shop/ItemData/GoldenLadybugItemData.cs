@@ -15,6 +15,7 @@ public class GoldenLadybugItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 무당벌레";
         if (string.IsNullOrEmpty(Description)) Description = "웨이브가 끝날 때 무당벌레의 수만큼 100골드를 추가로 획득합니다.";
         if (Price <= 0) Price = 2000;
+        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -33,7 +34,7 @@ public class GoldenLadybugItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 4;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

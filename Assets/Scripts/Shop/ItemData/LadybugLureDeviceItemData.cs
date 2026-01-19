@@ -14,6 +14,7 @@ public class LadybugLureDeviceItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "무당벌레 유도장치";
         if (string.IsNullOrEmpty(Description)) Description = "식물을 해치지 않는 무당벌레가 나올 확률이 증가합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -32,7 +33,7 @@ public class LadybugLureDeviceItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

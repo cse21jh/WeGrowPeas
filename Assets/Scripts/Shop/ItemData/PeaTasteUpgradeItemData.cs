@@ -11,6 +11,7 @@ public class PeaTasteUpgradeItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 맛 개선";
         if (string.IsNullOrEmpty(Description)) Description = "완두콩의 기본 가격이 40골드 증가합니다.";
         if (Price <= 0) Price = 1000;
+        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -21,7 +22,7 @@ public class PeaTasteUpgradeItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 8;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

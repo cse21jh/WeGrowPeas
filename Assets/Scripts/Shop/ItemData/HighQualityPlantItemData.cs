@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class HighQualityPlantItemData : ItemData
 {
     [Header("Rotation")]
-    [Min(0)] public int rotationWeight = 1;
+    [Min(0)] public int rotationWeight = 4;
 
     private WaveType? pendingWave = null;
 
@@ -15,6 +15,7 @@ public class HighQualityPlantItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고품질 식물 추가";
         if (string.IsNullOrEmpty(Description)) Description = "선택한 웨이브에 강한 완두콩을 1개 추가합니다.";
         if (Price <= 0) Price = 1500;
+        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
         InitialStock = 1;

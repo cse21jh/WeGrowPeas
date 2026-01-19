@@ -14,6 +14,7 @@ public class NepenthesPheromoneItemData : ItemData
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 페로몬 생성";
         if (string.IsNullOrEmpty(Description)) Description = "네펜데스에게 페로몬 효과를 추가합니다.";
         if (Price <= 0) Price = 3000;
+        Rarity = ItemRarity.Special; // 특수 등급
         
         IsStackable = false;
         InitialStock = 1;
@@ -37,7 +38,7 @@ public class NepenthesPheromoneItemData : ItemData
         return stage >= unlockStageDay;
     }
 
-    public override int GetRotationWeight(ShopContext ctx) => 1;
+    public override int GetRotationWeight(ShopContext ctx) => 2;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {

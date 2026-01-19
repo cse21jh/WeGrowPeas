@@ -124,7 +124,7 @@ public class TimerUI : MonoBehaviour
                 break;
             }
 
-            yield return new WaitForSeconds(0.1f); // 더 부드러운 업데이트를 위해 0.1초마다
+            yield return new WaitForSeconds(1f); // 더 부드러운 업데이트를 위해 0.1초마다
         }
     }
 

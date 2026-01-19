@@ -6,7 +6,7 @@ public class FertilizerItemData : ItemData
 {
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1; // 웨이브별 해금 시기
-    [Min(0)] public int rotationWeight = 2;
+    [Min(0)] public int rotationWeight = 8;
 
     private int? selectedIdx;
     private WaveType? pendingWave = null;
@@ -18,6 +18,7 @@ public class FertilizerItemData : ItemData
         InitialStock = 1;
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = -1; // 최대 구매 제한 없음
+        Rarity = ItemRarity.Common; // 일반 등급
 
         if (string.IsNullOrEmpty(DisplayName))
             DisplayName = "전용 비료";

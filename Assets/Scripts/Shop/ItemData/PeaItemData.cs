@@ -13,6 +13,7 @@ public class PeaItemData : ItemData
     {
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "완두콩";
         if (Price <= 0) Price = 500;
+        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
         InitialStock = 1;
