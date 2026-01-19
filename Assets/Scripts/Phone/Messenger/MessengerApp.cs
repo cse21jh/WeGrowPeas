@@ -294,6 +294,7 @@ public class MessengerApp : MonoBehaviour
                 else
                 {
                     // 두 번째 이후의 안 읽은 메시지부터는 정상적으로 딜레이 적용
+                    mc.AddTypingMessage(message.delayAfterPrevious);
                     yield return new WaitForSeconds(message.delayAfterPrevious);
                 }
 

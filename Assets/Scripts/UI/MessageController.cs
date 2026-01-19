@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System;
+using System.Collections;
 
 public class MessageController : MonoBehaviour
 {
@@ -11,12 +12,14 @@ public class MessageController : MonoBehaviour
         player
     }
 
-    [SerializeField] private Transform chatContent; // ScrollView ¾È Content
+    [SerializeField] private Transform chatContent; // ScrollView ì•ˆ Content
 
-    [SerializeField] private GameObject messagePrefab;     // ÀÏ¹İ ¸Ş½ÃÁö (ÇÑ °³ÀÇ ÅØ½ºÆ® ¹Ú½º / ¿ÏµÎÄá ¸Ş½ÃÁö)
-    [SerializeField] private GameObject selectionPrefab;     // ¼±ÅÃÇü ¸Ş½ÃÁö (µÎ °³ÀÇ ÅØ½ºÆ® ¹Ú½º / ÇÃ·¹ÀÌ¾î ¸Ş½ÃÁö)
+    [SerializeField] private GameObject messagePrefab;     // ì¼ë°˜ ë©”ì‹œì§€ (í•œ ê°œì˜ í…ìŠ¤íŠ¸ ë°•ìŠ¤ / ì™„ë‘ì½© ë©”ì‹œì§€)
+    [SerializeField] private GameObject selectionPrefab;     // ì„ íƒí˜• ë©”ì‹œì§€ (ë‘ ê°œì˜ í…ìŠ¤íŠ¸ ë°•ìŠ¤ / í”Œë ˆì´ì–´ ë©”ì‹œì§€)
 
     private GameObject currentPeaMessage;
+
+    private GameObject typingMessage;
 
     public void AddMessage(MessageSenderType sender, string messageContent, string bonusMessageContent = "", Action act1 = null, Action act2 = null)
     {
@@ -34,5 +37,28 @@ public class MessageController : MonoBehaviour
         }
 
         FindAnyObjectByType<AutoScroll>().OnNewMessage();
+    }
+
+    public void AddTypingMessage(float time)
+    {
+        StartCoroutine(Typing(time));
+    }
+
+    private IEnumerator Typing(float time)
+    {
+        typingMessage = Instantiate(messagePrefab, chatContent);
+        typingMessage.GetComponent<MessageBoxBtnController>().SetText("...");
+        yield return new WaitForSeconds(time);
+        Destroy(typingMessage);
+        typingMessage = null;
+    }
+
+    private void OnDisable()
+    {
+        if (typingMessage != null)
+        {
+            Destroy(typingMessage);
+            typingMessage = null;
+        }
     }
 }
