@@ -19,6 +19,9 @@ public class RequestManager : Singleton<RequestManager>
     public int cycle = 5;
     public int requestNum = 3;
 
+    private bool newRequestArrived = false;
+    public bool NewRequestArrived => newRequestArrived;
+
     [SerializeField] private List<RequestScriptable> requestPool = new();
 
     private readonly List<RequestInstance> activeReq = new();
@@ -44,7 +47,7 @@ public class RequestManager : Singleton<RequestManager>
 
     private void Start()
     {
-        
+
     }
 
     private void HandleRoundStarted(int round)
@@ -70,6 +73,8 @@ public class RequestManager : Singleton<RequestManager>
 
     private void GenerateRandomRequests()
     {
+        ClearRequestAlarm();
+
         var valid = requestPool.Where(p => p != null).ToList();
 
         if (valid.Count == 0) return;
@@ -96,6 +101,8 @@ public class RequestManager : Singleton<RequestManager>
             req.Start();
             activeReq.Add(req);
         }
+
+        PushRequestGenerateAlarm();
     }
 
     private RequestInstance CreateInstanceById(RequestScriptable data)
@@ -185,5 +192,31 @@ public class RequestManager : Singleton<RequestManager>
     private RequestScriptable FindScriptableById(string id)
     {
         return requestPool.FirstOrDefault(p => p != null && p.requestId == id);
+    }
+
+    private void ClearRequestAlarm()
+    {
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
+    }
+
+    private void PushRequestGenerateAlarm()
+    {
+        newRequestArrived = true;
+
+        PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = "새 퀘스트 도착!",
+                        message = "퀘스트 앱에서 확인해 주세요.",
+                        duration = 5f
+                    }
+                );
+
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+    }
+    public void CheckedNewRequest()
+    {
+        newRequestArrived = false;
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
     }
 }
