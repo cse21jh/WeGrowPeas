@@ -73,6 +73,9 @@ public class PlacementController : MonoBehaviour
 
         ctx.ShowGuide?.Invoke("토양을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
 
+        Vector3? confirmedPos = null;
+        bool shouldCancel = false;
+
         while (true)
         {
             // 현재 마우스 스크린 좌표
@@ -112,7 +115,7 @@ public class PlacementController : MonoBehaviour
             {
                 if (ok)
                 {
-                    onConfirm?.Invoke(screenPos); // screen 좌표를 그대로 넘김
+                    confirmedPos = screenPos;
                     break;
                 }
                 else
@@ -124,7 +127,7 @@ public class PlacementController : MonoBehaviour
             // 우클릭 or Esc 취소
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
-                onCancel?.Invoke();
+                shouldCancel = true;
                 break;
             }
 
@@ -145,7 +148,25 @@ public class PlacementController : MonoBehaviour
         shovel.IsEnabled = true;
         shovelButton.enabled = true;
 
+        // 코루틴이 완전히 종료된 후에 콜백 호출
         yield return null;
+        yield return null; // 한 프레임 더 대기하여 완전히 안전하게
+
+        try
+        {
+            if (shouldCancel)
+            {
+                onCancel?.Invoke();
+            }
+            else if (confirmedPos.HasValue)
+            {
+                onConfirm?.Invoke(confirmedPos.Value);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PlacementController] TilePlacement callback error: {e.Message}\n{e.StackTrace}");
+        }
     }
 
     public void StopPlacementInternal()
@@ -169,10 +190,39 @@ public class PlacementController : MonoBehaviour
         System.Action<Plant> onConfirm,
         System.Action onCancel)
     {
-        // 진행 중인 배치/선택 종료
-        if (isPlacing) StopPlacementInternal();
-        this.ctx = ctx;
-        placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
+        try
+        {
+            Debug.Log("[PlacementController] BeginPlantSelection 시작");
+            
+            // 진행 중인 배치/선택 종료
+            if (isPlacing)
+            {
+                Debug.Log("[PlacementController] 기존 배치 중지");
+                StopPlacementInternal();
+            }
+            
+            if (ctx == null)
+            {
+                Debug.LogError("[PlacementController] ShopContext is null!");
+                return;
+            }
+            
+            this.ctx = ctx;
+            
+            if (this == null || !gameObject.activeInHierarchy)
+            {
+                Debug.LogError("[PlacementController] PlacementController is not active!");
+                return;
+            }
+            
+            Debug.Log("[PlacementController] 코루틴 시작");
+            placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
+            Debug.Log("[PlacementController] 코루틴 시작 완료");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PlacementController] BeginPlantSelection error: {e.Message}\n{e.StackTrace}");
+        }
     }
 
     private IEnumerator PlantSelectionRoutine(
@@ -180,9 +230,38 @@ public class PlacementController : MonoBehaviour
         System.Action<Plant> onConfirm,
         System.Action onCancel)
     {
-        isPlacing = true;
-        shovel.IsEnabled = false;
-        shovelButton.enabled = false;
+        Debug.Log("[PlacementController] PlantSelectionRoutine 시작");
+        
+        try
+        {
+            isPlacing = true;
+            Debug.Log("[PlacementController] isPlacing = true 설정 완료");
+            
+            if (shovel != null)
+            {
+                shovel.IsEnabled = false;
+                Debug.Log("[PlacementController] shovel.IsEnabled = false 설정 완료");
+            }
+            else
+            {
+                Debug.LogWarning("[PlacementController] shovel is null!");
+            }
+            
+            if (shovelButton != null)
+            {
+                shovelButton.enabled = false;
+                Debug.Log("[PlacementController] shovelButton.enabled = false 설정 완료");
+            }
+            else
+            {
+                Debug.LogWarning("[PlacementController] shovelButton is null!");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PlacementController] PlantSelectionRoutine 초기화 오류: {e.Message}\n{e.StackTrace}");
+            yield break;
+        }
 
         // 1) Shop UI 입력 비활성
         bool hadCanvas = shopCanvas != null;
@@ -196,29 +275,99 @@ public class PlacementController : MonoBehaviour
         }
 
         hovered = null;
-        ctx.ShowGuide?.Invoke("식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
+        
+        if (ctx != null && ctx.ShowGuide != null)
+        {
+            ctx.ShowGuide.Invoke("식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
+            Debug.Log("[PlacementController] ShowGuide 호출 완료");
+        }
+        else
+        {
+            Debug.LogWarning("[PlacementController] ctx or ShowGuide is null!");
+        }
+        
+        Debug.Log("[PlacementController] while 루프 시작 전");
 
+        Plant confirmedPlant = null;
+        bool shouldCancel = false;
+        float timeout = 30f; // 30초 타임아웃
+        float startTime = Time.time;
+        int loopCount = 0;
+
+        Debug.Log("[PlacementController] while 루프 진입 직전");
         while (true)
         {
-            // UI 위에 있으면 하이라이트 해제 + 취소만 허용
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()
-                && (shopCanvas == null || shopCanvas.blocksRaycasts))
+            loopCount++;
+            if (loopCount == 1)
             {
+                Debug.Log("[PlacementController] while 루프 첫 번째 반복 시작");
+            }
+            
+            // 타임아웃 체크
+            if (Time.time - startTime > timeout)
+            {
+                Debug.LogError("[PlacementController] PlantSelection timeout!");
+                shouldCancel = true;
+                break;
+            }
+            
+            Debug.Log($"[PlacementController] 타임아웃 체크 완료 (loopCount={loopCount})");
+            
+            // UI 위에 있으면 하이라이트 해제 + 취소만 허용
+            bool isOverUI = false;
+            try
+            {
+                isOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()
+                    && (shopCanvas == null || shopCanvas.blocksRaycasts);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlacementController] UI 체크 오류: {e.Message}");
+                isOverUI = false;
+            }
+            
+            if (isOverUI)
+            {
+                Debug.Log("[PlacementController] UI 위에 있음 - 하이라이트 해제");
                 Hover(null);
                 if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
                 {
-                    onCancel?.Invoke();
+                    Debug.Log("[PlacementController] 취소 입력 감지");
+                    shouldCancel = true;
                     break;
                 }
-
+                Debug.Log("[PlacementController] continue 전 yield");
+                yield return null;
+                Debug.Log("[PlacementController] continue 후");
                 continue;
             }
-
-
+            
+            Debug.Log($"[PlacementController] UI 체크 완료, 레이캐스트 시작 (loopCount={loopCount})");
 
             // 마우스 아래 식물 레이캐스트
-            Plant p = RaycastPlantUnderMouse();
-            Hover(p);
+            Plant p = null;
+            try
+            {
+                Debug.Log("[PlacementController] RaycastPlantUnderMouse 호출 전");
+                p = RaycastPlantUnderMouse();
+                Debug.Log($"[PlacementController] RaycastPlantUnderMouse 완료: p={(p != null ? p.name : "null")}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlacementController] RaycastPlantUnderMouse error: {e.Message}\n{e.StackTrace}");
+                p = null;
+            }
+            
+            try
+            {
+                Debug.Log("[PlacementController] Hover 호출 전");
+                Hover(p);
+                Debug.Log("[PlacementController] Hover 호출 완료");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlacementController] Hover error: {e.Message}");
+            }
 
             // 좌클릭 확정
             if (Input.GetMouseButtonDown(0) && p != null)
@@ -228,8 +377,7 @@ public class PlacementController : MonoBehaviour
 
                 if (ok)
                 {
-                    var cb = onConfirm;
-                    cb?.Invoke(p);
+                    confirmedPlant = p;
                     break;
                 }
                 else
@@ -241,7 +389,7 @@ public class PlacementController : MonoBehaviour
             // 우클릭/ESC 취소
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
-                onCancel?.Invoke();
+                shouldCancel = true;
                 break;
             }
 
@@ -258,80 +406,167 @@ public class PlacementController : MonoBehaviour
         isPlacing = false;
         placingCo = null;
 
-        ctx.ShowGuide?.Invoke("");
-        shovel.IsEnabled = true;
-        shovelButton.enabled = true;
+        if (ctx != null && ctx.ShowGuide != null)
+        {
+            ctx.ShowGuide.Invoke("");
+        }
+        
+        if (shovel != null)
+        {
+            shovel.IsEnabled = true;
+        }
+        
+        if (shovelButton != null)
+        {
+            shovelButton.enabled = true;
+        }
 
+        // 코루틴이 완전히 종료된 후에 콜백 호출
         yield return null;
+        yield return null; // 한 프레임 더 대기하여 완전히 안전하게
+
+        try
+        {
+            if (shouldCancel)
+            {
+                onCancel?.Invoke();
+            }
+            else if (confirmedPlant != null)
+            {
+                onConfirm?.Invoke(confirmedPlant);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PlacementController] PlantSelection callback error: {e.Message}\n{e.StackTrace}");
+        }
     }
 
     private Plant RaycastPlantUnderMouse()
     {
-        var cam = worldCamera != null ? worldCamera : Camera.main;
-        if (!cam) return null;
-
-        // ① 3D 경로: BoxCollider(3D)용
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        const float MaxPickDist = 1000f;
-
-        // 트리거까지 포함해서 모두 맞춰봄(레이어 안 씀)
-        var hits3D = Physics.RaycastAll(ray, MaxPickDist, ~0, QueryTriggerInteraction.Collide);
-        if (hits3D != null && hits3D.Length > 0)
+        try
         {
-            // 카메라에 가장 가까운(거리 가장 작은) Plant를 우선
-            float bestDist = float.PositiveInfinity;
-            Plant best = null;
+            var cam = worldCamera != null ? worldCamera : Camera.main;
+            if (!cam) return null;
 
-            foreach (var hit in hits3D)
+            // ① 3D 경로: BoxCollider(3D)용
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            const float MaxPickDist = 1000f;
+
+            // 트리거까지 포함해서 모두 맞춰봄(레이어 안 씀)
+            var hits3D = Physics.RaycastAll(ray, MaxPickDist, ~0, QueryTriggerInteraction.Collide);
+            if (hits3D != null && hits3D.Length > 0)
             {
-                if (hit.transform.GetComponent<NepenthesPheromone>() != null)
-                    continue;
-                var t = hit.transform;
-                    var plant =
-                    t.GetComponent<Plant>() ??
-                    t.GetComponentInParent<Plant>() ??
-                    t.GetComponentInChildren<Plant>();
+                // 카메라에 가장 가까운(거리 가장 작은) Plant를 우선
+                float bestDist = float.PositiveInfinity;
+                Plant best = null;
 
-                if (plant == null) continue;
-
-                if (hit.distance < bestDist)
+                foreach (var hit in hits3D)
                 {
-                    bestDist = hit.distance;
-                    best = plant;
+                    try
+                    {
+                        if (hit.transform == null) continue;
+                        if (hit.transform.GetComponent<NepenthesPheromone>() != null)
+                            continue;
+                        
+                        var t = hit.transform;
+                        Plant plant = null;
+                        
+                        // 안전하게 컴포넌트 가져오기
+                        try { plant = t.GetComponent<Plant>(); } catch { }
+                        if (plant == null)
+                        {
+                            try { plant = t.GetComponentInParent<Plant>(); } catch { }
+                        }
+                        if (plant == null)
+                        {
+                            try { plant = t.GetComponentInChildren<Plant>(); } catch { }
+                        }
+
+                        if (plant == null) continue;
+
+                        if (hit.distance < bestDist)
+                        {
+                            bestDist = hit.distance;
+                            best = plant;
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogWarning($"[PlacementController] Error processing hit: {e.Message}");
+                        continue;
+                    }
+                }
+                if (best != null) return best;
+            }
+
+            // ② (백업) 그리드 기반: 해당 타일에 식물이 있으면 반환
+            if (grid != null)
+            {
+                try
+                {
+                    int? idx = grid.GetGridIndexFromPosition(Input.mousePosition);
+                    if (idx.HasValue && grid.plantGrid != null)
+                    {
+                        if (grid.plantGrid.TryGetValue(idx.Value, out var p) && p != null)
+                            return p;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"[PlacementController] Grid lookup error: {e.Message}");
                 }
             }
-            if (best != null) return best;
-        }
 
-        // ② (백업) 그리드 기반: 해당 타일에 식물이 있으면 반환
-        int? idx = grid.GetGridIndexFromPosition(Input.mousePosition);
-        if (idx.HasValue)
-        {
-            grid.plantGrid.TryGetValue(idx.Value, out var p);
-            if (p) return p;
-        }
-
-        // ③ (백업) 2D 경로: 혼합 씬에서 2D 콜라이더도 있는 경우
-        Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
-        world.z = 0f;
-        Vector2 p2 = new Vector2(world.x, world.y);
-        var hits2D = Physics2D.OverlapPointAll(p2);
-        if (hits2D != null && hits2D.Length == 0)
-            hits2D = Physics2D.OverlapCircleAll(p2, 0.1f);
-
-        if (hits2D != null)
-        {
-            foreach (var h in hits2D)
+            // ③ (백업) 2D 경로: 혼합 씬에서 2D 콜라이더도 있는 경우
+            try
             {
-                var plant =
-                    h.GetComponent<Plant>() ??
-                    h.GetComponentInParent<Plant>() ??
-                    h.GetComponentInChildren<Plant>();
-                if (plant) return plant;
-            }
-        }
+                Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
+                world.z = 0f;
+                Vector2 p2 = new Vector2(world.x, world.y);
+                var hits2D = Physics2D.OverlapPointAll(p2);
+                if (hits2D != null && hits2D.Length == 0)
+                    hits2D = Physics2D.OverlapCircleAll(p2, 0.1f);
 
-        return null;
+                if (hits2D != null)
+                {
+                    foreach (var h in hits2D)
+                    {
+                        if (h == null) continue;
+                        try
+                        {
+                            Plant plant = null;
+                            try { plant = h.GetComponent<Plant>(); } catch { }
+                            if (plant == null)
+                            {
+                                try { plant = h.GetComponentInParent<Plant>(); } catch { }
+                            }
+                            if (plant == null)
+                            {
+                                try { plant = h.GetComponentInChildren<Plant>(); } catch { }
+                            }
+                            if (plant != null) return plant;
+                        }
+                        catch (System.Exception e)
+                        {
+                            Debug.LogWarning($"[PlacementController] Error processing 2D hit: {e.Message}");
+                            continue;
+                        }
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[PlacementController] 2D raycast error: {e.Message}");
+            }
+
+            return null;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PlacementController] RaycastPlantUnderMouse fatal error: {e.Message}\n{e.StackTrace}");
+            return null;
+        }
     }
 
     private void Hover(Plant p)

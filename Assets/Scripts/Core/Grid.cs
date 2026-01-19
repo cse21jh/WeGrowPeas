@@ -533,13 +533,43 @@ public class Grid : MonoBehaviour
 
     public Transform GetSoilTransform(int idx)
     {
-        int row = idx / 4;
-        int col = idx % 4;
+        try
+        {
+            // InitSoils에서 index = col * 4 + row로 계산하므로
+            // idx = col * 4 + row
+            // col = idx / 4
+            // row = idx % 4
+            int col = idx / 4;
+            int row = idx % 4;
 
-        Transform rowT = transform.GetChild(row);
-        Transform colT = rowT.GetChild(col);
+            // 범위 체크
+            if (col < 0 || col >= transform.childCount)
+            {
+                Debug.LogError($"[Grid] GetSoilTransform: Invalid col={col}, idx={idx}, childCount={transform.childCount}");
+                return null;
+            }
 
-        return colT;
+            Transform colT = transform.GetChild(col);
+            if (colT == null)
+            {
+                Debug.LogError($"[Grid] GetSoilTransform: colT is null, col={col}");
+                return null;
+            }
+
+            if (row < 0 || row >= colT.childCount)
+            {
+                Debug.LogError($"[Grid] GetSoilTransform: Invalid row={row}, col={col}, idx={idx}, colT.childCount={colT.childCount}");
+                return null;
+            }
+
+            Transform rowT = colT.GetChild(row);
+            return rowT;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[Grid] GetSoilTransform exception: idx={idx}, error={e.Message}\n{e.StackTrace}");
+            return null;
+        }
     }
 
     /*public void DestroyPlant(int gridNum)
@@ -1284,22 +1314,50 @@ public class Grid : MonoBehaviour
 
     public void PlacePetBottle(int idx)
     {
-        if (petBottleTiles.Contains(idx)) return;
-
-        petBottleTiles.Add(idx);
-        // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
-        int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
-        petBottleBlockCount[idx] = baseBlockCount;
-
-        // 시각화(선택)
-        if (petBottleMarkerPrefab != null)
+        try
         {
-            var soilT = GetSoilTransform(idx);
-            var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity, soilT);
-            petMarkers[idx] = marker;
-        }
+            Debug.Log($"[Grid] PlacePetBottle 시작: idx={idx}");
+            
+            if (petBottleTiles.Contains(idx))
+            {
+                Debug.LogWarning($"[Grid] PlacePetBottle: 이미 페트병이 있는 위치 idx={idx}");
+                return;
+            }
 
-        Debug.Log($"[Grid] 페트병 설치: idx={idx}, 보호 횟수={baseBlockCount}");
+            // 인덱스 범위 체크
+            if (idx < 0 || idx >= maxCol * 4)
+            {
+                Debug.LogError($"[Grid] PlacePetBottle: Invalid idx={idx}, maxCol={maxCol}, maxIdx={maxCol * 4}");
+                return;
+            }
+
+            petBottleTiles.Add(idx);
+            // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
+            int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
+            petBottleBlockCount[idx] = baseBlockCount;
+
+            // 시각화(선택)
+            if (petBottleMarkerPrefab != null)
+            {
+                var soilT = GetSoilTransform(idx);
+                if (soilT == null)
+                {
+                    Debug.LogError($"[Grid] PlacePetBottle: GetSoilTransform returned null for idx={idx}");
+                    // 마커 없이 계속 진행
+                }
+                else
+                {
+                    var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity, soilT);
+                    petMarkers[idx] = marker;
+                }
+            }
+
+            Debug.Log($"[Grid] 페트병 설치 완료: idx={idx}, 보호 횟수={baseBlockCount}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[Grid] PlacePetBottle exception: idx={idx}, error={e.Message}\n{e.StackTrace}");
+        }
     }
     public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
     {

@@ -163,16 +163,59 @@ public class ShopUI : MonoBehaviour
                     break;
 
                 case ShopFlowType.SelectExistingPlant:
-                    placement?.BeginPlantSelection(
-                        ctx,
-                        validate: (plant) => data.ValidateTarget(ctx, plant, out _),
-                        onConfirm: (plant) =>
-                        {
-                            data.SetSelectedPlant(plant);
-                            TryChargeAndCommit(data, slot);
-                        },
-                        onCancel: () => data.Cancel(ctx)
-                    );
+                    if (placement == null)
+                    {
+                        Debug.LogError("[ShopUI] PlacementController is null!");
+                        ShowError("배치 컨트롤러를 찾을 수 없습니다");
+                        return;
+                    }
+                    try
+                    {
+                        placement.BeginPlantSelection(
+                            ctx,
+                            validate: (plant) => 
+                            {
+                                try
+                                {
+                                    return data.ValidateTarget(ctx, plant, out _);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogError($"[ShopUI] ValidateTarget error: {e.Message}");
+                                    return false;
+                                }
+                            },
+                            onConfirm: (plant) =>
+                            {
+                                try
+                                {
+                                    data.SetSelectedPlant(plant);
+                                    TryChargeAndCommit(data, slot);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogError($"[ShopUI] onConfirm error: {e.Message}\n{e.StackTrace}");
+                                    ShowError($"구매 처리 중 오류가 발생했습니다: {e.Message}");
+                                }
+                            },
+                            onCancel: () => 
+                            {
+                                try
+                                {
+                                    data.Cancel(ctx);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogError($"[ShopUI] onCancel error: {e.Message}");
+                                }
+                            }
+                        );
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError($"[ShopUI] BeginPlantSelection error: {e.Message}\n{e.StackTrace}");
+                        ShowError($"식물 선택 모드 시작 중 오류가 발생했습니다: {e.Message}");
+                    }
                     break;
             }
         },

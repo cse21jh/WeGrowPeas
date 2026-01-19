@@ -71,11 +71,8 @@ public class PetBottleItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다 (ShopContext.Grid 주입 필요)";
+        if (!ValidateGrid(ctx, out reason))
             return false;
-        }
         reason = null;
         return true;
     }
@@ -84,16 +81,15 @@ public class PetBottleItemData : ItemData
     {
         reason = null;
 
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = "Grid 객체가 없습니다";
+        if (!ValidateGrid(ctx, out reason))
             return false;
-        }
+        
         if (target == null)
         {
             reason = "선택된 식물이 없습니다";
             return false;
         }
+        
         int idx = target.gridIndex;
 
         // 이미 페트병이 위치한 칸 불가
@@ -103,14 +99,27 @@ public class PetBottleItemData : ItemData
             return false;
         }
 
-        if(!target.IsMovable)
+        if (!target.IsMovable)
         {
             reason = "유효한 식물이 아닙니다";
             return false;
         }
 
-        pendingIndex = idx;
         return true;
+    }
+
+    public override void SetSelectedPlant(Plant plant)
+    {
+        if (plant != null)
+        {
+            pendingIndex = plant.gridIndex;
+            Debug.Log($"[PetBottle] SetSelectedPlant: gridIndex={plant.gridIndex}");
+        }
+        else
+        {
+            Debug.LogWarning("[PetBottle] SetSelectedPlant: plant is null!");
+            pendingIndex = null;
+        }
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -122,19 +131,50 @@ public class PetBottleItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx == null || ctx.Grid == null)
+        Debug.Log($"[PetBottle] Commit 시작");
+        
+        if (!ValidateGrid(ctx, out _))
         {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+            Debug.LogWarning("[PetBottle] Commit: Grid validation failed");
             return;
         }
-        if (!pendingIndex.HasValue)
+        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
         {
-            ctx.ShowError?.Invoke("위치 선택이 유효하지 않습니다");
+            Debug.LogWarning("[PetBottle] Commit: PendingIndex validation failed");
             return;
         }
 
-        ctx.Grid.PlacePetBottle(pendingIndex.Value);
-        pendingIndex = null;
+        try
+        {
+            int idx = pendingIndex.Value;
+            Debug.Log($"[PetBottle] Commit: placing at idx={idx}, maxCol={ctx.Grid.maxCol}");
+            
+            // 유효한 인덱스 범위 체크
+            int maxIdx = ctx.Grid.maxCol * 4;
+            if (idx < 0 || idx >= maxIdx)
+            {
+                Debug.LogError($"[PetBottle] Commit: Invalid idx={idx}, maxIdx={maxIdx}");
+                ctx.ShowError?.Invoke($"유효하지 않은 위치입니다 (idx={idx})");
+                pendingIndex = null;
+                return;
+            }
+
+            Debug.Log($"[PetBottle] Commit: Calling PlacePetBottle");
+            ctx.Grid.PlacePetBottle(idx);
+            Debug.Log($"[PetBottle] Commit: PlacePetBottle 완료");
+            
+            ctx.ShowInfo?.Invoke($"{DisplayName} 배치 완료");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[PetBottle] Commit error: {e.Message}\n{e.StackTrace}");
+            ctx.ShowError?.Invoke($"페트병 배치 중 오류가 발생했습니다: {e.Message}");
+        }
+        finally
+        {
+            pendingIndex = null;
+            Debug.Log($"[PetBottle] Commit 종료");
+        }
     }
 
     public override void Cancel(ShopContext ctx)
