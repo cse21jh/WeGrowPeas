@@ -97,6 +97,8 @@ public class SaveData
     //shopManager
     public List<string> itemName = new();
     public List<int> itemPurchaseCount = new();
+    public List<int> shopSeedDays = new(); // 날짜 리스트
+    public List<int> shopSeeds = new(); // 해당 날짜의 시드 리스트 (인덱스 매칭)
 
     //ModManager
     public List<Mod> mods = new();
@@ -486,6 +488,16 @@ public class GameManager : Singleton<GameManager>
         {
             saveData.itemName.Add(p.Key);
             saveData.itemPurchaseCount.Add(p.Value);
+        }
+
+        // 상점 시드 저장
+        saveData.shopSeedDays.Clear();
+        saveData.shopSeeds.Clear();
+        var shopSeeds = shopManager.GetShopSeeds();
+        foreach (var kvp in shopSeeds)
+        {
+            saveData.shopSeedDays.Add(kvp.Key);
+            saveData.shopSeeds.Add(kvp.Value);
         }
 
         //modManager

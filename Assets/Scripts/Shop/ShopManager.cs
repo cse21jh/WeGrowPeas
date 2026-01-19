@@ -18,6 +18,12 @@ public class ShopManager : Singleton<ShopManager>
     private int dailyRerollCount = 0;
     public int DailyRerollCount => dailyRerollCount;
 
+    // 날짜별 시드 관리 (날짜 -> 시드 매핑)
+    private Dictionary<int, int> shopSeeds = new Dictionary<int, int>();
+    
+    // 현재 날짜의 리롤 횟수 (리롤할 때마다 증가하여 다른 시드 사용)
+    private int currentRerollCount = 0;
+
     /// <summary>
     /// 매일 상점 무료 리롤 가능 횟수를 추가합니다.
     /// </summary>
@@ -108,17 +114,57 @@ public class ShopManager : Singleton<ShopManager>
             if (!it) continue;
             if (!it.IsRotationUnlockOk(ctx)) continue;           // 해금 조건(각 아이템에서 override)
             if (it.GetRotationWeight(ctx) <= 0) continue;        // 가중치 0 이하는 제외
+            if (!it.CanPurchaseByLimit()) continue;              // 구매 제한에 도달한 아이템 제외
             candidates.Add(it);
         }
 
-        // 가중치 기반 중복 없이 N개 추첨 (WeightedRandom 유틸 사용 시)
+        // 시드 기반 deterministic 선택
+        int seed = GetShopSeed(currentDay);
+        System.Random rng = new System.Random(seed);
+        
+        // 가중치 기반 중복 없이 N개 추첨 (시드 기반)
         inv.Rotation = Game.Util.WeightedRandom.PickWithoutReplacement(
             candidates,
             it => Mathf.Max(0, it.GetRotationWeight(ctx)),
+            rng,
             rotationCount
         );
 
         return inv;
+    }
+
+    /// <summary>
+    /// 현재 날짜의 상점 시드를 가져옵니다. 없으면 생성합니다.
+    /// </summary>
+    private int GetShopSeed(int day)
+    {
+        // 날짜와 리롤 횟수를 조합하여 고유한 키 생성
+        int seedKey = day * 1000 + currentRerollCount;
+        
+        if (!shopSeeds.ContainsKey(seedKey))
+        {
+            // 새로운 시드 생성 (날짜 기반으로 deterministic하게)
+            int baseSeed = day * 12345 + currentRerollCount * 67890;
+            shopSeeds[seedKey] = baseSeed;
+        }
+        
+        return shopSeeds[seedKey];
+    }
+
+    /// <summary>
+    /// 리롤 시 호출하여 리롤 횟수를 증가시킵니다.
+    /// </summary>
+    public void IncrementRerollCount()
+    {
+        currentRerollCount++;
+    }
+
+    /// <summary>
+    /// 날짜가 변경될 때 호출하여 리롤 횟수를 리셋합니다.
+    /// </summary>
+    public void ResetRerollCount()
+    {
+        currentRerollCount = 0;
     }
 
     public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
@@ -173,6 +219,16 @@ public class ShopManager : Singleton<ShopManager>
 
             purchaseHistory[key] = saveData.itemPurchaseCount[i];
         }
+
+        // 시드 로드
+        shopSeeds.Clear();
+        if (saveData.shopSeedDays != null && saveData.shopSeeds != null)
+        {
+            for (int i = 0; i < saveData.shopSeedDays.Count && i < saveData.shopSeeds.Count; i++)
+            {
+                shopSeeds[saveData.shopSeedDays[i]] = saveData.shopSeeds[i];
+            }
+        }
     }
 
     /// <summary>
@@ -187,5 +243,13 @@ public class ShopManager : Singleton<ShopManager>
         // TryPurchase와 동일한 키 생성 방식 사용
         var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
         return purchaseHistory.ContainsKey(key) ? purchaseHistory[key] : 0;
+    }
+
+    /// <summary>
+    /// 저장을 위해 시드 딕셔너리를 반환합니다.
+    /// </summary>
+    public Dictionary<int, int> GetShopSeeds()
+    {
+        return shopSeeds;
     }
 }

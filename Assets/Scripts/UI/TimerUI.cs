@@ -85,11 +85,10 @@ public class TimerUI : MonoBehaviour
 
     private IEnumerator BreedingCountdown()
     {
-        int timeLeft = maxBreedingTime;
         textTimer.color = Color.white;
         breedTimerController.SetFillImmediately(1f);
 
-        while (timeLeft >= 0)
+        while (true)
         {
             if (GameManager.Instance.GetGameIsStopped())
             {
@@ -97,12 +96,35 @@ public class TimerUI : MonoBehaviour
                 continue;
             }
 
-            if (timeLeft <= 10) textTimer.color = Color.red;
+            // Grid의 실제 breedTimer와 동기화
+            if (GameManager.Instance?.grid != null)
+            {
+                float currentTimer = GameManager.Instance.grid.GetBreedTimer();
+                float currentMaxTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+                
+                if (currentTimer <= 0)
+                {
+                    break;
+                }
 
-            textTimer.text = $"{timeLeft}s";
-            yield return new WaitForSeconds(1f);
-            timeLeft--;
-            breedTimerController.SetFill(timeLeft / (float)maxBreedingTime);
+                int timeLeft = Mathf.CeilToInt(currentTimer);
+                maxBreedingTime = Mathf.CeilToInt(currentMaxTimer);
+
+                if (timeLeft <= 10) textTimer.color = Color.red;
+                else textTimer.color = Color.white;
+
+                textTimer.text = $"{timeLeft}s";
+                
+                // 프로그레스바 계산: 현재 시간 / 최대 시간
+                float fillAmount = currentTimer / currentMaxTimer;
+                breedTimerController.SetFill(fillAmount);
+            }
+            else
+            {
+                break;
+            }
+
+            yield return new WaitForSeconds(0.1f); // 더 부드러운 업데이트를 위해 0.1초마다
         }
     }
 

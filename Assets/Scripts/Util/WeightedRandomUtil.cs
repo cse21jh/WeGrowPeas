@@ -6,14 +6,14 @@ using UnityEngine;
 namespace Game.Util
 {
     /// <summary>
-    /// °¡ÁßÄ¡ ·£´ı À¯Æ¿ (UnityEngine.Random »ç¿ë)
-    /// - À½¼ö/NaN/Infinity´Â 0À¸·Î Ãë±Ş
-    /// - ÀüÃ¼ ÇÕÀÌ 0ÀÌ¸é TryPick*´Â false¸¦ ¹İÈ¯ (Á÷Á¢ fallback Ã³¸®)
-    /// - System.Random ¹öÀüµµ Á¦°ø(ÀçÇö¼º ÇÊ¿ä ½Ã)
+    /// ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¿ (UnityEngine.Random ï¿½ï¿½ï¿½)
+    /// - ï¿½ï¿½ï¿½ï¿½/NaN/Infinityï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    /// - ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ TryPick*ï¿½ï¿½ falseï¿½ï¿½ ï¿½ï¿½È¯ (ï¿½ï¿½ï¿½ï¿½ fallback Ã³ï¿½ï¿½)
+    /// - System.Random ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½ï¿½)
     /// </summary>
     public static class WeightedRandom
     {
-        // ---------- Index ±â¹İ ----------
+        // ---------- Index ï¿½ï¿½ï¿½ ----------
 
         public static bool TryPickIndex(IReadOnlyList<float> weights, out int index)
             => TryPickIndex(weights, out index, minClamp: 0f);
@@ -43,7 +43,7 @@ namespace Game.Util
                 if (r <= acc) { index = i; return true; }
             }
 
-            index = safe.Length - 1; // ºÎµ¿¼Ò¼öÁ¡ ¿ÀÂ÷ º¸È£
+            index = safe.Length - 1; // ï¿½Îµï¿½ï¿½Ò¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£
             return true;
         }
 
@@ -54,7 +54,7 @@ namespace Game.Util
             return idx;
         }
 
-        // ---------- Item + selector ±â¹İ ----------
+        // ---------- Item + selector ï¿½ï¿½ï¿½ ----------
 
         public static bool TryPick<T>(IReadOnlyList<T> items, Func<T, float> weightSelector, out T chosen, float minClamp = 0f)
         {
@@ -81,8 +81,8 @@ namespace Game.Util
         }
 
         /// <summary>
-        /// °¡ÁßÄ¡ ±â¹İ 'Áßº¹ ¾øÀÌ' N°³ ÃßÃâ.
-        /// °¢ ½ºÅÜ¸¶´Ù ³²Àº Ç×¸ñµéÀ» ÇöÀç °¡ÁßÄ¡·Î ´Ù½Ã »ÌÀ½.
+        /// ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ 'ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½' Nï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+        /// ï¿½ï¿½ ï¿½ï¿½ï¿½Ü¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½.
         /// </summary>
         public static List<T> PickWithoutReplacement<T>(IList<T> items, Func<T, float> weightSelector, int count, float minClamp = 0f)
         {
@@ -100,7 +100,7 @@ namespace Game.Util
             return result;
         }
 
-        // ---------- Deterministic(System.Random) ¹öÀü ----------
+        // ---------- Deterministic(System.Random) ï¿½ï¿½ï¿½ï¿½ ----------
 
         public static bool TryPickIndex(IReadOnlyList<float> weights, System.Random rng, out int index, float minClamp = 0f)
         {
@@ -129,6 +129,45 @@ namespace Game.Util
 
             index = safe.Length - 1;
             return true;
+        }
+
+        /// <summary>
+        /// System.Randomì„ ì‚¬ìš©í•˜ëŠ” TryPick ì˜¤ë²„ë¡œë“œ
+        /// </summary>
+        public static bool TryPick<T>(IReadOnlyList<T> items, Func<T, float> weightSelector, System.Random rng, out T chosen, float minClamp = 0f)
+        {
+            chosen = default;
+            if (items == null || items.Count == 0) return false;
+
+            var w = new float[items.Count];
+            for (int i = 0; i < items.Count; i++)
+            {
+                float ww = weightSelector(items[i]);
+                if (float.IsNaN(ww) || float.IsInfinity(ww) || ww < minClamp) ww = 0f;
+                w[i] = ww;
+            }
+            if (!TryPickIndex(w, rng, out int idx, minClamp)) return false;
+            chosen = items[idx];
+            return true;
+        }
+
+        /// <summary>
+        /// System.Randomì„ ì‚¬ìš©í•˜ëŠ” PickWithoutReplacement ì˜¤ë²„ë¡œë“œ (ì‹œë“œ ê¸°ë°˜)
+        /// </summary>
+        public static List<T> PickWithoutReplacement<T>(IList<T> items, Func<T, float> weightSelector, System.Random rng, int count, float minClamp = 0f)
+        {
+            count = Mathf.Clamp(count, 0, items?.Count ?? 0);
+            var result = new List<T>(count);
+            if (items == null || items.Count == 0 || count == 0) return result;
+
+            var pool = new List<T>(items);
+            for (int k = 0; k < count; k++)
+            {
+                if (!TryPick(pool, weightSelector, rng, out var picked, minClamp)) break;
+                result.Add(picked);
+                pool.Remove(picked);
+            }
+            return result;
         }
     }
 }

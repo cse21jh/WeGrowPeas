@@ -275,6 +275,7 @@ public class ShopUI : MonoBehaviour
         if (shopManager.UseReroll())
         {
             SoundManager.Instance.PlayEffect("Button");
+            shopManager.IncrementRerollCount(); // 리롤 횟수 증가 (다른 시드 사용)
             session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
             BuildShop();
             UpdateRerollButton();
@@ -286,6 +287,7 @@ public class ShopUI : MonoBehaviour
         {
             economy.SpendGold(rerollPrice);
             SoundManager.Instance.PlayEffect("Button");
+            shopManager.IncrementRerollCount(); // 리롤 횟수 증가 (다른 시드 사용)
             session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
             BuildShop();
             UpdateRerollButton();
@@ -327,6 +329,7 @@ public class ShopUI : MonoBehaviour
     /// </summary>
     public void DailyReroll()
     {
+        shopManager.ResetRerollCount(); // 날짜 변경 시 리롤 횟수 리셋
         session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
         BuildShop();
         UpdateRerollButton();

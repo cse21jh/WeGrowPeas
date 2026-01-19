@@ -609,7 +609,18 @@ public class Grid : MonoBehaviour
     {
         maxBreedTimer += time;
         breedTimerUI.UpdateMaxTimerCount();
-        return;
+        
+        // 교배 중이면 현재 타이머도 증가
+        if (isBreeding && breedTimer > 0)
+        {
+            breedTimer += time;
+            // 타이머가 최대값을 넘지 않도록 제한
+            float effectiveMaxBreedTimer = GetMaxBreedTimer();
+            if (breedTimer > effectiveMaxBreedTimer)
+            {
+                breedTimer = effectiveMaxBreedTimer;
+            }
+        }
     }
 
     public float GetMaxBreedTimer()
@@ -626,7 +637,16 @@ public class Grid : MonoBehaviour
     public void AddMaxBreedCount(int count)
     {
         maxBreedCount += count;
-        return;
+        
+        // 교배 중이면 현재 교배 횟수도 증가 (남은 횟수 증가)
+        if (isBreeding)
+        {
+            // breedCount는 이미 사용한 횟수이므로 변경하지 않음
+            // maxBreedCount가 증가하면 자동으로 남은 횟수가 증가함
+            // UI 업데이트
+            int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+            UpdateBreedCountUI(effectiveMaxBreedCount - breedCount);
+        }
     }
 
     public int GetMaxCol()
@@ -1316,11 +1336,8 @@ public class Grid : MonoBehaviour
     {
         try
         {
-            Debug.Log($"[Grid] PlacePetBottle 시작: idx={idx}");
-            
             if (petBottleTiles.Contains(idx))
             {
-                Debug.LogWarning($"[Grid] PlacePetBottle: 이미 페트병이 있는 위치 idx={idx}");
                 return;
             }
 
@@ -1340,19 +1357,12 @@ public class Grid : MonoBehaviour
             if (petBottleMarkerPrefab != null)
             {
                 var soilT = GetSoilTransform(idx);
-                if (soilT == null)
-                {
-                    Debug.LogError($"[Grid] PlacePetBottle: GetSoilTransform returned null for idx={idx}");
-                    // 마커 없이 계속 진행
-                }
-                else
+                if (soilT != null)
                 {
                     var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity, soilT);
                     petMarkers[idx] = marker;
                 }
             }
-
-            Debug.Log($"[Grid] 페트병 설치 완료: idx={idx}, 보호 횟수={baseBlockCount}");
         }
         catch (System.Exception e)
         {

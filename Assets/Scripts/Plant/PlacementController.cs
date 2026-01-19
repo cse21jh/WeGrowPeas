@@ -192,12 +192,9 @@ public class PlacementController : MonoBehaviour
     {
         try
         {
-            Debug.Log("[PlacementController] BeginPlantSelection 시작");
-            
             // 진행 중인 배치/선택 종료
             if (isPlacing)
             {
-                Debug.Log("[PlacementController] 기존 배치 중지");
                 StopPlacementInternal();
             }
             
@@ -215,9 +212,7 @@ public class PlacementController : MonoBehaviour
                 return;
             }
             
-            Debug.Log("[PlacementController] 코루틴 시작");
             placingCo = StartCoroutine(PlantSelectionRoutine(validate, onConfirm, onCancel));
-            Debug.Log("[PlacementController] 코루틴 시작 완료");
         }
         catch (System.Exception e)
         {
@@ -230,31 +225,18 @@ public class PlacementController : MonoBehaviour
         System.Action<Plant> onConfirm,
         System.Action onCancel)
     {
-        Debug.Log("[PlacementController] PlantSelectionRoutine 시작");
-        
         try
         {
             isPlacing = true;
-            Debug.Log("[PlacementController] isPlacing = true 설정 완료");
             
             if (shovel != null)
             {
                 shovel.IsEnabled = false;
-                Debug.Log("[PlacementController] shovel.IsEnabled = false 설정 완료");
-            }
-            else
-            {
-                Debug.LogWarning("[PlacementController] shovel is null!");
             }
             
             if (shovelButton != null)
             {
                 shovelButton.enabled = false;
-                Debug.Log("[PlacementController] shovelButton.enabled = false 설정 완료");
-            }
-            else
-            {
-                Debug.LogWarning("[PlacementController] shovelButton is null!");
             }
         }
         catch (System.Exception e)
@@ -279,30 +261,15 @@ public class PlacementController : MonoBehaviour
         if (ctx != null && ctx.ShowGuide != null)
         {
             ctx.ShowGuide.Invoke("식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)");
-            Debug.Log("[PlacementController] ShowGuide 호출 완료");
         }
-        else
-        {
-            Debug.LogWarning("[PlacementController] ctx or ShowGuide is null!");
-        }
-        
-        Debug.Log("[PlacementController] while 루프 시작 전");
 
         Plant confirmedPlant = null;
         bool shouldCancel = false;
         float timeout = 30f; // 30초 타임아웃
         float startTime = Time.time;
-        int loopCount = 0;
 
-        Debug.Log("[PlacementController] while 루프 진입 직전");
         while (true)
         {
-            loopCount++;
-            if (loopCount == 1)
-            {
-                Debug.Log("[PlacementController] while 루프 첫 번째 반복 시작");
-            }
-            
             // 타임아웃 체크
             if (Time.time - startTime > timeout)
             {
@@ -310,8 +277,6 @@ public class PlacementController : MonoBehaviour
                 shouldCancel = true;
                 break;
             }
-            
-            Debug.Log($"[PlacementController] 타임아웃 체크 완료 (loopCount={loopCount})");
             
             // UI 위에 있으면 하이라이트 해제 + 취소만 허용
             bool isOverUI = false;
@@ -328,29 +293,21 @@ public class PlacementController : MonoBehaviour
             
             if (isOverUI)
             {
-                Debug.Log("[PlacementController] UI 위에 있음 - 하이라이트 해제");
                 Hover(null);
                 if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
                 {
-                    Debug.Log("[PlacementController] 취소 입력 감지");
                     shouldCancel = true;
                     break;
                 }
-                Debug.Log("[PlacementController] continue 전 yield");
                 yield return null;
-                Debug.Log("[PlacementController] continue 후");
                 continue;
             }
-            
-            Debug.Log($"[PlacementController] UI 체크 완료, 레이캐스트 시작 (loopCount={loopCount})");
 
             // 마우스 아래 식물 레이캐스트
             Plant p = null;
             try
             {
-                Debug.Log("[PlacementController] RaycastPlantUnderMouse 호출 전");
                 p = RaycastPlantUnderMouse();
-                Debug.Log($"[PlacementController] RaycastPlantUnderMouse 완료: p={(p != null ? p.name : "null")}");
             }
             catch (System.Exception e)
             {
@@ -360,9 +317,7 @@ public class PlacementController : MonoBehaviour
             
             try
             {
-                Debug.Log("[PlacementController] Hover 호출 전");
                 Hover(p);
-                Debug.Log("[PlacementController] Hover 호출 완료");
             }
             catch (System.Exception e)
             {

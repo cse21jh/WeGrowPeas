@@ -113,11 +113,9 @@ public class PetBottleItemData : ItemData
         if (plant != null)
         {
             pendingIndex = plant.gridIndex;
-            Debug.Log($"[PetBottle] SetSelectedPlant: gridIndex={plant.gridIndex}");
         }
         else
         {
-            Debug.LogWarning("[PetBottle] SetSelectedPlant: plant is null!");
             pendingIndex = null;
         }
     }
@@ -131,23 +129,14 @@ public class PetBottleItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        Debug.Log($"[PetBottle] Commit 시작");
-        
         if (!ValidateGrid(ctx, out _))
-        {
-            Debug.LogWarning("[PetBottle] Commit: Grid validation failed");
             return;
-        }
         if (!ValidatePendingIndex(pendingIndex, ctx, out _))
-        {
-            Debug.LogWarning("[PetBottle] Commit: PendingIndex validation failed");
             return;
-        }
 
         try
         {
             int idx = pendingIndex.Value;
-            Debug.Log($"[PetBottle] Commit: placing at idx={idx}, maxCol={ctx.Grid.maxCol}");
             
             // 유효한 인덱스 범위 체크
             int maxIdx = ctx.Grid.maxCol * 4;
@@ -159,10 +148,7 @@ public class PetBottleItemData : ItemData
                 return;
             }
 
-            Debug.Log($"[PetBottle] Commit: Calling PlacePetBottle");
             ctx.Grid.PlacePetBottle(idx);
-            Debug.Log($"[PetBottle] Commit: PlacePetBottle 완료");
-            
             ctx.ShowInfo?.Invoke($"{DisplayName} 배치 완료");
         }
         catch (System.Exception e)
@@ -173,7 +159,6 @@ public class PetBottleItemData : ItemData
         finally
         {
             pendingIndex = null;
-            Debug.Log($"[PetBottle] Commit 종료");
         }
     }
 
