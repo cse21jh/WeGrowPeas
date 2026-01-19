@@ -67,6 +67,7 @@ public class PhoneManager : MonoBehaviour
     private float maxPhoneTimer = 30.0f;
     private float phoneTimer = 0;
     private bool skipPhoneTime = false;
+    private bool isPhoneTime = false;
     
     [SerializeField] private GameObject skipPhoneTimeButton;
     [SerializeField] private BreedTimerManager breedTimerManager;
@@ -104,7 +105,7 @@ public class PhoneManager : MonoBehaviour
     public void Toggle() => SetOpen(!_isOpen);
 
     public void SetOpen(bool open)
-    {
+    {   
         _isOpen = open;
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);
@@ -158,7 +159,7 @@ public class PhoneManager : MonoBehaviour
 
         bool _warned15s = false;
         //int rerollCount = 0;
-
+        isPhoneTime = true;
         while (!skipPhoneTime && (phoneTimer > 0))
         {
             if (GameManager.Instance.GetGameIsStopped())
@@ -194,6 +195,7 @@ public class PhoneManager : MonoBehaviour
         skipPhoneTimeButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
         skipPhoneTime = false;
+        isPhoneTime = false;
         yield return null;
     }
     
@@ -346,18 +348,18 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
-                GameManager.Instance.StopGame();
+                //GameManager.Instance.StopGame();
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
-                GameManager.Instance.ResumeGame();               
+                //GameManager.Instance.ResumeGame();               
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
-                GameManager.Instance.ResumeGame();                
+                //GameManager.Instance.ResumeGame();                
                 Debug.Log("폰 전체: 알람 없음");
                 break;
         }
@@ -395,6 +397,22 @@ public class PhoneManager : MonoBehaviour
             progress.activatedTriggers.Add(r);
         }
         messengerApp.SetProgress(progress);
+    }
+    public void TutorialPhonePhase()
+    {
+        ClickRouter.Instance.IsBlockedByUI = true;
+        SetPhoneTimer();
+
+        skipPhoneTimeButton.SetActive(true);
+        phoneTimer = maxPhoneTimer;
+        phoneTimerUI.StartPhoneTimer();
+
+        isPhoneTime = true;
+    }
+
+    public bool GetIsPhoneTime()
+    {
+        return isPhoneTime;
     }
 }
 

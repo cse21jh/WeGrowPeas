@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // TextMeshPro »ç¿ë ½Ã
+using TMPro; // TextMeshPro ì‚¬ìš© ì‹œ
 
 public class ChatPartnerUI : MonoBehaviour
 {
@@ -8,14 +8,14 @@ public class ChatPartnerUI : MonoBehaviour
     [SerializeField] private TMP_Text chatPartnerNameText;
     [SerializeField] private TMP_Text lastMessageText;
 
-    [SerializeField] private GameObject mandatoryunreadIndicator; // ÇÊ¼ö ¸Ş½ÃÁö ¾Ë¸²
-    [SerializeField] private GameObject notMandatoryUnreadIndicator; // ¼±ÅÃ ¸Ş½ÃÁö ¾Ë¸²
+    [SerializeField] private GameObject mandatoryunreadIndicator; // í•„ìˆ˜ ë©”ì‹œì§€ ì•Œë¦¼
+    [SerializeField] private GameObject notMandatoryUnreadIndicator; // ì„ íƒ ë©”ì‹œì§€ ì•Œë¦¼
 
     private Chat chat;
     private MessengerApp messengerApp;
 
-    // *** º¯°æÁ¡ 2: Setup ¸Ş¼­µå ÆÄ¶ó¹ÌÅÍ º¯°æ ***
-    // bool hasUnread ´ë½Å UnreadInfo¸¦ ¹Ş¾Æ ´õ ¸¹Àº Á¤º¸¸¦ Ã³¸®
+    // *** ë³€ê²½ì  2: Setup ë©”ì„œë“œ íŒŒë¼ë¯¸í„° ë³€ê²½ ***
+    // bool hasUnread ëŒ€ì‹  UnreadInfoë¥¼ ë°›ì•„ ë” ë§ì€ ì •ë³´ë¥¼ ì²˜ë¦¬
     public void Setup(Chat chat, string previewMessage, UnreadInfo unreadInfo, MessengerApp appController)
     {
         this.chat = chat;
@@ -23,13 +23,13 @@ public class ChatPartnerUI : MonoBehaviour
 
         chatPartnerImage.sprite = chat.chatPartner.chatPartnerImage;
         chatPartnerNameText.text = chat.chatPartner.chatPartnerName;
-        lastMessageText.text = previewMessage; // ¹Ì¸®º¸±â ¸Ş½ÃÁö·Î ÅØ½ºÆ® ¼³Á¤
+        lastMessageText.text = previewMessage; // ë¯¸ë¦¬ë³´ê¸° ë©”ì‹œì§€ë¡œ í…ìŠ¤íŠ¸ ì„¤ì •
 
-        // ¸ğµç ¾Ë¸²À» ÀÏ´Ü ²ö´Ù
+        // ëª¨ë“  ì•Œë¦¼ì„ ì¼ë‹¨ ëˆë‹¤
         mandatoryunreadIndicator.SetActive(false);
         notMandatoryUnreadIndicator.SetActive(false);
 
-        // ¾È ÀĞÀº ¸Ş½ÃÁö Á¤º¸¿¡ µû¶ó ÀûÀıÇÑ ¾Ë¸²À» ÄÒ´Ù
+        // ì•ˆ ì½ì€ ë©”ì‹œì§€ ì •ë³´ì— ë”°ë¼ ì ì ˆí•œ ì•Œë¦¼ì„ ì¼ ë‹¤
         if (unreadInfo.hasUnread)
         {
             if (unreadInfo.hasMandatory)
@@ -49,4 +49,5 @@ public class ChatPartnerUI : MonoBehaviour
     {
         messengerApp.OpenChatRoom(chat);
     }
+
 }

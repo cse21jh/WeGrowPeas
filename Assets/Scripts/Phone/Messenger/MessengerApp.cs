@@ -40,6 +40,8 @@ public class MessengerApp : MonoBehaviour
     [SerializeField] private TMP_Text chatRoomHeaderName;
     [SerializeField] private Image chatRoomHeaderImage;
     [SerializeField] private MessageController mc;
+    [SerializeField] private ScrollRect scrollRect;
+
 
     [SerializeField] private GameObject chatPartnerListItemPrefab;    
 
@@ -84,18 +86,21 @@ public class MessengerApp : MonoBehaviour
     {
         if (backTochatPartnersButton != null)
             backTochatPartnersButton.onClick.AddListener(OpenchatPartnerList);
-    }  
+    }
 
     public void UpdateMessenger()
     {
         if (chatRoomPanel.activeSelf && currentChat != null)
         {
-            // 만약 채팅방이 열려있다면, 해당 채팅방의 메시지만 갱신합니다.
-            DisplayChatMessages();
+            // 핵심 변경: 화면을 다 지우지 않고, 현재 진행 중인 코루틴이 없다면 새 메시지만 체크해서 시작
+            if (!IsDisplayingMessages)
+            {
+                if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
+                messageDisplayCoroutine = StartCoroutine(ShowUnreadMessagesCoroutine(false)); // false: 초기화 안함
+            }
         }
         else
         {
-            // 대화 상대 목록이 열려있거나, 둘 다 닫혀있는 경우
             OpenchatPartnerList();
         }
         ReportAlarmState();
@@ -163,6 +168,7 @@ public class MessengerApp : MonoBehaviour
         chatRoomHeaderImage.sprite = conversation.chatPartner.chatPartnerImage;
 
         DisplayChatMessages();
+        scrollRect.verticalNormalizedPosition = 0f;
     }
 
 
@@ -249,13 +255,15 @@ public class MessengerApp : MonoBehaviour
     }
 
     private void DisplayChatMessages()
-    {     
+    {
+        // 화면 초기화 (처음 방에 들어올 때만 실행)
         foreach (Transform child in chatRoomContent) Destroy(child.gameObject);
 
         if (currentChat == null) return;
 
         int lastSeenIndex = GetLastSeenIndex(currentChat);
 
+        // 과거에 이미 봤던 메시지들만 즉시 생성
         for (int i = 0; i <= lastSeenIndex; i++)
         {
             if (i < currentChat.messages.Count)
@@ -263,15 +271,13 @@ public class MessengerApp : MonoBehaviour
         }
 
         if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-        messageDisplayCoroutine = StartCoroutine(ShowUnreadMessagesCoroutine());
+        // 처음 방에 들어왔으니 첫 메시지는 즉시 출력하도록 설정
+        messageDisplayCoroutine = StartCoroutine(ShowUnreadMessagesCoroutine(true));
     }
 
-    private IEnumerator ShowUnreadMessagesCoroutine()
+    private IEnumerator ShowUnreadMessagesCoroutine(bool isFreshEntry)
     {
         IsDisplayingMessages = true;
-        bool hadUnreadMandatoryBefore = HasUnreadMandatoryMessages();
-
-        bool isFirstUnreadMessage = true;
 
         if (currentChat == null)
         {
@@ -279,51 +285,50 @@ public class MessengerApp : MonoBehaviour
             yield break;
         }
 
-        int lastSeenIndex = GetLastSeenIndex(currentChat);
+        // 방에 처음 들어온 상태가 아니라면(이미 방을 보고 있는데 새 메시지가 온 거라면) 
+        // 첫 메시지도 딜레이를 가져야 하므로 false로 시작
+        bool isFirstMessageInThisSession = isFreshEntry;
 
-        for (int i = lastSeenIndex + 1; i < currentChat.messages.Count; i++)
+        int i = GetLastSeenIndex(currentChat) + 1;
+
+        while (i < currentChat.messages.Count)
         {
             ChatMessage message = currentChat.messages[i];
+
             if (progress.activatedTriggers.Contains(message.triggerId))
             {
-                if (isFirstUnreadMessage)
+                // 딜레이 적용 로직
+                if (isFirstMessageInThisSession)
                 {
-                    // 첫 번째 안 읽은 메시지라면, 딜레이 없이 바로 
-                    isFirstUnreadMessage = false; 
+                    // 방에 처음 들어와서 과거 안읽은걸 뿌릴 때는 첫 메시지만 즉시 출력
+                    isFirstMessageInThisSession = false;
                 }
                 else
                 {
-                    // 두 번째 이후의 안 읽은 메시지부터는 정상적으로 딜레이 적용
-                    mc.AddTypingMessage(message.delayAfterPrevious);
-                    yield return new WaitForSeconds(message.delayAfterPrevious);
+                    // 이미 방을 보고 있는 상태에서 새 메시지가 추가된 거라면 딜레이와 타이핑 효과 적용
+                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
+                    mc.AddTypingMessage(message.delayAfterPrevious/2);
+                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
                 }
 
-                // 코루틴 실행 중 상태 변경에 대한 방어 
-                if (currentChat == null || i >= currentChat.messages.Count || currentChat.messages[i].triggerId != message.triggerId)
-                {
-                    IsDisplayingMessages = false;
-                    yield break;
-                }
+                if (currentChat == null) break;
 
                 CreateMessageBubble(message.messageText);
                 SetLastSeenIndex(currentChat, i);
                 ReportAlarmState();
 
                 yield return null;
+                scrollRect.verticalNormalizedPosition = 0f;
+
+                i++; 
             }
             else
             {
                 break;
             }
         }
+
         IsDisplayingMessages = false;
-
-        bool hasUnreadMandatoryAfter = HasUnreadMandatoryMessages();
-
-        if (hadUnreadMandatoryBefore && !hasUnreadMandatoryAfter)
-        {
-            // GameManager에 게임 재개를 요청
-        }
     }
 
     private void CreateMessageBubble(string text)
@@ -408,5 +413,36 @@ public class MessengerApp : MonoBehaviour
     {
         progress = pro;
         UpdateMessenger();
+    }
+
+    public bool IsTriggerFullySeen(string triggerId)
+    {
+        foreach (var chat in allChats)
+        {
+            // 1. 이 채팅방에서 해당 트리거 아이디를 사용하는 '가장 마지막 메시지'의 인덱스를 찾습니다.
+            int lastTargetIndex = -1;
+            for (int i = 0; i < chat.messages.Count; i++)
+            {
+                if (chat.messages[i].triggerId == triggerId)
+                {
+                    lastTargetIndex = i;
+                }
+            }
+
+            // 해당 채팅방에 이 트리거가 없다면 다음 채팅방으로
+            if (lastTargetIndex == -1) continue;
+
+            // 2. 현재 저장된 진행도(LastSeenIndex)와 비교합니다.
+            int currentSeenIndex = GetLastSeenIndex(chat);
+
+            // 마지막 메시지 인덱스보다 현재 본 인덱스가 작다면 아직 다 안 본 것임
+            if (currentSeenIndex < lastTargetIndex)
+            {
+                return false;
+            }
+        }
+
+        // 모든 채팅방을 검사했는데 미진행된 트리거 메시지가 없다면 완료된 것임
+        return true;
     }
 }

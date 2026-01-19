@@ -48,6 +48,7 @@ public class MessageController : MonoBehaviour
     {
         typingMessage = Instantiate(messagePrefab, chatContent);
         typingMessage.GetComponent<MessageBoxBtnController>().SetText("...");
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
         yield return new WaitForSeconds(time);
         Destroy(typingMessage);
         typingMessage = null;

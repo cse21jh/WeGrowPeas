@@ -7,36 +7,28 @@ public class TutorialManager : Singleton<TutorialManager>
 {
     [HideInInspector] public int tStage = 1;
 
+    [Header("Current Progress")]
+    [SerializeField] private int currentStep = 0; // í˜„ì¬ íŠœí† ë¦¬ì–¼ ë‹¨ê³„ (0ë¶€í„° ì‹œì‘)
+    [SerializeField] private int maxStep = 7;    // ì „ì²´ íŠœí† ë¦¬ì–¼ ë‹¨ê³„ ìˆ˜
+
+
+    [Header("Components")]
     [SerializeField] private TutorialGrid grid;
     [SerializeField] private EnemyController enemyController;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private ShopManager shopManager;
     [SerializeField] private GameObject shopUIPanel;
-
     [SerializeField] private TextMeshProUGUI textStage;
-    [SerializeField] private Narration n;
-    [SerializeField] private MessageController mc;
-
     [SerializeField] private GameObject shovel;
-
     [SerializeField] private Transform canvasTransform;
 
-    [Header("Sequences")]
-    [SerializeField] private DialogueStep[] step0;
-    [SerializeField] private DialogueStep[] step1;
-    [SerializeField] private DialogueStep[] step2;
-    [SerializeField] private DialogueStep[] step3;
-    [SerializeField] private DialogueStep[] step4;
-    [SerializeField] private DialogueStep[] step5;
 
-    [Header("Popup")]
-    //[SerializeField] private GameObject skipPopup;
-    //[SerializeField] private GameObject tutorialEndPopup;
+    [Header("Visual Guides")]
     [SerializeField] private GameObject breedGraph;
-
-    [Header("White Circle Area")]
     [SerializeField] private SpawnedCircle spawnedCircle;
     [SerializeField] private GameObject rc;
+    [SerializeField] private MessageController mc;
+
 
     private bool _narrationClickedThisFrame = false;
     private bool _breedSuccess = false;
@@ -71,216 +63,172 @@ public class TutorialManager : Singleton<TutorialManager>
         enemyController.UnlockWave(tStage);
         enemyController.ShowNextWaveText();
 
-        yield return PlayTutorialSequence(step0);
+        yield return PlayTutorialSequence();
     }
 
-    private IEnumerator PlayTutorialSequence(DialogueStep[] seq)
+    private IEnumerator PlayTutorialSequence()
     {
-        if (seq == null || seq.Length == 0) yield break;
-
-        /*
-        n.Flush();
-
-        for (int i = 0; i < seq.Length; i++)
+        while (currentStep <= maxStep)
         {
-            var s = seq[i];
-            if (s == null) continue;
+            // 1. í•´ë‹¹ ë‹¨ê³„ì˜ ë©”ì‹ ì € íŠ¸ë¦¬ê±° ë°œì†¡ (0, 1, 2...)
+            PhoneManager.Instance.messengerApp.ActivateTrigger(currentStep.ToString());
+            
 
-            // ´ë»ç Ãâ·Â
-            n.AddLine(s.text);
+            yield return new WaitUntil(() => PhoneManager.Instance.messengerApp.IsTriggerFullySeen(currentStep.ToString()));
 
-            // Æ®¸®°Å ´ë±â
-            yield return WaitForTrigger(s);
+            // 3. ë©”ì‹œì§€ ì¢…ë£Œ í›„, í•´ë‹¹ ë‹¨ê³„ì—ì„œ í•´ì•¼ í•  "ê°€ì´ë“œ/ì•¡ì…˜" ì‹¤í–‰ (ìŠ¤ìœ„ì¹˜ë¬¸)
+            ExecuteStepAction(currentStep);
 
-            // Æ©Åä¸®¾ó ³»ÀÇ Æ¯Á¤ ¾×¼Ç ¹ß»ı
-            if (s.actions[0] != TutorialActions.None)
-            {
-                DoAction(s);
-            }
+            // 4. í”Œë ˆì´ì–´ê°€ ëª©í‘œ í–‰ë™ì„ ì™„ë£Œí•  ë•Œê¹Œì§€ ëŒ€ê¸° (ìŠ¤ìœ„ì¹˜ë¬¸)
+            yield return WaitForTrigger(currentStep);
 
-            // ´ÙÀ½ stepÀ¸·Î ³Ñ¾î°¡´Â »óÈ²
-            if (s.chainTo != NextTutorialSequence.None)
-            {
-                var next = ResolveSequence(s.chainTo);
-                if (next != null && next.Length > 0)
-                    yield return PlayTutorialSequence(next);
-                yield break;
-            }
+            ExecuteAfterStepAction(currentStep);
+           
+            currentStep++;
         }
-        */
 
-        for (int i = 0; i < seq.Length; i++)
-        {
-            var s = seq[i];
-            if (s == null) continue;
+        Debug.Log("ëª¨ë“  íŠœí† ë¦¬ì–¼ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
 
-            // ´ë»ç Ãâ·Â
-            mc.AddMessage(MessageController.MessageSenderType.pea, s.text);
-
-            // Æ®¸®°Å ´ë±â
-            yield return WaitForTrigger(s);
-
-            // Æ©Åä¸®¾ó ³»ÀÇ Æ¯Á¤ ¾×¼Ç ¹ß»ı
-            if (s.actions[0] != TutorialActions.None)
-            {
-                DoAction(s);
-            }
-
-            // ´ÙÀ½ stepÀ¸·Î ³Ñ¾î°¡´Â »óÈ²
-            if (s.chainTo != NextTutorialSequence.None)
-            {
-                var next = ResolveSequence(s.chainTo);
-                if (next != null && next.Length > 0)
-                    yield return PlayTutorialSequence(next);
-                yield break;
-            }
-        }
     }
 
-    private IEnumerator WaitForTrigger(DialogueStep s)
+    private void ExecuteStepAction(int index)
     {
-        // ÇÑ ½ºÅÜ ½ÃÀÛÇÒ ¶§¸¶´Ù ½ÅÈ£ ÃÊ±âÈ­
+        switch (index)
+        {
+            case 0: // ì™„ë‘ì½©ì— ë§ˆìš°ìŠ¤ ê°€ì ¸ë‹¤ ë‘ë„ë¡
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f, 0f), new Vector2(75f, 75f));
+                break;
+            case 1: // ì™„ë‘ì½© í´ë¦­
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f,0f), new Vector2(75f, 75f));
+                grid.StartTutorialBreeding();
+                grid.MakeMovable();
+                break;
+            case 2: // êµë°°                
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f, 0f), new Vector2(75f, 150f));
+                break;
+            case 3: // ì‚½ í´ë¦­
+                shovel.SetActive(true);
+                spawnedCircle.ShowCircle(new Vector3(-8f, -3.9f, 0f), new Vector2(70f, 95f));
+                break;
+            case 4: // íŠ¹ì • ì™„ë‘ì½© íŒë§¤
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f, 0f), new Vector2(75f, 75f));
+                break;
+            case 5: // ì›¨ì´ë¸Œ ì§€ë‚˜ê°
+                ActivateWave();
+                break;
+            case 6: // ììœ ì‹œê°„
+                PhoneManager.Instance.TutorialPhonePhase();
+                break;
+            case 7: // ì´ì œ ì‹¤ì „ìœ¼ë¡œ ë
+                // 
+                break;
+        }
+    }
+    private IEnumerator WaitForTrigger(int currentStep)
+    {
+        // í•œ ìŠ¤í… ì‹œì‘í•  ë•Œë§ˆë‹¤ ì‹ í˜¸ ì´ˆê¸°í™”
         _narrationClickedThisFrame = false;
         _lastClickedObject = null;
 
-        switch (s.triggerType)
+        switch (currentStep)
         {
-            case DialogueTriggerType.NarrationClick:
-                // NarrationBox Å¬¸¯ ½ÅÈ£¸¦ ±â´Ù¸²
-                yield return new WaitUntil(() => _narrationClickedThisFrame);
-                _narrationClickedThisFrame = false;
-                break;
-
-            case DialogueTriggerType.KeyPress:
-                //yield return new WaitUntil(() => Input.GetKeyDown(s.triggerKey));
-                break;
-
-            case DialogueTriggerType.ObjectClick:
-                // ÁöÁ¤µÈ ¿ÀºêÁ§Æ®¸¦ Å¬¸¯ÇÒ ¶§±îÁö ´ë±â
+            case 0: // ì™„ë‘ì½©ì— ë§ˆìš°ìŠ¤ ê°€ì ¸ë‹¤ ë‘ë„ë¡
                 yield return new WaitUntil(() =>
-                    _lastClickedObject != null && 
+                        FenceUIManager.Instance.CheckFenceIsShowingMe(0) == true
+                    );
+            break;
+
+            case 1: // ì™„ë‘ì½© í´ë¦­
+                yield return new WaitUntil(() =>
+                    _lastClickedObject != null &&
                     _lastClickedObject.GetComponent<WhiteCircle>() != null
                 );
                 _lastClickedObject = null;
                 break;
-
-            case DialogueTriggerType.BreedSuccess:
+            case 2: // êµë°°
                 yield return new WaitUntil(() => _breedSuccess);
                 _breedSuccess = false;
                 break;
+            case 3: // ì‚½ í´ë¦­
+                yield return new WaitUntil(() =>
+                    grid.isDraggingShovel == true
+                );
+                _lastClickedObject = null;
+                break;
 
-            case DialogueTriggerType.CatchBug:
-                yield return new WaitUntil(() => _catchBug);
-                _catchBug = false;
+            case 4: // íŠ¹ì • ì™„ë‘ì½© íŒë§¤
+                yield return new WaitUntil(() =>
+                    GameObject.Find("EconomyManager").GetComponent<EconomyManager>().PeaSellCount >= 1
+                );
+                _lastClickedObject = null;
+                break;
+            case 5: // ì›¨ì´ë¸Œ ì§€ë‚˜ê°
+                yield return new WaitUntil(() =>
+                        tStage == 2
+                );
+                break;
+            case 6: // ììœ ì‹œê°„
+                yield return new WaitUntil(() =>
+                        PhoneManager.Instance.GetIsPhoneTime() == true
+                );
+                break;
+            case 7: // ì´ì œ ì‹¤ì „ìœ¼ë¡œ ë
+                yield return new WaitForSeconds(1f);
+                mc.AddMessage(MessageController.MessageSenderType.player, "ì™„ë‘ì½© í‚¤ìš°ëŸ¬ ê°€ì! í´ë¦­!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
                 break;
         }
     }
 
-    private void DoAction(DialogueStep s)
+    private void ExecuteAfterStepAction(int index)
     {
-        for (int i = 0; i < s.actions.Length; i++)
+        switch (index)
         {
-            switch (s.actions[i])
-            {
-                case TutorialActions.ShowSkipPopUp:
-                    //Time.timeScale = 0.0f;
-                    //skipPopup.SetActive(true);
-
-                    //Æ©Åä¸®¾óÀ» ½ºÅµÇÒ·¡?
-                    mc.AddMessage(MessageController.MessageSenderType.player, "ÀÀ! µé¾îº¼·¡.", "±¦Âú¾Æ!",
-                       FindAnyObjectByType<TutorialManager>().ContinueTutorial, FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
-                    break;
-
-                case TutorialActions.ShowWhiteCircle:
-                    spawnedCircle.ShowCircle(s.whiteCirclePos, s.whiteCircleSize);
-                    break;
-
-                case TutorialActions.FlushCircle:
-                    spawnedCircle.FlushSpawnedCircleCanvas();
-                    break;
-
-                case TutorialActions.SpawnBug:
-                    grid.SpawnTutorialBug();
-                    break;
-
-                case TutorialActions.Breed:
-                    grid.StartTutorialBreeding();
-                    break;
-
-                case TutorialActions.EnemyWave:
-                    ActivateWave();
-                    break;
-
-                case TutorialActions.Upgrade:
-                    upgradeManager.TutorialUpgrade();
-                    break;
-
-                case TutorialActions.InitShop:
-                    OpenShop();
-                    break;
-
-                case TutorialActions.ShowTutorialEndPopUp:
-                    //tutorialEndPopup.SetActive(true);
-
-                    mc.AddMessage(MessageController.MessageSenderType.player, "ÁÁ¾Æ! °¡º¸ÀÚ!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
-                    break;
-
-                case TutorialActions.ClosePanel:
-                    FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
-                    break;
-
-                case TutorialActions.EnableBugCatch:
-                    FindAnyObjectByType<TutorialBug>().canCatchBug = true;
-                    break;
-
-                case TutorialActions.EnableShovel:
-                    shovel.SetActive(true);
-                    break;
-
-                case TutorialActions.ShowBreedGraph:
-                    Instantiate(breedGraph, canvasTransform);
-
-
-                    break;
-
-                case TutorialActions.ShowResistanceChange:
-                    rc.SetActive(true);
-                    break;
-
-                case TutorialActions.DeactiveResistanceChange:
-                    rc.SetActive(false);
-                    break;
-
-                case TutorialActions.PlantToggleOn:
-                    FenceToggleOn(s.plantToggleIndex);
-                    break;
-
-                case TutorialActions.MakeMovable:
-                    grid.MakeMovable();
-                    break;
-
-                case TutorialActions.MakeAllUnmovable:
-                    grid.MakeAllUnmovable();
-                    break;
-            }
+            case 0: // ì™„ë‘ì½©ì— ë§ˆìš°ìŠ¤ ê°€ì ¸ë‹¤ ë‘ë„ë¡
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                grid.MakeMovable();
+                break;
+            case 1: // ì™„ë‘ì½© í´ë¦­
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 2: // êµë°°
+                Instantiate(breedGraph, canvasTransform);
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 3: // ì‚½ í´ë¦­
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 4: // íŠ¹ì • ì™„ë‘ì½© íŒë§¤
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 5: // ì›¨ì´ë¸Œ ì§€ë‚˜ê°
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 6: // ììœ ì‹œê°„
+                PhoneManager.Instance.TutorialPhonePhase();
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 7: // ì´ì œ ì‹¤ì „ìœ¼ë¡œ ë
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
         }
     }
 
-    /// <summary>NarrationBoxÀÇ EventTrigger/Button¿¡¼­ OnClick¿¡ ¿¬°á</summary>
+
+    /// <summary>NarrationBoxì˜ EventTrigger/Buttonì—ì„œ OnClickì— ì—°ê²°</summary>
     public void OnNarrationBoxClicked()
     {
         _narrationClickedThisFrame = true;
     }
 
     /// <summary>
-    /// MessageBoxÀÇ EventTrigger/Button¿¡¼­ OnClick¿¡ ¿¬°á
+    /// MessageBoxì˜ EventTrigger/Buttonì—ì„œ OnClickì— ì—°ê²°
     /// </summary>
     public void OnMessageBoxClicked()
     {
         _narrationClickedThisFrame = true;
     }
 
-    /// <summary>Æ¯Á¤ ¿ÀºêÁ§Æ®(¹ú·¹/½Ä¹°)ÀÇ EventTrigger/Button¿¡¼­ OnClick¿¡ ¿¬°á</summary>
+    /// <summary>íŠ¹ì • ì˜¤ë¸Œì íŠ¸(ë²Œë ˆ/ì‹ë¬¼)ì˜ EventTrigger/Buttonì—ì„œ OnClickì— ì—°ê²°</summary>
     public void OnObjectClicked(GameObject clicked)
     {
         _lastClickedObject = clicked;
@@ -296,27 +244,6 @@ public class TutorialManager : Singleton<TutorialManager>
         _catchBug = true;
     }
 
-    private DialogueStep[] ResolveSequence(NextTutorialSequence id)
-    {
-        return id switch
-        {
-            NextTutorialSequence.Step0 => step0,
-            NextTutorialSequence.Step1 => step1,
-            NextTutorialSequence.Step2 => step2,
-            NextTutorialSequence.Step3 => step3,
-            NextTutorialSequence.Step4 => step4,
-            NextTutorialSequence.Step5 => step5,
-            _ => null
-        };
-    }
-
-    public void ContinueTutorial()
-    {
-        StartCoroutine(PlayTutorialSequence(step1));
-        //skipPopup.SetActive(false);
-
-        //Time.timeScale = 1.0f;
-    }
 
     /*
     public void CloseBreedGraph()

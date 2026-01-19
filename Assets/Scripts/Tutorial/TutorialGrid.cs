@@ -84,7 +84,7 @@ public class TutorialGrid : Grid
 
     private IEnumerator TutorialBreeding()
     {
-        Debug.Log("À½ÇÏÇÏÇÏÇÏ");
+        Debug.Log("ìŒí•˜í•˜í•˜í•˜");
         isBreeding = true;
         isTBreeding = true;
         breedObj1 = null;
@@ -100,14 +100,14 @@ public class TutorialGrid : Grid
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
-                if (breedObj1 != null && breedObj2 != null) // ±³¹è ¹öÆ° µîÀ¸·Î ÃßÈÄ ¼öÁ¤
+                if (breedObj1 != null && breedObj2 != null) // êµë°° ë²„íŠ¼ ë“±ìœ¼ë¡œ ì¶”í›„ ìˆ˜ì •
                 {
                     Plant parent1 = breedObj1.GetComponent<Plant>();
                     Plant parent2 = breedObj2.GetComponent<Plant>();
-                    //ÀÚ½Ä ¿ÏµÎÄá ÇüÁú °è»ê ÈÄ Instantiate
+                    //ìì‹ ì™„ë‘ì½© í˜•ì§ˆ ê³„ì‚° í›„ Instantiate
 
                     bool canBreed = false;
-                    for (int idx = 0; idx < maxCol * 4; idx++) // ºó Ä­ÀÌ ÀÖ´Â°¡
+                    for (int idx = 0; idx < maxCol * 4; idx++) // ë¹ˆ ì¹¸ì´ ìˆëŠ”ê°€
                     {
                         if (!plantGrid.ContainsKey(idx))
                         {
@@ -117,7 +117,7 @@ public class TutorialGrid : Grid
                     }
 
                     bool isEqualPlant = false;
-                    if ((parent1.GetType() == parent2.GetType())) // ÃßÈÄ ¾ÆÁ¾ ±³¹è°¡ »ı±ä´Ù¸é ÀÌ°÷°ú ±³¹è ·ÎÁ÷ ¼öÁ¤À»...
+                    if ((parent1.GetType() == parent2.GetType())) // ì¶”í›„ ì•„ì¢… êµë°°ê°€ ìƒê¸´ë‹¤ë©´ ì´ê³³ê³¼ êµë°° ë¡œì§ ìˆ˜ì •ì„...
                     {
                         isEqualPlant = true;
                     }
@@ -138,7 +138,7 @@ public class TutorialGrid : Grid
                             AddPlantToGrid(child);
                             breedCount++;
                             curBreedCount = TMaxBreedCount - breedCount;
-                            Debug.Log("ÀÚ½Ä »ı¼º ¼º°ø. ³²Àº ±³¹è È½¼ö´Â " + (curBreedCount) + "ÀÔ´Ï´Ù");
+                            Debug.Log("ìì‹ ìƒì„± ì„±ê³µ. ë‚¨ì€ êµë°° íšŸìˆ˜ëŠ” " + (curBreedCount) + "ì…ë‹ˆë‹¤");
                             SoundManager.Instance.PlayEffect("Breed");
                             //totalBreedCount++;
                             /*if (child.GetType() == typeof(Pea))
@@ -160,7 +160,7 @@ public class TutorialGrid : Grid
                         }
                         else
                         {
-                            Debug.Log("ÀÚ½Ä »ı¼º¿¡ ¿À·ù ¹ß»ı");
+                            Debug.Log("ìì‹ ìƒì„±ì— ì˜¤ë¥˜ ë°œìƒ");
                             Destroy(childObj);
                             isBreedButtonPressed = false;
                         }
@@ -168,19 +168,19 @@ public class TutorialGrid : Grid
                     }
                     else if (breedCount >= TMaxBreedCount)
                     {
-                        Debug.Log("ÃÖ´ë ±³¹è È½¼ö ÃÊ°ú");
+                        Debug.Log("ìµœëŒ€ êµë°° íšŸìˆ˜ ì´ˆê³¼");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
                     else if (isEqualPlant)
                     {
-                        Debug.Log("µÎ Á¾ÀÌ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù");
+                        Debug.Log("ë‘ ì¢…ì´ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
                     else
                     {
-                        Debug.Log("Å°¿ï °ø°£ÀÌ ºÎÁ·ÇÕ´Ï´Ù");
+                        Debug.Log("í‚¤ìš¸ ê³µê°„ì´ ë¶€ì¡±í•©ë‹ˆë‹¤");
                         SoundManager.Instance.PlayEffect("WrongSelect");
                         isBreedButtonPressed = false;
                     }
@@ -189,13 +189,13 @@ public class TutorialGrid : Grid
                 }
                 else
                 {
-                    Debug.Log("¾ÆÁ÷ µÎ ÄáÀ» ¸ğµÎ ¼±ÅÃÇÏÁö ¾Ê¾Ò½À´Ï´Ù");
+                    Debug.Log("ì•„ì§ ë‘ ì½©ì„ ëª¨ë‘ ì„ íƒí•˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤");
                     isBreedButtonPressed = false;
                 }
             }
             else
             {
-                isBreedButtonPressed = false; // ¹ö±×·Î ÀÎÇØ Breed ¹öÆ°ÀÌ È°¼ºÈ­µÈ »óÅÂ¿¡¼­ ¹öÆ° ¸ÕÀú ´©¸£¸é ±³¹è°¡ ¹Ù·Î µÇ´ø Çö»ó ¼öÁ¤
+                isBreedButtonPressed = false; // ë²„ê·¸ë¡œ ì¸í•´ Breed ë²„íŠ¼ì´ í™œì„±í™”ëœ ìƒíƒœì—ì„œ ë²„íŠ¼ ë¨¼ì € ëˆ„ë¥´ë©´ êµë°°ê°€ ë°”ë¡œ ë˜ë˜ í˜„ìƒ ìˆ˜ì •
             }
 
             yield return null;
@@ -206,12 +206,12 @@ public class TutorialGrid : Grid
 
         breedTimerUI.StopTimer();
         breedCount = 0;
-        Debug.Log("±³¹è ÆäÀÌÁî Á¾·á");
+        Debug.Log("êµë°° í˜ì´ì¦ˆ ì¢…ë£Œ");
         breedButton.SetActive(false);
         enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
-        //GardenGrid ¸®·Îµå
+        //GardenGrid ë¦¬ë¡œë“œ
 
         yield return null;
     }
@@ -242,37 +242,37 @@ public class TutorialGrid : Grid
 
         if (breedObj1 == clickedObject)
         {
-            // ºÎ¸ğ 1 ¼±ÅÃ Ãë¼Ò
+            // ë¶€ëª¨ 1 ì„ íƒ ì·¨ì†Œ
             SoundManager.Instance.PlayEffect("SelectPlant");
             clickedPea.MakeDefaultSprite();
             breedObj1 = null;
         }
         else if (breedObj2 == clickedObject)
         {
-            // ºÎ¸ğ 2 ¼±ÅÃ Ãë¼Ò
+            // ë¶€ëª¨ 2 ì„ íƒ ì·¨ì†Œ
             SoundManager.Instance.PlayEffect("SelectPlant");
             clickedPea.MakeDefaultSprite();
             breedObj2 = null;
         }
         else if (breedObj1 == null && clickedPea.gridIndex == 0)
         {
-            // ºÎ¸ğ 1 ¼±ÅÃ
+            // ë¶€ëª¨ 1 ì„ íƒ
             SoundManager.Instance.PlayEffect("SelectPlant");
             breedObj1 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else if (breedObj2 == null && clickedPea.gridIndex == 1)
         {
-            // ºÎ¸ğ 2 ¼±ÅÃ
+            // ë¶€ëª¨ 2 ì„ íƒ
             SoundManager.Instance.PlayEffect("SelectPlant");
             breedObj2 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else
         {
-            // ÀÌ¹Ì µÎ ºÎ¸ğ ¼±ÅÃµÊ
+            // ì´ë¯¸ ë‘ ë¶€ëª¨ ì„ íƒë¨
             //SoundManager.Instance.PlayEffect("WrongSelect");
-            Debug.Log("ÀÌ¹Ì µÎ ºÎ¸ğ°¡ ¸ğµÎ ¼±ÅÃµÈ »óÅÂ");
+            Debug.Log("ì´ë¯¸ ë‘ ë¶€ëª¨ê°€ ëª¨ë‘ ì„ íƒëœ ìƒíƒœ");
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
@@ -280,7 +280,7 @@ public class TutorialGrid : Grid
 
     public void MakeMovable()
     {
-        Pea movablePea = plantGrid[4].GetComponent<Pea>();
+        Pea movablePea = plantGrid[0].GetComponent<Pea>();        
 
         bool targetValue = !movablePea.IsMovable;
 

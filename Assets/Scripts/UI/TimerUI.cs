@@ -43,7 +43,12 @@ public class TimerUI : MonoBehaviour
             StopCoroutine(countdownRoutine);
         }
 
-        maxBreedingTime = (int)GameManager.Instance.phoneManager.GetMaxPhoneTimer();
+
+        if (GameManager.Instance != null)
+            maxBreedingTime = (int)GameManager.Instance.phoneManager.GetMaxPhoneTimer();
+        else
+            maxBreedingTime = 30;
+
         countdownRoutine = StartCoroutine(PhoneCountdown());
     }
 
@@ -78,7 +83,10 @@ public class TimerUI : MonoBehaviour
 
     public void UpdatePhoneMaxTimerCount()
     {
-        textTimer.text = $"{(int)GameManager.Instance.phoneManager.GetMaxPhoneTimer()}s";
+        if(GameManager.Instance != null)
+            textTimer.text = $"{(int)GameManager.Instance.phoneManager.GetMaxPhoneTimer()}s";
+        else
+            textTimer.text = $"30s";
         breedTimerController.SetFill(0f);
         textTimer.color = Color.black;
     }

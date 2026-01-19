@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05e92e4919d75c040981d0a214fba377, type: 3}
+  m_Name: TutorialChat
+  m_EditorClassIdentifier: 
+  chatPartner: {fileID: 11400000, guid: b18f7ee73ddb6b648970a18ab4f3ae9c, type: 2}
+  messages:
+  - triggerId: 0
+    isMandatory: 1
+    messageText: "\uD734\uB300\uD3F0 \uC798 \uBC1B\uC558\uAD6C\uB098!"
+    delayAfterPrevious: 2
+  - triggerId: 0
+    isMandatory: 1
+    messageText: "\uC18C\uC2DD\uC740 \uB4E4\uC5C8\uC5B4! \uC6B0\uB9AC\uB97C \uD0A4\uC6CC\uC11C
+      \uC2DD\uB7C9\uB09C \uD574\uACB0\uC5D0 \uAE30\uC5EC\uD558\uACE0 \uC2F6\uC740\uAC70\uC9C0?"
+    delayAfterPrevious: 2
+  - triggerId: 0
+    isMandatory: 1
+    messageText: "\uD575\uC2EC\uB9CC \uBF51\uC544\uC11C \uC124\uBA85 \uD574 \uC904
+      \uD14C\uB2C8\uAE4C \uC798 \uB530\uB77C\uC640\uC57C \uD574!"
+    delayAfterPrevious: 2
+  - triggerId: 0
+    isMandatory: 1
+    messageText: "\uC6B0\uC120, \uD45C\uC2DC\uB41C \uC644\uB450\uCF69\uC5D0 \uB9C8\uC6B0\uC2A4\uB97C
+      \uAC00\uC838\uB2E4 \uBCFC\uB798?"
+    delayAfterPrevious: 2
+  - triggerId: 1
+    isMandatory: 1
+    messageText: "\uC644\uB450\uCF69\uC5D0 \uB9C8\uC6B0\uC2A4\uB97C \uAC00\uC838\uB2E4
+      \uB300\uBA74 \uD558\uB2E8\uC758 \uC6B8\uD0C0\uB9AC\uB85C \uD615\uC9C8, \uAC00\uACA9
+      \uB4F1\uC758 \uC815\uBCF4\uB97C \uBCFC \uC218 \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 1
+    isMandatory: 1
+    messageText: "\uAC01 \uD615\uC9C8\uB9C8\uB2E4 \uAE08\uC0C9, \uD68C\uC0C9 \uB450
+      \uAC00\uC9C0\uC758 \uC720\uC804\uC790\uB97C \uC9C0\uB2C8\uACE0 \uC788\uC9C0. "
+    delayAfterPrevious: 2
+  - triggerId: 1
+    isMandatory: 1
+    messageText: "\uAE30\uBCF8\uC801\uC73C\uB85C\uB294 \uAE08\uC0C9\uC758 \uC720\uC804\uC790\uB9CC
+      \uC788\uC5B4\uC57C \uB300\uC751\uB418\uB294 \uC790\uC5F0\uC7AC\uD574\uC5D0
+      \uC798 \uC0B4\uC544\uB0A8\uC744 \uC218 \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 1
+    isMandatory: 1
+    messageText: "\uC774\uC81C \uC644\uB450\uCF69\uC744 \uD074\uB9AD\uD574\uBCFC\uB798?"
+    delayAfterPrevious: 2
+  - triggerId: 2
+    isMandatory: 1
+    messageText: "\uC644\uB450\uCF69\uC744 \uD074\uB9AD\uD558\uBA74 \uCD5C\uB300
+      2\uAC1C\uAE4C\uC9C0 \uC120\uD0DD \uBC0F \uD574\uC81C\uB97C \uD560 \uC218 \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 2
+    isMandatory: 1
+    messageText: "\uB450 \uC644\uB450\uCF69\uC744 \uC120\uD0DD\uD55C \uD6C4, \uAD50\uBC30
+      \uBC84\uD2BC\uC744 \uB204\uB974\uBA74 \uADDC\uCE59\uC5D0 \uB530\uB77C \uC720\uC804\uC790\uAC00
+      \uC11E\uC774\uBA74\uC11C \uC0C8 \uC644\uB450\uCF69\uC774 \uC0DD\uACA8."
+    delayAfterPrevious: 2
+  - triggerId: 2
+    isMandatory: 1
+    messageText: "\uD55C \uBC88 \uAD50\uBC30 \uC2DC\uCF1C\uBCFC\uB798?"
+    delayAfterPrevious: 2
+  - triggerId: 3
+    isMandatory: 1
+    messageText: "\uAD50\uBC30\uB294 \uAC01 \uD615\uC9C8\uBCC4\uB85C \uB2E4\uC74C\uACFC
+      \uAC19\uC740 \uADDC\uCE59\uC73C\uB85C \uC720\uC804\uC790\uB97C \uC804\uB2EC\uD574."
+    delayAfterPrevious: 2
+  - triggerId: 3
+    isMandatory: 1
+    messageText: "\uD558\uB8E8 \uB3D9\uC548 \uC88C\uCE21 \uC0C1\uB2E8\uC758 \uAD50\uBC30
+      \uD69F\uC218\uB9CC\uD07C\uB9CC \uAD50\uBC30\uAC00 \uAC00\uB2A5\uD558\uB2C8
+      \uC2E0\uC911\uD574\uC57C\uD574!"
+    delayAfterPrevious: 2
+  - triggerId: 3
+    isMandatory: 1
+    messageText: "\uC644\uB450\uCF69\uC744 \uC62E\uAE30\uACE0 \uC2F6\uB2E4\uBA74
+      \uAFB9 \uB20C\uB7EC\uC11C \uB2E4\uB978 \uACF3\uC73C\uB85C \uC62E\uAE38 \uC218
+      \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 3
+    isMandatory: 1
+    messageText: "\uC774\uBC88\uC5D4 \uC88C\uCE21 \uD558\uB2E8\uC5D0 \uC788\uB294
+      \uC0BD\uC744 \uD074\uB9AD\uD574\uC11C \uB4E4\uC5B4\uBCFC\uB798?"
+    delayAfterPrevious: 2
+  - triggerId: 4
+    isMandatory: 1
+    messageText: "\uC644\uB450\uCF69\uC744 \uD314\uACE0 \uC2F6\uB2E4\uBA74 \uC0BD\uC744
+      \uB4E0 \uC0C1\uD0DC\uB85C \uC644\uB450\uCF69\uC744 \uD074\uB9AD\uD574\uC11C
+      \uD314 \uC218 \uC788\uC5B4. "
+    delayAfterPrevious: 2
+  - triggerId: 4
+    isMandatory: 1
+    messageText: "\uD45C\uC2DC\uB41C \uC644\uB450\uCF69\uC744 \uD314\uC544\uBCFC\uB798?"
+    delayAfterPrevious: 2
+  - triggerId: 5
+    isMandatory: 1
+    messageText: "\uADF8\uB807\uAC8C \uC644\uB450\uCF69\uC744 \uD310\uB9E4\uD558\uACE0,
+      \uBE48 \uACF3\uC744 \uD074\uB9AD\uD558\uBA74 \uC0BD\uC744 \uB193\uC744 \uC218
+      \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 5
+    isMandatory: 1
+    messageText: "\uADF8\uB7FC \uC774\uC81C \uC6E8\uC774\uBE0C\uC5D0 \uB300\uD574
+      \uC54C\uC544\uBCFC\uAE4C?"
+    delayAfterPrevious: 2
+  - triggerId: 6
+    isMandatory: 1
+    messageText: "\uC0C1\uB2E8\uC758 \uC8FC\uC5B4\uC9C4 \uAD50\uBC30 \uC2DC\uAC04\uC774
+      \uB05D\uB098\uBA74 \uBC29\uAE08\uACFC \uAC19\uC774 \uC6E8\uC774\uBE0C\uAC00
+      \uC9C0\uB098\uAC00\uACE0, \uC644\uB450\uCF69\uB4E4\uC774 \uC0B4\uC544\uB0A8\uAC70\uB098
+      \uC8FD\uAC8C \uB3FC."
+    delayAfterPrevious: 2
+  - triggerId: 6
+    isMandatory: 1
+    messageText: "\uC0C1\uB2E8\uC758 \uC8FC\uC5B4\uC9C4 \uAD50\uBC30 \uC2DC\uAC04\uC774
+      \uB05D\uB098\uBA74 \uBC29\uAE08\uACFC \uAC19\uC774 \uC6E8\uC774\uBE0C\uAC00
+      \uC9C0\uB098\uAC00\uACE0, \uC644\uB450\uCF69\uB4E4\uC774 \uC0B4\uC544\uB0A8\uAC70\uB098
+      \uC8FD\uAC8C \uB3FC."
+    delayAfterPrevious: 2
+  - triggerId: 6
+    isMandatory: 1
+    messageText: "\uADF8\uB9CC\uD07C \uAC00\uCE58\uAC00 \uB192\uC544\uC838 \uB354
+      \uBE44\uC2FC \uAC12\uC5D0 \uD314 \uC218 \uC788\uC5B4."
+    delayAfterPrevious: 2
+  - triggerId: 7
+    isMandatory: 1
+    messageText: "\uC6E8\uC774\uBE0C\uAC00 \uB05D\uB098\uBA74 \uC790\uC720\uC2DC\uAC04\uC774
+      \uC8FC\uC5B4\uC9C8\uAC70\uC57C."
+    delayAfterPrevious: 2
+  - triggerId: 7
+    isMandatory: 1
+    messageText: "\uAD50\uBC30\uC2DC\uAC04\uC5D0 \uBBF8\uCC98 \uD578\uB4DC\uD3F0\uC73C\uB85C
+      \uD655\uC778 \uBABB \uD55C \uC815\uBCF4\uAC00 \uC788\uC73C\uBA74 \uC774 \uC2DC\uAC04\uC744
+      \uC801\uADF9 \uD65C\uC6A9\uD574\uBD10!"
+    delayAfterPrevious: 2
+  - triggerId: 7
+    isMandatory: 1
+    messageText: "\uC544, \uB9C8\uC9C0\uB9C9\uC73C\uB85C \uD578\uB4DC\uD3F0\uC5D0
+      \uB3C4\uC6C0\uB420 \uC5B4\uD50C\uC774 \uBA87 \uAC1C \uB354 \uC788\uC73C\uB2C8\uAE4C
+      \uAF2D \uD655\uC778\uD574\uC918!"
+    delayAfterPrevious: 2
