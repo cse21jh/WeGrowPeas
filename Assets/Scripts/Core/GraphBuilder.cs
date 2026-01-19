@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 using XCharts.Runtime;
@@ -50,16 +50,18 @@ public class GraphBuilder : MonoBehaviour
 
     private static readonly string[] WaveNames =
     {
-        "자연사", "해충", "바람", "홍수", "폭우", "한파"
+        "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위"
     };
 
     private Color[] colors = {
-        ColorUtility.TryParseHtmlString("#fccf4e", out var c0) ? c0 : Color.white,
-        ColorUtility.TryParseHtmlString("#b6b53a", out var c1) ? c1 : Color.white,
-        ColorUtility.TryParseHtmlString("#d6e6eb", out var c2) ? c2 : Color.white,
-        ColorUtility.TryParseHtmlString("#469696", out var c3) ? c3 : Color.white,
-        ColorUtility.TryParseHtmlString("#629ab7", out var c4) ? c4 : Color.white,
-        ColorUtility.TryParseHtmlString("#746d80", out var c5) ? c5 : Color.white
+        ColorUtility.TryParseHtmlString("#fccf4e", out var c0) ? c0 : Color.white, //자연사
+        ColorUtility.TryParseHtmlString("#b6b53a", out var c1) ? c1 : Color.white, //해충
+        ColorUtility.TryParseHtmlString("#d6e6eb", out var c2) ? c2 : Color.white, //바람
+        ColorUtility.TryParseHtmlString("#469696", out var c3) ? c3 : Color.white, //홍수
+        ColorUtility.TryParseHtmlString("#746d80", out var c4) ? c4 : Color.white, //폭우
+        ColorUtility.TryParseHtmlString("#629ab7", out var c5) ? c5 : Color.white, //추위
+        ColorUtility.TryParseHtmlString("#be9978", out var c6) ? c6 : Color.white, //가뭄
+        ColorUtility.TryParseHtmlString("#ff6037", out var c7) ? c7 : Color.white, //더위
     };
 
     void Start()
@@ -68,7 +70,7 @@ public class GraphBuilder : MonoBehaviour
         {
             PlayerRecordForGraph.survivedPlants.Add(UnityEngine.Random.Range(5, 20));
             PlayerRecordForGraph.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));
-            PlayerRecordForGraph.waveEachDay.Add(UnityEngine.Random.Range(0, 6));
+            PlayerRecordForGraph.waveEachDay.Add(UnityEngine.Random.Range(0, 8));
         }*/
 
         ptop = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
@@ -225,7 +227,7 @@ public class GraphBuilder : MonoBehaviour
         {
             int w = PlayerRecordForGraph.waveEachDay[day];
 
-            if (PlayerRecordForGraph.waveEachDay[day] == 6) continue;
+            if (PlayerRecordForGraph.waveEachDay[day] == 8) continue;
 
             var s = waveChart.AddSerie<Line>();
             s.lineStyle.show = false;
