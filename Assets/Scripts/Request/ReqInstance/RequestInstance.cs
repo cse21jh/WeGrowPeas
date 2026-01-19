@@ -3,10 +3,10 @@ using UnityEngine;
 
 public enum RequestState
 {
-    InProgress, // ÁøÇà Áß
-    Complete, // ¿Ï·á(º¸»ó ¹ÌÁö±Ş)
-    Granted, // º¸»ó Áö±Ş
-    Fail // ½ÇÆĞ
+    InProgress, // ì§„í–‰ ì¤‘
+    Complete, // ì™„ë£Œ(ë³´ìƒ ë¯¸ì§€ê¸‰)
+    Granted, // ë³´ìƒ ì§€ê¸‰
+    Fail // ì‹¤íŒ¨
 }
 
 public abstract class RequestInstance
@@ -45,7 +45,17 @@ public abstract class RequestInstance
     {
         if (IsCompleted) return;
         State = RequestState.Complete;
-        GrantRewardOnce();
+        //ì™„ë£Œ ì•ŒëŒì„ ë³´ë‚´ì•¼ í•¨(ìƒë‹¨ë°”)
+        PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = "ì™„ë£Œëœ í€˜ìŠ¤íŠ¸ê°€ ìˆìŠµë‹ˆë‹¤",
+                        message = "ìˆ˜ë ¹ ë²„íŠ¼ì„ ëˆŒëŸ¬ ë³´ìƒì„ íšë“í•´ ì£¼ì„¸ìš”.",
+                        duration = 3f
+                    }
+                );
+        //ì™„ë£Œ ì•ŒëŒ(ì•± ì•„ì´ì½˜)
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
         RaiseChanged();
     }
 
@@ -57,9 +67,10 @@ public abstract class RequestInstance
         if (rewardGranted) return;
 
         State = RequestState.Granted;
-
+        RaiseChanged();
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
         //GameManager.Instance?.questToken += Data.rewardTokens;
-        Debug.Log("º¸»ó È¹µæ ¿Ï·á");
+        Debug.Log("ë³´ìƒ íšë“ ì™„ë£Œ");
     }
 
     public void MarkFailed()
