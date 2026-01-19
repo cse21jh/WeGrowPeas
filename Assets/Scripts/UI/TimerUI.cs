@@ -91,6 +91,12 @@ public class TimerUI : MonoBehaviour
 
         while (timeLeft >= 0)
         {
+            if (GameManager.Instance.GetGameIsStopped())
+            {
+                yield return null;
+                continue;
+            }
+
             if (timeLeft <= 10) textTimer.color = Color.red;
 
             textTimer.text = $"{timeLeft}s";
@@ -108,6 +114,12 @@ public class TimerUI : MonoBehaviour
 
         while (timeLeft >= 0)
         {
+            if (GameManager.Instance.GetGameIsStopped())
+            {
+                yield return null;
+                continue;
+            }
+
             if (timeLeft <= 10) textTimer.color = Color.red;
 
             textTimer.text = $"{timeLeft}s";

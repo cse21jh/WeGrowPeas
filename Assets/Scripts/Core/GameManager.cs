@@ -13,6 +13,7 @@ public class SaveData
 {
     //gameManager
     public int stage;
+    public bool seenFirstGold;
 
     //grid
     public List<PlantData> plantList = new();
@@ -130,8 +131,11 @@ public class PlantData
 public class GameManager : Singleton<GameManager>
 {
     [HideInInspector] public int stage = 0;
+    [HideInInspector] public bool seenFirstGold = false;
     private bool gameOver = false;
     public int requestCycle = 2;
+
+    private bool isStopped = false;
 
     public Grid grid;
     public EnemyController enemyController;
@@ -358,6 +362,7 @@ public class GameManager : Singleton<GameManager>
         //grid.plantGrid.Clear(); //if needed......
 
         stage = saveData.stage;
+        seenFirstGold = saveData.seenFirstGold;
         grid.LoadGrid(saveData);
         upgradeManager.LoadUpgradeManager(saveData);
         enemyController.LoadEnemyController(saveData);
@@ -375,7 +380,7 @@ public class GameManager : Singleton<GameManager>
 
         //gameManager
         saveData.stage = stage;
-
+        saveData.seenFirstGold = seenFirstGold;
 
         //grid
         foreach (var p in grid.plantGrid.Values)
@@ -520,5 +525,20 @@ public class GameManager : Singleton<GameManager>
             economyManager.ConsumeGold,
             mostKillWaveName,
             itemName);
+    }
+
+    public void StopGame()
+    {
+        isStopped = true;
+    }
+
+    public void ResumeGame()
+    {
+        isStopped = false;
+    }
+
+    public bool GetGameIsStopped()
+    {
+        return isStopped;
     }
 }

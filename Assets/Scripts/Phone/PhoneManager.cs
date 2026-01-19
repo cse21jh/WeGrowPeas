@@ -161,6 +161,12 @@ public class PhoneManager : MonoBehaviour
 
         while (!skipPhoneTime && (phoneTimer > 0))
         {
+            if (GameManager.Instance.GetGameIsStopped())
+            {
+                yield return null;
+                continue;
+            }
+
             phoneTimer -= Time.deltaTime;
 
             if (phoneTimer < 15f && !_warned15s)
@@ -340,18 +346,18 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
-                // 여기서 게임 정지 시키기
+                GameManager.Instance.StopGame();
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
-                //여기서 게임 재개 함수
+                GameManager.Instance.ResumeGame();               
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
-                //여기서 게임 재개 함수
+                GameManager.Instance.ResumeGame();                
                 Debug.Log("폰 전체: 알람 없음");
                 break;
         }

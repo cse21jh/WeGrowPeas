@@ -2,19 +2,20 @@ using UnityEngine;
 
 public class FirstGoldManager : MonoBehaviour
 {
-    [SerializeField] private bool isFirstGold = false;
     [SerializeField] private GameObject popup;
     [SerializeField] private PopupHideController popupHideController;
 
     public void SetFirstGold()
     {
-        if (isFirstGold)
+        if (GameManager.Instance.seenFirstGold)
             return;
-
-        isFirstGold = true;
+        PhoneManager.Instance.messengerApp.ActivateTrigger("GoldPlant");
+        GameManager.Instance.seenFirstGold = true;
+        /*
         Time.timeScale = 0f;
         popup.SetActive(true);
         popupHideController.MaximizePanel();
+        */
     }
 
     public void TimeContinues()

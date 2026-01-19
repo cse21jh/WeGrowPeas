@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -213,6 +213,12 @@ public class Grid : MonoBehaviour
 
         while (breedTimer > 0 && !isBreedSkipButtonPressed)
         {
+            if(GameManager.Instance.GetGameIsStopped())
+            {
+                yield return null;
+                continue;
+            }
+
             lastBugSpawnTimeInterval += Time.deltaTime;
             breedTimer -= Time.deltaTime;
 

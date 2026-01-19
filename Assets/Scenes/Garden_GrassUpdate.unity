@@ -1121,6 +1121,7 @@ MonoBehaviour:
   allChats:
   - {fileID: 11400000, guid: 82876e4d5f869474eb96e529d5429260, type: 2}
   - {fileID: 11400000, guid: e52cbdab8e5ab65409ef58680c704cbf, type: 2}
+  - {fileID: 11400000, guid: ea98a7d200f61c24bb07538d911d6aac, type: 2}
   chatPartnerListPanel: {fileID: 1935325626}
   chatRoomPanel: {fileID: 1951340121}
   chatPartnerListContent: {fileID: 2024446483}
@@ -243126,7 +243127,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14421294028a324e91dc2140f7bebc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFirstGold: 0
   popup: {fileID: 1284927594}
   popupHideController: {fileID: 1090067022}
 --- !u!1 &1090356145
@@ -314933,6 +314933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stage: 0
+  seenFirstGold: 0
   requestCycle: 2
   grid: {fileID: 1072018327}
   enemyController: {fileID: 415974144}
