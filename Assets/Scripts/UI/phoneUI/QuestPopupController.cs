@@ -39,8 +39,8 @@ public class QuestPopupController : MonoBehaviour
     private void ShowPopupDetail()
     {
         questName.text = currentRequest.GetTitleText();
-        questDescription.text = currentRequest.Data.requestDescription;
-        reward.text = "" + currentRequest.Data.reward + 'G';
+        questDescription.text = currentRequest.GetDescriptionText();
+        reward.text = currentRequest.GetRewardText();
     }
 
 

@@ -21,7 +21,7 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
         owner = ownerUI;
 
         title.text = request.GetTitleText();
-        reward.text = "보상 - " + request.Data.reward + "골드";
+        reward.text = "보상 - " + request.GetRewardText();
         progress.text = request.GetProgressText();
     }
 

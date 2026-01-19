@@ -1,6 +1,15 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public enum RequestDifficulty { Easy, Normal, Hard }
+public enum RewardType { Gold, Gene }
+
+[System.Serializable]
+public struct RewardEntry
+{
+    public RewardType type;
+    public int amount;
+}
 
 [CreateAssetMenu(menuName = "Request/RequestItem")]
 public class RequestScriptable : ScriptableObject
@@ -11,7 +20,7 @@ public class RequestScriptable : ScriptableObject
 
     public RequestDifficulty requestDifficulty;
 
-    public int reward;
+    public List<RewardEntry> rewards = new List<RewardEntry>();
 
     [TextArea] public string requestTitle;
 

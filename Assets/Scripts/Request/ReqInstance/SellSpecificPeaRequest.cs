@@ -9,6 +9,7 @@ public class SellSpecificPeaRequest : RequestInstance
     private int currentCount;
     private int conditionType;
     private string[] traitName = { "자연사", "해충", "바람", "홍수", "폭우", "가뭄", "추위", "더위" };
+    private string[] waveName = { "자연사가", "해충이", "바람이", "홍수가", "폭우가", "가뭄이", "추위가", "더위가" };
 
     public SellSpecificPeaRequest(RequestScriptable data) : base(data)
     {
@@ -38,6 +39,11 @@ public class SellSpecificPeaRequest : RequestInstance
     public override string GetTitleText()
     {
         return Data.requestTitle.Replace("{Trait}", traitName[conditionType]);
+    }
+
+    public override string GetDescriptionText()
+    {
+        return Data.requestDescription.Replace("{Wave}", waveName[conditionType]);
     }
 
     private void HandleCheckType(Plant p)

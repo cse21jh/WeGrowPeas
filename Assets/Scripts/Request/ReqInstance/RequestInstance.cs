@@ -41,6 +41,33 @@ public abstract class RequestInstance
         return Data.requestTitle;
     }
 
+    public virtual string GetDescriptionText()
+    {
+        return Data.requestDescription;
+    }
+
+    public string GetRewardText()
+    {
+        string t = string.Empty;
+
+        foreach (var r in Data.rewards)
+        {
+            switch (r.type)
+            {
+                case RewardType.Gold:
+                    t += r.amount.ToString() + "G ";
+                    break;
+                case RewardType.Gene:
+                    //t += "유전자 아이템" + r.amount.ToString() + " ";
+                    break;
+            }
+        }
+
+        //t += "치장 아이템1";
+
+        return t;
+    }
+
     protected void CompleteOnce()
     {
         if (IsCompleted) return;
@@ -66,10 +93,27 @@ public abstract class RequestInstance
         if (!IsCompleted) return;
         if (rewardGranted) return;
 
+        foreach (var r in Data.rewards)
+        {
+            switch(r.type)
+            {
+                case RewardType.Gold:
+                    //추가
+                    break;
+                case RewardType.Gene:
+                    //추가
+                    break;
+            }
+        }
+
+        //customize token 추가
+
         State = RequestState.Granted;
+
         RaiseChanged();
+
         PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
-        //GameManager.Instance?.questToken += Data.rewardTokens;
+
         Debug.Log("보상 획득 완료");
     }
 
