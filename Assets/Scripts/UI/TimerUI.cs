@@ -144,6 +144,13 @@ public class TimerUI : MonoBehaviour
 
         while (timeLeft >= 0)
         {
+
+            if (GameManager.Instance == null)
+            {
+                yield return null;
+                continue;
+            }
+
             if (GameManager.Instance.GetGameIsStopped())
             {
                 yield return null;

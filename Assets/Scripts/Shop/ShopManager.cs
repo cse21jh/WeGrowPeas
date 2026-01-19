@@ -1,8 +1,12 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+public class ShopInventory
+{
+    public List<ItemData> Fixed = new();
+    public List<ItemData> Rotation = new();
+}
 public class ShopManager : Singleton<ShopManager>
 {
     [Header("Inventory (Serialized here)")]
@@ -86,11 +90,7 @@ public class ShopManager : Singleton<ShopManager>
         }
     }
 
-    public class ShopInventory
-    {
-        public List<ItemData> Fixed = new();
-        public List<ItemData> Rotation = new();
-    }
+    
 
     // ShopUI가 호출해 쓰는 진입점: 현재 스테이지/컨텍스트로 인벤토리 생성
     public ShopInventory GenerateInventory(ShopContext ctx, int currentDay)

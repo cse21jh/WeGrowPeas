@@ -389,7 +389,11 @@ public class EnemyController : MonoBehaviour
         // 기본 가중치 복사
         var map = new Dictionary<WaveType, float>(baseWeights);
 
-        Season nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
+        Season nextSeason;
+        if (GameManager.Instance == null)
+            nextSeason = Season.Summer;
+        else
+            nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
         switch(nextSeason)
         {
             case Season.Spring:

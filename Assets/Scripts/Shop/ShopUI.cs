@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -75,8 +75,12 @@ public class ShopUI : MonoBehaviour
             ClearChildren(rotationItemsParent);
         slots.Clear();
 
+        ShopInventory inv;
         // ShopManager에서 인벤토리 생성
-        var inv = shopManager.GenerateInventory(ctx, GameManager.Instance.stage);
+        if (GameManager.Instance == null)
+            inv = shopManager.GenerateInventory(ctx, 1);
+        else
+            inv = shopManager.GenerateInventory(ctx, GameManager.Instance.stage);
 
         // 고정 아이템을 fixedItemsParent에 생성
         for (int i = 0; i < inv.Fixed.Count; i++)
