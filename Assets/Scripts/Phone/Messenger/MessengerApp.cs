@@ -120,17 +120,7 @@ public class MessengerApp : MonoBehaviour
             UpdateMessenger();
         }
 
-        bool hasNewUnreadMandatory = !hadUnreadMandatoryBefore && HasUnreadMandatoryMessages();
-        if (hasNewUnreadMandatory)
-        {
-            MandatoryAlarm();
-
-            // GameManager에 게임 정지를 직접 요청            
-        }
-        else
-        {
-            NotMandatoryAlarm();
-        }
+        ReportAlarmState();
     }
 
     // 해당 트리거 ID를 사용하는 메시지가 있으면 true, 없으면 false를 반환
@@ -316,6 +306,9 @@ public class MessengerApp : MonoBehaviour
 
                 CreateMessageBubble(message.messageText);
                 SetLastSeenIndex(currentChat, i);
+                ReportAlarmState();
+
+                yield return null;
             }
             else
             {
@@ -335,19 +328,7 @@ public class MessengerApp : MonoBehaviour
     private void CreateMessageBubble(string text)
     {
         mc.AddMessage(MessageController.MessageSenderType.pea, text);
-    }
-
-    private void MandatoryAlarm()
-    {
-        Debug.Log("폰 안 보면 죽이겠다");
-        //if (mandatoryMessageIndicator != null)
-          //  mandatoryMessageIndicator.SetActive(HasUnreadMandatoryMessages());
-    }
-
-    private void NotMandatoryAlarm()
-    {
-        Debug.Log("이건 안 봐도 된다");
-    }
+    }    
 
     
     private bool HasAnyArrivedMessages(Chat chat) => chat.messages.Any(msg => progress.activatedTriggers.Contains(msg.triggerId));
@@ -358,16 +339,34 @@ public class MessengerApp : MonoBehaviour
             .Skip(lastSeenIndex + 1)
             .Any(msg => progress.activatedTriggers.Contains(msg.triggerId));
     }
+    public void ReportAlarmState()
+    {
+        AlarmState currentState = AlarmState.None;
+
+        if (HasUnreadMandatoryMessages())
+        {
+            currentState = AlarmState.Mandatory;
+        }
+        else if (HasUnreadMessagesForAllChats()) // 모든 채팅방 중 하나라도 안 읽은 게 있다면
+        {
+            currentState = AlarmState.NonMandatory;
+        }
+        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Messenger, currentState);
+    }
+
+    private bool HasUnreadMessagesForAllChats()
+    {
+        return allChats.Any(chat => HasUnreadMessages(chat));
+    }
 
     private bool HasUnreadMandatoryMessages()
     {
         foreach (var chat in allChats)
         {
             int lastSeenIndex = GetLastSeenIndex(chat);
-            bool hasUnreadMandatory = chat.messages
-                .Skip(lastSeenIndex + 1)
-                .Any(msg => msg.isMandatory && progress.activatedTriggers.Contains(msg.triggerId));
-            if (hasUnreadMandatory) return true;
+            if (chat.messages.Skip(lastSeenIndex + 1)
+                .Any(msg => msg.isMandatory && progress.activatedTriggers.Contains(msg.triggerId)))
+                return true;
         }
         return false;
     }
@@ -397,5 +396,5 @@ public class MessengerApp : MonoBehaviour
     {
         progress.conversationSeenIndices[chat.chatPartner.chatPartnerName] = index;
         // TODO: SaveManager.Save(progress);
-    }
+    }    
 }

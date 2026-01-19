@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,9 +6,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
+public enum AlarmState
+{
+    None = 0,        // 알람 없음
+    NonMandatory = 1, // 읽지 않아도 되는 알람 (선택)
+    Mandatory = 2     // 반드시 읽어야 하는 알람 (필수)
+}
+public enum AppKey
+{
+    Weather,
+    Shop,
+    Quest,
+    Messenger,
+}
+
 public class PhoneManager : MonoBehaviour
 {
     public static PhoneManager Instance { get; private set; }
+
+    private Dictionary<AppKey, AlarmState> appAlarmStates = new Dictionary<AppKey, AlarmState>();
+    public AlarmState TotalPhoneAlarmState { get; private set; } = AlarmState.None;
+
+    [SerializeField] private GameObject mandatoryAlarm;
+    [SerializeField] private GameObject nonMandatoryAlarm;
+
+    [SerializeField] private List<GameObject> mandatoryAppAlarm;
+    [SerializeField] private List<GameObject> nonMandatoryAppAlarm;
 
     [Serializable]
     public class AppEntry
@@ -58,6 +81,9 @@ public class PhoneManager : MonoBehaviour
 
         if (phoneRoot != null) phoneRoot.SetActive(false);
         _isOpen = false;
+
+        foreach (AppKey key in Enum.GetValues(typeof(AppKey)))
+            appAlarmStates[key] = AlarmState.None;
     }
 
     private void Start()
@@ -273,13 +299,82 @@ public class PhoneManager : MonoBehaviour
         topBar.SetTitle(title);
     }
     */
+    public void UpdateAppAlarmState(AppKey appKey, AlarmState newState)
+    {
+        appAlarmStates[appKey] = newState;
+        RefreshTotalAlarmState();
+        UpdateAppIconUI(appKey, newState);
+    }
+
+    private void RefreshTotalAlarmState()
+    {
+        AlarmState highestState = AlarmState.None;
+
+        foreach (var state in appAlarmStates.Values)
+        {
+            if (state == AlarmState.Mandatory)
+            {
+                highestState = AlarmState.Mandatory;                
+                break; // 하나라도 필수면 즉시 최상위 등급
+            }
+            if (state == AlarmState.NonMandatory)
+            {
+                highestState = AlarmState.NonMandatory;                
+            }
+        }
+        if(TotalPhoneAlarmState == AlarmState.Mandatory &&  highestState != AlarmState.Mandatory)
+        {
+            
+        }
+
+        TotalPhoneAlarmState = highestState;
+        ApplyPhoneAlarmUI();
+    }
+
+    private void ApplyPhoneAlarmUI()
+    {
+        // 폰 외부 버튼이나 전체 루트 UI에 알람 수위 적용
+        switch (TotalPhoneAlarmState)
+        {
+            case AlarmState.Mandatory:
+                mandatoryAlarm.SetActive(true);
+                nonMandatoryAlarm.SetActive(false);
+                Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
+                // 여기서 게임 정지 시키기
+                break;
+            case AlarmState.NonMandatory:
+                mandatoryAlarm.SetActive(false);
+                nonMandatoryAlarm.SetActive(true);
+                Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
+                //여기서 게임 재개 함수
+                break;
+            case AlarmState.None:
+                mandatoryAlarm.SetActive(false);
+                nonMandatoryAlarm.SetActive(false);
+                //여기서 게임 재개 함수
+                Debug.Log("폰 전체: 알람 없음");
+                break;
+        }
+    }
+
+    private void UpdateAppIconUI(AppKey key, AlarmState state)
+    {
+        switch (state)
+        {
+            case AlarmState.Mandatory:
+                nonMandatoryAppAlarm[(int)key].SetActive(false);
+                mandatoryAppAlarm[(int)key].SetActive(true);
+                break;
+            case AlarmState.NonMandatory:
+                nonMandatoryAppAlarm[(int)key].SetActive(true);
+                mandatoryAppAlarm[(int)key].SetActive(false);
+                break;
+            case AlarmState.None:
+                nonMandatoryAppAlarm[(int)key].SetActive(false);
+                mandatoryAppAlarm[(int)key].SetActive(false);
+                break;
+        }
+    }
 }
 
 
-public enum AppKey
-{
-    Weather,
-    Shop,
-    Quest,
-    News,
-}
