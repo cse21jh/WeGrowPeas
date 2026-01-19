@@ -98,7 +98,7 @@ public abstract class RequestInstance
             switch(r.type)
             {
                 case RewardType.Gold:
-                    //추가
+                    GameManager.Instance.economyManager.AddGold(r.amount);
                     break;
                 case RewardType.Gene:
                     //추가

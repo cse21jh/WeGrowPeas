@@ -43,6 +43,9 @@ public class QuestPopupController : MonoBehaviour
         reward.text = currentRequest.GetRewardText();
     }
 
-
+    public void GetReward()
+    {
+        currentRequest.GrantRewardOnce();
+    }
 
 }
