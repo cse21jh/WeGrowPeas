@@ -47,7 +47,7 @@ public class PeaSurviveRequest : RequestInstance
     {
         date--;
 
-        if (date == 0) CompleteOnce();
+        if (date == 0 && !IsFailed) CompleteOnce();
     }
 
     private int SetDifficulty(string requestId)
