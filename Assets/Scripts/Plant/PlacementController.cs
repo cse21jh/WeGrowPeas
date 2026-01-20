@@ -256,6 +256,14 @@ public class PlacementController : MonoBehaviour
             shopCanvas.blocksRaycasts = false;
         }
 
+        // 2) 고스트 생성(있으면) - TilePlacementRoutine과 동일한 방식
+        SpriteRenderer ghostSr = null;
+        if (ghostPrefab != null)
+        {
+            ghost = Instantiate(ghostPrefab);
+            ghostSr = ghost.GetComponentInChildren<SpriteRenderer>();
+        }
+
         hovered = null;
         
         if (ctx != null && ctx.ShowGuide != null)
@@ -294,6 +302,14 @@ public class PlacementController : MonoBehaviour
             if (isOverUI)
             {
                 Hover(null);
+                // UI 위에 있을 때는 ghost를 숨기지 않고 그대로 두되 (TilePlacementRoutine과 동일)
+                // 투명하게만 만듦
+                if (ghostSr != null)
+                {
+                    var c = ghostSr.color;
+                    c.a = 0f; // 완전 투명
+                    ghostSr.color = c;
+                }
                 if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
                 {
                     shouldCancel = true;
@@ -322,6 +338,55 @@ public class PlacementController : MonoBehaviour
             catch (System.Exception e)
             {
                 Debug.LogError($"[PlacementController] Hover error: {e.Message}");
+            }
+
+            // 고스트 표시 업데이트 - TilePlacementRoutine과 동일한 방식
+            if (ghost != null && ghostSr != null)
+            {
+                if (p != null)
+                {
+                    // 고스트를 선택된 식물 위치에 표시
+                    var soilT = grid != null ? grid.GetSoilTransform(p.gridIndex) : null;
+                    if (soilT != null)
+                    {
+                        ghost.transform.position = soilT.position;
+                    }
+                    else
+                    {
+                        // soilT를 못 찾으면 마우스 위치 따라감
+                        if (worldCamera != null)
+                        {
+                            Vector3 screenPos = Input.mousePosition;
+                            Vector3 worldPos = worldCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 0f));
+                            worldPos.z = 0f;
+                            ghost.transform.position = worldPos;
+                        }
+                    }
+                    
+                    // 유효성 검사
+                    bool ok = (validate == null) || validate(p);
+                    
+                    // 고스트 색상/알파로 피드백
+                    var c = ghostSr.color;
+                    c.a = ok ? 1f : ghostInvalidAlpha;
+                    ghostSr.color = c;
+                }
+                else
+                {
+                    // 식물이 없으면 마우스 위치를 따라다니게 함
+                    if (worldCamera != null)
+                    {
+                        Vector3 screenPos = Input.mousePosition;
+                        Vector3 worldPos = worldCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 0f));
+                        worldPos.z = 0f;
+                        ghost.transform.position = worldPos;
+                        
+                        // 마우스 위치에서는 반투명하게
+                        var c = ghostSr.color;
+                        c.a = ghostInvalidAlpha;
+                        ghostSr.color = c;
+                    }
+                }
             }
 
             // 좌클릭 확정
@@ -353,6 +418,11 @@ public class PlacementController : MonoBehaviour
 
         // 3) 정리
         EndHover();
+        if (ghost != null)
+        {
+            Destroy(ghost);
+            ghost = null;
+        }
         if (hadCanvas)
         {
             shopCanvas.interactable = prevInteractable;

@@ -166,6 +166,26 @@ public class Grid : MonoBehaviour
     {
         if (breedButtonPosition != -1)
             MoveBreedButton(plantGrid[breedButtonPosition].transform.position, breedButtonPosition);
+        
+        // petMarker가 항상 표시되도록 보장 (부모 비활성화 방지 + UI 전환 시 Culling 방지)
+        foreach (var kvp in petMarkers)
+        {
+            if (kvp.Value != null)
+            {
+                // 비활성화되었으면 다시 활성화
+                if (!kvp.Value.activeSelf)
+                {
+                    kvp.Value.SetActive(true);
+                }
+                
+                // SpriteRenderer가 있으면 강제로 렌더링 활성화
+                var sr = kvp.Value.GetComponent<SpriteRenderer>();
+                if (sr != null && !sr.enabled)
+                {
+                    sr.enabled = true;
+                }
+            }
+        }
     }
 
     public void InitGrid()
@@ -1393,8 +1413,14 @@ public class Grid : MonoBehaviour
                 var soilT = GetSoilTransform(idx);
                 if (soilT != null)
                 {
-                    var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity, soilT);
+                    // petMarker를 부모 없이 생성하여 부모 비활성화 영향 방지 (고추 ghost prefab과 동일한 방식)
+                    var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity);
                     petMarkers[idx] = marker;
+                    // 항상 표시되도록 보장
+                    if (marker != null)
+                    {
+                        marker.SetActive(true);
+                    }
                 }
             }
         }
