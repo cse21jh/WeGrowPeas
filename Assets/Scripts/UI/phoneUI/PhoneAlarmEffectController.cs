@@ -96,10 +96,6 @@ public class PhoneAlarmEffectController : MonoBehaviour
             {
                 AlarmPermanent();
             }
-            else if(PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.NonMandatory)
-            {
-                AlarmImpermanent();
-            }
         }
 
     }
