@@ -129292,6 +129292,7 @@ MonoBehaviour:
   breedTimerManager: {fileID: 955418144}
   phoneTimerUI: {fileID: 462129144}
   phoneTimerText: {fileID: 708985688068586788}
+  isTutorial: 1
 --- !u!4 &570108822
 Transform:
   m_ObjectHideFlags: 0
@@ -129329,6 +129330,7 @@ MonoBehaviour:
   alarmInterval: 3
   isPermanentOn: 0
   isImpermanentOn: 0
+  isAlarmAble: 1
   vibWaves:
   - {fileID: 1664575246}
   - {fileID: 862694277}
@@ -165933,7 +165935,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2678830568825387510, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2678830568825387510, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode

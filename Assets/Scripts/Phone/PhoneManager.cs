@@ -73,7 +73,8 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private GameObject skipPhoneTimeButton;
     [SerializeField] private BreedTimerManager breedTimerManager;
     [SerializeField] private TimerUI phoneTimerUI;
-    [SerializeField] TextMeshProUGUI phoneTimerText;    
+    [SerializeField] TextMeshProUGUI phoneTimerText;
+    [SerializeField] bool isTutorial = false;
 
 
     private void Awake()
@@ -99,7 +100,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(toggleKey))
+        if (Input.GetKeyDown(toggleKey) && !isTutorial)
             Toggle();
     }
 
