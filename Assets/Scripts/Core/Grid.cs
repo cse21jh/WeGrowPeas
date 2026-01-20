@@ -636,7 +636,7 @@ public class Grid : MonoBehaviour
     public void AddMaxBreedTimer(int time)
     {
         maxBreedTimer += time;
-        breedTimerUI.UpdateMaxTimerCount();
+        //breedTimerUI.UpdateMaxTimerCount();
         
         // 교배 중이면 현재 타이머도 증가
         if (isBreeding && breedTimer > 0)
