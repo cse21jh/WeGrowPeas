@@ -41,7 +41,27 @@ public class PeaItemData : ItemData
 
         TraitSelectionUIController.Instance.ShowSingleTraitSelection(
             onConfirm: (selectedTraits) => {
-                pendingTraits = selectedTraits;
+                Debug.Log($"[PeaItemData] onConfirm 호출됨. selectedTraits: {(selectedTraits == null ? "null" : selectedTraits.Count.ToString())}개");
+                
+                // 형질이 선택되지 않은 경우 기본 형질 사용
+                if (selectedTraits == null || selectedTraits.Count == 0)
+                {
+                    Debug.LogWarning("[PeaItemData] 형질이 선택되지 않아 기본 형질을 사용합니다.");
+                    pendingTraits = new List<GeneticTrait>
+                    {
+                        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f)
+                    };
+                }
+                else
+                {
+                    // 형질 리스트 복사 (참조 문제 방지)
+                    pendingTraits = new List<GeneticTrait>(selectedTraits);
+                    Debug.Log($"[PeaItemData] 형질 {pendingTraits.Count}개 설정됨");
+                    foreach (var trait in pendingTraits)
+                    {
+                        Debug.Log($"[PeaItemData] - {trait.traitType}, genetics: {trait.genetics}, resistance: {trait.resistance}");
+                    }
+                }
                 onReady?.Invoke(); // 형질 선택 후 onReady 호출 → Instant 플로우로 즉시 설치
             },
             onCancel: () => {
@@ -67,13 +87,29 @@ public class PeaItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
+        Debug.Log($"[PeaItemData] Commit 호출됨. pendingTraits: {(pendingTraits == null ? "null" : pendingTraits.Count.ToString())}개");
+
+        // 형질이 없거나 빈 리스트인 경우 기본 형질 1개 보장
         if (pendingTraits == null || pendingTraits.Count == 0)
         {
-            // 형질이 선택되지 않은 경우 기본 형질 사용
+            Debug.LogWarning("[PeaItemData] Commit에서 형질이 없어 기본 형질을 사용합니다.");
             pendingTraits = new List<GeneticTrait>
             {
-                new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f)
+                new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f)
             };
+        }
+
+        // 형질이 최소 1개 이상인지 확인 (안전장치)
+        if (pendingTraits.Count == 0)
+        {
+            Debug.LogWarning("[PeaItemData] 형질이 0개입니다. 기본 형질을 추가합니다.");
+            pendingTraits.Add(new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f));
+        }
+
+        Debug.Log($"[PeaItemData] 최종 형질 {pendingTraits.Count}개로 AddPea 호출");
+        foreach (var trait in pendingTraits)
+        {
+            Debug.Log($"[PeaItemData] - {trait.traitType}, genetics: {trait.genetics}, resistance: {trait.resistance}");
         }
 
         // grididx를 지정하지 않으면 Grid.AddPea가 자동으로 가장 빠른 빈 칸에 설치

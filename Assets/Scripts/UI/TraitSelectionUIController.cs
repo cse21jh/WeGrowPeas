@@ -367,8 +367,8 @@ public class TraitSelectionUIController : MonoBehaviour
     private void SelectSingleTrait(TraitType traitType)
     {
         selectedTraits.Clear();
-        // 기본 저항력 0.5f, 유전자 0으로 추가
-        selectedTraits.Add(new GeneticTrait(traitType, 0.5f, 0, 0.0f));
+        // 기본 저항력 0.5f, 유전자 1로 추가 (완두콩 구매 시 형질 보장)
+        selectedTraits.Add(new GeneticTrait(traitType, 0.5f, 1, 0.0f));
         
         if (confirmButton != null)
             confirmButton.interactable = true; // 선택 후 확인 버튼 활성화
@@ -466,17 +466,27 @@ public class TraitSelectionUIController : MonoBehaviour
             return;
         }
 
+        // 형질이 제대로 선택되었는지 확인
+        Debug.Log($"[TraitSelectionUI] 형질 확인: {selectedTraits.Count}개 형질 선택됨");
+        foreach (var trait in selectedTraits)
+        {
+            Debug.Log($"[TraitSelectionUI] - {trait.traitType}, genetics: {trait.genetics}, resistance: {trait.resistance}");
+        }
+
+        // selectedTraits의 복사본을 만들어서 전달 (참조 문제 방지)
+        List<GeneticTrait> traitsCopy = new List<GeneticTrait>(selectedTraits);
+
         if (popupParent != null)
         {
             popupParent.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 popupParent.gameObject.SetActive(false);
-                onTraitConfirmCallback?.Invoke(selectedTraits);
+                onTraitConfirmCallback?.Invoke(traitsCopy);
             });
         }
         else
         {
-            onTraitConfirmCallback?.Invoke(selectedTraits);
+            onTraitConfirmCallback?.Invoke(traitsCopy);
         }
     }
 
