@@ -44,14 +44,13 @@ public class PlantHealingItemData : ItemData
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
         // 형질 선택 UI를 재사용하여 웨이브 선택 UI 표시
-        var selectionUI = FindAnyObjectByType<TraitSelectionUIController>();
-        if (selectionUI == null)
+        if (TraitSelectionUIController.Instance == null)
         {
             onError?.Invoke("웨이브 선택 UI를 찾을 수 없습니다");
             return;
         }
 
-        selectionUI.ShowWaveSelection(
+        TraitSelectionUIController.Instance.ShowWaveSelection(
             onConfirm: (selectedWave) => {
                 pendingWave = selectedWave;
                 onReady?.Invoke();

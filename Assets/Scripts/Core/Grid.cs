@@ -288,6 +288,9 @@ public class Grid : MonoBehaviour
                     Plant parent2 = breedObj2.GetComponent<Plant>();
                     //자식 완두콩 형질 계산 후 Instantiate
 
+                    // 교배 횟수 증가 아이템이 구매되었을 때 바로 적용되도록 매번 재계산
+                    int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+
                     bool canBreed = false;
                     for (int idx = 0; idx < maxCol * 4; idx++) // 빈 칸이 있는가
                     {
@@ -305,7 +308,7 @@ public class Grid : MonoBehaviour
                     }
 
 
-                    if (canBreed && breedCount < effectiveMaxBreedCount && isEqualPlant)
+                    if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
                     {
                         GameObject childObj = null;
                         if (parent1.GetType() == typeof(Pea))
@@ -320,14 +323,14 @@ public class Grid : MonoBehaviour
                             AddPlantToGrid(child);
                             breedCount++;
                             GameEvents.RaisePeaBreeded();
-                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (effectiveMaxBreedCount - breedCount) + "입니다");
+                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
                             SoundManager.Instance.PlayEffect("Breed");
                             totalBreedCount++;
                             if (child.GetType() == typeof(Pea))
                                 totalPeaBreedcount++;
                             else if (child.GetType() == typeof(Peanut))
                                 totalPeanutBreedCount++;
-                            UpdateBreedCountUI(effectiveMaxBreedCount - breedCount);
+                            UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
                             Plant p1 = breedObj1.GetComponent<Plant>();
                             Plant p2 = breedObj2.GetComponent<Plant>();
                             p1.MakeDefaultSprite();
@@ -344,7 +347,7 @@ public class Grid : MonoBehaviour
                         }
 
                     }
-                    else if (breedCount >= effectiveMaxBreedCount)
+                    else if (breedCount >= currentEffectiveMaxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
                         SoundManager.Instance.PlayEffect("WrongSelect");

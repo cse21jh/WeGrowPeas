@@ -33,14 +33,13 @@ public class PeaItemData : ItemData
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
     {
         // 형질 선택 UI 표시
-        var traitSelectionUI = FindAnyObjectByType<TraitSelectionUIController>();
-        if (traitSelectionUI == null)
+        if (TraitSelectionUIController.Instance == null)
         {
             onError?.Invoke("형질 선택 UI를 찾을 수 없습니다");
             return;
         }
 
-        traitSelectionUI.ShowSingleTraitSelection(
+        TraitSelectionUIController.Instance.ShowSingleTraitSelection(
             onConfirm: (selectedTraits) => {
                 pendingTraits = selectedTraits;
                 onReady?.Invoke(); // 형질 선택 후 onReady 호출 → Instant 플로우로 즉시 설치

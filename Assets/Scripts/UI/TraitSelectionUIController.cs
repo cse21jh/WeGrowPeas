@@ -12,6 +12,8 @@ public enum SelectionMode
 
 public class TraitSelectionUIController : MonoBehaviour
 {
+    public static TraitSelectionUIController Instance { get; private set; }
+
     [Header("UI References")]
     [SerializeField] private RectTransform popupParent;
     [SerializeField] private Transform traitButtonParent;
@@ -28,6 +30,19 @@ public class TraitSelectionUIController : MonoBehaviour
     private System.Action<List<GeneticTrait>> onTraitConfirmCallback;
     private System.Action<WaveType> onWaveConfirmCallback;
     private System.Action onCancelCallback;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Debug.LogWarning("TraitSelectionUIController: 중복 인스턴스가 감지되었습니다. 기존 인스턴스를 유지합니다.");
+            Destroy(gameObject);
+        }
+    }
 
     public void ShowTraitSelection(
         System.Action<List<GeneticTrait>> onConfirm, 

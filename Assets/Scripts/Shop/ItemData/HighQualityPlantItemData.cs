@@ -65,8 +65,7 @@ public class HighQualityPlantItemData : ItemData
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
         // 웨이브 선택 UI 표시 (현재 등장하는 웨이브만 표시)
-        var selectionUI = FindAnyObjectByType<TraitSelectionUIController>();
-        if (selectionUI == null)
+        if (TraitSelectionUIController.Instance == null)
         {
             onError?.Invoke("웨이브 선택 UI를 찾을 수 없습니다");
             return;
@@ -76,7 +75,7 @@ public class HighQualityPlantItemData : ItemData
         // ShowWaveSelection은 해금된 웨이브만 표시하므로, 
         // 현재 웨이브가 등장 중인지 확인은 TraitSelectionUIController에서 처리
         
-        selectionUI.ShowWaveSelection(
+        TraitSelectionUIController.Instance.ShowWaveSelection(
             onConfirm: (selectedWave) => {
                 // 현재 등장하는 웨이브인지 확인
                 if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
