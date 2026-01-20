@@ -853,6 +853,8 @@ public class Grid : MonoBehaviour
 
     public void SkipBreed()
     {
+        if (GameManager.Instance.GetGameIsStopped())
+            return;
         isBreedSkipButtonPressed = true;
     }
 

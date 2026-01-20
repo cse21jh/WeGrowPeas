@@ -227,6 +227,8 @@ public class PhoneManager : MonoBehaviour
 
     public void SkipPhoneTime()
     {
+        if (GameManager.Instance.GetGameIsStopped())
+            return;
         skipPhoneTime = true;
     }
 
