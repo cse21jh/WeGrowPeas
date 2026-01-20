@@ -66,7 +66,7 @@ public class PeaItemData : ItemData
             },
             onCancel: () => {
                 pendingTraits = null;
-                onError?.Invoke("구매 취소");
+                //onError?.Invoke("구매 취소");
             }
         );
     }

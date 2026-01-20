@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -403,8 +403,8 @@ public class TraitSelectionUIController : MonoBehaviour
     {
         selectedTraits.Clear();
         // 기본 저항력 0.5f, 유전자 0으로 둘 다 추가
-        selectedTraits.Add(new GeneticTrait(traitA, 0.5f, 0, 0.0f));
-        selectedTraits.Add(new GeneticTrait(traitB, 0.5f, 0, 0.0f));
+        selectedTraits.Add(new GeneticTrait(traitA, 0.65f, 1, 0.0f));
+        selectedTraits.Add(new GeneticTrait(traitB, 0.65f, 1, 0.0f));
         
         if (confirmButton != null)
             confirmButton.interactable = true; // 선택 후 확인 버튼 활성화
