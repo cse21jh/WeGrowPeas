@@ -275,14 +275,13 @@ public class GameManager : Singleton<GameManager>
 
 
         // 여기다가 밤으로 바뀌는 이펙트 추가해야 함
-        waveManager.StartNight();
-
+        yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
 
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
 
-        waveManager.StopNight();
+        yield return waveManager.StartCoroutine(waveManager.StopNightCoroutine());
         /*
         if (!enemyController.IsLastWaveNone())
             yield return StartCoroutine(upgradeManager.UpgradePhase());            

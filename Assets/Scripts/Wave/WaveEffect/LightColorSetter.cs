@@ -4,6 +4,8 @@ public class LightColorSetter : MonoBehaviour, ColorSetterInterface
 {
     [SerializeField] Gradient gradient = null;
 
+    public LightColorType type = LightColorType.None;
+
     private UnityEngine.Rendering.Universal.Light2D[] lights;
 
 

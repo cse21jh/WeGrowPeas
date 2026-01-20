@@ -17,7 +17,7 @@ public class WaveManager : MonoBehaviour
 
     [Space(10)]
     [Header("휴대폰 밤/낮 변경 효과 관련")]
-
+    [SerializeField] private float dayNightTransitionDuration = 1f;
 
 
     [Space(10)]
@@ -82,41 +82,36 @@ public class WaveManager : MonoBehaviour
     // ================ Day/Night Effects ================
 
 
-    public void StartNight()
-    {
-        StartCoroutine(StartNightCoroutine());
-    }
 
-    public void StopNight()
+    public IEnumerator StartNightCoroutine()
     {
-        StartCoroutine(StopNightCoroutine());
-    }
-
-    private IEnumerator StartNightCoroutine()
-    {
+        waveDuration = dayNightTransitionDuration;
         lcController.UpdateType(LightColorType.Night);
 
-        float elapsed_aging = 0f;
-        while (elapsed_aging < waveDuration)
+        float elapsed_night = 0f;
+        while (elapsed_night < waveDuration)
         {
-            elapsed_aging += Time.deltaTime;
+            elapsed_night += Time.deltaTime;
+            Debug.Log($"Elapsed Night Time: {elapsed_night}");
             lcController.UpdateType(LightColorType.Night);
-            lcController.time = Mathf.Clamp01(elapsed_aging / waveDuration);
+            lcController.time = Mathf.Clamp01(elapsed_night / waveDuration);
             yield return null;
         }
         lcController.time = 1f; // Ensure it ends exactly at 1
     }
 
-    private IEnumerator StopNightCoroutine()
+    public IEnumerator StopNightCoroutine()
     {
+        waveDuration = dayNightTransitionDuration;
         lcController.UpdateType(LightColorType.Day);
 
-        float elapsed_aging = 0f;
-        while (elapsed_aging < waveDuration)
+        float elapsed_day = 0f;
+        while (elapsed_day < waveDuration)
         {
-            elapsed_aging += Time.deltaTime;
+            elapsed_day += Time.deltaTime;
+            Debug.Log($"Elapsed Day Time: {elapsed_day}");
             lcController.UpdateType(LightColorType.Day);
-            lcController.time = Mathf.Clamp01(elapsed_aging / waveDuration);
+            lcController.time = Mathf.Clamp01(elapsed_day / waveDuration);
             yield return null;
         }
         lcController.time = 1f; // Ensure it ends exactly at 1

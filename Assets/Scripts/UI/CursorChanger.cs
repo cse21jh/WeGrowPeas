@@ -9,15 +9,18 @@ public class CursorChanger : MonoBehaviour
 
     private void OnMouseOver()
     {
-        CursorManager.Instance.SetCursor(cursorType);
+        if (CursorManager.Instance != null)
+            CursorManager.Instance.SetCursor(cursorType);
         if (Input.GetMouseButton(0))
         {
-            CursorManager.Instance.SetCursor(CursorType.Clicked);
+            if (CursorManager.Instance != null)
+                CursorManager.Instance.SetCursor(CursorType.Clicked);
         }
     }
 
     void OnMouseExit()
     {
-        CursorManager.Instance.SetCursor(CursorType.Default);
+        if(CursorManager.Instance != null)
+            CursorManager.Instance.SetCursor(CursorType.Default);
     }
 }

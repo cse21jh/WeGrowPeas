@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -10,7 +12,7 @@ public interface ColorSetterInterface
 
 public enum LightColorType
 {
-    All,
+    None,
     Natural,
     Rain,
     Drought,
@@ -24,16 +26,16 @@ public class LightColorController : MonoBehaviour
 {
     [Range(0, 1)] public float time;
 
-    private ColorSetterInterface[] setters;
+    private List<LightColorSetter> setters = new List<LightColorSetter>();
 
-    [SerializeField] private LightColorSetter[] naturalSetters;
-    [SerializeField] private LightColorSetter[] rainSetters;
-    [SerializeField] private LightColorSetter[] droughtSetters;
+    [SerializeField] private List<LightColorSetter> naturalSetters = new List<LightColorSetter>();
+    [SerializeField] private List<LightColorSetter> rainSetters = new List<LightColorSetter>();
+    [SerializeField] private List<LightColorSetter> droughtSetters = new List<LightColorSetter>();
 
-    [SerializeField] private LightColorSetter[] nightSetters;
-    [SerializeField] private LightColorSetter[] daySetters;
+    [SerializeField] private List<LightColorSetter> nightSetters = new List<LightColorSetter>();
+    [SerializeField] private List<LightColorSetter> daySetters = new List<LightColorSetter>();
 
-    [SerializeField] private LightColorType currentType = LightColorType.All;
+    [SerializeField] private LightColorType currentType = LightColorType.None;
 
     private float currentTime = 0;
 
@@ -41,10 +43,39 @@ public class LightColorController : MonoBehaviour
 
     public void GetSetters()
     {
-        setters = GetComponentsInChildren<ColorSetterInterface>();
+        setters.Clear();
+        naturalSetters.Clear();
+        rainSetters.Clear();
+        droughtSetters.Clear();
+        nightSetters.Clear();
+        daySetters.Clear();
+
+        setters = GetComponentsInChildren<LightColorSetter>().ToList();
+        Debug.Log($"Found {setters.Count} LightColorSetters");
+
+
         foreach (var setter in setters)
         {
             setter.Refresh();
+
+            switch (setter.type)
+            {
+                case LightColorType.Natural:
+                    naturalSetters.Add(setter);
+                    break;
+                case LightColorType.Rain:
+                    rainSetters.Add(setter);
+                    break;
+                case LightColorType.Drought:
+                    droughtSetters.Add(setter);
+                    break;
+                case LightColorType.Night:
+                    nightSetters.Add(setter);
+                    break;
+                case LightColorType.Day:
+                    daySetters.Add(setter);
+                    break;
+            }
         }
     }
 
@@ -53,6 +84,11 @@ public class LightColorController : MonoBehaviour
         time = 0;
         GetSetters();
         UpdateSetters();
+
+        foreach (var setter in naturalSetters)
+        {
+            setter.SetColor(0);
+        }
     }
 
     private void OnDisable()
@@ -75,8 +111,8 @@ public class LightColorController : MonoBehaviour
 
         switch (currentType)
         {
-            case LightColorType.All:
-                setters = GetComponentsInChildren<ColorSetterInterface>();
+            case LightColorType.None:
+                setters = null;
                 break;
             case LightColorType.Natural:
                 setters = naturalSetters;
