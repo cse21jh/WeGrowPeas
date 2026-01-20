@@ -20,6 +20,8 @@ public class PhoneAlarmEffectController : MonoBehaviour
     [SerializeField] private bool isPermanentOn = false;
     [SerializeField] private bool isImpermanentOn = false;
 
+    [SerializeField] private bool isAlarmAble = true;
+
     [Space(10)]
     [Header("Vibration Sprite")]
     [SerializeField] private CanvasGroup[] vibWaves;
@@ -45,7 +47,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmPermanent()
     {
-        if(isPermanentOn) return;
+        if(isPermanentOn || !isAlarmAble) return;
         StopAlarm();
 
         isPermanentOn = true;
@@ -60,7 +62,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmImpermanent()
     {
-        if(isImpermanentOn) return;
+        if(isImpermanentOn || !isAlarmAble) return;
         StopAlarm();
 
         isImpermanentOn = true;
@@ -80,6 +82,28 @@ public class PhoneAlarmEffectController : MonoBehaviour
         StopAllCoroutines();
     }
 
+    public void DisableAlarm()
+    {
+        isAlarmAble = false;
+        StopAlarm();
+    }
+
+    public void EnableAlarm()
+    {
+        isAlarmAble = true;
+        if(PhoneManager.Instance.TotalPhoneAlarmState != AlarmState.None) {
+            if(PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.Mandatory)
+            {
+                AlarmPermanent();
+            }
+            else if(PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.NonMandatory)
+            {
+                AlarmImpermanent();
+            }
+        }
+
+    }
+
     private IEnumerator AlarmEffectCoroutine(int count)
     {
         // 1. minRoot 흔들기 (기존 강도)
@@ -88,8 +112,8 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
         // 2. maxRoot 흔들기 (강도를 strength * 0.2f 정도로 약하게 설정)
         // 0.2f는 원하시는 느낌에 따라 0.1f ~ 0.3f 사이로 조절해보세요.
-        maxRoot.transform.DOShakeRotation(alarmDuration, new Vector3(0, 0, strength * 0.1f), vibrato, 90, false, ShakeRandomnessMode.Harmonic)
-            .SetLoops(2, LoopType.Restart);
+        //maxRoot.transform.DOShakeRotation(alarmDuration, new Vector3(0, 0, strength * 0.1f), vibrato, 90, false, ShakeRandomnessMode.Harmonic)
+        //    .SetLoops(2, LoopType.Restart);
 
         // 3. 파동 효과 실행
         PlayVibration(2);

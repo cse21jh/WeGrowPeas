@@ -112,7 +112,14 @@ public class PhoneManager : Singleton<PhoneManager>
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);
         messengerApp.CheckCoroutineByTab(open);
-
+        if (open)
+        {
+            alarm.DisableAlarm();
+        }
+        else
+        {
+            alarm.EnableAlarm();
+        }
         FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
         //if (open) RefreshTopBar();
     }
