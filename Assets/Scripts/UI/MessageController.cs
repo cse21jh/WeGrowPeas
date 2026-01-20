@@ -68,5 +68,12 @@ public class MessageController : MonoBehaviour
         currentPeaMessage = Instantiate(messagePrefab, chatContent);
         currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText(stage.ToString());
         FindAnyObjectByType<AutoScroll>().OnNewMessage();
-}
+    }
+
+    public void AddNewChatSeperator()
+    {
+        currentPeaMessage = Instantiate(messagePrefab, chatContent);
+        currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText("------------------------");
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+    }
 }

@@ -367,7 +367,11 @@ public class MessengerApp : MonoBehaviour
             }
 
             // 딜레이 적용
-            if (isFirstMessageInSession) { isFirstMessageInSession = false; }
+            if (isFirstMessageInSession)
+            {
+                mc.AddNewChatSeperator();
+                isFirstMessageInSession = false;
+            }
             else
             {
                 yield return new WaitForSeconds(message.delayAfterPrevious / 2);
