@@ -12,7 +12,7 @@ public class RequestInstanceSaveData
     public int progressCount; // 진행도 저장
     public int state;
     public List<string> extraStrings; //buymerch
-    public int extraInt; //sellspecificpea
+    public int extraInt; //sellspecificpea & peasurvive
 }
 
 public class RequestManager : Singleton<RequestManager>
@@ -169,6 +169,7 @@ public class RequestManager : Singleton<RequestManager>
         ClearActive();
 
         cycleEndRound = saveData.cycleEndRound;
+        //dayPassed = saveData.dayPassed;
 
         if (saveData.activeRequests.Count == 0) return;
 
