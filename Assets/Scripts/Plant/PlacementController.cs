@@ -266,7 +266,8 @@ public class PlacementController : MonoBehaviour
                 shouldCancel = true;
                 break;
             }
-            
+
+            /*
             // UI 위에 있으면 하이라이트 해제 + 취소만 허용
             bool isOverUI = false;
             try
@@ -298,7 +299,7 @@ public class PlacementController : MonoBehaviour
                 yield return null;
                 continue;
             }
-
+            */
             // 마우스 아래 식물 레이캐스트
             Plant p = null;
             try
