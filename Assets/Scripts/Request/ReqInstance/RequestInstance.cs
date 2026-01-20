@@ -114,6 +114,8 @@ public abstract class RequestInstance
 
         PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
 
+        SoundManager.Instance.PlayEffect("QuestSuccess");
+
         Debug.Log("보상 획득 완료");
     }
 

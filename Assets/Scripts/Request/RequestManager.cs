@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 [System.Serializable]
@@ -11,16 +12,19 @@ public class RequestInstanceSaveData
     public int progressCount; // 진행도 저장
     public int state;
     public List<string> extraStrings; //buymerch
-    public int extraInt; //sellspecificpea
+    public int extraInt; //sellspecificpea & peasurvive
 }
 
 public class RequestManager : Singleton<RequestManager>
 {
     public int cycle = 5;
     public int requestNum = 3;
+    private int dayPassed = 0;
+    public int DayPassed => dayPassed;
+
+    [SerializeField] private TextMeshProUGUI appTitle;
 
     private bool newRequestArrived = false;
-    public bool NewRequestArrived => newRequestArrived;
 
     [SerializeField] private List<RequestScriptable> requestPool = new();
 
@@ -36,13 +40,13 @@ public class RequestManager : Singleton<RequestManager>
 
     private void OnEnable()
     {
-        //GameEvents.OnRoundStarted += HandleRoundStarted;
+        GameEvents.OnDayPassedForRequest += HandleDayPassed;
     }
 
     private void OnDisable()
     {
-        //GameEvents.OnRoundStarted -= HandleRoundStarted;
-        //ClearActive();
+        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
+        ClearActive();
     }
 
     private void Start()
@@ -50,23 +54,20 @@ public class RequestManager : Singleton<RequestManager>
 
     }
 
-    private void HandleRoundStarted(int round)
+    private void HandleDayPassed()
     {
-        if (round > cycleEndRound)
-        {
-            StartNewCycle(round);
-            return;
-        }
-
-        GrantRewardsForCompleted();
+        dayPassed++;
+        UpdateRequestAppTitle();
     }
 
     public void StartNewCycle(int startRound)
     {
         cycleEndRound = startRound + cycle - 1;
+        dayPassed = 0;
 
         ClearActive();
         GenerateRandomRequests();
+        UpdateRequestAppTitle();
 
         OnBoardUpdated?.Invoke();
     }
@@ -168,6 +169,7 @@ public class RequestManager : Singleton<RequestManager>
         ClearActive();
 
         cycleEndRound = saveData.cycleEndRound;
+        dayPassed = saveData.dayPassed;
 
         if (saveData.activeRequests.Count == 0) return;
 
@@ -214,9 +216,20 @@ public class RequestManager : Singleton<RequestManager>
 
         PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
     }
-    public void CheckedNewRequest()
+
+    public void OnCheckedNewRequest()
     {
-        newRequestArrived = false;
-        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
+        if(newRequestArrived)
+        {
+            newRequestArrived = false;
+            PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
+        }
+    }
+
+    public void UpdateRequestAppTitle()
+    {
+        if (cycleEndRound < 0) return;
+
+        appTitle.text = "퀘스트 - " + (cycle - dayPassed) +"일 남음";
     }
 }

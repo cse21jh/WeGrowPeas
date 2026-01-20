@@ -50,6 +50,10 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("HitBug", Resources.Load<AudioClip>("Audio/Effect/HitBug"));
 
         EffectSoundDictionary.Add("Button", Resources.Load<AudioClip>("Audio/Effect/Button"));
+        EffectSoundDictionary.Add("PhoneTouch", Resources.Load<AudioClip>("Audio/Effect/PhoneTouch"));
+        EffectSoundDictionary.Add("QuestSuccess", Resources.Load<AudioClip>("Audio/Effect/QuestSuccess"));
+        EffectSoundDictionary.Add("Alarm", Resources.Load<AudioClip>("Audio/Effect/Alarm"));
+        EffectSoundDictionary.Add("Vibration", Resources.Load<AudioClip>("Audio/Effect/Vibration"));
 
         EffectSoundDictionary.Add("Aging", Resources.Load<AudioClip>("Audio/Wave/Aging"));
         EffectSoundDictionary.Add("Wind", Resources.Load<AudioClip>("Audio/Wave/Wind"));
@@ -57,8 +61,8 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("Pest", Resources.Load<AudioClip>("Audio/Wave/Pest"));
         EffectSoundDictionary.Add("Cold", Resources.Load<AudioClip>("Audio/Wave/Cold"));
         EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
-        EffectSoundDictionary.Add("Heat", Resources.Load<AudioClip>("Audio/Wave/Heat")); // ÃßÀ§¿Í µ¿ÀÏÇÑ ÀÓ½Ã »ç¿îµå »ğÀÔÇØµÒ
-        EffectSoundDictionary.Add("Drought", Resources.Load<AudioClip>("Audio/Wave/Drought")); // Æø¿ì¿Í µ¿ÀÏÇÑ ÀÓ½Ã »ç¿îµå »ğÀÔÇØµÒ
+        EffectSoundDictionary.Add("Heat", Resources.Load<AudioClip>("Audio/Wave/Heat")); 
+        EffectSoundDictionary.Add("Drought", Resources.Load<AudioClip>("Audio/Wave/Drought")); // í­ìš°ì™€ ë™ì¼í•œ ì„ì‹œ ì‚¬ìš´ë“œ ì‚½ì…í•´ë‘ 
 
         EffectSoundDictionary.Add("Tractor", Resources.Load<AudioClip>("Audio/Tractor"));
 

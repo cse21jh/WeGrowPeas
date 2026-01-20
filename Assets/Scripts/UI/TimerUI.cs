@@ -39,7 +39,8 @@ public class TimerUI : MonoBehaviour
     {
         if (countdownRoutine != null)
         {
-            maxBreedingTime = (int)GameManager.Instance.phoneManager.GetMaxPhoneTimer();
+            if (GameManager.Instance != null)
+                maxBreedingTime = (int)GameManager.Instance.phoneManager.GetMaxPhoneTimer();
             StopCoroutine(countdownRoutine);
         }
 

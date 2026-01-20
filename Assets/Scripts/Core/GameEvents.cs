@@ -24,7 +24,7 @@ public static class GameEvents
     public static event Action<ItemData> OnShopBought;
     public static void RaiseShopBought(ItemData item) => OnShopBought?.Invoke(item);
 
-    public static event Action OnDayPassedForRequest; //NoSellPea Àü¿ë
+    public static event Action OnDayPassedForRequest; //NoSellPea & remaining day check
     public static void RaiseDayPassedForRequest() => OnDayPassedForRequest?.Invoke();
 
     public static event Action<Plant> OnPeaSold;

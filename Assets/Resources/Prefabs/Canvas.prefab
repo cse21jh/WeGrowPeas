@@ -43442,11 +43442,11 @@ RectTransform:
   - {fileID: 6300738646081662956}
   - {fileID: 5126848336387041511}
   - {fileID: 3093375997142955692}
-  - {fileID: 7866123575859932076}
   - {fileID: 5186917378702891610}
   - {fileID: 2353103670543667660}
   - {fileID: 1886617223432279488}
   - {fileID: 8512082855895185640}
+  - {fileID: 7866123575859932076}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -45766,9 +45766,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af5f37e2197dbd044baaef92322960b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemsParent: {fileID: 0}
+  fixedItemsParent: {fileID: 0}
+  rotationItemsParent: {fileID: 0}
   itemSlotPrefab: {fileID: 4787940912900662695, guid: cef68c3211327a848a861d415e5c2b92, type: 3}
   footerText: {fileID: 8889800654211703311}
+  popupParent: {fileID: 0}
+  rerollButton: {fileID: 0}
+  rerollButtonText: {fileID: 0}
 --- !u!1 &4952836938843987406
 GameObject:
   m_ObjectHideFlags: 0

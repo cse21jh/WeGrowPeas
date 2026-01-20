@@ -57,6 +57,8 @@ public class Grid : MonoBehaviour
 
     public bool isDraggingShovel = false;
 
+    private int breedButtonPosition = -1;
+
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
@@ -156,12 +158,14 @@ public class Grid : MonoBehaviour
         InitSoils();
         plantGrid.Clear();
         breedButton.SetActive(false);
+        breedButtonPosition = -1;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (breedButtonPosition != -1)
+            MoveBreedButton(plantGrid[breedButtonPosition].transform.position, breedButtonPosition);
     }
 
     public void InitGrid()
@@ -362,6 +366,7 @@ public class Grid : MonoBehaviour
         breedCount = 0;
         // Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
+        breedButtonPosition = -1;
         enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
@@ -778,9 +783,27 @@ public class Grid : MonoBehaviour
             // 이미 두 부모 선택됨
             SoundManager.Instance.PlayEffect("WrongSelect");
             Debug.Log("이미 두 부모가 모두 선택된 상태");
+            return;
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
+        breedButtonPosition = (breedObj1 != null && breedObj2 != null) ? clickedPea.gridIndex : -1;
+        
+        MoveBreedButton(clickedObject.transform.position, clickedPea.gridIndex);        
+    }
+
+    public void MoveBreedButton(Vector3 pos, int index)
+    {
+        RectTransform canvasRect = breedButton.GetComponentInParent<Canvas>().transform as RectTransform;
+        Vector3 targetWorldPos = new Vector3(1, 0, 0) + pos;
+        Vector2 screenPoint = Camera.main.WorldToScreenPoint(targetWorldPos);
+
+        // 캔버스에 설정된 카메라(renderCamera)를 사용해야 함
+        Camera uiCamera = breedButton.GetComponentInParent<Canvas>().worldCamera;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, uiCamera, out Vector2 localPoint);
+        breedButton.GetComponent<RectTransform>().anchoredPosition = localPoint;
+        breedButtonPosition = index;
     }
 
     public void CheckBreedButtonBeforeDie(GameObject plant)
@@ -788,6 +811,7 @@ public class Grid : MonoBehaviour
         if(breedObj1 == plant || breedObj2 == plant)
         {
             breedButton.SetActive(false);
+            breedButtonPosition = -1;
         }
     }
 
@@ -799,6 +823,7 @@ public class Grid : MonoBehaviour
     protected void DeactivateBreed()
     {
         breedButton.SetActive(false);
+        breedButtonPosition = -1;
         isBreedButtonPressed = false;
     }
 
@@ -884,6 +909,10 @@ public class Grid : MonoBehaviour
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
+            if(GetBreedButtonPosition() == fromIndex)
+            {
+                MoveBreedButton(toSoil.position, toIndex);
+            }
 
             return true;
         }
@@ -895,6 +924,11 @@ public class Grid : MonoBehaviour
             plant.SetGridIndex(toIndex);
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
+
+            if (GetBreedButtonPosition() == fromIndex)
+            {
+                MoveBreedButton(plant.transform.position, toIndex);
+            }
 
             return true;
         }
@@ -1607,6 +1641,11 @@ public class Grid : MonoBehaviour
             }
         }
         return count;
+    }
+
+    public int GetBreedButtonPosition()
+    {
+        return breedButtonPosition;
     }
 }
 

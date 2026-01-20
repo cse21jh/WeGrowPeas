@@ -16,6 +16,8 @@ public class MessageController : MonoBehaviour
 
     [SerializeField] private GameObject messagePrefab;     // 일반 메시지 (한 개의 텍스트 박스 / 완두콩 메시지)
     [SerializeField] private GameObject selectionPrefab;     // 선택형 메시지 (두 개의 텍스트 박스 / 플레이어 메시지)
+    [SerializeField] private GameObject timePrefab;     // 날짜 구분 프리팹
+    [SerializeField] private GameObject recentPrefab;     // 선택형 메시지 (두 개의 텍스트 박스 / 플레이어 메시지)
 
     private GameObject currentPeaMessage;
 
@@ -61,5 +63,18 @@ public class MessageController : MonoBehaviour
             Destroy(typingMessage);
             typingMessage = null;
         }
+    }
+
+    public void AddDay(int stage)
+    {
+        currentPeaMessage = Instantiate(timePrefab, chatContent);
+        currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText("--------------" + stage.ToString() + "일차--------------");
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+    }
+
+    public void AddNewChatSeperator()
+    {
+        currentPeaMessage = Instantiate(recentPrefab, chatContent);
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
     }
 }

@@ -105,6 +105,7 @@ public class SaveData
 
     //RequestManager
     public int cycleEndRound;
+    public int dayPassed;
     public List<RequestInstanceSaveData> activeRequests = new();
 
     //PlayerRecordForGraph
@@ -120,6 +121,9 @@ public class SaveData
     public List<string> chatPartners = new();
     public List<int> conversationSeenIndices = new();
     public List<string> activatedTriggers = new();
+
+    public List<string> dayChatPartners = new();
+    public List<ChatDayData> dayByChatPartners = new();
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
 }
@@ -134,6 +138,12 @@ public class PlantData
     public int resistWaveCount;
 }
 
+[System.Serializable]
+public class ChatDayData
+{
+    public List<int> index;
+    public List<int> day;
+}
 
 public class GameManager : Singleton<GameManager>
 {
@@ -505,6 +515,7 @@ public class GameManager : Singleton<GameManager>
 
         //RequestManager
         saveData.cycleEndRound = requestManager.CycleEndRound;
+        saveData.dayPassed = requestManager.DayPassed;
         saveData.activeRequests = requestManager.getSaveData();
 
         //PlayerRecordForGraph
@@ -522,7 +533,20 @@ public class GameManager : Singleton<GameManager>
             saveData.chatPartners.Add(p.Key);
             saveData.conversationSeenIndices.Add(p.Value);
         }
-        foreach(var r in progress.activatedTriggers)
+        foreach (KeyValuePair<string, Dictionary<int, int>> p in progress.daySeparators)
+        {
+            saveData.dayChatPartners.Add(p.Key);
+            ChatDayData tmp = new();
+            tmp.index = new();
+            tmp.day = new();
+            foreach (KeyValuePair<int, int> p2 in p.Value)
+            {
+                tmp.index.Add(p2.Key);
+                tmp.day.Add(p2.Value);                
+            }
+            saveData.dayByChatPartners.Add(tmp);
+        }
+        foreach (var r in progress.activatedTriggersOrdered)
         {
             saveData.activatedTriggers.Add(r);
         }
