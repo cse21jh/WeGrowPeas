@@ -1048,6 +1048,7 @@ GameObject:
   - component: {fileID: 5427600}
   - component: {fileID: 5427599}
   - component: {fileID: 5427601}
+  - component: {fileID: 5427602}
   m_Layer: 0
   m_Name: PhoneManager
   m_TagString: Untagged
@@ -1133,6 +1134,26 @@ MonoBehaviour:
   mc: {fileID: 1626043422}
   scrollRect: {fileID: 811567576}
   chatPartnerListItemPrefab: {fileID: 4682548665550701744, guid: 4ef3dfd923cc5214d8eeaf17288c1e98, type: 3}
+--- !u!114 &5427602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5427598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a63852f9f0024574e8a8dde8dfe6fea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxRoot: {fileID: 1351691274}
+  minRoot: {fileID: 1616802096}
+  maxRotateZ: 5
+  minRotateZ: 15
+  alarmDuration: 5
+  strength: 10
+  vibrato: 10
+  alarmInterval: 1
 --- !u!1 &5839771
 GameObject:
   m_ObjectHideFlags: 0
