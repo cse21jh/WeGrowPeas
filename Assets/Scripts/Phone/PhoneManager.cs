@@ -348,18 +348,18 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
-                //GameManager.Instance.StopGame();
+                GameManager.Instance.StopGame();
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
-                //GameManager.Instance.ResumeGame();               
+                GameManager.Instance.ResumeGame();               
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
-                //GameManager.Instance.ResumeGame();                
+                GameManager.Instance.ResumeGame();                
                 Debug.Log("폰 전체: 알람 없음");
                 break;
         }
@@ -391,6 +391,23 @@ public class PhoneManager : MonoBehaviour
         for (int i = 0; i < saveData.chatPartners.Count; i++)
         {
             progress.conversationSeenIndices.Add(saveData.chatPartners[i], saveData.conversationSeenIndices[i]);
+        }
+        for (int i = 0; i < saveData.dayChatPartners.Count; i++)
+        {
+            string partnerName = saveData.dayChatPartners[i];
+
+            ChatDayData chatDayData = saveData.dayByChatPartners[i];
+            
+
+            Dictionary<int, int> separatorsForPartner = new Dictionary<int, int>();
+            for (int j = 0; j < chatDayData.index.Count; j++)
+            {
+                int messageIndex = chatDayData.index[j];
+                int day = chatDayData.day[j];
+
+                separatorsForPartner.Add(messageIndex, day);
+            }
+            progress.daySeparators.Add(partnerName, separatorsForPartner);
         }
         foreach (var r in saveData.activatedTriggers)
         {

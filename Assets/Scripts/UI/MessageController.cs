@@ -62,4 +62,11 @@ public class MessageController : MonoBehaviour
             typingMessage = null;
         }
     }
+
+    public void AddDay(int stage)
+    {
+        currentPeaMessage = Instantiate(messagePrefab, chatContent);
+        currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText(stage.ToString());
+        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+}
 }

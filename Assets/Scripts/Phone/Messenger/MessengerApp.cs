@@ -13,6 +13,8 @@ public class MessengerProgress
 
     // 활성화된 모든 트리거 ID들을 저장 (중복 없이)
     public List<string> activatedTriggersOrdered = new List<string>();
+
+    public Dictionary<string, Dictionary<int, int>> daySeparators = new Dictionary<string, Dictionary<int, int>>();
 }
 
 public struct UnreadInfo
@@ -48,7 +50,9 @@ public class MessengerApp : MonoBehaviour
     private MessengerProgress progress;
     private Chat currentChat;
     private Coroutine messageDisplayCoroutine;
-    
+
+    private Dictionary<string, int> lastMessageDay = new Dictionary<string, int>();
+
     public bool IsDisplayingMessages { get; private set; } = false;
 
     void Awake()
@@ -285,35 +289,6 @@ public class MessengerApp : MonoBehaviour
         foreach (Transform child in chatRoomContent) Destroy(child.gameObject);
         if (currentChat == null) return;
 
-        // *** 여기가 수정된 핵심 로직 ***
-        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬
-        List<ChatMessage> messagesToShow = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
-        {
-            messagesToShow.AddRange(currentChat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        // 2. "몇 개까지 봤는지"를 계산
-        int seenMessageCount = 0;
-        int lastSeenIndex = GetLastSeenIndex(currentChat);
-        if (lastSeenIndex > -1)
-        {
-            ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
-            int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
-            if (positionInShowList > -1)
-            {
-                seenMessageCount = positionInShowList + 1;
-            }
-        }
-
-        // 3. 이미 본 메시지들을 즉시 표시
-        for (int i = 0; i < seenMessageCount; i++)
-        {
-            CreateMessageBubble(messagesToShow[i].messageText);
-        }
-        // *** 수정된 로직 끝 ***
-
-        // 4. 코루틴 시작 (안 본 메시지를 이어서 표시)
         if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
         messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(true));
     }
@@ -325,45 +300,73 @@ public class MessengerApp : MonoBehaviour
         if (currentChat == null) { IsDisplayingMessages = false; yield break; }
 
         bool isFirstMessageInSession = isFreshEntry;
+        string partnerName = currentChat.chatPartner.chatPartnerName;
 
-        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬 (이전과 동일)
+        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬
         List<ChatMessage> messagesToShow = new List<ChatMessage>();
         foreach (string triggerId in progress.activatedTriggersOrdered)
         {
             messagesToShow.AddRange(currentChat.messages.Where(msg => msg.triggerId == triggerId));
         }
 
-        // *** 여기가 수정된 핵심 로직 ***
-        // 2. "몇 개까지 봤는지"를 정확히 계산
+        // 2. "몇 개까지 봤는지" 계산
         int seenMessageCount = 0;
         int lastSeenIndex = GetLastSeenIndex(currentChat);
-
-        if (lastSeenIndex > -1) // -1은 한 번도 안 봤다는 의미
+        if (lastSeenIndex > -1)
         {
-            // 마지막으로 본 메시지가 원본 리스트의 'lastSeenIndex'에 있음
             ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
-
-            // 그 메시지가 messagesToShow 리스트에서는 몇 번째인지 찾음
             int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
-
-            // positionInShowList는 0부터 시작하는 인덱스이므로, 본 메시지의 개수는 +1
-            if (positionInShowList > -1) // 찾았다면
-            {
-                seenMessageCount = positionInShowList + 1;
-            }
+            if (positionInShowList > -1) seenMessageCount = positionInShowList + 1;
         }
-        // *** 수정된 로직 끝 ***
 
-        // 3. 이미 본 메시지는 즉시 표시
-        // 이 부분은 이제 필요 없어짐. DisplayChatMessages가 이 역할을 대신 함.
-        // DisplayChatMessages가 seenMessageCount 만큼을 미리 그려주도록 수정 필요.
+        // 3. 이미 본 메시지들을 즉시 표시 (저장된 날짜 구분선 정보 사용)
+        for (int i = 0; i < seenMessageCount; i++)
+        {
+            if (isFreshEntry == false)
+                break;
+            // 현재 메시지의 원본 인덱스
+            int originalIndex = currentChat.messages.IndexOf(messagesToShow[i]);
 
-        // 4. 아직 안 본 메시지들을 이어서 표시 (seenMessageCount부터 시작)
+            // 이 메시지 앞에 날짜 구분선이 있는지 확인
+            if (progress.daySeparators.ContainsKey(partnerName) && progress.daySeparators[partnerName].ContainsKey(originalIndex))
+            {
+                mc.AddDay(progress.daySeparators[partnerName][originalIndex]);
+            }
+            CreateMessageBubble(messagesToShow[i].messageText);
+        }
+
+        // 4. 아직 안 본 메시지들을 이어서 표시 (날짜 변경 감지 및 저장)
         for (int i = seenMessageCount; i < messagesToShow.Count; i++)
         {
             ChatMessage message = messagesToShow[i];
+            int originalIndex = currentChat.messages.IndexOf(message);
+            int currentDay = GameManager.Instance.stage;
 
-            // ... (딜레이 로직은 이전과 동일) ...
+            // *** 날짜 변경 감지 및 저장 로직 ***
+            if (!lastMessageDay.ContainsKey(partnerName))
+            {
+                // 이 대화 상대의 첫 메시지라면, 현재 날짜를 기록
+                lastMessageDay[partnerName] = -1; // -1로 초기화하여 첫 메시지 앞에 날짜가 뜨도록 함
+            }
+
+            if (lastMessageDay[partnerName] != currentDay)
+            {
+                // 날짜가 변경되었다면
+                mc.AddDay(currentDay); // 날짜 알림 표시
+
+                // 이 정보를 progress에 영구적으로 저장
+                if (!progress.daySeparators.ContainsKey(partnerName))
+                {
+                    progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                }
+                progress.daySeparators[partnerName][originalIndex] = currentDay;
+                // TODO: 세이브
+
+                lastMessageDay[partnerName] = currentDay; // 마지막 날짜 갱신
+                yield return new WaitForSeconds(0.5f); // 날짜 표시 후 잠시 대기
+            }
+
+            // 딜레이 적용
             if (isFirstMessageInSession) { isFirstMessageInSession = false; }
             else
             {
@@ -371,19 +374,15 @@ public class MessengerApp : MonoBehaviour
                 mc.AddTypingMessage(message.delayAfterPrevious / 2);
                 yield return new WaitForSeconds(message.delayAfterPrevious / 2);
             }
-
             if (currentChat == null) break;
 
             CreateMessageBubble(message.messageText);
-
-            int originalIndex = currentChat.messages.IndexOf(message);
             SetLastSeenIndex(currentChat, originalIndex);
 
             ReportAlarmState();
             yield return null;
             scrollRect.verticalNormalizedPosition = 0f;
         }
-
         IsDisplayingMessages = false;
     }
 
@@ -529,7 +528,28 @@ public class MessengerApp : MonoBehaviour
     public void SetProgress(MessengerProgress pro)
     {
         progress = pro;
+        RestoreLastMessageDays(); // lastMessageDay 상태 복원
         UpdateMessenger();
+    }
+
+    // *** lastMessageDay 상태를 복원하는 새로운 헬퍼 함수 ***
+    private void RestoreLastMessageDays()
+    {
+        lastMessageDay.Clear();
+        if (progress == null || progress.daySeparators == null) return;
+
+        foreach (var chatPartnerEntry in progress.daySeparators)
+        {
+            string partnerName = chatPartnerEntry.Key;
+            Dictionary<int, int> separators = chatPartnerEntry.Value;
+
+            if (separators.Count > 0)
+            {
+                // 가장 마지막 인덱스(가장 최근)의 날짜 구분선 날짜를 가져와서 설정
+                int latestDay = separators.OrderByDescending(kvp => kvp.Key).First().Value;
+                lastMessageDay[partnerName] = latestDay;
+            }
+        }
     }
 
     public bool IsTriggerFullySeen(string triggerId)
