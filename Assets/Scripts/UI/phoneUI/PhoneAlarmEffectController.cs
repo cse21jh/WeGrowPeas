@@ -17,7 +17,8 @@ public class PhoneAlarmEffectController : MonoBehaviour
     [SerializeField] private int vibrato = 10;
     [SerializeField] private float alarmInterval = 1f;
 
-    [SerializeField] private bool isAlarmOn = false;
+    [SerializeField] private bool isPermanentOn = false;
+    [SerializeField] private bool isImpermanentOn = false;
 
     [Space(10)]
     [Header("Vibration Sprite")]
@@ -44,10 +45,10 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmPermanent()
     {
-        if(isAlarmOn) return;
+        if(isPermanentOn) return;
         StopAlarm();
 
-        isAlarmOn = true;
+        isPermanentOn = true;
         Debug.Log("Alarm Permanent On");
 
         StartCoroutine(AlarmEffectCoroutine(0));
@@ -59,10 +60,10 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmImpermanent()
     {
-        if(isAlarmOn) return;
+        if(isImpermanentOn) return;
         StopAlarm();
 
-        isAlarmOn = true;
+        isImpermanentOn = true;
 
         StartCoroutine(AlarmEffectCoroutine(1));
         foreach (var wave in vibWaves)
@@ -74,7 +75,8 @@ public class PhoneAlarmEffectController : MonoBehaviour
     public void StopAlarm()
     {
         Debug.Log("Alarm Off");
-        isAlarmOn = false;
+        isPermanentOn = false;
+        isImpermanentOn = false;
         StopAllCoroutines();
     }
 
