@@ -522,7 +522,7 @@ public class GameManager : Singleton<GameManager>
             saveData.chatPartners.Add(p.Key);
             saveData.conversationSeenIndices.Add(p.Value);
         }
-        foreach(var r in progress.activatedTriggers)
+        foreach(var r in progress.activatedTriggersOrdered)
         {
             saveData.activatedTriggers.Add(r);
         }

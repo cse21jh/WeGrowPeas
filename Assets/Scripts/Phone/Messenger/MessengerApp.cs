@@ -12,7 +12,7 @@ public class MessengerProgress
     public Dictionary<string, int> conversationSeenIndices = new Dictionary<string, int>();
 
     // 활성화된 모든 트리거 ID들을 저장 (중복 없이)
-    public HashSet<string> activatedTriggers = new HashSet<string>();
+    public List<string> activatedTriggersOrdered = new List<string>();
 }
 
 public struct UnreadInfo
@@ -96,7 +96,7 @@ public class MessengerApp : MonoBehaviour
             if (!IsDisplayingMessages)
             {
                 if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-                messageDisplayCoroutine = StartCoroutine(ShowUnreadMessagesCoroutine(false)); // false: 초기화 안함
+                messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(false)); // false: 초기화 안함
             }
         }
         else
@@ -108,14 +108,12 @@ public class MessengerApp : MonoBehaviour
 
     public void ActivateTrigger(string triggerId)
     {
-        // 이 triggerId를 사용하는 메시지가 하나라도 있는지 먼저 확인
-        if (!DoesAnyMessageUseTrigger(triggerId))
-            return;
+        if (!DoesAnyMessageUseTrigger(triggerId)) return;
 
-        bool hadUnreadMandatoryBefore = HasUnreadMandatoryMessages();
-
-        if (progress.activatedTriggers.Add(triggerId))
+        // 중복 추가 방지
+        if (!progress.activatedTriggersOrdered.Contains(triggerId))
         {
+            progress.activatedTriggersOrdered.Add(triggerId);
             Debug.Log($"Messenger Trigger Activated: {triggerId}");
             // TODO: 세이브
         }
@@ -124,7 +122,6 @@ public class MessengerApp : MonoBehaviour
         {
             UpdateMessenger();
         }
-
         ReportAlarmState();
     }
 
@@ -205,22 +202,46 @@ public class MessengerApp : MonoBehaviour
         UnreadInfo info = new UnreadInfo { hasUnread = false, hasMandatory = false };
         if (chat == null || chat.messages == null) return info;
 
+        // --- 여기가 수정된 로직 ---
+        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
+        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
+        {
+            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
+        }
+
+        if (arrivedMessages.Count == 0) return info;
+
+        // 2. 마지막으로 본 메시지가 도착한 메시지 리스트에서 몇 번째인지 확인
         int lastSeenIndex = GetLastSeenIndex(chat);
+        int lastSeenPositionInArrivedList = -1; // -1은 한 번도 안 봤다는 의미
 
-        // 안 읽은 메시지들만 필터링
-        var unreadMessages = chat.messages
-            .Skip(lastSeenIndex + 1)
-            .Where(msg => progress.activatedTriggers.Contains(msg.triggerId));
+        if (lastSeenIndex > -1)
+        {
+            // lastSeenIndex가 유효한지 확인
+            if (lastSeenIndex >= chat.messages.Count)
+            {
+                Debug.LogError($"Invalid lastSeenIndex ({lastSeenIndex}) for chat '{chat.name}'.");
+                return info; // 오류 상황에서는 안 읽은 메시지 없다고 처리
+            }
+            ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
+            lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
+        }
 
-        if (unreadMessages.Any())
+        // 3. 아직 안 본 메시지가 있는지 확인
+        if (arrivedMessages.Count > lastSeenPositionInArrivedList + 1)
         {
             info.hasUnread = true;
-            // 안 읽은 메시지 중에 '필수' 메시지가 있는지 확인
+
+            // 4. 안 읽은 메시지들 중에 '필수' 메시지가 있는지 확인
+            var unreadMessages = arrivedMessages.Skip(lastSeenPositionInArrivedList + 1);
             if (unreadMessages.Any(msg => msg.isMandatory))
             {
                 info.hasMandatory = true;
             }
         }
+        // --- 수정된 로직 끝 ---
+
         return info;
     }
 
@@ -228,104 +249,139 @@ public class MessengerApp : MonoBehaviour
     {
         if (chat == null || chat.messages == null || chat.messages.Count == 0) return "새로운 대화";
 
+        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
+        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
+        {
+            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
+        }
+
+        if (arrivedMessages.Count == 0) return "새로운 대화";
+
         if (hasUnread)
         {
-            // 안 읽은 메시지가 있는 경우: 다음에 와야 할 첫 번째 메시지를 찾아서 반환
+            // 2. 마지막으로 본 메시지의 위치 확인
             int lastSeenIndex = GetLastSeenIndex(chat);
-            var nextMessage = chat.messages
-                .Skip(lastSeenIndex + 1)
-                .FirstOrDefault(msg => progress.activatedTriggers.Contains(msg.triggerId));
-
-            if (nextMessage != null)
+            int lastSeenPositionInArrivedList = -1;
+            if (lastSeenIndex > -1)
             {
-                return nextMessage.messageText;
+                lastSeenPositionInArrivedList = arrivedMessages.IndexOf(chat.messages[lastSeenIndex]);
+            }
+
+            // 3. 안 읽은 메시지 중 첫 번째 메시지 반환
+            int nextMessageIndex = lastSeenPositionInArrivedList + 1;
+            if (nextMessageIndex < arrivedMessages.Count)
+            {
+                return arrivedMessages[nextMessageIndex].messageText;
             }
         }
 
-        // 안 읽은 메시지가 없는 경우: 마지막으로 본 메시지를 반환
-        int finalSeenIndex = GetLastSeenIndex(chat);
-        if (finalSeenIndex >= 0 && finalSeenIndex < chat.messages.Count)
-        {
-            return chat.messages[finalSeenIndex].messageText;
-        }
-
-        // 아무 메시지도 본 적 없고, 안 읽은 메시지도 없는 이상한 경우
-        // (또는 도착한 메시지가 아예 없는 경우)
-        return "새로운 대화";
+        // 4. 안 읽은 메시지가 없는 경우: 마지막으로 도착한 메시지를 반환 (더 자연스러움)
+        return arrivedMessages.Last().messageText;
     }
 
     private void DisplayChatMessages()
     {
-        // 화면 초기화 (처음 방에 들어올 때만 실행)
         foreach (Transform child in chatRoomContent) Destroy(child.gameObject);
-
         if (currentChat == null) return;
 
-        int lastSeenIndex = GetLastSeenIndex(currentChat);
-
-        // 과거에 이미 봤던 메시지들만 즉시 생성
-        for (int i = 0; i <= lastSeenIndex; i++)
+        // *** 여기가 수정된 핵심 로직 ***
+        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬
+        List<ChatMessage> messagesToShow = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
         {
-            if (i < currentChat.messages.Count)
-                CreateMessageBubble(currentChat.messages[i].messageText);
+            messagesToShow.AddRange(currentChat.messages.Where(msg => msg.triggerId == triggerId));
         }
 
+        // 2. "몇 개까지 봤는지"를 계산
+        int seenMessageCount = 0;
+        int lastSeenIndex = GetLastSeenIndex(currentChat);
+        if (lastSeenIndex > -1)
+        {
+            ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
+            int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
+            if (positionInShowList > -1)
+            {
+                seenMessageCount = positionInShowList + 1;
+            }
+        }
+
+        // 3. 이미 본 메시지들을 즉시 표시
+        for (int i = 0; i < seenMessageCount; i++)
+        {
+            CreateMessageBubble(messagesToShow[i].messageText);
+        }
+        // *** 수정된 로직 끝 ***
+
+        // 4. 코루틴 시작 (안 본 메시지를 이어서 표시)
         if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-        // 처음 방에 들어왔으니 첫 메시지는 즉시 출력하도록 설정
-        messageDisplayCoroutine = StartCoroutine(ShowUnreadMessagesCoroutine(true));
+        messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(true));
     }
 
-    private IEnumerator ShowUnreadMessagesCoroutine(bool isFreshEntry)
+
+    private IEnumerator ShowMessagesInOrderCoroutine(bool isFreshEntry)
     {
         IsDisplayingMessages = true;
+        if (currentChat == null) { IsDisplayingMessages = false; yield break; }
 
-        if (currentChat == null)
+        bool isFirstMessageInSession = isFreshEntry;
+
+        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬 (이전과 동일)
+        List<ChatMessage> messagesToShow = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
         {
-            IsDisplayingMessages = false;
-            yield break;
+            messagesToShow.AddRange(currentChat.messages.Where(msg => msg.triggerId == triggerId));
         }
 
-        // 방에 처음 들어온 상태가 아니라면(이미 방을 보고 있는데 새 메시지가 온 거라면) 
-        // 첫 메시지도 딜레이를 가져야 하므로 false로 시작
-        bool isFirstMessageInThisSession = isFreshEntry;
+        // *** 여기가 수정된 핵심 로직 ***
+        // 2. "몇 개까지 봤는지"를 정확히 계산
+        int seenMessageCount = 0;
+        int lastSeenIndex = GetLastSeenIndex(currentChat);
 
-        int i = GetLastSeenIndex(currentChat) + 1;
-
-        while (i < currentChat.messages.Count)
+        if (lastSeenIndex > -1) // -1은 한 번도 안 봤다는 의미
         {
-            ChatMessage message = currentChat.messages[i];
+            // 마지막으로 본 메시지가 원본 리스트의 'lastSeenIndex'에 있음
+            ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
 
-            if (progress.activatedTriggers.Contains(message.triggerId))
+            // 그 메시지가 messagesToShow 리스트에서는 몇 번째인지 찾음
+            int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
+
+            // positionInShowList는 0부터 시작하는 인덱스이므로, 본 메시지의 개수는 +1
+            if (positionInShowList > -1) // 찾았다면
             {
-                // 딜레이 적용 로직
-                if (isFirstMessageInThisSession)
-                {
-                    // 방에 처음 들어와서 과거 안읽은걸 뿌릴 때는 첫 메시지만 즉시 출력
-                    isFirstMessageInThisSession = false;
-                }
-                else
-                {
-                    // 이미 방을 보고 있는 상태에서 새 메시지가 추가된 거라면 딜레이와 타이핑 효과 적용
-                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
-                    mc.AddTypingMessage(message.delayAfterPrevious/2);
-                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
-                }
-
-                if (currentChat == null) break;
-
-                CreateMessageBubble(message.messageText);
-                SetLastSeenIndex(currentChat, i);
-                ReportAlarmState();
-
-                yield return null;
-                scrollRect.verticalNormalizedPosition = 0f;
-
-                i++; 
+                seenMessageCount = positionInShowList + 1;
             }
+        }
+        // *** 수정된 로직 끝 ***
+
+        // 3. 이미 본 메시지는 즉시 표시
+        // 이 부분은 이제 필요 없어짐. DisplayChatMessages가 이 역할을 대신 함.
+        // DisplayChatMessages가 seenMessageCount 만큼을 미리 그려주도록 수정 필요.
+
+        // 4. 아직 안 본 메시지들을 이어서 표시 (seenMessageCount부터 시작)
+        for (int i = seenMessageCount; i < messagesToShow.Count; i++)
+        {
+            ChatMessage message = messagesToShow[i];
+
+            // ... (딜레이 로직은 이전과 동일) ...
+            if (isFirstMessageInSession) { isFirstMessageInSession = false; }
             else
             {
-                break;
+                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
+                mc.AddTypingMessage(message.delayAfterPrevious / 2);
+                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
             }
+
+            if (currentChat == null) break;
+
+            CreateMessageBubble(message.messageText);
+
+            int originalIndex = currentChat.messages.IndexOf(message);
+            SetLastSeenIndex(currentChat, originalIndex);
+
+            ReportAlarmState();
+            yield return null;
+            scrollRect.verticalNormalizedPosition = 0f;
         }
 
         IsDisplayingMessages = false;
@@ -334,16 +390,45 @@ public class MessengerApp : MonoBehaviour
     private void CreateMessageBubble(string text)
     {
         mc.AddMessage(MessageController.MessageSenderType.pea, text);
-    }    
+    }
 
-    
-    private bool HasAnyArrivedMessages(Chat chat) => chat.messages.Any(msg => progress.activatedTriggers.Contains(msg.triggerId));
+
+    private bool HasAnyArrivedMessages(Chat chat)
+    {
+        if (chat == null || chat.messages == null) return false;
+        // 도착한 트리거 중 이 채팅에 해당하는 메시지가 하나라도 있는지 확인
+        return progress.activatedTriggersOrdered.Any(triggerId => chat.messages.Any(msg => msg.triggerId == triggerId));
+    }
+
     private bool HasUnreadMessages(Chat chat)
     {
+        if (chat == null || chat.messages == null) return false;
+
+        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
+        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
+        {
+            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
+        }
+
+        // 2. 마지막으로 본 메시지가 도착한 메시지 리스트의 몇 번째인지 확인
         int lastSeenIndex = GetLastSeenIndex(chat);
-        return chat.messages
-            .Skip(lastSeenIndex + 1)
-            .Any(msg => progress.activatedTriggers.Contains(msg.triggerId));
+        if (lastSeenIndex == -1) // 한 번도 안 봤다면
+        {
+            return arrivedMessages.Count > 0; // 도착한 메시지가 있으면 안 읽은 것임
+        }
+
+        if (lastSeenIndex >= chat.messages.Count)
+        {
+            Debug.LogError("Invalid lastSeenIndex detected!");
+            return false;
+        }
+
+        ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
+        int lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
+
+        // 3. 도착한 메시지 수와 마지막으로 본 메시지의 위치를 비교
+        return arrivedMessages.Count > lastSeenPositionInArrivedList + 1;
     }
     public void ReportAlarmState()
     {
@@ -369,13 +454,45 @@ public class MessengerApp : MonoBehaviour
     {
         foreach (var chat in allChats)
         {
-            int lastSeenIndex = GetLastSeenIndex(chat);
-            if (chat.messages.Skip(lastSeenIndex + 1)
-                .Any(msg => msg.isMandatory && progress.activatedTriggers.Contains(msg.triggerId)))
+            if (HasUnreadMandatoryMessagesInChat(chat))
                 return true;
         }
         return false;
     }
+    private bool HasUnreadMandatoryMessagesInChat(Chat chat)
+    {
+        if (chat == null || chat.messages == null) return false;
+
+        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
+        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
+        foreach (string triggerId in progress.activatedTriggersOrdered)
+        {
+            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
+        }
+
+        // 2. 마지막으로 본 메시지의 위치 확인
+        int lastSeenIndex = GetLastSeenIndex(chat);
+        if (lastSeenIndex == -1) // 한 번도 안 봤다면
+        {
+            // 도착한 메시지 중에 필수 메시지가 있는지 확인
+            return arrivedMessages.Any(msg => msg.isMandatory);
+        }
+
+        if (lastSeenIndex >= chat.messages.Count)
+        {
+            Debug.LogError("Invalid lastSeenIndex detected!");
+            return false;
+        }
+
+        ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
+        int lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
+
+        // 3. 아직 안 본 메시지들 중에 필수 메시지가 있는지 확인
+        return arrivedMessages
+            .Skip(lastSeenPositionInArrivedList + 1)
+            .Any(msg => msg.isMandatory);
+    }
+
 
     private string GetLastMessageText(Chat chat)
     {
@@ -383,7 +500,7 @@ public class MessengerApp : MonoBehaviour
         if (lastSeenIndex >= 0)
             return chat.messages[lastSeenIndex].messageText;
 
-        var firstMessage = chat.messages.FirstOrDefault(msg => progress.activatedTriggers.Contains(msg.triggerId));
+        var firstMessage = chat.messages.FirstOrDefault(msg => progress.activatedTriggersOrdered.Contains(msg.triggerId));
         return firstMessage != null ? firstMessage.messageText : "새로운 대화";
     }
 

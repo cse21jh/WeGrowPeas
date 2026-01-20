@@ -394,7 +394,7 @@ public class PhoneManager : MonoBehaviour
         }
         foreach (var r in saveData.activatedTriggers)
         {
-            progress.activatedTriggers.Add(r);
+            progress.activatedTriggersOrdered.Add(r);
         }
         messengerApp.SetProgress(progress);
     }
