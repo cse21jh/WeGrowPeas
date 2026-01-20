@@ -353696,6 +353696,7 @@ MonoBehaviour:
   grid: {fileID: 1072018327}
   worldCamera: {fileID: 963194227}
   ghostPrefab: {fileID: 8364664605164439072, guid: 0b93d8a10e93165429c404b4238687f8, type: 3}
+  guideText: {fileID: 0}
   ghostInvalidAlpha: 0.4
   plantLayer:
     serializedVersion: 2
@@ -452120,6 +452121,34 @@ PrefabInstance:
     - target: {fileID: 3809060504626462860, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -55
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 5427599}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PhoneTouchEffect
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PhoneManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3916151626056191648, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_AnchorMax.y

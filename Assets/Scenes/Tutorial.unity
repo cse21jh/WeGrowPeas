@@ -63779,8 +63779,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
   worldCamera: {fileID: 0}
-  shopCanvas: {fileID: 0}
   ghostPrefab: {fileID: 8364664605164439072, guid: 0b93d8a10e93165429c404b4238687f8, type: 3}
+  guideText: {fileID: 0}
   ghostInvalidAlpha: 0.4
   plantLayer:
     serializedVersion: 2
@@ -160664,6 +160664,34 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -55
       objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 570108821}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: PhoneTouchEffect
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PhoneManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3872314741044406035, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3916151626056191648, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -161722,6 +161750,7 @@ MonoBehaviour:
   - {fileID: 1303300334}
   shadowSpeed: 10
   waveEffectSkipButton: {fileID: 46772236}
+  dayNightTransitionDuration: 1
   windEffects:
   - {fileID: 1548855739}
   - {fileID: 1331162085}
@@ -238120,6 +238149,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1036177554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238162,6 +238192,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1036177555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -262237,6 +262268,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1135966985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -262279,6 +262311,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1135966986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299614,6 +299647,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1303300333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299656,6 +299690,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1303300334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332785,6 +332820,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1430781037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332827,6 +332863,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1430781038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435711,6 +435748,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1855291597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435753,6 +435791,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &1855291598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -476667,6 +476706,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &2064608653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -476709,6 +476749,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  type: 0
 --- !u!114 &2064608654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -490752,21 +490793,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   time: 0
-  naturalSetters:
-  - {fileID: 1036177554}
-  - {fileID: 1430781037}
-  - {fileID: 1855291597}
-  - {fileID: 2064608653}
-  - {fileID: 1135966985}
-  - {fileID: 1303300333}
-  rainSetters:
-  - {fileID: 1036177553}
-  - {fileID: 1430781036}
-  - {fileID: 1855291596}
-  - {fileID: 2064608652}
-  - {fileID: 1135966984}
-  - {fileID: 1303300332}
+  naturalSetters: []
+  rainSetters: []
   droughtSetters: []
+  nightSetters: []
+  daySetters: []
   currentType: 0
 --- !u!1 &2138108818
 GameObject:
