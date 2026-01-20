@@ -68,7 +68,7 @@ public class PanelTranstionController : MonoBehaviour
 
         if (index == 0)
         {
-            //PhoneManager.Instance.messengerApp.CheckCoroutineByTab(false);
+            PhoneManager.Instance.messengerApp.CheckCoroutineByTab(false);
             for (int i = 1; i < panels.Length; i++)
             {
                 TransitionOut(panels[i]);
@@ -78,11 +78,10 @@ public class PanelTranstionController : MonoBehaviour
         }
         else
         {
-            if(index == 4)
-                //PhoneManager.Instance.messengerApp.CheckCoroutineByTab(true);
-
             TransitionOut(panels[0]);
             TransitionIn(panels[index]);
+            if (index == 4)
+                PhoneManager.Instance.messengerApp.CheckCoroutineByTab(true);
         }
     }
 }
