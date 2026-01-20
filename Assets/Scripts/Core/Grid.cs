@@ -164,7 +164,8 @@ public class Grid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (breedButtonPosition != -1)
+            MoveBreedButton(plantGrid[breedButtonPosition].transform.position, breedButtonPosition);
     }
 
     public void InitGrid()
