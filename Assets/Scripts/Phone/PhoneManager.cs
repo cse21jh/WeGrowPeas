@@ -20,9 +20,8 @@ public enum AppKey
     Messenger,
 }
 
-public class PhoneManager : MonoBehaviour
+public class PhoneManager : Singleton<PhoneManager>
 {
-    public static PhoneManager Instance { get; private set; }
 
     private Dictionary<AppKey, AlarmState> appAlarmStates = new Dictionary<AppKey, AlarmState>();
     public AlarmState TotalPhoneAlarmState { get; private set; } = AlarmState.None;
@@ -79,8 +78,6 @@ public class PhoneManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
 
         if (phoneRoot != null) phoneRoot.SetActive(false);
         _isOpen = false;
