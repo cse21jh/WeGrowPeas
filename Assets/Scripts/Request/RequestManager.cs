@@ -169,7 +169,7 @@ public class RequestManager : Singleton<RequestManager>
         ClearActive();
 
         cycleEndRound = saveData.cycleEndRound;
-        //dayPassed = saveData.dayPassed;
+        dayPassed = saveData.dayPassed;
 
         if (saveData.activeRequests.Count == 0) return;
 

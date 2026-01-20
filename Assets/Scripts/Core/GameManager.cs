@@ -105,6 +105,7 @@ public class SaveData
 
     //RequestManager
     public int cycleEndRound;
+    public int dayPassed;
     public List<RequestInstanceSaveData> activeRequests = new();
 
     //PlayerRecordForGraph
@@ -514,6 +515,7 @@ public class GameManager : Singleton<GameManager>
 
         //RequestManager
         saveData.cycleEndRound = requestManager.CycleEndRound;
+        saveData.dayPassed = requestManager.DayPassed;
         saveData.activeRequests = requestManager.getSaveData();
 
         //PlayerRecordForGraph
