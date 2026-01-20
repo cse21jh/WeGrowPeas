@@ -360,41 +360,42 @@ public abstract class Plant : MonoBehaviour
         
         int rangeLevel = grid.ChiliPepperRangeLevel;
         Plant chiliPepper;
-        
+
         // 0단계: 가로 2칸 (좌우)
-        if ((gridIndex - 1) / 4 == gridIndex / 4) // 왼쪽
+        if ((gridIndex - 4) >= 0) // 왼쪽
         {
-            if (grid.plantGrid.TryGetValue(gridIndex - 1, out chiliPepper))
+            if (grid.plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
             {
                 if (chiliPepper.GetType() == typeof(ChiliPepper))
                     return true;
             }
         }
 
-        if ((gridIndex + 1) / 4 == gridIndex / 4) // 오른쪽
+        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // 오른쪽
         {
-            if (grid.plantGrid.TryGetValue(gridIndex + 1, out chiliPepper))
+            if (grid.plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
             {
                 if (chiliPepper.GetType() == typeof(ChiliPepper))
                     return true;
             }
         }
+        
 
         // 1단계 이상: 십자 4칸 (상하 추가)
         if (rangeLevel >= 1)
         {
-            if ((gridIndex - 4) >= 0) // 위쪽
+            if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
             {
-                if (grid.plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
+                if (grid.plantGrid.TryGetValue(gridIndex - 1, out chiliPepper))
                 {
                     if (chiliPepper.GetType() == typeof(ChiliPepper))
                         return true;
                 }
             }
 
-            if ((gridIndex + 4) < grid.GetMaxCol() * 4) // 아래쪽
+            if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래
             {
-                if (grid.plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
+                if (grid.plantGrid.TryGetValue(gridIndex + 1, out chiliPepper))
                 {
                     if (chiliPepper.GetType() == typeof(ChiliPepper))
                         return true;
@@ -405,8 +406,8 @@ public abstract class Plant : MonoBehaviour
         // 2단계: 대각선까지 8칸 (대각선 4칸 추가)
         if (rangeLevel >= 2)
         {
-            // 왼쪽 위 대각선
-            if ((gridIndex - 5) >= 0 && (gridIndex - 5) / 4 == (gridIndex - 1) / 4)
+            // 왼쪽 위 대각선 
+            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
             {
                 if (grid.plantGrid.TryGetValue(gridIndex - 5, out chiliPepper))
                 {
@@ -416,7 +417,7 @@ public abstract class Plant : MonoBehaviour
             }
 
             // 오른쪽 위 대각선
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) / 4 == (gridIndex - 1) / 4)
+            if ((gridIndex + 3) >= 0 && (gridIndex + 3) % 4 == (gridIndex - 1) % 4)
             {
                 if (grid.plantGrid.TryGetValue(gridIndex - 3, out chiliPepper))
                 {
@@ -426,7 +427,7 @@ public abstract class Plant : MonoBehaviour
             }
 
             // 왼쪽 아래 대각선
-            if ((gridIndex + 3) < grid.GetMaxCol() * 4 && (gridIndex + 3) / 4 == (gridIndex + 1) / 4)
+            if ((gridIndex - 3) < grid.GetMaxCol() * 4 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
             {
                 if (grid.plantGrid.TryGetValue(gridIndex + 3, out chiliPepper))
                 {
@@ -436,7 +437,7 @@ public abstract class Plant : MonoBehaviour
             }
 
             // 오른쪽 아래 대각선
-            if ((gridIndex + 5) < grid.GetMaxCol() * 4 && (gridIndex + 5) / 4 == (gridIndex + 1) / 4)
+            if ((gridIndex + 5) < grid.GetMaxCol() * 4 && (gridIndex + 5) % 4 == (gridIndex + 1) % 4)
             {
                 if (grid.plantGrid.TryGetValue(gridIndex + 5, out chiliPepper))
                 {
