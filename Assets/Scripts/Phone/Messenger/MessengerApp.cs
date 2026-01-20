@@ -91,8 +91,11 @@ public class MessengerApp : MonoBehaviour
     void Start()
     {
         if (backTochatPartnersButton != null)
+        { 
             backTochatPartnersButton.onClick.AddListener(OpenchatPartnerList);
-    }
+            backTochatPartnersButton.onClick.AddListener(PhoneManager.Instance.PhoneTouchEffect);
+        }
+    }    
 
     public void UpdateMessenger()
     {

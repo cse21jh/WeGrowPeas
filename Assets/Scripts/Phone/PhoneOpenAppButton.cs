@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PhoneOpenAppButton : MonoBehaviour
 {
@@ -7,6 +7,6 @@ public class PhoneOpenAppButton : MonoBehaviour
     public void Open()
     {
         if (PhoneManager.Instance != null)
-            PhoneManager.Instance.OpenApp(key);
+            PhoneManager.Instance.OpenApp(key);        
     }
 }

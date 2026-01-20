@@ -43,6 +43,7 @@ public class ChatPartnerUI : MonoBehaviour
         }
 
         GetComponent<Button>().onClick.AddListener(OnItemClick);
+        GetComponent<Button>().onClick.AddListener(PhoneManager.Instance.PhoneTouchEffect);
     }
 
     private void OnItemClick()

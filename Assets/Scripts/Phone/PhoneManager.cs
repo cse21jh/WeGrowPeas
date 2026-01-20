@@ -109,7 +109,8 @@ public class PhoneManager : MonoBehaviour
     public void Toggle() => SetOpen(!_isOpen);
 
     public void SetOpen(bool open)
-    {   
+    {
+        PhoneTouchEffect();
         _isOpen = open;
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);
@@ -122,7 +123,7 @@ public class PhoneManager : MonoBehaviour
     public void OpenHome()
     {
         _current = null;
-
+        PhoneTouchEffect();
         transitionController.TransitionToIndex(0);
         //RefreshTopBar();
     }
@@ -147,9 +148,13 @@ public class PhoneManager : MonoBehaviour
         */
 
         //RefreshTopBar();
-
+        PhoneTouchEffect();
         transitionController.TransitionToIndex((int)key + 1);
         _current = key;
+    }
+    public void PhoneTouchEffect()
+    {
+        SoundManager.Instance.PlayEffect("PhoneTouch");
     }
 
     public IEnumerator PhonePhase()
