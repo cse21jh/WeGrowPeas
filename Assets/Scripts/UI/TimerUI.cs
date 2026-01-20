@@ -69,7 +69,7 @@ public class TimerUI : MonoBehaviour
         if (countdownRoutine != null)
         {
             textTimer.text = $"{maxBreedingTime}s";
-            breedTimerController.SetFill(0f);
+            breedTimerController.SetFill(1f);
             textTimer.color = Color.black;
             StopCoroutine(countdownRoutine);
         }
