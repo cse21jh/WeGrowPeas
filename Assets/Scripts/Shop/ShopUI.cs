@@ -52,6 +52,13 @@ public class ShopUI : MonoBehaviour
         var placementObj = GameObject.Find("PlacementController");
         if (placementObj != null) placement = placementObj.GetComponent<PlacementController>();
         if (placement == null) placement = FindAnyObjectByType<PlacementController>();
+        
+        // PlacementController에 guideText 설정
+        if (placement != null && footerText != null)
+        {
+            placement.SetGuideText(footerText);
+        }
+        
         ctx = new ShopContext
         {
             Grid = grid,
