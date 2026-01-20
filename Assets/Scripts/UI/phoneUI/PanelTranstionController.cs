@@ -10,6 +10,8 @@ public class PanelTranstionController : MonoBehaviour
     [SerializeField] private RectTransform[] panels;
 
     [SerializeField] private bool[] isPanelActive;
+    [SerializeField] private int lastActiveIndex = -1;
+    [SerializeField] private int currentActiveIndex = -1;
     [SerializeField] private KeyCode toggleKey = KeyCode.F1;
 
     private void Start()
@@ -19,6 +21,8 @@ public class PanelTranstionController : MonoBehaviour
         {
             isPanelActive[i] = panels[i].gameObject.activeSelf;
         }
+        lastActiveIndex = 0;
+        currentActiveIndex = 0;
     }
 
     private void Update()
@@ -34,6 +38,7 @@ public class PanelTranstionController : MonoBehaviour
 
     private void TransitionIn(RectTransform panel)
     {
+        panel.gameObject.SetActive(true);
         panel.DOKill();
 
         panel.localScale = new Vector3(0f, 0f, 1f);
@@ -43,26 +48,39 @@ public class PanelTranstionController : MonoBehaviour
 
     private void TransitionOut(RectTransform panel)
     {
+        if(panel.gameObject.activeSelf == false)
+            return;
         panel.DOKill();
 
         panel.localScale = new Vector3(1f, 1f, 1f);
-        panel.DOScale(new Vector3(0f, 0f, 0f), transitionDuration).SetEase(transitionEase);
+        panel.DOScale(new Vector3(0f, 0f, 0f), transitionDuration).SetEase(transitionEase).OnComplete(() =>
+        {
+            panel.gameObject.SetActive(false);
+        });
     }
 
 
 
     public void TransitionToIndex(int index)
     {
-        if(index == 0)
+        lastActiveIndex = currentActiveIndex;
+        currentActiveIndex = index;
+
+        if (index == 0)
         {
-            for(int i = 1; i < panels.Length; i++)
+            //PhoneManager.Instance.messengerApp.CheckCoroutineByTab(false);
+            for (int i = 1; i < panels.Length; i++)
             {
                 TransitionOut(panels[i]);
             }
-            TransitionIn(panels[0]);
+            if(lastActiveIndex != 0)
+                TransitionIn(panels[0]);
         }
         else
         {
+            if(index == 4)
+                //PhoneManager.Instance.messengerApp.CheckCoroutineByTab(true);
+
             TransitionOut(panels[0]);
             TransitionIn(panels[index]);
         }
