@@ -2,14 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
-using UnityEngine.UI; // CanvasGroup
 
 public class PlacementController : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private Grid grid;                 // 네 Grid 클래스
     [SerializeField] private Camera worldCamera;        // 보통 Camera.main
-    [SerializeField] private CanvasGroup shopCanvas;    // ShopUI 루트 CanvasGroup (선택)
     [SerializeField] private GameObject ghostPrefab;    // 배치 미리보기 프리팹(선택)
 
     [Header("Ghost")]
@@ -52,18 +50,7 @@ public class PlacementController : MonoBehaviour
         shovel.IsEnabled = false;
         shovelButton.enabled = false;
 
-        // 1) Shop UI 클릭 비활성 (화면은 보이되, 입력은 통과)
-        bool hadCanvas = shopCanvas != null;
-        bool prevInteractable = false, prevBlocks = false;
-        if (hadCanvas)
-        {
-            prevInteractable = shopCanvas.interactable;
-            prevBlocks = shopCanvas.blocksRaycasts;
-            shopCanvas.interactable = false;
-            shopCanvas.blocksRaycasts = false;
-        }
-
-        // 2) 고스트 생성(있으면)
+        // 고스트 생성(있으면)
         SpriteRenderer ghostSr = null;
         if (ghostPrefab != null)
         {
@@ -136,11 +123,6 @@ public class PlacementController : MonoBehaviour
 
         // 3) 정리
         if (ghost != null) Destroy(ghost);
-        if (hadCanvas)
-        {
-            shopCanvas.interactable = prevInteractable;
-            shopCanvas.blocksRaycasts = prevBlocks;
-        }
         isPlacing = false;
         placingCo = null;
         ctx.ShowGuide?.Invoke("");
@@ -176,12 +158,6 @@ public class PlacementController : MonoBehaviour
         isPlacing = false;
 
         if (ghost != null) Destroy(ghost);
-        if (shopCanvas != null)
-        {
-            // 안전하게 다시 켜주기
-            shopCanvas.interactable = true;
-            shopCanvas.blocksRaycasts = true;
-        }
     }
 
     public void BeginPlantSelection(
@@ -245,18 +221,7 @@ public class PlacementController : MonoBehaviour
             yield break;
         }
 
-        // 1) Shop UI 입력 비활성
-        bool hadCanvas = shopCanvas != null;
-        bool prevInteractable = false, prevBlocks = false;
-        if (hadCanvas)
-        {
-            prevInteractable = shopCanvas.interactable;
-            prevBlocks = shopCanvas.blocksRaycasts;
-            shopCanvas.interactable = false;
-            shopCanvas.blocksRaycasts = false;
-        }
-
-        // 2) 고스트 생성(있으면) - TilePlacementRoutine과 동일한 방식
+        // 고스트 생성(있으면) - TilePlacementRoutine과 동일한 방식
         SpriteRenderer ghostSr = null;
         if (ghostPrefab != null)
         {
@@ -290,8 +255,7 @@ public class PlacementController : MonoBehaviour
             bool isOverUI = false;
             try
             {
-                isOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()
-                    && (shopCanvas == null || shopCanvas.blocksRaycasts);
+                isOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
             }
             catch (System.Exception e)
             {
@@ -422,11 +386,6 @@ public class PlacementController : MonoBehaviour
         {
             Destroy(ghost);
             ghost = null;
-        }
-        if (hadCanvas)
-        {
-            shopCanvas.interactable = prevInteractable;
-            shopCanvas.blocksRaycasts = prevBlocks;
         }
         isPlacing = false;
         placingCo = null;
