@@ -35,7 +35,11 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         if (buyButton)
         {
             buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(() => shop.OnClickShowPopup(effect, this));
+            buyButton.onClick.AddListener(() => 
+            {
+                PhoneManager.Instance.PhoneTouchEffect();
+                shop.OnClickShowPopup(effect, this);
+            });
         }
 
         Refresh();

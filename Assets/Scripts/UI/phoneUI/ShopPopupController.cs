@@ -45,13 +45,21 @@ public class ShopPopupController : MonoBehaviour
         if (buyButton != null)
         {
             buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(() => shop.OnClickBuy(itemData, slot));
+            buyButton.onClick.AddListener(() => 
+            {
+                PhoneManager.Instance.PhoneTouchEffect();
+                shop.OnClickBuy(itemData, slot);
+            });
         }
 
         if( closeButton != null)
         {
             closeButton.onClick.RemoveAllListeners();
-            closeButton.onClick.AddListener(() => shop.OnClickHidePopup());
+            closeButton.onClick.AddListener(() => 
+            {
+                PhoneManager.Instance.PhoneTouchEffect();
+                shop.OnClickHidePopup();
+            });
         }
     }
 

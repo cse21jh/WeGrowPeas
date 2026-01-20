@@ -67,14 +67,20 @@ public class TraitSelectionUIController : MonoBehaviour
         if (confirmButton != null)
         {
             confirmButton.onClick.RemoveAllListeners();
-            confirmButton.onClick.AddListener(OnTraitConfirm);
+            confirmButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnTraitConfirm();
+            });
             confirmButton.interactable = true; // 형질은 선택 전에도 확인 가능
         }
         
         if (cancelButton != null)
         {
             cancelButton.onClick.RemoveAllListeners();
-            cancelButton.onClick.AddListener(OnCancel);
+            cancelButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnCancel();
+            });
         }
 
         if (titleText != null)
@@ -108,14 +114,20 @@ public class TraitSelectionUIController : MonoBehaviour
         if (confirmButton != null)
         {
             confirmButton.onClick.RemoveAllListeners();
-            confirmButton.onClick.AddListener(OnTraitConfirm);
+            confirmButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnTraitConfirm();
+            });
             confirmButton.interactable = false; // 형질 선택 전에는 비활성화
         }
         
         if (cancelButton != null)
         {
             cancelButton.onClick.RemoveAllListeners();
-            cancelButton.onClick.AddListener(OnCancel);
+            cancelButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnCancel();
+            });
         }
 
         if (titleText != null)
@@ -146,14 +158,20 @@ public class TraitSelectionUIController : MonoBehaviour
         if (confirmButton != null)
         {
             confirmButton.onClick.RemoveAllListeners();
-            confirmButton.onClick.AddListener(OnWaveConfirm);
+            confirmButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnWaveConfirm();
+            });
             confirmButton.interactable = false; // 웨이브는 선택 전에는 비활성화
         }
         
         if (cancelButton != null)
         {
             cancelButton.onClick.RemoveAllListeners();
-            cancelButton.onClick.AddListener(OnCancel);
+            cancelButton.onClick.AddListener(() => {
+                PhoneManager.Instance.PhoneTouchEffect();
+                OnCancel();
+            });
         }
 
         if (titleText != null)
@@ -193,6 +211,7 @@ public class TraitSelectionUIController : MonoBehaviour
                 bool isSelected = false;
                 
                 btn.onClick.AddListener(() => {
+                    PhoneManager.Instance.PhoneTouchEffect();
                     isSelected = !isSelected;
                     ToggleTrait(currentTrait, isSelected);
                     UpdateButtonVisual(btn, isSelected);
@@ -249,6 +268,7 @@ public class TraitSelectionUIController : MonoBehaviour
                 if (btn != null)
                 {
                     btn.onClick.AddListener(() => {
+                        PhoneManager.Instance.PhoneTouchEffect();
                         SelectPairedTrait(TraitType.Cold, TraitType.Heat);
                         UpdateAllTraitButtonVisuals();
                     });
@@ -278,6 +298,7 @@ public class TraitSelectionUIController : MonoBehaviour
                 if (btn != null)
                 {
                     btn.onClick.AddListener(() => {
+                        PhoneManager.Instance.PhoneTouchEffect();
                         SelectPairedTrait(TraitType.HeavyRain, TraitType.Drought);
                         UpdateAllTraitButtonVisuals();
                     });
@@ -302,6 +323,7 @@ public class TraitSelectionUIController : MonoBehaviour
                 TraitType currentTrait = traitType; // 클로저를 위한 로컬 변수
                 
                 btn2.onClick.AddListener(() => {
+                    PhoneManager.Instance.PhoneTouchEffect();
                     SelectSingleTrait(currentTrait);
                     UpdateAllTraitButtonVisuals();
                 });
@@ -560,6 +582,7 @@ public class TraitSelectionUIController : MonoBehaviour
                 WaveType currentWave = waveType; // 클로저를 위한 로컬 변수
 
                 btn.onClick.AddListener(() => {
+                    PhoneManager.Instance.PhoneTouchEffect();
                     SelectWave(currentWave);
                     UpdateAllWaveButtonVisuals();
                 });

@@ -280,6 +280,7 @@ public class ShopUI : MonoBehaviour
     /// </summary>
     public void OnClickReroll()
     {
+        PhoneManager.Instance.PhoneTouchEffect();
         const int rerollPrice = 500; // 리롤 가격
 
         // 무료 리롤 횟수가 있으면 무료로 리롤
