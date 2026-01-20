@@ -9,13 +9,13 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
     private RectTransform buttonRect;
 
     [Header("Animation Settings")]
-    [SerializeField] private float hoverScale = 1.1f; // ¸¶¿ì½º ¿À¹ö ½Ã Å©±â
-    [SerializeField] private bool enableShake = false; // Èçµé¸² È¿°ú È°¼ºÈ­ ¿©ºÎ
-    [Range(0f, 1f), SerializeField] private float shakeStrength = 1f; // Èçµé¸®´Â Á¤µµ
-    private Vector3 originalScale; // ¿ø·¡ Å©±â
+    [SerializeField] private float hoverScale = 1.1f; // ë§ˆìš°ìŠ¤ ì˜¤ë²„ ì‹œ í¬ê¸°
+    [SerializeField] private bool enableShake = false; // í”ë“¤ë¦¼ íš¨ê³¼ í™œì„±í™” ì—¬ë¶€
+    [Range(0f, 1f), SerializeField] private float shakeStrength = 1f; // í”ë“¤ë¦¬ëŠ” ì •ë„
+    private Vector3 originalScale; // ì›ë˜ í¬ê¸°
     private Quaternion originalRotation;
-    [SerializeField] private float animationDuration = 0.2f; // ¾Ö´Ï¸ŞÀÌ¼Ç Áö¼Ó ½Ã°£
-    [SerializeField] private Ease easeType; // ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌÂ¡
+    [SerializeField] private float animationDuration = 0.2f; // ì• ë‹ˆë©”ì´ì…˜ ì§€ì† ì‹œê°„
+    [SerializeField] private Ease easeType; // ì• ë‹ˆë©”ì´ì…˜ ì´ì§•
 
     [SerializeField] private RectTransform onMouseIcon;
 
@@ -28,7 +28,7 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
     {
         buttonRect = GetComponent<RectTransform>();
         originalRotation = buttonRect.rotation;
-        originalScale = buttonRect.localScale; // ¿ø·¡ Å©±â ÀúÀå
+        originalScale = buttonRect.localScale; // ì›ë˜ í¬ê¸° ì €ì¥
     }
 
 
@@ -36,8 +36,8 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
     {
         if (buttonRect != null)
         {
-            // ¹öÆ°ÀÌ ºñÈ°¼ºÈ­µÉ ¶§ ¿ø·¡ »óÅÂ·Î º¹¿ø
-            buttonRect.DOKill(); // ±âÁ¸ ¾Ö´Ï¸ŞÀÌ¼Ç ÃÊ±âÈ­
+            // ë²„íŠ¼ì´ ë¹„í™œì„±í™”ë  ë•Œ ì›ë˜ ìƒíƒœë¡œ ë³µì›
+            buttonRect.DOKill(); // ê¸°ì¡´ ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™”
             buttonRect.localScale = originalScale;
             buttonRect.rotation = originalRotation;
             if (onMouseIcon != null)
@@ -56,11 +56,12 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // ¸¶¿ì½º°¡ ¹öÆ° À§¿¡ ¿Ã·ÁÁ³À» ¶§
-        CursorManager.Instance.SetCursor(cursorType);
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ ìœ„ì— ì˜¬ë ¤ì¡Œì„ ë•Œ
+        if(CursorManager.Instance != null)
+            CursorManager.Instance.SetCursor(cursorType);
 
 
-        buttonRect.DOKill(); // ±âÁ¸ ¾Ö´Ï¸ŞÀÌ¼Ç ÃÊ±âÈ­
+        buttonRect.DOKill(); // ê¸°ì¡´ ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™”
         buttonRect.DOScale(hoverScale, animationDuration).SetEase(easeType).SetUpdate(true);
         //buttonRect.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), animationDuration).SetEase(easeType).SetUpdate(true);
 
@@ -82,18 +83,21 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
 
     private void OnMouseOver()
     {
-        CursorManager.Instance.SetCursor(cursorType);
+        if (CursorManager.Instance != null)
+            CursorManager.Instance.SetCursor(cursorType);
         if (Input.GetMouseButton(0))
         {
-            CursorManager.Instance.SetCursor(CursorType.Clicked);
+            if (CursorManager.Instance != null)
+                CursorManager.Instance.SetCursor(CursorType.Clicked);
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // ¸¶¿ì½º°¡ ¹öÆ°À» ¶°³µÀ» ¶§
-        CursorManager.Instance.SetCursor(CursorType.Default);
-        buttonRect.DOKill(); // ±âÁ¸ ¾Ö´Ï¸ŞÀÌ¼Ç ÃÊ±âÈ­
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ì„ ë– ë‚¬ì„ ë•Œ
+        if (CursorManager.Instance != null)
+            CursorManager.Instance.SetCursor(CursorType.Default);
+        buttonRect.DOKill(); // ê¸°ì¡´ ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™”
         buttonRect.DOScale(originalScale, animationDuration).SetEase(easeType).SetUpdate(true);
 
         if (onMouseIcon != null)
