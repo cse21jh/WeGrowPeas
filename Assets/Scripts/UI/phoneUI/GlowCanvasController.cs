@@ -20,9 +20,9 @@ public class GlowCanvasController : MonoBehaviour
 
     public void SyncUI(RectTransform original, RectTransform glow)
     {
-        Debug.Log("변경 전 " + original.anchoredPosition + " / " + glow.anchoredPosition);
+        //Debug.Log("변경 전 " + original.anchoredPosition + " / " + glow.anchoredPosition);
         glow.anchoredPosition = original.anchoredPosition;
-        Debug.Log("변경 후 " + original.anchoredPosition + " / " + glow.anchoredPosition);
+        //Debug.Log("변경 후 " + original.anchoredPosition + " / " + glow.anchoredPosition);
 
         glow.rotation = original.rotation;
         //glow.localScale = original.localScale;
