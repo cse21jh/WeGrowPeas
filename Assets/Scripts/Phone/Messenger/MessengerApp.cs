@@ -60,32 +60,68 @@ public class MessengerApp : MonoBehaviour
     void Awake()
     {
         progress = new MessengerProgress();
-        // TODO: Save/Load
 
-        // --- 초기화 로직 추가 ---
-        // 만약 로드된 데이터가 없다면 (새 게임이라면) 딕셔너리를 초기화
-        if (progress.conversationSeenIndices.Count == 0)
+        //Trigger 0인 애들은 이미 와있던 메세지로 취급하고 삽입해줌. (New Game인 경우)
+        if(progress.conversationSeenIndices.Count == 0 && progress.activatedTriggersOrdered.Count == 0) // 더 확실한 새 게임 확인
         {
-            InitializeConversationIndices();
+            InitializeForNewGame();
         }
     }
 
-    private void InitializeConversationIndices()
+    private void InitializeForNewGame()
     {
         if (allChats == null) return;
+
+        // Trigger "Default"을 가장 먼저 활성화된 것으로 기록
+        progress.activatedTriggersOrdered.Add("Default");        
+
 
         foreach (var chat in allChats)
         {
             if (chat != null && chat.chatPartner != null)
             {
-                // 아직 딕셔너리에 없는 대화 상대만 추가
-                if (!progress.conversationSeenIndices.ContainsKey(chat.chatPartner.chatPartnerName))
+                string partnerName = chat.chatPartner.chatPartnerName;
+
+                // 딕셔너리에 대화 상대 추가
+                if (!progress.conversationSeenIndices.ContainsKey(partnerName))
                 {
-                    // -1은 "아직 아무 메시지도 보지 않았다"는 의미
-                    progress.conversationSeenIndices.Add(chat.chatPartner.chatPartnerName, -1);
+                    progress.conversationSeenIndices.Add(partnerName, -1);
+                }
+
+                int lastIndexOfTriggerZero = -1;
+                int firstIndexOfTriggerZero = -1; 
+
+                for (int i = 0; i < chat.messages.Count; i++)
+                {
+                    if (chat.messages[i].triggerId == "Default")
+                    {
+                        if (firstIndexOfTriggerZero == -1) 
+                        {
+                            firstIndexOfTriggerZero = i;
+                        }
+                        lastIndexOfTriggerZero = i; 
+                    }
+                }
+
+                // Trigger "0" 메시지가 있다면, "이미 읽음" 처리
+                if (lastIndexOfTriggerZero > -1)
+                {
+                    progress.conversationSeenIndices[partnerName] = lastIndexOfTriggerZero;
+
+                    if (!progress.daySeparators.ContainsKey(partnerName))
+                    {
+                        progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                    }
+
+                    // 방어 코드
+                    if (!progress.daySeparators[partnerName].ContainsKey(firstIndexOfTriggerZero))
+                    {
+                        progress.daySeparators[partnerName].Add(firstIndexOfTriggerZero, 0);
+                    }
                 }
             }
         }
+        RefreshchatPartnerList();
     }
 
     void Start()
