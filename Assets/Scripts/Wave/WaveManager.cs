@@ -16,21 +16,26 @@ public class WaveManager : MonoBehaviour
     [SerializeField] GameObject waveEffectSkipButton;
 
     [Space(10)]
-    [Header("¹Ù¶÷ È¿°ú °ü·Ã")]
+    [Header("íœ´ëŒ€í° ë°¤/ë‚® ë³€ê²½ íš¨ê³¼ ê´€ë ¨")]
+
+
+
+    [Space(10)]
+    [Header("ë°”ëŒ íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private ParticleSystem[] windEffects;
     [SerializeField] private CinemachineVirtualCamera[] vcams;
     [SerializeField] private float windStrength = 1f;
     [SerializeField] private float windFrequency = 1f;
 
     [Space(10)]
-    [Header("È«¼ö È¿°ú °ü·Ã")]
+    [Header("í™ìˆ˜ íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private GameObject floodEffect;
     [SerializeField] private float floodStartPosX = 0;
     [SerializeField] private float floodEndPosX = 10f;
     [SerializeField] private Ease floodEase = Ease.InOutSine;
 
     [Space(10)]
-    [Header("ÇØÃæ È¿°ú °ü·Ã")]
+    [Header("í•´ì¶© íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private GameObject grassHopper;
     [SerializeField] private GameObject shadow;
     [SerializeField] private GameObject dust;
@@ -40,14 +45,14 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private Ease dustEase = Ease.InOutSine;
 
     [Space(10)]
-    [Header("ÃßÀ§ È¿°ú °ü·Ã")]
+    [Header("ì¶”ìœ„ íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private ParticleSystem snowEffect;
     [SerializeField] private Material[] snowMats;
     [SerializeField] private float snowDuration = 1.5f;
     [SerializeField] private Ease snowEase = Ease.InOutSine;
 
     [Space(10)]
-    [Header("´õÀ§ È¿°ú °ü·Ã")]
+    [Header("ë”ìœ„ íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private Light2D heatLight;
     [SerializeField] private GameObject heatEffect;
     [SerializeField] private SpriteRenderer heatDistortionSprite;
@@ -57,7 +62,7 @@ public class WaveManager : MonoBehaviour
 
 
     [Space(10)]
-    [Header("Æø¿ì È¿°ú °ü·Ã")]
+    [Header("í­ìš° íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private ParticleSystem rainEffect;
     [SerializeField] private GameObject lightningEffect;
     [SerializeField, Range(0f, 1f)] private float lightningDuration = 0.3f;
@@ -66,12 +71,60 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private int lightningCount = 4;
 
     [Space(10)]
-    [Header("°¡¹³ È¿°ú °ü·Ã")]
+    [Header("ê°€ë­„ íš¨ê³¼ ê´€ë ¨")]
     [SerializeField] private GameObject[] grassObjects;
     [SerializeField] private GameObject droughtEffect;
     [SerializeField] private Material grassMat;
     [SerializeField] private float dissolveDuration = 1.5f;
     [SerializeField] private Ease dissolveEase = Ease.InOutSine;
+
+
+    // ================ Day/Night Effects ================
+
+
+    public void StartNight()
+    {
+        StartCoroutine(StartNightCoroutine());
+    }
+
+    public void StopNight()
+    {
+        StartCoroutine(StopNightCoroutine());
+    }
+
+    private IEnumerator StartNightCoroutine()
+    {
+        lcController.UpdateType(LightColorType.Night);
+
+        float elapsed_aging = 0f;
+        while (elapsed_aging < waveDuration)
+        {
+            elapsed_aging += Time.deltaTime;
+            lcController.UpdateType(LightColorType.Night);
+            lcController.time = Mathf.Clamp01(elapsed_aging / waveDuration);
+            yield return null;
+        }
+        lcController.time = 1f; // Ensure it ends exactly at 1
+    }
+
+    private IEnumerator StopNightCoroutine()
+    {
+        lcController.UpdateType(LightColorType.Day);
+
+        float elapsed_aging = 0f;
+        while (elapsed_aging < waveDuration)
+        {
+            elapsed_aging += Time.deltaTime;
+            lcController.UpdateType(LightColorType.Day);
+            lcController.time = Mathf.Clamp01(elapsed_aging / waveDuration);
+            yield return null;
+        }
+        lcController.time = 1f; // Ensure it ends exactly at 1
+    }
+
+
+
+    // ================ Wave Effects ================
 
 
 

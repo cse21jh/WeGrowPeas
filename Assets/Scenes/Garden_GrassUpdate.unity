@@ -1154,7 +1154,8 @@ MonoBehaviour:
   strength: 10
   vibrato: 10
   alarmInterval: 3
-  isAlarmOn: 0
+  isPermanentOn: 0
+  isImpermanentOn: 0
   vibWaves:
   - {fileID: 1998015052}
   - {fileID: 1030595937}
@@ -27932,6 +27933,8 @@ GameObject:
   - component: {fileID: 144341486}
   - component: {fileID: 144341485}
   - component: {fileID: 144341490}
+  - component: {fileID: 144341492}
+  - component: {fileID: 144341491}
   m_Layer: 0
   m_Name: Light 2D - BG (1)
   m_TagString: Untagged
@@ -28183,6 +28186,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &144341491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144341483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key1: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key2: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &144341492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144341483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 1}
+    key2: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key3: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0
@@ -100144,6 +100231,8 @@ GameObject:
   - component: {fileID: 469048172}
   - component: {fileID: 469048171}
   - component: {fileID: 469048176}
+  - component: {fileID: 469048178}
+  - component: {fileID: 469048177}
   m_Layer: 0
   m_Name: Light 2D - GardenBG
   m_TagString: Untagged
@@ -100395,6 +100484,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &469048177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469048169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key1: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key2: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &469048178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469048169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 1}
+    key2: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key3: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0
@@ -212401,6 +212574,8 @@ GameObject:
   - component: {fileID: 954772623}
   - component: {fileID: 954772622}
   - component: {fileID: 954772627}
+  - component: {fileID: 954772629}
+  - component: {fileID: 954772628}
   m_Layer: 0
   m_Name: Light 2D - BG
   m_TagString: Untagged
@@ -212652,6 +212827,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &954772628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954772620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key1: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key2: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &954772629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954772620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 1}
+    key2: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key3: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0
@@ -239769,6 +240028,8 @@ GameObject:
   - component: {fileID: 1075964556}
   - component: {fileID: 1075964555}
   - component: {fileID: 1075964558}
+  - component: {fileID: 1075964560}
+  - component: {fileID: 1075964559}
   m_Layer: 6
   m_Name: Global Light_Outline
   m_TagString: Untagged
@@ -239952,6 +240213,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1075964559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075964553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 1}
+    key1: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 1}
+    key2: {r: 0.5686275, g: 0.6431373, b: 0.7960785, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1075964560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075964553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.56937706, g: 0.64499354, b: 0.79622644, a: 1}
+    key2: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 0}
+    key3: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0
@@ -308398,7 +308743,27 @@ MonoBehaviour:
   - {fileID: 144341485}
   - {fileID: 469048171}
   - {fileID: 1832034426}
-  droughtSetters: []
+  droughtSetters:
+  - {fileID: 1933352892}
+  - {fileID: 1075964558}
+  - {fileID: 954772627}
+  - {fileID: 144341490}
+  - {fileID: 469048176}
+  - {fileID: 1832034431}
+  nightSetters:
+  - {fileID: 1933352894}
+  - {fileID: 1075964560}
+  - {fileID: 954772629}
+  - {fileID: 144341492}
+  - {fileID: 469048178}
+  - {fileID: 1832034433}
+  daySetters:
+  - {fileID: 1933352893}
+  - {fileID: 1075964559}
+  - {fileID: 954772628}
+  - {fileID: 144341491}
+  - {fileID: 469048177}
+  - {fileID: 1832034432}
   currentType: 0
 --- !u!1 &1430565215
 GameObject:
@@ -353309,7 +353674,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 1072018327}
   worldCamera: {fileID: 963194227}
-  shopCanvas: {fileID: 0}
   ghostPrefab: {fileID: 8364664605164439072, guid: 0b93d8a10e93165429c404b4238687f8, type: 3}
   ghostInvalidAlpha: 0.4
   plantLayer:
@@ -379538,6 +379902,8 @@ GameObject:
   - component: {fileID: 1832034427}
   - component: {fileID: 1832034426}
   - component: {fileID: 1832034431}
+  - component: {fileID: 1832034433}
+  - component: {fileID: 1832034432}
   m_Layer: 0
   m_Name: Light 2D - GardenBG (1)
   m_TagString: Untagged
@@ -379789,6 +380155,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1832034432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832034424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key1: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 1}
+    key2: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1832034433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832034424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.49022645, g: 0.41491634, b: 0.8490566, a: 1}
+    key2: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key3: {r: 0.16862746, g: 0.101960786, b: 0.4862745, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0
@@ -399565,6 +400015,8 @@ GameObject:
   - component: {fileID: 1933352890}
   - component: {fileID: 1933352889}
   - component: {fileID: 1933352892}
+  - component: {fileID: 1933352894}
+  - component: {fileID: 1933352893}
   m_Layer: 0
   m_Name: Global Light
   m_TagString: Untagged
@@ -399748,6 +400200,90 @@ MonoBehaviour:
     ctime0: 0
     ctime1: 19661
     ctime2: 45875
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1933352893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933352887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 1}
+    key1: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 1}
+    key2: {r: 0.5686275, g: 0.6431373, b: 0.7960785, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 45875
+    ctime2: 55705
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+--- !u!114 &1933352894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933352887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86fc2af156ebc2499a0bbe0f0737d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.56937706, g: 0.64499354, b: 0.79622644, a: 1}
+    key2: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 0}
+    key3: {r: 0.03137255, g: 0.0627451, b: 0.13333334, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 9830
+    ctime2: 19661
     ctime3: 65535
     ctime4: 0
     ctime5: 0

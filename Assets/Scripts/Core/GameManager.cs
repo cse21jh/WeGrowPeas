@@ -156,6 +156,7 @@ public class GameManager : Singleton<GameManager>
 
     public Grid grid;
     public EnemyController enemyController;
+    public WaveManager waveManager;
     public UpgradeManager upgradeManager;
     public ShopManager shopManager;
     public EconomyManager economyManager;
@@ -272,7 +273,16 @@ public class GameManager : Singleton<GameManager>
 
         GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check
 
+
+        // 여기다가 밤으로 바뀌는 이펙트 추가해야 함
+        waveManager.StartNight();
+
+
+
         yield return StartCoroutine(phoneManager.PhonePhase());
+
+
+        waveManager.StopNight();
         /*
         if (!enemyController.IsLastWaveNone())
             yield return StartCoroutine(upgradeManager.UpgradePhase());            

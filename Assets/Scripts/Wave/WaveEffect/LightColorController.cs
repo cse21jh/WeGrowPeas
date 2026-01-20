@@ -13,7 +13,9 @@ public enum LightColorType
     All,
     Natural,
     Rain,
-    Drought
+    Drought,
+    Night,
+    Day
 }
 
 
@@ -27,6 +29,9 @@ public class LightColorController : MonoBehaviour
     [SerializeField] private LightColorSetter[] naturalSetters;
     [SerializeField] private LightColorSetter[] rainSetters;
     [SerializeField] private LightColorSetter[] droughtSetters;
+
+    [SerializeField] private LightColorSetter[] nightSetters;
+    [SerializeField] private LightColorSetter[] daySetters;
 
     [SerializeField] private LightColorType currentType = LightColorType.All;
 
@@ -81,6 +86,12 @@ public class LightColorController : MonoBehaviour
                 break;
             case LightColorType.Drought:
                 setters = droughtSetters;
+                break;
+            case LightColorType.Night:
+                setters = nightSetters;
+                break;
+            case LightColorType.Day:
+                setters = daySetters;
                 break;
         }
 
