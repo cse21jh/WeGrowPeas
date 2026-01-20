@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -84,6 +84,7 @@ public class PhoneNotificationPanel : MonoBehaviour
 
     private void ShowImmediate(PhoneNotificationData data)
     {
+        SoundManager.Instance.PlayEffect("Alarm");
         if (titleText != null) titleText.text = data.title;
         if (messageText != null) messageText.text = data.message;
         if (root != null) root.SetActive(true);
