@@ -778,9 +778,20 @@ public class Grid : MonoBehaviour
             // 이미 두 부모 선택됨
             SoundManager.Instance.PlayEffect("WrongSelect");
             Debug.Log("이미 두 부모가 모두 선택된 상태");
+            return;
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
+
+        RectTransform canvasRect = breedButton.GetComponentInParent<Canvas>().transform as RectTransform;
+        Vector3 targetWorldPos = new Vector3(1, 0, 0) + clickedObject.transform.position;
+        Vector2 screenPoint = Camera.main.WorldToScreenPoint(targetWorldPos);
+
+        // 캔버스에 설정된 카메라(renderCamera)를 사용해야 함
+        Camera uiCamera = breedButton.GetComponentInParent<Canvas>().worldCamera;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, uiCamera, out Vector2 localPoint);
+        breedButton.GetComponent<RectTransform>().anchoredPosition = localPoint;
     }
 
     public void CheckBreedButtonBeforeDie(GameObject plant)
