@@ -273,6 +273,7 @@ public class TutorialGrid : Grid
             // 이미 두 부모 선택됨
             //SoundManager.Instance.PlayEffect("WrongSelect");
             Debug.Log("이미 두 부모가 모두 선택된 상태");
+            return;
         }
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);

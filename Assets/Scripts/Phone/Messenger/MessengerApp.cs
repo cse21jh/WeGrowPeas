@@ -53,6 +53,8 @@ public class MessengerApp : MonoBehaviour
 
     private Dictionary<string, int> lastMessageDay = new Dictionary<string, int>();
 
+    private bool closedByTabShowingChat = false;
+
     public bool IsDisplayingMessages { get; private set; } = false;
 
     void Awake()
@@ -390,6 +392,7 @@ public class MessengerApp : MonoBehaviour
             scrollRect.verticalNormalizedPosition = 0f;
         }
         IsDisplayingMessages = false;
+        messageDisplayCoroutine = null;
     }
 
     private void CreateMessageBubble(string text)
@@ -587,5 +590,20 @@ public class MessengerApp : MonoBehaviour
 
         // 모든 채팅방을 검사했는데 미진행된 트리거 메시지가 없다면 완료된 것임
         return true;
+    }
+
+    public void CheckCoroutineByTab(bool open)
+    {
+        if (messageDisplayCoroutine != null && !open)
+        {            
+            StopCoroutine(messageDisplayCoroutine);
+            IsDisplayingMessages = false;
+            closedByTabShowingChat = true;
+        }
+        if (closedByTabShowingChat && open)
+        {
+            OpenChatRoom(currentChat);
+            closedByTabShowingChat = false;
+        }
     }
 }

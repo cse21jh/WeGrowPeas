@@ -109,6 +109,7 @@ public class PhoneManager : MonoBehaviour
         _isOpen = open;
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);
+        messengerApp.CheckCoroutineByTab(open);
 
         FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
         //if (open) RefreshTopBar();
