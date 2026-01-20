@@ -33,6 +33,8 @@ public class PhoneManager : MonoBehaviour
     [SerializeField] private List<GameObject> mandatoryAppAlarm;
     [SerializeField] private List<GameObject> nonMandatoryAppAlarm;
 
+    PhoneAlarmEffectController alarm;
+
     [Serializable]
     public class AppEntry
     {
@@ -85,6 +87,8 @@ public class PhoneManager : MonoBehaviour
 
         foreach (AppKey key in Enum.GetValues(typeof(AppKey)))
             appAlarmStates[key] = AlarmState.None;
+
+        alarm = GetComponent<PhoneAlarmEffectController>();
     }
 
     private void Start()
@@ -349,6 +353,7 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
+                alarm.AlarmPermanent();
                 if(GameManager.Instance != null)
                     GameManager.Instance.StopGame();
                 break;
@@ -356,12 +361,14 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
+                alarm.AlarmImpermanent();
                 if (GameManager.Instance != null)
                     GameManager.Instance.ResumeGame();               
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
+                alarm.StopAlarm();
                 if (GameManager.Instance != null)
                     GameManager.Instance.ResumeGame();                
                 Debug.Log("폰 전체: 알람 없음");

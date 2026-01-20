@@ -17,12 +17,16 @@ public class PhoneAlarmEffectController : MonoBehaviour
     [SerializeField] private int vibrato = 10;
     [SerializeField] private float alarmInterval = 1f;
 
+    [SerializeField] private bool isAlarmOn = false;
+
     [Space(10)]
     [Header("Vibration Sprite")]
     [SerializeField] private CanvasGroup[] vibWaves;
     [SerializeField] private float duration = 0.6f;    // 개별 파동이 커지는 시간
     [SerializeField] private float interval = 0.2f;    // 파동 간의 간격 (딜레이)
     [SerializeField] private float maxScale = 1.2f;    // 최대 크기
+    [SerializeField] private Color permanentColor;
+    [SerializeField] private Color periodColor;
 
 
     private void Update()
@@ -40,12 +44,38 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmPermanent()
     {
+        if(isAlarmOn) return;
+        StopAlarm();
+
+        isAlarmOn = true;
+        Debug.Log("Alarm Permanent On");
+
         StartCoroutine(AlarmEffectCoroutine(0));
+        foreach (var wave in vibWaves)
+        {
+            wave.GetComponent<Image>().color = permanentColor;
+        }
     }
 
     public void AlarmImpermanent()
     {
+        if(isAlarmOn) return;
+        StopAlarm();
+
+        isAlarmOn = true;
+
         StartCoroutine(AlarmEffectCoroutine(1));
+        foreach (var wave in vibWaves)
+        {
+            wave.GetComponent<Image>().color = periodColor;
+        }
+    }
+
+    public void StopAlarm()
+    {
+        Debug.Log("Alarm Off");
+        isAlarmOn = false;
+        StopAllCoroutines();
     }
 
     private IEnumerator AlarmEffectCoroutine(int count)
@@ -70,10 +100,16 @@ public class PhoneAlarmEffectController : MonoBehaviour
         {
             StartCoroutine(AlarmEffectCoroutine(count));
         }
+        else
+        {
+            StopAlarm();
+        }
     }
 
     public void PlayVibration(int loopCount)
     {
+        SoundManager.Instance.PlayEffect("Vibration");
+
         // 시퀀스 생성
         Sequence mainSeq = DOTween.Sequence();
 

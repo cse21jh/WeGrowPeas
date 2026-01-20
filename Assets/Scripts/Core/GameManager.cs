@@ -147,7 +147,7 @@ public class ChatDayData
 
 public class GameManager : Singleton<GameManager>
 {
-    [HideInInspector] public int stage = 0;
+    public int stage = 0;
     [HideInInspector] public bool seenFirstGold = false;
     private bool gameOver = false;
     public int requestCycle = 2;
