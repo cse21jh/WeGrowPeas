@@ -1,5 +1,3 @@
-// Assets/Scripts/Shop/Items/ItemData_Adrenaline.cs
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,8 +7,6 @@ public class DNAExtractionItemData : ItemData
 {
     [Header("Effect")]
     [Min(1)] public int copyCount = 3;
-    [Tooltip("���� Ƚ��")]
-    
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
@@ -23,8 +19,9 @@ public class DNAExtractionItemData : ItemData
         FlowType = ShopFlowType.PlaceOnTile;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
+        Rarity = ItemRarity.Common;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "������ �����";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "DNA 추출";
         if (Price <= 0) Price = 1000;
     }
 
@@ -74,10 +71,10 @@ public class DNAExtractionItemData : ItemData
             else if (plant.GetType() == typeof(Peanut))
                 g.AddPeanut(trait);
             else
-                Debug.Log("���� �߸���");
+                Debug.Log("식물 타입 오류");
         }
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} �ߵ�: ������ �����ڸ� ���� ������ �Ĺ��� 3�� �߰��մϴ�");
+        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 선택한 식물의 유전자를 가진 식물을 3개 추가했습니다");
     }
 
     public override void Cancel(ShopContext ctx)
@@ -85,17 +82,16 @@ public class DNAExtractionItemData : ItemData
         selectedIdx = null;
     }
 
-    // === PlaceOnTile �� ===
     public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason)
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid ����"; return false; }
+        if (!g) { reason = "Grid 객체가 없습니다"; return false; }
 
         int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = "����� �ƴմϴ�"; return false; }
+        if (!idx.HasValue) { reason = "유효한 위치가 아닙니다"; return false; }
 
-        if (!g.HasBreedablePlantAt(idx.Value)) { reason = "���� ���� �Ĺ��� �����ϴ�"; return false; }
+        if (!g.HasBreedablePlantAt(idx.Value)) { reason = "교배 가능한 식물이 없습니다"; return false; }
 
         return true;
     }
@@ -106,6 +102,4 @@ public class DNAExtractionItemData : ItemData
         int? idx = g ? g.GetGridIndexFromPosition(worldPos) : null;
         selectedIdx = idx;
     }
-
-
 }

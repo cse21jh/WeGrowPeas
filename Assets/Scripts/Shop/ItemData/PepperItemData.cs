@@ -10,8 +10,9 @@ public class ChiliPepperItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "����";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추";
         if (Price <= 0) Price = 1500;
+        Rarity = ItemRarity.Common;
 
         IsStackable = false;
         InitialStock = 1;
@@ -39,19 +40,18 @@ public class ChiliPepperItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ������ �����ϴ� (ShopContext.Grid ���� �ʿ�)";
+            reason = "Grid 객체가 없습니다 (ShopContext.Grid 필요)";
             return false;
         }
         if (!ctx.Grid.HasEmptyGrid())
         {
-            reason = "��ġ�� �� �ִ� ��ĭ�� �����ϴ�";
+            reason = "배치할 수 있는 빈 칸이 없습니다";
             return false;
         }
         reason = null;
         return true;
     }
 
-    // ��ġ ��� ����: ���� �غ� ����
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
     {
         onReady?.Invoke();
@@ -62,26 +62,23 @@ public class ChiliPepperItemData : ItemData
         reason = null;
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid ������ �����ϴ�";
+            reason = "Grid 객체가 없습니다";
             return false;
         }
 
-        // ��ũ�� ��ǥ �� �׸��� �ε���
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
-            reason = "��ȿ�� ����� �ƴմϴ�";
+            reason = "유효한 위치가 아닙니다";
             return false;
         }
 
-        // �� ĭ���� Ȯ��
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "�̹� �Ĺ��� �ִ� ĭ�Դϴ�";
+            reason = "이미 식물이 있는 칸입니다";
             return false;
         }
 
-        // ���� ������ Ȯ�� �ĺ� ����
         pendingIndex = idx.Value;
         return true;
     }
@@ -91,16 +88,15 @@ public class ChiliPepperItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            ctx?.ShowError?.Invoke("Grid ������ �����ϴ�");
+            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
             return;
         }
         if (!pendingIndex.HasValue)
         {
-            ctx.ShowError?.Invoke("��ġ ��ġ�� ��ȿ���� �ʽ��ϴ�");
+            ctx.ShowError?.Invoke("위치 선택이 유효하지 않습니다");
             return;
         }
 
-        // ���� ��ġ
         ctx.Grid.AddChiliPepper(pendingIndex.Value);
 
         pendingIndex = null;

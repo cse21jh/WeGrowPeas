@@ -5,8 +5,8 @@ using System;
 public class BugSprayItemData : ItemData
 {
     [Header("Effect")]
-    [Range(0f, 1f)] public float reducePercent = 0.5f; // 50% ����
-    [Min(1)] public int durationDays = 6;             // ���� 6�ϰ� (���� �ֱ� ������ Commit���� ������)
+    [Range(0f, 1f)] public float reducePercent = 0.5f;
+    [Min(1)] public int durationDays = 6;
 
     [Header("Rotation")]
     [Min(1)] public int unlockStageDay = 1;
@@ -17,7 +17,8 @@ public class BugSprayItemData : ItemData
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "���� ��������";
+        Rarity = ItemRarity.Common;
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 구제 스프레이";
         if (Price <= 0) Price = 500;
     }
 

@@ -1,4 +1,3 @@
-// Assets/Scripts/Shop/Items/ItemData_Adrenaline.cs
 using UnityEngine;
 using System;
 using System.Linq;
@@ -7,12 +6,12 @@ using System.Linq;
 public class AdrenalineItemData : ItemData
 {
     [Header("Effect")]
-    [Min(1)] public int durationDays = 6;  // ������ �󵵡� ���� �Ÿ� Commit���� ������
-    [Tooltip("���� ���� ��� (0.5 = 2�� ��)")]
-    [Range(0.05f, 2f)] public float spawnIntervalMul = 0.5f; // = 2x frequency
-    [Tooltip("���� �ܰ� �ð� ��� (2 = 2�� ���)")]
+    [Min(1)] public int durationDays = 6;
+    [Tooltip("벌레 스폰 간격 배수 (0.5 = 2배 빠름)")]
+    [Range(0.05f, 2f)] public float spawnIntervalMul = 0.5f;
+    [Tooltip("교배 단계 시간 배수 (2 = 2배 길게)")]
     [Range(0.1f, 5f)] public float breedingDurationMul = 2f;
-    [Tooltip("���� ���� Ƚ�� ��� (2 = 2��)")]
+    [Tooltip("교배 시도 횟수 배수 (2 = 2배)")]
     [Range(1f, 5f)] public float breedingAttemptsMul = 2f;
 
     [Header("Rotation")]
@@ -24,8 +23,9 @@ public class AdrenalineItemData : ItemData
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
+        Rarity = ItemRarity.Legendary;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "�Ƶ巹����";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "아드레날린";
         if (Price <= 0) Price = 10000;
     }
 
@@ -44,17 +44,13 @@ public class AdrenalineItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        // ������ �󵵸� ���� 6�ϡ� �ؼ��� ��Ȯ�� �Ϸ��� �Ʒ�ó�� �ֱ� ������:
         int days = durationDays;
-        // var sm = ShopManager.Instance;
-        // if (sm) days *= Mathf.Max(1, sm.ShopOpenDay);
 
-        // �� ȿ������ ���� ��尡 ������ �Ⱓ ����, ������ ���� �߰�
         ExtendOrAddMod("Adrenaline_Spawn", StatId.BugSpawnIntervalMul, spawnIntervalMul, days);
         ExtendOrAddMod("Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
         ExtendOrAddMod("Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} �ߵ�: {days}�ϰ� ������{(1f / spawnIntervalMul):0.#}, ����ð���{breedingDurationMul:0.#}, ����Ƚ����{breedingAttemptsMul:0.#}");
+        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: {days}일간 벌레{(1f / spawnIntervalMul):0.#}배, 교배시간{breedingDurationMul:0.#}배, 교배횟수{breedingAttemptsMul:0.#}배");
     }
 
     private void ExtendOrAddMod(string sourceTag, StatId stat, float multiplier, int days)
@@ -63,12 +59,10 @@ public class AdrenalineItemData : ItemData
         
         if (existingMod != null)
         {
-            // ���� ��尡 ������ �Ⱓ�� ����
             existingMod.expireDay += days;
         }
         else
         {
-            // ���ο� ��� �߰�
             ModManager.Instance.AddTimedMultiplier(stat, -1, multiplier, days, sourceTag);
         }
     }

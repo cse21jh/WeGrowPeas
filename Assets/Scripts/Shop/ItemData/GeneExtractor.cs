@@ -6,22 +6,22 @@ using System.Collections.Generic;
 public class GeneExtractorItemData : ItemData
 {
     [Header("Rotation")]
-    [Min(1)] public int unlockStageDay = 1; // 1�������� ����
+    [Min(1)] public int unlockStageDay = 1;
     [Min(0)] public int rotationWeight = 8;
 
-    private Plant selected; // ����ڰ� ������ ���� �Ĺ�
+    private Plant selected;
 
     private void OnValidate()
     {
-        FlowType = ShopFlowType.SelectExistingPlant; // �Ĺ� ���� �÷ο�
+        FlowType = ShopFlowType.SelectExistingPlant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
+        Rarity = ItemRarity.Common;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "������ �����";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "유전자 추출기";
         if (Price <= 0) Price = 1000;
     }
 
-    // ���� �����̼� �ĺ� ����/����ġ ����������������������������������������������������������
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         int stage = GameManager.Instance.stage;
@@ -29,34 +29,29 @@ public class GeneExtractorItemData : ItemData
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
 
-    // ���� ���� ���ɿ���(�̸�) ����������������������������������������������������������������������
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid ����"; return false; }
+        if (!g) { reason = "Grid 객체가 없습니다"; return false; }
 
-        // �ּ� 1ĭ �̻� �� ĭ�� �־�� �ǹ� ����
         int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
-        if (empty <= 0) { reason = "�� ĭ�� �����ϴ�"; return false; }
+        if (empty <= 0) { reason = "빈 칸이 없습니다"; return false; }
 
-        // ���� ����� �� �׷絵 ���ٸ� ��� �Ұ�
-        if (g.plantGrid.Count <= 0) { reason = "������ �Ĺ��� �����ϴ�"; return false; }
+        if (g.plantGrid.Count <= 0) { reason = "선택할 수 있는 식물이 없습니다"; return false; }
 
         return true;
     }
 
-    // ���� ���� �÷ο� �� ��������������������������������������������������������������������������������
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
-        // ShopUI�� BeginPlantSelection���� ������ �� �� �� ���⼱ �ٷ� ok
         onReady?.Invoke();
     }
 
     public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
     {
-        if (target == null) { reason = "�Ĺ��� �����ϼ���"; return false; }
+        if (target == null) { reason = "식물을 선택해주세요"; return false; }
         reason = null;
         return true;
     }
@@ -66,12 +61,11 @@ public class GeneExtractorItemData : ItemData
         selected = plant;
     }
 
-    // ���� ����(Ȯ��) ����������������������������������������������������������������������������������������
     public override void Commit(ShopContext ctx)
     {
         if (!selected)
         {
-            ctx.ShowError?.Invoke("���õ� �Ĺ��� �����ϴ�");
+            ctx.ShowError?.Invoke("선택한 식물이 없습니다");
             return;
         }
 
@@ -82,19 +76,15 @@ public class GeneExtractorItemData : ItemData
             return;
         }
 
-        // ���� ���� ���� ����
-        List<GeneticTrait> genes = selected.GetGeneticTrait(); // Plant�� �̹� ����
+        List<GeneticTrait> genes = selected.GetGeneticTrait();
 
-        // ���� ������ �� = min(3, �� ĭ ��)
         int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
-        int toSpawn = Mathf.Clamp(3, 0, empty); // ��ĭ�� 0~2�� �׸�ŭ��
+        int toSpawn = Mathf.Clamp(3, 0, empty);
 
         int spawned = 0;
         for (int i = 0; i < toSpawn; i++)
         {
-            // �������� �Ĺ����� ���� ������ Ȯ���� ������ ���� (Pea/Peanut)
-            // (Nepenthes/ChiliPepper�� SetTrait �帧�� �ٸ� �� �־��)
             if (UnityEngine.Random.Range(0, 2) == 0)
                 g.AddPea(genes);
             else
@@ -104,11 +94,10 @@ public class GeneExtractorItemData : ItemData
         }
 
         if (spawned > 0)
-            ctx.ShowInfo?.Invoke($"{DisplayName}: {spawned}�� ���� �Ϸ�");
+            ctx.ShowInfo?.Invoke($"{DisplayName}: {spawned}개 생성 완료");
         else
-            ctx.ShowError?.Invoke("�� ĭ�� ���� �������� �ʾҽ��ϴ�");
+            ctx.ShowError?.Invoke("빈 칸이 부족하여 생성할 수 없습니다");
 
-        // ����
         selected = null;
     }
 
