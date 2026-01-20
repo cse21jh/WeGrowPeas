@@ -39,10 +39,10 @@ public class UpgradeManager : MonoBehaviour
         //{ typeof(AddPestPeanutUpgrade), () => new AddPestPeanutUpgrade()},
         //{ typeof(AddColdPeanutUpgrade), () => new AddColdPeanutUpgrade()},
         //{ typeof(AddHeavyRainPeanutUpgrade), () => new AddHeavyRainPeanutUpgrade()},
-        //{ typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},  ¶¥ÄáÀÇ ºÎÈ°À» ±â´Ù¸°´Ù..
-        //{ typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},  ¶¥ÄáÀÇ ºÎÈ°À» ±â´Ù¸°´Ù..
-        //{ typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},  ¶¥ÄáÀÇ ºÎÈ°À» ±â´Ù¸°´Ù..
-        // ¾Æ·¡´Â µğ¹ö±ë¿ë 
+        //{ typeof(PeanutCopyUpgrade), () => new PeanutCopyUpgrade()},  ë•…ì½©ì˜ ë¶€í™œì„ ê¸°ë‹¤ë¦°ë‹¤..
+        //{ typeof(PeanutGoldUpgrade), () => new PeanutGoldUpgrade()},  ë•…ì½©ì˜ ë¶€í™œì„ ê¸°ë‹¤ë¦°ë‹¤..
+        //{ typeof(AddBasicPeanutUpgrade), () => new AddBasicPeanutUpgrade()},  ë•…ì½©ì˜ ë¶€í™œì„ ê¸°ë‹¤ë¦°ë‹¤..
+        // ì•„ë˜ëŠ” ë””ë²„ê¹…ìš© 
         //{ typeof(AddNepenthesUpgrade), () => new AddNepenthesUpgrade()},
         //{ typeof(AddChiliPepperUpgrade), () => new AddChiliPepperUpgrade()},
     };
@@ -71,11 +71,13 @@ public class UpgradeManager : MonoBehaviour
 
     
 
-    //ÀúÀå ÇÊ¿ä
+    //ì €ì¥ í•„ìš”
     private Dictionary<Type, int> remainUpgrade = new();
 
     private void Start()
     {
+        if (upgradePanel == null)
+            return;
         upgradeCards = upgradePanel.GetComponentsInChildren<UpgradeCardUI>();
         upgradePanel.SetActive(false);
     }
@@ -92,7 +94,7 @@ public class UpgradeManager : MonoBehaviour
                 remainUpgrade.Add(type, tmp.MaxAmount);
             }
         }
-        // stage ³¡³ª°í ³ª¿Í¾ß ÇÏ´Â ÇÊ¼ö ¾÷±×·¹ÀÌµå
+        // stage ëë‚˜ê³  ë‚˜ì™€ì•¼ í•˜ëŠ” í•„ìˆ˜ ì—…ê·¸ë ˆì´ë“œ
         switch(stage)
         {
             case PestWave.UnlockStage - 3:
@@ -113,7 +115,7 @@ public class UpgradeManager : MonoBehaviour
 
     private void SetRandomUpgrade()
     {
-        // randomUpgrade¿¡ 3°³ ·£´ıÇÏ°Ô ¼³Á¤ÇÏ±â remainUpgrade 0ÀÌ¸é ¾È ³ª¿Àµµ·Ï. rerollÇÏ¸é ÇØ´ç ÇÔ¼ö ÀçÈ£Ãâ?
+        // randomUpgradeì— 3ê°œ ëœë¤í•˜ê²Œ ì„¤ì •í•˜ê¸° remainUpgrade 0ì´ë©´ ì•ˆ ë‚˜ì˜¤ë„ë¡. rerollí•˜ë©´ í•´ë‹¹ í•¨ìˆ˜ ì¬í˜¸ì¶œ?
         List<Type> availableUpgrades = remainUpgrade.Where(kvp => kvp.Value != 0).Select(kvp => kvp.Key).ToList();
         
         for(int i = 0; i<randomUpgrade.Length; i++)
@@ -141,13 +143,13 @@ public class UpgradeManager : MonoBehaviour
         {
             if (randomUpgrade[i] != null)
             {
-                //Debug.Log($"¾÷±×·¹ÀÌµå ½½·Ô {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
+                //Debug.Log($"ì—…ê·¸ë ˆì´ë“œ ìŠ¬ë¡¯ {i+1}: {UpgradeInstance[randomUpgrade[i]]().Name}");
                 Upgrade randUpgrade = UpgradeInstance[randomUpgrade[i]]();
                 upgradeCards[i].Set(randUpgrade, i, this);
             }
             else
             {
-                Debug.Log($"¾÷±×·¹ÀÌµå ½½·Ô {i+1}: °¡´ÉÇÑ ¾÷±×·¹ÀÌµå°¡ ¾ø½À´Ï´Ù");
+                Debug.Log($"ì—…ê·¸ë ˆì´ë“œ ìŠ¬ë¡¯ {i+1}: ê°€ëŠ¥í•œ ì—…ê·¸ë ˆì´ë“œê°€ ì—†ìŠµë‹ˆë‹¤");
             }
         }
 
@@ -158,18 +160,18 @@ public class UpgradeManager : MonoBehaviour
         var tmp = randomUpgrade[idx];
         if (tmp == null)
         { 
-            Debug.Log("¾÷±×·¹ÀÌµå Á¸Àç X");
+            Debug.Log("ì—…ê·¸ë ˆì´ë“œ ì¡´ì¬ X");
             return;
         }
         remainUpgrade[tmp]--;   
-        UpgradeInstance[tmp]().OnSelectAction(); // ½ÇÁ¦ ¾÷±×·¹ÀÌµå ÀÛµ¿. °¢ upgrade¿¡¼­ ¼±¾ğÇØµÒ. 
-        //Debug.Log($"¾÷±×·¹ÀÌµå : {UpgradeInstance[tmp]().Name}");
+        UpgradeInstance[tmp]().OnSelectAction(); // ì‹¤ì œ ì—…ê·¸ë ˆì´ë“œ ì‘ë™. ê° upgradeì—ì„œ ì„ ì–¸í•´ë‘ . 
+        //Debug.Log($"ì—…ê·¸ë ˆì´ë“œ : {UpgradeInstance[tmp]().Name}");
         /*
         if (UpgradeInstance[randomUpgrade[idx]]().UpgradeId <= 6 && UpgradeInstance[randomUpgrade[idx]]().UpgradeId >= 1)
             selectAddPeaOrPeanutButton.SetActive(true);
         else
             select = true;
-        */  // ¶¥ÄáÀÇ ºÎÈ°À» ±â´Ù¸°´Ù... 
+        */  // ë•…ì½©ì˜ ë¶€í™œì„ ê¸°ë‹¤ë¦°ë‹¤... 
         select = true;
         for (int i = 0; i < randomUpgrade.Length; i++)
             randomUpgrade[i] = null;
@@ -180,7 +182,7 @@ public class UpgradeManager : MonoBehaviour
     {
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Upgrade);
 
-        // Debug.Log("¾÷±×·¹ÀÌµå ÆäÀÌÁî ½ÃÀÛ. ¸®·Ñ °¡´É È½¼ö´Â " + maxRerollCount + " ÀÔ´Ï´Ù");
+        // Debug.Log("ì—…ê·¸ë ˆì´ë“œ í˜ì´ì¦ˆ ì‹œì‘. ë¦¬ë¡¤ ê°€ëŠ¥ íšŸìˆ˜ëŠ” " + maxRerollCount + " ì…ë‹ˆë‹¤");
         ClickRouter.Instance.IsBlockedByUI = true;
         curRerollCount = maxRerollCount;
         SetRerollCountUI(curRerollCount);
@@ -196,8 +198,8 @@ public class UpgradeManager : MonoBehaviour
 
         while (!select && (Time.time < endTime))
         {
-            // ÀÓ½Ã·Î 1,2,3 ¹öÆ° ´©¸¦ ½Ã µÇµµ·Ï ¼³Á¤
-            // UI ¶ç¿ö ¼±ÅÃ °¡´ÉÇÏµµ·Ï ¼öÁ¤ ÇÊ¿ä
+            // ì„ì‹œë¡œ 1,2,3 ë²„íŠ¼ ëˆ„ë¥¼ ì‹œ ë˜ë„ë¡ ì„¤ì •
+            // UI ë„ì›Œ ì„ íƒ ê°€ëŠ¥í•˜ë„ë¡ ìˆ˜ì • í•„ìš”
             /*if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 SelectUpgrade(0);
@@ -214,7 +216,7 @@ public class UpgradeManager : MonoBehaviour
                 select = true;
             }*/
 
-            // ÀÓ½Ã ¸®·Ñ ±â´É.
+            // ì„ì‹œ ë¦¬ë¡¤ ê¸°ëŠ¥.
             /*if(Input.GetKeyDown(KeyCode.R) && rerollCount < maxRerollCount)
             {
                 SetRandomUpgrade();
@@ -229,7 +231,7 @@ public class UpgradeManager : MonoBehaviour
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
         FindAnyObjectByType<UIAnimationManager>().ResetShopPanelPosition();
-        //Debug.Log("¾÷±×·¹ÀÌµå ÆäÀÌÁî Á¾·á");
+        //Debug.Log("ì—…ê·¸ë ˆì´ë“œ í˜ì´ì¦ˆ ì¢…ë£Œ");
         upgradePanel.SetActive(false);
         selectAddPeaOrPeanutButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
@@ -262,7 +264,7 @@ public class UpgradeManager : MonoBehaviour
     private void UpgradeTimerUI(float timeRatio)
     {
         upgradeTimeSlider.value = timeRatio;
-        upgradeTimerText.text = Mathf.CeilToInt(upgradeTimer * (1 - timeRatio)).ToString() + "ÃÊ ³²À½...";
+        upgradeTimerText.text = Mathf.CeilToInt(upgradeTimer * (1 - timeRatio)).ToString() + "ì´ˆ ë‚¨ìŒ...";
     }
 
     public Dictionary<Type, int> GetRemainUpgrade()
@@ -285,14 +287,14 @@ public class UpgradeManager : MonoBehaviour
 
             if (tmp.UnlockStage <= saveData.stage)
             {
-                idx = saveData.remainUpgradeId.IndexOf(tmp.UpgradeId); // ÇØ´ç ÀÎµ¦½º°¡ ¾ø´Ù¸é ÀúÀåµÈ °ª¿¡ ¾ø´Â °Í. ¿À·ù
+                idx = saveData.remainUpgradeId.IndexOf(tmp.UpgradeId); // í•´ë‹¹ ì¸ë±ìŠ¤ê°€ ì—†ë‹¤ë©´ ì €ì¥ëœ ê°’ì— ì—†ëŠ” ê²ƒ. ì˜¤ë¥˜
                 if (idx == -1)
                 {
-                    Debug.Log("ÀÌ°Å½¼ ¹ö±×ÀÔ´Ï´Ù");
+                    Debug.Log("ì´ê±°ìŠ¨ ë²„ê·¸ì…ë‹ˆë‹¤");
                     continue;
                 }
 
-                if (remainUpgrade.ContainsKey(type)) // ¸ğÁ¾ÀÇ ÀÌÀ¯·Î (unlockUpgrade¸¦ ¸ÕÀú Çß°Å³ª...) ÀÌ¹Ì remainUpgrade¿¡ °ªÀÌ ÀÖ´Â °æ¿ì ³²Àº ¾÷±×·¹ÀÌµå °³¼ö¸¸ °»½Å
+                if (remainUpgrade.ContainsKey(type)) // ëª¨ì¢…ì˜ ì´ìœ ë¡œ (unlockUpgradeë¥¼ ë¨¼ì € í–ˆê±°ë‚˜...) ì´ë¯¸ remainUpgradeì— ê°’ì´ ìˆëŠ” ê²½ìš° ë‚¨ì€ ì—…ê·¸ë ˆì´ë“œ ê°œìˆ˜ë§Œ ê°±ì‹ 
                 {
                     remainUpgrade[type] = saveData.remainUpgradeCount[idx];
                     continue;
@@ -301,7 +303,7 @@ public class UpgradeManager : MonoBehaviour
             }
         }
 
-        // ÇÊ¼ö ¾÷±×·¹ÀÌµå°¡ ÀÖ´Â °æ¿ì
+        // í•„ìˆ˜ ì—…ê·¸ë ˆì´ë“œê°€ ìˆëŠ” ê²½ìš°
         switch (saveData.stage)
         {
             case PestWave.UnlockStage - 3:
@@ -344,7 +346,7 @@ public class UpgradeManager : MonoBehaviour
     {
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Upgrade);
 
-        Debug.Log("¾÷±×·¹ÀÌµå ÆäÀÌÁî ½ÃÀÛ. ¸®·Ñ °¡´É È½¼ö´Â " + maxRerollCount + " ÀÔ´Ï´Ù");
+        Debug.Log("ì—…ê·¸ë ˆì´ë“œ í˜ì´ì¦ˆ ì‹œì‘. ë¦¬ë¡¤ ê°€ëŠ¥ íšŸìˆ˜ëŠ” " + maxRerollCount + " ì…ë‹ˆë‹¤");
         ClickRouter.Instance.IsBlockedByUI = true;
         curRerollCount = maxRerollCount;
         SetRerollCountUI(curRerollCount);
@@ -370,7 +372,7 @@ public class UpgradeManager : MonoBehaviour
         }
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Normal);
-        Debug.Log("¾÷±×·¹ÀÌµå ÆäÀÌÁî Á¾·á");
+        Debug.Log("ì—…ê·¸ë ˆì´ë“œ í˜ì´ì¦ˆ ì¢…ë£Œ");
         upgradePanel.SetActive(false);
         selectAddPeaOrPeanutButton.SetActive(false);
         ClickRouter.Instance.IsBlockedByUI = false;
