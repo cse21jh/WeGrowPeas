@@ -340,7 +340,9 @@ public class MessengerApp : MonoBehaviour
         {
             ChatMessage message = messagesToShow[i];
             int originalIndex = currentChat.messages.IndexOf(message);
-            int currentDay = GameManager.Instance.stage;
+            int currentDay = 1;
+            if (GameManager.Instance != null)
+                currentDay = GameManager.Instance.stage;
 
             // *** 날짜 변경 감지 및 저장 로직 ***
             if (!lastMessageDay.ContainsKey(partnerName))

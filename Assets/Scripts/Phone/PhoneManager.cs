@@ -348,18 +348,21 @@ public class PhoneManager : MonoBehaviour
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
-                GameManager.Instance.StopGame();
+                if(GameManager.Instance != null)
+                    GameManager.Instance.StopGame();
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
-                GameManager.Instance.ResumeGame();               
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ResumeGame();               
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
-                GameManager.Instance.ResumeGame();                
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ResumeGame();                
                 Debug.Log("폰 전체: 알람 없음");
                 break;
         }
