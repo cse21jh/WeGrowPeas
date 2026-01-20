@@ -34,7 +34,7 @@ public class KillBugRequest : RequestInstance
         if (IsCompleted) return;
 
         currentCount++;
-        Debug.Log("ÇöÀç ¸ñÇ¥·® " + requiredCount + "±îÁö " + currentCount + "Àâ¾Ò½À´Ï´Ù.");
+        Debug.Log("í˜„ìž¬ ëª©í‘œëŸ‰ " + requiredCount + "ê¹Œì§€ " + currentCount + "ìž¡ì•˜ìŠµë‹ˆë‹¤.");
         
         if (currentCount == requiredCount) CompleteOnce();
         else RaiseChanged();
@@ -49,8 +49,8 @@ public class KillBugRequest : RequestInstance
         return difficulty switch
         {
             1 => 10,
-            2 => 20,
-            3 => 30,
+            2 => 15,
+            3 => 20,
             _ => 10,
         };
     }
