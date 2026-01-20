@@ -51,7 +51,6 @@ public class LightColorController : MonoBehaviour
         daySetters.Clear();
 
         setters = GetComponentsInChildren<LightColorSetter>().ToList();
-        Debug.Log($"Found {setters.Count} LightColorSetters");
 
 
         foreach (var setter in setters)

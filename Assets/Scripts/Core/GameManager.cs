@@ -164,6 +164,8 @@ public class GameManager : Singleton<GameManager>
     public RequestManager requestManager;
     public PhoneManager phoneManager;
 
+    [SerializeField] private GlowCanvasController gcController;
+
     [SerializeField] private TextMeshProUGUI textStage;
 
     [SerializeField] private int endStage = 40;
@@ -275,12 +277,14 @@ public class GameManager : Singleton<GameManager>
 
 
         // 여기다가 밤으로 바뀌는 이펙트 추가해야 함
+        gcController.ToggleGlow(true);
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
 
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
 
+        gcController.ToggleGlow(false);
         yield return waveManager.StartCoroutine(waveManager.StopNightCoroutine());
         /*
         if (!enemyController.IsLastWaveNone())

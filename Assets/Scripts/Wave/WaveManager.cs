@@ -92,7 +92,6 @@ public class WaveManager : MonoBehaviour
         while (elapsed_night < waveDuration)
         {
             elapsed_night += Time.deltaTime;
-            Debug.Log($"Elapsed Night Time: {elapsed_night}");
             lcController.UpdateType(LightColorType.Night);
             lcController.time = Mathf.Clamp01(elapsed_night / waveDuration);
             yield return null;
@@ -109,7 +108,6 @@ public class WaveManager : MonoBehaviour
         while (elapsed_day < waveDuration)
         {
             elapsed_day += Time.deltaTime;
-            Debug.Log($"Elapsed Day Time: {elapsed_day}");
             lcController.UpdateType(LightColorType.Day);
             lcController.time = Mathf.Clamp01(elapsed_day / waveDuration);
             yield return null;
