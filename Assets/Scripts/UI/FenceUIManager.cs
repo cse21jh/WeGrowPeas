@@ -43,7 +43,7 @@ public class FenceUIManager : MonoBehaviour
         HideFenceElements();
     }
 
-    #region Åä±Û ±â´É °ü·Ã
+    #region í† ê¸€ ê¸°ëŠ¥ ê´€ë ¨
     private void SaveData(int plantIndex, Plant plant)
     {
         if(savedPlant != null)
@@ -116,21 +116,23 @@ public class FenceUIManager : MonoBehaviour
         FindAnyObjectByType<PriceSignController>().ShowTaste(taste);
 
         int tmp = 0;
-        //ÀÌÁ¦ ¿©±â¼­ Taste °ü¸® ¾È ÇÔ
+        //ì´ì œ ì—¬ê¸°ì„œ Taste ê´€ë¦¬ ì•ˆ í•¨
+        List<TraitType> types = new List<TraitType> {TraitType.NaturalDeath, TraitType.Pest, TraitType.Wind, TraitType.Flood, TraitType.HeavyRain, TraitType.Cold };
         for (int i = 0; i < Traits.Count; i++)
         {
             if ((int)Traits[i].traitType >= (int)TraitType.Drought)
             {
                 break;
             }
-            bool isTasteActive = i < taste;
-            fenceElements[i].SetElement(plantIndex, Traits[i], isTasteActive, plant);
+            bool isTasteActive = (int)Traits[i].traitType < taste;
+            fenceElements[(int)Traits[i].traitType].SetElement(plantIndex, Traits[i], isTasteActive, plant);
             tmp++;
+            types.Remove(Traits[i].traitType);
         }
 
-        for(int i = tmp; i < fenceElements.Length; i++)
+        foreach(var i in types)        
         {
-            bool isTasteActive = i < taste;
+            bool isTasteActive = (int)i < taste;
             GeneticTrait defaultTrait = new GeneticTrait
             {
                 traitType = TraitType.None,
@@ -138,7 +140,7 @@ public class FenceUIManager : MonoBehaviour
                 additionalResistance = 0f,
                 genetics = 0
             };
-            fenceElements[i].SetElement(plantIndex, defaultTrait, isTasteActive, plant);
+            fenceElements[(int)i].SetElement(plantIndex, defaultTrait, isTasteActive, plant);
         }
     }
 
@@ -210,22 +212,28 @@ public class FenceUIManager : MonoBehaviour
         switch (wave.WaveType)
         {
             case WaveType.Aging:
-                fenceElements[0].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.Aging].SetLightActive(true, wave.WaveType);
                 break;
             case WaveType.Wind:
-                fenceElements[1].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.Wind].SetLightActive(true, wave.WaveType);
                 break;
             case WaveType.Flood:
-                fenceElements[2].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.Flood].SetLightActive(true, wave.WaveType);
                 break;
             case WaveType.Pest:
-                fenceElements[3].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.Pest].SetLightActive(true, wave.WaveType);
                 break;
             case WaveType.Cold:
-                fenceElements[4].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.Cold].SetLightActive(true, wave.WaveType);
                 break;
             case WaveType.HeavyRain:
-                fenceElements[5].SetLightActive(true, wave.WaveType);
+                fenceElements[(int)WaveType.HeavyRain].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Drought:
+                fenceElements[(int)WaveType.Drought - 2].SetLightActive(true, wave.WaveType);
+                break;
+            case WaveType.Heat:
+                fenceElements[(int)WaveType.Heat - 2].SetLightActive(true, wave.WaveType);
                 break;
             default:
                 break;

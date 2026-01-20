@@ -5,23 +5,23 @@ using System.Collections;
 
 public class FenceElementController : MonoBehaviour
 {
-    [Header("ÇöÀç ¿şÀÌºê Å¸ÀÔ")]
-    [SerializeField] private bool isWaveResistance = false; // ¿şÀÌºê ÀúÇ× ¿©ºÎ
-    [SerializeField] private WaveType currentWaveType = WaveType.None; // ÇöÀç ¿şÀÌºê Å¸ÀÔ
-    [SerializeField] private GameObject highlight; // ºû³ª´Â È¿°ú
-    [SerializeField] private bool LightActive = false; // ¿ÏµÎÄá ºû³ª´Â È¿°ú È°¼ºÈ­ ¿©ºÎ
+    [Header("í˜„ì¬ ì›¨ì´ë¸Œ íƒ€ì…")]
+    [SerializeField] private bool isWaveResistance = false; // ì›¨ì´ë¸Œ ì €í•­ ì—¬ë¶€
+    [SerializeField] private WaveType currentWaveType = WaveType.None; // í˜„ì¬ ì›¨ì´ë¸Œ íƒ€ì…
+    [SerializeField] private GameObject highlight; // ë¹›ë‚˜ëŠ” íš¨ê³¼
+    [SerializeField] private bool LightActive = false; // ì™„ë‘ì½© ë¹›ë‚˜ëŠ” íš¨ê³¼ í™œì„±í™” ì—¬ë¶€
 
-    [Header("¿ÏµÎÄá ¸ğ½À °ü·Ã")]
+    [Header("ì™„ë‘ì½© ëª¨ìŠµ ê´€ë ¨")]
     [SerializeField] private GameObject[] peas;
     [SerializeField] private string[] peaNames;
 
     [Space(10)]
-    [Header("¶¥Äá ¸ğ½À °ü·Ã")]
+    [Header("ë•…ì½© ëª¨ìŠµ ê´€ë ¨")]
     [SerializeField] private GameObject[] peanuts;
     [SerializeField] private string[] peanutNames;
 
     [Space(10)]
-    [Header("UI ¿ä¼Òµé")]
+    [Header("UI ìš”ì†Œë“¤")]
     [SerializeField] private TextMeshProUGUI elementName;
     [SerializeField] private TextMeshProUGUI surviveProbability;
     [SerializeField] private Image[] dnaImages;
@@ -36,7 +36,7 @@ public class FenceElementController : MonoBehaviour
     public void SetLightActive(bool isActive, WaveType type)
     {
         LightActive = isActive;
-        currentWaveType = type;
+        currentWaveType = (type == WaveType.Drought || type == WaveType.Heat) ? (WaveType)((int)type - 2) : type;
     }
 
 
@@ -46,7 +46,7 @@ public class FenceElementController : MonoBehaviour
         float surviveProb = plant.GetResistanceValue((int)trait.traitType);
         int dnaIndex = (int)trait.genetics;
 
-        //ÃÊ±âÈ­
+        //ì´ˆê¸°í™”
         foreach (GameObject pea in peas)
         {
             pea.SetActive(false);
@@ -57,7 +57,7 @@ public class FenceElementController : MonoBehaviour
         }
 
         isWaveResistance = false;
-        //¿ÏµÎÄá ¹× ¶¥Äá ¼³Á¤
+        //ì™„ë‘ì½© ë° ë•…ì½© ì„¤ì •
         if (plantIndex == 0)
         {
             switch (trait.traitType)
@@ -111,9 +111,9 @@ public class FenceElementController : MonoBehaviour
                     }
                     break;
                 default:
-                    peas[0].SetActive(true); // ±âº» ¿ÏµÎÄá
+                    peas[0].SetActive(true); // ê¸°ë³¸ ì™„ë‘ì½©
                     elementName.text = peaNames[0];
-                    isWaveResistance = false; // ÇöÀç Ç¥½Ã ÁßÀÎ ¿ÏµÎÄáÀÌ ¿şÀÌºê ÀúÇ×ÀÌ ¾ø´Ù¸é(±âº» ¿ÏµÎÄáÀÌ¶ó¸é) false·Î ¼³Á¤
+                    isWaveResistance = false; // í˜„ì¬ í‘œì‹œ ì¤‘ì¸ ì™„ë‘ì½©ì´ ì›¨ì´ë¸Œ ì €í•­ì´ ì—†ë‹¤ë©´(ê¸°ë³¸ ì™„ë‘ì½©ì´ë¼ë©´) falseë¡œ ì„¤ì •
                     break;
             }
         }
@@ -146,22 +146,22 @@ public class FenceElementController : MonoBehaviour
                     elementName.text = peanutNames[6];
                     break;
                 default:
-                    peanuts[0].SetActive(true); // ±âº» ¶¥Äá
+                    peanuts[0].SetActive(true); // ê¸°ë³¸ ë•…ì½©
                     elementName.text = peanutNames[0];
-                    isWaveResistance = false; // ÇöÀç Ç¥½Ã ÁßÀÎ ¶¥ÄáÀÌ ¿şÀÌºê ÀúÇ×ÀÌ ¾ø´Ù¸é(±âº» ¶¥ÄáÀÌ¶ó¸é) false·Î ¼³Á¤
+                    isWaveResistance = false; // í˜„ì¬ í‘œì‹œ ì¤‘ì¸ ë•…ì½©ì´ ì›¨ì´ë¸Œ ì €í•­ì´ ì—†ë‹¤ë©´(ê¸°ë³¸ ë•…ì½©ì´ë¼ë©´) falseë¡œ ì„¤ì •
                     break;
             }
         }
 
         if (isWaveResistance)
         {
-            // ¿şÀÌºê ÀúÇ×ÀÌ ÀÖ´Â °æ¿ì
-            highlight.SetActive(LightActive);   // È¿°ú È°¼ºÈ­ ¿©ºÎ¿¡ µû¶ó ¼³Á¤
+            // ì›¨ì´ë¸Œ ì €í•­ì´ ìˆëŠ” ê²½ìš°
+            highlight.SetActive(LightActive);   // íš¨ê³¼ í™œì„±í™” ì—¬ë¶€ì— ë”°ë¼ ì„¤ì •
         }
         else
         {
-            // ¿şÀÌºê ÀúÇ×ÀÌ ¾ø´Â °æ¿ì
-            highlight.SetActive(false);         // ºû³ª´Â È¿°ú ºñÈ°¼ºÈ­
+            // ì›¨ì´ë¸Œ ì €í•­ì´ ì—†ëŠ” ê²½ìš°
+            highlight.SetActive(false);         // ë¹›ë‚˜ëŠ” íš¨ê³¼ ë¹„í™œì„±í™”
         }
 
 

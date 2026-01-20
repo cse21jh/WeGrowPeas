@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevelPhysics;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -135,6 +136,10 @@ public abstract class Plant : MonoBehaviour
     public void SetGridIndex(int idx)
     {
         gridIndex = idx;
+        if(isOnGoldenSoil())
+        {
+            stemController.SetGold(true);
+        }
     }
 
     public bool CanResist(WaveType wave) // if can't resist, Call Die()
@@ -153,7 +158,7 @@ public abstract class Plant : MonoBehaviour
     public virtual float GetResistanceValue(int traitNum) // (int)waveType 혹은 (int)traitType으로 가능
     {
         // 황금 비료에 심어진 식물은 모든 저항력 90%
-        if (grid != null && grid.HasGoldSoil(gridIndex))
+        if (grid != null && isOnGoldenSoil())
         {
             return 0.9f;
         }
@@ -609,5 +614,10 @@ public abstract class Plant : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    public bool isOnGoldenSoil()
+    {
+        return grid.HasGoldSoil(gridIndex);
     }
 }
