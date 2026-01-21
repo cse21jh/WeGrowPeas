@@ -68,7 +68,7 @@ public class MessageController : MonoBehaviour
     public void AddDay(int stage)
     {
         currentPeaMessage = Instantiate(timePrefab, chatContent);
-        currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText("--------------" + stage.ToString() + "일차--------------");
+        currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText("---------- " + stage.ToString() + " 일차 ----------");
         FindAnyObjectByType<AutoScroll>().OnNewMessage();
     }
 
