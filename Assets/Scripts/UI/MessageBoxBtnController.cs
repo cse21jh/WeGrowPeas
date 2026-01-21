@@ -7,7 +7,7 @@ public class MessageBoxBtnController : MonoBehaviour
 
     public void OnClicked()
     {
-        FindAnyObjectByType<TutorialManager>().OnMessageBoxClicked();
+        FindAnyObjectByType<TutorialManager>()?.OnMessageBoxClicked();
         SoundManager.Instance.PlayEffect("Button");
     }
 
