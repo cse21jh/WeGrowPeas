@@ -232,7 +232,9 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public float GetMaxPhoneTimer()
     {
-        return GameManager.Instance.grid.GetMaxBreedTimer();
+        if(GameManager.Instance != null)
+            return GameManager.Instance.grid.GetMaxBreedTimer();
+        return 30f;
     }
 
     public void SkipPhoneTime()
@@ -446,7 +448,7 @@ public class PhoneManager : Singleton<PhoneManager>
         SetPhoneTimer();
 
         skipPhoneTimeButton.SetActive(true);
-        phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+        phoneTimer = GetMaxPhoneTimer();
         phoneTimerUI.StartPhoneTimer();
 
         isPhoneTime = true;
