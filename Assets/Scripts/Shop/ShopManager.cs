@@ -22,6 +22,9 @@ public class ShopManager : Singleton<ShopManager>
     private int dailyRerollCount = 0;
     public int DailyRerollCount => dailyRerollCount;
 
+    // 게임별 고유 시드 (게임마다 다르게 생성, 저장/불러오기 시 유지)
+    private int gameUniqueSeed = -1;
+    
     // 날짜별 시드 관리 (날짜 -> 시드 매핑)
     private Dictionary<int, int> shopSeeds = new Dictionary<int, int>();
     
@@ -134,17 +137,36 @@ public class ShopManager : Singleton<ShopManager>
     }
 
     /// <summary>
+    /// 게임 고유 시드를 초기화합니다. 새 게임일 때만 호출됩니다.
+    /// </summary>
+    public void InitializeGameSeed()
+    {
+        if (gameUniqueSeed == -1)
+        {
+            // 새 게임 시작 시 랜덤 시드 생성
+            gameUniqueSeed = UnityEngine.Random.Range(0, int.MaxValue);
+            Debug.Log($"[ShopManager] 새 게임 고유 시드 생성: {gameUniqueSeed}");
+        }
+    }
+
+    /// <summary>
     /// 현재 날짜의 상점 시드를 가져옵니다. 없으면 생성합니다.
     /// </summary>
     private int GetShopSeed(int day)
     {
+        // 게임 고유 시드가 없으면 초기화
+        if (gameUniqueSeed == -1)
+        {
+            InitializeGameSeed();
+        }
+
         // 날짜와 리롤 횟수를 조합하여 고유한 키 생성
         int seedKey = day * 1000 + currentRerollCount;
         
         if (!shopSeeds.ContainsKey(seedKey))
         {
-            // 새로운 시드 생성 (날짜 기반으로 deterministic하게)
-            int baseSeed = day * 12345 + currentRerollCount * 67890;
+            // 새로운 시드 생성 (게임 고유 시드 + 날짜 기반으로 deterministic하게)
+            int baseSeed = gameUniqueSeed + day * 12345 + currentRerollCount * 67890;
             shopSeeds[seedKey] = baseSeed;
         }
         
@@ -220,6 +242,18 @@ public class ShopManager : Singleton<ShopManager>
             purchaseHistory[key] = saveData.itemPurchaseCount[i];
         }
 
+        // 게임 고유 시드 로드
+        gameUniqueSeed = saveData.gameUniqueShopSeed;
+        if (gameUniqueSeed == -1)
+        {
+            // 저장 데이터에 시드가 없으면 새로 생성 (이전 버전 호환성)
+            InitializeGameSeed();
+        }
+        else
+        {
+            Debug.Log($"[ShopManager] 게임 고유 시드 로드: {gameUniqueSeed}");
+        }
+
         // 시드 로드
         shopSeeds.Clear();
         if (saveData.shopSeedDays != null && saveData.shopSeeds != null)
@@ -251,5 +285,18 @@ public class ShopManager : Singleton<ShopManager>
     public Dictionary<int, int> GetShopSeeds()
     {
         return shopSeeds;
+    }
+
+    /// <summary>
+    /// 게임 고유 시드를 반환합니다.
+    /// </summary>
+    public int GetGameUniqueSeed()
+    {
+        // 시드가 없으면 초기화
+        if (gameUniqueSeed == -1)
+        {
+            InitializeGameSeed();
+        }
+        return gameUniqueSeed;
     }
 }

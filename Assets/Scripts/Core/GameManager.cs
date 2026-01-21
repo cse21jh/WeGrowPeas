@@ -99,6 +99,7 @@ public class SaveData
     public List<int> itemPurchaseCount = new();
     public List<int> shopSeedDays = new(); // 날짜 리스트
     public List<int> shopSeeds = new(); // 해당 날짜의 시드 리스트 (인덱스 매칭)
+    public int gameUniqueShopSeed = -1; // 게임별 고유 시드 (게임마다 다르게 생성, 저장/불러오기 시 유지)
 
     //ModManager
     public List<Mod> mods = new();
@@ -186,6 +187,7 @@ public class GameManager : Singleton<GameManager>
                 Debug.Log("새 게임");
                 grid.InitGrid();
                 economyManager.InitEconomyManager();
+                shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화
                 PlayerRecordForGraph.ClearAll();
                 StageUpdate();
                 break;
@@ -522,6 +524,8 @@ public class GameManager : Singleton<GameManager>
             saveData.shopSeedDays.Add(kvp.Key);
             saveData.shopSeeds.Add(kvp.Value);
         }
+        // 게임 고유 시드 저장
+        saveData.gameUniqueShopSeed = shopManager.GetGameUniqueSeed();
 
         //modManager
         saveData.mods = modManager.Mods;
