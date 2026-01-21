@@ -649,7 +649,12 @@ public class TraitSelectionUIController : MonoBehaviour
         if (btn == null) return;
 
         var colors = btn.colors;
-        colors.normalColor = isSelected ? Color.green : Color.white;
+        Color targetColor = isSelected ? Color.green : Color.white;
+        colors.normalColor = targetColor;
+        colors.highlightedColor = targetColor;
+        colors.pressedColor = targetColor;
+        colors.selectedColor = targetColor;
+        colors.disabledColor = targetColor;
         btn.colors = colors;
     }
 
