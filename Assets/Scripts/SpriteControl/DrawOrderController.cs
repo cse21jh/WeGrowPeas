@@ -6,9 +6,18 @@ public class DrawOrderController : MonoBehaviour
     [SerializeField] protected float drawOrderOffset = 0f;
     [SerializeField] protected float YOffset = 0f;
 
+    [SerializeField] private bool isRandomRotateOn = false;
+    [SerializeField] private float randomRotateRange = 10f;
+
     virtual protected void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if(isRandomRotateOn)
+        {
+            float rand = Random.Range(-randomRotateRange, randomRotateRange);
+            transform.Rotate(0f, 0f, rand);
+        }
     }
 
     protected void Start()

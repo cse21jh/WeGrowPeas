@@ -63,6 +63,11 @@ public class EnemyController : MonoBehaviour
 
 
     private Season currentSeason = Season.Spring; // 세이브데이터에서 불러와야함
+    [SerializeField] private SeasonManager seasonManager;
+
+
+
+
 
     private Wave lastWave;
     private Wave currentWave;
@@ -258,6 +263,8 @@ public class EnemyController : MonoBehaviour
                 break;
         }
         currentSeason = season;
+
+        seasonManager.ChangeToSeason(season);
     }
 
     public void WaveSkip()
