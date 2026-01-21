@@ -362,14 +362,7 @@ public class PhoneManager : Singleton<PhoneManager>
     }
 
     private void ApplyPhoneAlarmUI()
-    {
-        // 핸드폰이 닫혀있으면 알람 UI를 표시하지 않음
-        if (!_isOpen)
-        {
-            mandatoryAlarm.SetActive(false);
-            nonMandatoryAlarm.SetActive(false);
-            return;
-        }
+    {        
         // 폰 외부 버튼이나 전체 루트 UI에 알람 수위 적용
         switch (TotalPhoneAlarmState)
         {
