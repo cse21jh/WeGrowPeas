@@ -74,7 +74,7 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private TimerUI phoneTimerUI;
     [SerializeField] TextMeshProUGUI phoneTimerText;
     [SerializeField] public bool isTutorial = false;
-
+    [SerializeField] public bool isTutorialEnd = false;
 
     private void Awake()
     {
@@ -108,6 +108,8 @@ public class PhoneManager : Singleton<PhoneManager>
     public void SetOpen(bool open)
     {
         PhoneTouchEffect();
+        if (isTutorial && isTutorialEnd)
+            return;
         _isOpen = open;
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);

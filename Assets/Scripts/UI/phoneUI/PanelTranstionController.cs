@@ -74,6 +74,8 @@ public class PanelTranstionController : MonoBehaviour
         PhoneManager.Instance.PhoneTouchEffect();
         if (index == 0)
         {
+            if (PhoneManager.Instance.isTutorial && PhoneManager.Instance.isTutorialEnd)
+                return;
             PhoneManager.Instance.messengerApp.CheckCoroutineByTab(false);
             for (int i = 1; i < panels.Length; i++)
             {

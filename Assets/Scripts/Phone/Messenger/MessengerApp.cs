@@ -193,6 +193,9 @@ public class MessengerApp : MonoBehaviour
 
     public void OpenchatPartnerList()
     {
+        if (PhoneManager.Instance.isTutorial && PhoneManager.Instance.isTutorialEnd)
+            return;
+
         if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
         IsDisplayingMessages = false;
 

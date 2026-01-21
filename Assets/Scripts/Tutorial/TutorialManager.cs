@@ -173,7 +173,8 @@ public class TutorialManager : Singleton<TutorialManager>
                 );
                 break;
             case 7: // 이제 실전으로 끝
-                yield return new WaitForSeconds(1f);
+                //yield return new WaitForSeconds(1f);
+                PhoneManager.Instance.isTutorialEnd = true;
                 mc.AddMessage(MessageController.MessageSenderType.player, "완두콩 키우러 가자! 클릭!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
                 break;
         }
