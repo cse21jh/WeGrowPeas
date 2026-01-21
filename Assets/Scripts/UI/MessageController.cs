@@ -38,7 +38,7 @@ public class MessageController : MonoBehaviour
             currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText(messageContent);
         }
 
-        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+        FindAnyObjectByType<AutoScroll>()?.OnNewMessage();
     }
 
     public void AddTypingMessage(float time)
@@ -50,7 +50,7 @@ public class MessageController : MonoBehaviour
     {
         typingMessage = Instantiate(messagePrefab, chatContent);
         typingMessage.GetComponent<MessageBoxBtnController>().SetText("...");
-        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+        FindAnyObjectByType<AutoScroll>()?.OnNewMessage();
         yield return new WaitForSeconds(time);
         Destroy(typingMessage);
         typingMessage = null;
@@ -69,12 +69,12 @@ public class MessageController : MonoBehaviour
     {
         currentPeaMessage = Instantiate(timePrefab, chatContent);
         currentPeaMessage.GetComponent<MessageBoxBtnController>().SetText("---------- " + stage.ToString() + " 일차 ----------");
-        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+        FindAnyObjectByType<AutoScroll>()?.OnNewMessage();
     }
 
     public void AddNewChatSeperator()
     {
         currentPeaMessage = Instantiate(recentPrefab, chatContent);
-        FindAnyObjectByType<AutoScroll>().OnNewMessage();
+        FindAnyObjectByType<AutoScroll>()?.OnNewMessage();
     }
 }
