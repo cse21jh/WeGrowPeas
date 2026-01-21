@@ -66,6 +66,7 @@ public class PanelTranstionController : MonoBehaviour
         lastActiveIndex = currentActiveIndex;
         currentActiveIndex = index;
 
+        PhoneManager.Instance.PhoneTouchEffect();
         if (index == 0)
         {
             PhoneManager.Instance.messengerApp.CheckCoroutineByTab(false);

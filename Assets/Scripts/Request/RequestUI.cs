@@ -30,6 +30,7 @@ public class RequestUI : MonoBehaviour
 
     public void OnClickShowPopup()
     {
+        PhoneManager.Instance.PhoneTouchEffect();
         popupParent.gameObject.SetActive(true);
         popupParent.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
         popupParent.GetComponent<QuestPopupController>().SetItemInfo(this);

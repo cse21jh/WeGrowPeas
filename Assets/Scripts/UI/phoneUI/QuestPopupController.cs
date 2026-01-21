@@ -33,6 +33,7 @@ public class QuestPopupController : MonoBehaviour
         {
             closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(() => request.OnClickHidePopup());
+            closeButton.onClick.AddListener(() => PhoneManager.Instance.PhoneTouchEffect());
         }
     }
 
