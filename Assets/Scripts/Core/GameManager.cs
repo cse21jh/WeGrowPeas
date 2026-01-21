@@ -239,11 +239,11 @@ public class GameManager : Singleton<GameManager>
         enemyController.UnlockWave(stage);
         upgradeManager.UnlockUpgrade(stage);
         
-        // 매일 상점 자동 리롤
-        var shopUI = FindAnyObjectByType<ShopUI>();
-        if (shopUI != null)
+        // 매일 상점 자동 리롤 (비활성화된 오브젝트도 포함해서 찾기)
+        var shopUIs = FindObjectsOfType<ShopUI>(true);
+        if (shopUIs != null && shopUIs.Length > 0)
         {
-            shopUI.DailyReroll();
+            shopUIs[0].DailyReroll();
         }
     }
 
