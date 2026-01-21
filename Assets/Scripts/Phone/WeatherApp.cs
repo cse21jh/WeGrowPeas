@@ -21,6 +21,7 @@ public class WeatherApp : MonoBehaviour
     [SerializeField] private Image waveImage;
     [SerializeField] private Color[] waveColors; // 웨이브 타입별 색상 배열
 
+    [SerializeField] private Sprite[] waveIcons;
 
     public void LoadNextDay(int stage, Wave lastWave, Wave currentWave, int lastDangerousPlantCount, int currentDangerousPlantCount, int dieCount)
     {
@@ -43,7 +44,7 @@ public class WeatherApp : MonoBehaviour
             stageText.text = stage.ToString() + "일차";
             waveText.text = wave.WaveName + " 웨이브가 지나갈 예정입니다.";
             dangerousPlantText.text = wave.WaveName + " 저항이 없는 식물 " + dangerousPlantCount.ToString() + "개";
-            // 웨이브 이미지 삽입 필요
+            waveImage.sprite = waveIcons[(int)wave.WaveType]; 
 
             currentWavePanel.color = waveColors[(int)wave.WaveType];
         }
@@ -61,6 +62,7 @@ public class WeatherApp : MonoBehaviour
         TMP_Text waveText = newPastWeather.transform.Find("Wave").GetComponent<TMP_Text>();
         TMP_Text dangerousPlantText = newPastWeather.transform.Find("DangerousPlant").GetComponent<TMP_Text>();
         Image waveImage = newPastWeather.transform.Find("WaveImage").GetComponent<Image>();
+        Image wavePanel = newPastWeather.transform.GetComponent<Image>();
 
         if (wave.WaveType == WaveType.None)
         {
@@ -74,7 +76,7 @@ public class WeatherApp : MonoBehaviour
             stageText.text = "안전재난경보 - " + stage.ToString() + "일차";
             waveText.text = wave.WaveName + "가 지나갔습니다!";
             dangerousPlantText.text = "저항이 없던 식물 " + dangerousPlantCount.ToString() + "개";
-            // 웨이브 이미지 삽입 필요
+            waveImage.sprite = waveIcons[(int)wave.WaveType];
         }
     }
 
@@ -92,9 +94,10 @@ public class WeatherApp : MonoBehaviour
         TMP_Text stageText = newPastWeather.transform.Find("Stage").GetComponent<TMP_Text>();
         TMP_Text waveText = newPastWeather.transform.Find("Wave").GetComponent<TMP_Text>();
         Image waveImage = newPastWeather.transform.Find("WaveImage").GetComponent<Image>();
+        Image wavePanel = newPastWeather.transform.GetComponent<Image>();
 
         stageText.text = "안전재난경보 - " + stage.ToString() + "일차";
         waveText.text = wave.WaveName + "로 " + dieCount.ToString() + "개의 식물이 \n시들었습니다";
-        // 웨이브 이미지 삽입 필요
+        waveImage.sprite = waveIcons[(int)wave.WaveType];
     }
 }
