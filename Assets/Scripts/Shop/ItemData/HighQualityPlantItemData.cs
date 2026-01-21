@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "Shop/Items/High Quality Plant (고품질 식물 추가)", fileName = "HighQualityPlantItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/High Quality Plant (고품질 완두콩)", fileName = "HighQualityPlantItemData")]
 public class HighQualityPlantItemData : ItemData
 {
     [Header("Rotation")]
@@ -12,7 +12,7 @@ public class HighQualityPlantItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고품질 식물 추가";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고품질 완두콩";
         if (string.IsNullOrEmpty(Description)) Description = "선택한 웨이브에 강한 완두콩을 1개 추가합니다.";
         if (Price <= 0) Price = 1500;
         Rarity = ItemRarity.Rare; // 희귀 등급

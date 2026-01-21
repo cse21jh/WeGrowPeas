@@ -1,16 +1,16 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Weak Genetics Resistance Upgrade (약한 유전자 생존력 개선)", fileName = "WeakGeneticsResistanceUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Weak Genetics Resistance Upgrade (약자생존)", fileName = "WeakGeneticsResistanceUpgradeItemData")]
 public class WeakGeneticsResistanceUpgradeItemData : ItemData
 {
     [Header("Effect")]
     [SerializeField] private float resistanceBonus = 0.05f; // 5% 증가
 
-    private string purchaseKey = "약한 유전자 생존력 개선";
+    private string purchaseKey = "약자생존";
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "약한 유전자 생존력 개선";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "약자생존";
         if (string.IsNullOrEmpty(Description)) Description = "강하지 않은 웨이브에 대한 완두콩의 저항력을 증가시킵니다.";
         if (Price <= 0) Price = 1000;
         Rarity = ItemRarity.Common; // 일반 등급

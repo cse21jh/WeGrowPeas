@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/DNA Extraction (DNA 추출)", fileName = "DNAExtractionItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/DNA Extraction (유전자 추출기)", fileName = "DNAExtractionItemData")]
 public class DNAExtractionItemData : ItemData
 {
     [Header("Effect")]
@@ -21,7 +21,7 @@ public class DNAExtractionItemData : ItemData
         OnePerShopIfNotStackable = true;
         Rarity = ItemRarity.Common;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "DNA 추출";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "유전자 추출기";
         if (Price <= 0) Price = 1000;
     }
 

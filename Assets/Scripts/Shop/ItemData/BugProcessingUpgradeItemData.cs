@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Bug Processing Upgrade (벌레 가공 기술 향상)", fileName = "BugProcessingUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Bug Processing Upgrade (벌레 가공 기계)", fileName = "BugProcessingUpgradeItemData")]
 public class BugProcessingUpgradeItemData : ItemData
 {
     [Header("Effect")]
@@ -11,7 +11,7 @@ public class BugProcessingUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 가공 기술 향상";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 가공 기계";
         if (string.IsNullOrEmpty(Description)) Description = "벌레의 기본 가격이 50골드 증가합니다.";
         if (Price <= 0) Price = 1000;
         Rarity = ItemRarity.Common; // 일반 등급

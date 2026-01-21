@@ -1,10 +1,10 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "Shop/Items/Bug Fan (벌레 방해 선풍기)", fileName = "BugFanItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Bug Fan (벌레 방해용 선풍기)", fileName = "BugFanItemData")]
 public class BugFanItemData : ItemData
 {
-    private string purchaseKey = "벌레 방해 선풍기";
+    private string purchaseKey = "벌레 방해용 선풍기";
 
     [Header("Effect")]
     [Range(0f, 1f)] public float reducePercent = 0.1f; // 10%
@@ -23,7 +23,7 @@ public class BugFanItemData : ItemData
         OnePerShopIfNotStackable = true;
         InitialStock = 1;
         Rarity = ItemRarity.Common; // 일반 등급
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 방해 선풍기";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 방해용 선풍기";
         if (string.IsNullOrEmpty(Description)) Description = "벌레 이동속도 영구적으로 10% 감소 (중첩 시 합적용)";
         if (Price <= 0) Price = 500;
     }

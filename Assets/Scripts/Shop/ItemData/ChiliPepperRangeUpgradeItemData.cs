@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper Range Upgrade (고추 영향 범위 강화)", fileName = "ChiliPepperRangeUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/ChiliPepper Range Upgrade (매운 고추)", fileName = "ChiliPepperRangeUpgradeItemData")]
 public class ChiliPepperRangeUpgradeItemData : ItemData
 {
     [Header("Effect")]

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Pea Maturation Upgrade (식물 숙성도 개선)", fileName = "PeaMaturationUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Pea Maturation Upgrade (고속 숙성)", fileName = "PeaMaturationUpgradeItemData")]
 public class PeaMaturationUpgradeItemData : ItemData
 {
     [Header("Effect")]
@@ -8,7 +8,7 @@ public class PeaMaturationUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 숙성도 개선";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고속 숙성";
         if (string.IsNullOrEmpty(Description)) Description = "완두콩이 웨이브를 버틸 때마다 더 빠르게 비싸집니다.";
         if (Price <= 0) Price = 1000;
         Rarity = ItemRarity.Common; // 일반 등급

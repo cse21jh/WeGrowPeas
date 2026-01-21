@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Add Soil (농장 확장)", fileName = "AddSoilItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Add Soil (땅문서)", fileName = "AddSoilItemData")]
 public class AddSoilItemData : ItemData
 {
-    private string purchaseKey = "농장 확장";
+    private string purchaseKey = "땅문서";
 
     [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;

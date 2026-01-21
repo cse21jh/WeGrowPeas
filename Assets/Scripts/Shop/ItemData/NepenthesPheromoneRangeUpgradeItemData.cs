@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Nepenthes Pheromone Range Upgrade (네펜데스 페로몬 범위 증가)", fileName = "NepenthesPheromoneRangeUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Nepenthes Pheromone Range Upgrade (네펜데스 페로몬 강화)", fileName = "NepenthesPheromoneRangeUpgradeItemData")]
 public class NepenthesPheromoneRangeUpgradeItemData : ItemData
 {
     [Header("Effect")]
@@ -12,7 +12,7 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 페로몬 범위 증가";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 페로몬 강화";
         if (string.IsNullOrEmpty(Description)) Description = "네펜데스의 페로몬 범위가 증가합니다.";
         if (Price <= 0) Price = 1500;
         Rarity = ItemRarity.Rare; // 희귀 등급

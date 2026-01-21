@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "Shop/Items/Bug Spray (벌레 구제 스프레이)", fileName = "BugSprayItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Bug Spray (벌레 스프레이)", fileName = "BugSprayItemData")]
 public class BugSprayItemData : ItemData
 {
     [Header("Effect")]
@@ -18,7 +18,7 @@ public class BugSprayItemData : ItemData
         IsStackable = false;
         OnePerShopIfNotStackable = true;
         Rarity = ItemRarity.Common;
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 구제 스프레이";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 스프레이";
         if (Price <= 0) Price = 500;
     }
 

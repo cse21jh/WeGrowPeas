@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Pea (완두콩)", fileName = "PeaItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Pea (완두콩 모종)", fileName = "PeaItemData")]
 public class PeaItemData : ItemData
 {
     [Header("Rotation")]
@@ -11,7 +11,7 @@ public class PeaItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "완두콩";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "완두콩 모종";
         if (Price <= 0) Price = 500;
         Rarity = ItemRarity.Rare; // 희귀 등급
         

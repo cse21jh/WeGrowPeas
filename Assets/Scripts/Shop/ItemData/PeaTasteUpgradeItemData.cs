@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Shop/Items/Pea Taste Upgrade (식물 맛 개선)", fileName = "PeaTasteUpgradeItemData")]
+[CreateAssetMenu(menuName = "Shop/Items/Pea Taste Upgrade (풍미 증진)", fileName = "PeaTasteUpgradeItemData")]
 public class PeaTasteUpgradeItemData : ItemData
 {
     [Header("Effect")]
@@ -8,7 +8,7 @@ public class PeaTasteUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 맛 개선";
+        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "풍미 증진";
         if (string.IsNullOrEmpty(Description)) Description = "완두콩의 기본 가격이 40골드 증가합니다.";
         if (Price <= 0) Price = 1000;
         Rarity = ItemRarity.Common; // 일반 등급
