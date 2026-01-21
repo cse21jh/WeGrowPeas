@@ -119,6 +119,11 @@ public class PhoneManager : Singleton<PhoneManager>
         }
         else
         {
+            // 핸드폰을 닫을 때 notification이 표시 중이면 먼저 닫기 (알람과의 충돌 방지)
+            PhoneNotificationBus.OnHide?.Invoke();
+            // 핸드폰을 닫을 때 알람 UI 닫기
+            mandatoryAlarm.SetActive(false);
+            nonMandatoryAlarm.SetActive(false);
             alarm.EnableAlarm();
         }
         FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
@@ -358,6 +363,13 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void ApplyPhoneAlarmUI()
     {
+        // 핸드폰이 닫혀있으면 알람 UI를 표시하지 않음
+        if (!_isOpen)
+        {
+            mandatoryAlarm.SetActive(false);
+            nonMandatoryAlarm.SetActive(false);
+            return;
+        }
         // 폰 외부 버튼이나 전체 루트 UI에 알람 수위 적용
         switch (TotalPhoneAlarmState)
         {

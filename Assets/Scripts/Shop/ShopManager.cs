@@ -240,7 +240,7 @@ public class ShopManager : Singleton<ShopManager>
         if (purchaseHistory.Count == 0) return null;
 
         var mostSold = purchaseHistory
-        .Where(item => item.Key != "농장 확장" && item.Key != "교배 횟수 증가")
+        .Where(item => item.Key != "농장 확장" && item.Key != "교배 키트")
         .OrderByDescending(item => item.Value)
         .FirstOrDefault();
 
