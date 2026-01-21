@@ -393,8 +393,10 @@ public class EnemyController : MonoBehaviour
         if (GameManager.Instance == null)
             nextSeason = Season.Summer;
         else
-            nextSeason = GetSeasonByStage(GameManager.Instance.stage); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
-        switch(nextSeason)
+        { 
+            nextSeason = GetSeasonByStage(GameManager.Instance.stage + 2); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
+        }
+        switch (nextSeason)
         {
             case Season.Spring:
                 map[WaveType.Cold] = 0;
