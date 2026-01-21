@@ -51,6 +51,8 @@ public class RequestUI : MonoBehaviour
 
         ClearRequestContent();
 
+        if (RequestManager.Instance == null) return;
+
         var reqs = RequestManager.Instance.ActiveReq;
         int spawnCount = reqs.Count;
 
