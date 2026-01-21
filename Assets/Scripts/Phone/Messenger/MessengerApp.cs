@@ -718,10 +718,14 @@ public class MessengerApp : MonoBehaviour
         return true;
     }
 
+    private bool doubleClose = false;
     public void CheckCoroutineByTab(bool open)
     {
-        if (!open && alreadyOpenChatRoom == true)
+        if (!open && alreadyOpenChatRoom == true )
         {
+            if(!closedByTabShowingChat)
+                doubleClose = true;
+
             if(messageDisplayCoroutine != null)
             { 
                 StopCoroutine(messageDisplayCoroutine);
@@ -731,6 +735,11 @@ public class MessengerApp : MonoBehaviour
         }
         if (closedByTabShowingChat && open && alreadyOpenChatRoom == true)
         {
+            if(doubleClose == true)
+            {
+                doubleClose = false;
+                return;
+            }
             OpenChatRoom(currentChat);
             closedByTabShowingChat = false;
         }
