@@ -101,8 +101,16 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         // 비스택형도 구매 직후 슬롯 닫히도록 0 처리
         if (effect.IsStackable) stock = Mathf.Max(0, stock - 1);
         else if (effect.OnePerShopIfNotStackable) stock = 0;
-        else if (effect.Price == int.MaxValue) stock = 0; // 가격표 떼기 조건이면 0
+        else if (effect.GetDisplayPrice() == int.MaxValue) stock = 0; // 가격표 떼기 조건이면 0
         
+        Refresh();
+    }
+
+    /// <summary>
+    /// 가격을 업데이트합니다 (구매 후 가격이 변경되는 아이템용).
+    /// </summary>
+    public void RefreshPrice()
+    {
         Refresh();
     }
 

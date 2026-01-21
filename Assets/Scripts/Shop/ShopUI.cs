@@ -280,6 +280,9 @@ public class ShopUI : MonoBehaviour
             if (!data.IsStackable) session.MarkBought(data);
             slot.OnPurchased();
             
+            // 가격이 동적으로 변경되는 아이템의 경우 가격 업데이트
+            slot.RefreshPrice();
+            
             // 전체 구매 제한에 도달했는지 확인
             bool reachedTotalLimit = !data.CanPurchaseByLimit();
             
