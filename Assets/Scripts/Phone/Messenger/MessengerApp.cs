@@ -738,6 +738,7 @@ public class MessengerApp : MonoBehaviour
             if(doubleClose == true)
             {
                 doubleClose = false;
+                OpenChatRoom(currentChat);
                 return;
             }
             OpenChatRoom(currentChat);
