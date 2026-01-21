@@ -39,11 +39,13 @@ public class SeasonManager : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.V))
         {
             currentSeason = (Season)(((int)currentSeason + 1) % 4);
             ChangeToSeason(currentSeason);
         }
+        */
 
         //Debug.Log(grassMat.GetFloat("_Dryness"));
     }
