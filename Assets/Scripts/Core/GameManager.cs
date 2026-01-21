@@ -238,6 +238,7 @@ public class GameManager : Singleton<GameManager>
     {
         stage++;
         ModManager.Instance?.OnNewDay(stage);
+        PhoneManager.Instance.messengerApp.RefreshchatPartnerList();
         enemyController.UnlockWave(stage);
         upgradeManager.UnlockUpgrade(stage);
         

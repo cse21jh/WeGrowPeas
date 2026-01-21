@@ -52,8 +52,6 @@ public class MessengerApp : MonoBehaviour
     private Chat currentChat;
     private Coroutine messageDisplayCoroutine;
 
-    private Dictionary<string, int> lastMessageDay = new Dictionary<string, int>();
-
     private bool closedByTabShowingChat = false;
     private bool alreadyOpenChatRoom = false;
     public bool IsDisplayingMessages { get; private set; } = false;
@@ -138,16 +136,16 @@ public class MessengerApp : MonoBehaviour
     {
         if (chatRoomPanel.activeSelf && currentChat != null)
         {
-            // 핵심 변경: 화면을 다 지우지 않고, 현재 진행 중인 코루틴이 없다면 새 메시지만 체크해서 시작
+            // 화면을 다 지우지 않고, 현재 진행 중인 코루틴이 없다면 새 메시지만 체크해서 시작
             if (!IsDisplayingMessages)
             {
                 if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-                messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine()); // false: 초기화 안함
+                messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(false)); // false: 초기화 안함
             }
         }
         else
         {
-            OpenchatPartnerList();
+            RefreshchatPartnerList();
         }
         ReportAlarmState();
     }
@@ -164,7 +162,14 @@ public class MessengerApp : MonoBehaviour
             // TODO: 세이브
         }
 
-        RefreshchatPartnerList();
+        if (chatPartnerListPanel.activeInHierarchy || chatRoomPanel.activeInHierarchy)
+        {
+            UpdateMessenger();
+        }
+        else
+        {
+            RefreshchatPartnerList();
+        }            
         ReportAlarmState();
     }
 
@@ -216,7 +221,7 @@ public class MessengerApp : MonoBehaviour
 
 
 
-    private void RefreshchatPartnerList()
+    public void RefreshchatPartnerList()
     {
         foreach (Transform child in chatPartnerListContent) Destroy(child.gameObject);
 
@@ -387,7 +392,7 @@ public class MessengerApp : MonoBehaviour
 
 
 
-    private IEnumerator ShowMessagesInOrderCoroutine()
+    private IEnumerator ShowMessagesInOrderCoroutine(bool isFreshEntry = true) // 기본값을 true로 설정
     {
         IsDisplayingMessages = true;
         if (currentChat == null) { IsDisplayingMessages = false; yield break; }
@@ -406,79 +411,121 @@ public class MessengerApp : MonoBehaviour
         int lastSeenIndex = GetLastSeenIndex(currentChat);
         if (lastSeenIndex > -1)
         {
-            ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
-            int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
-            if (positionInShowList > -1) seenMessageCount = positionInShowList + 1;
+            if (lastSeenIndex < currentChat.messages.Count) // 방어 코드
+            {
+                ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
+                int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
+                if (positionInShowList > -1) seenMessageCount = positionInShowList + 1;
+            }
         }
 
-        int lastDisplayedDay = -1;
-        bool isFirstUnreadInSession = true; // 이 세션에서 처음으로 표시하는 '안 읽은' 메시지인지 추적
-        bool afterPast = false;
+        // 3. 이미 본 메시지들을 즉시 표시 (채팅방에 처음 들어왔을 때만)
+        if (isFreshEntry)
+        {
+            // 화면을 깨끗이 비운다
+            foreach (Transform child in chatRoomContent) Destroy(child.gameObject);
 
-        // 3. 모든 메시지를 하나로 통합된 루프에서 처리
-        for (int i = 0; i < messagesToShow.Count; i++)
+            int lastDisplayedDay = -1;
+            for (int i = 0; i < seenMessageCount; i++)
+            {
+                int originalIndex = currentChat.messages.IndexOf(messagesToShow[i]);
+                if (progress.daySeparators.ContainsKey(partnerName) &&
+                    progress.daySeparators[partnerName].ContainsKey(originalIndex))
+                {
+                    int day = progress.daySeparators[partnerName][originalIndex];
+                    if (lastDisplayedDay != day)
+                    {
+                        mc.AddDay(day);
+                        lastDisplayedDay = day;
+                    }
+                }
+                CreateMessageBubble(messagesToShow[i].messageText);
+            }
+        }
+
+        // 4. 아직 안 본 메시지들을 이어서 표시
+        bool isFirstUnreadInThisSession = true;
+        bool afterPast = false;
+        int lastDay = GetLastDisplayedDayForChat(partnerName);
+
+        if(seenMessageCount == messagesToShow.Count)
+            mc.AddNewChatSeperator();
+
+        for (int i = seenMessageCount; i < messagesToShow.Count; i++)
         {
             ChatMessage message = messagesToShow[i];
             int originalIndex = currentChat.messages.IndexOf(message);
+            int currentDay = GetMessageDay(message.triggerId);
 
-            // --- 날짜 처리 로직 ---
-            int messageDay = GetMessageDay(message.triggerId); // 메시지의 날짜 가져오기
-
-            if (lastDisplayedDay != messageDay)
+            // --- 날짜 변경 감지 및 저장/표시 로직 ---
+            if (lastDay != currentDay && !PhoneManager.Instance.isTutorial)
             {
-                mc.AddDay(messageDay);
-                lastDisplayedDay = messageDay;
+                mc.AddDay(currentDay);
+                if (!progress.daySeparators.ContainsKey(partnerName))
+                    progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                progress.daySeparators[partnerName][originalIndex] = currentDay;
+                // TODO: 세이브
+                lastDay = currentDay;
             }
+            bool isPast = IsPastDayMessage(message.triggerId);
 
-            // --- 메시지 표시 (본 것 vs 안 본 것) ---
-            if (i < seenMessageCount)
+            if (isFirstUnreadInThisSession && isPast)
             {
-                // 이미 본 메시지: 즉시 생성
-                CreateMessageBubble(message.messageText);
-            }
-            else // 아직 안 본 메시지 (i >= seenMessageCount)
-            {
-                bool isPastDayMessage = IsPastDayMessage(message.triggerId);
-                // 딜레이 적용
-                if (isFirstUnreadInSession && isPastDayMessage)
-                {
-                    // 과거, 처음 읽음
+                // 과거, 처음 읽음
+                if(isFreshEntry)
                     mc.AddNewChatSeperator();
-                    isFirstUnreadInSession = false;
-                    afterPast = true;
-                }
-                else if (isFirstUnreadInSession)
-                {
-                    // 세션의 첫 안읽은 메시지이지만, '오늘' 날짜라면 분리선만 표시
-                    mc.AddNewChatSeperator();
-                    isFirstUnreadInSession = false;
-                }
-                else if (!isFirstUnreadInSession && afterPast && !isPastDayMessage)
-                {
-                    afterPast = false;
-                }
-                else if (!isPastDayMessage)
-                {
-                    // 두 번째 이후의 안 읽은 메시지는 타이핑 효과 적용
-                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
-                    mc.AddTypingMessage(message.delayAfterPrevious / 2);
-                    yield return new WaitForSeconds(message.delayAfterPrevious / 2);
-                }
-
-                if (currentChat == null) break;
-
-                CreateMessageBubble(message.messageText);
-                SetLastSeenIndex(currentChat, originalIndex);
-
-                ReportAlarmState();
-                yield return null;
-                scrollRect.verticalNormalizedPosition = 0f;
+                isFirstUnreadInThisSession = false;
+                afterPast = true;
             }
+            else if (isFirstUnreadInThisSession)
+            {
+                // 세션의 첫 안읽은 메시지이지만, '오늘' 날짜라면 분리선만 표시
+                if(isFreshEntry)
+                    mc.AddNewChatSeperator();
+                isFirstUnreadInThisSession = false;
+            }
+            else if (!isFirstUnreadInThisSession && afterPast && !isPast)
+            {
+                afterPast = false;
+            }
+            else if (!isPast)
+            {
+                // 두 번째 이후의 안 읽은 메시지는 타이핑 효과 적용
+                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
+                mc.AddTypingMessage(message.delayAfterPrevious / 2);
+                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
+            }
+
+            if (currentChat == null) break;
+
+            CreateMessageBubble(message.messageText);
+            SetLastSeenIndex(currentChat, originalIndex);
+
+            ReportAlarmState();
+            yield return null;
+            scrollRect.verticalNormalizedPosition = 0f;
         }
+
         IsDisplayingMessages = false;
         messageDisplayCoroutine = null;
     }
 
+    private int GetLastDisplayedDayForChat(string partnerName)
+    {
+        // 2. 런타임 기록이 없다면 (예: 채팅방에 처음 들어왔을 때),
+        //    저장된 progress 데이터에서 복원 시도
+        if (progress != null && progress.daySeparators.TryGetValue(partnerName, out var separators) && separators.Count > 0)
+        {
+            // daySeparators에는 {메시지 인덱스, 날짜} 쌍이 저장되어 있음.
+            // 이 중 가장 큰 메시지 인덱스(가장 최근)에 해당하는 날짜를 찾아서 반환.
+            int latestDay = separators.OrderByDescending(kvp => kvp.Key).First().Value;
+
+            return latestDay;
+        }
+
+        // 런타임 기록도, 저장된 기록도 없으면 -1 반환
+        return -1;
+    }
     private int GetMessageDay(string triggerId)
     {
         // int.TryParse는 문자열을 정수로 변환 시도, 성공하면 true 반환
@@ -611,16 +658,6 @@ public class MessengerApp : MonoBehaviour
     }
 
 
-    private string GetLastMessageText(Chat chat)
-    {
-        int lastSeenIndex = GetLastSeenIndex(chat);
-        if (lastSeenIndex >= 0)
-            return chat.messages[lastSeenIndex].messageText;
-
-        var firstMessage = chat.messages.FirstOrDefault(msg => progress.activatedTriggersOrdered.Contains(msg.triggerId));
-        return firstMessage != null ? firstMessage.messageText : "새로운 대화";
-    }
-
     private int GetLastSeenIndex(Chat chat)
     {
         if (chat == null || chat.chatPartner == null) return -1;
@@ -646,29 +683,9 @@ public class MessengerApp : MonoBehaviour
     public void SetProgress(MessengerProgress pro)
     {
         progress = pro;
-        RestoreLastMessageDays(); // lastMessageDay 상태 복원
         UpdateMessenger();
     }
 
-    // *** lastMessageDay 상태를 복원하는 새로운 헬퍼 함수 ***
-    private void RestoreLastMessageDays()
-    {
-        lastMessageDay.Clear();
-        if (progress == null || progress.daySeparators == null) return;
-
-        foreach (var chatPartnerEntry in progress.daySeparators)
-        {
-            string partnerName = chatPartnerEntry.Key;
-            Dictionary<int, int> separators = chatPartnerEntry.Value;
-
-            if (separators.Count > 0)
-            {
-                // 가장 마지막 인덱스(가장 최근)의 날짜 구분선 날짜를 가져와서 설정
-                int latestDay = separators.OrderByDescending(kvp => kvp.Key).First().Value;
-                lastMessageDay[partnerName] = latestDay;
-            }
-        }
-    }
 
     public bool IsTriggerFullySeen(string triggerId)
     {
