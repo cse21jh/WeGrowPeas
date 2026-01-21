@@ -860,7 +860,7 @@ public class Grid : MonoBehaviour
 
     protected void UpdateBreedCountUI(int count)
     {
-        breedCountUI.text = $"{count}개";
+        breedCountUI.text = $"{count}회";
     }
 
     private void SpawnRandomBug()

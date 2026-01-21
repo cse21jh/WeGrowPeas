@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EconomyManager : MonoBehaviour
 {
+
+
     
     [SerializeField] private TextMeshProUGUI CoinUI;
 
@@ -22,7 +24,7 @@ public class EconomyManager : MonoBehaviour
 
     private void Start()
     {
-       
+        UpdateCoinUI(gold);
     }
 
     public void InitEconomyManager()
@@ -53,9 +55,29 @@ public class EconomyManager : MonoBehaviour
         Debug.Log($"골드 {amount} 획득 → 합계 {gold}");
     }
 
+    public string ToAbbreviatedString(int number)
+    {
+        float value = number;
+
+        if (number >= 100000000) // 1억 이상 (B)
+        {
+            return (value / 1000000000f).ToString("0.#") + "B";
+        }
+        if (number >= 100000) // 10만 이상 (M)
+        {
+            return (value / 1000000f).ToString("0.#") + "M";
+        }
+        if (number >= 100) // 100 이상 (K)
+        {
+            return (value / 1000f).ToString("0.#") + "K";
+        }
+
+        return number.ToString(); // 1000 미만은 그대로 출력
+    }
+
     private void UpdateCoinUI(int val)
     {
-        CoinUI.text = $"{val}$";
+        CoinUI.text = $"{ToAbbreviatedString(val)}";
     }
 
     public int GetGold()
