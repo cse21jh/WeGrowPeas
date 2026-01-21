@@ -279,7 +279,36 @@ public class ShopUI : MonoBehaviour
         {
             if (!data.IsStackable) session.MarkBought(data);
             slot.OnPurchased();
+            
+            // 전체 구매 제한에 도달했는지 확인
+            bool reachedTotalLimit = !data.CanPurchaseByLimit();
+            
+            // 일일 구매 제한에 도달했는지 확인 (OnePerShopIfNotStackable && !IsStackable)
+            bool reachedDailyLimit = data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data);
+            
+            // 전체 제한 또는 일일 제한에 도달했으면 ItemSlot 제거
+            if (reachedTotalLimit || reachedDailyLimit)
+            {
+                RemoveItemSlot(slot);
+            }
             //ShowInfo($"{data.DisplayName} 구매 완료");
+        }
+    }
+
+    /// <summary>
+    /// ItemSlot을 제거합니다 (구매 제한에 도달한 경우).
+    /// </summary>
+    private void RemoveItemSlot(ItemSlot slot)
+    {
+        if (slot == null) return;
+
+        // slots 리스트에서 제거
+        slots.Remove(slot);
+
+        // GameObject 제거
+        if (slot.gameObject != null)
+        {
+            Destroy(slot.gameObject);
         }
     }
 
