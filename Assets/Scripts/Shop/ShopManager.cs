@@ -54,11 +54,25 @@ public class ShopManager : Singleton<ShopManager>
 
     /// <summary>
     /// 매일 초기화 시 호출 (GameManager에서 호출)
+    /// 상점 연락처 구매 횟수만큼 무료 리롤 횟수를 추가합니다.
     /// </summary>
     public void ResetDailyRerollCount()
     {
-        // 구매한 "상점 연락처" 아이템의 효과는 계속 유지되므로 리셋하지 않음
-        // dailyRerollCount는 게임 전체 동안 유지됨
+        // 사용한 무료 리롤 횟수는 리셋 (매일 초기화)
+        dailyRerollCount = 0;
+        
+        // 상점 연락처 구매 횟수 확인 및 무료 리롤 추가
+        const string shopContactKey = "상점 연락처";
+        if (purchaseHistory.ContainsKey(shopContactKey))
+        {
+            int purchaseCount = purchaseHistory[shopContactKey];
+            if (purchaseCount > 0)
+            {
+                // 상점 연락처는 구매 1회당 매일 무료 리롤 1회 추가
+                dailyRerollCount += purchaseCount;
+                Debug.Log($"[ShopManager] 상점 연락처 구매 {purchaseCount}회: 매일 무료 리롤 {purchaseCount}회 추가");
+            }
+        }
     }
 
     void Awake()

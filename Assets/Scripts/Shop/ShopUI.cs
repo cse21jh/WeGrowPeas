@@ -294,6 +294,9 @@ public class ShopUI : MonoBehaviour
             {
                 RemoveItemSlot(slot);
             }
+            
+            // 상점 연락처 등 무료 리롤 횟수를 변경하는 아이템 구매 시 리롤 버튼 UI 업데이트
+            UpdateRerollButton();
             //ShowInfo($"{data.DisplayName} 구매 완료");
         }
     }
@@ -440,6 +443,7 @@ public class ShopUI : MonoBehaviour
         }
 
         shopManager.ResetRerollCount(); // 날짜 변경 시 리롤 횟수 리셋
+        shopManager.ResetDailyRerollCount(); // 매일 무료 리롤 횟수 초기화 및 상점 연락처 효과 적용
         session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
         BuildShop();
         UpdateRerollButton();
