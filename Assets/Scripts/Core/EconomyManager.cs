@@ -59,15 +59,15 @@ public class EconomyManager : MonoBehaviour
     {
         float value = number;
 
-        if (number >= 100000000) // 1억 이상 (B)
+        if (number >= 1000000000) // 10억 이상 (B)
         {
             return (value / 1000000000f).ToString("0.#") + "B";
         }
-        if (number >= 100000) // 10만 이상 (M)
+        if (number >= 1000000) // 100만 이상 (M)
         {
             return (value / 1000000f).ToString("0.#") + "M";
         }
-        if (number >= 100) // 100 이상 (K)
+        if (number >= 10000) // 10000 이상 (K)
         {
             return (value / 1000f).ToString("0.#") + "K";
         }
