@@ -444,7 +444,7 @@ public class MessengerApp : MonoBehaviour
         }
 
         // 4. 아직 안 본 메시지들을 이어서 표시
-        bool isFirstUnreadInThisSession = true;
+        bool isFirstUnreadInThisSession = isFreshEntry;
         bool afterPast = false;
         int lastDay = GetLastDisplayedDayForChat(partnerName);
 

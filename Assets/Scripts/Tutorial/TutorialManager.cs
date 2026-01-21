@@ -99,7 +99,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f, 0f), new Vector2(75f, 75f));
                 break;
             case 1: // 완두콩 클릭
-                spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f,0f), new Vector2(75f, 75f));
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f,0f), new Vector2(75f, 150f));
                 grid.StartTutorialBreeding();
                 grid.MakeMovable();
                 break;
