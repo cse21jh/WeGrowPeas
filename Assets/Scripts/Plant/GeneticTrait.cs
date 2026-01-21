@@ -12,9 +12,9 @@ public enum TraitType // 기존 형질
     Cold,
     Drought,
     Heat,
+    None,
     FD,
-    CH,
-    None
+    CH
 }
 
 [System.Serializable]
