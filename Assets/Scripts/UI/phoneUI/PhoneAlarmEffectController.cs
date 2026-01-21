@@ -80,6 +80,9 @@ public class PhoneAlarmEffectController : MonoBehaviour
         isPermanentOn = false;
         isImpermanentOn = false;
         StopAllCoroutines();
+
+        minRoot.transform.rotation = Quaternion.Euler(0, 0, 0);
+        maxRoot.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     public void DisableAlarm()
