@@ -22,6 +22,12 @@ public abstract class ItemData : ScriptableObject
     
     [Header("Rarity")]
     public ItemRarity Rarity = ItemRarity.Common;
+    
+    [Header("Grade Tag")]
+    [Tooltip("등급 태그 텍스트 (예: S, A, B, C)")]
+    public string GradeTagText;
+    [Tooltip("등급 태그 이미지")]
+    public Sprite GradeTagImage;
 
     [Header("Rule")]
     public bool IsStackable = false;

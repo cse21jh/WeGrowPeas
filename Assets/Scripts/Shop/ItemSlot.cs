@@ -15,6 +15,14 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private Animator leftAnim;
     [SerializeField] private Animator rightAnim;
 
+    [Header("Grade Tag UI")]
+    [SerializeField] private Image gradeTagImage;
+    [SerializeField] private TMP_Text gradeTagText;
+
+    [Header("Rarity Colors")]
+    [Tooltip("등급별 색상 (순서: Common, Rare, Special, Legendary)")]
+    [SerializeField] private Color[] rarityColors = new Color[4];
+
     private ItemData effect;
     private ShopUI shop;            // 콜백용
     private int stock;              // IsStackable이면 초기 n, 아니면 1
@@ -25,8 +33,14 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         shop = shopUI;
         effect = eff;
 
-        if (iconImage) iconImage.sprite = eff.Icon;
-        if (nameText) nameText.text = eff.DisplayName;
+        if (iconImage)
+        {
+            iconImage.sprite = eff.Icon;
+        }
+        if (nameText)
+        {
+            nameText.text = eff.DisplayName;
+        }
 
         stock = eff.IsStackable ? Mathf.Max(1, eff.InitialStock) : 1;
         maxStock = stock;
@@ -40,6 +54,43 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
                 PhoneManager.Instance.PhoneTouchEffect();
                 shop.OnClickShowPopup(effect, this);
             });
+        }
+
+        // Grade Tag 설정 - iconImage, nameText와 동일하게 설정만 하고 Refresh()에서 활성화/비활성화
+        Color rarityColor = GetRarityColor(eff.Rarity);
+        string gradeText = GetRarityGradeText(eff.Rarity);
+
+        if (gradeTagImage != null)
+        {
+            if (eff.GradeTagImage != null)
+            {
+                gradeTagImage.sprite = eff.GradeTagImage;
+            }
+            else
+            {
+                gradeTagImage.sprite = null;
+            }
+            gradeTagImage.color = rarityColor;
+        }
+
+        if (gradeTagText != null)
+        {
+            // ItemData에 GradeTagText가 있으면 사용, 없으면 자동 생성된 등급 텍스트 사용
+            if (!string.IsNullOrEmpty(eff.GradeTagText))
+            {
+                gradeTagText.text = eff.GradeTagText;
+            }
+            else
+            {
+                // 자동 생성된 등급 텍스트 사용 (S, A, B, C)
+                gradeTagText.text = gradeText;
+            }
+            // 텍스트 색상은 변경하지 않음 (원래 색상 유지)
+            // 프리팹에서 비활성화되어 있을 수 있으므로 명시적으로 활성화
+            if (!string.IsNullOrEmpty(gradeTagText.text))
+            {
+                gradeTagText.gameObject.SetActive(true);
+            }
         }
 
         Refresh();
@@ -92,6 +143,26 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         iconImage.gameObject.SetActive(shouldOpen);
         nameText.gameObject.SetActive(shouldOpen);
+
+        // Grade Tag 활성화/비활성화 - iconImage, nameText와 동일하게 shouldOpen에 따라 처리
+        // 단, 시작할 때는 항상 활성화되도록 보장
+        if (gradeTagImage != null)
+        {
+            bool hasGradeTagImage = gradeTagImage.sprite != null;
+            if (hasGradeTagImage)
+            {
+                gradeTagImage.gameObject.SetActive(shouldOpen);
+            }
+        }
+        if (gradeTagText != null)
+        {
+            // text가 설정되어 있으면 표시 (ItemData의 GradeTagText 또는 자동 생성된 등급 텍스트)
+            bool hasGradeTagText = !string.IsNullOrEmpty(gradeTagText.text);
+            if (hasGradeTagText)
+            {
+                gradeTagText.gameObject.SetActive(shouldOpen);
+            }
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -109,5 +180,40 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         if (shop == null) return;
         //shop.SendMessage("ShowInfo", ""); // 하단 정보 지우기
+    }
+
+    /// <summary>
+    /// Rarity에 따른 등급 텍스트 반환 (S, A, B, C)
+    /// </summary>
+    private string GetRarityGradeText(ItemRarity rarity)
+    {
+        return rarity switch
+        {
+            ItemRarity.Legendary => "S",
+            ItemRarity.Special => "A",
+            ItemRarity.Rare => "B",
+            ItemRarity.Common => "C",
+            _ => ""
+        };
+    }
+
+    /// <summary>
+    /// Rarity에 따른 색상 반환
+    /// </summary>
+    private Color GetRarityColor(ItemRarity rarity)
+    {
+        int index = rarity switch
+        {
+            ItemRarity.Common => 0,
+            ItemRarity.Rare => 1,
+            ItemRarity.Special => 2,
+            ItemRarity.Legendary => 3,
+            _ => 0
+        };
+
+        if (rarityColors != null && index < rarityColors.Length)
+            return rarityColors[index];
+        
+        return Color.white;
     }
 }

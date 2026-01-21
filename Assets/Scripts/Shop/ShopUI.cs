@@ -109,6 +109,7 @@ public class ShopUI : MonoBehaviour
     private void MakeSlot(Transform parent, ItemData data)
     {
         var slot = Instantiate(itemSlotPrefab, parent);
+        slot.gameObject.SetActive(true); // 프리팹이 비활성화되어 있을 수 있으므로 활성화
         slot.Bind(this, data);
         slots.Add(slot);
     }
