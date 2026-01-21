@@ -95,21 +95,82 @@ public class FenceElementController : MonoBehaviour
                     }
                     break;
                 case TraitType.Cold:
-                    peas[5].SetActive(true);
-                    elementName.text = peaNames[5];
-                    if (currentWaveType == WaveType.Cold)
+
+                    if(trait.genetics == 0)
                     {
-                        isWaveResistance = true;
+                        // 유전자 0개
+                        // heat
+                        peas[8].SetActive(true);
+                        elementName.text = peaNames[8];
+                        if (currentWaveType == WaveType.Heat)
+                        {
+                            isWaveResistance = true;
+                        }
+                    }
+                    else if(trait.genetics == 1)
+                    {
+                        // 유전자 1개
+                        // 반반
+                        peas[10].SetActive(true);
+                        elementName.text = peaNames[10];
+                        if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
+                        {
+                            isWaveResistance = true;
+                        }
+                    }
+                    else
+                    {
+                        // 유전자 2개
+                        // cold
+                        peas[5].SetActive(true);
+                        elementName.text = peaNames[5];
+                        if (currentWaveType == WaveType.Cold)
+                        {
+                            isWaveResistance = true;
+                        }
                     }
                     break;
                 case TraitType.HeavyRain:
-                    peas[6].SetActive(true);
-                    elementName.text = peaNames[6];
-                    if (currentWaveType == WaveType.HeavyRain)
+
+                    if (trait.genetics == 0)
                     {
-                        isWaveResistance = true;
+                        // 유전자 0개
+                        // drought
+                        peas[7].SetActive(true);
+                        elementName.text = peaNames[7];
+                        if (currentWaveType == WaveType.Drought)
+                        {
+                            isWaveResistance = true;
+                        }
                     }
+                    else if (trait.genetics == 1)
+                    {
+                        // 유전자 1개
+                        // 반반
+                        peas[9].SetActive(true);
+                        elementName.text = peaNames[9];
+                        if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.HeavyRain)
+                        {
+                            isWaveResistance = true;
+                        }
+                    }
+                    else
+                    {
+                        // 유전자 2개
+                        // heavyRain
+                        peas[6].SetActive(true);
+                        elementName.text = peaNames[6];
+                        if (currentWaveType == WaveType.HeavyRain)
+                        {
+                            isWaveResistance = true;
+                        }
+                    }
+
+
+
+                    
                     break;
+                    /*
                 case TraitType.Drought:
                     peas[7].SetActive(true);
                     elementName.text = peaNames[7];
@@ -142,6 +203,7 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
+                    */
                 default:
                     peas[0].SetActive(true); // 기본 완두콩
                     elementName.text = peaNames[0];
