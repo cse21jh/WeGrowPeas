@@ -57,6 +57,11 @@ public class PanelTranstionController : MonoBehaviour
         {
             panel.gameObject.SetActive(false);
         });
+
+        if(panel == panels[3])
+        {
+            FindAnyObjectByType<RequestUI>().OnClickHidePopup();
+        }
     }
 
 
