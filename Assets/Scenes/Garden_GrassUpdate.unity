@@ -467491,6 +467491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3b2225ce4110d141a17310a7a8fdbe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previousSeason: 3
   currentSeason: 0
   changeDuration: 2
   changeEase: 4
@@ -469131,7 +469132,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 708985688053105884, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_text
-      value: "\uD64D\uC218\uAC00 \uB36E\uCCD0\uC635\uB2C8\uB2E4......"
+      value: "\uBD88\uAE38\uD55C \uB0A0\uAC2F\uC9D3 \uC18C\uB9AC\uAC00 \uB4E4\uB9BD\uB2C8\uB2E4......"
+      objectReference: {fileID: 0}
+    - target: {fileID: 708985688053105884, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_margin.z
+      value: -12.602497
       objectReference: {fileID: 0}
     - target: {fileID: 872719052591354692, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_IsActive
@@ -470532,6 +470537,18 @@ PrefabInstance:
     - target: {fileID: 7789918469135106337, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7799906544167948990, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7799906544167948990, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -7.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7799906544167948990, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -51.6
       objectReference: {fileID: 0}
     - target: {fileID: 7841773904490601737, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_LocalScale.x
