@@ -90,7 +90,11 @@ public abstract class RequestInstance
 
     public virtual void GrantRewardOnce()
     {
-        if (!IsCompleted) return;
+        if (!IsCompleted)
+        {
+            SoundManager.Instance.PlayEffect("WrongSelect");
+            return;
+        }
         if (rewardGranted) return;
 
         foreach (var r in Data.rewards)
