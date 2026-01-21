@@ -255,7 +255,7 @@ public class Grid : MonoBehaviour
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "웨이브가 얼마남지 않았습니다",
+                        title = "웨이브가 얼마 남지 않았습니다",
                         message = "조심하세요.",
                         duration = 5f
                     }

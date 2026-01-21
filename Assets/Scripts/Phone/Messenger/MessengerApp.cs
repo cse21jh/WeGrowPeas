@@ -488,10 +488,11 @@ public class MessengerApp : MonoBehaviour
             }
             else if (!isPast)
             {
+                float time = (message.messageText.Length / 10f);
                 // 두 번째 이후의 안 읽은 메시지는 타이핑 효과 적용
-                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
-                mc.AddTypingMessage(message.delayAfterPrevious / 2);
-                yield return new WaitForSeconds(message.delayAfterPrevious / 2);
+                yield return new WaitForSeconds(time / 3);
+                mc.AddTypingMessage(time - (time / 3));
+                yield return new WaitForSeconds(time - (time / 3));
             }
 
             if (currentChat == null) break;
