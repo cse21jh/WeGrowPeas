@@ -20,7 +20,7 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
         IsStackable = false;
         InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 3; // 최대 구매 제한 3회
+        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
     }
 
