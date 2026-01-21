@@ -64,7 +64,6 @@ public class PhoneManager : Singleton<PhoneManager>
     public MessengerApp messengerApp;
 
     //폰 페이즈 관련
-    private float maxPhoneTimer = 30.0f;
     private float phoneTimer = 0;
     private bool skipPhoneTime = false;
     private bool isPhoneTime = false;
@@ -170,7 +169,7 @@ public class PhoneManager : Singleton<PhoneManager>
         SetPhoneTimer();
         
         skipPhoneTimeButton.SetActive(true);
-        phoneTimer = maxPhoneTimer;
+        phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
         phoneTimerUI.StartPhoneTimer();
 
         bool _warned15s = false;
@@ -228,7 +227,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public float GetMaxPhoneTimer()
     {
-        return maxPhoneTimer;
+        return GameManager.Instance.grid.GetMaxBreedTimer();
     }
 
     public void SkipPhoneTime()

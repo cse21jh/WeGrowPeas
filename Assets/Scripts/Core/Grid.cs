@@ -67,7 +67,7 @@ public class Grid : MonoBehaviour
     public int totalPeaBreedcount = 0;
     public int totalPeanutBreedCount = 0;
 
-    protected float bugSpawnTimeInterval = 10.0f;
+    protected float bugSpawnTimeInterval = 15.0f;
     protected float lastBugSpawnTimeInterval = 0f;
 
     protected float bugSpeedDecreasement = 0f;
@@ -95,7 +95,7 @@ public class Grid : MonoBehaviour
     protected float additionalPestResistance = 0f;
 
     protected int additionalInheritance = 0;
-    protected float maxBreedTimer = 30.0f;
+    protected float maxBreedTimer = 40.0f;
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
