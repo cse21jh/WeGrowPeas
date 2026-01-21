@@ -73,8 +73,28 @@ public class ShopUI : MonoBehaviour
         UpdateRerollButton();
     }
 
+    private void OnDestroy()
+    {
+        // 객체 파괴 시 진행 중인 애니메이션 kill
+        if (popupParent != null)
+        {
+            popupParent.DOKill();
+        }
+    }
+
     public void BuildShop()
     {
+        // 초기화 확인
+        if (shopManager == null || ctx == null)
+        {
+            InitializeIfNeeded();
+            if (shopManager == null || ctx == null)
+            {
+                Debug.LogError("[ShopUI] BuildShop: shopManager or ctx is null!");
+                return;
+            }
+        }
+
         // 고정 아이템과 로테이션 아이템을 각각 다른 부모에 배치
         if (fixedItemsParent != null)
             ClearChildren(fixedItemsParent);
@@ -116,16 +136,34 @@ public class ShopUI : MonoBehaviour
 
     public void OnClickShowPopup(ItemData data, ItemSlot slot)
     {
+        if (popupParent == null) return;
+        
+        // 진행 중인 애니메이션 kill
+        popupParent.DOKill();
+        
         popupParent.gameObject.SetActive(true);
         popupParent.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
-        popupParent.GetComponent<ShopPopupController>().SetItemInfo(data, this, slot);
+        
+        var popupController = popupParent.GetComponent<ShopPopupController>();
+        if (popupController != null)
+        {
+            popupController.SetItemInfo(data, this, slot);
+        }
     }
 
     public void OnClickHidePopup()
     {
+        if (popupParent == null) return;
+        
+        // 진행 중인 애니메이션 kill
+        popupParent.DOKill();
+        
         popupParent.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
         {
-            popupParent.gameObject.SetActive(false);
+            if (popupParent != null)
+            {
+                popupParent.gameObject.SetActive(false);
+            }
         });
     }
 
@@ -318,6 +356,17 @@ public class ShopUI : MonoBehaviour
     {
         if (rerollButton == null) return;
 
+        // shopManager 초기화 확인
+        if (shopManager == null)
+        {
+            shopManager = ShopManager.Instance;
+            if (shopManager == null)
+            {
+                Debug.LogError("[ShopUI] UpdateRerollButton: ShopManager.Instance is null!");
+                return;
+            }
+        }
+
         int freeRerollCount = shopManager.DailyRerollCount;
         
         if (rerollButtonText != null)
@@ -342,10 +391,82 @@ public class ShopUI : MonoBehaviour
     /// </summary>
     public void DailyReroll()
     {
+        // 초기화되지 않았다면 초기화 (Awake 전에 호출될 수 있음)
+        InitializeIfNeeded();
+        
+        // shopManager가 여전히 null이면 에러
+        if (shopManager == null)
+        {
+            Debug.LogError("[ShopUI] DailyReroll: ShopManager.Instance is null!");
+            return;
+        }
+
+        // session이 null이면 초기화
+        if (session == null)
+        {
+            session = new ShopSession();
+        }
+
         shopManager.ResetRerollCount(); // 날짜 변경 시 리롤 횟수 리셋
         session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
         BuildShop();
         UpdateRerollButton();
+    }
+
+    /// <summary>
+    /// 필요한 필드가 초기화되지 않았다면 초기화합니다.
+    /// </summary>
+    private void InitializeIfNeeded()
+    {
+        // shopManager 초기화
+        if (shopManager == null)
+        {
+            shopManager = ShopManager.Instance;
+        }
+
+        // session 초기화
+        if (session == null)
+        {
+            session = new ShopSession();
+        }
+
+        // ctx 초기화
+        if (ctx == null)
+        {
+            // services 초기화
+            if (grid == null)
+            {
+                if (GameManager.Instance != null)
+                {
+                    grid = GameManager.Instance.grid;
+                }
+                else
+                {
+                    grid = FindAnyObjectByType<Grid>();
+                }
+            }
+
+            if (economy == null)
+            {
+                if (GameManager.Instance != null)
+                {
+                    economy = GameManager.Instance.economyManager;
+                }
+                else
+                {
+                    economy = FindAnyObjectByType<EconomyManager>();
+                }
+            }
+
+            ctx = new ShopContext
+            {
+                Grid = grid,
+                Economy = economy,
+                Session = session,
+                Shop = shopManager,
+                ShowError = ShowError,
+            };
+        }
     }
 
     private class ShopSession
