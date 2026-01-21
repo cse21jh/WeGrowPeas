@@ -110,6 +110,38 @@ public class FenceElementController : MonoBehaviour
                         isWaveResistance = true;
                     }
                     break;
+                case TraitType.Drought:
+                    peas[7].SetActive(true);
+                    elementName.text = peaNames[7];
+                    if (currentWaveType == WaveType.Drought)
+                    {
+                        isWaveResistance = true;
+                    }
+                    break;
+                case TraitType.Heat:
+                    peas[8].SetActive(true);
+                    elementName.text = peaNames[8];
+                    if (currentWaveType == WaveType.Heat)
+                    {
+                        isWaveResistance = true;
+                    }
+                    break;
+                case TraitType.FD:
+                    peas[9].SetActive(true);
+                    elementName.text = peaNames[9];
+                    if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.Flood)
+                    {
+                        isWaveResistance = true;
+                    }
+                    break;
+                case TraitType.CH:
+                    peas[10].SetActive(true);
+                    elementName.text = peaNames[10];
+                    if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
+                    {
+                        isWaveResistance = true;
+                    }
+                    break;
                 default:
                     peas[0].SetActive(true); // 기본 완두콩
                     elementName.text = peaNames[0];

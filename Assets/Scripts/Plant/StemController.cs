@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 //using Unity.Android.Types;
 using UnityEngine;
@@ -73,7 +73,7 @@ public class StemController : MonoBehaviour
                                 peaSprites[i].SetPeaSprite((int)TraitType.Drought);
                                 break;
                             case 1:
-                                peaSprites[i].SetPeaSprite((int)TraitType.None+1);
+                                peaSprites[i].SetPeaSprite((int)TraitType.FD);
                                 break;
                             case 2:
                                 peaSprites[i].SetPeaSprite((int)traits[i].traitType);
@@ -90,7 +90,7 @@ public class StemController : MonoBehaviour
                                 peaSprites[i].SetPeaSprite((int)TraitType.Heat);
                                 break;
                             case 1:
-                                peaSprites[i].SetPeaSprite((int)TraitType.None + 2);
+                                peaSprites[i].SetPeaSprite((int)TraitType.CH);
                                 break;
                             case 2:
                                 peaSprites[i].SetPeaSprite((int)traits[i].traitType);

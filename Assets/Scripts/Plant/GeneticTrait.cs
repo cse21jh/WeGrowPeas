@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TraitType // ±âÁ¸ ÇüÁú
+public enum TraitType // ê¸°ì¡´ í˜•ì§ˆ
 {
     NaturalDeath,
     Pest,
@@ -12,6 +12,8 @@ public enum TraitType // ±âÁ¸ ÇüÁú
     Cold,
     Drought,
     Heat,
+    FD,
+    CH,
     None
 }
 

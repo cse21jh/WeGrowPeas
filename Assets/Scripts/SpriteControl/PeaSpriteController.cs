@@ -7,10 +7,11 @@ public class PeaSpriteController : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
     Animator faceAnim;
-    [SerializeField] private float faceStartMaxDelay = 0.1f; // ¾ó±¼ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ Áö¿¬ ½Ã°£
+    [SerializeField] private float faceStartMaxDelay = 0.1f; // ì–¼êµ´ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘ ì§€ì—° ì‹œê°„
 
     [SerializeField] private Sprite[] peaSprites;
     [SerializeField] private SpriteRenderer accessoryRenderer;
+    [SerializeField] private GameObject accessoryRenderer_SUB;
 
     [SerializeField] private GameObject WindEffect;
     [SerializeField] private GameObject SweatEffect;
@@ -51,54 +52,56 @@ public class PeaSpriteController : MonoBehaviour
 
 
 
+        accessoryRenderer_SUB.SetActive(false);
         switch (index)
         {
             case (int)TraitType.NaturalDeath:
-                spriteRenderer.sprite = peaSprites[1]; // ÀÚ¿¬»ç ÀúÇ×
+                spriteRenderer.sprite = peaSprites[1]; // ìì—°ì‚¬ ì €í•­
                 accessoryRenderer.sprite = null;
                 break;
             case (int)TraitType.Pest:
-                spriteRenderer.sprite = peaSprites[0]; // ÇØÃæ ÀúÇ×
+                spriteRenderer.sprite = peaSprites[0]; // í•´ì¶© ì €í•­
                 accessoryRenderer.sprite = peaSprites[4];
                 break;
             case (int)TraitType.Wind:
-                spriteRenderer.sprite = peaSprites[7]; // ¹Ù¶÷ ÀúÇ×
+                spriteRenderer.sprite = peaSprites[7]; // ë°”ëŒ ì €í•­
                 accessoryRenderer.sprite = null;
                 break;
             case (int)TraitType.Flood:
-                spriteRenderer.sprite = peaSprites[0]; // È«¼ö ÀúÇ×
+                spriteRenderer.sprite = peaSprites[0]; // í™ìˆ˜ ì €í•­
                 accessoryRenderer.sprite = peaSprites[9];
                 break;
             case (int)TraitType.HeavyRain:
-                spriteRenderer.sprite = peaSprites[0]; // Æø¿ì ÀúÇ× À¯ÀüÀÚ 2°³
+                spriteRenderer.sprite = peaSprites[0]; // í­ìš° ì €í•­ ìœ ì „ì 2ê°œ
                 accessoryRenderer.sprite = peaSprites[6];
                 break;
             case (int)TraitType.Cold:
-                spriteRenderer.sprite = peaSprites[0]; // ÃßÀ§ ÀúÇ× À¯ÀüÀÚ 2°³
+                spriteRenderer.sprite = peaSprites[0]; // ì¶”ìœ„ ì €í•­ ìœ ì „ì 2ê°œ
                 accessoryRenderer.sprite = peaSprites[5];
                 break;
             case (int)TraitType.Drought:
-                spriteRenderer.sprite = peaSprites[2]; // °¡¹³ ÀúÇ× À¯ÀüÀÚ 2°³ (Æø¿ì 0°³) 
+                spriteRenderer.sprite = peaSprites[2]; // ê°€ë­„ ì €í•­ ìœ ì „ì 2ê°œ (í­ìš° 0ê°œ) 
                 accessoryRenderer.sprite = null; 
                 break;
             case (int)TraitType.Heat:
-                spriteRenderer.sprite = peaSprites[0]; // ´õÀ§ ÀúÇ× À¯ÀüÀÚ 2°³ (ÃßÀ§ 0°³)
+                spriteRenderer.sprite = peaSprites[0]; // ë”ìœ„ ì €í•­ ìœ ì „ì 2ê°œ (ì¶”ìœ„ 0ê°œ)
                 accessoryRenderer.sprite = peaSprites[3];
-                //¶¡ ÀÌÆåÆ®
+                //ë•€ ì´í™íŠ¸
                 SweatEffect.SetActive(true);
                 break;
-            case (int)TraitType.None + 1:
-                spriteRenderer.sprite = peaSprites[2]; // Æø¿ì °¡¹³ ¹İ¹İ
+            case (int)TraitType.FD:
+                spriteRenderer.sprite = peaSprites[2]; // í­ìš° ê°€ë­„ ë°˜ë°˜
                 accessoryRenderer.sprite = peaSprites[6];
                 break;
-            case (int)TraitType.None + 2:
-                spriteRenderer.sprite = peaSprites[0]; // ÃßÀ§ ´õÀ§ ¹İ¹İ
+            case (int)TraitType.CH:
+                spriteRenderer.sprite = peaSprites[0]; // ì¶”ìœ„ ë”ìœ„ ë°˜ë°˜
                 accessoryRenderer.sprite = peaSprites[5];
-                //¶¡ ÀÌÆåÆ®
+                accessoryRenderer_SUB.SetActive(true);
+                //ë•€ ì´í™íŠ¸
                 SweatEffect.SetActive(true);
                 break;
             case (int)TraitType.None:
-                spriteRenderer.sprite = peaSprites[0]; // ±âº»
+                spriteRenderer.sprite = peaSprites[0]; // ê¸°ë³¸
                 accessoryRenderer.sprite = null;
                 break;
             default:
@@ -116,7 +119,7 @@ public class PeaSpriteController : MonoBehaviour
         }
 
 
-        if(index == (int)TraitType.Heat || index == (int)TraitType.None + 2)
+        if(index == (int)TraitType.Heat || index == (int)TraitType.CH)
         {
             SweatEffect.SetActive(true);
             Debug.Log("Sweat Effect Activated");
