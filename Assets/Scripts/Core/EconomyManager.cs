@@ -73,7 +73,7 @@ public class EconomyManager : MonoBehaviour
         }
 
         return number.ToString(); // 1000 미만은 그대로 출력
-    }
+    } 
 
     private void UpdateCoinUI(int val)
     {
