@@ -72,8 +72,8 @@ public class WeatherApp : MonoBehaviour
         else
         {
             stageText.text = "안전재난경보 - " + stage.ToString() + "일차";
-            waveText.text = wave.WaveName + " 웨이브가 지나갔습니다!";
-            dangerousPlantText.text = wave.WaveName + " 저항이 없던 식물 " + dangerousPlantCount.ToString() + "개";
+            waveText.text = wave.WaveName + "가 지나갔습니다!";
+            dangerousPlantText.text = "저항이 없던 식물 " + dangerousPlantCount.ToString() + "개";
             // 웨이브 이미지 삽입 필요
         }
     }
@@ -94,7 +94,7 @@ public class WeatherApp : MonoBehaviour
         Image waveImage = newPastWeather.transform.Find("WaveImage").GetComponent<Image>();
 
         stageText.text = "안전재난경보 - " + stage.ToString() + "일차";
-        waveText.text = wave.WaveName + " 웨이브로 " + dieCount.ToString() + "개의 식물이 시들었습니다";
+        waveText.text = wave.WaveName + "로 " + dieCount.ToString() + "개의 식물이 \n시들었습니다";
         // 웨이브 이미지 삽입 필요
     }
 }
