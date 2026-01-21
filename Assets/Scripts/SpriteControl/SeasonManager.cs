@@ -4,6 +4,7 @@ using DG.Tweening;
 
 public class SeasonManager : MonoBehaviour
 {
+    [SerializeField] private Season previousSeason = Season.Spring;
     [SerializeField] private Season currentSeason = Season.Spring;
 
     [SerializeField] private float changeDuration = 2f;
@@ -26,6 +27,7 @@ public class SeasonManager : MonoBehaviour
 
     private void InitSettings()
     {
+        currentSeason = previousSeason;
         grassMat.SetFloat("_Dryness", 0f);
         flowerMat.SetFloat("_DissolveAmount", 1f);
         mapleMat.SetFloat("_DissolveAmount", 1f);
@@ -49,7 +51,10 @@ public class SeasonManager : MonoBehaviour
 
     public void ChangeToSeason(Season season)
     {
-        switch(season)
+        if(previousSeason == currentSeason)
+            return;
+
+        switch (season)
         {
             case Season.Spring:
                 snowEffect.SetActive(false);
@@ -76,6 +81,9 @@ public class SeasonManager : MonoBehaviour
                 snowEffect.SetActive(true);
                 break;
         }
+
+        previousSeason = currentSeason;
+        currentSeason = season;
     }
 
     private void ChangeMaterialValue(Material mat, string property, float fromValue, float toValue)
