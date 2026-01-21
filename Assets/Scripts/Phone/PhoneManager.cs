@@ -441,7 +441,7 @@ public class PhoneManager : Singleton<PhoneManager>
         SetPhoneTimer();
 
         skipPhoneTimeButton.SetActive(true);
-        phoneTimer = maxPhoneTimer;
+        phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
         phoneTimerUI.StartPhoneTimer();
 
         isPhoneTime = true;
