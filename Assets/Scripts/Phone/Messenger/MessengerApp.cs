@@ -158,7 +158,6 @@ public class MessengerApp : MonoBehaviour
         if (!progress.activatedTriggersOrdered.Contains(triggerId))
         {
             progress.activatedTriggersOrdered.Add(triggerId);
-            Debug.Log($"Messenger Trigger Activated: {triggerId}");
             // TODO: 세이브
         }
 
@@ -272,7 +271,6 @@ public class MessengerApp : MonoBehaviour
             // lastSeenIndex가 유효한지 확인
             if (lastSeenIndex >= chat.messages.Count)
             {
-                Debug.LogError($"Invalid lastSeenIndex ({lastSeenIndex}) for chat '{chat.name}'.");
                 return info; // 오류 상황에서는 안 읽은 메시지 없다고 처리
             }
             ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
@@ -584,7 +582,6 @@ public class MessengerApp : MonoBehaviour
 
         if (lastSeenIndex >= chat.messages.Count)
         {
-            Debug.LogError("Invalid lastSeenIndex detected!");
             return false;
         }
 
@@ -644,7 +641,6 @@ public class MessengerApp : MonoBehaviour
 
         if (lastSeenIndex >= chat.messages.Count)
         {
-            Debug.LogError("Invalid lastSeenIndex detected!");
             return false;
         }
 

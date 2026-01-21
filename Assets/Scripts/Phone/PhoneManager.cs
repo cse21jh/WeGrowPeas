@@ -191,7 +191,7 @@ public class PhoneManager : Singleton<PhoneManager>
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "내일이 얼마남지 않았습니다",
+                        title = "내일이 얼마 남지 않았습니다",
                         message = "또 힘내봅시다.",
                         duration = 5f
                     }
@@ -363,7 +363,6 @@ public class PhoneManager : Singleton<PhoneManager>
             case AlarmState.Mandatory:
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
-                Debug.Log("<color=red>폰 전체: 필수 알람 울림!</color>");
                 alarm.AlarmPermanent();
                 if(GameManager.Instance != null)
                     GameManager.Instance.StopGame();
@@ -371,7 +370,6 @@ public class PhoneManager : Singleton<PhoneManager>
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
-                Debug.Log("<color=yellow>폰 전체: 선택 알람 있음</color>");
                 alarm.AlarmImpermanent();
                 if (GameManager.Instance != null)
                     GameManager.Instance.ResumeGame();               
@@ -382,7 +380,6 @@ public class PhoneManager : Singleton<PhoneManager>
                 alarm.StopAlarm();
                 if (GameManager.Instance != null)
                     GameManager.Instance.ResumeGame();                
-                Debug.Log("폰 전체: 알람 없음");
                 break;
         }
     }

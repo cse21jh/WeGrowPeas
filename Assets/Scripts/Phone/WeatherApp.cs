@@ -19,7 +19,7 @@ public class WeatherApp : MonoBehaviour
     [Header("Wave Properties")]
     [SerializeField] private Image currentWavePanel;
     [SerializeField] private Image waveImage;
-    [SerializeField] private Color[] waveColors; // ¿şÀÌºê Å¸ÀÔº° »ö»ó ¹è¿­
+    [SerializeField] private Color[] waveColors; // ì›¨ì´ë¸Œ íƒ€ì…ë³„ ìƒ‰ìƒ ë°°ì—´
 
 
     public void LoadNextDay(int stage, Wave lastWave, Wave currentWave, int lastDangerousPlantCount, int currentDangerousPlantCount, int dieCount)
@@ -33,17 +33,17 @@ public class WeatherApp : MonoBehaviour
     {
         if(wave.WaveType == WaveType.None)
         {
-            stageText.text = stage.ToString() + "ÀÏÂ÷";
-            waveText.text = "¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾ÊÀ» ¿¹Á¤ÀÔ´Ï´Ù!";
+            stageText.text = stage.ToString() + "ì¼ì°¨";
+            waveText.text = "ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šì„ ì˜ˆì •ì…ë‹ˆë‹¤!";
             dangerousPlantText.text = "";
-            // ¿şÀÌºê ÀÌ¹ÌÁö »ğÀÔ ÇÊ¿ä
+            // ì›¨ì´ë¸Œ ì´ë¯¸ì§€ ì‚½ì… í•„ìš”
         }
         else
         {
-            stageText.text = stage.ToString() + "ÀÏÂ÷";
-            waveText.text = wave.WaveName + "¿şÀÌºê°¡ Áö³ª°¥ ¿¹Á¤ÀÔ´Ï´Ù.";
-            dangerousPlantText.text = wave.WaveName + "ÀúÇ×ÀÌ ¾ø´Â ½Ä¹° " + dangerousPlantCount.ToString() + "°³";
-            // ¿şÀÌºê ÀÌ¹ÌÁö »ğÀÔ ÇÊ¿ä
+            stageText.text = stage.ToString() + "ì¼ì°¨";
+            waveText.text = wave.WaveName + " ì›¨ì´ë¸Œê°€ ì§€ë‚˜ê°ˆ ì˜ˆì •ì…ë‹ˆë‹¤.";
+            dangerousPlantText.text = wave.WaveName + " ì €í•­ì´ ì—†ëŠ” ì‹ë¬¼ " + dangerousPlantCount.ToString() + "ê°œ";
+            // ì›¨ì´ë¸Œ ì´ë¯¸ì§€ ì‚½ì… í•„ìš”
 
             currentWavePanel.color = waveColors[(int)wave.WaveType];
         }
@@ -64,17 +64,17 @@ public class WeatherApp : MonoBehaviour
 
         if (wave.WaveType == WaveType.None)
         {
-            stageText.text = "¾ÈÀüÀç³­°æº¸ - " + stage.ToString() + "ÀÏÂ÷";
-            waveText.text = "¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾Ê¾Ò½À´Ï´Ù!";
+            stageText.text = "ì•ˆì „ì¬ë‚œê²½ë³´ - " + stage.ToString() + "ì¼ì°¨";
+            waveText.text = "ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!";
             dangerousPlantText.text = "";
-            // ¿şÀÌºê ÀÌ¹ÌÁö »ğÀÔ ÇÊ¿ä
+            // ì›¨ì´ë¸Œ ì´ë¯¸ì§€ ì‚½ì… í•„ìš”
         }
         else
         {
-            stageText.text = "¾ÈÀüÀç³­°æº¸ - " + stage.ToString() + "ÀÏÂ÷";
-            waveText.text = wave.WaveName + " ¿şÀÌºê°¡ Áö³ª°¬½À´Ï´Ù!";
-            dangerousPlantText.text = wave.WaveName + " ÀúÇ×ÀÌ ¾ø´ø ½Ä¹° " + dangerousPlantCount.ToString() + "°³";
-            // ¿şÀÌºê ÀÌ¹ÌÁö »ğÀÔ ÇÊ¿ä
+            stageText.text = "ì•ˆì „ì¬ë‚œê²½ë³´ - " + stage.ToString() + "ì¼ì°¨";
+            waveText.text = wave.WaveName + " ì›¨ì´ë¸Œê°€ ì§€ë‚˜ê°”ìŠµë‹ˆë‹¤!";
+            dangerousPlantText.text = wave.WaveName + " ì €í•­ì´ ì—†ë˜ ì‹ë¬¼ " + dangerousPlantCount.ToString() + "ê°œ";
+            // ì›¨ì´ë¸Œ ì´ë¯¸ì§€ ì‚½ì… í•„ìš”
         }
     }
 
@@ -93,8 +93,8 @@ public class WeatherApp : MonoBehaviour
         TMP_Text waveText = newPastWeather.transform.Find("Wave").GetComponent<TMP_Text>();
         Image waveImage = newPastWeather.transform.Find("WaveImage").GetComponent<Image>();
 
-        stageText.text = "¾ÈÀüÀç³­°æº¸ - " + stage.ToString() + "ÀÏÂ÷";
-        waveText.text = wave.WaveName + " ¿şÀÌºê·Î " + dieCount.ToString() + "°³ÀÇ ½Ä¹°ÀÌ ½Ãµé¾ú½À´Ï´Ù";
-        // ¿şÀÌºê ÀÌ¹ÌÁö »ğÀÔ ÇÊ¿ä
+        stageText.text = "ì•ˆì „ì¬ë‚œê²½ë³´ - " + stage.ToString() + "ì¼ì°¨";
+        waveText.text = wave.WaveName + " ì›¨ì´ë¸Œë¡œ " + dieCount.ToString() + "ê°œì˜ ì‹ë¬¼ì´ ì‹œë“¤ì—ˆìŠµë‹ˆë‹¤";
+        // ì›¨ì´ë¸Œ ì´ë¯¸ì§€ ì‚½ì… í•„ìš”
     }
 }
