@@ -53,7 +53,7 @@ public class SeasonManager : MonoBehaviour
 
     public void ChangeToSeason(Season season)
     {
-        if(previousSeason == currentSeason)
+        if(season == currentSeason)
             return;
 
         switch (season)
