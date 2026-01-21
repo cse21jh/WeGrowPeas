@@ -73,7 +73,7 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private BreedTimerManager breedTimerManager;
     [SerializeField] private TimerUI phoneTimerUI;
     [SerializeField] TextMeshProUGUI phoneTimerText;
-    [SerializeField] bool isTutorial = false;
+    [SerializeField] public bool isTutorial = false;
 
 
     private void Awake()
