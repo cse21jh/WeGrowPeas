@@ -500,6 +500,7 @@ public class TraitSelectionUIController : MonoBehaviour
 
         if (popupParent != null)
         {
+            confirmButton.interactable = false;
             popupParent.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 popupParent.gameObject.SetActive(false);

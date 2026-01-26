@@ -83,6 +83,12 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
         minRoot.transform.rotation = Quaternion.Euler(0, 0, 0);
         maxRoot.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+        foreach (var wave in vibWaves)
+        {
+            wave.alpha = 0f;
+            wave.transform.localScale = Vector3.zero;
+        }
     }
 
     public void DisableAlarm()
