@@ -47,6 +47,12 @@ public class SceneLoader : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public void LoadIntroScene()
+    {
+        SceneManager.LoadScene("IntroScene");
+        Time.timeScale = 1f;
+    }
+
     public void LoadTutorialScene()
     {
         SceneManager.LoadScene("Tutorial");
