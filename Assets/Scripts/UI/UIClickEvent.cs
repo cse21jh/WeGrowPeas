@@ -30,6 +30,8 @@ public class UIClickEvent : MonoBehaviour
 {
     [SerializeField] private Button continueEndlessButton;
     [SerializeField] private GameObject restartPopup;
+    [SerializeField] private GameObject buttonPanel;
+    [SerializeField] private GameObject saveSlotPanel;
 
     private IEnumerator DelayAction(float delay, Action action)
     {
@@ -39,17 +41,19 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_StartNewGame()
     {
-        TransitionController.instance.Transition_Out();
+        /*TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
         {
             GameStartContext.SetStartType(GameStartType.NewGame);
             SceneLoader.Instance?.LoadGardenScene();
-        }));
+        }));*/
+
+        OnClickShowSaveSlotPanel();
     }
 
     public void OnClick_ContinueGame()
     {
-        string path = Application.dataPath + "/UserData.json";
+        /*string path = Application.dataPath + "/UserData.json";
 
         GetGameStartTypeFromSave();
 
@@ -63,7 +67,9 @@ public class UIClickEvent : MonoBehaviour
             }));
         }
 
-        return;
+        return;*/
+
+        OnClickShowSaveSlotPanel();
     }
 
     public void OnClick_GoToTutorial()
@@ -130,5 +136,11 @@ public class UIClickEvent : MonoBehaviour
     public void PlayButtonClickSound()
     {
         SoundManager.Instance.PlayEffect("Button");
+    }
+
+    public void OnClickShowSaveSlotPanel()
+    {
+        buttonPanel.SetActive(false);
+        saveSlotPanel.SetActive(true);
     }
 }

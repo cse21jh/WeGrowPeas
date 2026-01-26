@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
+using JetBrains.Annotations;
 
 [System.Serializable]
 public class SaveData
@@ -127,6 +128,15 @@ public class SaveData
     public List<ChatDayData> dayByChatPartners = new();
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
+}
+
+[System.Serializable]
+public class ConstantSaveData
+{
+    public int geneToken;
+    public int customizeToken;
+
+    //setting data
 }
 
 [System.Serializable]
@@ -579,7 +589,7 @@ public class GameManager : Singleton<GameManager>
 
     private string GetSavePath()
     {
-        return Application.dataPath + "/UserData.json";
+        return SaveContext.Instance.CurrentSaveFilePath;
     }
 
     private void PassRecordToGameRecordHolder()
