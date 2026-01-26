@@ -189867,7 +189867,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalTransform:
   - {fileID: 697552845}
-  - {fileID: 0}
+  - {fileID: 1001494163}
   glowTransform:
   - {fileID: 1733982317}
   - {fileID: 1402146058}
@@ -318522,6 +318522,8 @@ MonoBehaviour:
   textStage: {fileID: 1385910835}
   shovel: {fileID: 516381530}
   canvasTransform: {fileID: 1205389965510942847}
+  waveManager: {fileID: 702171818}
+  gcController: {fileID: 794207855}
   breedGraph: {fileID: 3411097808476539923, guid: f49092047142c1c4194e0a57b697e45d, type: 3}
   spawnedCircle: {fileID: 2143237336}
   rc: {fileID: 160201830}
@@ -337172,7 +337174,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1402146058
 RectTransform:
   m_ObjectHideFlags: 0
@@ -337251,7 +337253,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 570108821}
         m_TargetAssemblyTypeName: PhoneManager, Assembly-CSharp
         m_MethodName: Toggle
         m_Mode: 1
@@ -438376,7 +438378,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC0BD"
+  m_text: "\uC0BD C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 595b1ad5204330b45aa4685db4b6e1e6, type: 2}
@@ -438403,8 +438405,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -513732,6 +513734,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   continueEndlessButton: {fileID: 0}
   restartPopup: {fileID: 0}
+  buttonPanel: {fileID: 0}
+  saveSlotPanel: {fileID: 0}
 --- !u!1 &4213111200126028736
 GameObject:
   m_ObjectHideFlags: 0

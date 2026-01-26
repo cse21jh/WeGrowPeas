@@ -27,17 +27,31 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     // Update is called once per frame
     void Update()
     {
-        if(isDragging)
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+
+            if (!isDragging)
+            {
+                grid.isDraggingShovel = true;
+                isDragging = true;
+                grid.ShowAllPriceSign();
+                UpdatePosition();
+            }
+            else
+            {
+                ResetShovel();
+            }
+        }
+
+        if (isDragging)
         {
             if(!IsEnabled)
             {
                 ResetShovel();
                 return;
             }
-
             UpdatePosition();
-
-        }
+        }        
     }
     public void OnPointerDown(PointerEventData eventData)
     {

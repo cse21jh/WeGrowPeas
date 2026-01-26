@@ -1,7 +1,8 @@
+using DG.Tweening.Core.Easing;
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
-using System.Linq;
 
 public class TutorialManager : Singleton<TutorialManager>
 {
@@ -21,6 +22,9 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private TextMeshProUGUI textStage;
     [SerializeField] private GameObject shovel;
     [SerializeField] private Transform canvasTransform;
+    [SerializeField] private WaveManager waveManager;
+    [SerializeField] private GlowCanvasController gcController;
+
 
 
     [Header("Visual Guides")]
@@ -117,6 +121,8 @@ public class TutorialManager : Singleton<TutorialManager>
                 ActivateWave();
                 break;
             case 6: // 자유시간
+                gcController.ToggleGlow(true);
+                waveManager.StartCoroutine(waveManager.StartNightCoroutine());
                 PhoneManager.Instance.TutorialPhonePhase();
                 break;
             case 7: // 이제 실전으로 끝
@@ -175,6 +181,8 @@ public class TutorialManager : Singleton<TutorialManager>
             case 7: // 이제 실전으로 끝
                 //yield return new WaitForSeconds(1f);
                 PhoneManager.Instance.isTutorialEnd = true;
+                gcController.ToggleGlow(false);
+                waveManager.StartCoroutine(waveManager.StopNightCoroutine());
                 mc.AddMessage(MessageController.MessageSenderType.player, "완두콩 키우러 가자! 클릭!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
                 break;
         }
