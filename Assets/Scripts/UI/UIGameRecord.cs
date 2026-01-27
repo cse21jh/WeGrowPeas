@@ -18,10 +18,10 @@ public class UIGameRecord : MonoBehaviour
 
     private string[] endingTextDisc = new string[4]
     {
-        "»ì¾Æ³²´Â µ¥´Â ¼º°øÇßÁö¸¸, ½Ä·® È®º¸°¡ º¸ÀåµÇÁö ¾Ê´Â´Ù°í ÆÇ´ÜµÇ¾î ´Ù¸¥ ´ë¾ÈÀ» Å½»öÇÏ·¯ ¶°³µ´Ù¡¦.",
-        "¾ÈÁ¤ÀûÀÎ È¯°æ¿¡¼­ »ı»êÀÌ ºü¸¥ ÁÁÀº ½Ä·®À¸·Î Æò°¡¹Ş¾Æ È¯°æÀûÀÎ º¯È­°¡ Å©°Ô ¾ø´Â ÀÏºÎ Áö¿ª¿¡¼­ ¾²ÀÌ°Ô µÇ¾ú´Ù.",
-        "´Ù¾çÇÑ È¯°æ¿¡¼­ ±¦ÂúÀº »ı»ê·®À» º¸¿© ÁÖ¾ú±â¿¡ ºñ»ó½Ã¿¡ »ç¿ëµÉ ´ëÃ¼½ÄÇ°À¸·Î °¢±¤¹ŞÀ¸¸ç ÁÁÀº ¸Ô°Å¸®°¡ µÇ¾ú´Ù.",
-        "¶Ù¾î³­ ÀûÀÀ¼º°ú ¹ø½Ä ¼Óµµ¸¦ ÀÔÁõÇØ Àü¼¼°è¿¡ È®»êµÇ¾ú°í, ÀÌÈÄ ÀÎ·ùÀÇ ÇÙ½ÉÀûÀÎ ½Ä·®ÀÌ µÇ¾ú´Ù!"
+        "ì‚´ì•„ë‚¨ëŠ” ë°ëŠ” ì„±ê³µí–ˆì§€ë§Œ, ì‹ëŸ‰ í™•ë³´ê°€ ë³´ì¥ë˜ì§€ ì•ŠëŠ”ë‹¤ê³  íŒë‹¨ë˜ì–´ ë‹¤ë¥¸ ëŒ€ì•ˆì„ íƒìƒ‰í•˜ëŸ¬ ë– ë‚¬ë‹¤â€¦.",
+        "ì•ˆì •ì ì¸ í™˜ê²½ì—ì„œ ìƒì‚°ì´ ë¹ ë¥¸ ì¢‹ì€ ì‹ëŸ‰ìœ¼ë¡œ í‰ê°€ë°›ì•„ í™˜ê²½ì ì¸ ë³€í™”ê°€ í¬ê²Œ ì—†ëŠ” ì¼ë¶€ ì§€ì—­ì—ì„œ ì“°ì´ê²Œ ë˜ì—ˆë‹¤.",
+        "ë‹¤ì–‘í•œ í™˜ê²½ì—ì„œ ê´œì°®ì€ ìƒì‚°ëŸ‰ì„ ë³´ì—¬ ì£¼ì—ˆê¸°ì— ë¹„ìƒì‹œì— ì‚¬ìš©ë  ëŒ€ì²´ì‹í’ˆìœ¼ë¡œ ê°ê´‘ë°›ìœ¼ë©° ì¢‹ì€ ë¨¹ê±°ë¦¬ê°€ ë˜ì—ˆë‹¤.",
+        "ë›°ì–´ë‚œ ì ì‘ì„±ê³¼ ë²ˆì‹ ì†ë„ë¥¼ ì…ì¦í•´ ì „ì„¸ê³„ì— í™•ì‚°ë˜ì—ˆê³ , ì´í›„ ì¸ë¥˜ì˜ í•µì‹¬ì ì¸ ì‹ëŸ‰ì´ ë˜ì—ˆë‹¤!"
     };
 
     private int recordStage = 0;
@@ -31,7 +31,7 @@ public class UIGameRecord : MonoBehaviour
     {
         recordStage = (GameStartContext.StartType == GameStartType.GameOver) ? GameRecordHolder.maxStageReached - 1 : GameRecordHolder.maxStageReached;
 
-        peaEmotionSprite = Resources.LoadAll<Sprite>("Sprites/UI/peaFace_1-sheet");
+        peaEmotionSprite = Resources.LoadAll<Sprite>("peaFace_1-sheet");
         var texts = GetComponentsInChildren<TextMeshProUGUI>(true);
 
         endingText = texts.FirstOrDefault(t => t.name == "EndingText");
@@ -69,26 +69,26 @@ public class UIGameRecord : MonoBehaviour
 
     private void SetEndingMailContent()
     {
-        endingText.text = $"¿ì¸®´Â {recordStage}ÀÏ°£ {endingTextDisc[GameRecordHolder.PlayerRank]}";
+        endingText.text = $"ìš°ë¦¬ëŠ” {recordStage}ì¼ê°„ {endingTextDisc[GameRecordHolder.PlayerRank]}";
 
-        pg1.text = $"ÃÑ \"{recordStage}\"ÀÏÀ» ¹öÅá´Ù!";
+        pg1.text = $"ì´ \"{recordStage}\"ì¼ì„ ë²„í…¼ë‹¤!";
 
-        pg2.text = $"\"{GameRecordHolder.TotalPeas}\"°³ÀÇ ¿ÏµÎÄá Áß \"{GameRecordHolder.soldPeas}\"°³¸¦ ÆÇ¸ÅÇß´Ù.\n" +
-            /*$"\"{GameRecordHolder.TotalPeanuts}\"°³ÀÇ ¶¥Äá Áß \"{GameRecordHolder.soldPeanuts}\"°³¸¦ ÆÇ¸ÅÇß´Ù.\n" +*/
-            $"¹ú·¹´Â \"{GameRecordHolder.TotalBugsKilled}\"¸¶¸® Àâ¾Ò´Ù.\n" +
-            $"ÃÑ \"{GameRecordHolder.totalGoldEarned}\"°ñµå¸¦ ¹ú¾ú´Ù!\n" +
-            $"»óÁ¡¿¡¼­ \"{GameRecordHolder.totalGoldSpend}\"°ñµå¸¦ ¼Ò¸ğÇß´Ù.";
+        pg2.text = $"\"{GameRecordHolder.TotalPeas}\"ê°œì˜ ì™„ë‘ì½© ì¤‘ \"{GameRecordHolder.soldPeas}\"ê°œë¥¼ íŒë§¤í–ˆë‹¤.\n" +
+            /*$"\"{GameRecordHolder.TotalPeanuts}\"ê°œì˜ ë•…ì½© ì¤‘ \"{GameRecordHolder.soldPeanuts}\"ê°œë¥¼ íŒë§¤í–ˆë‹¤.\n" +*/
+            $"ë²Œë ˆëŠ” \"{GameRecordHolder.TotalBugsKilled}\"ë§ˆë¦¬ ì¡ì•˜ë‹¤.\n" +
+            $"ì´ \"{GameRecordHolder.totalGoldEarned}\"ê³¨ë“œë¥¼ ë²Œì—ˆë‹¤!\n" +
+            $"ìƒì ì—ì„œ \"{GameRecordHolder.totalGoldSpend}\"ê³¨ë“œë¥¼ ì†Œëª¨í–ˆë‹¤.";
 
         if(GameRecordHolder.PopularItemName == null)
         {
-            pg3.text = $"¿ì¸® ³óÀåÀº {GameRecordHolder.MostKilledWave}¿¡ Ãë¾àÇß´Ù¡¦.\n" +
-            $"»ç¶÷µéÀº {GameRecordHolder.MostSellPlantName}À» °¡Àå ÁÁ¾ÆÇÏ´Â µíÇÏ´Ù.";
+            pg3.text = $"ìš°ë¦¬ ë†ì¥ì€ {GameRecordHolder.MostKilledWave}ì— ì·¨ì•½í–ˆë‹¤â€¦.\n" +
+            $"ì‚¬ëŒë“¤ì€ {GameRecordHolder.MostSellPlantName}ì„ ê°€ì¥ ì¢‹ì•„í•˜ëŠ” ë“¯í•˜ë‹¤.";
         }
         else
         {
-            pg3.text = $"¿ì¸® ³óÀåÀº {GameRecordHolder.MostKilledWave}¿¡ Ãë¾àÇß´Ù¡¦\n" +
-            $"»óÁ¡¿¡¼­ {GameRecordHolder.PopularItemName}À»/¸¦ ¾Ö¿ëÇß´Ù.\n" +
-            $"»ç¶÷µéÀº {GameRecordHolder.MostSellPlantName}À» °¡Àå ÁÁ¾ÆÇÏ´Â µíÇÏ´Ù.";
+            pg3.text = $"ìš°ë¦¬ ë†ì¥ì€ {GameRecordHolder.MostKilledWave}ì— ì·¨ì•½í–ˆë‹¤â€¦\n" +
+            $"ìƒì ì—ì„œ {GameRecordHolder.PopularItemName}ì„/ë¥¼ ì• ìš©í–ˆë‹¤.\n" +
+            $"ì‚¬ëŒë“¤ì€ {GameRecordHolder.MostSellPlantName}ì„ ê°€ì¥ ì¢‹ì•„í•˜ëŠ” ë“¯í•˜ë‹¤.";
         }
 
         pg4.text = "";

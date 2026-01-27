@@ -10,12 +10,14 @@ public class SaveSlotUI : MonoBehaviour
 {
     [SerializeField] private GameObject[] slotItems;
     [SerializeField] private GameObject savePopup;
+    [SerializeField] private GameObject clickBlocker;
 
     private string path;
 
     private void Start()
     {
         SetSlots();
+        clickBlocker.SetActive(false);
     }
 
     public void SetSlots()
@@ -65,6 +67,7 @@ public class SaveSlotUI : MonoBehaviour
     public void OnClickNewGame()
     {
         File.Delete(path);
+        ActivateBlocker();
         TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
         {
@@ -79,6 +82,8 @@ public class SaveSlotUI : MonoBehaviour
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
         GameStartContext.SetStartType(saveData.gst);
+
+        ActivateBlocker();
 
         TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
@@ -96,5 +101,10 @@ public class SaveSlotUI : MonoBehaviour
     public void CloseSavePopup()
     {
         savePopup.SetActive(false);
+    }
+
+    public void ActivateBlocker()
+    {
+        clickBlocker.SetActive(true);
     }
 }
