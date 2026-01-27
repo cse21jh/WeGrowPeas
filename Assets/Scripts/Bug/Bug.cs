@@ -44,8 +44,8 @@ public class Bug : MonoBehaviour
 
     protected virtual void Start()
     {
-        bugKillerPrefab = Resources.Load<GameObject>("Prefabs/BugKiller");
-        WarningPrefab = Resources.Load<GameObject>("Prefabs/Warning");
+        bugKillerPrefab = Resources.Load<GameObject>("BugKiller");
+        WarningPrefab = Resources.Load<GameObject>("Warning");
         economyManager = GameObject.Find("EconomyManager").GetComponent<EconomyManager>();
         grid = GameObject.Find("Grid").GetComponent<Grid>();
 
