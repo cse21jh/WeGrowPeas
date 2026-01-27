@@ -589,6 +589,10 @@ public class GameManager : Singleton<GameManager>
 
     private string GetSavePath()
     {
+        string defaultPath = Application.dataPath + "/UserData_2.json";
+
+        if (SaveContext.Instance == null) return defaultPath;
+
         return SaveContext.Instance.CurrentSaveFilePath;
     }
 
