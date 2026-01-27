@@ -64,6 +64,7 @@ public class SaveSlotUI : MonoBehaviour
 
     public void OnClickNewGame()
     {
+        File.Delete(path);
         TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
         {

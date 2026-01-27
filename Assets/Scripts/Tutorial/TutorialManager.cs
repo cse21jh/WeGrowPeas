@@ -183,7 +183,9 @@ public class TutorialManager : Singleton<TutorialManager>
                 PhoneManager.Instance.isTutorialEnd = true;
                 gcController.ToggleGlow(false);
                 waveManager.StartCoroutine(waveManager.StopNightCoroutine());
-                mc.AddMessage(MessageController.MessageSenderType.player, "완두콩 키우러 가자! 클릭!", "", FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame);
+                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 0에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(0));
+                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 1에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(1));
+                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 2에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(2));
                 break;
         }
     }

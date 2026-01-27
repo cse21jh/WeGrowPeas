@@ -39,8 +39,10 @@ public class UIClickEvent : MonoBehaviour
         action?.Invoke();
     }
 
-    public void OnClick_StartNewGame()
+    public void OnClick_StartNewGame(int slotIndex)
     {
+        SaveContext.Instance.SelectSlot(slotIndex);
+
         TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
         {
