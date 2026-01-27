@@ -41,14 +41,14 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_StartNewGame()
     {
-        /*TransitionController.instance.Transition_Out();
+        TransitionController.instance.Transition_Out();
         StartCoroutine(DelayAction(1.1f, () =>
         {
             GameStartContext.SetStartType(GameStartType.NewGame);
             SceneLoader.Instance?.LoadGardenScene();
-        }));*/
+        }));
 
-        OnClickShowSaveSlotPanel();
+        //OnClickShowSaveSlotPanel();
     }
 
     public void OnClick_ContinueGame()

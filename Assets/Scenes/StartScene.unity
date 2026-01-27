@@ -442,7 +442,7 @@ GameObject:
   - component: {fileID: 46073214}
   - component: {fileID: 46073217}
   m_Layer: 5
-  m_Name: NewGameButton
+  m_Name: TutorialButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -515,7 +515,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1054901302}
         m_TargetAssemblyTypeName: UIClickEvent, Assembly-CSharp
-        m_MethodName: OnClick_StartNewGame
+        m_MethodName: OnClick_GoToTutorial
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6695,7 +6695,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1078773750
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7274,7 +7274,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC2DC\uC791"
+  m_text: "\uD29C\uD1A0\uB9AC\uC5BC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d08a1eff5e7710143b424ce7bafedd0c, type: 2}
   m_sharedMaterial: {fileID: 165057806373141443, guid: d08a1eff5e7710143b424ce7bafedd0c, type: 2}
@@ -9084,7 +9084,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBD88\uB7EC\uC624\uAE30"
+  m_text: "\uC2DC\uC791\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d08a1eff5e7710143b424ce7bafedd0c, type: 2}
   m_sharedMaterial: {fileID: 165057806373141443, guid: d08a1eff5e7710143b424ce7bafedd0c, type: 2}
@@ -11663,7 +11663,7 @@ GameObject:
   - component: {fileID: 1924243942}
   - component: {fileID: 1924243945}
   m_Layer: 5
-  m_Name: ContinueGameButton
+  m_Name: GameStartButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11736,7 +11736,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1054901302}
         m_TargetAssemblyTypeName: UIClickEvent, Assembly-CSharp
-        m_MethodName: OnClick_ContinueGame
+        m_MethodName: OnClickShowSaveSlotPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
