@@ -294,7 +294,17 @@ public class EnemyController : MonoBehaviour
     public void ShowNextWaveText()
     {
         nextWaveText.text = currentWave.WaveDescription;
-    }    
+    }
+
+    public void SetNextWaveText(string text)
+    {
+        nextWaveText.text = text;
+    }
+
+    public string GetNextWaveText()
+    {
+        return nextWaveText.text;   
+    }
 
     private void FlushNextWaveText()
     {

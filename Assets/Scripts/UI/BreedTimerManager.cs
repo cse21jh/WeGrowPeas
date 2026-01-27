@@ -90,9 +90,9 @@ public class BreedTimerManager : MonoBehaviour
             timer.SetActive(false);
         }
 
-        // 8¹ø Ä­¿¡ ÃßÈÄ Æù Å¸ÀÌ¸Ó UI »ğÀÔÇÏ¸é µÊ
+        // 8ë²ˆ ì¹¸ì— ì¶”í›„ í° íƒ€ì´ë¨¸ UI ì‚½ì…í•˜ë©´ ë¨
         timers[8].SetActive(true);
         timerUIs[8].UpdatePhoneMaxTimerCount();
-        //GameManager.Instance.phoneManager.SetPhoneTimerUI(timerUIs[8]);
+        grid.SetBreedTimerUI(timerUIs[8]);
     }
 }

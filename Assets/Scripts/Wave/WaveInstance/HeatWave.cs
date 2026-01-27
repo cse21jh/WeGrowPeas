@@ -5,8 +5,8 @@ using UnityEngine;
 public class HeatWave : Wave
 {
     public override WaveType WaveType => WaveType.Heat;
-    public override string WaveName => "´õÀ§";
-    public override string WaveDescription => "±â¿ÂÀÌ ¿Ã¶ó°¡°í ÀÖ½À´Ï´Ù......";
+    public override string WaveName => "ë”ìœ„";
+    public override string WaveDescription => "ê¸°ì˜¨ì´ ì˜¬ë¼ê°€ê³ \nìˆìŠµë‹ˆë‹¤......";
     public override string WaveSoundString => "Heat";
     public const int UnlockStage = 26;
 }

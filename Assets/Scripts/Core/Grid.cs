@@ -982,6 +982,11 @@ public class Grid : MonoBehaviour
         breedTimerUI = timerUI;
     }
 
+    public TimerUI GetBreedTimerUI()
+    {
+        return breedTimerUI;
+    }
+
     public void LoadGrid(SaveData saveData)
     {
         List<PlantData> plantList = saveData.plantList;

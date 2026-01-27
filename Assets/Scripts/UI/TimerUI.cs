@@ -8,6 +8,7 @@ public class TimerUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textTimer;
     private int maxBreedingTime;
     private Coroutine countdownRoutine;
+    private string waveText = null;
 
     [SerializeField] private BreedTimerController breedTimerController;
 
@@ -164,6 +165,26 @@ public class TimerUI : MonoBehaviour
             yield return new WaitForSeconds(1f);
             timeLeft--;
             breedTimerController.SetFill(1 - (timeLeft / (float)maxBreedingTime));
+        }
+    }
+
+    public void ShowPhoneAlarmText()
+    {
+        if (!breedTimerController.isLocked)
+        {
+            waveText = GameManager.Instance.enemyController.GetNextWaveText();
+            GameManager.Instance.enemyController.SetNextWaveText("<color=#FF4F4F>폰 알람</color> 확인!");
+            breedTimerController.LockText();
+        }
+    }
+
+    public void HidePhoneAlarmText()
+    {
+        if (waveText != null)
+        {
+            GameManager.Instance.enemyController.SetNextWaveText(waveText);
+            breedTimerController.ReleaseText();
+            waveText = null;
         }
     }
 }

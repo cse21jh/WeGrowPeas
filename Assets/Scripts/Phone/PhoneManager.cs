@@ -168,11 +168,11 @@ public class PhoneManager : Singleton<PhoneManager>
     }
 
     public IEnumerator PhonePhase()
-    {
-        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString());
+    {        
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
-        
+        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString());
+
         skipPhoneTimeButton.SetActive(true);
         phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
         phoneTimerUI.StartPhoneTimer();
@@ -222,7 +222,7 @@ public class PhoneManager : Singleton<PhoneManager>
     public void SetPhoneTimer()
     {
         breedTimerManager.SetPhoneTimer();
-        phoneTimerText.text = "자기 전에 핸드폰 봐야지...";
+        phoneTimerText.text = "자기 전에\n핸드폰 봐야지...";
     }
 
     public void SetPhoneTimerUI(TimerUI timerUI)
@@ -373,21 +373,30 @@ public class PhoneManager : Singleton<PhoneManager>
                 nonMandatoryAlarm.SetActive(false);
                 alarm.AlarmPermanent();
                 if(GameManager.Instance != null)
+                { 
                     GameManager.Instance.StopGame();
+                    GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText();
+                }
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
                 alarm.AlarmImpermanent();
                 if (GameManager.Instance != null)
-                    GameManager.Instance.ResumeGame();               
+                {
+                    GameManager.Instance.ResumeGame();
+                    GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
+                }
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
                 alarm.StopAlarm();
                 if (GameManager.Instance != null)
-                    GameManager.Instance.ResumeGame();                
+                {
+                    GameManager.Instance.ResumeGame();
+                    GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
+                }
                 break;
         }
     }

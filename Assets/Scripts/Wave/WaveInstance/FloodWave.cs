@@ -5,8 +5,8 @@ using UnityEngine;
 public class FloodWave : Wave
 {
     public override WaveType WaveType => WaveType.Flood;
-    public override string WaveName => "È«¼ö";
-    public override string WaveDescription => "È«¼ö°¡ µ¤ÃÄ¿É´Ï´Ù......";
+    public override string WaveName => "í™ìˆ˜";
+    public override string WaveDescription => "í™ìˆ˜ê°€\në®ì³ì˜µë‹ˆë‹¤......";
     public override string WaveSoundString => "Flood";
     public const int UnlockStage = 16;
 }

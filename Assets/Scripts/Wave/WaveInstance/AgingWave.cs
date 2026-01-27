@@ -5,8 +5,8 @@ using UnityEngine;
 public class AgingWave : Wave
 {
     public override WaveType WaveType => WaveType.Aging;
-    public override string WaveName => "ÀÚ¿¬»ç";
-    public override string WaveDescription => "°ð ÇÏ·ç°¡ Áö³ª°©´Ï´Ù......";
+    public override string WaveName => "ìžì—°ì‚¬";
+    public override string WaveDescription => "ê³§ í•˜ë£¨ê°€\nì§€ë‚˜ê°‘ë‹ˆë‹¤......";
     public override string WaveSoundString => "Aging";
     public const int UnlockStage = 1;
 }

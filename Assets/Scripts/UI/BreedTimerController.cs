@@ -13,7 +13,7 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
 
     [SerializeField] private float targetFillAmount = 1f;
 
-
+    public bool isLocked = false;
 
     public void SetFill(float fillAmount)
     {
@@ -34,20 +34,34 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    public void LockText()
+    {
+        isLocked = true;
+        waveTextBox.ShowWaveTextBox();
+    }
 
-
-
+    public void ReleaseText()
+    {
+        isLocked = false;
+        waveTextBox.HideWaveTextBox();
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // ¸¶¿ì½º°¡ ¹öÆ° À§¿¡ ¿Ã·ÁÁ³À» ¶§
-        waveTextBox.ShowWaveTextBox();
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ ìœ„ì— ì˜¬ë ¤ì¡Œì„ ë•Œ
+        if (!isLocked)
+        {
+            waveTextBox.ShowWaveTextBox();
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // ¸¶¿ì½º°¡ ¹öÆ°À» ¶°³µÀ» ¶§
-        waveTextBox.HideWaveTextBox();
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ì„ ë– ë‚¬ì„ ë•Œ
+        if (!isLocked)
+        {
+            waveTextBox.HideWaveTextBox();
+        }
     }
 
 

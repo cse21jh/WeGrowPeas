@@ -5,8 +5,8 @@ using UnityEngine;
 public class HeavyRainWave : Wave
 {
     public override WaveType WaveType => WaveType.HeavyRain;
-    public override string WaveName => "Æø¿ì";
-    public override string WaveDescription => "Æø¿ì°¡ ³»¸®±â ½ÃÀÛÇÕ´Ï´Ù......";
+    public override string WaveName => "í­ìš°";
+    public override string WaveDescription => "í­ìš°ê°€ ë‚´ë¦¬ê¸°\nì‹œìž‘í•©ë‹ˆë‹¤......";
     public override string WaveSoundString => "HeavyRain";
     public const int UnlockStage = 21;
 }
