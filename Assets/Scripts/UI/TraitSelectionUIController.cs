@@ -375,7 +375,7 @@ public class TraitSelectionUIController : MonoBehaviour
         if (add)
         {
             // 기본 저항력 0.5f, 유전자 0으로 추가
-            selectedTraits.Add(new GeneticTrait(traitType, 0.5f, 0, 0.0f));
+            selectedTraits.Add(new GeneticTrait(traitType, Plant.GetResistanceBasedOnGenetics(traitType, 0), 0, 0.0f));
         }
         else
         {
@@ -389,8 +389,8 @@ public class TraitSelectionUIController : MonoBehaviour
     private void SelectSingleTrait(TraitType traitType)
     {
         selectedTraits.Clear();
-        // 기본 저항력 0.5f, 유전자 1로 추가 (완두콩 구매 시 형질 보장)
-        selectedTraits.Add(new GeneticTrait(traitType, 0.5f, 1, 0.0f));
+        // 현 저장 파일의 식물 종류에 따라서 저항력 저장
+        selectedTraits.Add(new GeneticTrait(traitType, Plant.GetResistanceBasedOnGenetics(traitType, 1), 1, 0.0f));
         
         if (confirmButton != null)
             confirmButton.interactable = true; // 선택 후 확인 버튼 활성화
@@ -402,9 +402,9 @@ public class TraitSelectionUIController : MonoBehaviour
     private void SelectPairedTrait(TraitType traitA, TraitType traitB)
     {
         selectedTraits.Clear();
-        // 기본 저항력 0.5f, 유전자 0으로 둘 다 추가
-        selectedTraits.Add(new GeneticTrait(traitA, 0.65f, 1, 0.0f));
-        selectedTraits.Add(new GeneticTrait(traitB, 0.65f, 1, 0.0f));
+        // 쌍 형질 넣어줌
+        selectedTraits.Add(new GeneticTrait(traitA, Plant.GetResistanceBasedOnGenetics(traitA, 1), 1, 0.0f));
+        selectedTraits.Add(new GeneticTrait(traitB, Plant.GetResistanceBasedOnGenetics(traitB, 1), 1, 0.0f));
         
         if (confirmButton != null)
             confirmButton.interactable = true; // 선택 후 확인 버튼 활성화

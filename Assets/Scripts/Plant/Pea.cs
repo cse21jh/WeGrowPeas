@@ -11,7 +11,7 @@ public class Pea : MovablePlant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "¿ÏµÎÄá";
+        speciesname = "ì™„ë‘ì½©";
         base.Init(gridIndex, grid);
         plantID = 0;
     }
@@ -23,7 +23,7 @@ public class Pea : MovablePlant
         StemController stem = GetComponentInChildren<StemController>();
         if (stem != null)
         {
-            stem.SetTraits(newTraits, PlantType.Pea);
+            stem.SetTraits(newTraits, PlayablePlantType.Pea);
         }
         else
         {
@@ -105,34 +105,12 @@ public class Pea : MovablePlant
             priceSign.gameObject.SetActive(false);
     }
 
-    public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
-    {
-        if ((int)traitType >= (int)TraitType.HeavyRain) // ???? ?????? ??? ???, 1???? ????? 60
-        {
-            switch (genetics)
-            {
-                case 0: return 0.5f;
-                case 1: return 0.65f;
-                case 2: return 0.8f;
-            }
-        }
-        else
-        {
-            switch (genetics)
-            {
-                case 0: return 0.5f;
-                case 1: return 0.5f;
-                case 2: return 0.8f;
-            }
-        }
-        return 0.1f;
-    }
 
     public override int GetSellingPrice()
     {
         if (grid == null)
         {
-            // grid°¡ ÃÊ±âÈ­µÇÁö ¾ÊÀº °æ¿ì ±âº»°ª ¹İÈ¯
+            // gridê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì€ ê²½ìš° ê¸°ë³¸ê°’ ë°˜í™˜
             switch (taste)
             {
                 case 0: return 90;

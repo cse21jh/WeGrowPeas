@@ -20,10 +20,6 @@ public class Nepenthes : Plant
         return 1f;
     }
 
-    public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
-    {
-        return 1f;
-    }
 
     public override void ResistWave(WaveType waveType)
     {

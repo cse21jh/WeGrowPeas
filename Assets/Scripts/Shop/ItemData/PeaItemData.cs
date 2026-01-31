@@ -49,7 +49,7 @@ public class PeaItemData : ItemData
                     Debug.LogWarning("[PeaItemData] 형질이 선택되지 않아 기본 형질을 사용합니다.");
                     pendingTraits = new List<GeneticTrait>
                     {
-                        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f)
+                        new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f)
                     };
                 }
                 else
@@ -95,7 +95,7 @@ public class PeaItemData : ItemData
             Debug.LogWarning("[PeaItemData] Commit에서 형질이 없어 기본 형질을 사용합니다.");
             pendingTraits = new List<GeneticTrait>
             {
-                new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f)
+                new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f)
             };
         }
 
@@ -103,7 +103,7 @@ public class PeaItemData : ItemData
         if (pendingTraits.Count == 0)
         {
             Debug.LogWarning("[PeaItemData] 형질이 0개입니다. 기본 형질을 추가합니다.");
-            pendingTraits.Add(new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f));
+            pendingTraits.Add(new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f));
         }
 
         Debug.Log($"[PeaItemData] 최종 형질 {pendingTraits.Count}개로 AddPea 호출");
@@ -113,7 +113,7 @@ public class PeaItemData : ItemData
         }
 
         // grididx를 지정하지 않으면 Grid.AddPea가 자동으로 가장 빠른 빈 칸에 설치
-        ctx.Grid.AddPea(pendingTraits);
+        ctx.Grid.AddMovablePlant(pendingTraits);
 
         // 초기화
         pendingTraits = null;

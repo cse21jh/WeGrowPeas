@@ -121,11 +121,11 @@ public class HighQualityPlantItemData : ItemData
         // 유전자를 2로 설정한 형질 생성 (고품질 = 유리한 유전자)
         List<GeneticTrait> traits = new List<GeneticTrait>
         {
-            new GeneticTrait(targetTrait, 0.8f, 2, 0.0f) // genetics = 2 (유리한 유전자)
+            new GeneticTrait(targetTrait, Plant.GetResistanceBasedOnGenetics(targetTrait, 2), 2, 0.0f) // genetics = 2 (유리한 유전자)
         };
 
         // 완두콩 추가 (자동으로 가장 빠른 빈 칸에 설치)
-        ctx.Grid.AddPea(traits);
+        ctx.Grid.AddMovablePlant(traits);
 
         ctx.ShowInfo?.Invoke($"{DisplayName} 적용: {targetWave} 웨이브에 강한 완두콩 추가");
         pendingWave = null;

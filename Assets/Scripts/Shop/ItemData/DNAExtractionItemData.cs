@@ -61,17 +61,11 @@ public class DNAExtractionItemData : ItemData
             {
                 int genetics = UnityEngine.Random.Range(0, 3);
                 if(r.traitType == TraitType.Pest)
-                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.GetAdditionalPestResistance()));
+                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.GetAdditionalPestResistance()));
                 else
-                    trait.Add(new GeneticTrait(r.traitType, plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
+                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
             }
-
-            if (plant.GetType() == typeof(Pea))
-                g.AddPea(trait);
-            else if (plant.GetType() == typeof(Peanut))
-                g.AddPeanut(trait);
-            else
-                Debug.Log("식물 타입 오류");
+            g.AddMovablePlant(trait);
         }
 
         ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 선택한 식물의 유전자를 가진 식물을 3개 추가했습니다");

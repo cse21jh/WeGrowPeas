@@ -5,15 +5,11 @@ public class ChiliPepper : Plant
 {
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "∞Ì√ﬂ";
+        speciesname = "Í≥†Ï∂î";
         base.Init(gridIndex, grid);
         plantID = 3;
     }
     public override float GetResistanceValue(int order)
-    {
-        return 1f;
-    }
-    public override float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
         return 1f;
     }

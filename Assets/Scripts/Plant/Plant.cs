@@ -17,6 +17,12 @@ public enum DeathCause { Generic, Bug, Shovel, Other }
 // Generic은 보통 웨이브에 의해 죽는 경우
 // 형질이나 웨이브 추가 시 GetResistantValue 및 번식 시 Initialize Trait 에서 저항력 계산 추가 필요.
 
+public enum PlayablePlantType
+{
+    Pea,
+    Peanut
+}
+
 public abstract class Plant : MonoBehaviour
 {
     //저장이 필요한 값들
@@ -329,7 +335,7 @@ public abstract class Plant : MonoBehaviour
         for (int i = 0; i < traits.Count; i++)
         {
             // 열성이 아니고(genetics != 0) 최초 저항력이 80%가 아닌(resistance != 0.8f) 형질
-            if (traits[i].genetics != 0 && Mathf.Abs(traits[i].resistance - 0.8f) > 0.01f)
+            if (traits[i].genetics != 2)
             {
                 float newResistance = traits[i].resistance + bonus;
                 newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 사이로 제한
@@ -346,7 +352,7 @@ public abstract class Plant : MonoBehaviour
         for (int i = 0; i < traits.Count; i++)
         {
             // 우성(genetics == 2)이고 최초 저항력이 80%인(resistance == 0.8f) 형질
-            if (traits[i].genetics == 2 && Mathf.Abs(traits[i].resistance - 0.8f) <= 0.01f)
+            if (traits[i].genetics == 2)
             {
                 float newResistance = traits[i].resistance + bonus;
                 newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 사이로 제한
@@ -355,7 +361,57 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public abstract float GetResistanceBasedOnGenetics(TraitType traitType, int genetics);
+    public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
+    {
+        switch (GameManager.Instance.currentPlant)
+        {
+            case "완두콩":
+                if ((int)traitType >= (int)TraitType.HeavyRain) 
+                {
+                    switch (genetics)
+                    {
+                        case 0: return 0.5f;
+                        case 1: return 0.65f;
+                        case 2: return 0.8f;
+                    }
+                }
+                else
+                {
+                    switch (genetics)
+                    {
+                        case 0: return 0.5f;
+                        case 1: return 0.5f;
+                        case 2: return 0.8f;
+                    }
+                }
+                return 0.1f;
+            case "땅콩":
+                if ((int)traitType >= (int)TraitType.HeavyRain)
+                {
+                    switch (genetics)
+                    {
+                        case 0: return 0.4f;
+                        case 1: return 0.55f;
+                        case 2: return 0.7f;
+                    }
+                }
+                else
+                {
+                    switch (genetics)
+                    {
+                        case 0: return 0.4f;
+                        case 1: return 0.4f;
+                        case 2: return 0.7f;
+                    }
+                }
+                return 0.1f;
+            case "네펜데스":
+                return 1f;
+            case "고추":
+                return 1f;                        
+        }
+        return 0.1f;
+    }
 
     public abstract int GetSellingPrice();
 

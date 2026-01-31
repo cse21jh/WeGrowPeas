@@ -14280,57 +14280,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &66307780
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 66307782}
-  - component: {fileID: 66307781}
-  m_Layer: 0
-  m_Name: UpgradeManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &66307781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66307780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d280af2f9e8cb478e4cc03d3ea866c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  upgradePanel: {fileID: 2045264550}
-  rerollNum: {fileID: 1743335595}
-  upgradeTimeSlider: {fileID: 1950519608}
-  upgradeTimerText: {fileID: 1865385618}
-  addPeaTrait: []
-  addPeanutTrait: []
-  selectAddPeaOrPeanutButton: {fileID: 1520918638}
---- !u!4 &66307782
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66307780}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 190.19043, y: 490.07312, z: -0.980704}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &66370339
 GameObject:
   m_ObjectHideFlags: 0
@@ -331666,11 +331615,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stage: 0
   seenFirstGold: 0
+  currentPlant: "\uC644\uB450\uCF69"
   requestCycle: 2
   grid: {fileID: 1072018327}
   enemyController: {fileID: 415974144}
   waveManager: {fileID: 1843401599}
-  upgradeManager: {fileID: 66307781}
   shopManager: {fileID: 692799760}
   economyManager: {fileID: 1891974902}
   modManager: {fileID: 1352802709}
@@ -343097,11 +343046,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1520918638 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3713825461661632610, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1520971866
 GameObject:
   m_ObjectHideFlags: 0
@@ -384926,17 +384870,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1743335595 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2406532158185133467, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1743923573
 GameObject:
   m_ObjectHideFlags: 0
@@ -426240,17 +426173,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1950519608 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4371969086604240150, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1950564748
 GameObject:
   m_ObjectHideFlags: 0
@@ -445284,11 +445206,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 6505677902874605984, guid: bdfacd93f673a2f4f90ab18e1a2e4b13, type: 3}
   m_PrefabInstance: {fileID: 2045262562}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2045264550 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4790740388157164541, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-  m_PrefabInstance: {fileID: 4472167833932565131}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2046903587
 GameObject:
@@ -474292,7 +474209,7 @@ PrefabInstance:
     - target: {fileID: 1376253399417791342, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 66307781}
+      objectReference: {fileID: 0}
     - target: {fileID: 1381785451926375124, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: grid
       value: 
@@ -474644,7 +474561,7 @@ PrefabInstance:
     - target: {fileID: 3508650409260784935, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 66307781}
+      objectReference: {fileID: 0}
     - target: {fileID: 3613821954650781581, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_LocalScale.x
       value: 0
@@ -475048,7 +474965,7 @@ PrefabInstance:
     - target: {fileID: 5813947977010601867, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 66307781}
+      objectReference: {fileID: 0}
     - target: {fileID: 5818316001546011763, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: offset.x
       value: 0.00000017881396
@@ -475204,7 +475121,7 @@ PrefabInstance:
     - target: {fileID: 6820410927924129267, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 66307781}
+      objectReference: {fileID: 0}
     - target: {fileID: 6820410927924129267, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Reroll
@@ -476969,7 +476886,6 @@ SceneRoots:
   - {fileID: 1654424022}
   - {fileID: 1461606228}
   - {fileID: 415974145}
-  - {fileID: 66307782}
   - {fileID: 1553829375}
   - {fileID: 1891974903}
   - {fileID: 1801813057}

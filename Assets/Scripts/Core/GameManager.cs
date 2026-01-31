@@ -72,12 +72,6 @@ public class SaveData
     public List<WaveType> fertilizerType = new();
     //public float remainBreedTime;
 
-
-    //upgradeManager
-    public int remainUpgradeRerollCount;
-    public List<int> remainUpgradeId = new();
-    public List<int> remainUpgradeCount = new();
-
     //enemyController
     public Season currentSeason;
     public WaveType lastWaveType;
@@ -160,6 +154,10 @@ public class GameManager : Singleton<GameManager>
 {
     public int stage = 0;
     [HideInInspector] public bool seenFirstGold = false;
+    public string currentPlant = "땅콩";
+
+    //위는 저장 필요
+
     private bool gameOver = false;
     public int requestCycle = 2;
 
@@ -168,7 +166,6 @@ public class GameManager : Singleton<GameManager>
     public Grid grid;
     public EnemyController enemyController;
     public WaveManager waveManager;
-    public UpgradeManager upgradeManager;
     public ShopManager shopManager;
     public EconomyManager economyManager;
     public ModManager modManager;
@@ -250,7 +247,6 @@ public class GameManager : Singleton<GameManager>
         ModManager.Instance?.OnNewDay(stage);
         PhoneManager.Instance.messengerApp.RefreshchatPartnerList();
         enemyController.UnlockWave(stage);
-        upgradeManager.UnlockUpgrade(stage);
         
         // 매일 상점 자동 리롤 (비활성화된 오브젝트도 포함해서 찾기)
         var shopUIs = FindObjectsOfType<ShopUI>(true);
@@ -407,7 +403,6 @@ public class GameManager : Singleton<GameManager>
         stage = saveData.stage;
         seenFirstGold = saveData.seenFirstGold;
         grid.LoadGrid(saveData);
-        upgradeManager.LoadUpgradeManager(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
         shopManager.LoadShopManager(saveData);
@@ -491,15 +486,7 @@ public class GameManager : Singleton<GameManager>
             saveData.fertilizerType.Add(fer.Value);
         }
 
-        //upgradeManager
-        saveData.remainUpgradeRerollCount = upgradeManager.MaxRerollCount;
-        Dictionary<Type, int> remainUpgrade = upgradeManager.GetRemainUpgrade();
-        Dictionary<Type, Func<Upgrade>> upgradeInstance = upgradeManager.GetUpgradeInstance();
-        foreach (KeyValuePair<Type, int> u in remainUpgrade)
-        {
-            saveData.remainUpgradeId.Add(upgradeInstance[u.Key]().UpgradeId);
-            saveData.remainUpgradeCount.Add(u.Value);
-        }
+
         //enemyController
         saveData.currentSeason = enemyController.CurrentSeason;
         saveData.remainWaveSkipCount = enemyController.WaveSkipCount;

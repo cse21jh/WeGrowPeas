@@ -16,7 +16,6 @@ public class TutorialManager : Singleton<TutorialManager>
     [Header("Components")]
     [SerializeField] private TutorialGrid grid;
     [SerializeField] private EnemyController enemyController;
-    [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private ShopManager shopManager;
     [SerializeField] private GameObject shopUIPanel;
     [SerializeField] private TextMeshProUGUI textStage;

@@ -5,7 +5,7 @@ public class PeanutSpriteController : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
     Animator faceAnim;
-    [SerializeField] private float faceStartMaxDelay = 0.1f; // ¾ó±¼ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ Áö¿¬ ½Ã°£
+    [SerializeField] private float faceStartMaxDelay = 0.1f; // ì–¼êµ´ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘ ì§€ì—° ì‹œê°„
 
     [SerializeField] private Sprite[] peanutSprites;
     [SerializeField] private SpriteRenderer accessoryRenderer;
@@ -51,47 +51,47 @@ public class PeanutSpriteController : MonoBehaviour
         switch (index)
         {
             case (int)TraitType.NaturalDeath:
-                spriteRenderer.sprite = peanutSprites[1]; // ÀÚ¿¬»ç ÀúÇ×
+                spriteRenderer.sprite = peanutSprites[1]; // ìì—°ì‚¬ ì €í•­
                 accessoryRenderer.sprite = null;
                 break;
             case (int)TraitType.Wind:
-                spriteRenderer.sprite = peanutSprites[7]; // ¹Ù¶÷ ÀúÇ×
+                spriteRenderer.sprite = peanutSprites[2]; // ë°”ëŒ ì €í•­
                 accessoryRenderer.sprite = null;
                 break;
             case (int)TraitType.Flood:
-                spriteRenderer.sprite = peanutSprites[0]; // È«¼ö ÀúÇ×
-                accessoryRenderer.sprite = peanutSprites[9];
+                spriteRenderer.sprite = peanutSprites[0]; // í™ìˆ˜ ì €í•­
+                accessoryRenderer.sprite = peanutSprites[3];
                 break;
             case (int)TraitType.Pest:
-                spriteRenderer.sprite = peanutSprites[0]; // ÇØÃæ ÀúÇ×
+                spriteRenderer.sprite = peanutSprites[0]; // í•´ì¶© ì €í•­
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
             case (int)TraitType.Cold:
-                spriteRenderer.sprite = peanutSprites[0]; // ÃßÀ§ ÀúÇ×
+                spriteRenderer.sprite = peanutSprites[0]; // ì¶”ìœ„ ì €í•­
                 accessoryRenderer.sprite = peanutSprites[5];
                 break;
             case (int)TraitType.HeavyRain:
-                spriteRenderer.sprite = peanutSprites[0]; // Æø¿ì ÀúÇ×
+                spriteRenderer.sprite = peanutSprites[0]; // í­ìš° ì €í•­
                 accessoryRenderer.sprite = peanutSprites[6];
                 break;
             case (int)TraitType.Drought:
-                spriteRenderer.sprite = peanutSprites[1]; // °¡¹³ ÀúÇ× À¯ÀüÀÚ 2°³ (Æø¿ì 0°³) 
+                spriteRenderer.sprite = peanutSprites[1]; // ê°€ë­„ ì €í•­ ìœ ì „ì 2ê°œ (í­ìš° 0ê°œ) 
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
             case (int)TraitType.Heat:
-                spriteRenderer.sprite = peanutSprites[1]; // ´õÀ§ ÀúÇ× À¯ÀüÀÚ 2°³ (ÃßÀ§ 0°³)
+                spriteRenderer.sprite = peanutSprites[1]; // ë”ìœ„ ì €í•­ ìœ ì „ì 2ê°œ (ì¶”ìœ„ 0ê°œ)
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
             case (int)TraitType.None + 1:
-                spriteRenderer.sprite = peanutSprites[7]; // Æø¿ì °¡¹³ ¹İ¹İ
+                spriteRenderer.sprite = peanutSprites[2]; // í­ìš° ê°€ë­„ ë°˜ë°˜
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
             case (int)TraitType.None + 2:
-                spriteRenderer.sprite = peanutSprites[7]; // ÃßÀ§ ´õÀ§ ¹İ¹İ
+                spriteRenderer.sprite = peanutSprites[2]; // ì¶”ìœ„ ë”ìœ„ ë°˜ë°˜
                 accessoryRenderer.sprite = peanutSprites[4];
                 break;
             case (int)TraitType.None:
-                spriteRenderer.sprite = peanutSprites[0]; // ±âº»
+                spriteRenderer.sprite = peanutSprites[0]; // ê¸°ë³¸
                 accessoryRenderer.sprite = null;
                 break;
             default:

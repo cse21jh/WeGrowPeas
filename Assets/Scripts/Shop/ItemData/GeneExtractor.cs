@@ -85,11 +85,7 @@ public class GeneExtractorItemData : ItemData
         int spawned = 0;
         for (int i = 0; i < toSpawn; i++)
         {
-            if (UnityEngine.Random.Range(0, 2) == 0)
-                g.AddPea(genes);
-            else
-                g.AddPeanut(genes);
-
+            g.AddMovablePlant(genes);
             spawned++;
         }
 

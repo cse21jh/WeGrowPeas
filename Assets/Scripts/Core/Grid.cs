@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -194,17 +195,15 @@ public class Grid : MonoBehaviour
     {
         for (int i = 0; i < 2; i++)
         {
-
-            GameObject obj = Instantiate(peaPrefab);
-            Pea pea = obj.GetComponent<Pea>();
+            GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
+            Plant plant = obj.GetComponent<Plant>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
         {
-            new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
+            new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f),
         };
-            FenceUIManager.Instance.SetFenceElements(0, pea);
-            pea.SetTrait(basicTrait);
-            //plants.Add(pea);
-            AddPlantToGrid(pea);            
+            //FenceUIManager.Instance.SetFenceElements(0, plant);
+            plant.SetTrait(basicTrait);
+            AddPlantToGrid(plant);            
         }
     }
 
@@ -311,43 +310,25 @@ public class Grid : MonoBehaviour
 
 
                     if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
-                    {
-                        GameObject childObj = null;
-                        if (parent1.GetType() == typeof(Pea))
-                            childObj = Instantiate(peaPrefab);
-                        else if (parent1.GetType() == typeof(Peanut))
-                            childObj = Instantiate(peanutPrefab);
-                        Plant child = childObj.GetComponent<Plant>();
-                        if (child != null)
-                        {
-                            Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), child);
-                            //plants.Add(child);
-                            AddPlantToGrid(child);
-                            breedCount++;
-                            GameEvents.RaisePeaBreeded();
-                            Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
-                            SoundManager.Instance.PlayEffect("Breed");
-                            totalBreedCount++;
-                            if (child.GetType() == typeof(Pea))
-                                totalPeaBreedcount++;
-                            else if (child.GetType() == typeof(Peanut))
-                                totalPeanutBreedCount++;
-                            UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
-                            Plant p1 = breedObj1.GetComponent<Plant>();
-                            Plant p2 = breedObj2.GetComponent<Plant>();
-                            p1.MakeDefaultSprite();
-                            p2.MakeDefaultSprite();
-                            breedObj1 = null;
-                            breedObj2 = null;
-                            DeactivateBreed();
-                        }
-                        else
-                        {
-                            Debug.Log("자식 생성에 오류 발생");
-                            Destroy(childObj);
-                            isBreedButtonPressed = false;
-                        }
-
+                    {                        
+                        AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait()));
+                        breedCount++;
+                        GameEvents.RaisePeaBreeded();
+                        Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
+                        SoundManager.Instance.PlayEffect("Breed");
+                        totalBreedCount++;
+                        if (GameManager.Instance.currentPlant == "완두콩")
+                            totalPeaBreedcount++;
+                        else if (GameManager.Instance.currentPlant == "땅콩")
+                            totalPeanutBreedCount++;
+                        UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
+                        Plant p1 = breedObj1.GetComponent<Plant>();
+                        Plant p2 = breedObj2.GetComponent<Plant>();
+                        p1.MakeDefaultSprite();
+                        p2.MakeDefaultSprite();
+                        breedObj1 = null;
+                        breedObj2 = null;
+                        DeactivateBreed();
                     }
                     else if (breedCount >= currentEffectiveMaxBreedCount)
                     {
@@ -400,7 +381,7 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
-    protected void Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, Plant child)
+    protected List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
@@ -461,7 +442,7 @@ public class Grid : MonoBehaviour
                 default: break;
             }
 
-            float resistance = child.GetResistanceBasedOnGenetics(trait, childGenetic);
+            float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic);
             // 약한 유전자 저항력 보너스 적용
             if (childGenetic != 0 && Mathf.Abs(resistance - 0.8f) > 0.01f)
             {
@@ -480,7 +461,7 @@ public class Grid : MonoBehaviour
             else
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
-        child.SetTrait(childTrait);
+        return childTrait;
     }
 
     protected void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
@@ -490,7 +471,7 @@ public class Grid : MonoBehaviour
             if (!plantGrid.ContainsKey(grididx))
             {
                 plant.Init(grididx, this);
-                Plantplant(plant);
+                PlantPlant(plant);
 
                 return;
             }
@@ -502,7 +483,7 @@ public class Grid : MonoBehaviour
             {
                 plant.Init(idx, this);
                 //Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
-                Plantplant(plant);
+                PlantPlant(plant);
 
                 return;
             }
@@ -510,41 +491,42 @@ public class Grid : MonoBehaviour
         Destroy(plant.gameObject);
         return;
     }
-
-    public void AddPea(List<GeneticTrait> trait, int grididx = -1)
+    private void PlantPlant(Plant plant)
     {
-        GameObject obj = Instantiate(peaPrefab);
-        Pea pea = obj.GetComponent<Pea>();
-        pea.SetTrait(trait);
-        // 약한 유전자 저항력 보너스 적용
-        if (weakGeneticsResistanceBonus > 0f)
-        {
-            pea.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
-        }
-        // 강한 유전자 저항력 보너스 적용
-        if (strongGeneticsResistanceBonus > 0f)
-        {
-            pea.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
-        }
-        AddPlantToGrid(pea, grididx);
+        plantGrid[plant.gridIndex] = plant;
+        enemyController.UpdateCurrentWaveAlarm();
+        Transform soilT = GetSoilTransform(plant.gridIndex);
+        plant.transform.position = soilT.position;
     }
 
-    public void AddPeanut(List<GeneticTrait> trait, int grididx = -1)
+    public void AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
     {
-        GameObject obj = Instantiate(peanutPrefab);
-        Peanut peanut = obj.GetComponent<Peanut>();
-        peanut.SetTrait(trait);
+        GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
+        Plant plant = obj.GetComponent<Plant>();
+        plant.SetTrait(trait);
         // 약한 유전자 저항력 보너스 적용
         if (weakGeneticsResistanceBonus > 0f)
         {
-            peanut.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
+            plant.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
         }
         // 강한 유전자 저항력 보너스 적용
         if (strongGeneticsResistanceBonus > 0f)
         {
-            peanut.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
+            plant.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
         }
-        AddPlantToGrid(peanut, grididx);
+        AddPlantToGrid(plant, grididx);
+    }
+
+    public GameObject InstantiatePlant(string plantName)
+    {
+        switch (plantName)
+        {
+            case "완두콩": return Instantiate(peaPrefab);
+            case "땅콩": return Instantiate(peanutPrefab);
+            case "네펜데스": return Instantiate(nepenthesPrefab);
+            case "고추": return Instantiate(chiliPepperPrefab);
+            default: return Instantiate(peaPrefab);
+        }
     }
 
     public void AddNepenthes(int idx)
@@ -968,15 +950,7 @@ public class Grid : MonoBehaviour
             }
         }
         return null;
-    }
-
-    private void Plantplant(Plant plant)
-    {
-        plantGrid[plant.gridIndex] = plant;
-        enemyController.UpdateCurrentWaveAlarm();
-        Transform soilT = GetSoilTransform(plant.gridIndex);
-        plant.transform.position = soilT.position;
-    }
+    }   
     public void SetBreedTimerUI(TimerUI timerUI)
     {
         breedTimerUI = timerUI;
@@ -992,22 +966,14 @@ public class Grid : MonoBehaviour
         List<PlantData> plantList = saveData.plantList;
         foreach (var item in plantList)
         {
-            GameObject obj;
-            switch (item.speciesname)
-            {
-                case "완두콩": obj = Instantiate(peaPrefab); break;
-                case "땅콩": obj = Instantiate(peanutPrefab); break;
-                case "네펜데스": obj = Instantiate(nepenthesPrefab); break;
-                case "고추": obj = Instantiate(chiliPepperPrefab); break;
-                default: obj = Instantiate(peaPrefab); break;
-            }
+            GameObject obj = InstantiatePlant(item.speciesname);
 
             Plant plant = obj.GetComponent<Plant>();
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
-            Plantplant(plant);
+            PlantPlant(plant);
         }
         maxCol = saveData.maxCol;
         UpdateSoil();
@@ -1633,7 +1599,7 @@ public class Grid : MonoBehaviour
             new GeneticTrait(TraitType.Drought, 1f , 2, 0.0f),
             new GeneticTrait(TraitType.Heat, 1f , 2, 0.0f)
         };
-        AddPea(peaTrait);        
+        AddMovablePlant(peaTrait);        
     }
 
     public void ShowAllPriceSign()

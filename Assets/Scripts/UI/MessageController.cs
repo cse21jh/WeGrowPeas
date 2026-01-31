@@ -25,7 +25,6 @@ public class MessageController : MonoBehaviour
 
     public void AddMessage(MessageSenderType sender, string messageContent, string bonusMessageContent = "", Action act1 = null, Action act2 = null)
     {
-        Debug.Log(sender + ": " + messageContent);
 
         if (sender == MessageSenderType.player)
         {

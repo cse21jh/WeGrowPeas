@@ -5,13 +5,6 @@ using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
 
-public enum PlantType
-{
-    Pea,
-    Peanut
-}
-
-
 public class StemController : MonoBehaviour
 {
     [SerializeField] private PeaSpriteController[] peaSprites;
@@ -55,11 +48,11 @@ public class StemController : MonoBehaviour
     }
 
 
-    public void SetTraits(List<GeneticTrait> traits, PlantType type = PlantType.Pea)
+    public void SetTraits(List<GeneticTrait> traits, PlayablePlantType type = PlayablePlantType.Pea)
     {
         switch (type)
         {
-            case PlantType.Pea:
+            case PlayablePlantType.Pea:
                 for (int i = 0; i < traits.Count; i += 1)
                 {
                     if ((int)traits[i].traitType >= (int)TraitType.Drought)
@@ -112,7 +105,7 @@ public class StemController : MonoBehaviour
                 }
 
                 break;
-            case PlantType.Peanut:
+            case PlayablePlantType.Peanut:
                 for (int i = 0; i < traits.Count; i += 1)
                 {
                     if ((int)traits[i].traitType >= (int)TraitType.Drought)
