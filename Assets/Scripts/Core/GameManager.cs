@@ -15,6 +15,7 @@ public class SaveData
     //gameManager
     public int stage;
     public bool seenFirstGold;
+    public string currentPlant;
 
     //grid
     public List<PlantData> plantList = new();
@@ -120,6 +121,11 @@ public class SaveData
 
     public List<string> dayChatPartners = new();
     public List<ChatDayData> dayByChatPartners = new();
+
+    //AbilityManager
+    public List<PlantAbilityData> currentPlantAbility = new();
+    public List<GeneralAbilityData> currentGeneralAbility = new();
+
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
 }
@@ -192,9 +198,11 @@ public class GameManager : Singleton<GameManager>
         {
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
+                if (AbilityManager.Instance != null)
+                    AbilityManager.Instance.ApplyAbilities(this);
                 grid.InitGrid();
                 economyManager.InitEconomyManager();
-                shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화
+                shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
                 StageUpdate();
                 break;
@@ -402,6 +410,7 @@ public class GameManager : Singleton<GameManager>
 
         stage = saveData.stage;
         seenFirstGold = saveData.seenFirstGold;
+        currentPlant = saveData.currentPlant;
         grid.LoadGrid(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
@@ -409,6 +418,10 @@ public class GameManager : Singleton<GameManager>
         modManager.LoadModManager(saveData);
         requestManager.LoadRequestManager(saveData);
         phoneManager.LoadPhoneManager(saveData);
+        if (AbilityManager.Instance != null)
+        {
+            AbilityManager.Instance.LoadCurrentAbilityManager(saveData);
+        }
         PlayerRecordForGraph.SetDataFromLoad(saveData);
         Debug.Log("불러옴");
     }
@@ -420,6 +433,7 @@ public class GameManager : Singleton<GameManager>
         //gameManager
         saveData.stage = stage;
         saveData.seenFirstGold = seenFirstGold;
+        saveData.currentPlant = currentPlant;
 
         //grid
         foreach (var p in grid.plantGrid.Values)
@@ -564,6 +578,13 @@ public class GameManager : Singleton<GameManager>
         foreach (var r in progress.activatedTriggersOrdered)
         {
             saveData.activatedTriggers.Add(r);
+        }
+
+        //AbilityManager
+        if(AbilityManager.Instance !=null)
+        {
+            saveData.currentPlantAbility = AbilityManager.Instance.CurrentPlantAbility;
+            saveData.currentGeneralAbility = AbilityManager.Instance.CurrentGeneralAbility;
         }
 
         string json = JsonUtility.ToJson(saveData, true);
