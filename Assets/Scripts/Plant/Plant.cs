@@ -95,6 +95,13 @@ public abstract class Plant : MonoBehaviour
         EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
     }
 
+    public virtual List<Vector2> GetPairData_TraitFace()
+    {
+        return GetComponentsInChildren<PeaSpriteController>()
+           .Select(peaSC => peaSC.pairData_TraitFace)
+           .ToList();
+    }
+
     private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // 대응 형질 넣어주는 
     {
         bool hasTraitA = traits.Any(t => t.traitType == traitA);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEditor.VFX.UI;
 
 public class FenceUIManager : MonoBehaviour
 {
@@ -111,6 +112,7 @@ public class FenceUIManager : MonoBehaviour
         }
         */
 
+
         List<GeneticTrait> Traits = plant.GetGeneticTrait();
         int taste = plant.GetTaste();
         FindAnyObjectByType<PriceSignController>().ShowTaste(taste);
@@ -141,6 +143,14 @@ public class FenceUIManager : MonoBehaviour
                 genetics = 0
             };
             fenceElements[(int)i].SetElement(plantIndex, defaultTrait, isTasteActive, plant);
+        }
+
+
+
+        List<Vector2> pairDatas = plant.GetPairData_TraitFace();
+        for (int i = 0; i < fenceElements.Length; i++)
+        {
+            fenceElements[i].SetFaceAnim(pairDatas);
         }
     }
 

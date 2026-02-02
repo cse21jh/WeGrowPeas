@@ -7,6 +7,8 @@ public class PeaSpriteController : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
     Animator faceAnim;
+    public Vector2 pairData_TraitFace = new Vector2(8, -1);
+    [SerializeField] private int randFaceIndex = -1;
     [SerializeField] private float faceStartMaxDelay = 0.1f; // 얼굴 애니메이션 시작 지연 시간
 
     [SerializeField] private Sprite[] peaSprites;
@@ -29,6 +31,9 @@ public class PeaSpriteController : MonoBehaviour
             }
         }
 
+        randFaceIndex = Random.Range(0, 9);
+        pairData_TraitFace.y = randFaceIndex;
+
         if (faceAnim != null)
         {
             StartCoroutine(FaceStart());
@@ -38,7 +43,6 @@ public class PeaSpriteController : MonoBehaviour
     private IEnumerator FaceStart()
     {
         float rand = Random.Range(0f, faceStartMaxDelay);
-        int randFaceIndex = Random.Range(0, 9);
         yield return new WaitForSeconds(rand);
         faceAnim.SetInteger("faceIndex", randFaceIndex);
         faceAnim.SetTrigger("Start");
@@ -47,7 +51,9 @@ public class PeaSpriteController : MonoBehaviour
 
     public void SetPeaSprite(int index)
     {
-        if(spriteRenderer == null)
+        pairData_TraitFace.x = index;
+
+        if (spriteRenderer == null)
         {
             spriteRenderer = this.GetComponent<SpriteRenderer>();
         }

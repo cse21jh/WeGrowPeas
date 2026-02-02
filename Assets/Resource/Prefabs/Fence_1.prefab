@@ -565,6 +565,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 172250790442341435}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 5643642777020954920}
   - {fileID: 8796022289634558759}
@@ -1428,8 +1429,8 @@ GameObject:
   - component: {fileID: 4441607873329452817}
   - component: {fileID: 2424046156561842458}
   - component: {fileID: 4797400734100476944}
-  - component: {fileID: 8598786739690128602}
   - component: {fileID: 7064650480846903083}
+  - component: {fileID: 7559333037156114203}
   m_Layer: 5
   m_Name: Face
   m_TagString: Untagged
@@ -1451,10 +1452,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6050575804232722686}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.9999862, y: 1}
-  m_SizeDelta: {x: 30, y: 30}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -24, y: -24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2424046156561842458
 CanvasRenderer:
@@ -1484,7 +1485,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1026852015, guid: b7c470534fe648b47bbf7962cac74571, type: 3}
+  m_Sprite: {fileID: 1977706325, guid: e69a1c12ad97492478e7d97b5b3ff54c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1494,7 +1495,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!95 &8598786739690128602
+--- !u!114 &7064650480846903083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2594245301421367966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 047d26c6a1979bf46b433c219179b85b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxDelay: 0.5
+--- !u!95 &7559333037156114203
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -1516,19 +1530,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7064650480846903083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2594245301421367966}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 047d26c6a1979bf46b433c219179b85b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxDelay: 0.5
 --- !u!1 &2803803997846610968
 GameObject:
   m_ObjectHideFlags: 0

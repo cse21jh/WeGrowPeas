@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class FenceElementController : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class FenceElementController : MonoBehaviour
     [SerializeField] private bool LightActive = false; // 완두콩 빛나는 효과 활성화 여부
 
     [Header("완두콩 모습 관련")]
+    [SerializeField] private TraitType currentTraitType = TraitType.None;
     [SerializeField] private GameObject[] peas;
     [SerializeField] private string[] peaNames;
 
@@ -40,8 +43,57 @@ public class FenceElementController : MonoBehaviour
     }
 
 
+    public void SetFaceAnim(List<Vector2> pairDatas)
+    {
+        bool isSet = false;
+
+        for (int i = 0; i < pairDatas.Count; i++)
+        {
+            if(isSet == true)
+            {
+                break;
+            }
+            Debug.Log("페어데이터 확인 중... " + i + " / " + pairDatas[i].x + " " + pairDatas[i].y);
+
+            if ((int)pairDatas[i].x == -1 || (int)pairDatas[i].y == -1)
+            {
+                continue;
+            }
+
+            if (pairDatas[i].x == (int)currentTraitType)
+            {
+                Debug.Log("형질에 맞는 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
+
+                foreach (GameObject pea in peas)
+                {
+                    if(pea.activeSelf == true)
+                    {
+                        Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        Animator anim = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
+                        anim.Rebind();
+                        anim.SetInteger("faceIndex", (int)pairDatas[i].y);
+                        anim.SetTrigger("Start");
+                        pairDatas.RemoveAt(i);
+
+                        isSet = true;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+        }
+
+
+    }
+
+
     public void SetElement(int plantIndex, GeneticTrait trait, bool isTaste, Plant plant)
     {
+        currentTraitType = trait.traitType;
         //Debug.Log($"SetElement called with trait: {trait.traitType}, isTaste: {isTaste}");
         float surviveProb = plant.GetResistanceValue((int)trait.traitType);
         int dnaIndex = (int)trait.genetics;
