@@ -38,7 +38,9 @@ public class PeaSpriteController : MonoBehaviour
     private IEnumerator FaceStart()
     {
         float rand = Random.Range(0f, faceStartMaxDelay);
+        int randFaceIndex = Random.Range(0, 9);
         yield return new WaitForSeconds(rand);
+        faceAnim.SetInteger("faceIndex", randFaceIndex);
         faceAnim.SetTrigger("Start");
     }
 
