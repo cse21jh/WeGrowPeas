@@ -12,6 +12,8 @@ public class SaveSlotUI : MonoBehaviour
     [SerializeField] private GameObject savePopup;
     [SerializeField] private GameObject clickBlocker;
 
+    [SerializeField] private AbilityUIController abilityUIController;
+
     private string path;
 
     private void Start()
@@ -60,7 +62,8 @@ public class SaveSlotUI : MonoBehaviour
         }
         else //new game
         {
-            OnClickNewGame();
+            abilityUIController.OpenPlantAbilityPanel();
+            //OnClickNewGame();
         }
     }
 

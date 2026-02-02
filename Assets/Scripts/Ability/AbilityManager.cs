@@ -9,6 +9,10 @@ public class AbilityManager : MonoBehaviour
 
     private string currentPlant = "완두콩";
 
+    [SerializeField] private List<PlantAbilityData> allPlantAbilities;
+    [SerializeField] private List<GeneralAbilityData> allGeneralAbilities;
+
+
     //인게임에 따로 적용은 되지만 세이브 데이터별 저장은 해야하는 값들. UI에 보여줘야 함
     private List<PlantAbilityData> currentPlantAbility = new();
 
@@ -19,16 +23,19 @@ public class AbilityManager : MonoBehaviour
 
 
 
-    // 프로필 데이터로 저장 필요한 값들
-    private Dictionary<PlayablePlantType, bool> unlockedPlant = new();
+    // 프로필 데이터로 저장 필요한 값들. 추후 불러오기 시 Initialize다음에 불러와야 함
+    private Dictionary<PlayablePlantType, bool> isPlantUnlocked = new();
 
     private Dictionary<PlayablePlantType, int> plantAbilityPoint = new();
 
+    private Dictionary<string, bool> isGeneralAbilityDataUnlocked = new(); // 일반 특성 이름, 해당 특성의 해금 여부
+
     private int generalAbilityPoint = 0;
 
-    public Dictionary<PlayablePlantType, bool> UnlockedPlant => unlockedPlant;
+    public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
 
     public Dictionary<PlayablePlantType, int> PlantAbilityPoint => plantAbilityPoint;
+    public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 이름, 해당 특성의 해금 여부
 
     public int GeneralAbilityPoint => generalAbilityPoint;
 
@@ -53,7 +60,7 @@ public class AbilityManager : MonoBehaviour
             return;
 
         // 기본값으로 초기화
-        unlockedPlant = new Dictionary<PlayablePlantType, bool>();
+        isPlantUnlocked = new Dictionary<PlayablePlantType, bool>();
         plantAbilityPoint = new Dictionary<PlayablePlantType, int>();
         generalAbilityPoint = 1;
 
@@ -61,20 +68,38 @@ public class AbilityManager : MonoBehaviour
         {
             if(i == 0)
             {
-                unlockedPlant.Add((PlayablePlantType)i, true);
+                isPlantUnlocked.Add((PlayablePlantType)i, true);
                 plantAbilityPoint.Add((PlayablePlantType)i, 3);
             }
             else
             {
-                unlockedPlant.Add((PlayablePlantType)i, false);
+                isPlantUnlocked.Add((PlayablePlantType)i, false);
                 plantAbilityPoint.Add((PlayablePlantType)i, 3);
             }
+        }
+
+        foreach(var ability in allGeneralAbilities)
+        {
+            isGeneralAbilityDataUnlocked.Add(ability.name, ability.isUnlocked);
         }
     }
 
     public void SetPlant(string plantName)
     {
         currentPlant = plantName;
+    }
+
+    public void SetPlantByEnum(PlayablePlantType plant)
+    {
+        switch(plant)
+        {
+            case PlayablePlantType.Pea:
+                SetPlant("완두콩");
+                return;
+            case PlayablePlantType.Peanut:
+                SetPlant("땅콩");
+                return;
+        }
     }
 
     public void SetPlantAbility(List<PlantAbilityData> plantAbility)
@@ -87,42 +112,69 @@ public class AbilityManager : MonoBehaviour
         currentGeneralAbility = generalAbility;
     }
 
-    public void ResetAbilities()
+    public void ResetCurrentAbility()
     {
         currentPlant = null;
         currentPlantAbility.Clear();
         currentGeneralAbility.Clear();
     }
 
-    // 현 식물 해금 여부, 식물 특성 포인트 받아오는 함수들
-    public Dictionary<PlayablePlantType, bool> GetUnlockedPlant()
+    public List<PlantAbilityData> GetAllPlantAbility()
     {
-        return UnlockedPlant;
+        return allPlantAbilities;
+    }
+
+    public List<GeneralAbilityData> GetAllGeneralAbility()
+    {
+        return allGeneralAbilities;
+    }
+
+    // 현 식물 해금 여부, 식물 특성 포인트 받아오는 함수들
+    public Dictionary<PlayablePlantType, bool> GetIsPlantUnlocked()
+    {
+        return isPlantUnlocked;
     }
 
     public Dictionary<PlayablePlantType, int> GetPlantAbilityPoint()
     {
-        return PlantAbilityPoint;
+        return plantAbilityPoint;
     }
 
     public int GetGeneralAbilityPoint()
     {
-        return GeneralAbilityPoint;
+        return generalAbilityPoint;
     }
 
-    //해금 관련 함수들
+    //해금 관련 함수들. 돈 관련 처리도 여기서
     public bool UnlockPlant(PlayablePlantType plant)
     {
-        if (!unlockedPlant.ContainsKey(plant) && !unlockedPlant[plant])
+        if (!isPlantUnlocked.ContainsKey(plant) && !isPlantUnlocked[plant]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
-        return unlockedPlant[plant] = true;        
+        //재화 관련 판단
+
+        return isPlantUnlocked[plant] = true;        
+    }
+
+    public bool UnlockGeneralAbility(GeneralAbilityData ability)
+    {
+        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.name) && !isGeneralAbilityDataUnlocked[ability.name]) // 키가 없거나 이미 해금 되어있던 경우
+            return false;
+
+        //재화 관련 판단
+
+        isGeneralAbilityDataUnlocked[ability.name] = true;
+        allGeneralAbilities.Find(a => a == ability).isUnlocked = true;
+
+        return true;
     }
 
     public bool AddPlantAbilityPoint(PlayablePlantType plant)
     {
         if (!plantAbilityPoint.ContainsKey(plant) && plantAbilityPoint[plant] >= 10)
             return false;
+
+        //재화 관련 판단
 
         plantAbilityPoint[plant]++;
         return true;
@@ -132,6 +184,8 @@ public class AbilityManager : MonoBehaviour
     {
         if(generalAbilityPoint >= 3)
             return false;
+
+        //재화 관련 판단
 
         generalAbilityPoint++;
         return true;
