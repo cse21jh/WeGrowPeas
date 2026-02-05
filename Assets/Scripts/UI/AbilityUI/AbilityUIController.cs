@@ -22,6 +22,9 @@ public class AbilityUIController : MonoBehaviour
     [SerializeField] private Transform plantAbilityListContent;
     [SerializeField] private GameObject plantAbilityPrefab;
 
+    [SerializeField] private Button addPlantAbilityButton;
+    [SerializeField] private TextMeshProUGUI plantAbilityPointText;
+
     //일반 특성 UI
     [SerializeField] private Transform generalAbilityListContent;
     [SerializeField] private GameObject generalAbilityPrefab;
@@ -30,6 +33,8 @@ public class AbilityUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI generalAbilityName;
     [SerializeField] private TextMeshProUGUI generalAbilityDescription;
 
+    [SerializeField] private Button addGeneralAbilityButton;
+    [SerializeField] private TextMeshProUGUI generalAbilityPointText;
 
 
     private PlayablePlantType selectedPlant = PlayablePlantType.Pea;
@@ -62,6 +67,7 @@ public class AbilityUIController : MonoBehaviour
         plantAbilityPanel.SetActive(true);
         generalAbilityPanel.SetActive(false);
         UpdatePlantList();
+        SelectPlant(PlayablePlantType.Pea);
     }
 
     private void UpdatePlantList()
@@ -94,6 +100,12 @@ public class AbilityUIController : MonoBehaviour
     {
         selectedPlant = plant;
         remainPlantAbilityPoint = abilityManager.GetPlantAbilityPoint()[plant];
+        addPlantAbilityButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        addPlantAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            TryAddPlantAbilityPoint(plant);
+            SoundManager.Instance.PlayEffect("Button");
+        });
         UpdatePlantAbilityList(plant);
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
     }
@@ -121,6 +133,7 @@ public class AbilityUIController : MonoBehaviour
     private void UpdateRemainPlantAbilityPoint(int point) // 특성 포인트 사용, 반환, 최대량 증가 시 remain에 적용 및 UI에 적용
     {
         remainPlantAbilityPoint = point;
+        plantAbilityPointText.text = "남은 포인트 : " + remainPlantAbilityPoint.ToString();
         //UI에 적용 필요
     }
 
@@ -168,9 +181,9 @@ public class AbilityUIController : MonoBehaviour
         return true;
     }
 
-    public bool TryAddPlantAbilityPoint() // 해당 식물의 특성 포인트 증가
+    public bool TryAddPlantAbilityPoint(PlayablePlantType plant) // 해당 식물의 특성 포인트 증가
     {
-        if (remainPlantAbilityPoint == -1) // 아직 식물 선택 전이라 포인트 증가 X
+        if (remainPlantAbilityPoint == -1) // 아직 식물 선택 전이라 포인트 증가 X. 안전장치
             return false;
 
         if (AbilityManager.Instance.AddPlantAbilityPoint(selectedPlant))
@@ -206,6 +219,11 @@ public class AbilityUIController : MonoBehaviour
             ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.name] ,this);
         }
 
+        addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            TryAddGeneralAbilityPoint();
+        });
+
         remainGeneralAbilityPoint = abilityManager.GetGeneralAbilityPoint();
         UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint);
     }
@@ -213,7 +231,7 @@ public class AbilityUIController : MonoBehaviour
     public void UpdateRemainGeneralAbilityPoint(int point)
     {
         remainGeneralAbilityPoint = point;
-
+        generalAbilityPointText.text = "남은 포인트 : " + remainGeneralAbilityPoint.ToString();
         //UI 업데이트 필요
     }
     public bool SelectGeneralAbility(GeneralAbilityData ability) // 특정 특성 레벨 + 1
@@ -227,7 +245,7 @@ public class AbilityUIController : MonoBehaviour
         else // 리스트에 없음
         {
             selectedGeneralAbilities.Add(ability);
-            UpdateRemainPlantAbilityPoint(remainGeneralAbilityPoint - 1);
+            UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint - 1);
             ShowGeneralAbilityDescription(ability);
             return true;
         }                
@@ -238,7 +256,7 @@ public class AbilityUIController : MonoBehaviour
         if (selectedGeneralAbilities.Contains(ability)) // 이미 리스트에 들어있음
         {
             selectedGeneralAbilities.Remove(ability);
-            UpdateRemainPlantAbilityPoint(remainGeneralAbilityPoint + 1);
+            UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint + 1);
             ClearGeneralAbilityDescription();
             return true;
         }
@@ -267,7 +285,7 @@ public class AbilityUIController : MonoBehaviour
         if (AbilityManager.Instance.AddGeneralAbilityPoint())
         {
             remainGeneralAbilityPoint++;
-            UpdateRemainPlantAbilityPoint(remainGeneralAbilityPoint);
+            UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint);
             return true;
         }
 

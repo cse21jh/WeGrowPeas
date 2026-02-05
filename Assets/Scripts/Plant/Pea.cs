@@ -124,16 +124,16 @@ public class Pea : MovablePlant
             return 0;
         }
 
-        float multiplier = grid.GetAdditionalPeaGoldMultiplier();
+        float multiplier = grid.GetAdditionalPlantGoldMultiplier();
         switch (taste)
         {
-            case 0: return (int)((90 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 1: return (int)((130 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 2: return (int)((160 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 3: return (int)((180 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 4: return (int)((200 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 5: return (int)((230 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
-            case 6: return (int)((270 + grid.GetAdditionalPeaGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 0: return (int)((90 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 1: return (int)((130 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 2: return (int)((160 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 3: return (int)((180 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 4: return (int)((200 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 5: return (int)((230 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
+            case 6: return (int)((270 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * GetResistWaveCount())));
         }
         return 0;
     }

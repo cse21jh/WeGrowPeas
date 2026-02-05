@@ -40,14 +40,21 @@ public class SaveData
     public bool hasNepenthesPheromone;
     public float additionalNepenthesPheromoneSizeMultiplier;
     public float nepenthesSpawnProbability;
+
     public float weakGeneticsResistanceBonus;
     public float strongGeneticsResistanceBonus;
     public float goldenGeneticsProbabilityBonus;
 
-    public float additionalPeanutCopyProbability;
-    public int additionalPeanutGold;
-    public int additionalPeaGold;
-    public float additionalPeaGoldMultiplier;
+    public float resistanceBonus; // 식물 일반 특성
+    public int additionalPlantGold;
+
+    public float resistanceDecayReduction; // 완두콩 특성
+    public float resistanceAdaptation;
+
+    public float additionalPeanutCopyProbability; // 땅콩 특성
+    public float bonusRatioWhenDie;
+
+    public float additionalPlantGoldMultiplier;
 
     public float additionalPestResistance;
 
@@ -55,7 +62,7 @@ public class SaveData
     public float maxBreedTimer;
     public int maxBreedCount;
     public int breedCount;
-        public List<int> perBottleTiles = new();
+    public List<int> perBottleTiles = new();
     public int petBottleInitialStockBonus = 0;
     public int petBottlePriceReduction = 0;
     public float petBottleSpawnProbability = 0f;
@@ -511,14 +518,22 @@ public class GameManager : Singleton<GameManager>
         saveData.hasNepenthesPheromone = grid.HasNepenthesPheromone;
         saveData.additionalNepenthesPheromoneSizeMultiplier = grid.AdditionalNepenthesPheromoneSizeMultiplier;
         saveData.nepenthesSpawnProbability = grid.NepenthesSpawnProbability;
+
         saveData.weakGeneticsResistanceBonus = grid.WeakGeneticsResistanceBonus;
         saveData.strongGeneticsResistanceBonus = grid.StrongGeneticsResistanceBonus;
         saveData.goldenGeneticsProbabilityBonus = grid.GoldenGeneticsProbabilityBonus;
 
-        saveData.additionalPeanutGold = grid.AdditionalPeanutGold;
-        saveData.additionalPeaGold = grid.AdditionalPeaGold;
-        saveData.additionalPeaGoldMultiplier = grid.AdditionalPeaGoldMultiplier;
-        saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability;
+        saveData.resistanceBonus = grid.ResistanceBonus; // 식물 일반 특성
+        saveData.additionalPlantGold = grid.AdditionalPlantGold;
+
+        saveData.resistanceDecayReduction = grid.ResistanceDecayReduction;// 완두콩 특성
+        saveData.resistanceAdaptation = grid.ResistanceAdaptation;
+
+        saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability; // 땅콩 특성
+        saveData.bonusRatioWhenDie = grid.BonusRatioWhenDie;
+
+        saveData.additionalPlantGoldMultiplier = grid.AdditionalPlantGoldMultiplier;
+
 
         saveData.additionalPestResistance = grid.AdditionalPestResistance;
 
@@ -536,7 +551,7 @@ public class GameManager : Singleton<GameManager>
         saveData.chiliPepperSpawnProbability = grid.ChiliPepperSpawnProbability;
         saveData.chiliPepperHealPercent = grid.ChiliPepperHealPercent;
         saveData.goldSoilTiles = grid.GoldSoilTiles;
-        foreach(KeyValuePair<int,WaveType> fer in grid.GetFertilizerColumns())
+        foreach (KeyValuePair<int, WaveType> fer in grid.GetFertilizerColumns())
         {
             saveData.fertilizerColumns.Add(fer.Key);
             saveData.fertilizerType.Add(fer.Value);
@@ -563,7 +578,7 @@ public class GameManager : Singleton<GameManager>
 
         //shopManager
         Dictionary<string, int> pHistory = shopManager.PurchaseHistory;
-        foreach(KeyValuePair<string, int> p in pHistory)
+        foreach (KeyValuePair<string, int> p in pHistory)
         {
             saveData.itemName.Add(p.Key);
             saveData.itemPurchaseCount.Add(p.Value);
@@ -599,7 +614,7 @@ public class GameManager : Singleton<GameManager>
 
         //PhoneManager
         MessengerProgress progress = phoneManager.messengerApp.GetProgress();
-        foreach(KeyValuePair<string, int> p in progress.conversationSeenIndices)
+        foreach (KeyValuePair<string, int> p in progress.conversationSeenIndices)
         {
             saveData.chatPartners.Add(p.Key);
             saveData.conversationSeenIndices.Add(p.Value);
@@ -613,7 +628,7 @@ public class GameManager : Singleton<GameManager>
             foreach (KeyValuePair<int, int> p2 in p.Value)
             {
                 tmp.index.Add(p2.Key);
-                tmp.day.Add(p2.Value);                
+                tmp.day.Add(p2.Value);
             }
             saveData.dayByChatPartners.Add(tmp);
         }
@@ -623,7 +638,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         //AbilityManager
-        if(AbilityManager.Instance !=null)
+        if (AbilityManager.Instance != null)
         {
             saveData.currentPlantAbility = AbilityManager.Instance.CurrentPlantAbility;
             saveData.currentGeneralAbility = AbilityManager.Instance.CurrentGeneralAbility;

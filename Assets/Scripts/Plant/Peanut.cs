@@ -134,13 +134,13 @@ public class Peanut : MovablePlant
     {
         switch (taste)
         {
-            case 0: return (int)((60 + grid.GetAdditionalPeanutGold()) * (1f + (0.2f * GetResistWaveCount())));
-            case 1: return (int)((100 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 2: return (int)((130 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 3: return (int)((150 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 4: return (int)((170 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 5: return (int)((200 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 6: return (int)((240 + grid.GetAdditionalPeanutGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 0: return (int)((60 + grid.GetAdditionalPlantGold()) * (1f + (0.2f * GetResistWaveCount())));
+            case 1: return (int)((100 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 2: return (int)((130 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 3: return (int)((150 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 4: return (int)((170 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 5: return (int)((200 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 6: return (int)((240 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
         }
         return 0;
     }

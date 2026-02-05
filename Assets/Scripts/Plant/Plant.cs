@@ -222,6 +222,8 @@ public abstract class Plant : MonoBehaviour
         grid.CheckBreedButtonBeforeDie(this.gameObject);
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
+        if(GameManager.Instance != null)
+            GameManager.Instance.economyManager.AddGold((int)(GetSellingPrice() * grid.GetBonusRatioWhenDie()));
         Destroy(this.gameObject, dissolveDuration);
         return true;
     }
@@ -334,6 +336,15 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    public void IncreaseResistance(float bonus)
+    {
+        for (int i = 0; i < traits.Count; i++)
+        {
+            float newResistance = traits[i].resistance + bonus;
+            traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+        }
+    }
+
     /// <summary>
     /// 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질)의 최초 저항력을 증가시킵니다.
     /// </summary>
@@ -370,6 +381,7 @@ public abstract class Plant : MonoBehaviour
 
     public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
     {
+        float resistance = 0.0f;
         switch (GameManager.Instance.currentPlant)
         {
             case "완두콩":
@@ -377,47 +389,57 @@ public abstract class Plant : MonoBehaviour
                 {
                     switch (genetics)
                     {
-                        case 0: return 0.5f;
-                        case 1: return 0.65f;
-                        case 2: return 0.8f;
+                        case 0: resistance += 0.5f; break;
+                        case 1: resistance += 0.65f; break;
+                        case 2: resistance += 0.8f; break;
                     }
                 }
                 else
                 {
                     switch (genetics)
                     {
-                        case 0: return 0.5f;
-                        case 1: return 0.5f;
-                        case 2: return 0.8f;
+                        case 0:  resistance += 0.5f; break;
+                        case 1:  resistance += 0.5f; break;
+                        case 2:  resistance += 0.8f; break;
                     }
                 }
-                return 0.1f;
+                break;
             case "땅콩":
                 if ((int)traitType >= (int)TraitType.HeavyRain)
                 {
                     switch (genetics)
                     {
-                        case 0: return 0.4f;
-                        case 1: return 0.55f;
-                        case 2: return 0.7f;
+                        case 0:  resistance += 0.4f; break;
+                        case 1:  resistance += 0.55f; break;
+                        case 2:  resistance += 0.7f; break;
                     }
                 }
                 else
                 {
                     switch (genetics)
                     {
-                        case 0: return 0.4f;
-                        case 1: return 0.4f;
-                        case 2: return 0.7f;
+                        case 0:  resistance += 0.4f; break;
+                        case 1:  resistance += 0.4f; break;
+                        case 2:  resistance += 0.7f; break;
                     }
                 }
-                return 0.1f;
-            case "네펜데스":
-                return 1f;
-            case "고추":
-                return 1f;                        
+                break;
         }
-        return 0.1f;
+
+        resistance += GameManager.Instance.grid.GetResistanceBonus();
+
+        // 강한 유전자 저항력 보너스 적용
+        if (genetics == 2)
+        {
+            resistance += GameManager.Instance.grid.GetStrongGenericsResistanceBonus();
+        }
+        // 약한 유전자 저항력 보너스 적용
+        else
+        {
+            resistance += GameManager.Instance.grid.GetWeakGenericsResistanceBonus();
+        }
+
+        return resistance;
     }
 
     public abstract int GetSellingPrice();
@@ -603,12 +625,19 @@ public abstract class Plant : MonoBehaviour
         {
             for (int i = 0; i < Wave.NumberOfWave; i++)
             {
-                if ((int)waveType != i && fertilizer != i)
+                if (fertilizer != i)
                 {
-                    if (GameManager.Instance != null && GameManager.Instance.stage > 25)
-                        ChangeResistance(i, -0.1f);
+                    if ((int)waveType != i)
+                    {
+                        if (GameManager.Instance != null && GameManager.Instance.stage > 25)
+                            ChangeResistance(i, -0.1f + grid.GetResistanceDecayReduction());
+                        else
+                            ChangeResistance(i, -0.05f + grid.GetResistanceDecayReduction());
+                    }
                     else
-                        ChangeResistance(i, -0.05f);
+                    {
+                        ChangeResistance(i, grid.GetResistanceAdaptation());
+                    }
                 }
             }
         }

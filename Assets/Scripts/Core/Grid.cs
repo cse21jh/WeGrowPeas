@@ -83,17 +83,28 @@ public class Grid : MonoBehaviour
     protected bool hasNepenthesPheromone = false; // 네펜데스 페로몬 활성화 여부
     protected float additionalNepenthesPheromoneSizeMultiplier = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
     protected float nepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
-
+    
     protected float weakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
     protected float strongGeneticsResistanceBonus = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
     protected float goldenGeneticsProbabilityBonus = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
 
-    protected float additionalPeanutCopyProbability = 0f;
-    protected int additionalPeanutGold = 0;
-    protected int additionalPeaGold = 0;
-    protected float additionalPeaGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
+    
+    protected float additionalPlantGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
 
     protected float additionalPestResistance = 0f;
+
+    //식물 공통 특성
+    protected float resistanceBonus = 0f; // 기본 저항력 보너스
+    protected int additionalPlantGold = 0; // 기본 식물 가격 보너스
+
+    //완두콩 특성
+    protected float resistanceDecayReduction = 0f; // 웨이브를 버텼을 때, 감소하는 저항력의 감소량
+    protected float resistanceAdaptation = 0f; // 웨이브를 버텼을 때, 해당 웨이브의 저항력 증가량
+
+    // 땅콩 특성
+    protected float additionalPeanutCopyProbability = 0f; // 땅콩 복사 확률 증가
+    protected float bonusRatioWhenDie = 0f; // 죽었을 때, 추가 골드
+    
 
     protected int additionalInheritance = 0;
     protected float maxBreedTimer = 40.0f;
@@ -131,11 +142,21 @@ public class Grid : MonoBehaviour
     public float NepenthesSpawnProbability => nepenthesSpawnProbability;
     public float WeakGeneticsResistanceBonus => weakGeneticsResistanceBonus;
     public float StrongGeneticsResistanceBonus => strongGeneticsResistanceBonus;
-    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;
+    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;    
+
+    //식물 공통 특성
+    public float ResistanceBonus => resistanceBonus;
+    public int AdditionalPlantGold => additionalPlantGold;
+
+    //완두콩 특성
+    public float ResistanceDecayReduction => resistanceDecayReduction;
+    public float ResistanceAdaptation => resistanceAdaptation;
+    //땅콩 특성
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
-    public int AdditionalPeanutGold => additionalPeanutGold;
-    public int AdditionalPeaGold => additionalPeaGold;
-    public float AdditionalPeaGoldMultiplier => additionalPeaGoldMultiplier;
+    public float BonusRatioWhenDie =>  bonusRatioWhenDie;
+
+
+    public float AdditionalPlantGoldMultiplier => additionalPlantGoldMultiplier;
     public float AdditionalPestResistance => additionalPestResistance;
     public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
@@ -443,18 +464,7 @@ public class Grid : MonoBehaviour
             }
 
             float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic);
-            // 약한 유전자 저항력 보너스 적용
-            if (childGenetic != 0 && Mathf.Abs(resistance - 0.8f) > 0.01f)
-            {
-                resistance += weakGeneticsResistanceBonus;
-                resistance = Mathf.Clamp(resistance, 0.1f, 1.0f);
-            }
-            // 강한 유전자 저항력 보너스 적용
-            if (childGenetic == 2 && Mathf.Abs(resistance - 0.8f) <= 0.01f)
-            {
-                resistance += strongGeneticsResistanceBonus;
-                resistance = Mathf.Clamp(resistance, 0.1f, 1.0f);
-            }
+
 
             if (trait == TraitType.Pest)
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
@@ -503,17 +513,7 @@ public class Grid : MonoBehaviour
     {
         GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
         Plant plant = obj.GetComponent<Plant>();
-        plant.SetTrait(trait);
-        // 약한 유전자 저항력 보너스 적용
-        if (weakGeneticsResistanceBonus > 0f)
-        {
-            plant.IncreaseWeakGeneticsResistance(weakGeneticsResistanceBonus);
-        }
-        // 강한 유전자 저항력 보너스 적용
-        if (strongGeneticsResistanceBonus > 0f)
-        {
-            plant.IncreaseStrongGeneticsResistance(strongGeneticsResistanceBonus);
-        }
+        plant.SetTrait(trait);        
         AddPlantToGrid(plant, grididx);
     }
 
@@ -541,6 +541,20 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(chiliPepperPrefab);
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
+    }
+
+    public float GetResistanceBonus()
+    {
+        return resistanceBonus;
+    }
+    public float GetWeakGenericsResistanceBonus()
+    {
+        return weakGeneticsResistanceBonus;
+    }
+
+    public float GetStrongGenericsResistanceBonus()
+    {
+        return strongGeneticsResistanceBonus;
     }
 
     public Transform GetSoilTransform(int idx)
@@ -996,6 +1010,16 @@ public class Grid : MonoBehaviour
         hasNepenthesPheromone = saveData.hasNepenthesPheromone;
         additionalNepenthesPheromoneSizeMultiplier = saveData.additionalNepenthesPheromoneSizeMultiplier;
         nepenthesSpawnProbability = saveData.nepenthesSpawnProbability;
+
+        resistanceBonus = saveData.resistanceBonus; // 식물 공통 특성
+        additionalPlantGold = saveData.additionalPlantGold;
+
+        resistanceDecayReduction = saveData.resistanceDecayReduction; // 완두콩 특성
+        resistanceAdaptation = saveData.resistanceAdaptation;
+        
+        additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability; // 땅콩 특성
+        bonusRatioWhenDie = saveData.bonusRatioWhenDie;
+
         weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
         strongGeneticsResistanceBonus = saveData.strongGeneticsResistanceBonus;
         goldenGeneticsProbabilityBonus = saveData.goldenGeneticsProbabilityBonus;
@@ -1009,11 +1033,8 @@ public class Grid : MonoBehaviour
                 nepenthes.UpdatePheromoneSize();
             }
         }
-
-        additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability;
-        additionalPeanutGold = saveData.additionalPeanutGold;
-        additionalPeaGold = saveData.additionalPeaGold;
-        additionalPeaGoldMultiplier = saveData.additionalPeaGoldMultiplier;
+                
+        additionalPlantGoldMultiplier = saveData.additionalPlantGoldMultiplier;
 
         additionalPestResistance = saveData.additionalPestResistance;
 
@@ -1123,6 +1144,28 @@ public class Grid : MonoBehaviour
         return 1f + additionalNepenthesPheromoneSizeMultiplier; // 0.2 = +20% = 1.2배
     }
 
+    public void AddResistanceBonus(float value)
+    {
+        resistanceBonus += value;
+        // 기존 식물들에도 적용
+        ApplyResistanceBonusToExistingPlants(value);
+    }
+
+    private void ApplyResistanceBonusToExistingPlants(float bonus)
+    {
+        for (int idx = 0; idx < GetMaxCol() * 4; idx++)
+        {
+            if (plantGrid.ContainsKey(idx))
+            {
+                Plant plant = plantGrid[idx];
+                if (plant is MovablePlant)
+                {
+                    plant.IncreaseResistance(bonus);
+                }
+            }
+        }
+    }
+
     public void AddWeakGeneticsResistanceBonus(float value)
     {
         weakGeneticsResistanceBonus += value;
@@ -1137,7 +1180,7 @@ public class Grid : MonoBehaviour
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
+                if (plant is MovablePlant)
                 {
                     plant.IncreaseWeakGeneticsResistance(bonus);
                 }
@@ -1159,7 +1202,7 @@ public class Grid : MonoBehaviour
             if (plantGrid.ContainsKey(idx))
             {
                 Plant plant = plantGrid[idx];
-                if (plant.GetType() == typeof(Pea) || plant.GetType() == typeof(Peanut))
+                if (plant is MovablePlant)
                 {
                     plant.IncreaseStrongGeneticsResistance(bonus);
                 }
@@ -1272,34 +1315,25 @@ public class Grid : MonoBehaviour
     {
         return additionalBugGold;
     }
-    public void AddAdditionalPeanutGold(int value)
+
+    public void AddAdditionalPlantGold(int value)
     {
-        additionalPeanutGold += value;
+        additionalPlantGold += value;
     }
 
-    public int GetAdditionalPeanutGold()
+    public int GetAdditionalPlantGold()
     {
-        return additionalPeanutGold;
+        return additionalPlantGold;
     }
 
-    public void AddAdditionalPeaGold(int value)
+    public void AddAdditionalPlantGoldMultiplier(float value)
     {
-        additionalPeaGold += value;
+        additionalPlantGoldMultiplier += value;
     }
 
-    public int GetAdditionalPeaGold()
+    public float GetAdditionalPlantGoldMultiplier()
     {
-        return additionalPeaGold;
-    }
-
-    public void AddAdditionalPeaGoldMultiplier(float value)
-    {
-        additionalPeaGoldMultiplier += value;
-    }
-
-    public float GetAdditionalPeaGoldMultiplier()
-    {
-        return additionalPeaGoldMultiplier;
+        return additionalPlantGoldMultiplier;
     }
 
     public void AddAdditionalPeanutCopyProbability(float value)
@@ -1311,6 +1345,37 @@ public class Grid : MonoBehaviour
     {
         return additionalPeanutCopyProbability;
     }
+
+    public void AddResistanceDecayReduction(float value)
+    {
+        resistanceDecayReduction += value;
+    }
+
+    public float GetResistanceDecayReduction()
+    {
+        return resistanceDecayReduction;
+    }
+
+    public void AddResistanceAdaptation(float value)
+    {
+        resistanceAdaptation += value;
+    }
+
+    public float GetResistanceAdaptation()
+    {
+        return resistanceAdaptation;
+    }
+    public void AddBonusRatioWhenDie(float value)
+    {
+        bonusRatioWhenDie += value;
+    }
+
+    public float GetBonusRatioWhenDie()
+    {
+        return bonusRatioWhenDie;
+    }
+
+
     public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
 
     public bool HasGoldSoil(int idx) => goldSoilTiles.Contains(idx);

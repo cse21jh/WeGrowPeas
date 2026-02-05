@@ -66,6 +66,11 @@ public class AbilityManager : MonoBehaviour
 
         for (int i = 0; i < Enum.GetValues(typeof(PlayablePlantType)).Length; i++)
         {
+            //임시로 모든 식물 가능하도록 
+            isPlantUnlocked.Add((PlayablePlantType)i, true);
+            plantAbilityPoint.Add((PlayablePlantType)i, 3);
+
+            /*
             if(i == 0)
             {
                 isPlantUnlocked.Add((PlayablePlantType)i, true);
@@ -76,6 +81,7 @@ public class AbilityManager : MonoBehaviour
                 isPlantUnlocked.Add((PlayablePlantType)i, false);
                 plantAbilityPoint.Add((PlayablePlantType)i, 3);
             }
+            */
         }
 
         foreach(var ability in allGeneralAbilities)
@@ -148,7 +154,7 @@ public class AbilityManager : MonoBehaviour
     //해금 관련 함수들. 돈 관련 처리도 여기서
     public bool UnlockPlant(PlayablePlantType plant)
     {
-        if (!isPlantUnlocked.ContainsKey(plant) && !isPlantUnlocked[plant]) // 키가 없거나 이미 해금 되어있던 경우
+        if (!isPlantUnlocked.ContainsKey(plant) || !isPlantUnlocked[plant]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
         //재화 관련 판단
@@ -158,7 +164,7 @@ public class AbilityManager : MonoBehaviour
 
     public bool UnlockGeneralAbility(GeneralAbilityData ability)
     {
-        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.name) && !isGeneralAbilityDataUnlocked[ability.name]) // 키가 없거나 이미 해금 되어있던 경우
+        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.name) || !isGeneralAbilityDataUnlocked[ability.name]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
         //재화 관련 판단
@@ -171,7 +177,7 @@ public class AbilityManager : MonoBehaviour
 
     public bool AddPlantAbilityPoint(PlayablePlantType plant)
     {
-        if (!plantAbilityPoint.ContainsKey(plant) && plantAbilityPoint[plant] >= 10)
+        if (!plantAbilityPoint.ContainsKey(plant) || plantAbilityPoint[plant] >= 10)
             return false;
 
         //재화 관련 판단
