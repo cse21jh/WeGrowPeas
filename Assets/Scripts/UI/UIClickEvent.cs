@@ -74,6 +74,23 @@ public class UIClickEvent : MonoBehaviour
         OnClickShowSaveSlotPanel();
     }
 
+    public void OnClick_ContinueGameAfterEnding()
+    {
+        string path = SaveContext.Instance.CurrentSaveFilePath;
+
+        string json = File.ReadAllText(path);
+        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+        GameStartContext.SetStartType(saveData.gst);
+
+        TransitionController.instance.Transition_Out();
+        StartCoroutine(DelayAction(1.1f, () =>
+        {
+            //GameStartContext.SetStartType(GameStartType.ContinueGame);
+            SceneLoader.Instance?.LoadGardenScene();
+        }));
+    }
+
     public void OnClick_GoToTutorial()
     {
         TransitionController.instance.Transition_Out();
