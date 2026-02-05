@@ -35965,6 +35965,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 0}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 750946628}
   - {fileID: 1322531104}
@@ -40468,6 +40469,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 0}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 2052240002}
   - {fileID: 1443458501}
@@ -42681,6 +42683,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 0}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 983335258}
   - {fileID: 1990577568}
@@ -142173,6 +142176,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 0}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 377230734}
   - {fileID: 1853887774}
@@ -236621,6 +236625,53 @@ MonoBehaviour:
   m_AmplitudeGain: 0
   m_FrequencyGain: 1
   mNoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!1 &1013437986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1013437988}
+  - component: {fileID: 1013437987}
+  m_Layer: 0
+  m_Name: CurseManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1013437987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013437986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe997fc662795a4b8a121faf005fd52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  temporalCursePool:
+  - {fileID: 11400000, guid: 2b3670702c5bcca47bdea7f1ce14c72d, type: 2}
+  fog: {fileID: 0}
+--- !u!4 &1013437988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013437986}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 719.5614, y: 436.7199, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1013494788
 GameObject:
   m_ObjectHideFlags: 0
@@ -269503,6 +269554,7 @@ MonoBehaviour:
   currentWaveType: 6
   highlight: {fileID: 0}
   LightActive: 0
+  currentTraitType: 8
   peas:
   - {fileID: 137604207}
   - {fileID: 1669827745}
@@ -331625,6 +331677,7 @@ MonoBehaviour:
   modManager: {fileID: 1352802709}
   requestManager: {fileID: 889034676}
   phoneManager: {fileID: 5427599}
+  curseManager: {fileID: 1013437987}
   gcController: {fileID: 444471572}
   textStage: {fileID: 261653010}
   endStage: 40
@@ -476897,3 +476950,4 @@ SceneRoots:
   - {fileID: 5427600}
   - {fileID: 889034677}
   - {fileID: 2140546009}
+  - {fileID: 1013437988}

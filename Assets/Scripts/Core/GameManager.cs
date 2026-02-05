@@ -184,6 +184,7 @@ public class GameManager : Singleton<GameManager>
     public ModManager modManager;
     public RequestManager requestManager;
     public PhoneManager phoneManager;
+    public CurseManager curseManager;
 
     [SerializeField] private GlowCanvasController gcController;
 
@@ -275,10 +276,11 @@ public class GameManager : Singleton<GameManager>
         {
             UpdateStageUI();
 
-            ApplyCurses();
+            curseManager.ApplyCurse();
 
             yield return StartCoroutine(StartStage());
 
+            curseManager.SelectCurse(stage);
             StageUpdate();
             SaveGame();
         }
@@ -404,19 +406,6 @@ public class GameManager : Singleton<GameManager>
         }
         
         yield return null;
-    }
-
-    private void ApplyCurses()
-    {
-        //curseManager.ApplyTemporalCurse();
-        //curseManager.ApplySeasonalCurse();
-        Debug.Log("저주 발동!");
-
-        if(stage % 5 == 0)
-        {
-            //curseManager.SetNextSeasonalCurse();
-            Debug.Log("지속형 저주 설정");
-        }
     }
 
     public IEnumerator GameOver()
