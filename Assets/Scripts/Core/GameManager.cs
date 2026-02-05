@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
-using JetBrains.Annotations;
 
 [System.Serializable]
 public class SaveData
@@ -169,6 +167,8 @@ public class GameManager : Singleton<GameManager>
 
     private bool isStopped = false;
 
+    private int gameMode = 0; //0: normal 1: endless
+
     public Grid grid;
     public EnemyController enemyController;
     public WaveManager waveManager;
@@ -204,22 +204,26 @@ public class GameManager : Singleton<GameManager>
                 economyManager.InitEconomyManager();
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
+                gameMode = 0;
                 StageUpdate();
                 break;
 
             case GameStartType.ContinueGame:
                 Debug.Log("불러오기");
                 LoadGame();
+                gameMode = (stage > endStage) ? 1 : 0;
                 break;
 
             case GameStartType.ContinueAfterEnding:
                 Debug.Log("40일 이후 계속 불러오기");
                 LoadGame();
+                gameMode = 1;
                 stage++;
                 break;
         }
 
-        StartCoroutine(GameStart());
+        if (gameMode == 1) StartCoroutine(StartEndlessGameMode()); 
+        else StartCoroutine(StartNormalMode());
     }
 
     // Update is called once per frame
@@ -238,12 +242,37 @@ public class GameManager : Singleton<GameManager>
         GameEvents.OnSaveGameRequested -= SaveGame;
     }
 
-    IEnumerator GameStart()
+    IEnumerator StartNormalMode()
     {
         while (!gameOver)
         {
             UpdateStageUI();
             yield return StartCoroutine(StartStage());
+
+            if (stage == endStage)
+            {
+                economyManager.PushEarnedGold();
+                yield return StartCoroutine(ClearNormalMode());
+                break;
+            }
+
+            StageUpdate();
+            SaveGame();
+        }
+    }
+
+    IEnumerator StartEndlessGameMode()
+    {
+        Debug.Log("무한 모드입니다.");
+
+        while(!gameOver)
+        {
+            UpdateStageUI();
+
+            ApplyCurses();
+
+            yield return StartCoroutine(StartStage());
+
             StageUpdate();
             SaveGame();
         }
@@ -282,11 +311,11 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
 
-        if (stage == endStage)
+        /*if (stage == endStage)
         {
             economyManager.PushEarnedGold();
             yield return StartCoroutine(ClearNormalMode());
-        }
+        }*/
 
         yield return StartCoroutine(BreedEndRoutine());
 
@@ -369,6 +398,19 @@ public class GameManager : Singleton<GameManager>
         }
         
         yield return null;
+    }
+
+    private void ApplyCurses()
+    {
+        //curseManager.ApplyTemporalCurse();
+        //curseManager.ApplySeasonalCurse();
+        Debug.Log("저주 발동!");
+
+        if(stage % 5 == 0)
+        {
+            //curseManager.SetNextSeasonalCurse();
+            Debug.Log("지속형 저주 설정");
+        }
     }
 
     public IEnumerator GameOver()
