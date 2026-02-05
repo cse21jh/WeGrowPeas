@@ -225,7 +225,6 @@ public class GameManager : Singleton<GameManager>
                 Debug.Log("40일 이후 계속 불러오기");
                 LoadGame();
                 gameMode = 1;
-                stage++;
                 break;
         }
 
@@ -443,6 +442,7 @@ public class GameManager : Singleton<GameManager>
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Ending);
         //File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
+        stage++;
         GameStartContext.SetStartType(GameStartType.ContinueAfterEnding);
         SaveGame();
         Debug.Log("40일 클리어했습니다. YEAH!");
