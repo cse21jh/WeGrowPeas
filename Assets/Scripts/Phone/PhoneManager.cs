@@ -17,6 +17,7 @@ public enum AppKey
     Shop,
     Quest,
     Messenger,
+    Info,
 }
 
 public class PhoneManager : Singleton<PhoneManager>
