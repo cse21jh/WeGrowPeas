@@ -54,6 +54,10 @@ public class SaveData
     public float additionalPeanutCopyProbability; // 땅콩 특성
     public float bonusRatioWhenDie;
 
+    public bool hasResistanceScouter; // 일반 특성
+    public bool hasGoldScouter;
+    public bool hasWeatherForecast;
+
     public float additionalPlantGoldMultiplier;
 
     public float additionalPestResistance;
@@ -520,6 +524,10 @@ public class GameManager : Singleton<GameManager>
 
         saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability; // 땅콩 특성
         saveData.bonusRatioWhenDie = grid.BonusRatioWhenDie;
+
+        saveData.hasResistanceScouter = grid.HasResistanceScouter;
+        saveData.hasGoldScouter = grid.HasGoldScouter;
+        saveData.hasWeatherForecast = grid.HasWeatherForecast;
 
         saveData.additionalPlantGoldMultiplier = grid.AdditionalPlantGoldMultiplier;
 

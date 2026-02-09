@@ -104,7 +104,11 @@ public class Grid : MonoBehaviour
     // 땅콩 특성
     protected float additionalPeanutCopyProbability = 0f; // 땅콩 복사 확률 증가
     protected float bonusRatioWhenDie = 0f; // 죽었을 때, 추가 골드
-    
+
+    //일반 특성
+    protected bool hasResistanceScouter = false;
+    protected bool hasGoldScouter = false;
+    protected bool hasWeatherForecast = false;
 
     protected int additionalInheritance = 0;
     protected float maxBreedTimer = 40.0f;
@@ -155,6 +159,10 @@ public class Grid : MonoBehaviour
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
     public float BonusRatioWhenDie =>  bonusRatioWhenDie;
 
+    //일반 특성
+    public bool HasResistanceScouter => hasResistanceScouter;
+    public bool HasGoldScouter => hasGoldScouter;
+    public bool HasWeatherForecast => hasWeatherForecast;
 
     public float AdditionalPlantGoldMultiplier => additionalPlantGoldMultiplier;
     public float AdditionalPestResistance => additionalPestResistance;
@@ -224,7 +232,7 @@ public class Grid : MonoBehaviour
         };
             //FenceUIManager.Instance.SetFenceElements(0, plant);
             plant.SetTrait(basicTrait);
-            AddPlantToGrid(plant);            
+            AddPlantToGrid(plant);
         }
     }
 
@@ -504,6 +512,7 @@ public class Grid : MonoBehaviour
     private void PlantPlant(Plant plant)
     {
         plantGrid[plant.gridIndex] = plant;
+        UpdateGoldScouterImageInGrid();
         enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
@@ -541,6 +550,7 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(chiliPepperPrefab);
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
+        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
     }
 
     public float GetResistanceBonus()
@@ -919,7 +929,7 @@ public class Grid : MonoBehaviour
 
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
-            targetPlant.SetGridIndex(fromIndex);
+            targetPlant.SetGridIndex(fromIndex);            
 
             // 위치 바꾸기
             Transform fromSoil = GetSoilTransform(fromIndex);
@@ -931,6 +941,15 @@ public class Grid : MonoBehaviour
             plantGrid[toIndex] = plant;
             plantGrid[fromIndex] = targetPlant;
 
+            //스카우터 확인 (고추, 비료 때문)
+            if(plant is MovablePlant p1)
+            {
+                p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
+            }
+            if (targetPlant is MovablePlant p2)
+            {
+                p2.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
+            }
 
             return true;
         }
@@ -943,6 +962,10 @@ public class Grid : MonoBehaviour
             plant.transform.position = GetSoilTransform(toIndex).position;
             plantGrid[toIndex] = plant;
 
+            if (plant is MovablePlant p1)
+            {
+                p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
+            }
             return true;
         }
     }
@@ -1019,6 +1042,10 @@ public class Grid : MonoBehaviour
         
         additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability; // 땅콩 특성
         bonusRatioWhenDie = saveData.bonusRatioWhenDie;
+
+        SetResistanceScouter(saveData.hasResistanceScouter); // 일반 특성
+        SetGoldScouter(saveData.hasGoldScouter);
+        SetWeatherForecast(saveData.hasWeatherForecast);
 
         weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
         strongGeneticsResistanceBonus = saveData.strongGeneticsResistanceBonus;
@@ -1122,6 +1149,43 @@ public class Grid : MonoBehaviour
             if (plant is Nepenthes nepenthes)
             {
                 nepenthes.UpdatePheromone();
+            }
+        }
+    }
+
+    public void UpdateResistanceScouterImageInGrid(WaveType wave)
+    {
+        if (!hasResistanceScouter)
+            return;
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is MovablePlant p)
+            {
+                p.CheckResistanceScouterImage(wave);
+            }
+        }
+    }
+
+    public void UpdateGoldScouterImageInGrid()
+    {
+        if (!hasGoldScouter)
+            return;
+        List<MovablePlant> sortedPlants = plantGrid.Values 
+                                                   .OfType<MovablePlant>() 
+                                                   .OrderByDescending(p => p.GetSellingPrice()) // GetSellingPrice() 결과가 높은 순으로 정렬
+                                                   .ToList(); // 정렬된 결과를 리스트로 변환
+
+        for (int i = 0; i < sortedPlants.Count; i++)
+        {
+            MovablePlant currentPlant = sortedPlants[i];
+
+            if (i < 3)
+            {
+                currentPlant.ShowGoldScouterImage();
+            }
+            else 
+            {
+                currentPlant.HideGoldScouterImage();
             }
         }
     }
@@ -1254,6 +1318,7 @@ public class Grid : MonoBehaviour
     public void AddChiliPepperRangeLevel(int value)
     {
         chiliPepperRangeLevel = Mathf.Min(2, chiliPepperRangeLevel + value); // 최대 2단계
+        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
     }
 
     public void AddChiliPepperSpawnProbability(float value)
@@ -1374,6 +1439,45 @@ public class Grid : MonoBehaviour
     {
         return bonusRatioWhenDie;
     }
+
+    public void SetResistanceScouter(bool val)
+    {
+        if(hasResistanceScouter = val)
+        {
+            UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+        }
+    }
+
+    public bool GetHasReistanceScouter()
+    {
+        return hasResistanceScouter;
+    }
+
+    public void SetGoldScouter(bool val)
+    {
+        if(hasGoldScouter = val)
+        {
+            UpdateGoldScouterImageInGrid();
+        }
+    }
+
+    public bool GetHasGoldScouter()
+    {
+        return hasGoldScouter;
+    }
+    public void SetWeatherForecast(bool val)
+    {
+        if(hasWeatherForecast = val)
+        {
+
+        }
+    }
+
+    public bool GetHasWeatherForecast()
+    {
+        return hasWeatherForecast;
+    }
+
 
 
     public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
@@ -1549,6 +1653,7 @@ public class Grid : MonoBehaviour
         marker.SetFertilizer(wave);
 
         Debug.Log($"[Grid] Fertilizer placed: col={col}, wave={wave}");
+        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
         return true;
     }
 
@@ -1566,6 +1671,7 @@ public class Grid : MonoBehaviour
             }
 
             marker.RemoveFertilizer();
+            UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
             Debug.Log($"[Grid] Fertilizer removed at col={soilColT.GetSiblingIndex()}");
         }
     }

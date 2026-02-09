@@ -177,6 +177,9 @@ public class EnemyController : MonoBehaviour
         SetNextSeason(); 
         SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
 
+        grid.UpdateGoldScouterImageInGrid(); // 웨이브로 인해 단체로 죽을 때는 한 번만 갱신해서 연산량 줄이기
+        grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
+
         int stage = GameManager.Instance.stage;
         if(weatherApp != null)
             weatherApp.LoadNextDay(stage, lastWave, currentWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
@@ -214,6 +217,7 @@ public class EnemyController : MonoBehaviour
     {
         lastWave = currentWave;
         currentWave = nextWave;
+        grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType);
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         WaveType picked = PickNextByWeight();
@@ -368,6 +372,7 @@ public class EnemyController : MonoBehaviour
         InitBaseWeightsByStage(saveData.stage);
 
         currentWave = GetWaveFromWaveType(saveData.curWaveType);
+        grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType);
         setWave = currentWave.WaveType;
         lastWave = GetWaveFromWaveType(saveData.lastWaveType);
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);

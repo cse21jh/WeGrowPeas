@@ -220,6 +220,10 @@ public abstract class Plant : MonoBehaviour
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         grid.CheckBreedButtonBeforeDie(this.gameObject);
+        if(cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
+            grid.UpdateGoldScouterImageInGrid();
+        if(this is ChiliPepper)
+            grid.UpdateResistanceScouterImageInGrid(GameManager.Instance.enemyController.CurrentWave.WaveType);
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
         if(GameManager.Instance != null)
@@ -340,8 +344,7 @@ public abstract class Plant : MonoBehaviour
     {
         for (int i = 0; i < traits.Count; i++)
         {
-            float newResistance = traits[i].resistance + bonus;
-            traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+            ChangeResistance((int)traits[i].traitType,bonus);
         }
     }
 
@@ -355,9 +358,7 @@ public abstract class Plant : MonoBehaviour
             // 열성이 아니고(genetics != 0) 최초 저항력이 80%가 아닌(resistance != 0.8f) 형질
             if (traits[i].genetics != 2)
             {
-                float newResistance = traits[i].resistance + bonus;
-                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 사이로 제한
-                traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+                ChangeResistance((int)traits[i].traitType, bonus);
             }
         }
     }
@@ -372,9 +373,7 @@ public abstract class Plant : MonoBehaviour
             // 우성(genetics == 2)이고 최초 저항력이 80%인(resistance == 0.8f) 형질
             if (traits[i].genetics == 2)
             {
-                float newResistance = traits[i].resistance + bonus;
-                newResistance = Mathf.Clamp(newResistance, 0.1f, 1.0f); // 0.1~1.0 사이로 제한
-                traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
+                ChangeResistance((int)traits[i].traitType, bonus);
             }
         }
     }
@@ -650,6 +649,9 @@ public abstract class Plant : MonoBehaviour
 
     private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
     {
+        if (amount == 0)
+            return false;
+
         for (int i = 0; i < traits.Count; i++)
         {
             if ((int)traits[i].traitType == traitNum)
@@ -665,6 +667,10 @@ public abstract class Plant : MonoBehaviour
                 {
                     if (stemController.CheckGold(traits))
                         stemController.SetGold(true);
+                }
+                if(this is MovablePlant p && traitNum == (int)GameManager.Instance.enemyController.CurrentWave.WaveType) // 바뀐 저항력이 현 웨이브랑 동일한 저항력이면 스카우터 체크 
+                {
+                    p.CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
                 }
                 return true;
             }
