@@ -102,25 +102,28 @@ public class InfoApp : BasePhoneApp
         // 0. Plant Info (Top Left)
         if (AbilityManager.Instance != null)
         {
-            string plantName = AbilityManager.Instance.CurrentPlantName;
-            if (currentPlantName != null) currentPlantName.text = plantName;
+            var plantType = AbilityManager.Instance.GetCurrentPlantType();
+            var info = AbilityManager.Instance.GetPlantInfo(plantType);
+            
+            if (currentPlantName != null) 
+            {
+                // info가 유효하면 그 이름 사용, 아니면 기존 CurrentPlantName 사용 (Fallback)
+                if (!string.IsNullOrEmpty(info.plantName))
+                    currentPlantName.text = info.plantName;
+                else
+                    currentPlantName.text = AbilityManager.Instance.CurrentPlantName;
+            }
 
             if (currentPlantIcon != null)
             {
-                // Try to find icon in itemLookup
-                // Key logic might need adjustment based on how they are stored (Name vs DisplayName)
-                // Assuming plantName matches functionality
-                if (itemLookup.TryGetValue(plantName, out ItemData data))
+                if (info.icon != null)
                 {
-                    currentPlantIcon.sprite = data.Icon;
+                    currentPlantIcon.sprite = info.icon;
                     currentPlantIcon.gameObject.SetActive(true);
                 }
                 else
                 {
-                    // Fallback or specific search if key mismatch
-                    // e.g. "완두콩" vs item name "Pea" -> This mapping might be missing.
-                    // For now, try direct lookup. User might need to ensure names match.
-                    currentPlantIcon.gameObject.SetActive(false); 
+                    currentPlantIcon.gameObject.SetActive(false);
                 }
             }
         }

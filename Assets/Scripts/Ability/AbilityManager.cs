@@ -40,6 +40,13 @@ public class AbilityManager : MonoBehaviour
 
     public int GeneralAbilityPoint => generalAbilityPoint;
 
+    [SerializeField] private List<PlantInfoData> plantInfos;
+
+    public PlantInfoData GetPlantInfo(PlayablePlantType type)
+    {
+        return plantInfos.Find(x => x.type == type);
+    }
+
 
     void Awake()
     {

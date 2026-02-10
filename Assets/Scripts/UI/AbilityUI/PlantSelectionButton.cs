@@ -14,19 +14,23 @@ public class PlantSelectionButton : MonoBehaviour
     [SerializeField] private TextMeshProUGUI name;
     [SerializeField] private TextMeshProUGUI description;
 
-    [SerializeField] List<Sprite> plantImage;
-    [SerializeField] List<string> plantName;
-    [SerializeField] List<string> plantDescription;    
+    //[SerializeField] List<Sprite> plantImage;
+    //[SerializeField] List<string> plantName;
+    //[SerializeField] List<string> plantDescription;    
 
     //언락 여부에 따라 활성화, 비활성화 시켜줘야 함
     public void Init(PlayablePlantType plant, bool isUnlocked, AbilityUIController controller) // 아직 해금 전인 경우엔 클릭 시 해금 안내 창 떠야함
     {
         abilityUIController = controller;
 
-        plantType = plant;  
-        icon.sprite = plantImage[(int)plant];
-        name.text = plantName[(int)plant];
-        description.text = plantDescription[(int)plant];
+        plantType = plant;
+        
+        var info = AbilityManager.Instance.GetPlantInfo(plant);
+        // info가 default값일 수 있으므로(리스트에 없을 때), 체크 필요할 수 있음
+        
+        if (icon != null) icon.sprite = info.icon;
+        if (name != null) name.text = info.plantName;
+        if (description != null) description.text = info.description;
 
         if (isUnlocked)
         {
