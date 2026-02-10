@@ -17,6 +17,8 @@ public class InfoApp : BasePhoneApp
     [SerializeField] private GameObject gridInfoPanel;
 
     [Header("Characteristics UI")]
+    [SerializeField] private Image currentPlantIcon;
+    [SerializeField] private TMP_Text currentPlantName;
     [SerializeField] private Transform plantAbilityContainer;
     [SerializeField] private InfoAppItemSlot plantAbilitySlotPrefab; // Reusing ItemSlot for list items
     [SerializeField] private Transform generalAbilityContainer; // Horizontal Layout
@@ -97,16 +99,62 @@ public class InfoApp : BasePhoneApp
         SetActivePanel(characteristicsPanel);
         ClearDescription();
 
+        // 0. Plant Info (Top Left)
+        if (AbilityManager.Instance != null)
+        {
+            string plantName = AbilityManager.Instance.CurrentPlantName;
+            if (currentPlantName != null) currentPlantName.text = plantName;
+
+            if (currentPlantIcon != null)
+            {
+                // Try to find icon in itemLookup
+                // Key logic might need adjustment based on how they are stored (Name vs DisplayName)
+                // Assuming plantName matches functionality
+                if (itemLookup.TryGetValue(plantName, out ItemData data))
+                {
+                    currentPlantIcon.sprite = data.Icon;
+                    currentPlantIcon.gameObject.SetActive(true);
+                }
+                else
+                {
+                    // Fallback or specific search if key mismatch
+                    // e.g. "완두콩" vs item name "Pea" -> This mapping might be missing.
+                    // For now, try direct lookup. User might need to ensure names match.
+                    currentPlantIcon.gameObject.SetActive(false); 
+                }
+            }
+        }
+
         // 1. Plant Abilities
         ClearContainer(plantAbilityContainer);
         if (AbilityManager.Instance != null && plantAbilitySlotPrefab != null)
         {
-            var plantAbilities = AbilityManager.Instance.CurrentPlantAbility;
-            foreach (var ability in plantAbilities)
+            var allPlantAbilities = AbilityManager.Instance.GetAllPlantAbility();
+            var currentPlantAbilities = AbilityManager.Instance.CurrentPlantAbility;
+            var currentPlantType = AbilityManager.Instance.GetCurrentPlantType();
+
+            foreach (var ability in allPlantAbilities)
             {
                 if (ability == null) continue;
+                if (ability.type != currentPlantType) continue; // Filter by current plant type
+
+                // Check if ability is learned (in currentPlantAbilities)
+                // Assuming ability instances are unique or compare by name/ID
+                // PlantAbilityData is ScriptableObject so instance check *might* work if not instantiated runtime copies
+                // But better to check by name or reference if 'currentPlantAbilities' holds references to 'allPlantAbilities' elements.
+                
+                var learnedAbility = currentPlantAbilities.Find(a => a.abilityName == ability.abilityName);
+                
+                int level = (learnedAbility != null) ? learnedAbility.level : 0;
+                string desc = ability.description; // Use base description
+
                 var slot = Instantiate(plantAbilitySlotPrefab, plantAbilityContainer);
-                slot.Setup(ability.icon, ability.abilityName, ability.level, ability.description, UpdateDescription, ClearDescription);
+                slot.Setup(ability.icon, ability.abilityName, level, desc, UpdateDescription, ClearDescription);
+                
+                // Use Level Bar visualization
+                // Assuming max level is 5 for now
+                slot.SetupLevel(level, 5); 
+                
                 slot.gameObject.SetActive(true);
             }
         }

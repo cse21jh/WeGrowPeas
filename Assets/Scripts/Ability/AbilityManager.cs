@@ -20,6 +20,7 @@ public class AbilityManager : MonoBehaviour
 
     public List<PlantAbilityData> CurrentPlantAbility => currentPlantAbility;
     public List<GeneralAbilityData> CurrentGeneralAbility => currentGeneralAbility;
+    public string CurrentPlantName => currentPlant;
 
 
 
@@ -105,6 +106,16 @@ public class AbilityManager : MonoBehaviour
             case PlayablePlantType.Peanut:
                 SetPlant("땅콩");
                 return;
+        }
+    }
+
+    public PlayablePlantType GetCurrentPlantType()
+    {
+        switch (currentPlant)
+        {
+            case "완두콩": return PlayablePlantType.Pea;
+            case "땅콩": return PlayablePlantType.Peanut;
+            default: return PlayablePlantType.Pea; // Default fallback
         }
     }
 
