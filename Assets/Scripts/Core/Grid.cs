@@ -771,6 +771,100 @@ public class Grid : MonoBehaviour
             }
         }
     }
+    public bool IsAffectedByChiliPepper(int gridIndex)
+    {
+        Plant chiliPepper;
+        int maxIndex = GetMaxCol() * 4;
+
+        // 0단계: 좌우
+        if ((gridIndex - 4) >= 0) // 왼쪽
+        {
+            if (plantGrid.TryGetValue(gridIndex - 4, out chiliPepper))
+            {
+                if (chiliPepper is ChiliPepper) return true;
+            }
+        }
+
+        if ((gridIndex + 4) < maxIndex) // 오른쪽
+        {
+            if (plantGrid.TryGetValue(gridIndex + 4, out chiliPepper))
+            {
+                if (chiliPepper is ChiliPepper) return true;
+            }
+        }
+
+        // 1단계: 상하
+        if (chiliPepperRangeLevel >= 1)
+        {
+            if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
+            {
+                if (plantGrid.TryGetValue(gridIndex - 1, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래
+            {
+                if (plantGrid.TryGetValue(gridIndex + 1, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+        }
+
+        // 2단계: 대각선
+        if (chiliPepperRangeLevel >= 2)
+        {
+            // 왼쪽 위
+            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
+            {
+                if (plantGrid.TryGetValue(gridIndex - 5, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            // 오른쪽 위
+            // Plant.cs의 로직 참고: index - 3
+            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex - 1) % 4)
+            {
+                // **주의**: Plant.cs에서도 gridIndex - 3을 체크하고 있음. (오타일 가능성 있으나 기존 로직 유지)
+                // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
+                // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
+                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함. (기존 InfoAppGridSlot 구현과 동일하게)
+                 if (plantGrid.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+            // Plant.cs 원본 로직을 그대로 따르려면 -3이어야 하지만, InfoAppGridSlot에서 +3으로 구현했었음.
+            // 여기서는 논리적으로 맞는 +3 (오른쪽 위)을 사용. 
+            // 만약 Plant.cs가 -3을 의도한거라면 (왼쪽 아래?) ... 아니, 대각선은 4방향이어야 함.
+            // 왼쪽 위(-5), 오른쪽 위(+3), 왼쪽 아래(-3), 오른쪽 아래(+5) 가 맞음.
+
+            // 왼쪽 아래
+             if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
+            {
+                if (plantGrid.TryGetValue(gridIndex - 3, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            // 오른쪽 아래
+            if ((gridIndex + 5) < maxIndex && (gridIndex + 5) % 4 == (gridIndex + 1) % 4)
+            {
+                if (plantGrid.TryGetValue(gridIndex + 5, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     public virtual void RequestBreedSelect(GameObject clickedObject)
     {
