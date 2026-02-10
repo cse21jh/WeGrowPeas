@@ -24,7 +24,6 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         onHover = hoverCallback;
         onHoverExit = hoverExitCallback;
 
-        // 초기화
         if (goldSoilIndicator) goldSoilIndicator.SetActive(false);
         if (fertilizerIndicator) fertilizerIndicator.gameObject.SetActive(false);
         if (petBottleIndicator) petBottleIndicator.SetActive(false);
@@ -35,11 +34,14 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         StringBuilder sb = new StringBuilder();
         sb.AppendLine($"<b>Grid {gridIndex}</b>");
 
+        bool hasEffect = false;
+
         // 1. 황금 흙
         if (grid.HasGoldSoil(gridIndex))
         {
             if (goldSoilIndicator) goldSoilIndicator.SetActive(true);
             sb.AppendLine("- <color=yellow>황금 흙</color>: 모든 저항력 90% 고정, 이동 불가");
+            hasEffect = true;
         }
 
         // 2. 비료
@@ -56,6 +58,7 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 }
             }
             sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
+            hasEffect = true;
         }
 
         // 3. 페트병
@@ -63,19 +66,20 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         {
             if (petBottleIndicator) petBottleIndicator.SetActive(true);
             sb.AppendLine("- <color=blue>페트병</color>: 사망 1회 방지, 이동 불가");
+            hasEffect = true;
         }
 
-        // 4. 고추 (주변에 있는지 확인)
-        // Grid.cs에는 특정 인덱스가 고추의 영향을 받는지 확인하는 공개 메서드가 없음.
-        // Plant.CheckChiliPepper()는 Plant 인스턴스 메서드임.
-        // 여기서 Grid 상태를 보고 직접 판별하거나, Grid에 헬퍼 메서드를 추가해야 함.
-        // 일단 Plant가 있는지 확인하고 그 Plant의 CheckChiliPepper를 호출하는 방식은 Plant가 없으면 확인 불가.
-        // 따라서 Grid의 식물 정보를 통해 역으로 추적하거나, 범위를 직접 계산해야 함.
-        // 여기서는 간단히 로직 복사 (CheckChiliPepper 로직)
+        // 4. 고추
         if (IsAffectedByChiliPepper(gridIndex, grid))
         {
             if (chiliIndicator) chiliIndicator.SetActive(true);
             sb.AppendLine("- <color=red>매운 맛</color>: 우성 형질 저항력 +20%");
+            hasEffect = true;
+        }
+
+        if (!hasEffect)
+        {
+            sb.AppendLine("효과 없음 (일반 토양)");
         }
 
         tooltipText = sb.ToString();

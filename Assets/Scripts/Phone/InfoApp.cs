@@ -227,8 +227,16 @@ public class InfoApp : BasePhoneApp
             for (int i = 0; i < totalCells; i++)
             {
                 var slot = Instantiate(gridSlotPrefab, gridContainer);
-                slot.Setup(i, grid, UpdateDescription, ClearDescription);
+                
+                // Ensure the GameObject and components are enabled
                 slot.gameObject.SetActive(true);
+                slot.enabled = true; 
+                
+                // Force enable Image if present on root (covers the case where baseImage is root)
+                var img = slot.GetComponent<Image>();
+                if (img) img.enabled = true;
+
+                slot.Setup(i, grid, UpdateDescription, ClearDescription);
             }
         }
     }
