@@ -236,6 +236,87 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public bool TryGetFertilizerType(int gridIndex, out WaveType type)
+    {
+        int col = gridIndex / 4;
+        return fertilizerColumns.TryGetValue(col, out type);
+    }
+
+    private void ExecuteBreeding()
+    {
+        if (breedObj1 != null && breedObj2 != null) 
+        {
+            Plant parent1 = breedObj1.GetComponent<Plant>();
+            Plant parent2 = breedObj2.GetComponent<Plant>();
+            //자식 완두콩 형질 계산 후 Instantiate
+
+            // 교배 횟수 증가 아이템이 구매되었을 때 바로 적용되도록 매번 재계산
+            int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+
+            bool canBreed = false;
+            for (int idx = 0; idx < maxCol * 4; idx++) // 빈 칸이 있는가
+            {
+                if (!plantGrid.ContainsKey(idx))
+                {
+                    canBreed = true;
+                    break;
+                }
+            }
+
+            bool isEqualPlant = false;
+            if ((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
+            {
+                isEqualPlant = true;
+            }
+
+
+            if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
+            {                        
+                AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait()));
+                breedCount++;
+                GameEvents.RaisePeaBreeded();
+                Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
+                SoundManager.Instance.PlayEffect("Breed");
+                totalBreedCount++;
+                if (GameManager.Instance.currentPlant == "완두콩")
+                    totalPeaBreedcount++;
+                else if (GameManager.Instance.currentPlant == "땅콩")
+                    totalPeanutBreedCount++;
+                UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
+                Plant p1 = breedObj1.GetComponent<Plant>();
+                Plant p2 = breedObj2.GetComponent<Plant>();
+                p1.MakeDefaultSprite();
+                p2.MakeDefaultSprite();
+                breedObj1 = null;
+                breedObj2 = null;
+                DeactivateBreed();
+            }
+            else if (breedCount >= currentEffectiveMaxBreedCount)
+            {
+                Debug.Log("최대 교배 횟수 초과");
+                SoundManager.Instance.PlayEffect("WrongSelect");
+                isBreedButtonPressed = false;
+            }
+            else if (isEqualPlant)
+            {
+                Debug.Log("두 종이 일치하지 않습니다");
+                SoundManager.Instance.PlayEffect("WrongSelect");
+                isBreedButtonPressed = false;
+            }
+            else
+            {
+                Debug.Log("키울 공간이 부족합니다");
+                SoundManager.Instance.PlayEffect("WrongSelect");
+                isBreedButtonPressed = false;
+            }
+        }
+        else
+        {
+            Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
+            isBreedButtonPressed = false;
+        }
+    }
+
     public IEnumerator Breeding()
     {
         //breedTimer 만큼 동안 아래 과정 반복 진행 가능
@@ -312,79 +393,7 @@ public class Grid : MonoBehaviour
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
-                if (breedObj1 != null && breedObj2 != null) // 교배 버튼 등으로 추후 수정
-                {
-                    Plant parent1 = breedObj1.GetComponent<Plant>();
-                    Plant parent2 = breedObj2.GetComponent<Plant>();
-                    //자식 완두콩 형질 계산 후 Instantiate
-
-                    // 교배 횟수 증가 아이템이 구매되었을 때 바로 적용되도록 매번 재계산
-                    int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
-
-                    bool canBreed = false;
-                    for (int idx = 0; idx < maxCol * 4; idx++) // 빈 칸이 있는가
-                    {
-                        if (!plantGrid.ContainsKey(idx))
-                        {
-                            canBreed = true;
-                            break;
-                        }
-                    }
-
-                    bool isEqualPlant = false;
-                    if ((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
-                    {
-                        isEqualPlant = true;
-                    }
-
-
-                    if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
-                    {                        
-                        AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait()));
-                        breedCount++;
-                        GameEvents.RaisePeaBreeded();
-                        Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
-                        SoundManager.Instance.PlayEffect("Breed");
-                        totalBreedCount++;
-                        if (GameManager.Instance.currentPlant == "완두콩")
-                            totalPeaBreedcount++;
-                        else if (GameManager.Instance.currentPlant == "땅콩")
-                            totalPeanutBreedCount++;
-                        UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
-                        Plant p1 = breedObj1.GetComponent<Plant>();
-                        Plant p2 = breedObj2.GetComponent<Plant>();
-                        p1.MakeDefaultSprite();
-                        p2.MakeDefaultSprite();
-                        breedObj1 = null;
-                        breedObj2 = null;
-                        DeactivateBreed();
-                    }
-                    else if (breedCount >= currentEffectiveMaxBreedCount)
-                    {
-                        Debug.Log("최대 교배 횟수 초과");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
-                        isBreedButtonPressed = false;
-                    }
-                    else if (isEqualPlant)
-                    {
-                        Debug.Log("두 종이 일치하지 않습니다");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
-                        isBreedButtonPressed = false;
-                    }
-                    else
-                    {
-                        Debug.Log("키울 공간이 부족합니다");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
-                        isBreedButtonPressed = false;
-                    }
-
-
-                }
-                else
-                {
-                    Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
-                    isBreedButtonPressed = false;
-                }
+                ExecuteBreeding();
             }
             else
             {

@@ -42,31 +42,20 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         }
 
         // 2. 비료
-        bool hasFertilizer = grid.HasFertilizerAt(gridIndex);
-        if (hasFertilizer)
+        // 2. 비료
+        if (grid.TryGetFertilizerType(gridIndex, out var fertilizerType))
         {
-            var fertilizerCols = grid.GetFertilizerColumns();
-            int col = gridIndex / 4;
-            
-            if (fertilizerCols.TryGetValue(col, out var fertilizerType))
+            if (fertilizerIndicator)
             {
-                if (fertilizerIndicator)
+                fertilizerIndicator.gameObject.SetActive(true);
+                int typeIndex = (int)fertilizerType;
+                if (fertilizerColors != null && typeIndex >= 0 && typeIndex < fertilizerColors.Length)
                 {
-                    fertilizerIndicator.gameObject.SetActive(true);
-                    int typeIndex = (int)fertilizerType;
-                    if (fertilizerColors != null && typeIndex >= 0 && typeIndex < fertilizerColors.Length)
-                    {
-                        fertilizerIndicator.color = fertilizerColors[typeIndex];
-                    }
+                    fertilizerIndicator.color = fertilizerColors[typeIndex];
                 }
-                sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
-                hasEffect = true;
             }
-            else
-            {
-                // This shouldn't happen if HasFertilizerAt relies on the same dictionary, but safe fallback
-                 if (fertilizerIndicator) fertilizerIndicator.gameObject.SetActive(false);
-            }
+            sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
+            hasEffect = true;
         }
         else
         {
