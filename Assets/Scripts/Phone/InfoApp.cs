@@ -196,48 +196,32 @@ public class InfoApp : BasePhoneApp
             Grid grid = GameManager.Instance.grid;
             int maxCol = grid.GetMaxCol();
             int totalCells = maxCol * 4;
-
-            // Update GridLayoutGroup constraint if needed
-            GridLayoutGroup glg = gridContainer.GetComponent<GridLayoutGroup>();
-            if (glg != null)
-            {
-                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                glg.constraintCount = 4; // Rows are dynamic, Columns are fixed to 4 (per column in Grid.cs logic usually 4 rows per col? No, Grid.cs: 4 rows per col, maxCol cols.)
-                // Wait, Grid.cs structure: index = col * 4 + row. 
-                // Visual representation: usually we want Columns to be vertical.
-                // If GridLayoutGroup fills Horizontal first:
-                // Cell 0, 1, 2, 3 ...
-                // Grid.cs index: 0 is (Col 0, Row 0), 1 is (Col 0, Row 1).
-                // So if we want to visually match the game grid (Active Grid is Horizontal?):
-                // Game View: Low index left?
-                // Let's assume standard iteration 0 to MAX matches the visual order 
-                // or we adhere to "Col * 4 + Row". 
-                // If the game world is: Cols are X axis, Rows are Y axis (4 rows).
-                // Then gridIndex 0,1,2,3 are the first Column (Vertical strip).
-                // To visualize this in a GridLayoutGroup that usually fills Rows first:
-                // We might need to rearrange parsing or setup LayoutGroup to "Start Axis: Vertical".
-                // If "Start Axis: Vertical", then elements 0,1,2,3 go down, then next column.
-                // That matches Grid.cs indexing perfectly!
-                
-                glg.startAxis = GridLayoutGroup.Axis.Vertical;
-                glg.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-                glg.constraintCount = 4; 
-            }
-
+            
             for (int i = 0; i < totalCells; i++)
             {
                 var slot = Instantiate(gridSlotPrefab, gridContainer);
-                
-                // Ensure the GameObject and components are enabled
-                slot.gameObject.SetActive(true);
-                slot.enabled = true; 
-                
-                // Force enable Image if present on root (covers the case where baseImage is root)
-                var img = slot.GetComponent<Image>();
-                if (img) img.enabled = true;
 
                 slot.Setup(i, grid, UpdateDescription, ClearDescription);
             }
+
+            // Force rebuild layout to ensure ContentSizeFitter and RectMask2D work correctly
+            // Ensure ContentSizeFitter exists to work with ScrollRect
+            var csf = gridContainer.GetComponent<ContentSizeFitter>();
+            if (csf == null)
+            {
+                csf = gridContainer.gameObject.AddComponent<ContentSizeFitter>();
+                csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            }
+
+            // Check if parent has RectMask2D which might cause issues
+            var parentMask = gridContainer.GetComponentInParent<RectMask2D>();
+            if (parentMask != null)
+            {
+                // If persistent issues occur, suggest switching to Mask component
+                // Debug.LogWarning("[InfoApp] GridContainer is under a RectMask2D. If items are invisible, try replacing RectMask2D with a standard Mask component on the Viewport.");
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(gridContainer.GetComponent<RectTransform>());
         }
     }
 

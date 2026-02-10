@@ -24,55 +24,71 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         onHover = hoverCallback;
         onHoverExit = hoverExitCallback;
 
-        if (goldSoilIndicator) goldSoilIndicator.SetActive(false);
-        if (fertilizerIndicator) fertilizerIndicator.gameObject.SetActive(false);
-        if (petBottleIndicator) petBottleIndicator.SetActive(false);
-        if (chiliIndicator) chiliIndicator.SetActive(false);
-
         if (grid == null) return;
 
         StringBuilder sb = new StringBuilder();
         sb.AppendLine($"<b>Grid {gridIndex}</b>");
 
         bool hasEffect = false;
-
+        
         // 1. 황금 흙
-        if (grid.HasGoldSoil(gridIndex))
+        bool isGoldSoil = grid.HasGoldSoil(gridIndex);
+        if (goldSoilIndicator) goldSoilIndicator.SetActive(isGoldSoil);
+        
+        if (isGoldSoil)
         {
-            if (goldSoilIndicator) goldSoilIndicator.SetActive(true);
             sb.AppendLine("- <color=yellow>황금 흙</color>: 모든 저항력 90% 고정, 이동 불가");
             hasEffect = true;
         }
 
         // 2. 비료
-        if (grid.HasFertilizerAt(gridIndex))
+        bool hasFertilizer = grid.HasFertilizerAt(gridIndex);
+        if (hasFertilizer)
         {
-            var fertilizerType = grid.GetFertilizerColumns()[gridIndex / 4];
-            if (fertilizerIndicator)
+            var fertilizerCols = grid.GetFertilizerColumns();
+            int col = gridIndex / 4;
+            
+            if (fertilizerCols.TryGetValue(col, out var fertilizerType))
             {
-                fertilizerIndicator.gameObject.SetActive(true);
-                int typeIndex = (int)fertilizerType;
-                if (fertilizerColors != null && typeIndex >= 0 && typeIndex < fertilizerColors.Length)
+                if (fertilizerIndicator)
                 {
-                    fertilizerIndicator.color = fertilizerColors[typeIndex];
+                    fertilizerIndicator.gameObject.SetActive(true);
+                    int typeIndex = (int)fertilizerType;
+                    if (fertilizerColors != null && typeIndex >= 0 && typeIndex < fertilizerColors.Length)
+                    {
+                        fertilizerIndicator.color = fertilizerColors[typeIndex];
+                    }
                 }
+                sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
+                hasEffect = true;
             }
-            sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
-            hasEffect = true;
+            else
+            {
+                // This shouldn't happen if HasFertilizerAt relies on the same dictionary, but safe fallback
+                 if (fertilizerIndicator) fertilizerIndicator.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            if (fertilizerIndicator) fertilizerIndicator.gameObject.SetActive(false);
         }
 
         // 3. 페트병
-        if (grid.HasPetBottle(gridIndex))
+        bool isPetBottle = grid.HasPetBottle(gridIndex);
+        if (petBottleIndicator) petBottleIndicator.SetActive(isPetBottle);
+
+        if (isPetBottle)
         {
-            if (petBottleIndicator) petBottleIndicator.SetActive(true);
             sb.AppendLine("- <color=blue>페트병</color>: 사망 1회 방지, 이동 불가");
             hasEffect = true;
         }
 
         // 4. 고추
-        if (IsAffectedByChiliPepper(gridIndex, grid))
+        bool isChili = IsAffectedByChiliPepper(gridIndex, grid);
+        if (chiliIndicator) chiliIndicator.SetActive(isChili);
+
+        if (isChili)
         {
-            if (chiliIndicator) chiliIndicator.SetActive(true);
             sb.AppendLine("- <color=red>매운 맛</color>: 우성 형질 저항력 +20%");
             hasEffect = true;
         }
