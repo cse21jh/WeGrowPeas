@@ -120,6 +120,16 @@ public class InfoApp : BasePhoneApp
                 {
                     currentPlantIcon.sprite = info.icon;
                     currentPlantIcon.gameObject.SetActive(true);
+
+                    // Hover Event Setup
+                    var hoverHandler = currentPlantIcon.GetComponent<UIHoverHandler>();
+                    if (hoverHandler == null)
+                        hoverHandler = currentPlantIcon.gameObject.AddComponent<UIHoverHandler>();
+
+                    hoverHandler.Setup(
+                        () => UpdateDescription(info.description),
+                        () => ClearDescription()
+                    );
                 }
                 else
                 {
