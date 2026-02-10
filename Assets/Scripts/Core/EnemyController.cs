@@ -90,7 +90,7 @@ public class EnemyController : MonoBehaviour
     public List<int> StageNoTraitRecord => stageNoTraitRecord;
 
     // Start is called before the first frame update
-    void Start()
+    public void InitEnemyController()
     {
         waveKillCount = new int[Wave.NumberOfWave];
         stageWaveRecord.Add(WaveType.Aging);
@@ -106,6 +106,8 @@ public class EnemyController : MonoBehaviour
         lastWave = GetWaveFromWaveType(WaveType.Aging);
         currentWave = lastWave;
         nextWave = GetWaveFromWaveType(PickNextByWeight());
+
+        weatherApp.InitApp(1, currentWave, nextWave, grid.CountNoTraitPlant(currentWave.WaveType));
 
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
@@ -182,7 +184,7 @@ public class EnemyController : MonoBehaviour
 
         int stage = GameManager.Instance.stage;
         if(weatherApp != null)
-            weatherApp.LoadNextDay(stage, lastWave, currentWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
+            weatherApp.LoadNextDay(stage, lastWave, currentWave,nextWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
         //FlushNextWaveText();
         yield return null;
     }
@@ -378,7 +380,7 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
         waveSkipCount = saveData.remainWaveSkipCount;
-        for(int i =0;i<7;i++)
+        for(int i =0;i< Wave.NumberOfWave; i++)
             waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
@@ -394,7 +396,7 @@ public class EnemyController : MonoBehaviour
             int count = grid.CountNoTraitPlant(currentWave.WaveType);
             for (int i = 1; i < stageWaveRecord.Count; i++)
             {
-                weatherApp.LoadNextDay(i, waves[stageWaveRecord[i]], currentWave, stageNoTraitRecord[i], count, stageKillRecord[i]);
+                weatherApp.LoadNextDay(i, waves[stageWaveRecord[i]], currentWave, nextWave, stageNoTraitRecord[i], count, stageKillRecord[i]);
             }
         }
     }

@@ -15,6 +15,13 @@ public class WeatherApp : MonoBehaviour
     [SerializeField] private Transform scrollViewContent;
 
 
+    // 다음날 특성
+    [SerializeField] GameObject nextWeather;
+    [SerializeField] TMP_Text nextStageText;
+    [SerializeField] TMP_Text nextWaveText;
+    [SerializeField] private Image nextWaveImage;
+
+
     [Space(10)]
     [Header("Wave Properties")]
     [SerializeField] private Image currentWavePanel;
@@ -23,11 +30,41 @@ public class WeatherApp : MonoBehaviour
 
     [SerializeField] private Sprite[] waveIcons;
 
-    public void LoadNextDay(int stage, Wave lastWave, Wave currentWave, int lastDangerousPlantCount, int currentDangerousPlantCount, int dieCount)
+    public void InitApp(int stage, Wave currentWave, Wave nextWave, int currentDangerousPlantCount)
+    {
+        UpdateCurrentWave(stage, currentWave, currentDangerousPlantCount);
+        if (GameManager.Instance.grid.GetHasWeatherForecast())
+        {
+            nextWeather.SetActive(true);
+            UpdateNextWave(stage + 1, nextWave);
+        }
+        else
+        {
+            nextWeather.SetActive(false);
+        }
+    }
+
+    public void LoadNextDay(int stage, Wave lastWave, Wave currentWave,Wave nextWave, int lastDangerousPlantCount, int currentDangerousPlantCount, int dieCount)
     {
         UpdateCurrentWave(stage + 1, currentWave, currentDangerousPlantCount);
         AddPastWeatherKillPrefab(stage, lastWave, dieCount);
-        AddPastWeatherPrefab(stage, lastWave, lastDangerousPlantCount);        
+        AddPastWeatherPrefab(stage, lastWave, lastDangerousPlantCount);
+        if(GameManager.Instance.grid.GetHasWeatherForecast())
+        {
+            nextWeather.SetActive(true);
+            UpdateNextWave(stage+2, nextWave);
+        }
+        else
+        {
+            nextWeather.SetActive(false);
+        }
+    }
+
+    public void UpdateNextWave(int stage, Wave wave)
+    {
+        nextStageText.text = "일기예보 - " + stage.ToString() + "일차";
+        nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가 예상됩니다.";
+        nextWaveImage.sprite = waveIcons[(int)wave.WaveType];
     }
 
     public void UpdateCurrentWave(int stage, Wave wave, int dangerousPlantCount)

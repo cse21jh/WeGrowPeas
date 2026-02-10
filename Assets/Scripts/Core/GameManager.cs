@@ -213,6 +213,7 @@ public class GameManager : Singleton<GameManager>
                 if (AbilityManager.Instance != null)
                     AbilityManager.Instance.ApplyAbilities(this);
                 grid.InitGrid();
+                enemyController.InitEnemyController();
                 economyManager.InitEconomyManager();
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
@@ -222,6 +223,7 @@ public class GameManager : Singleton<GameManager>
 
             case GameStartType.ContinueGame:
                 Debug.Log("불러오기");
+                enemyController.InitEnemyController();
                 LoadGame();
                 gameMode = (stage > endStage) ? 1 : 0;
                 break;
