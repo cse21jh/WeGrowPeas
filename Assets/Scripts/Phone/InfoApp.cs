@@ -48,6 +48,9 @@ public class InfoApp : BasePhoneApp
 
         // Build Item Lookup Dictionary once
         BuildItemLookup();
+        
+        // Ensure UI is updated after initialization (fixes issue where OnEnable runs before Manager init)
+        ShowCharacteristics();
     }
 
     public override void OnCreate(PhoneManager phone)
@@ -295,8 +298,23 @@ public class InfoApp : BasePhoneApp
 
     private void UpdateDescription(string text)
     {
-        if (descriptionPanel) descriptionPanel.SetActive(true);
-        if (descriptionText) descriptionText.text = text;
+        if (descriptionPanel != null)
+        {
+            descriptionPanel.SetActive(true);
+            
+            // 패널이 마우스 이벤트를 가로채지 않도록 설정 (깜빡임 방지)
+            var canvasGroup = descriptionPanel.GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = descriptionPanel.AddComponent<CanvasGroup>();
+            }
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        if (descriptionText != null)
+        {
+            descriptionText.text = text;
+        }
     }
 
     private void ClearDescription()
