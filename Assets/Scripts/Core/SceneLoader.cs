@@ -79,10 +79,6 @@ public class SceneLoader : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(delay);
 
-        if(SceneManager.GetActiveScene().name == "StartScene")
-        {
-            yield break;
-        }
         FindAnyObjectByType<TransitionController>().Transition_In();
     }
 }

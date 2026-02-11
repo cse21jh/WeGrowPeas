@@ -89,12 +89,12 @@ public class TransitionController : MonoBehaviour
     private IEnumerator Transition(float rad)
     {
         DOTween.To(() => transitionMat.GetFloat("_Radius"), x => transitionMat.SetFloat("_Radius", x),
-            rad, transitionDuration).SetEase(easeType).SetUpdate(true);
+            rad, transitionDuration).SetEase(easeType).SetUpdate(true).SetId("Transition");
 
         yield return new WaitUntil(() => transitionMat.GetFloat("_Radius") == rad);
 
         isFinished = true;
-        DOTween.KillAll();
+        DOTween.Kill("Transition", true);
         StopAllCoroutines();
     }
 }
