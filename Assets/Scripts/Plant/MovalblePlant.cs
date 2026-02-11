@@ -27,7 +27,8 @@ public abstract class MovablePlant : Plant
     {
         base.Init(gridIndex, grid);
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);
-        CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
+        if(GameManager.Instance)
+            CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType); 
     }
 
     protected void Update()

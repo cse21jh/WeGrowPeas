@@ -142,8 +142,8 @@ PlayerSettings:
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1
   preloadedAssets:
-  - {fileID: 11400000, guid: 3de604fb50407be4c8d53354326d32d9, type: 2}
-  - {fileID: 11400000, guid: 4c165b9e08268fe4182ce6abdf174558, type: 2}
+  - {fileID: 11400000, guid: 7b5acc9ab79ccf047a8642de2239a0c4, type: 2}
+  - {fileID: 11400000, guid: d04b0816f04cb4742af95526b9c3b670, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -552,6 +552,12 @@ PlayerSettings:
     m_Automatic: 1
   - m_BuildTarget: WindowsStandaloneSupport
     m_APIs: 0200000012000000
+    m_Automatic: 0
+  - m_BuildTarget: MacStandaloneSupport
+    m_APIs: 10000000
+    m_Automatic: 0
+  - m_BuildTarget: LinuxStandaloneSupport
+    m_APIs: 1100000015000000
     m_Automatic: 0
   m_BuildTargetVRSettings:
   - m_BuildTarget: Standalone
