@@ -32,13 +32,13 @@ public class SaveSlotUI : MonoBehaviour
 
             string path = SaveContext.Instance.GetSavePath(slotIndex);
 
-            if (!File.Exists(path)) tmp.text = $"저장소 {slotIndex} - 비어 있음";
+            if (!File.Exists(path)) tmp.text = $"저장소 {slotIndex}\n비어 있음";
             else
             {
                 string json = File.ReadAllText(path);
                 SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
-                tmp.text = $"저장소 {slotIndex} - Day {saveData.stage}";
+                tmp.text = $"저장소 {slotIndex}\nDay {saveData.stage}";
             }
         }
 

@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 5949325163439129400}
   - component: {fileID: 70159326526407214}
   - component: {fileID: 8392296241975766402}
+  - component: {fileID: 6808673178980460415}
   m_Layer: 5
   m_Name: PlantButton
   m_TagString: Untagged
@@ -145,7 +146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 4076be6d41d5061439e51aa51bd915db, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -154,7 +155,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!114 &70159326526407214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,21 +215,38 @@ MonoBehaviour:
   icon: {fileID: 3070340978051602342}
   name: {fileID: 6686626773586266136}
   description: {fileID: 1113859443994842274}
-  plantImage:
-  - {fileID: 21300000, guid: b7a738d99ee654246882f43f1cbc92db, type: 3}
-  - {fileID: 21300000, guid: 89f375f3851185d45a3150126e1dc2ea, type: 3}
-  - {fileID: 554816622, guid: 2a5407c4d2af7784ab3d9b479f601597, type: 3}
-  plantName:
-  - "\uC644\uB450\uCF69"
-  - "\uB545\uCF69"
-  - "\uD53C\uC2A4\uD0C0\uCE58\uC624"
-  plantDescription:
-  - "\uAC00\uC7A5 \uAE30\uBCF8 \uC644\uB450\uCF69\uC774\uB2E4. \\n\uAE30\uBCF8 \uC800\uD56D\uB825\uC774
-    \uB192\uB2E4."
-  - "Pea\uB11B\uC774\uB2E4. \\n\uC6E8\uC774\uBE0C \uC885\uB8CC \uC2DC \uD655\uB960\uC801\uC73C\uB85C
-    \uC2ED\uC790\uBC29\uD5A5 \uC911 \uD55C \uACF3\uC5D0 \uC790\uC2E0\uC744 \uBCF5\uC81C\uD55C\uB2E4."
-  - "Pea\uC2A4\uD0C0\uCE58\uC624\uB2E4. \\n\uAD50\uBC30\uB97C \uD560 \uB54C, \uBD80\uBAA8\uC5D0\uAC8C
-    \uB0AE\uC740 \uD655\uB960\uB85C \uBCF4\uD638\uB9C9\uC774 \uC0DD\uC131\uB41C\uB2E4."
+--- !u!114 &6808673178980460415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907223587930593736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithm: 0
+  size: 2
+  spread: 0
+  useGlobalAngle: 0
+  offsetAngle: 90
+  offsetDistance: 6
+  offset: {x: 0.00000035762793, y: -6}
+  color: {r: 0, g: 0, b: 0, a: 0.6}
+  inset: 0
+  blendMode: 0
+  useCasterAlpha: 1
+  ignoreCasterColor: 0
+  skipTextHashing: 0
+  deallocateOnDisable: 0
+  disableFitCompensation: 0
+  shadowAsSibling: 0
+  cutout: 0
+  baked: 0
+  modifiedFromInspector: 0
+  bakedShadows: []
 --- !u!1 &2881914648712043336
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,7 +315,7 @@ MonoBehaviour:
   m_text: "\uC644\uB450\uCF69"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 595b1ad5204330b45aa4685db4b6e1e6, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 58a3883789f097d45a4eeca70d2e27e2, type: 2}
   m_fontSharedMaterials:
   - {fileID: -3296111813810895173, guid: 5975f5db9fa474542b68b563727b4a1b, type: 2}
   m_fontMaterial: {fileID: 0}
@@ -435,7 +453,7 @@ MonoBehaviour:
     \uC5B4\uCA4C\uAD6C \uC800\uCA4C\uAD6C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 595b1ad5204330b45aa4685db4b6e1e6, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: d081767eceba35544b5a33a9d3174d94, type: 2}
   m_fontSharedMaterials:
   - {fileID: -3296111813810895173, guid: 5975f5db9fa474542b68b563727b4a1b, type: 2}
   m_fontMaterial: {fileID: 0}
