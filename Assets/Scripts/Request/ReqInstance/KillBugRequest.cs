@@ -34,7 +34,7 @@ public class KillBugRequest : RequestInstance
         if (IsCompleted) return;
 
         currentCount++;
-        Debug.Log("현재 목표량 " + requiredCount + "까지 " + currentCount + "잡았습니다.");
+        //Debug.Log("현재 목표량 " + requiredCount + "까지 " + currentCount + "잡았습니다.");
         
         if (currentCount == requiredCount) CompleteOnce();
         else RaiseChanged();

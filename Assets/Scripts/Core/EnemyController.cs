@@ -89,7 +89,12 @@ public class EnemyController : MonoBehaviour
     public List<int> StageKillRecord => stageKillRecord;
     public List<int> StageNoTraitRecord => stageNoTraitRecord;
 
-    // Start is called before the first frame update
+    private void Awake()
+    {
+        if (waveKillCount == null || waveKillCount.Length != Wave.NumberOfWave)
+            waveKillCount = new int[Wave.NumberOfWave];
+    }
+
     public void InitEnemyController()
     {
         waveKillCount = new int[Wave.NumberOfWave];
@@ -111,12 +116,6 @@ public class EnemyController : MonoBehaviour
 
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public IEnumerator EnemyWaveCoroutine()
