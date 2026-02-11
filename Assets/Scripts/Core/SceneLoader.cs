@@ -71,13 +71,18 @@ public class SceneLoader : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"{scene.name} ¾À ·ÎµåµÊ (¸ğµå: {mode})");
+        Debug.Log($"{scene.name} ì”¬ ë¡œë“œë¨ (ëª¨ë“œ: {mode})");
         StartCoroutine(Transition(1.0f));
     }
 
     private IEnumerator Transition(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
+
+        if(SceneManager.GetActiveScene().name == "StartScene")
+        {
+            yield break;
+        }
         FindAnyObjectByType<TransitionController>().Transition_In();
     }
 }

@@ -59,8 +59,8 @@ public class TransitionController : MonoBehaviour
 
 
     /// <summary>
-    /// Á¡Á¡ ¹à¾ÆÁö´Â Æ®·£Áö¼Ç.
-    /// ÀÎÆ®·Î ¼º°İ
+    /// ì ì  ë°ì•„ì§€ëŠ” íŠ¸ëœì§€ì…˜.
+    /// ì¸íŠ¸ë¡œ ì„±ê²©
     /// </summary>
     public void Transition_In()
     {
@@ -71,8 +71,8 @@ public class TransitionController : MonoBehaviour
     }
 
     /// <summary>
-    /// Á¡Á¡ ¾îµÎ¿öÁö´Â Æ®·£Áö¼Ç.
-    /// ¾Æ¿ôÆ®·Î ¼º°İ
+    /// ì ì  ì–´ë‘ì›Œì§€ëŠ” íŠ¸ëœì§€ì…˜.
+    /// ì•„ì›ƒíŠ¸ë¡œ ì„±ê²©
     /// </summary>
     public void Transition_Out()
     {

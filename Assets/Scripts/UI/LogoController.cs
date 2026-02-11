@@ -21,9 +21,8 @@ public class LogoController : MonoBehaviour
 
         this.transform.DOLocalMoveY(0.2f, popupDuration)
         .SetEase(popupEase)
-        .SetLoops(-1, LoopType.Yoyo);
+        .SetLoops(-1, LoopType.Yoyo).Play();
     }
-
 
 
     private void OnMouseEnter()
@@ -35,5 +34,4 @@ public class LogoController : MonoBehaviour
     {
         this.transform.DOScale(initialScale, popupDuration * 0.5f).SetEase(popupEase);
     }
-
 }
