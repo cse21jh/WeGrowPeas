@@ -94,7 +94,8 @@ public class TransitionController : MonoBehaviour
         yield return new WaitUntil(() => transitionMat.GetFloat("_Radius") == rad);
 
         isFinished = true;
-        DOTween.Kill("Transition", true);
+        //DOTween.KillAll(true);
+         DOTween.Kill("Transition", true);
         StopAllCoroutines();
     }
 }

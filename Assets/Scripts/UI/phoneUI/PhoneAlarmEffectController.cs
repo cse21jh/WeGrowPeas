@@ -113,7 +113,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
     {
         // 1. minRoot 흔들기 (기존 강도)
         minRoot.transform.DOShakeRotation(alarmDuration, new Vector3(0, 0, strength), vibrato, 90, false, ShakeRandomnessMode.Harmonic)
-            .SetLoops(2, LoopType.Restart);
+            .SetLoops(2, LoopType.Restart).SetLink(minRoot);
 
         // 2. maxRoot 흔들기 (강도를 strength * 0.2f 정도로 약하게 설정)
         // 0.2f는 원하시는 느낌에 따라 0.1f ~ 0.3f 사이로 조절해보세요.
@@ -142,7 +142,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
         SoundManager.Instance.PlayEffect("Vibration");
 
         // 시퀀스 생성
-        Sequence mainSeq = DOTween.Sequence();
+        Sequence mainSeq = DOTween.Sequence().SetLink(gameObject);
 
         for (int i = 0; i < vibWaves.Length; i++)
         {
@@ -163,7 +163,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
         wave.alpha = 0f;
         wave.transform.localScale = Vector3.zero;
 
-        Sequence seq = DOTween.Sequence();
+        Sequence seq = DOTween.Sequence().SetLink(gameObject);
 
         // 1. 인덱스에 따른 가변 파라미터 설정
         float startDelay = index * interval;
@@ -173,18 +173,18 @@ public class PhoneAlarmEffectController : MonoBehaviour
         // 2. 스케일 애니메이션
         seq.Append(wave.transform.DOScale(indexedMaxScale, duration)
             .SetDelay(startDelay)
-            .SetEase(Ease.OutQuad));
+            .SetEase(Ease.OutQuad)).SetLink(wave.transform.gameObject);
 
         // 3. 페이드인 타이밍 (인덱스가 높을수록 더 커진 상태에서 등장)
         // index * 0.2f를 더해줄수록 더 늦게(더 커졌을 때) 나타납니다.
         float fadeInDelay = startDelay + (index * 0.2f);
         float fadeInDuration = duration * 0.3f;
 
-        seq.Insert(fadeInDelay, wave.DOFade(1f, fadeInDuration).SetEase(Ease.OutCubic));
+        seq.Insert(fadeInDelay, wave.DOFade(1f, fadeInDuration).SetEase(Ease.OutCubic)).SetLink(wave.transform.gameObject);
 
         // 4. 페이드아웃 (스케일 끝자락에 맞춰 소멸)
         float fadeOutStart = startDelay + (duration * 0.7f);
-        seq.Insert(fadeOutStart, wave.DOFade(0f, duration * 0.3f));
+        seq.Insert(fadeOutStart, wave.DOFade(0f, duration * 0.3f)).SetLink(wave.transform.gameObject);
 
         return seq;
     }
