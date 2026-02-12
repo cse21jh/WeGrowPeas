@@ -19,9 +19,16 @@ public class SoundManager : Singleton<SoundManager>
 
     private Dictionary<string, AudioClip> EffectSoundDictionary = new Dictionary<string, AudioClip>();
 
+
     void Awake()
     {
-
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        DontDestroyOnLoad(gameObject);
+        
         GameObject EffectTempObject = new GameObject("Effect");
         EffectTempObject.transform.SetParent(gameObject.transform);
         EffectPlayer = EffectTempObject.AddComponent<AudioSource>();
@@ -72,6 +79,16 @@ public class SoundManager : Singleton<SoundManager>
         
         if(SceneManager.GetActiveScene().name == "StartScene")
             PlayBgm("StartScene");
+    }
+
+    public void ConnectSlider(Slider BGM, Slider Effect)
+    {
+        BGMVolumeSlider = BGM;
+        EffectVolumeSlider = Effect;
+        BGMVolumeSlider.value = BGMVolume;
+        EffectVolumeSlider.value = EffectVolume;
+        BGMVolumeSlider.onValueChanged.AddListener(ChangeBGMVolume);
+        EffectVolumeSlider.onValueChanged.AddListener(ChangeEffectVolume);
     }
 
     public void PlayEffect(string name)
@@ -125,17 +142,17 @@ public class SoundManager : Singleton<SoundManager>
         BgmPlayer.Stop();
     }
 
-    public void ChangeBGMVolume()
+    public void ChangeBGMVolume(float val)
     {
-        BGMVolume = BGMVolumeSlider.value;
-        BgmPlayer.volume = BGMVolumeSlider.value;
+        BGMVolume = val;
+        BgmPlayer.volume = val;
     }
 
-    public void ChangeEffectVolume()
+    public void ChangeEffectVolume(float val)
     {
-        EffectVolume = EffectVolumeSlider.value;
-        EffectPlayer.volume = EffectVolumeSlider.value;
-        FlexibleEffectPlayer.volume = EffectVolumeSlider.value;
+        EffectVolume = val;
+        EffectPlayer.volume = val;
+        FlexibleEffectPlayer.volume = val;
     }
 
 }

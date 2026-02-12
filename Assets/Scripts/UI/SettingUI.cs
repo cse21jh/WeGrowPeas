@@ -25,7 +25,8 @@ public class SettingUI : MonoBehaviour
     {
         if (SettingPanel == null)
             return;
-        SettingPanel.SetActive(true);        
+        SettingPanel.SetActive(true);
+        SoundManager.Instance.ConnectSlider(SettingPanel.transform.Find("BGMVolumeBar").GetComponent<Slider>(), SettingPanel.transform.Find("EffectVolumeBar").GetComponent<Slider>());        
         Time.timeScale = 0;
         ClickRouter.Instance.IsBlockedByUI = true;
         return;

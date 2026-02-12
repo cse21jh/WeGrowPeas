@@ -44,6 +44,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadStartScene()
     {
         SceneManager.LoadScene("StartScene");
+        SoundManager.Instance.PlayBgm("StartScene");
         Time.timeScale = 1f;
     }
 
