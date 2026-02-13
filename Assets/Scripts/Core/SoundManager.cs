@@ -155,4 +155,9 @@ public class SoundManager : Singleton<SoundManager>
         FlexibleEffectPlayer.volume = val;
     }
 
+    public void LoadSoundManager(ProfileData data)
+    {
+        ChangeBGMVolume(data.BGMVolume);
+        ChangeEffectVolume(data.EffectVolume);        
+    }
 }

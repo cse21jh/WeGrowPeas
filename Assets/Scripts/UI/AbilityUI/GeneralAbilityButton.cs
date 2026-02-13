@@ -10,8 +10,12 @@ public class GeneralAbilityButton : MonoBehaviour
     private bool isSelected = false;
     private GeneralAbilityData abilityData;
 
+    private int price;
+
+
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI name;
+    [SerializeField] private GameObject lockIcon;
 
     public void Init(GeneralAbilityData ability, bool isUnlocked, AbilityUIController controller)
     {
@@ -19,17 +23,19 @@ public class GeneralAbilityButton : MonoBehaviour
         abilityData = ability;
         icon.sprite = ability.icon;
         name.text = ability.abilityName;
+        price = ability.price;
 
         if(isUnlocked)
         {
             this.GetComponent<Button>().onClick.AddListener(OnClick);
+            lockIcon.SetActive(false);
         }
         else
         {
             //해금 관련 이미지 + 버튼 눌렀을 때 해금창 뜨도록
             this.GetComponent<Button>().onClick.AddListener(() =>
             {
-                SoundManager.Instance.PlayEffect("Button");
+                abilityUIController.OpenUnlockUI(name.text, price, () => abilityUIController.TryUnlockGeneralAbility(abilityData));                
             });
         }
     }

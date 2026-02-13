@@ -36,6 +36,12 @@ public class AbilityUIController : MonoBehaviour
     [SerializeField] private Button addGeneralAbilityButton;
     [SerializeField] private TextMeshProUGUI generalAbilityPointText;
 
+    //해금 UI
+    [SerializeField] private GameObject unlockUI;
+
+    //유전자 개수 UI
+    [SerializeField] private TextMeshProUGUI geneticsInPlantPanel;
+    [SerializeField] private TextMeshProUGUI geneticsInGeneralPanel;
 
     private PlayablePlantType selectedPlant = PlayablePlantType.Pea;
     private List<PlantAbilityData> selectedPlantAbilities = new();
@@ -66,8 +72,8 @@ public class AbilityUIController : MonoBehaviour
     {        
         plantAbilityPanel.SetActive(true);
         generalAbilityPanel.SetActive(false);
-        UpdatePlantList();
-        SelectPlant(PlayablePlantType.Pea);
+        UpdateGenetics();
+        UpdatePlantList();        
     }
 
     private void UpdatePlantList()
@@ -83,17 +89,20 @@ public class AbilityUIController : MonoBehaviour
             plantButton.GetComponent<PlantSelectionButton>().Init(plantType, unlockedPlant[plantType], this);
         }
         ClearPlantAbilityList();
+        SelectPlant(PlayablePlantType.Pea);
     }
 
-    public bool TryUnlockPlant(PlayablePlantType plant)
+    public void TryUnlockPlant(PlayablePlantType plant)
     {
         if (abilityManager.UnlockPlant(plant)) // 해금 성공
         {
-            UpdatePlantList();            
-            return true;
+            UpdatePlantList();
+            CloseUnlockUI();
+            return;
         }
 
-        return false;
+        FailUnlcok();
+        return;
     }
 
     public void SelectPlant(PlayablePlantType plant) // 식물을 선택
@@ -103,8 +112,7 @@ public class AbilityUIController : MonoBehaviour
         addPlantAbilityButton.GetComponent<Button>().onClick.RemoveAllListeners();
         addPlantAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            TryAddPlantAbilityPoint(plant);
-            SoundManager.Instance.PlayEffect("Button");
+            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).plantName + "의 특성 포인트 1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
         });
         UpdatePlantAbilityList(plant);
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
@@ -181,19 +189,21 @@ public class AbilityUIController : MonoBehaviour
         return true;
     }
 
-    public bool TryAddPlantAbilityPoint(PlayablePlantType plant) // 해당 식물의 특성 포인트 증가
+    public void TryAddPlantAbilityPoint(PlayablePlantType plant) // 해당 식물의 특성 포인트 증가
     {
         if (remainPlantAbilityPoint == -1) // 아직 식물 선택 전이라 포인트 증가 X. 안전장치
-            return false;
+            return;
 
         if (AbilityManager.Instance.AddPlantAbilityPoint(selectedPlant))
         {
             remainPlantAbilityPoint++;
             UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
-            return true;
+            CloseUnlockUI();
+            return;
         }
 
-        return false;
+        FailUnlcok();
+        return;
         // 포인트 증가 실패 (이미 포인트가 최대거나 재화 부족)
     }
 
@@ -205,6 +215,7 @@ public class AbilityUIController : MonoBehaviour
         generalAbilityPanel.SetActive(true);
         ClearGeneralAbilityDescription();
         UpdateGeneralAbilityList();
+        UpdateGenetics();
     }
 
     private void UpdateGeneralAbilityList() // 
@@ -216,12 +227,12 @@ public class AbilityUIController : MonoBehaviour
         {
             GameObject ability = Instantiate(generalAbilityPrefab, generalAbilityListContent);
 
-            ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.name] ,this);
+            ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.abilityName] ,this);
         }
 
         addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            TryAddGeneralAbilityPoint();
+            OpenUnlockUI("일반 특성 포인트 1", AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
         });
 
         remainGeneralAbilityPoint = abilityManager.GetGeneralAbilityPoint();
@@ -266,30 +277,34 @@ public class AbilityUIController : MonoBehaviour
         }
     }
 
-    public bool TryUnlockGeneralAbility(GeneralAbilityData ability)
+    public void TryUnlockGeneralAbility(GeneralAbilityData ability)
     {
         if (abilityManager.UnlockGeneralAbility(ability)) // 해금 성공
         {
             UpdateGeneralAbilityList();
-            return true;
+            CloseUnlockUI();
+            return;
         }
+        FailUnlcok();
+        return;
 
-        return false;
     }
 
-    public bool TryAddGeneralAbilityPoint() // 일반 특성 포인트 증가
+    public void TryAddGeneralAbilityPoint() // 일반 특성 포인트 증가
     {
         if (remainGeneralAbilityPoint == -1) // 일반 특성 창 들어오지 않은 오류
-            return false;
+            return;
 
         if (AbilityManager.Instance.AddGeneralAbilityPoint())
         {
             remainGeneralAbilityPoint++;
             UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint);
-            return true;
+            CloseUnlockUI();
+            return;
         }
 
-        return false;
+        FailUnlcok();
+        return;
         // 포인트 증가 실패 (이미 포인트가 최대거나 재화 부족)
     }
 
@@ -321,6 +336,38 @@ public class AbilityUIController : MonoBehaviour
 
         saveSlotUI.OnClickNewGame();
         //게임 시작
+    }
+
+
+    public void OpenUnlockUI(string name, int price, Action unlockAction)
+    {
+        unlockUI.gameObject.SetActive(true);
+        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = name + " 해금에\n" + price.ToString() + "개의 유전자가 필요합니다.\n해금하시겠습니까?";
+        Button b = unlockUI.transform.Find("ConfirmButton").GetComponent<Button>();
+        b.onClick.RemoveAllListeners();
+        b.onClick.AddListener(() =>
+        {            
+            unlockAction();
+            SoundManager.Instance.PlayEffect("Button");
+        });
+    }
+
+    public void FailUnlcok()
+    {
+        SoundManager.Instance.PlayEffect("WrongSelect");
+        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "<color=#FF4F4F>유전자가 부족하거나 이미 최대치입니다</color>";
+    }
+
+    public void CloseUnlockUI()
+    {
+        unlockUI.gameObject.SetActive(false);
+
+    }
+
+    public void UpdateGenetics()
+    {
+        geneticsInGeneralPanel.text = "유전자 : " + abilityManager.GetGenetics().ToString();
+        geneticsInPlantPanel.text = "유전자 : " + abilityManager.GetGenetics().ToString();
     }
 }
 

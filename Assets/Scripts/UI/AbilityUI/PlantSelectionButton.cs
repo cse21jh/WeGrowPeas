@@ -10,9 +10,14 @@ public class PlantSelectionButton : MonoBehaviour
 
     private PlayablePlantType plantType;
 
+    private int price;    
+
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI name;
     [SerializeField] private TextMeshProUGUI description;
+    [SerializeField] private GameObject lockIcon;
+
+    
 
     //[SerializeField] List<Sprite> plantImage;
     //[SerializeField] List<string> plantName;
@@ -24,24 +29,27 @@ public class PlantSelectionButton : MonoBehaviour
         abilityUIController = controller;
 
         plantType = plant;
-        
+
         var info = AbilityManager.Instance.GetPlantInfo(plant);
         // info가 default값일 수 있으므로(리스트에 없을 때), 체크 필요할 수 있음
         
         if (icon != null) icon.sprite = info.icon;
         if (name != null) name.text = info.plantName;
         if (description != null) description.text = info.description;
+        if (description != null) price = info.price;
 
         if (isUnlocked)
         {
             this.GetComponent<Button>().onClick.AddListener(OnClick);
+            lockIcon.SetActive(false);
         }
         else
         {
+            lockIcon.SetActive(true);
             //해금 관련 이미지 + 버튼 눌렀을 때 해금창 뜨도록
             this.GetComponent<Button>().onClick.AddListener(() =>
             {
-                SoundManager.Instance.PlayEffect("Button");
+                abilityUIController.OpenUnlockUI(name.text, price, () => abilityUIController.TryUnlockPlant(plant));
             });
         }
     }

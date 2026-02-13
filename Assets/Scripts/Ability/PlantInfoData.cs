@@ -7,4 +7,5 @@ public class PlantInfoData : ScriptableObject
     public string plantName;
     [TextArea] public string description;
     public Sprite icon;
+    public int price;
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using System;
+using JetBrains.Annotations;
 
 public class AbilityManager : MonoBehaviour
 {
@@ -33,12 +34,14 @@ public class AbilityManager : MonoBehaviour
 
     private int generalAbilityPoint = 0;
 
-    public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
+    private int genetics = 5000;
 
+    public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
     public Dictionary<PlayablePlantType, int> PlantAbilityPoint => plantAbilityPoint;
     public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 이름, 해당 특성의 해금 여부
-
     public int GeneralAbilityPoint => generalAbilityPoint;
+    public int Genetics => genetics;
+
 
     [SerializeField] private List<PlantInfoData> plantInfos;
 
@@ -73,12 +76,7 @@ public class AbilityManager : MonoBehaviour
         generalAbilityPoint = 1;
 
         for (int i = 0; i < Enum.GetValues(typeof(PlayablePlantType)).Length; i++)
-        {
-            //임시로 모든 식물 가능하도록 
-            isPlantUnlocked.Add((PlayablePlantType)i, true);
-            plantAbilityPoint.Add((PlayablePlantType)i, 3);
-
-            /*
+        {            
             if(i == 0)
             {
                 isPlantUnlocked.Add((PlayablePlantType)i, true);
@@ -89,12 +87,14 @@ public class AbilityManager : MonoBehaviour
                 isPlantUnlocked.Add((PlayablePlantType)i, false);
                 plantAbilityPoint.Add((PlayablePlantType)i, 3);
             }
-            */
         }
 
         foreach(var ability in allGeneralAbilities)
         {
-            isGeneralAbilityDataUnlocked.Add(ability.name, ability.isUnlocked);
+            if(ability.abilityName == "기본 자금 증가")
+                isGeneralAbilityDataUnlocked.Add(ability.abilityName, true);
+            else
+                isGeneralAbilityDataUnlocked.Add(ability.abilityName, false);
         }
     }
 
@@ -105,25 +105,16 @@ public class AbilityManager : MonoBehaviour
 
     public void SetPlantByEnum(PlayablePlantType plant)
     {
-        switch(plant)
-        {
-            case PlayablePlantType.Pea:
-                SetPlant("완두콩");
-                return;
-            case PlayablePlantType.Peanut:
-                SetPlant("땅콩");
-                return;
-        }
+        SetPlant(GetPlantInfo(plant).plantName);
     }
 
     public PlayablePlantType GetCurrentPlantType()
     {
-        switch (currentPlant)
-        {
-            case "완두콩": return PlayablePlantType.Pea;
-            case "땅콩": return PlayablePlantType.Peanut;
-            default: return PlayablePlantType.Pea; // Default fallback
-        }
+        var t = plantInfos.Find(x => x.plantName == currentPlant);
+
+        if (t == null)
+            return PlayablePlantType.Pea;
+        return t.type;
     }
 
     public void SetPlantAbility(List<PlantAbilityData> plantAbility)
@@ -172,25 +163,27 @@ public class AbilityManager : MonoBehaviour
     //해금 관련 함수들. 돈 관련 처리도 여기서
     public bool UnlockPlant(PlayablePlantType plant)
     {
-        if (!isPlantUnlocked.ContainsKey(plant) || !isPlantUnlocked[plant]) // 키가 없거나 이미 해금 되어있던 경우
+        if (!isPlantUnlocked.ContainsKey(plant) || isPlantUnlocked[plant]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
-        //재화 관련 판단
+        if (UseGenetics(GetPlantInfo(plant).price))
+            return isPlantUnlocked[plant] = true;
 
-        return isPlantUnlocked[plant] = true;        
+        return false; // 돈 없어서 실패
     }
 
     public bool UnlockGeneralAbility(GeneralAbilityData ability)
     {
-        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.name) || !isGeneralAbilityDataUnlocked[ability.name]) // 키가 없거나 이미 해금 되어있던 경우
+        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.abilityName) || isGeneralAbilityDataUnlocked[ability.abilityName]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
-        //재화 관련 판단
+        if(UseGenetics(ability.price))
+        {
+            isGeneralAbilityDataUnlocked[ability.abilityName] = true;
+            return true;
+        }
 
-        isGeneralAbilityDataUnlocked[ability.name] = true;
-        allGeneralAbilities.Find(a => a == ability).isUnlocked = true;
-
-        return true;
+        return false; // 돈 없어서 실패
     }
 
     public bool AddPlantAbilityPoint(PlayablePlantType plant)
@@ -198,10 +191,14 @@ public class AbilityManager : MonoBehaviour
         if (!plantAbilityPoint.ContainsKey(plant) || plantAbilityPoint[plant] >= 10)
             return false;
 
-        //재화 관련 판단
 
-        plantAbilityPoint[plant]++;
-        return true;
+        if (UseGenetics(plantAbilityPoint[plant] * 300))
+        {
+            plantAbilityPoint[plant]++;
+            return true;
+        }
+
+        return false;
     }
 
     public bool AddGeneralAbilityPoint()
@@ -209,10 +206,13 @@ public class AbilityManager : MonoBehaviour
         if(generalAbilityPoint >= 3)
             return false;
 
-        //재화 관련 판단
+        if (UseGenetics(generalAbilityPoint * 500))
+        {
+            generalAbilityPoint++;
+            return true;
+        }
 
-        generalAbilityPoint++;
-        return true;
+        return false;
     }
 
     // 각 세이브 파일별 저장이 필요한 AbilityManager를 Load
@@ -246,5 +246,49 @@ public class AbilityManager : MonoBehaviour
                 ability.ApplyEffect(gameManager);
             }
         }
+    }
+
+    public bool UseGenetics(int val)
+    {
+        if(genetics >= val)
+        {
+            ChangeGenetics(genetics - val);
+            return true;
+        }
+        return false;
+    }
+    public void ChangeGenetics(int val)
+    {
+        genetics = val;
+        if(GameObject.Find("AbilityPanel") is var a)
+        {
+            a.GetComponent<AbilityUIController>().UpdateGenetics();
+        }
+
+        // 인게임 내에서 변동 등도 필요하면 수정 필요
+    }
+
+    public int GetGenetics()
+    {
+        return genetics;
+    }
+
+    public void LoadAbilityManager(ProfileData data)
+    {
+        genetics = data.genetics;
+
+        isPlantUnlocked.Clear();
+        for (int i = 0; i < data.unlockPlantType.Count; i++)
+            isPlantUnlocked.Add(data.unlockPlantType[i], data.isPlantUnlocked[i]);
+
+        plantAbilityPoint.Clear();
+        for (int i = 0; i < data.plantTypeOfAbilityPoint.Count; i++)
+            plantAbilityPoint.Add(data.plantTypeOfAbilityPoint[i], data.plantAbilityPoint[i]);
+
+        isGeneralAbilityDataUnlocked.Clear();
+        for (int i = 0; i < data.generalAbilityDataName.Count; i++)
+            isGeneralAbilityDataUnlocked.Add(data.generalAbilityDataName[i], data.isGeneralAbilityDataUnlocked[i]);
+
+        generalAbilityPoint = data.generalAbilityPoint;
     }
 }
