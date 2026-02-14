@@ -9,7 +9,7 @@ public class CurseManager : Singleton<CurseManager>
     [Header("Curse Related Objects")]
     [SerializeField] private GameObject fog;
 
-    private float tempCursePercentage = 0.2f;
+    private float tempCursePercentage = 0.2f; //test 시 1로 설정
 
     public CurseInstance currentTempCurse = null;
 
@@ -31,7 +31,7 @@ public class CurseManager : Singleton<CurseManager>
     public void SelectCurse(int stage)
     {
         SelectTemporalCurse();
-        if (stage % 5 == 0) SelectSeasonalCurse();
+        //if (stage % 5 == 0) SelectSeasonalCurse();
     }
 
     public void ApplyCurse()
@@ -44,11 +44,11 @@ public class CurseManager : Singleton<CurseManager>
     {
         Debug.Log("CurseManager입니다.");
         float rd = UnityEngine.Random.value;
-        /*if (rd > tempCursePercentage)
+        if (rd > tempCursePercentage)
         {
             Debug.Log(rd);
             return;
-        }*/
+        }
 
         Debug.Log("단발형 저주 생성!");
 
@@ -87,7 +87,15 @@ public class CurseManager : Singleton<CurseManager>
 
         return typeCode switch
         {
+            "101" => new ReverseCurse(data),
             "102" => new FogCurse(data),
+            "103" => new ThiefCurse(data),
+            "104" => new WaveBlindCurse(data),
+            "105" => new MushroomCurse(data),
+            "106" => new BreedMadnessCurse(data),
+            "107" => new RearrangeCurse(data),
+            "108" => new DoubleWaveCurse(data),
+            "109" => new EMPCurse(data),
 
             _ => null
         };
