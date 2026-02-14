@@ -119,6 +119,114 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1927465
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1927466}
+  - component: {fileID: 1927469}
+  - component: {fileID: 1927468}
+  - component: {fileID: 1927467}
+  m_Layer: 5
+  m_Name: Icon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1927466
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927465}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 33237681}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.00001335144}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1927467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithm: 0
+  size: 2
+  spread: 0
+  useGlobalAngle: 0
+  offsetAngle: 90
+  offsetDistance: 3
+  offset: {x: 0.00000017881396, y: -3}
+  color: {r: 0, g: 0, b: 0, a: 0.6}
+  inset: 0
+  blendMode: 0
+  useCasterAlpha: 1
+  ignoreCasterColor: 0
+  skipTextHashing: 0
+  deallocateOnDisable: 0
+  disableFitCompensation: 0
+  shadowAsSibling: 0
+  cutout: 0
+  baked: 0
+  modifiedFromInspector: 0
+  bakedShadows: []
+--- !u!114 &1927468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: ada560db905c0ca40a9b4df0a975cb1c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1927469
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927465}
+  m_CullTransparentMesh: 1
 --- !u!1 &10783851
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,6 +427,83 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: e7a9863185e78ae4f8ff397d2e7bd061, type: 3}
   - type: 2
     sprite: {fileID: 21300000, guid: 6eeb5d43d1412f64b8daa0a96f0d5910, type: 3}
+--- !u!1 &33237680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 33237681}
+  - component: {fileID: 33237683}
+  - component: {fileID: 33237682}
+  m_Layer: 5
+  m_Name: Genetics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &33237681
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33237680}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1927466}
+  - {fileID: 1294914358}
+  m_Father: {fileID: 1903202544}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 20, y: 19.999985}
+  m_SizeDelta: {x: 171.9013, y: 50}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &33237682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33237680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &33237683
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33237680}
+  m_CullTransparentMesh: 1
 --- !u!1 &42636039
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,18 +601,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 42636039}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &46073212
 GameObject:
   m_ObjectHideFlags: 0
@@ -813,6 +993,7 @@ GameObject:
   - component: {fileID: 75489788}
   - component: {fileID: 75489787}
   - component: {fileID: 75489786}
+  - component: {fileID: 75489790}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -964,6 +1145,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 75489784}
   m_CullTransparentMesh: 1
+--- !u!114 &75489790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75489784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithm: 0
+  size: 2
+  spread: 0
+  useGlobalAngle: 0
+  offsetAngle: 90
+  offsetDistance: 3
+  offset: {x: 0.00000017881396, y: -3}
+  color: {r: 0, g: 0, b: 0, a: 0.6}
+  inset: 0
+  blendMode: 0
+  useCasterAlpha: 1
+  ignoreCasterColor: 0
+  skipTextHashing: 0
+  deallocateOnDisable: 0
+  disableFitCompensation: 0
+  shadowAsSibling: 0
+  cutout: 0
+  baked: 0
+  modifiedFromInspector: 0
+  bakedShadows: []
 --- !u!1 &101370731
 GameObject:
   m_ObjectHideFlags: 0
@@ -1061,18 +1274,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 101370731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &123119056
 GameObject:
   m_ObjectHideFlags: 0
@@ -1382,18 +1590,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 147543504}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &148127107
 GameObject:
   m_ObjectHideFlags: 0
@@ -1658,18 +1861,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 153247870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &167656505
 GameObject:
   m_ObjectHideFlags: 0
@@ -2174,18 +2372,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 220211504}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &235122598
 GameObject:
   m_ObjectHideFlags: 0
@@ -2419,18 +2612,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 244557554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &250980544
 GameObject:
   m_ObjectHideFlags: 0
@@ -2528,18 +2716,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 250980544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &265241682
 GameObject:
   m_ObjectHideFlags: 0
@@ -2928,18 +3111,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 272316653}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &280078651
 GameObject:
   m_ObjectHideFlags: 0
@@ -3175,18 +3353,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 288913594}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &293370372
 GameObject:
   m_ObjectHideFlags: 0
@@ -3284,18 +3457,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 293370372}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &294880981
 GameObject:
   m_ObjectHideFlags: 0
@@ -3725,18 +3893,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 344540784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &359984000
 GameObject:
   m_ObjectHideFlags: 0
@@ -3970,7 +4133,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &397920116
 Transform:
   m_ObjectHideFlags: 0
@@ -4260,6 +4423,83 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!1 &409885735
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 409885736}
+  - component: {fileID: 409885738}
+  - component: {fileID: 409885737}
+  m_Layer: 5
+  m_Name: Genetics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &409885736
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409885735}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1064456085}
+  - {fileID: 1065450153}
+  m_Father: {fileID: 1079207710}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -20, y: 20}
+  m_SizeDelta: {x: 171.9013, y: 50}
+  m_Pivot: {x: 1, y: 0}
+--- !u!114 &409885737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409885735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &409885738
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409885735}
+  m_CullTransparentMesh: 1
 --- !u!1 &414257661
 GameObject:
   m_ObjectHideFlags: 0
@@ -4494,18 +4734,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 418438288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &419801267
 GameObject:
   m_ObjectHideFlags: 0
@@ -4603,18 +4838,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 419801267}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &420233430
 GameObject:
   m_ObjectHideFlags: 0
@@ -4780,7 +5010,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 4.5
+  m_PixelsPerUnitMultiplier: 6
 --- !u!222 &420233436
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5284,18 +5514,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 456968597}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &459610204
 GameObject:
   m_ObjectHideFlags: 0
@@ -5393,18 +5618,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 459610204}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &490879404
 GameObject:
   m_ObjectHideFlags: 0
@@ -5502,18 +5722,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 490879404}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &495453968
 GameObject:
   m_ObjectHideFlags: 0
@@ -5808,18 +6023,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 498843128}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &525912833
 GameObject:
   m_ObjectHideFlags: 0
@@ -5917,18 +6127,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 525912833}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &528539605
 GameObject:
   m_ObjectHideFlags: 0
@@ -6026,18 +6231,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 528539605}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &561727592
 GameObject:
   m_ObjectHideFlags: 0
@@ -6517,18 +6717,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 624185755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &624460412
 GameObject:
   m_ObjectHideFlags: 0
@@ -6648,7 +6843,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &633400492
 Transform:
   m_ObjectHideFlags: 0
@@ -7733,18 +7928,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 729070136}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &737973150
 GameObject:
   m_ObjectHideFlags: 0
@@ -8041,18 +8231,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 738355511}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &753193002
 GameObject:
   m_ObjectHideFlags: 0
@@ -8812,18 +8997,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 792956567}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &801235020
 GameObject:
   m_ObjectHideFlags: 0
@@ -8921,18 +9101,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 801235020}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &817186029
 GameObject:
   m_ObjectHideFlags: 0
@@ -9489,18 +9664,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 841511413}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &847008071
 GameObject:
   m_ObjectHideFlags: 0
@@ -9570,7 +9740,7 @@ MonoBehaviour:
   generalAbilityPointText: {fileID: 587584941}
   unlockUI: {fileID: 1653019182}
   geneticsInPlantPanel: {fileID: 1294914356}
-  geneticsInGeneralPanel: {fileID: 1944815635}
+  geneticsInGeneralPanel: {fileID: 1065450154}
 --- !u!1 &874841117
 GameObject:
   m_ObjectHideFlags: 0
@@ -10015,18 +10185,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 899526216}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &915606096
 GameObject:
   m_ObjectHideFlags: 0
@@ -10275,18 +10440,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 928762399}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &935435642
 GameObject:
   m_ObjectHideFlags: 0
@@ -10782,18 +10942,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 987102955}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &998899195
 GameObject:
   m_ObjectHideFlags: 0
@@ -10891,18 +11046,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 998899195}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1002311153
 GameObject:
   m_ObjectHideFlags: 0
@@ -11000,18 +11150,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1002311153}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1033492332
 GameObject:
   m_ObjectHideFlags: 0
@@ -11243,18 +11388,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1050576533}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1054901300
 GameObject:
   m_ObjectHideFlags: 0
@@ -11568,18 +11708,257 @@ MonoBehaviour:
   m_GameObject: {fileID: 1063493609}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
+--- !u!1 &1064456084
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1064456085}
+  - component: {fileID: 1064456088}
+  - component: {fileID: 1064456087}
+  - component: {fileID: 1064456086}
+  m_Layer: 5
+  m_Name: Icon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1064456085
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064456084}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 409885736}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.00001335144}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1064456086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064456084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithm: 0
+  size: 2
+  spread: 0
+  useGlobalAngle: 0
+  offsetAngle: 90
+  offsetDistance: 3
+  offset: {x: 0.00000017881396, y: -3}
+  color: {r: 0, g: 0, b: 0, a: 0.6}
+  inset: 0
+  blendMode: 0
+  useCasterAlpha: 1
+  ignoreCasterColor: 0
+  skipTextHashing: 0
+  deallocateOnDisable: 0
+  disableFitCompensation: 0
+  shadowAsSibling: 0
+  cutout: 0
+  baked: 0
+  modifiedFromInspector: 0
+  bakedShadows: []
+--- !u!114 &1064456087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064456084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: ada560db905c0ca40a9b4df0a975cb1c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1064456088
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064456084}
+  m_CullTransparentMesh: 1
+--- !u!1 &1065450152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1065450153}
+  - component: {fileID: 1065450155}
+  - component: {fileID: 1065450154}
+  m_Layer: 5
+  m_Name: GeneticsAmount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1065450153
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065450152}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.7499998, y: 0.7499998, z: 0.7499998}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 409885736}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -34.85988, y: -18.75}
+  m_SizeDelta: {x: 160, y: 50}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1065450154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065450152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 1000
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: d081767eceba35544b5a33a9d3174d94, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 30
+  m_fontSizeBase: 30
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 4096
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1065450155
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065450152}
+  m_CullTransparentMesh: 1
 --- !u!1 &1069927188
 GameObject:
   m_ObjectHideFlags: 0
@@ -11590,7 +11969,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1069927189}
   - component: {fileID: 1069927191}
-  - component: {fileID: 1069927190}
+  - component: {fileID: 1069927192}
   m_Layer: 0
   m_Name: grassss (179)
   m_TagString: Untagged
@@ -11613,27 +11992,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1912448092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1069927190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1069927188}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawOrderOffset: 100
-  YOffset: 0
-  isRandomRotateOn: 0
-  randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!212 &1069927191
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -11689,6 +12047,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1069927192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069927188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawOrderOffset: 100
+  YOffset: 0
+  isRandomRotateOn: 0
+  randomRotateRange: 10
 --- !u!1 &1076057700
 GameObject:
   m_ObjectHideFlags: 0
@@ -11786,18 +12160,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1076057700}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1078773749
 GameObject:
   m_ObjectHideFlags: 0
@@ -12022,7 +12391,7 @@ RectTransform:
   - {fileID: 753193003}
   - {fileID: 1695318822}
   - {fileID: 689867041}
-  - {fileID: 1944815637}
+  - {fileID: 409885736}
   m_Father: {fileID: 847008072}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -12165,18 +12534,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1093705945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1111283954
 GameObject:
   m_ObjectHideFlags: 0
@@ -12274,18 +12638,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1111283954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1152016441
 GameObject:
   m_ObjectHideFlags: 0
@@ -12828,18 +13187,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1220404564}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1268621728
 GameObject:
   m_ObjectHideFlags: 0
@@ -13023,7 +13377,7 @@ GameObject:
   - component: {fileID: 1294914357}
   - component: {fileID: 1294914356}
   m_Layer: 5
-  m_Name: Genetics
+  m_Name: GeneticsAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13049,10 +13403,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC720\uC804\uC790: 0"
+  m_text: 1000
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
-  m_sharedMaterial: {fileID: 7133888830723503448, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: d081767eceba35544b5a33a9d3174d94, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -13076,15 +13430,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -13137,16 +13491,16 @@ RectTransform:
   m_GameObject: {fileID: 1294914355}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7499999, y: 0.7499999, z: 0.7499999}
+  m_LocalScale: {x: 0.7499998, y: 0.7499998, z: 0.7499998}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1903202544}
+  m_Father: {fileID: 33237681}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -223.2, y: -130}
-  m_SizeDelta: {x: 261.6245, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -34.85988, y: -18.75}
+  m_SizeDelta: {x: 160, y: 50}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &1302998748
 GameObject:
   m_ObjectHideFlags: 0
@@ -13452,18 +13806,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1359966946}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1368632831
 GameObject:
   m_ObjectHideFlags: 0
@@ -13561,18 +13910,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1368632831}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1415800257
 GameObject:
   m_ObjectHideFlags: 0
@@ -13806,18 +14150,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1423528242}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1452645859
 GameObject:
   m_ObjectHideFlags: 0
@@ -13903,7 +14242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1459845759}
   - component: {fileID: 1459845761}
-  - component: {fileID: 1459845760}
+  - component: {fileID: 1459845762}
   m_Layer: 0
   m_Name: grassss (182)
   m_TagString: Untagged
@@ -13926,27 +14265,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1912448092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1459845760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459845758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawOrderOffset: 100
-  YOffset: 0
-  isRandomRotateOn: 0
-  randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!212 &1459845761
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -14002,6 +14320,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1459845762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459845758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawOrderOffset: 100
+  YOffset: 0
+  isRandomRotateOn: 0
+  randomRotateRange: 10
 --- !u!1 &1473129773
 GameObject:
   m_ObjectHideFlags: 0
@@ -14099,18 +14433,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1473129773}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1474543009
 GameObject:
   m_ObjectHideFlags: 0
@@ -14345,18 +14674,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1478910713}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1493960899
 GameObject:
   m_ObjectHideFlags: 0
@@ -14579,18 +14903,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1516647740}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1522375158
 GameObject:
   m_ObjectHideFlags: 0
@@ -14688,18 +15007,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1522375158}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1546118793
 GameObject:
   m_ObjectHideFlags: 0
@@ -14797,18 +15111,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1546118793}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1555738808
 GameObject:
   m_ObjectHideFlags: 0
@@ -15309,18 +15618,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1574510485}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1586282472
 GameObject:
   m_ObjectHideFlags: 0
@@ -15691,18 +15995,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1601572664}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1609188619
 GameObject:
   m_ObjectHideFlags: 0
@@ -16101,18 +16400,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1618157186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1653019182
 GameObject:
   m_ObjectHideFlags: 0
@@ -16555,18 +16849,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1660822345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1668494037
 GameObject:
   m_ObjectHideFlags: 0
@@ -16664,18 +16953,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1668494037}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1678786583
 GameObject:
   m_ObjectHideFlags: 0
@@ -17005,18 +17289,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1696362515}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1704539832
 GameObject:
   m_ObjectHideFlags: 0
@@ -17114,18 +17393,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1704539832}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1713723472
 GameObject:
   m_ObjectHideFlags: 0
@@ -17223,18 +17497,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1713723472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1715830398
 GameObject:
   m_ObjectHideFlags: 0
@@ -17510,18 +17779,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1734171144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1743556133
 GameObject:
   m_ObjectHideFlags: 0
@@ -18074,18 +18338,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1764143000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1776613684
 GameObject:
   m_ObjectHideFlags: 0
@@ -18329,18 +18588,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1789508949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1796280390
 GameObject:
   m_ObjectHideFlags: 0
@@ -18351,7 +18605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1796280391}
   - component: {fileID: 1796280393}
-  - component: {fileID: 1796280392}
+  - component: {fileID: 1796280394}
   m_Layer: 0
   m_Name: grassss (181)
   m_TagString: Untagged
@@ -18374,27 +18628,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1912448092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1796280392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1796280390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawOrderOffset: 100
-  YOffset: 0
-  isRandomRotateOn: 0
-  randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!212 &1796280393
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -18450,6 +18683,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1796280394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796280390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawOrderOffset: 100
+  YOffset: 0
+  isRandomRotateOn: 0
+  randomRotateRange: 10
 --- !u!1 &1803700009
 GameObject:
   m_ObjectHideFlags: 0
@@ -18547,18 +18796,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1803700009}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1817567617
 GameObject:
   m_ObjectHideFlags: 0
@@ -18656,18 +18900,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1817567617}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1831787559
 GameObject:
   m_ObjectHideFlags: 0
@@ -18765,18 +19004,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1831787559}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1843203151
 GameObject:
   m_ObjectHideFlags: 0
@@ -18949,18 +19183,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1849428731}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1862724054
 GameObject:
   m_ObjectHideFlags: 0
@@ -19209,7 +19438,7 @@ RectTransform:
   - {fileID: 761698481}
   - {fileID: 770940600}
   - {fileID: 1333035206}
-  - {fileID: 1294914358}
+  - {fileID: 33237681}
   m_Father: {fileID: 847008072}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -19794,142 +20023,6 @@ MonoBehaviour:
   baked: 0
   modifiedFromInspector: 0
   bakedShadows: []
---- !u!1 &1944815634
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1944815637}
-  - component: {fileID: 1944815636}
-  - component: {fileID: 1944815635}
-  m_Layer: 5
-  m_Name: Genetics
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1944815635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944815634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: "\uC720\uC804\uC790: 0"
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
-  m_sharedMaterial: {fileID: 7133888830723503448, guid: 46ca1385ad4fe2c45a842c7bd6a4eb9f, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &1944815636
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944815634}
-  m_CullTransparentMesh: 1
---- !u!224 &1944815637
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944815634}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7499998, y: 0.7499998, z: 0.7499998}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1079207710}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 185.5, y: -132.2}
-  m_SizeDelta: {x: 261.6245, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1951673844
 GameObject:
   m_ObjectHideFlags: 0
@@ -20027,18 +20120,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1951673844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &1953115390
 GameObject:
   m_ObjectHideFlags: 0
@@ -20410,18 +20498,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1990424028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2001444451
 GameObject:
   m_ObjectHideFlags: 0
@@ -20759,18 +20842,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2015248646}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2020486566
 GameObject:
   m_ObjectHideFlags: 0
@@ -20837,8 +20915,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286614015
-  m_fontColor: {r: 1, g: 0.5359, b: 0.50377357, a: 1}
+    rgba: 4279769924
+  m_fontColor: {r: 0.2679245, g: 0.1049354, b: 0.09453184, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -21004,18 +21082,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2030394392}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2033351498
 GameObject:
   m_ObjectHideFlags: 0
@@ -21113,18 +21186,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2033351498}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2052647916
 GameObject:
   m_ObjectHideFlags: 0
@@ -21259,18 +21327,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2054490842}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2066330599
 GameObject:
   m_ObjectHideFlags: 0
@@ -21368,18 +21431,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2066330599}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2073638580
 GameObject:
   m_ObjectHideFlags: 0
@@ -21477,18 +21535,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2073638580}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2073942797
 GameObject:
   m_ObjectHideFlags: 0
@@ -21586,18 +21639,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2073942797}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2095087174
 GameObject:
   m_ObjectHideFlags: 0
@@ -21608,7 +21656,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2095087175}
   - component: {fileID: 2095087177}
-  - component: {fileID: 2095087176}
+  - component: {fileID: 2095087178}
   m_Layer: 0
   m_Name: grassss (180)
   m_TagString: Untagged
@@ -21631,27 +21679,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1912448092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2095087176
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2095087174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawOrderOffset: 100
-  YOffset: 0
-  isRandomRotateOn: 0
-  randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!212 &2095087177
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -21707,6 +21734,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2095087178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095087174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drawOrderOffset: 100
+  YOffset: 0
+  isRandomRotateOn: 0
+  randomRotateRange: 10
 --- !u!1 &2096552326
 GameObject:
   m_ObjectHideFlags: 0
@@ -21963,18 +22006,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2125847730}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1 &2127053833
 GameObject:
   m_ObjectHideFlags: 0
@@ -22072,18 +22110,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2127053833}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9819c3740d55cb94a8d15cf8ae499277, type: 3}
+  m_Script: {fileID: 11500000, guid: 66032c4e4d53db24abce629e1eaae2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   drawOrderOffset: 100
   YOffset: 0
   isRandomRotateOn: 0
   randomRotateRange: 10
-  multiplyColor: {r: 1, g: 1, b: 1, a: 1}
-  maxY: 1
-  minY: -1
-  mulY: 0
-  colorOffset: 0.9
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

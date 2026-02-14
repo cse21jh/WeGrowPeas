@@ -559,6 +559,7 @@ GameObject:
   - component: {fileID: 5313486907680451848}
   - component: {fileID: 4255948125271528347}
   - component: {fileID: 9129791289686571325}
+  - component: {fileID: 5772830954089000105}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -582,8 +583,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -240, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchoredPosition: {x: -240, y: 4}
+  m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4255948125271528347
 CanvasRenderer:
@@ -623,6 +624,38 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5772830954089000105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4375446460772860984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c162dc854d2f24fa639ba0623de5ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithm: 0
+  size: 2
+  spread: 0
+  useGlobalAngle: 0
+  offsetAngle: 90
+  offsetDistance: 3
+  offset: {x: 0.00000017881396, y: -3}
+  color: {r: 0, g: 0, b: 0, a: 0.6}
+  inset: 0
+  blendMode: 0
+  useCasterAlpha: 1
+  ignoreCasterColor: 0
+  skipTextHashing: 0
+  deallocateOnDisable: 0
+  disableFitCompensation: 0
+  shadowAsSibling: 0
+  cutout: 0
+  baked: 0
+  modifiedFromInspector: 0
+  bakedShadows: []
 --- !u!1 &5730208602490774731
 GameObject:
   m_ObjectHideFlags: 0

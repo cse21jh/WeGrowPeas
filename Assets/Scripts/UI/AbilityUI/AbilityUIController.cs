@@ -366,8 +366,8 @@ public class AbilityUIController : MonoBehaviour
 
     public void UpdateGenetics()
     {
-        geneticsInGeneralPanel.text = "유전자 : " + abilityManager.GetGenetics().ToString();
-        geneticsInPlantPanel.text = "유전자 : " + abilityManager.GetGenetics().ToString();
+        geneticsInGeneralPanel.text = abilityManager.GetGenetics().ToString();
+        geneticsInPlantPanel.text = abilityManager.GetGenetics().ToString();
     }
 }
 
