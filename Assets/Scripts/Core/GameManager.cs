@@ -135,6 +135,9 @@ public class SaveData
     public List<PlantAbilityData> currentPlantAbility = new();
     public List<GeneralAbilityData> currentGeneralAbility = new();
 
+    //CurseManager
+    public string tempCurseId;
+
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
 }
@@ -462,6 +465,7 @@ public class GameManager : Singleton<GameManager>
         modManager.LoadModManager(saveData);
         requestManager.LoadRequestManager(saveData);
         phoneManager.LoadPhoneManager(saveData);
+        curseManager.LoadCurseManager(saveData);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData);
@@ -642,6 +646,9 @@ public class GameManager : Singleton<GameManager>
             saveData.currentPlantAbility = AbilityManager.Instance.CurrentPlantAbility;
             saveData.currentGeneralAbility = AbilityManager.Instance.CurrentGeneralAbility;
         }
+
+        //curseManager
+        saveData.tempCurseId = curseManager.SaveCurseManager();
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);

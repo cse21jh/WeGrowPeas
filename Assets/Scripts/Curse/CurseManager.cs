@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CurseManager : Singleton<CurseManager>
@@ -101,4 +102,24 @@ public class CurseManager : Singleton<CurseManager>
         };
     }
 
+    public string SaveCurseManager()
+    {
+        if(currentTempCurse != null)
+            return currentTempCurse.Data.curseId;
+
+        return null;
+    }
+
+    public void LoadCurseManager(SaveData saveData)
+    {
+        var scriptable = FindScriptableById(saveData.tempCurseId);
+
+        if(scriptable != null) currentTempCurse = CreateInstanceById(scriptable);
+        else currentTempCurse = null;
+    }
+
+    private CurseScriptable FindScriptableById(string id)
+    {
+        return temporalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
+    }
 }
