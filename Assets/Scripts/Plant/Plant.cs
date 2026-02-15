@@ -31,6 +31,7 @@ public abstract class Plant : MonoBehaviour
     public int gridIndex { get; private set; }
     protected int taste;
     protected int resistWaveCount = 0;
+    protected int bonusGoldMultiplierCount = 0; // 스프링클러 등으로 인한 추가 배수 카운트
 
 
     protected Grid grid;
@@ -184,7 +185,14 @@ public abstract class Plant : MonoBehaviour
                 if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
                 {
                     if ((int)grid.GetFertilizerColumns()[gridIndex / 4] == traitNum)
+                    {
                         resistance += 0.05f;
+                        // 스프링클러 범위 내에 있다면 시너지 보너스 추가
+                        if (grid.IsAffectedBySprinkler(gridIndex))
+                        {
+                            resistance += grid.GetSprinklerFertilizerSynergyBonus();
+                        }
+                    }
                 }
                 if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
                     resistance += 0.2f;
@@ -602,6 +610,17 @@ public abstract class Plant : MonoBehaviour
     {
         resistWaveCount = val;
         priceSign.SetPrice(GetSellingPrice());
+    }
+
+    public void AddBonusGoldMultiplier(int amount)
+    {
+        bonusGoldMultiplierCount += amount;
+        priceSign.SetPrice(GetSellingPrice());
+    }
+
+    public int GetBonusGoldMultiplierCount()
+    {
+        return bonusGoldMultiplierCount;
     }
 
     public void ShowPriceSign()

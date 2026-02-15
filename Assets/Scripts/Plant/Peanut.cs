@@ -132,15 +132,16 @@ public class Peanut : MovablePlant
     }
     public override int GetSellingPrice()
     {
+        int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
         switch (taste)
         {
-            case 0: return (int)((60 + grid.GetAdditionalPlantGold()) * (1f + (0.2f * GetResistWaveCount())));
-            case 1: return (int)((100 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 2: return (int)((130 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 3: return (int)((150 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 4: return (int)((170 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 5: return (int)((200 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
-            case 6: return (int)((240 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * GetResistWaveCount())));
+            case 0: return (int)((60 + grid.GetAdditionalPlantGold()) * (1f + (0.2f * totalMultiplierCount)));
+            case 1: return (int)((100 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
+            case 2: return (int)((130 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
+            case 3: return (int)((150 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
+            case 4: return (int)((170 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
+            case 5: return (int)((200 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
+            case 6: return (int)((240 + grid.GetAdditionalPlantGold()) *(1f + (0.2f * totalMultiplierCount)));
         }
         return 0;
     }
