@@ -16,8 +16,11 @@ public abstract class MovablePlant : Plant
     [SerializeField] private GameObject holdGaugeCanvasObj;
 
     // 스카우터, 골드 스카우터 표시
-    [SerializeField] private GameObject resistanceScouterImage;
-    [SerializeField] private GameObject goldScouterImage;
+    [SerializeField] private ScouterShowController scouter;
+    [SerializeField] private bool hasGoldScouter;
+    [SerializeField] private bool hasResistanceScouter;
+    //[SerializeField] private GameObject resistanceScouterImage;
+    //[SerializeField] private GameObject goldScouterImage;
 
     private bool isReallyMovable = true;
 
@@ -147,21 +150,34 @@ public abstract class MovablePlant : Plant
 
     public void ShowGoldScouterImage()
     {
-        goldScouterImage.SetActive(true);
+        //goldScouterImage.SetActive(true);
+        hasGoldScouter = true;
+        SetScouter();
     }
 
     public void HideGoldScouterImage()
     {
-        goldScouterImage.SetActive(false);
+        //goldScouterImage.SetActive(false);
+        hasGoldScouter = false;
+        SetScouter();
     }
 
     public void ShowResistanceScouterImage()
     {
-        resistanceScouterImage.SetActive(true);
+        //resistanceScouterImage.SetActive(true);
+        hasResistanceScouter = true;
+        SetScouter();
     }
 
     public void HideResistanceScouterImage()
     {
-        resistanceScouterImage.SetActive(false);
+        //resistanceScouterImage.SetActive(false);
+        hasResistanceScouter = false;
+        SetScouter();
+    }
+
+    private void SetScouter()
+    {
+        scouter.SetScouter(hasGoldScouter, hasResistanceScouter);
     }
 }
