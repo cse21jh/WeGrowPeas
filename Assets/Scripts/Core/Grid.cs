@@ -30,6 +30,7 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject peanutPrefab;
     [SerializeField] protected GameObject nepenthesPrefab;
     [SerializeField] protected GameObject chiliPepperPrefab;
+    [SerializeField] protected GameObject moneyTreePrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] protected GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] protected List<GameObject> bugPrefabs;
@@ -179,6 +180,9 @@ public class Grid : MonoBehaviour
     public int ChiliPepperRangeLevel => chiliPepperRangeLevel;
     public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
     public float ChiliPepperHealPercent => chiliPepperHealPercent;
+    
+    // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
+    public event System.Action OnGridStateChanged;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -525,6 +529,9 @@ public class Grid : MonoBehaviour
         enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
+        
+        // 그리드 상태 변경 알림
+        OnGridStateChanged?.Invoke();
     }
 
     public void AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
@@ -560,6 +567,13 @@ public class Grid : MonoBehaviour
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
         UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+    }
+
+    public void AddMoneyTree(int idx)
+    {
+        GameObject obj = Instantiate(moneyTreePrefab);
+        MoneyTree moneyTree = obj.GetComponent<MoneyTree>();
+        AddPlantToGrid(moneyTree, idx);
     }
 
     public float GetResistanceBonus()
@@ -627,7 +641,11 @@ public class Grid : MonoBehaviour
 
     public void ClearGridIndex(int gridIndex)
     {
-        if (plantGrid.ContainsKey(gridIndex)) plantGrid.Remove(gridIndex);
+        if (plantGrid.ContainsKey(gridIndex)) 
+        {
+            plantGrid.Remove(gridIndex);
+            OnGridStateChanged?.Invoke();
+        }
 
         if (CheckGameOver())
         {
@@ -1054,6 +1072,7 @@ public class Grid : MonoBehaviour
                 p2.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
 
+            OnGridStateChanged?.Invoke();
             return true;
         }
         else
@@ -1069,6 +1088,7 @@ public class Grid : MonoBehaviour
             {
                 p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
+            OnGridStateChanged?.Invoke();
             return true;
         }
     }
