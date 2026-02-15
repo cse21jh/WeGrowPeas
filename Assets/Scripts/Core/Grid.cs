@@ -30,6 +30,8 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject peanutPrefab;
     [SerializeField] protected GameObject nepenthesPrefab;
     [SerializeField] protected GameObject chiliPepperPrefab;
+    [SerializeField] protected GameObject moneyTreePrefab;
+    [SerializeField] protected GameObject sprinklerPrefab;
     //[SerializeField] private GameObject soilPrefab;
     [SerializeField] protected GameObject[] disabledSoil; // 4개 이상의 열이 추가될 때 활성화되는 토양들
     [SerializeField] protected List<GameObject> bugPrefabs;
@@ -96,6 +98,13 @@ public class Grid : MonoBehaviour
     //식물 공통 특성
     protected float resistanceBonus = 0f; // 기본 저항력 보너스
     protected int additionalPlantGold = 0; // 기본 식물 가격 보너스
+
+    protected int sprinklerRangeBonus = 0; // 스프링클러 범위 보너스
+    protected float sprinklerFertilizerSynergyBonus = 0f; // 스프링클러 비료 시너지 보너스
+
+    protected int timeIsGoldLevel = 0; // 시간은 금이다 레벨
+
+    //완두콩 특성
 
     //완두콩 특성
     protected float resistanceDecayReduction = 0f; // 웨이브를 버텼을 때, 감소하는 저항력의 감소량
@@ -179,6 +188,9 @@ public class Grid : MonoBehaviour
     public int ChiliPepperRangeLevel => chiliPepperRangeLevel;
     public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
     public float ChiliPepperHealPercent => chiliPepperHealPercent;
+    
+    // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
+    public event System.Action OnGridStateChanged;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -525,6 +537,9 @@ public class Grid : MonoBehaviour
         enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
+        
+        // 그리드 상태 변경 알림
+        OnGridStateChanged?.Invoke();
     }
 
     public void AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
@@ -560,6 +575,20 @@ public class Grid : MonoBehaviour
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
         UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+    }
+
+    public void AddMoneyTree(int idx)
+    {
+        GameObject obj = Instantiate(moneyTreePrefab);
+        MoneyTree moneyTree = obj.GetComponent<MoneyTree>();
+        AddPlantToGrid(moneyTree, idx);
+    }
+
+    public void AddSprinkler(int idx)
+    {
+        GameObject obj = Instantiate(sprinklerPrefab);
+        Sprinkler sprinkler = obj.GetComponent<Sprinkler>();
+        AddPlantToGrid(sprinkler, idx);
     }
 
     public float GetResistanceBonus()
@@ -627,7 +656,11 @@ public class Grid : MonoBehaviour
 
     public void ClearGridIndex(int gridIndex)
     {
-        if (plantGrid.ContainsKey(gridIndex)) plantGrid.Remove(gridIndex);
+        if (plantGrid.ContainsKey(gridIndex)) 
+        {
+            plantGrid.Remove(gridIndex);
+            OnGridStateChanged?.Invoke();
+        }
 
         if (CheckGameOver())
         {
@@ -1054,6 +1087,7 @@ public class Grid : MonoBehaviour
                 p2.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
 
+            OnGridStateChanged?.Invoke();
             return true;
         }
         else
@@ -1069,6 +1103,7 @@ public class Grid : MonoBehaviour
             {
                 p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
+            OnGridStateChanged?.Invoke();
             return true;
         }
     }
@@ -1385,6 +1420,65 @@ public class Grid : MonoBehaviour
     public void AddNepenthesSpawnProbability(float value)
     {
         nepenthesSpawnProbability += value;
+    }
+
+    public void AddSprinklerRangeBonus(int val)
+    {
+        sprinklerRangeBonus += val;
+    }
+
+    public int GetSprinklerRangeBonus()
+    {
+        return sprinklerRangeBonus;
+    }
+
+    public void AddSprinklerFertilizerSynergyBonus(float val)
+    {
+        sprinklerFertilizerSynergyBonus += val;
+        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+    }
+
+    public float GetSprinklerFertilizerSynergyBonus()
+    {
+        return sprinklerFertilizerSynergyBonus;
+    }
+
+    public void AddTimeIsGoldLevel(int val)
+    {
+        timeIsGoldLevel += val;
+    }
+
+    public int GetTimeIsGoldLevel()
+    {
+        return timeIsGoldLevel;
+    }
+
+    public bool IsAffectedBySprinkler(int targetIdx)
+    {
+        int range = 1 + sprinklerRangeBonus;
+
+        foreach (var kvp in plantGrid)
+        {
+            if (kvp.Value is Sprinkler)
+            {
+                int sIdx = kvp.Key;
+                
+                // 1. 같은 열 (상하 관계)
+                if (sIdx / 4 == targetIdx / 4)
+                {
+                    if (Mathf.Abs(sIdx - targetIdx) <= range) return true;
+                }
+                
+                // 2. 같은 행 (좌우 관계)
+                if (sIdx % 4 == targetIdx % 4)
+                {
+                    int sCol = sIdx / 4;
+                    int tCol = targetIdx / 4;
+                    if (Mathf.Abs(sCol - tCol) <= range) return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void AddPetBottleInitialStockBonus(int value)
