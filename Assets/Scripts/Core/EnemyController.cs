@@ -276,22 +276,6 @@ public class EnemyController : MonoBehaviour
     {
         if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave!=noneWave)
         {
-            // [시간은 금이다] 아이템 효과
-            int timeIsGoldLevel = grid.GetTimeIsGoldLevel();
-            if (timeIsGoldLevel > 0)
-            {
-                float remainingTime = grid.GetBreedTimer();
-                if (remainingTime > 0)
-                {
-                    int reward = Mathf.FloorToInt(remainingTime) * 10 * timeIsGoldLevel;
-                    if (reward > 0)
-                    {
-                        GameManager.Instance.economyManager.AddGold(reward);
-                        Debug.Log($"[TimeIsGold] Skipped with {remainingTime:F1}s left. Level {timeIsGoldLevel}. Reward: {reward}G");
-                    }
-                }
-            }
-
             currentWave = noneWave;
             waveSkipCount--;
             SetWaveSkipCountText();            
@@ -299,6 +283,7 @@ public class EnemyController : MonoBehaviour
             if (weatherApp != null)
                 weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, 0);
         }
+
         if(waveSkipCount <= 0)
             HideWaveSkipButton();
         return;

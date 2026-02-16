@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,6 +81,13 @@ public class SaveData
 
     public List<int> fertilizerColumns = new();
     public List<WaveType> fertilizerType = new();
+    
+    // 신규 아이템 스탯
+    public int timeIsGoldLevel;
+    public int badGuyMoreRiceLevel;
+    public int sprinklerRangeBonus;
+    public float sprinklerFertilizerSynergyBonus;
+
     //public float remainBreedTime;
 
     //enemyController
@@ -559,6 +567,12 @@ public class GameManager : Singleton<GameManager>
             saveData.fertilizerColumns.Add(fer.Key);
             saveData.fertilizerType.Add(fer.Value);
         }
+
+        // 신규 아이템 스탯 저장
+        saveData.timeIsGoldLevel = grid.GetTimeIsGoldLevel();
+        saveData.badGuyMoreRiceLevel = grid.GetBadGuyMoreRiceLevel();
+        saveData.sprinklerRangeBonus = grid.GetSprinklerRangeBonus();
+        saveData.sprinklerFertilizerSynergyBonus = grid.GetSprinklerFertilizerSynergyBonus();
 
 
         //enemyController

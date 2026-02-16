@@ -36,6 +36,7 @@ public class TimeIsGoldItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
         ctx.Grid.AddTimeIsGoldLevel(1);
+        Debug.Log($"[TimeIsGold] Commit: Level increased to {ctx.Grid.GetTimeIsGoldLevel()}");
     }
 
     public override void InitializePrice(ShopContext ctx)

@@ -998,6 +998,23 @@ public class Grid : MonoBehaviour
     {
         if (GameManager.Instance.GetGameIsStopped())
             return;
+
+        // [시간은 금이다] 아이템 효과
+        if (timeIsGoldLevel > 0)
+        {
+            if (breedTimer > 0.1f)
+            {
+                int reward = Mathf.CeilToInt(breedTimer) * 10 * timeIsGoldLevel;
+                if (reward > 0)
+                {
+                    //GameManager.Instance.economyManager.AddGold(reward);
+                    // AddGold에 로그가 있을 수 있으므로 여기서는 로그 생략하거나 필요시 추가
+                    GameManager.Instance.economyManager.AddGold(reward);
+                    Debug.Log($"[TimeIsGold] Success! Skipped. Remain: {breedTimer:F2}s, Level: {timeIsGoldLevel}, Reward: {reward}G");
+                }
+            }
+        }
+
         isBreedSkipButtonPressed = true;
     }
 
@@ -1189,6 +1206,12 @@ public class Grid : MonoBehaviour
         weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
         strongGeneticsResistanceBonus = saveData.strongGeneticsResistanceBonus;
         goldenGeneticsProbabilityBonus = saveData.goldenGeneticsProbabilityBonus;
+
+        // 신규 아이템 스탯 로드
+        timeIsGoldLevel = saveData.timeIsGoldLevel;
+        badGuyMoreRiceLevel = saveData.badGuyMoreRiceLevel;
+        sprinklerRangeBonus = saveData.sprinklerRangeBonus;
+        sprinklerFertilizerSynergyBonus = saveData.sprinklerFertilizerSynergyBonus;
         
         // 네펜데스 페로몬 업데이트
         foreach (var plant in plantGrid.Values)
