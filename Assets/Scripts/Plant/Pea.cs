@@ -106,38 +106,18 @@ public class Pea : MovablePlant
     }
 
 
+    private static readonly int[] BasePrices = { 90, 130, 160, 180, 200, 230, 270 };
+
     public override int GetSellingPrice()
     {
+        int basePrice = (taste >= 0 && taste < BasePrices.Length) ? BasePrices[taste] : 0;
+
         if (grid == null)
         {
-            // grid가 초기화되지 않은 경우 기본값 반환
-            switch (taste)
-            {
-                case 0: return 90;
-                case 1: return 130;
-                case 2: return 160;
-                case 3: return 180;
-                case 4: return 200;
-                case 5: return 230;
-                case 6: return 270;
-            }
-            return 0;
+            return basePrice;
         }
 
-        float multiplier = grid.GetAdditionalPlantGoldMultiplier();
-        int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
-
-        switch (taste)
-        {
-            case 0: return (int)((90 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 1: return (int)((130 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 2: return (int)((160 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 3: return (int)((180 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 4: return (int)((200 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 5: return (int)((230 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-            case 6: return (int)((270 + grid.GetAdditionalPlantGold()) * (1f + (multiplier * totalMultiplierCount)));
-        }
-        return 0;
+        return CalculateSellingPrice(basePrice, grid.GetAdditionalPlantGoldMultiplier());
     }
 
 

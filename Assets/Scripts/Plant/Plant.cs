@@ -606,6 +606,34 @@ public abstract class Plant : MonoBehaviour
         return resistWaveCount;
     }
 
+    public int GetBadGenesCount()
+    {
+        int count = 0;
+        foreach (var trait in traits)
+        {
+            // 자연사, 해충, 바람, 홍수 중 우성(genetics <= 1)인 경우
+            if (trait.genetics <= 1 && 
+               (trait.traitType == TraitType.NaturalDeath || 
+                trait.traitType == TraitType.Pest ||
+                trait.traitType == TraitType.Wind ||
+                trait.traitType == TraitType.Flood))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    protected int CalculateSellingPrice(int basePrice, float multiplier)
+    {
+        if (grid == null) return 0;
+        
+        int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
+        int badGeneBonus = grid.GetBadGuyMoreRiceLevel() * 5 * GetBadGenesCount();
+
+        return (int)((basePrice + grid.GetAdditionalPlantGold() + badGeneBonus) * (1f + (multiplier * totalMultiplierCount)));
+    }
+
     public void SetResistWaveCount(int val)
     {
         resistWaveCount = val;

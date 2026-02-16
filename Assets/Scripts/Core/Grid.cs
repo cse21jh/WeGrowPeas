@@ -103,6 +103,7 @@ public class Grid : MonoBehaviour
     protected float sprinklerFertilizerSynergyBonus = 0f; // 스프링클러 비료 시너지 보너스
 
     protected int timeIsGoldLevel = 0; // 시간은 금이다 레벨
+    protected int badGuyMoreRiceLevel = 0; // 미운 놈 떡 하나 더 준다 레벨
 
     //완두콩 특성
 
@@ -1451,6 +1452,17 @@ public class Grid : MonoBehaviour
     public int GetTimeIsGoldLevel()
     {
         return timeIsGoldLevel;
+    }
+
+    public void AddBadGuyMoreRiceLevel(int val)
+    {
+        badGuyMoreRiceLevel += val;
+        ShowAllPriceSign(); // 가격 변동 갱신
+    }
+
+    public int GetBadGuyMoreRiceLevel()
+    {
+        return badGuyMoreRiceLevel;
     }
 
     public bool IsAffectedBySprinkler(int targetIdx)
