@@ -42,6 +42,9 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject breedSkipButton;
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
+    [SerializeField] protected GameObject scouterButton; // 스카우터 온오프 버튼
+    [SerializeField] protected bool isScouterOn = false; 
+
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
@@ -1326,9 +1329,38 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public void ShowScouterButton()
+    {
+        scouterButton.SetActive(true);
+        scouterButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        scouterButton.GetComponent<Button>().onClick.AddListener(ToggleScouter);
+        HideGoldScouterImageInGrid();
+        HideResistanceScouterImageInGrid();
+    }
+
+    public void ToggleScouter()
+    {
+        if(isScouterOn)
+        {
+            isScouterOn = false;
+            if (hasResistanceScouter)
+                HideResistanceScouterImageInGrid();
+            if (hasGoldScouter)
+                HideGoldScouterImageInGrid();            
+        }
+        else
+        {
+            isScouterOn = true;
+            if (hasResistanceScouter)
+                UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+            if (hasGoldScouter)
+                UpdateGoldScouterImageInGrid();            
+        }
+    }
+
     public void UpdateResistanceScouterImageInGrid(WaveType wave)
     {
-        if (!hasResistanceScouter)
+        if (!hasResistanceScouter || !isScouterOn)
             return;
         foreach (var plant in plantGrid.Values)
         {
@@ -1341,7 +1373,7 @@ public class Grid : MonoBehaviour
 
     public void UpdateGoldScouterImageInGrid()
     {
-        if (!hasGoldScouter)
+        if (!hasGoldScouter || !isScouterOn)
             return;
         List<MovablePlant> sortedPlants = plantGrid.Values 
                                                    .OfType<MovablePlant>() 
@@ -1362,6 +1394,29 @@ public class Grid : MonoBehaviour
             }
         }
     }
+
+    public void HideResistanceScouterImageInGrid()
+    {
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is MovablePlant p)
+            {
+                p.HideResistanceScouterImage();
+            }
+        }
+    }
+
+    public void HideGoldScouterImageInGrid()
+    {
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant is MovablePlant p)
+            {
+                p.HideGoldScouterImage();
+            }
+        }
+    }
+
 
     public void AddAdditionalNepenthesPheromoneSizeMultiplier(float value)
     {
@@ -1902,7 +1957,7 @@ public class Grid : MonoBehaviour
     {
         if(hasResistanceScouter = val)
         {
-            UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+            ShowScouterButton();
         }
     }
 
@@ -1915,7 +1970,7 @@ public class Grid : MonoBehaviour
     {
         if(hasGoldScouter = val)
         {
-            UpdateGoldScouterImageInGrid();
+            ShowScouterButton();
         }
     }
 
@@ -1923,6 +1978,12 @@ public class Grid : MonoBehaviour
     {
         return hasGoldScouter;
     }
+
+    public bool GetIsScouterOn()
+    {
+        return isScouterOn;
+    }
+
     public void SetWeatherForecast(bool val)
     {
         if(hasWeatherForecast = val)
