@@ -179,6 +179,8 @@ public class Grid : MonoBehaviour
     public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
+    private HashSet<int> absorbFertilizerTiles = new HashSet<int>(); // 저항력 흡수 비료가 뿌려진 타일 리스트
+
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
     public bool HasCoolingShield => hasCoolingShield;
     public List<int> PetBottleTiles => petBottleTiles;
@@ -1212,6 +1214,15 @@ public class Grid : MonoBehaviour
         badGuyMoreRiceLevel = saveData.badGuyMoreRiceLevel;
         sprinklerRangeBonus = saveData.sprinklerRangeBonus;
         sprinklerFertilizerSynergyBonus = saveData.sprinklerFertilizerSynergyBonus;
+
+        absorbFertilizerTiles.Clear();
+        if (saveData.absorbFertilizerTiles != null)
+        {
+            foreach (int idx in saveData.absorbFertilizerTiles)
+            {
+                absorbFertilizerTiles.Add(idx);
+            }
+        }
         
         // 네펜데스 페로몬 업데이트
         foreach (var plant in plantGrid.Values)
@@ -1499,26 +1510,241 @@ public class Grid : MonoBehaviour
                 int sIdx = kvp.Key;
                 
                 // 1. 같은 열 (상하 관계)
-                if (sIdx / 4 == targetIdx / 4)
+                if (Mathf.Abs(sIdx - targetIdx) % 4 == 0) 
                 {
-                    if (Mathf.Abs(sIdx - targetIdx) <= range) return true;
+                     int sRow = sIdx % 4;
+                     int tRow = targetIdx % 4;
+                     int sCol = sIdx / 4;
+                     int tCol = targetIdx / 4;
+
+                     // 같은 열이므로 Col은 같음. Row 차이 확인
+                     if (sCol == tCol && Mathf.Abs(sRow - tRow) <= range) return true;
                 }
                 
                 // 2. 같은 행 (좌우 관계)
-                if (sIdx % 4 == targetIdx % 4)
+                if (Mathf.Abs(sIdx - targetIdx) < 4) // 같은 컬럼 그룹 내에 있지는 않음. 인덱스 차이가 작다고 같은 행은 아님.
                 {
-                    int sCol = sIdx / 4;
-                    int tCol = targetIdx / 4;
-                    if (Mathf.Abs(sCol - tCol) <= range) return true;
+                     int sRow = sIdx % 4;
+                     int tRow = targetIdx % 4;
+                     int sCol = sIdx / 4;
+                     int tCol = targetIdx / 4;
+
+                     // 같은 행이므로 Row는 같음. Col 차이 확인
+                     if (sRow == tRow && Mathf.Abs(sCol - tCol) <= range) return true;
                 }
             }
         }
         return false;
     }
 
+    // 급속 냉각기 관련
+    public void ApplyRapidFreezer(int centerIdx)
+    {
+        int centerCol = centerIdx / 4;
+        int centerRow = centerIdx % 4;
+
+        // 3x3 범위 순회
+        for (int c = centerCol - 1; c <= centerCol + 1; c++)
+        {
+            for (int r = centerRow - 1; r <= centerRow + 1; r++)
+            {
+                if (c >= 0 && c < GetMaxCol() && r >= 0 && r < 4)
+                {
+                    int targetIdx = c * 4 + r;
+                    if (plantGrid.ContainsKey(targetIdx))
+                    {
+                        plantGrid[targetIdx].SetFrozen(true);
+                    }
+                    
+                    // 시각적 피드백 (얼음 이펙트 등) 추가 가능
+                    // 현재는 Plant.SetFrozen 내부에서 색상 변경 처리
+                }
+            }
+        }
+        Debug.Log($"[RapidFreezer] Applied to 3x3 around index {centerIdx}");
+    }
+
+    public void UnfreezeAllPlants()
+    {
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant.IsFrozen())
+            {
+                plant.SetFrozen(false);
+            }
+        }
+        Debug.Log("[RapidFreezer] All plants unfrozen.");
+    }
+
     public void AddPetBottleInitialStockBonus(int value)
     {
         petBottleInitialStockBonus += value;
+    }
+
+    // === 저항력 흡수 비료 ===
+    public void AddAbsorbFertilizer(int index)
+    {
+        if (index < 0 || index >= maxCol * 4) return;
+        if (!absorbFertilizerTiles.Contains(index))
+        {
+            absorbFertilizerTiles.Add(index);
+            // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
+            Debug.Log($"Absorb Fertilizer Added at {index}");
+        }
+    }
+
+    public List<int> GetAbsorbFertilizerTiles()
+    {
+        return absorbFertilizerTiles.ToList();
+    }
+
+    public bool HasAbsorbFertilizer(int index)
+    {
+        return absorbFertilizerTiles.Contains(index);
+    }
+
+    public void ProcessResistanceAbsorption()
+    {
+        Debug.Log("[AbsorbFertilizer] Start Processing...");
+        // 흡수 비료가 있는 타일 순회
+        foreach (int centerIdx in absorbFertilizerTiles)
+        {
+            // 중심 타일에 식물이 있어야 함
+            if (!plantGrid.TryGetValue(centerIdx, out Plant centerPlant)) continue;
+            if (centerPlant.isDying) continue;
+
+            List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait();
+            
+            // 상하좌우 인접 타일 검사
+            int[] neighborIndices = GetNeighborIndices(centerIdx);
+
+            foreach (int neighborIdx in neighborIndices)
+            {
+                if (!plantGrid.TryGetValue(neighborIdx, out Plant neighborPlant)) continue;
+                if (neighborPlant.isDying) continue;
+                if (centerPlant == neighborPlant) continue; // 혹시라도 자기 자신이면 패스
+
+                List<GeneticTrait> neighborTraits = neighborPlant.GetGeneticTrait();
+
+                // 겹치는 형질 찾기
+                foreach (var cTrait in centerTraits)
+                {
+                    foreach (var nTrait in neighborTraits)
+                    {
+                        if (cTrait.traitType == nTrait.traitType)
+                        {
+                            // 겹치는 형질 발견! 흡수 진행
+                            // 이웃 식물의 저항력을 3% 깎음 (하한선 10%)
+                            float currentNeighborRes = neighborPlant.GetResistanceValue((int)nTrait.traitType);
+                            // 기본 저항력(traits의 resistance)을 가져와야 하는데 GetResistanceValue는 보정치 포함임.
+                            // 하지만 ChangeResistance는 delta를 받아서 traits의 resistance를 수정함.
+                            // 따라서 "현재 저항력이 10% 이상일 때만" 깎아야 함.
+                            // Plant.ChangeResistance 내부 로직상 "traits[i].resistance"를 직접 수정하고 0.1f 하한선을 둠.
+                            // 하지만 여기서 하한선을 체크하려면 neighborPlant의 순수 resistance를 알아야 함.
+                            // ChangeResistance가 0.1f 미만으로 안 떨어지게 내부 방어 로직이 있으므로,
+                            // 그냥 -0.03f를 호출하면 됨. 
+                            // 단, "뺏어옴"이므로, 상대가 잃은 만큼 내가 가져와야 함.
+                            // 만약 상대가 이미 0.1f라서 못 잃으면? 나도 못 가져오는 게 맞음.
+                            
+                            // -> ChangeResistance는 bool을 리턴하지 않고 void였음 (수정 전).
+                            // 아까 public bool ChangeResistance로 바꿨음! 
+                            // ChangeResistance 내부에서: var < 0.1f 면 var = 0.1f로 보정함.
+                            // 근데 "실제로 깎였는지"를 알아야 내가 가져올 수 있음.
+                            
+                            // 로직 개선:
+                            // 1. 상대의 현재 raw 저항력을 안쪽에서 알기 어려우므로(public 접근자 부족),
+                            //    ChangeResistance가 "실제 변동량"을 리턴하거나, 
+                            //    외부에서 예측해야 함.
+                            
+                            // 여기서는 간단하게 구현: "일단 깎아보고, 깎는데 성공했으면 나도 올린다"
+                            // 근데 ChangeResistance는 "변동 후 값"을 리턴하거나 하지 않음.
+                            // bool 리턴도 그냥 "amount != 0"이면 true였음 (수정 전 추측).
+                            
+                            // Plant.ChangeResistance를 다시 보자.
+                            // if (var < 0.1f) var = 0.1f;
+                            // 이렇게 되어있음. 
+                            // 즉, 이미 0.1이면 더 안 깎임.
+                            
+                            // 정확한 흡수를 위해선 상대 줄이기 -> 성공 여부/량 확인 -> 나 늘리기 순서가 필요.
+                            // 지금 Plant 구조상 private List<GeneticTrait> traits; 이고 GetGeneticTrait()는 리스트 반환.
+                            // 리스트의 요소는 struct면 복사본.. class면 참조.
+                            // GeneticTrait는 struct인가 class인가? -> 확인 필요.
+                            
+                            // 보통 struct로 구현했을 가능성 높음. Plant.cs 보면 traits[i] = new GeneticTrait(...) 이렇게 덮어쓰고 있음. struct임.
+                            
+                            // 따라서 ChangeResistance를 믿어야 함.
+                            // ChangeResistance를 조금 더 똑똑하게 수정해서 "실제 적용된 수치"를 반환하게 하거나
+                            // 아니면 "줄일 수 있는지 확인"하는 메서드가 필요함.
+                            
+                            // 여기서는 "하한선 10%" 규칙이 있으므로,
+                            // 상대방의 해당 형질 저항력이 0.13f 이상일 때만 흡수 가능하다고 가정.
+                            // 근데 GetResistanceValue는 보정된 값(비료 등 포함)이라 raw resistance가 아님.
+                            
+                            // -> 정밀한 구현을 위해 ChangeResistance를 활용하되,
+                            // 이번 기획은 "3%p씩 뺏어옴"이므로, 
+                            // 그냥 -0.03f 호출하고, +0.03f 호출하는 식으로 진행. (상대가 0.1f여도 나는 오르면 '창조 흡수'가 되지만, 게임적 허용범위일 수 있음)
+                            // "하한선 10%"는 뺏기는 쪽에 적용되는 룰.
+                            // "뺏어옴"이라는 워딩을 엄격하게 지키려면 상대가 잃어야만 얻어야 함.
+                            
+                            // 로직:
+                            // 1. nTrait의 resistance가 0.1f보다 큰지 확인 (traits 리스트 순회해서 직접 확인해야 함)
+                            // 2. 크다면 0.03f 감소 시도. (0.1f 밑으로는 안 내려가게)
+                            // 3. 감소된 실제 양만큼 내 저항력 증가.
+                            
+                            float amountToAbsorb = 0.03f;
+                            
+                            // 이웃 식물의 해당 형질 raw resistance 찾기
+                            float neighborRawRes = 0f;
+                             // GetGeneticTrait()로 리스트 가져와서 찾기
+                            var nTargetTrait = neighborTraits.FirstOrDefault(t => t.traitType == cTrait.traitType);
+                            // default(struct) 체크
+                            // GeneticTrait가 struct라면 traitType 비교가 애매할 수 있으니 loop로 찾자. (어차피 위에서 찾음)
+                            neighborRawRes = nTargetTrait.resistance;
+                            
+                            // 흡수 가능량 계산
+                            float actualAbsorb = 0f;
+                            if (neighborRawRes > 0.1f)
+                            {
+                                if (neighborRawRes - amountToAbsorb < 0.1f)
+                                {
+                                    actualAbsorb = neighborRawRes - 0.1f; // 0.1f까지만 뺌
+                                }
+                                else
+                                {
+                                    actualAbsorb = amountToAbsorb;
+                                }
+                            }
+                            
+                            if (actualAbsorb > 0.0001f)
+                            {
+                                neighborPlant.ChangeResistance((int)nTrait.traitType, -actualAbsorb);
+                                centerPlant.ChangeResistance((int)cTrait.traitType, actualAbsorb);
+                                Debug.Log($"[Absorb] {centerIdx} absorbed {actualAbsorb:F3} from {neighborIdx} ({nTrait.traitType})");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Debug.Log("[AbsorbFertilizer] Process Complete.");
+    }
+
+    private int[] GetNeighborIndices(int centerIdx)
+    {
+        List<int> neighbors = new List<int>();
+        int col = centerIdx / 4;
+        int row = centerIdx % 4;
+
+        // 상 (row + 1)
+        if (row + 1 < 4) neighbors.Add(centerIdx + 1);
+        // 하 (row - 1)
+        if (row - 1 >= 0) neighbors.Add(centerIdx - 1);
+        // 좌 (col - 1)
+        if (col - 1 >= 0) neighbors.Add(centerIdx - 4);
+        // 우 (col + 1)
+        if (col + 1 < maxCol) neighbors.Add(centerIdx + 4);
+
+        return neighbors.ToArray();
     }
 
     public void AddPetBottlePriceReduction(int value)

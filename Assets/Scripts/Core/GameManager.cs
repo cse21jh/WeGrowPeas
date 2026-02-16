@@ -87,6 +87,9 @@ public class SaveData
     public int badGuyMoreRiceLevel;
     public int sprinklerRangeBonus;
     public float sprinklerFertilizerSynergyBonus;
+    
+    // 저항력 흡수 비료 타일 인덱스 리스트
+    public List<int> absorbFertilizerTiles = new List<int>();
 
     //public float remainBreedTime;
 
@@ -600,6 +603,10 @@ public class GameManager : Singleton<GameManager>
             saveData.itemName.Add(p.Key);
             saveData.itemPurchaseCount.Add(p.Value);
         }
+
+        // 저항력 흡수 비료 타일 저장
+        saveData.absorbFertilizerTiles.Clear();
+        saveData.absorbFertilizerTiles.AddRange(grid.GetAbsorbFertilizerTiles());
 
         // 상점 시드 저장
         saveData.shopSeedDays.Clear();

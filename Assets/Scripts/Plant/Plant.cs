@@ -37,6 +37,10 @@ public abstract class Plant : MonoBehaviour
     protected Grid grid;
 
     public bool isDying = false;
+    
+    // 급속 냉각기 관련
+    protected bool isFrozen = false;
+    protected int frozenPrice = 0;
 
     //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
@@ -138,8 +142,34 @@ public abstract class Plant : MonoBehaviour
 
     public void SetTaste(int val)
     {
+        if (isFrozen) return; // 얼어있으면 맛(가격) 변동 없음
         taste = val;
     }
+
+    public void SetFrozen(bool freeze)
+    {
+        isFrozen = freeze;
+        if (isFrozen)
+        {
+            frozenPrice = GetSellingPrice(); // 현재 가격 저장
+            
+            // 시각적 효과 (예: 파랗게 변함)
+            foreach (var sr in childSpriteRenderers)
+            {
+                sr.color = new Color(0.5f, 0.5f, 1f, 1f); 
+            }
+        }
+        else
+        {
+            // 해동 시 원래 색상 복구 (구체적인 복구 로직은 쉐이더나 스프라이트 상황에 따라 다를 수 있음. 일단 흰색으로)
+            foreach (var sr in childSpriteRenderers)
+            {
+                sr.color = Color.white; 
+            }
+        }
+    }
+
+    public bool IsFrozen() => isFrozen;
 
     public virtual List<GeneticTrait> GetGeneticTrait()
     {
@@ -159,6 +189,8 @@ public abstract class Plant : MonoBehaviour
     public bool CanResist(WaveType wave) // if can't resist, Call Die()
     {
         int randomNumber = UnityEngine.Random.Range(0, 100);
+        if (isFrozen) return true; // 얼어있으면 무조건 저항 성공
+
         if (randomNumber <= (int)(GetResistanceValue((int)wave) * 100))
         {
             return true;
@@ -214,6 +246,8 @@ public abstract class Plant : MonoBehaviour
         // 페트병이 막으면 true 리턴 → 사망 취소
         if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
             return false;
+
+        if (isFrozen && cause == DeathCause.Generic) return false; // 얼어있으면 웨이브(Generic)로 인한 죽음 면역
 
         int alive = grid.GetLivingPlantCount();
 
@@ -565,7 +599,7 @@ public abstract class Plant : MonoBehaviour
         priceSign.SetPrice(GetSellingPrice());
     }
 
-    private bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
+    public bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
     {
         if (amount == 0)
             return false;
@@ -605,6 +639,8 @@ public abstract class Plant : MonoBehaviour
     {
         return resistWaveCount;
     }
+
+
 
     public int GetBadGenesCount()
     {

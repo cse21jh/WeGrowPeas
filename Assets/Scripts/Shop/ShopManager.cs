@@ -31,6 +31,11 @@ public class ShopManager : Singleton<ShopManager>
     // 현재 날짜의 리롤 횟수 (리롤할 때마다 증가하여 다른 시드 사용)
     private int currentRerollCount = 0;
 
+    // 확률 증가 이벤트 (Probability Event) - 모든 아이템 확률 동일하게
+    // 이 플래그가 true면 가중치를 강제로 8로 설정
+    public bool isProbabilityEqualized = false;
+
+
     /// <summary>
     /// 매일 상점 무료 리롤 가능 횟수를 추가합니다.
     /// </summary>
@@ -142,7 +147,12 @@ public class ShopManager : Singleton<ShopManager>
         // 가중치 기반 중복 없이 N개 추첨 (시드 기반)
         inv.Rotation = Game.Util.WeightedRandom.PickWithoutReplacement(
             candidates,
-            it => Mathf.Max(0, it.GetRotationWeight(ctx)),
+            it => {
+                int weight = Mathf.Max(0, it.GetRotationWeight(ctx));
+                // 확률 증가 이벤트 활성화 시, 가중치가 0보다 큰 아이템은 모두 8로 고정
+                if (isProbabilityEqualized && weight > 0) return 8;
+                return weight;
+            },
             rng,
             rotationCount
         );
@@ -201,6 +211,8 @@ public class ShopManager : Singleton<ShopManager>
     public void ResetRerollCount()
     {
         currentRerollCount = 0;
+        // 날짜가 바뀌면 확률 증가 이벤트 초기화
+        isProbabilityEqualized = false;
     }
 
     public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
