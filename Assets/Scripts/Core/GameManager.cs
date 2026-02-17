@@ -226,8 +226,8 @@ public class GameManager : Singleton<GameManager>
                 Debug.Log("새 게임");
                 if (AbilityManager.Instance != null)
                     AbilityManager.Instance.ApplyAbilities(this);
-                grid.InitGrid();
                 enemyController.InitEnemyController();
+                grid.InitGrid();                
                 economyManager.InitEconomyManager();
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();

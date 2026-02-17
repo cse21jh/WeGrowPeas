@@ -70,7 +70,7 @@ public class EnemyController : MonoBehaviour
 
 
     private Wave lastWave;
-    private Wave currentWave;
+    private Wave currentWave = new AgingWave();
     private Wave nextWave;
     private int waveSkipCount = 0;
     private int[] waveKillCount;
