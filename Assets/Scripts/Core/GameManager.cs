@@ -147,7 +147,7 @@ public class SaveData
     public List<GeneralAbilityData> currentGeneralAbility = new();
 
     //CurseManager
-    public string[] CurseId = new string[2];
+    public string[] curseId = new string[2]; //0:temp 1:season
     public int remainSeasonCurseDay;
 
     //종료 시 저장
@@ -670,8 +670,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         //curseManager
-        saveData.tempCurseId = curseManager.currentTempCurse.Data.curseId;
-        saveData.tempCurseId = curseManager.currentSeasonalCurse.Data.curseId;
+        saveData.curseId = curseManager.SaveCurseManager();
         saveData.remainSeasonCurseDay = curseManager.RemainingCurseDay;
 
         string json = JsonUtility.ToJson(saveData, true);
