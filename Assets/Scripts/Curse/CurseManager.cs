@@ -93,6 +93,7 @@ public class CurseManager : Singleton<CurseManager>
 
         Debug.Log("저주 해제!");
         currentTempCurse.Deactivate();
+        currentTempCurse = null;
     }
 
     private void UpdateSeasonalCurse()
