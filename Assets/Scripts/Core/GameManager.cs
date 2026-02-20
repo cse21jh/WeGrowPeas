@@ -145,6 +145,7 @@ public class SaveData
     //AbilityManager
     public List<PlantAbilityData> currentPlantAbility = new();
     public List<GeneralAbilityData> currentGeneralAbility = new();
+    public int geneStorage;
 
     //CurseManager
     public string[] curseId = new string[2]; //0:temp 1:season
@@ -667,6 +668,7 @@ public class GameManager : Singleton<GameManager>
         {
             saveData.currentPlantAbility = AbilityManager.Instance.CurrentPlantAbility;
             saveData.currentGeneralAbility = AbilityManager.Instance.CurrentGeneralAbility;
+            saveData.geneStorage = AbilityManager.Instance.Storage;
         }
 
         //curseManager

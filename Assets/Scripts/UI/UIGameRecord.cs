@@ -16,6 +16,8 @@ public class UIGameRecord : MonoBehaviour
 
     private Sprite[] peaEmotionSprite;
 
+    private float multiple;
+
     private string[] endingTextDisc = new string[4]
     {
         "살아남는 데는 성공했지만, 식량 확보가 보장되지 않는다고 판단되어 다른 대안을 탐색하러 떠났다….",
@@ -42,6 +44,7 @@ public class UIGameRecord : MonoBehaviour
 
         SetPeaEmotion();
         SetEndingMailContent();
+        AddGeneticsInEnding();
     }
         
     private void SetPeaEmotion()
@@ -50,18 +53,22 @@ public class UIGameRecord : MonoBehaviour
         {
             case 0:
                 peaEmotionUI.sprite = peaEmotionSprite[3];
+                multiple = 0.75f;
                 break;
 
             case 1:
                 peaEmotionUI.sprite = peaEmotionSprite[2];
+                multiple = 1.0f;
                 break;
 
             case 2:
                 peaEmotionUI.sprite = peaEmotionSprite[1];
+                multiple = 1.0f;
                 break;
 
             case 3:
                 peaEmotionUI.sprite = peaEmotionSprite[0];
+                multiple = 1.25f;
                 break;
         }
     }
@@ -93,5 +100,19 @@ public class UIGameRecord : MonoBehaviour
 
         pg4.text = "";
     }
+
+    private void AddGeneticsInEnding()
+    {
+        int g = GameRecordHolder.totalGoldEarned / 500;
+
+        if (AbilityManager.Instance == null)
+        {
+            Debug.Log("Ability Manager가 없습니다");
+            return;
+        }
+
+        AbilityManager.Instance.AddGeneStorage((int)(g * multiple));
+        AbilityManager.Instance.AddGenetics();
+    }    
 }
 

@@ -36,6 +36,9 @@ public class AbilityManager : MonoBehaviour
 
     private int genetics = 5000;
 
+    private int storage = 0; //퀘스트, 등 게임 중간에 저장해 뒀다가 일정 기간을 두고 추가
+    public int Storage => storage;
+
     public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
     public Dictionary<PlayablePlantType, int> PlantAbilityPoint => plantAbilityPoint;
     public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 이름, 해당 특성의 해금 여부
@@ -221,6 +224,7 @@ public class AbilityManager : MonoBehaviour
         SetPlant(saveData.currentPlant);
         SetPlantAbility(saveData.currentPlantAbility);
         SetGeneralAbility(saveData.currentGeneralAbility);
+        storage = saveData.geneStorage;
     }
 
 
@@ -290,5 +294,16 @@ public class AbilityManager : MonoBehaviour
             isGeneralAbilityDataUnlocked.Add(data.generalAbilityDataName[i], data.isGeneralAbilityDataUnlocked[i]);
 
         generalAbilityPoint = data.generalAbilityPoint;
+    }
+
+    public void AddGeneStorage(int num)
+    {
+        storage += num;
+    }
+
+    public void AddGenetics()
+    {
+        genetics += storage;
+        storage = 0;
     }
 }

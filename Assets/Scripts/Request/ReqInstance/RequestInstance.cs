@@ -110,6 +110,18 @@ public abstract class RequestInstance
             }
         }
 
+        switch(Data.requestDifficulty)
+        {
+            case RequestDifficulty.Easy:
+                break;
+            case RequestDifficulty.Normal:
+                AbilityManager.Instance.AddGeneStorage(5);
+                break;
+            case RequestDifficulty.Hard:
+                AbilityManager.Instance.AddGeneStorage(10);
+                break;
+        }
+
         //customize token 추가
 
         State = RequestState.Granted;
