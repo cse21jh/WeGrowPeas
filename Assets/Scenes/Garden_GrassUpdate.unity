@@ -1212,6 +1212,8 @@ MonoBehaviour:
   phoneTimerText: {fileID: 185629416}
   isTutorial: 0
   isTutorialEnd: 0
+  weatherApp_Default: {fileID: 1913653022}
+  weatherApp_Tomorrow: {fileID: 1913653023}
 --- !u!4 &5427600
 Transform:
   m_ObjectHideFlags: 0
@@ -217711,7 +217713,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1609070044737278827, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
   m_PrefabInstance: {fileID: 6467942666001449438}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1913653022}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dfdc61a8c2dd6c049a8d57cbfd837b8e, type: 3}
@@ -430462,6 +430464,16 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1913653022 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 45737140232077302, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+  m_PrefabInstance: {fileID: 6467942666001449438}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1913653023 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6934074085944694686, guid: 477d977d5a15f384883063545f12cc4d, type: 3}
+  m_PrefabInstance: {fileID: 6467942666001449438}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1914399787
 GameObject:
   m_ObjectHideFlags: 0

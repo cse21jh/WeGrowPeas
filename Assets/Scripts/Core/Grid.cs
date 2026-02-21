@@ -1986,9 +1986,9 @@ public class Grid : MonoBehaviour
 
     public void SetWeatherForecast(bool val)
     {
-        if(hasWeatherForecast = val)
-        {
-
+        if (hasWeatherForecast = val)
+        { 
+            GameManager.Instance.phoneManager.SetWeatherForecastPanel();
         }
     }
 

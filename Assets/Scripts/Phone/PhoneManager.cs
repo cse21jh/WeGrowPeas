@@ -76,6 +76,10 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] public bool isTutorial = false;
     [SerializeField] public bool isTutorialEnd = false;
 
+
+    [SerializeField] public GameObject weatherApp_Default;
+    [SerializeField] public GameObject weatherApp_Tomorrow;
+
     private void Awake()
     {
 
@@ -467,6 +471,22 @@ public class PhoneManager : Singleton<PhoneManager>
     public bool GetIsPhoneTime()
     {
         return isPhoneTime;
+    }
+
+    public void SetWeatherForecastPanel()
+    {
+        if(!GameManager.Instance.grid.GetHasWeatherForecast())
+        {
+            weatherApp_Default.SetActive(true);
+            weatherApp_Tomorrow.SetActive(false);
+            GameManager.Instance.enemyController.SetWeatherApp(weatherApp_Default.GetComponent<WeatherApp>());
+        }
+        else
+        {
+            weatherApp_Default.SetActive(false);
+            weatherApp_Tomorrow.SetActive(true);
+            GameManager.Instance.enemyController.SetWeatherApp(weatherApp_Tomorrow.GetComponent<WeatherApp>());
+        }
     }
 }
 

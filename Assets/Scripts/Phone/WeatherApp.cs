@@ -16,7 +16,6 @@ public class WeatherApp : MonoBehaviour
 
 
     // 다음날 특성
-    [SerializeField] GameObject nextWeather;
     [SerializeField] TMP_Text nextStageText;
     [SerializeField] TMP_Text nextWaveText;
     [SerializeField] private Image nextWaveImage;
@@ -35,12 +34,7 @@ public class WeatherApp : MonoBehaviour
         UpdateCurrentWave(stage, currentWave, currentDangerousPlantCount);
         if (GameManager.Instance.grid.GetHasWeatherForecast())
         {
-            nextWeather.SetActive(true);
             UpdateNextWave(stage + 1, nextWave);
-        }
-        else
-        {
-            nextWeather.SetActive(false);
         }
     }
 
@@ -51,18 +45,13 @@ public class WeatherApp : MonoBehaviour
         AddPastWeatherPrefab(stage, lastWave, lastDangerousPlantCount);
         if(GameManager.Instance.grid.GetHasWeatherForecast())
         {
-            nextWeather.SetActive(true);
             UpdateNextWave(stage+2, nextWave);
-        }
-        else
-        {
-            nextWeather.SetActive(false);
         }
     }
 
     public void UpdateNextWave(int stage, Wave wave)
     {
-        nextStageText.text = "일기예보 - " + stage.ToString() + "일차";
+        nextStageText.text = stage.ToString() + "일차 (내일)";
         nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가 예상됩니다.";
         nextWaveImage.sprite = waveIcons[(int)wave.WaveType];
     }

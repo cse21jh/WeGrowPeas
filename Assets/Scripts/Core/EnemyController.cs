@@ -562,4 +562,9 @@ public class EnemyController : MonoBehaviour
 
         return traitType;
     }
+
+    public void SetWeatherApp(WeatherApp app)
+    {
+        weatherApp = app;
+    }
 }

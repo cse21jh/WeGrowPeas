@@ -162,4 +162,10 @@ public class UIClickEvent : MonoBehaviour
         buttonPanel.SetActive(false);
         saveSlotPanel.SetActive(true);
     }
+
+    public void OnClickHideSaveSlotPanel()
+    {
+        buttonPanel.SetActive(true);
+        saveSlotPanel.SetActive(false);
+    }
 }
