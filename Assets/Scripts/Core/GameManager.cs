@@ -302,7 +302,7 @@ public class GameManager : Singleton<GameManager>
 
             yield return StartCoroutine(StartStage());
 
-            curseManager.SelectCurse(stage);
+            //curseManager.SelectCurse(stage);
             StageUpdate();
             SaveGame();
         }
@@ -356,6 +356,7 @@ public class GameManager : Singleton<GameManager>
         gcController.ToggleGlow(true);
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
 
+        if (gameMode == 1) curseManager.SelectCurse(stage);
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 

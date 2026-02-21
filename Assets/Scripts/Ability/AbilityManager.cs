@@ -304,6 +304,7 @@ public class AbilityManager : MonoBehaviour
     public void AddGenetics()
     {
         genetics += storage;
+        GameRecordHolder.SaveGenetics(storage);
         storage = 0;
     }
 }

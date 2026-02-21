@@ -15,8 +15,9 @@ public static class GameRecordHolder
     public static string MostKilledWave { get; private set; }
     public static string PopularItemName { get; private set; }
     public static string MostSellPlantName { get; private set; }
+    public static int totalGenetics { get; private set; }
 
-    //±âÅ¸ ·Î±×µé
+    //ê¸°íƒ€ ë¡œê·¸ë“¤
     public static int PlayerRank { get; private set; }
 
     
@@ -36,6 +37,11 @@ public static class GameRecordHolder
 
         CalculateRank();
         CalculateMSP();
+    }
+
+    public static void SaveGenetics(int g)
+    {
+        totalGenetics = g;
     }
 
     private static void CalculateRank()
@@ -64,6 +70,6 @@ public static class GameRecordHolder
 
     private static void CalculateMSP()
     {
-        MostSellPlantName = (soldPeas >= soldPeanuts) ? "¿ÏµÎÄá" : "¶¥Äá";
+        MostSellPlantName = (soldPeas >= soldPeanuts) ? "ì™„ë‘ì½©" : "ë•…ì½©";
     }
 }

@@ -69,12 +69,14 @@ public class CurseManager : Singleton<CurseManager>
         if(currentTempCurse == null) return;
 
         currentTempCurse.Activate();
+        //단발형 저주 발동 UI
     }
 
     private void SelectSeasonalCurse()
     {
         var data = seasonalCursePool[UnityEngine.Random.Range(0, seasonalCursePool.Count)];
         currentSeasonCurse = CreateInstanceById(data);
+        remainingCurseDay = 5;
 
         Debug.Log("지속형 저주 설정!");
         //다음 지속형 저주에 대한 경고 UI 표시
@@ -100,6 +102,9 @@ public class CurseManager : Singleton<CurseManager>
     {
         remainingCurseDay--;
 
+        if (currentSeasonCurse != null)
+            Debug.Log(currentSeasonCurse.Data.name + " 저주가 " +  remainingCurseDay +"일 남았습니다.");
+
         if(remainingCurseDay == 0)
         {
             currentSeasonCurse.Deactivate();
@@ -124,14 +129,14 @@ public class CurseManager : Singleton<CurseManager>
             "108" => new DoubleWaveCurse(data),
             "109" => new EMPCurse(data),
 
-            //"201" => new BugFestivalCurse(data),
-            //"202" => new MutationCurse(data),
-            //"203" => new RadiationCurse(data),
-            //"204" => new PollenLostCurse(data),
-            //"205" => new ShopMonopolyCurse(data),
-            //"206" => new InsomniaCurse(data),
-            //"207" => new SeedlessCurse(data),
-            //"208" => new HeavyFireCurse(data),
+            "201" => new BugFestivalCurse(data),
+            "202" => new MutationCurse(data),
+            "203" => new RadiationCurse(data),
+            "204" => new PollenLostCurse(data),
+            "205" => new ShopMonopolyCurse(data),
+            "206" => new InsomniaCurse(data),
+            "207" => new SeedlessCurse(data),
+            "208" => new HeavyFireCurse(data),
 
             _ => null
         };
@@ -149,12 +154,12 @@ public class CurseManager : Singleton<CurseManager>
 
     public void LoadCurseManager(SaveData saveData)
     {
-        var scriptable = FindScriptableById(saveData.curseId[0]); //temp
+        var scriptable = FindTempScriptableById(saveData.curseId[0]); //temp
 
         if(scriptable != null) currentTempCurse = CreateInstanceById(scriptable);
         else currentTempCurse = null;
 
-        scriptable = FindScriptableById(saveData.curseId[1]); //season
+        scriptable = FindSeasonScriptableById(saveData.curseId[1]); //season
 
         if (scriptable != null) currentSeasonCurse = CreateInstanceById(scriptable);
         else currentSeasonCurse = null;
@@ -162,8 +167,13 @@ public class CurseManager : Singleton<CurseManager>
         remainingCurseDay = saveData.remainSeasonCurseDay;
     }
 
-    private CurseScriptable FindScriptableById(string id)
+    private CurseScriptable FindTempScriptableById(string id)
     {
         return temporalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
+    }
+
+    private CurseScriptable FindSeasonScriptableById(string id)
+    {
+        return seasonalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
     }
 }

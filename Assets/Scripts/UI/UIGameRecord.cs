@@ -113,6 +113,8 @@ public class UIGameRecord : MonoBehaviour
 
         AbilityManager.Instance.AddGeneStorage((int)(g * multiple));
         AbilityManager.Instance.AddGenetics();
+
+        pg2.text += $"총 \"{GameRecordHolder.totalGenetics}\"개의 유전자 토큰을 획득했다.";
     }    
 }
 
