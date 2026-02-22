@@ -236,6 +236,11 @@ public class Grid : MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ToggleScouter();
+        }
     }
 
     public void InitGrid()
@@ -1334,12 +1339,16 @@ public class Grid : MonoBehaviour
         scouterButton.SetActive(true);
         scouterButton.GetComponent<Button>().onClick.RemoveAllListeners();
         scouterButton.GetComponent<Button>().onClick.AddListener(ToggleScouter);
+        scouterButton.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance.PlayEffect("Button"));
         HideGoldScouterImageInGrid();
         HideResistanceScouterImageInGrid();
     }
 
     public void ToggleScouter()
     {
+        if (!hasResistanceScouter && !hasGoldScouter)
+            return;
+
         if(isScouterOn)
         {
             isScouterOn = false;
