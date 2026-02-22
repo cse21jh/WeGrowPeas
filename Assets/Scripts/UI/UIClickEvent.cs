@@ -100,6 +100,15 @@ public class UIClickEvent : MonoBehaviour
         }));
     }
 
+    public void OnClick_GoToIntro()
+    {
+        TransitionController.instance.Transition_Out();
+        StartCoroutine(DelayAction(1.1f, () =>
+        {
+            SceneLoader.Instance?.LoadIntroScene();
+        }));
+    }
+
     public void OnClick_PlayAgain()
     {
         TransitionController.instance.Transition_Out();

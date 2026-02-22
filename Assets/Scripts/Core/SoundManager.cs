@@ -75,9 +75,10 @@ public class SoundManager : Singleton<SoundManager>
 
         EffectSoundDictionary.Add("Farm", Resources.Load<AudioClip>("Audio/BGM/BGM"));
         EffectSoundDictionary.Add("StartScene", Resources.Load<AudioClip>("Audio/BGM/StartSceneBGM"));
+        EffectSoundDictionary.Add("IntroScene", Resources.Load<AudioClip>("Audio/BGM/IntroSceneBGM"));
 
-        
-        if(SceneManager.GetActiveScene().name == "StartScene")
+
+        if (SceneManager.GetActiveScene().name == "StartScene")
             PlayBgm("StartScene");
     }
 

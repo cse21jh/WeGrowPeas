@@ -51,6 +51,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadIntroScene()
     {
         SceneManager.LoadScene("IntroScene");
+        SoundManager.Instance.PlayBgm("IntroScene");
         Time.timeScale = 1f;
     }
 
