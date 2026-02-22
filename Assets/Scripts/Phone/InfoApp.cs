@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using LeTai.TrueShadow;
 
 public class InfoApp : BasePhoneApp
 {
@@ -352,7 +353,10 @@ public class InfoApp : BasePhoneApp
             GameObject child = container.GetChild(i).gameObject;
 
             // 1. 즉시 비활성화하여 추가적인 Update/LateUpdate 접근 차단
-            child.SetActive(false);
+            foreach(TrueShadow shadow in child.GetComponentsInChildren<TrueShadow>(true))
+            {
+                shadow.enabled = false; // TrueShadow가 있다면 비활성화 (깜빡임 방지)
+            }
 
             // 2. 삭제
             Destroy(child);

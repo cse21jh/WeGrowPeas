@@ -1,4 +1,4 @@
-﻿// Copyright (c) Le Loc Tai <leloctai.com> . All rights reserved. Do not redistribute.
+// Copyright (c) Le Loc Tai <leloctai.com> . All rights reserved. Do not redistribute.
 
 using System;
 using System.Collections.Generic;
@@ -623,6 +623,8 @@ public partial class TrueShadow : UIBehaviour, IMeshModifier, ICanvasElement
 
     void LateUpdate()
     {
+            if (shadowRenderer == null || Graphic == null) return;
+
         shadowRenderer.gameObject.SetActive(Graphic && Graphic.isActiveAndEnabled);
 
         if (!ShouldPerformWorks())
@@ -648,7 +650,13 @@ public partial class TrueShadow : UIBehaviour, IMeshModifier, ICanvasElement
 
     void OnWillRenderCanvas()
     {
-        if (!isActiveAndEnabled) return;
+            if (this.gameObject == null)
+            {
+                Debug.LogWarning("TrueShadow: GameObject is null. This should not happen. Please make a bug report with steps to reproduce.");
+                return;
+            }
+
+                if (!isActiveAndEnabled) return;
 
 #if LETAI_TRUESHADOW_DEBUG
         if (alwaysRender) textureDirty = true;
@@ -666,7 +674,8 @@ public partial class TrueShadow : UIBehaviour, IMeshModifier, ICanvasElement
 
         if (!shadowAsSibling)
         {
-            if (shadowRenderer.transform.parent != RectTransform)
+            if(shadowRenderer == null) return;
+                if (shadowRenderer.transform.parent != RectTransform)
                 shadowRenderer.transform.SetParent(RectTransform, true);
 
             if (shadowRenderer.transform.GetSiblingIndex() != shadowIndex)

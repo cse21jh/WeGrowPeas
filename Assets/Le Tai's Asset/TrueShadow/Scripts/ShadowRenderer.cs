@@ -234,6 +234,7 @@ public partial class ShadowRenderer : MonoBehaviour, ILayoutIgnorer, IMaterialMo
     public void SetTexture(Texture texture)
     {
         shadowTexture = texture;
+            if (CanvasRenderer == null) return;
         CanvasRenderer.SetTexture(texture);
         graphic.texture = texture;
     }
