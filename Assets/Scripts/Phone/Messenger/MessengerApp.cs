@@ -227,14 +227,31 @@ public class MessengerApp : MonoBehaviour
     {
         foreach (Transform child in chatPartnerListContent) Destroy(child.gameObject);
 
-        foreach (var chat in allChats)
+        List<Chat> chatsToShow = allChats
+            .Where(chat => chat != null && chat.messages != null && HasAnyArrivedMessages(chat))
+            .ToList();
+
+        List<Chat> sortedChats = chatsToShow.OrderByDescending(chat => {
+            List<ChatMessage> arrivedMessages = new List<ChatMessage>();
+            foreach (string triggerId in progress.activatedTriggersOrdered)
+            {
+                arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
+            }
+
+            if (arrivedMessages.Count == 0)
+            {
+                return -1;
+            }
+
+            ChatMessage lastMessage = arrivedMessages.Last();
+            return GetMessageDay(lastMessage.triggerId);
+
+        }).ToList();
+
+
+        foreach (var chat in sortedChats)
         {
-            if (chat == null || chat.messages == null || !HasAnyArrivedMessages(chat)) continue;
-
-            // 안 읽은 메시지 정보 가져오기
             UnreadInfo unreadInfo = GetUnreadInfo(chat);
-
-            // 미리보기 메시지 가져오기
             string previewMessage = GetPreviewMessageText(chat, unreadInfo.hasUnread);
 
             GameObject itemGO = Instantiate(chatPartnerListItemPrefab, chatPartnerListContent);
@@ -738,9 +755,11 @@ public class MessengerApp : MonoBehaviour
             if(doubleClose == true)
             {
                 doubleClose = false;
+                scrollRect.verticalNormalizedPosition = 1f;
                 OpenChatRoom(currentChat);
                 return;
             }
+            scrollRect.verticalNormalizedPosition = 1f;
             OpenChatRoom(currentChat);
             closedByTabShowingChat = false;
         }
