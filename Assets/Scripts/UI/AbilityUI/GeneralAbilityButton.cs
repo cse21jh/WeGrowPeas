@@ -16,6 +16,7 @@ public class GeneralAbilityButton : MonoBehaviour
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI name;
     [SerializeField] private GameObject lockIcon;
+    [SerializeField] private GameObject selectedIcon;
 
     public void Init(GeneralAbilityData ability, bool isUnlocked, AbilityUIController controller)
     {
@@ -29,10 +30,12 @@ public class GeneralAbilityButton : MonoBehaviour
         {
             this.GetComponent<Button>().onClick.AddListener(OnClick);
             lockIcon.SetActive(false);
+            selectedIcon.SetActive(false);
         }
         else
         {
             //해금 관련 이미지 + 버튼 눌렀을 때 해금창 뜨도록
+            selectedIcon.SetActive(false);
             this.GetComponent<Button>().onClick.AddListener(() =>
             {
                 abilityUIController.OpenUnlockUI(name.text, price, () => abilityUIController.TryUnlockGeneralAbility(abilityData));                
@@ -47,6 +50,7 @@ public class GeneralAbilityButton : MonoBehaviour
             abilityUIController.SelectGeneralAbility(abilityData);
             SoundManager.Instance.PlayEffect("Button");
             isSelected = true;
+            selectedIcon.SetActive(true);
             // 선택된 표시 해줘야함
         }
         else
@@ -54,6 +58,7 @@ public class GeneralAbilityButton : MonoBehaviour
             abilityUIController.CancelGeneralAbility(abilityData);
             SoundManager.Instance.PlayEffect("Button");
             isSelected = false;
+            selectedIcon.SetActive(false);
             //선택된 표시 풀어줘야 함
         }
     }
