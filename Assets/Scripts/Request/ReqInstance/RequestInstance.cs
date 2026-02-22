@@ -132,6 +132,8 @@ public abstract class RequestInstance
 
         SoundManager.Instance.PlayEffect("QuestSuccess");
 
+        RequestManager.Instance.AddCompleteRequestCount();
+
         Debug.Log("보상 획득 완료");
     }
 

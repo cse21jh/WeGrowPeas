@@ -38,6 +38,10 @@ public class RequestManager : Singleton<RequestManager>
 
     public event Action OnBoardUpdated;
 
+    private int completeRequestCount = 0;
+
+    public int CompleteRequestCount => completeRequestCount;
+
     private void OnEnable()
     {
         GameEvents.OnDayPassedForRequest += HandleDayPassed;
@@ -188,6 +192,8 @@ public class RequestManager : Singleton<RequestManager>
             activeReq.Add(instance);
         }
 
+        completeRequestCount = saveData.completeRequestCount;
+
         OnBoardUpdated?.Invoke();
     }
 
@@ -231,5 +237,10 @@ public class RequestManager : Singleton<RequestManager>
         if (cycleEndRound < 0) return;
 
         appTitle.text = "퀘스트 - " + (cycle - dayPassed) +"일 남음";
+    }
+
+    public void AddCompleteRequestCount()
+    {
+        completeRequestCount++;
     }
 }

@@ -81,7 +81,9 @@ public class SaveData
 
     public List<int> fertilizerColumns = new();
     public List<WaveType> fertilizerType = new();
-    
+
+    public int mostExpensivePlant;
+
     // 신규 아이템 스탯
     public int timeIsGoldLevel;
     public int badGuyMoreRiceLevel;
@@ -124,6 +126,7 @@ public class SaveData
     public int cycleEndRound;
     public int dayPassed;
     public List<RequestInstanceSaveData> activeRequests = new();
+    public int completeRequestCount;
 
     //PlayerRecordForGraph
     public List<int> survivedPlants = new();
@@ -580,6 +583,7 @@ public class GameManager : Singleton<GameManager>
         saveData.sprinklerRangeBonus = grid.GetSprinklerRangeBonus();
         saveData.sprinklerFertilizerSynergyBonus = grid.GetSprinklerFertilizerSynergyBonus();
 
+        saveData.mostExpensivePlant = grid.MostExpensivePlant;
 
         //enemyController
         saveData.currentSeason = enemyController.CurrentSeason;
@@ -630,6 +634,7 @@ public class GameManager : Singleton<GameManager>
         saveData.cycleEndRound = requestManager.CycleEndRound;
         saveData.dayPassed = requestManager.DayPassed;
         saveData.activeRequests = requestManager.getSaveData();
+        saveData.completeRequestCount = requestManager.CompleteRequestCount;
 
         //PlayerRecordForGraph
         saveData.survivedPlants = PlayerRecordForGraph.survivedPlants;
@@ -707,7 +712,12 @@ public class GameManager : Singleton<GameManager>
             economyManager.TotalGold,
             economyManager.ConsumeGold,
             mostKillWaveName,
-            itemName);
+            itemName,
+            grid.MostExpensivePlant,
+            requestManager.CompleteRequestCount
+            );
+            
+
     }
 
     public void StopGame()

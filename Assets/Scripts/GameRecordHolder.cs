@@ -16,13 +16,15 @@ public static class GameRecordHolder
     public static string PopularItemName { get; private set; }
     public static string MostSellPlantName { get; private set; }
     public static int totalGenetics { get; private set; }
+    public static int MostExpensivePlant { get; private set; }
+    public static int CompleteRequestCount { get; private set; }
 
     //기타 로그들
     public static int PlayerRank { get; private set; }
 
     
 
-    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, string wName, string iName)
+    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, string wName, string iName, int mPlant, int rCount)
     {
         maxStageReached = GameStartContext.StartType == GameStartType.GameOver ? stage - 1 : stage;
         TotalPeas = peas + 2;
@@ -34,6 +36,8 @@ public static class GameRecordHolder
         totalGoldSpend = sgold;
         MostKilledWave = wName;
         PopularItemName = iName;
+        MostExpensivePlant = mPlant;
+        CompleteRequestCount = rCount;
 
         CalculateRank();
         CalculateMSP();

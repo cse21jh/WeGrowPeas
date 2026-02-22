@@ -142,6 +142,8 @@ public class Grid : MonoBehaviour
 
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
+    private int mostExpensivePlant = 0;
+
     public List<int> GoldSoilTiles => goldSoilTiles;
 
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
@@ -194,7 +196,9 @@ public class Grid : MonoBehaviour
     public int ChiliPepperRangeLevel => chiliPepperRangeLevel;
     public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
     public float ChiliPepperHealPercent => chiliPepperHealPercent;
-    
+    public int MostExpensivePlant => mostExpensivePlant;
+
+
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
     public event System.Action OnGridStateChanged;
 
@@ -1274,6 +1278,8 @@ public class Grid : MonoBehaviour
             PlacePetBottle(i);
         for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
             TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
+
+        mostExpensivePlant = saveData.mostExpensivePlant;
     }
 
     public void AddBugSpeedDcreasement(float value)
@@ -2336,6 +2342,14 @@ public class Grid : MonoBehaviour
         return count;
     }
 
+    public void TryUpdateMostExpensivePlant(int price)
+    {
+        if(mostExpensivePlant < price)
+        {
+            mostExpensivePlant = price;
+        }
+        return;
+    }
 }
 
 

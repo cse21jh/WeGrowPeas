@@ -80,11 +80,13 @@ public class UIGameRecord : MonoBehaviour
 
         pg1.text = $"총 \"{recordStage}\"일을 버텼다!";
 
-        pg2.text = $"\"{GameRecordHolder.TotalPeas}\"개의 완두콩 중 \"{GameRecordHolder.soldPeas}\"개를 판매했다.\n" +
+        pg2.text = $"\"{GameRecordHolder.TotalPeas}\"개의 식물 중 \"{GameRecordHolder.soldPeas}\"개를 판매했다.\n" +
             /*$"\"{GameRecordHolder.TotalPeanuts}\"개의 땅콩 중 \"{GameRecordHolder.soldPeanuts}\"개를 판매했다.\n" +*/
             $"벌레는 \"{GameRecordHolder.TotalBugsKilled}\"마리 잡았다.\n" +
             $"총 \"{GameRecordHolder.totalGoldEarned}\"골드를 벌었다!\n" +
-            $"상점에서 \"{GameRecordHolder.totalGoldSpend}\"골드를 소모했다.";
+            $"상점에서 \"{GameRecordHolder.totalGoldSpend}\"골드를 소모했다.\n" +
+            $"가장 비싸게 판 식물은 \"{GameRecordHolder.MostExpensivePlant}\"골드였다.\n" +
+            $"사람들을 \"{GameRecordHolder.CompleteRequestCount}\"번 도와줬다!.\n";
 
         if(GameRecordHolder.PopularItemName == null)
         {
