@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System;
+using DG.Tweening;
 
 public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -12,9 +13,9 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     [SerializeField] private GameObject lockIcon; // 잠금 상태 표시 (일반 특성용)
 
     [Header("Level Bar UI")]
-    [SerializeField] private RectTransform levelBarContainer;
-    [SerializeField] private GameObject levelBarFillPrefab;
-    [SerializeField] private GameObject levelBarEmptyPrefab;
+    [SerializeField] private Slider levelBar;
+    [SerializeField] private float levelBarFillDuration = 0.5f;
+    [SerializeField] private Ease levelBarFillEase = Ease.InOutQuart;
 
     private string description;
     private Action<string> onHover;
@@ -71,24 +72,10 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         if (countText != null) countText.gameObject.SetActive(false);
         
-        if (levelBarContainer != null)
+        if (levelBar != null)
         {
-            levelBarContainer.gameObject.SetActive(true);
-            
-            // 기존 자식 제거 (풀링을 고려하면 다른 방식이 좋지만, 간단하게 구현)
-            foreach(Transform child in levelBarContainer)
-            {
-                Destroy(child.gameObject);
-            }
-            
-            for(int i = 0; i < maxLevel; i++)
-            {
-                GameObject prefab = (i < currentLevel) ? levelBarFillPrefab : levelBarEmptyPrefab;
-                if (prefab != null)
-                {
-                    Instantiate(prefab, levelBarContainer);
-                }
-            }
+            levelBar.DOKill(); // 이전 애니메이션이 있다면 중지
+            levelBar.DOValue((float)currentLevel / maxLevel, levelBarFillDuration).From(0f).SetEase(levelBarFillEase);
         }
     }
 }

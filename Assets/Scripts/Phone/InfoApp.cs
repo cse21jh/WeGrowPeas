@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 
 public class InfoApp : BasePhoneApp
 {
@@ -10,6 +11,10 @@ public class InfoApp : BasePhoneApp
     [SerializeField] private Button characteristicsTabButton;
     [SerializeField] private Button purchasesTabButton;
     [SerializeField] private Button gridInfoTabButton;
+
+    [SerializeField] private Color activeTabColor = Color.white;
+    [SerializeField] private Color inactiveTabColor = Color.black;
+
 
     [Header("Panels")]
     [SerializeField] private GameObject characteristicsPanel;
@@ -97,8 +102,21 @@ public class InfoApp : BasePhoneApp
         }
     }
 
+    private void SetTabButton(int index)
+    {
+        characteristicsTabButton.GetComponentInChildren<Image>().DOColor((index == 0) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+        characteristicsTabButton.GetComponentInChildren<TMP_Text>().DOColor((index == 0) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+
+        purchasesTabButton.GetComponentInChildren<Image>().DOColor((index == 1) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+        purchasesTabButton.GetComponentInChildren<TMP_Text>().DOColor((index == 1) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+
+        gridInfoTabButton.GetComponentInChildren<Image>().DOColor((index == 2) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+        gridInfoTabButton.GetComponentInChildren<TMP_Text>().DOColor((index == 2) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+    }
+
     private void ShowCharacteristics()
     {
+        SetTabButton(0);
         SetActivePanel(characteristicsPanel);
         ClearDescription();
 
@@ -219,6 +237,7 @@ public class InfoApp : BasePhoneApp
 
     private void ShowPurchases()
     {
+        SetTabButton(1);
         SetActivePanel(purchasesPanel);
         ClearDescription();
         ClearContainer(purchasesContainer);
@@ -251,6 +270,7 @@ public class InfoApp : BasePhoneApp
 
     private void ShowGridInfo()
     {
+        SetTabButton(2);
         SetActivePanel(gridInfoPanel);
         ClearDescription();
         ClearContainer(gridContainer);
@@ -326,9 +346,16 @@ public class InfoApp : BasePhoneApp
     private void ClearContainer(Transform container)
     {
         if (container == null) return;
-        foreach (Transform child in container)
+
+        for (int i = container.childCount - 1; i >= 0; i--)
         {
-            Destroy(child.gameObject);
+            GameObject child = container.GetChild(i).gameObject;
+
+            // 1. 즉시 비활성화하여 추가적인 Update/LateUpdate 접근 차단
+            child.SetActive(false);
+
+            // 2. 삭제
+            Destroy(child);
         }
     }
 }
