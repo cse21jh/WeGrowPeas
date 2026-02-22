@@ -47,10 +47,12 @@ public class GeneralAbilityButton : MonoBehaviour
     {
         if (!isSelected)
         {
-            abilityUIController.SelectGeneralAbility(abilityData);
-            SoundManager.Instance.PlayEffect("Button");
-            isSelected = true;
-            selectedIcon.SetActive(true);
+            if(abilityUIController.SelectGeneralAbility(abilityData))
+            {
+                isSelected = true;
+                selectedIcon.SetActive(true);
+            }
+            SoundManager.Instance.PlayEffect("Button");            
             // 선택된 표시 해줘야함
         }
         else
