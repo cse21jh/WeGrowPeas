@@ -1692,7 +1692,7 @@ public class Grid : MonoBehaviour
             if (!plantGrid.TryGetValue(centerIdx, out Plant centerPlant)) continue;
             if (centerPlant.isDying) continue;
 
-            List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait();
+            List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait().ToList();
             
             // 상하좌우 인접 타일 검사
             int[] neighborIndices = GetNeighborIndices(centerIdx);
@@ -1703,7 +1703,7 @@ public class Grid : MonoBehaviour
                 if (neighborPlant.isDying) continue;
                 if (centerPlant == neighborPlant) continue; // 혹시라도 자기 자신이면 패스
 
-                List<GeneticTrait> neighborTraits = neighborPlant.GetGeneticTrait();
+                List<GeneticTrait> neighborTraits = neighborPlant.GetGeneticTrait().ToList();
 
                 // 겹치는 형질 찾기
                 foreach (var cTrait in centerTraits)

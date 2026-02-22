@@ -85,13 +85,13 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
             hasEffect = true;
         }
 
-        // 5. 냉각기
+        // 5. 급속 냉각기
         bool isFrozen = IsPlantFrozen(gridIndex, grid);
         if (coolerIndicator) coolerIndicator.SetActive(isFrozen);
 
         if (isFrozen)
         {
-            sb.AppendLine("- 냉각기: 식물 빙결 상태 (피해 면역)");
+            sb.AppendLine("- 급속 냉각기: 식물 빙결 상태 (피해 면역)");
             hasEffect = true;
         }
 
