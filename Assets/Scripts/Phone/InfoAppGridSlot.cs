@@ -11,6 +11,9 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     [SerializeField] private Image fertilizerIndicator; // 색상 변경용
     [SerializeField] private GameObject petBottleIndicator;
     [SerializeField] private GameObject chiliIndicator;
+    [SerializeField] private GameObject coolerIndicator;
+    [SerializeField] private GameObject sprinklerIndicator;
+    [SerializeField] private GameObject absorbFertilizerIndicator;
 
     [Header("Colors")]
     [SerializeField] private Color[] fertilizerColors; // WaveType 순서와 일치해야 함
@@ -37,7 +40,7 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         
         if (isGoldSoil)
         {
-            sb.AppendLine("- <color=yellow>황금 흙</color>: 모든 저항력 90% 고정, 이동 불가");
+            sb.AppendLine("- 황금 흙: 모든 저항력 90% 고정, 이동 불가");
             hasEffect = true;
         }
 
@@ -54,7 +57,7 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
                     fertilizerIndicator.color = fertilizerColors[typeIndex];
                 }
             }
-            sb.AppendLine($"- <color=green>비료</color>: {fertilizerType} 저항력 +5%");
+            sb.AppendLine($"- 비료: {fertilizerType} 저항력 +5%");
             hasEffect = true;
         }
         else
@@ -68,7 +71,7 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (isPetBottle)
         {
-            sb.AppendLine("- <color=blue>페트병</color>: 사망 1회 방지, 이동 불가");
+            sb.AppendLine("- 페트병: 사망 1회 방지, 이동 불가");
             hasEffect = true;
         }
 
@@ -78,7 +81,37 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (isChili)
         {
-            sb.AppendLine("- <color=red>매운 맛</color>: 우성 형질 저항력 +20%");
+            sb.AppendLine("- 매운 맛: 우성 형질 저항력 +20%");
+            hasEffect = true;
+        }
+
+        // 5. 냉각기
+        bool isFrozen = IsPlantFrozen(gridIndex, grid);
+        if (coolerIndicator) coolerIndicator.SetActive(isFrozen);
+
+        if (isFrozen)
+        {
+            sb.AppendLine("- 냉각기: 식물 빙결 상태 (피해 면역)");
+            hasEffect = true;
+        }
+
+        // 6. 스프링클러
+        bool isSprinkler = grid.IsAffectedBySprinkler(gridIndex);
+        if (sprinklerIndicator) sprinklerIndicator.SetActive(isSprinkler);
+
+        if (isSprinkler)
+        {
+            sb.AppendLine("- 스프링클러: 수분 공급 (비료 시너지 효과 포함)");
+            hasEffect = true;
+        }
+
+        // 7. 저항력흡수비료
+        bool isAbsorbFertilizer = grid.HasAbsorbFertilizer(gridIndex);
+        if (absorbFertilizerIndicator) absorbFertilizerIndicator.SetActive(isAbsorbFertilizer);
+
+        if (isAbsorbFertilizer)
+        {
+            sb.AppendLine("- 저항력 흡수 비료: 주변 식물의 저항력을 지속 흡수");
             hasEffect = true;
         }
 
@@ -94,6 +127,12 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         if (grid == null) return false;
         return grid.IsAffectedByChiliPepper(gridIndex);
+    }
+
+    private bool IsPlantFrozen(int gridIndex, Grid grid)
+    {
+        if (grid == null) return false;
+        return grid.IsPlantFrozen(gridIndex);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

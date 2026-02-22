@@ -1646,6 +1646,15 @@ public class Grid : MonoBehaviour
         Debug.Log("[RapidFreezer] All plants unfrozen.");
     }
 
+    public bool IsPlantFrozen(int gridIndex)
+    {
+        if (plantGrid.TryGetValue(gridIndex, out Plant plant))
+        {
+            return plant.IsFrozen();
+        }
+        return false;
+    }
+
     public void AddPetBottleInitialStockBonus(int value)
     {
         petBottleInitialStockBonus += value;
