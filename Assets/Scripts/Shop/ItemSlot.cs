@@ -107,10 +107,21 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     }
 
     /// <summary>
-    /// 가격을 업데이트합니다 (구매 후 가격이 변경되는 아이템용).
+    /// 가격 및 재고를 다시 계산합니다 (구매 후 전역 상태가 변경되었을 때 호출).
     /// </summary>
-    public void RefreshPrice()
+    public void Reinitialize(ShopContext ctx)
     {
+        if (effect == null) return;
+
+        effect.InitializePrice(ctx);
+        int newMaxStock = effect.IsStackable ? Mathf.Max(1, effect.InitialStock) : 1;
+        
+        if (newMaxStock != maxStock)
+        {
+            stock = newMaxStock; // 최대 재고량이 늘어나면 즉시 가득 채워줌
+            maxStock = newMaxStock;
+        }
+
         Refresh();
     }
 

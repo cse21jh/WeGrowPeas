@@ -280,8 +280,8 @@ public class ShopUI : MonoBehaviour
             if (!data.IsStackable) session.MarkBought(data);
             slot.OnPurchased();
             
-            // 가격이 동적으로 변경되는 아이템의 경우 가격 업데이트
-            slot.RefreshPrice();
+            // 모든 슬롯의 가격 및 재고 갱신 (전역 상태 변화 반영)
+            RefreshAllSlots();
             
             // 전체 구매 제한에 도달했는지 확인
             bool reachedTotalLimit = !data.CanPurchaseByLimit();
@@ -298,6 +298,20 @@ public class ShopUI : MonoBehaviour
             // 상점 연락처 등 무료 리롤 횟수를 변경하는 아이템 구매 시 리롤 버튼 UI 업데이트
             UpdateRerollButton();
             //ShowInfo($"{data.DisplayName} 구매 완료");
+        }
+    }
+
+    /// <summary>
+    /// 모든 활성화된 슬롯의 가격과 최대 재고량을 다시 계산합니다.
+    /// </summary>
+    private void RefreshAllSlots()
+    {
+        foreach (var s in slots)
+        {
+            if (s != null && s.gameObject.activeInHierarchy)
+            {
+                s.Reinitialize(ctx);
+            }
         }
     }
 
