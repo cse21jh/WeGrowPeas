@@ -112,7 +112,7 @@ public class AbilityUIController : MonoBehaviour
         addPlantAbilityButton.GetComponent<Button>().onClick.RemoveAllListeners();
         addPlantAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).plantName + "의 특성 포인트 1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
+            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).plantName + "의 특성 포인트 +1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
         });
         UpdatePlantAbilityList(plant);
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
@@ -232,7 +232,7 @@ public class AbilityUIController : MonoBehaviour
 
         addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            OpenUnlockUI("일반 특성 포인트 1", AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
+            OpenUnlockUI("일반 특성 포인트 +1", AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
         });
 
         remainGeneralAbilityPoint = abilityManager.GetGeneralAbilityPoint();
@@ -342,7 +342,7 @@ public class AbilityUIController : MonoBehaviour
     public void OpenUnlockUI(string name, int price, Action unlockAction)
     {
         unlockUI.gameObject.SetActive(true);
-        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = name + " 해금에\n" + price.ToString() + "개의 유전자가 필요합니다.\n해금하시겠습니까?";
+        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "\"" + name + "\" 해금에\n" + price.ToString() + "개의 유전자가 필요합니다.\n해금하시겠습니까?";
         Button b = unlockUI.transform.Find("ConfirmButton").GetComponent<Button>();
         b.onClick.RemoveAllListeners();
         b.onClick.AddListener(() =>

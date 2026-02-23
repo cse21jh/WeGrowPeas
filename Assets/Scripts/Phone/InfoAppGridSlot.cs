@@ -30,7 +30,7 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (grid == null) return;
 
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"Grid {gridIndex}");     // <b> 태그 제거 (폰트 깨짐 발생)
+        sb.AppendLine($"{gridIndex+1} 번째 땅");     // <b> 태그 제거 (폰트 깨짐 발생)
 
         bool hasEffect = false;
         

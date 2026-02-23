@@ -52,7 +52,7 @@ public class WeatherApp : MonoBehaviour
     public void UpdateNextWave(int stage, Wave wave)
     {
         nextStageText.text = stage.ToString() + "일차 (내일)";
-        nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가 예상됩니다.";
+        nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가\n예상됩니다.";
         nextWaveImage.sprite = waveIcons[(int)wave.WaveType];
     }
 
@@ -68,7 +68,7 @@ public class WeatherApp : MonoBehaviour
         else
         {
             stageText.text = stage.ToString() + "일차";
-            waveText.text = wave.WaveName + " 웨이브가 지나갈 예정입니다.";
+            waveText.text = wave.WaveName + " 웨이브가\n지나갈 예정입니다.";
             dangerousPlantText.text = wave.WaveName + " 저항이 없는 식물 " + dangerousPlantCount.ToString() + "개";
             waveImage.sprite = waveIcons[(int)wave.WaveType]; 
 
