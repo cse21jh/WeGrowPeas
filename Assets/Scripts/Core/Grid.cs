@@ -1614,6 +1614,21 @@ public class Grid : MonoBehaviour
                     if (plantGrid.ContainsKey(targetIdx))
                     {
                         plantGrid[targetIdx].SetFrozen(true);
+
+                        if(plantGrid[targetIdx].gameObject == breedObj1)
+                        {
+                            plantGrid[targetIdx].MakeDefaultSprite();
+                            breedObj1 = null;
+                            breedButton.SetActive(false);
+                            breedButtonPlant = null;
+                        }
+                        if (plantGrid[targetIdx].gameObject == breedObj2)
+                        {
+                            plantGrid[targetIdx].MakeDefaultSprite();
+                            breedObj2 = null;
+                            breedButton.SetActive(false);
+                            breedButtonPlant = null;
+                        }                        
                     }
                     
                     // 시각적 피드백 (얼음 이펙트 등) 추가 가능

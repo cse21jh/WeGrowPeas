@@ -26,6 +26,8 @@ public abstract class MovablePlant : Plant
 
     private bool isReallyMovable = true;
 
+    [SerializeField] private GameObject iceEffect;
+
     public override bool IsMovable => isReallyMovable;
 
     public override void Init(int gridIndex, Grid grid)
@@ -68,7 +70,7 @@ public abstract class MovablePlant : Plant
                 FollowMouse();
         }
 
-        if (!grid.GetIsBreeding())
+        if (!grid.GetIsBreeding() || isFrozen)
         {
             isDragging = false;
             isHolding = false;
@@ -80,7 +82,7 @@ public abstract class MovablePlant : Plant
 
     private void OnMouseDown()
     {
-        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel)
+        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen)
             return;
         holdTime = 0f;
         isHolding = true;
@@ -97,7 +99,7 @@ public abstract class MovablePlant : Plant
         }
         else
         {
-            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel) return;
+            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen) return;
             grid.RequestBreedSelect(this.gameObject);
         }
 
@@ -187,5 +189,10 @@ public abstract class MovablePlant : Plant
     public void PlayWaterParticle()
     {
         waterParticle.Play();
+    }
+
+    public void SetIceEffect(bool val)
+    {
+        iceEffect.SetActive(val);
     }
 }

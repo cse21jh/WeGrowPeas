@@ -148,23 +148,17 @@ public abstract class Plant : MonoBehaviour
 
     public void SetFrozen(bool freeze)
     {
-        isFrozen = freeze;
-        if (isFrozen)
+        if (this is MovablePlant p)
         {
-            frozenPrice = GetSellingPrice(); // 현재 가격 저장
-            
-            // 시각적 효과 (예: 파랗게 변함)
-            foreach (var sr in childSpriteRenderers)
+            isFrozen = freeze;
+            if (isFrozen)
             {
-                sr.color = new Color(0.5f, 0.5f, 1f, 1f); 
+                frozenPrice = GetSellingPrice(); // 현재 가격 저장
+                p.SetIceEffect(isFrozen);
             }
-        }
-        else
-        {
-            // 해동 시 원래 색상 복구 (구체적인 복구 로직은 쉐이더나 스프라이트 상황에 따라 다를 수 있음. 일단 흰색으로)
-            foreach (var sr in childSpriteRenderers)
+            else
             {
-                sr.color = Color.white; 
+                p.SetIceEffect(isFrozen);
             }
         }
     }
