@@ -16,13 +16,14 @@ public class BugFanItemData : ItemData
     [Header("Limit")]
     [Min(1)] public int maxTotalPurchase = 3;
 
-    private void OnValidate()
+    private void OnEnable()
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
         InitialStock = 1;
         Rarity = ItemRarity.Common; // 일반 등급
+        MaxPurchaseCount = maxTotalPurchase;
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 방해용 선풍기";
         if (string.IsNullOrEmpty(Description)) Description = "벌레 이동속도 영구적으로 10% 감소 (중첩 시 합적용)";
         if (Price <= 0) Price = 500;

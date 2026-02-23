@@ -12,12 +12,13 @@ public class GoldenClockItemData : ItemData
     [Header("Limit")]
     [SerializeField] private int maxTotalPurchase = 2; // 전체 게임 내 최대 구매 가능 횟수
 
-    private void OnValidate()
+    private void OnEnable()
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
         InitialStock = 1;
+        MaxPurchaseCount = maxTotalPurchase;
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 시계";
         if (string.IsNullOrEmpty(Description)) Description = "구매 시 교배 시간이 10초 증가";
         if (Price <= 0) Price = basePrice;
