@@ -34,7 +34,7 @@ public class AbilityManager : MonoBehaviour
 
     private int generalAbilityPoint = 0;
 
-    private int genetics = 5000;
+    private int genetics = 10000;
 
     private int storage = 0; //퀘스트, 등 게임 중간에 저장해 뒀다가 일정 기간을 두고 추가
     public int Storage => storage;
