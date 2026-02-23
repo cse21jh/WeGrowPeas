@@ -29,6 +29,7 @@ public class TransitionController : MonoBehaviour
             {
                 DontDestroyOnLoad(gameObject);
 
+                transitionMat.DOKill(true);
                 transitionMat.SetFloat("_Radius", 1.5f);
             }
         }
@@ -53,6 +54,7 @@ public class TransitionController : MonoBehaviour
     {
         if (isDebug)
         {
+            transitionMat.DOKill(true);
             transitionMat.SetFloat("_Radius", debugRadius);
         }
     }
@@ -64,6 +66,7 @@ public class TransitionController : MonoBehaviour
     /// </summary>
     public void Transition_In()
     {
+        transitionMat.DOKill(true);
         Debug.Log("Transition In");
         transitionMat.SetFloat("_Radius", 0f);
         isFinished = false;
@@ -76,6 +79,7 @@ public class TransitionController : MonoBehaviour
     /// </summary>
     public void Transition_Out()
     {
+        transitionMat.DOKill(true);
         transitionMat.SetFloat("_Radius", 1.5f);
         isFinished = false;
         StartCoroutine(Transition(0f));
@@ -88,6 +92,8 @@ public class TransitionController : MonoBehaviour
 
     private IEnumerator Transition(float rad)
     {
+        transitionMat.DOKill(true);
+
         DOTween.To(() => transitionMat.GetFloat("_Radius"), x => transitionMat.SetFloat("_Radius", x),
             rad, transitionDuration).SetEase(easeType).SetUpdate(true).SetId("Transition");
 
