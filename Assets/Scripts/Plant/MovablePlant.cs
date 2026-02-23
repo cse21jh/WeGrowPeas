@@ -34,6 +34,8 @@ public abstract class MovablePlant : Plant
     {
         base.Init(gridIndex, grid);
         waterParticle = transform.Find("Water").GetComponent<ParticleSystem>();
+        if (isOnGoldenSoil())
+            stemController.SetGold(true);
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);
         if(GameManager.Instance)
             CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType); 
