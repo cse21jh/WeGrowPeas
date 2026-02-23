@@ -110,10 +110,10 @@ public class Bug : MonoBehaviour
             }
             if (nepenthes == null)
                 break;
-            MoveToward(nepenthes.transform.position, speed - 0.5f);
+            MoveToward(nepenthes.transform.position, speed * 0.5f);
             yield return null;
         }
-        // ������ ������ �� ���浥���� ����� ��� �ٽ� ���� ��ƾ ����
+        //    浥   ٽ  ƾ 
         movingCoroutine = StartCoroutine(Moving());
         yield return null;
     }
