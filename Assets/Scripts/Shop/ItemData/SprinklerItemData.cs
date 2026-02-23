@@ -17,7 +17,7 @@ public class SprinklerItemData : ItemData
         IsStackable = false;
         InitialStock = 1; // 일일 구매 제한 1회
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 1; // 최대 구매 제한 1회
+        MaxPurchaseCount = -1; // 최대 구매 제한 없음 (여러 번 구매 가능)
         FlowType = ShopFlowType.PlaceOnTile;
     }
 
