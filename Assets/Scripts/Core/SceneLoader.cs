@@ -73,6 +73,7 @@ public class SceneLoader : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        FindAnyObjectByType<TransitionController>().transitionMat.SetFloat("_Radius", 0f);
         Debug.Log($"{scene.name} 씬 로드됨 (모드: {mode})");
         StartCoroutine(Transition(1.0f));
     }

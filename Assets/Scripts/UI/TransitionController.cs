@@ -11,7 +11,7 @@ public class TransitionController : MonoBehaviour
 
     [SerializeField] private GameObject blocker;
 
-    [SerializeField] private Material transitionMat;
+    public Material transitionMat;
     [SerializeField] private float transitionDuration = 1f;
     [SerializeField] private Ease easeType;
 
@@ -41,6 +41,13 @@ public class TransitionController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        transitionMat.DOKill(true);
+        transitionMat.SetFloat("_Radius", 1.5f);
+        isFinished = true;
+    }
+
     private void Start()
     {
         /*
@@ -56,6 +63,7 @@ public class TransitionController : MonoBehaviour
     {
         if (isDebug)
         {
+            Debug.Log(transitionMat.GetFloat("_Radius"));
             //transitionMat.DOKill(true);
             //transitionMat.SetFloat("_Radius", debugRadius);
         }
@@ -68,6 +76,8 @@ public class TransitionController : MonoBehaviour
     /// </summary>
     public void Transition_In()
     {
+        if (!isFinished) return;
+
         blocker.SetActive(true);
         transitionMat.DOKill(true);
         Debug.Log("Transition In");
