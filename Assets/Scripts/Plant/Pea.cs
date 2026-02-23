@@ -110,7 +110,7 @@ public class Pea : MovablePlant
 
     public override int GetSellingPrice()
     {
-        if (isFrozen) return frozenPrice;
+        //if (isFrozen) return frozenPrice;
 
         int basePrice = (taste >= 0 && taste < BasePrices.Length) ? BasePrices[taste] : 0;
 
