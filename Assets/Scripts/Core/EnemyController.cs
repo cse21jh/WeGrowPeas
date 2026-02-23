@@ -553,7 +553,7 @@ public class EnemyController : MonoBehaviour
     public void UpdateCurrentWaveAlarm()
     {
         if (weatherApp != null)
-            weatherApp.UpdateCurrentWave(PhoneManager.Instance.GetIsPhoneTime() ? GameManager.Instance.stage + 1 : GameManager.Instance.stage + 1, currentWave, grid.CountNoTraitPlant(currentWave.WaveType));
+            weatherApp.UpdateCurrentWave(PhoneManager.Instance.GetIsPhoneTime() ? GameManager.Instance.stage + 1 : GameManager.Instance.stage, currentWave, grid.CountNoTraitPlant(currentWave.WaveType));
     }
 
     public int PickTraitFromUnlockWave()
