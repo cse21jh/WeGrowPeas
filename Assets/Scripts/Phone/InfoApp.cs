@@ -205,21 +205,20 @@ public class InfoApp : BasePhoneApp
             for (int i = 0; i < maxSlots; i++)
             {
                 var slot = Instantiate(generalAbilitySlotPrefab, generalAbilityContainer);
-                
+                bool isLocked = (i >= AbilityManager.Instance.GetGeneralAbilityPoint());
+
                 if (i < generalAbilities.Count && generalAbilities[i] != null)
                 {
                     var ability = generalAbilities[i];
-                    bool isUnlocked = AbilityManager.Instance.IsGeneralAbilityDataUnlocked.ContainsKey(ability.name) 
-                                      && AbilityManager.Instance.IsGeneralAbilityDataUnlocked[ability.name];
-                    
+
                     // If locked logic is needed, handled here. 
                     // But CurrentGeneralAbility usually contains *equipped* abilities.
                     // If the request implies showing "Potential" slots vs "Equipped", we might need logic adjustment.
                     // "General characteristics ... lock icon if slot is unavailable"
                     // If AbilityManager manages slots, we check that. 
                     // Let's assume CurrentGeneralAbility has the equipped ones.
-                    
-                    slot.Setup(ability.icon, ability.abilityName, 0, ability.description, UpdateDescription, ClearDescription, !isUnlocked);
+
+                    slot.Setup(ability.icon, ability.abilityName, 0, ability.description, UpdateDescription, ClearDescription, isLocked);
                 }
                 else
                 {
@@ -227,7 +226,6 @@ public class InfoApp : BasePhoneApp
                      // How to determine if it's just empty or locked? 
                      // AbilityManager.GeneralAbilityPoint seems to track available points/slots?
                      // Let's simplified: If index >= GeneralAbilityPoint, it's Locked. Else Empty.
-                     bool isLocked = (i >= AbilityManager.Instance.GetGeneralAbilityPoint());
                      string desc = isLocked ? "잠김" : "빈 슬롯";
                      slot.Setup(null, "", 0, desc, UpdateDescription, ClearDescription, isLocked);
                 }

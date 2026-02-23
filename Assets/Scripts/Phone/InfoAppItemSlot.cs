@@ -34,7 +34,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
             nameText.text = name;
             nameText.gameObject.SetActive(!string.IsNullOrEmpty(name));
         }
-
+        /*
         if (countText != null)
         {
             if (count > 0)
@@ -47,7 +47,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 countText.gameObject.SetActive(false);
             }
         }
-
+        */
         if (lockIcon != null)
         {
             lockIcon.SetActive(isLocked);
@@ -75,7 +75,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (levelBar != null)
         {
             levelBar.DOKill(); // 이전 애니메이션이 있다면 중지
-            levelBar.DOValue((float)currentLevel / maxLevel, levelBarFillDuration).From(0f).SetEase(levelBarFillEase);
+            levelBar.DOValue((float)currentLevel / maxLevel, levelBarFillDuration).From(0f).SetEase(levelBarFillEase).SetLink(levelBar.gameObject);
         }
     }
 }
