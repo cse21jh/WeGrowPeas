@@ -22,6 +22,8 @@ public abstract class MovablePlant : Plant
     //[SerializeField] private GameObject resistanceScouterImage;
     //[SerializeField] private GameObject goldScouterImage;
 
+    private ParticleSystem waterParticle;
+
     private bool isReallyMovable = true;
 
     public override bool IsMovable => isReallyMovable;
@@ -29,6 +31,7 @@ public abstract class MovablePlant : Plant
     public override void Init(int gridIndex, Grid grid)
     {
         base.Init(gridIndex, grid);
+        waterParticle = transform.Find("Water").GetComponent<ParticleSystem>();
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);
         if(GameManager.Instance)
             CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType); 
@@ -179,5 +182,10 @@ public abstract class MovablePlant : Plant
     private void SetScouter()
     {
         scouter.SetScouter(hasGoldScouter, hasResistanceScouter);
+    }
+
+    public void PlayWaterParticle()
+    {
+        waterParticle.Play();
     }
 }

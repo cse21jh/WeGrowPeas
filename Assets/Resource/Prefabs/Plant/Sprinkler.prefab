@@ -4938,7 +4938,7 @@ Transform:
   m_GameObject: {fileID: 4535171586957460776}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.182, y: 0.049, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10156,7 +10156,7 @@ Transform:
   m_GameObject: {fileID: 7123366062132582181}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.777, y: 2.174, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10285,6 +10285,7 @@ MonoBehaviour:
   holdCanvas: {fileID: 2784728890964193543}
   foamEffect: {fileID: 1291638743406356370}
   snowRenderers: []
+  waterParticle: {fileID: 0}
 --- !u!1 &7435105536543307973
 GameObject:
   m_ObjectHideFlags: 0
@@ -10585,7 +10586,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:

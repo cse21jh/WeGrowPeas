@@ -3,11 +3,15 @@ using System.Collections.Generic;
 
 public class Sprinkler : Plant
 {
+    private Animator anim;
+    public ParticleSystem waterParticle;
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = "스프링클러";
         base.Init(gridIndex, grid);
         plantID = 4; // 식물 ID 4
+        anim = GetComponentInChildren<Animator>();
+        waterParticle = transform.Find("Water").GetComponent<ParticleSystem>();
     }
 
     public override void ResistWave(WaveType waveType)
@@ -26,6 +30,9 @@ public class Sprinkler : Plant
         List<Plant> neighbors = new List<Plant>();
         int maxIndex = grid.GetMaxCol() * 4;
         int range = 1 + grid.GetSprinklerRangeBonus();
+
+        anim.Play("sprinkler");
+        waterParticle.Play();
 
         // 1. 상 (Up)
         for (int i = 1; i <= range; i++)
@@ -58,10 +65,13 @@ public class Sprinkler : Plant
             // 판매 골드 배수 2회 획득 효과
             // = 이미 로직상 1회 올랐을 것이므로, 여기서 1회 더 올려줌
             // 단, 저항 횟수(ResistWaveCount) 자체는 올리지 않고 보너스 배수만 추가
-            luckyPlant.AddBonusGoldMultiplier(1);
-            
-            // UI 갱신 (가격표)
-            luckyPlant.ShowPriceSign(); 
+            if (luckyPlant is MovablePlant p) // 일반 판매 식물인 경우에만 골드 추가
+            {
+                p.AddBonusGoldMultiplier(1);
+                // UI 갱신 (가격표)
+                p.PlayWaterParticle();
+                p.ShowPriceSign();
+            }
         }
     }
 
