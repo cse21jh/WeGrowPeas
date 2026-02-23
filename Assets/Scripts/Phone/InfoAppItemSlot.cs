@@ -75,7 +75,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (levelBar != null)
         {
             levelBar.DOKill(); // 이전 애니메이션이 있다면 중지
-            levelBar.DOValue((float)currentLevel / maxLevel, levelBarFillDuration).From(0f).SetEase(levelBarFillEase);
+            levelBar.DOValue((float)currentLevel / maxLevel, levelBarFillDuration).From(0f).SetEase(levelBarFillEase).SetLink(levelBar.gameObject);
         }
     }
 }
