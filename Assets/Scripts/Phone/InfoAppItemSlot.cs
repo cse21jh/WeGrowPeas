@@ -34,7 +34,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
             nameText.text = name;
             nameText.gameObject.SetActive(!string.IsNullOrEmpty(name));
         }
-
+        /*
         if (countText != null)
         {
             if (count > 0)
@@ -47,7 +47,7 @@ public class InfoAppItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 countText.gameObject.SetActive(false);
             }
         }
-
+        */
         if (lockIcon != null)
         {
             lockIcon.SetActive(isLocked);
