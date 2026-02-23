@@ -15,6 +15,14 @@ public class AnimDelayController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (anim != null)
+        {
+            StartCoroutine(AnimStart());
+        }
+    }
+
 
     private IEnumerator AnimStart()
     {

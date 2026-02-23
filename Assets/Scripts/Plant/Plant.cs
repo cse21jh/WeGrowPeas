@@ -102,9 +102,13 @@ public abstract class Plant : MonoBehaviour
 
     public virtual List<Vector2> GetPairData_TraitFace()
     {
-        return GetComponentsInChildren<PeaSpriteController>()
-           .Select(peaSC => peaSC.pairData_TraitFace)
-           .ToList();
+        var peas = GetComponentsInChildren<PeaSpriteController>()
+           .Select(pea => pea.pairData_TraitFace);
+
+        var peanuts = GetComponentsInChildren<PeanutSpriteController>()
+                      .Select(pnut => pnut.pairData_TraitFace);
+
+        return peas.Concat(peanuts).ToList();
     }
 
     private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // 대응 형질 넣어주는 

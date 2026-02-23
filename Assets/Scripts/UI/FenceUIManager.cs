@@ -174,7 +174,11 @@ public class FenceUIManager : MonoBehaviour
 
     private IEnumerator ShowUI()
     {
+        DOTween.Kill("FencuUI");
+
         Sequence showSeq = DOTween.Sequence();
+        showSeq.SetId("FencuUI").SetUpdate(true);
+        showSeq.SetLink(this.gameObject);
 
         for (int i = 0; i < fenceElements.Length; i++)
         {
@@ -193,7 +197,11 @@ public class FenceUIManager : MonoBehaviour
 
     private IEnumerator HideUI()
     {
+        DOTween.Kill("FencuUI");
+
         Sequence showSeq = DOTween.Sequence();
+        showSeq.SetId("FencuUI").SetUpdate(true);
+        showSeq.SetLink(this.gameObject);
 
         for (int i = 0; i < fenceElements.Length; i++)
         {

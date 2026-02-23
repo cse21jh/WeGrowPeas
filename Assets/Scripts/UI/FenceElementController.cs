@@ -53,7 +53,7 @@ public class FenceElementController : MonoBehaviour
             {
                 break;
             }
-            //Debug.Log("페어데이터 확인 중... " + i + " / " + pairDatas[i].x + " " + pairDatas[i].y);
+            Debug.Log("페어데이터 확인 중... " + i + " / " + pairDatas[i].x + " " + pairDatas[i].y);
 
             if ((int)pairDatas[i].x == -1 || (int)pairDatas[i].y == -1)
             {
@@ -69,10 +69,32 @@ public class FenceElementController : MonoBehaviour
                     if(pea.activeSelf == true)
                     {
                         // Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
-                        Animator anim = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
-                        anim.Rebind();
-                        anim.SetInteger("faceIndex", (int)pairDatas[i].y);
-                        anim.SetTrigger("Start");
+                        Animator anim_pea = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
+                        anim_pea.Rebind();
+                        anim_pea.SetInteger("faceIndex", (int)pairDatas[i].y);
+                        anim_pea.SetTrigger("Start");
+                        pairDatas.RemoveAt(i);
+
+                        isSet = true;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                foreach (GameObject peanut in peanuts)
+                {
+                    if (peanut.activeSelf == true)
+                    {
+                        Debug.Log("땅콩 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
+
+                        // Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        Animator anim_peanut = peanut.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
+                        anim_peanut.Rebind();
+                        anim_peanut.SetInteger("faceIndex", (int)pairDatas[i].y);
+                        anim_peanut.SetTrigger("Start");
                         pairDatas.RemoveAt(i);
 
                         isSet = true;
