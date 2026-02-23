@@ -1577,31 +1577,20 @@ public class Grid : MonoBehaviour
         {
             if (kvp.Value is Sprinkler)
             {
+                if (kvp.Key == targetIdx)
+                    return false; // 본인 자체에는 효과 X
+
                 int sIdx = kvp.Key;
-                
-                // 1. 같은 열 (상하 관계)
-                if (Mathf.Abs(sIdx - targetIdx) % 4 == 0) 
-                {
-                     int sRow = sIdx % 4;
-                     int tRow = targetIdx % 4;
-                     int sCol = sIdx / 4;
-                     int tCol = targetIdx / 4;
 
-                     // 같은 열이므로 Col은 같음. Row 차이 확인
-                     if (sCol == tCol && Mathf.Abs(sRow - tRow) <= range) return true;
-                }
-                
-                // 2. 같은 행 (좌우 관계)
-                if (Mathf.Abs(sIdx - targetIdx) < 4) // 같은 컬럼 그룹 내에 있지는 않음. 인덱스 차이가 작다고 같은 행은 아님.
-                {
-                     int sRow = sIdx % 4;
-                     int tRow = targetIdx % 4;
-                     int sCol = sIdx / 4;
-                     int tCol = targetIdx / 4;
+                int sRow = sIdx % 4;
+                int tRow = targetIdx % 4;
+                int sCol = sIdx / 4;
+                int tCol = targetIdx / 4;
+                // 같은 열이므로 Col은 같음. Row 차이 확인
+                if (sCol == tCol && Mathf.Abs(sRow - tRow) <= range) return true;
 
-                     // 같은 행이므로 Row는 같음. Col 차이 확인
-                     if (sRow == tRow && Mathf.Abs(sCol - tCol) <= range) return true;
-                }
+                // 같은 행이므로 Row는 같음. Col 차이 확인
+                if (sRow == tRow && Mathf.Abs(sCol - tCol) <= range) return true;
             }
         }
         return false;
