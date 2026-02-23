@@ -9,6 +9,8 @@ public class TransitionController : MonoBehaviour
 {
     public static TransitionController instance;
 
+    [SerializeField] private GameObject blocker;
+
     [SerializeField] private Material transitionMat;
     [SerializeField] private float transitionDuration = 1f;
     [SerializeField] private Ease easeType;
@@ -54,8 +56,8 @@ public class TransitionController : MonoBehaviour
     {
         if (isDebug)
         {
-            transitionMat.DOKill(true);
-            transitionMat.SetFloat("_Radius", debugRadius);
+            //transitionMat.DOKill(true);
+            //transitionMat.SetFloat("_Radius", debugRadius);
         }
     }
 
@@ -66,11 +68,12 @@ public class TransitionController : MonoBehaviour
     /// </summary>
     public void Transition_In()
     {
+        blocker.SetActive(true);
         transitionMat.DOKill(true);
         Debug.Log("Transition In");
         transitionMat.SetFloat("_Radius", 0f);
         isFinished = false;
-        StartCoroutine(Transition(1.5f));
+        Transition(1.5f);
     }
 
     /// <summary>
@@ -79,10 +82,11 @@ public class TransitionController : MonoBehaviour
     /// </summary>
     public void Transition_Out()
     {
+        blocker.SetActive(true);
         transitionMat.DOKill(true);
         transitionMat.SetFloat("_Radius", 1.5f);
         isFinished = false;
-        StartCoroutine(Transition(0f));
+        Transition(0f);
     }
 
     public bool IsFinished()
@@ -90,18 +94,20 @@ public class TransitionController : MonoBehaviour
         return isFinished;
     }
 
-    private IEnumerator Transition(float rad)
+    private void Transition(float rad)
     {
         transitionMat.DOKill(true);
 
-        DOTween.To(() => transitionMat.GetFloat("_Radius"), x => transitionMat.SetFloat("_Radius", x),
-            rad, transitionDuration).SetEase(easeType).SetUpdate(true).SetId("Transition");
+        Sequence seq = DOTween.Sequence();
 
-        yield return new WaitUntil(() => transitionMat.GetFloat("_Radius") == rad);
-
-        isFinished = true;
-        //DOTween.KillAll(true);
-         DOTween.Kill("Transition", true);
-        StopAllCoroutines();
+        seq.Join(transitionMat.DOFloat(rad, "_Radius", transitionDuration).SetEase(easeType).SetUpdate(true).SetId("Transition")).SetLink(this.gameObject);
+        seq.OnComplete(() =>
+        {
+            blocker.SetActive(false);
+            isFinished = true;
+            //DOTween.KillAll(true);
+            DOTween.Kill("Transition", true);
+            StopAllCoroutines();
+        });
     }
 }
