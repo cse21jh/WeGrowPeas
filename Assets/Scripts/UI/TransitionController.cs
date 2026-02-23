@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
 [ExecuteInEditMode]
 public class TransitionController : MonoBehaviour
@@ -90,13 +91,21 @@ public class TransitionController : MonoBehaviour
     /// 점점 어두워지는 트랜지션.
     /// 아웃트로 성격
     /// </summary>
-    public void Transition_Out()
+    public async Task Transition_Out()
     {
+        await Task.Yield();
+
         blocker.SetActive(true);
         transitionMat.DOKill(true);
         transitionMat.SetFloat("_Radius", 1.5f);
+        Debug.Log(transitionMat.GetFloat("_Radius"));
         isFinished = false;
         Transition(0f);
+
+        while(!isFinished)
+        {
+            await Task.Yield();
+        }
     }
 
     public bool IsFinished()
@@ -110,11 +119,16 @@ public class TransitionController : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        seq.Join(transitionMat.DOFloat(rad, "_Radius", transitionDuration).SetEase(easeType).SetUpdate(true).SetId("Transition")).SetLink(this.gameObject);
+        seq.Append(transitionMat.DOFloat(rad, "_Radius", transitionDuration)).SetEase(easeType).SetUpdate(true).SetId("Transition");
+        seq.Play();
+        Debug.Log(transitionMat.GetFloat("_Radius"));
+        Debug.Log(seq.IsPlaying());
+
         seq.OnComplete(() =>
         {
-            blocker.SetActive(false);
+            Debug.Log(transitionMat.GetFloat("_Radius"));
             isFinished = true;
+            blocker.SetActive(false);
             DOTween.KillAll(true);
             //DOTween.Kill("Transition", true);
             StopAllCoroutines();

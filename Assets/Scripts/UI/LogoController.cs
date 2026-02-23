@@ -18,11 +18,6 @@ public class LogoController : MonoBehaviour
         {
             this.transform.DOScale(initialScale, popupDuration * 0.5f).SetEase(popupEase);
         });
-
-        this.transform.DOLocalMoveY(0.2f, popupDuration)
-        .SetEase(popupEase)
-        .SetLink(this.gameObject)
-        .SetLoops(-1, LoopType.Yoyo).Play();
     }
 
     private void Update()

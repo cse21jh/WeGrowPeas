@@ -39,16 +39,13 @@ public class UIClickEvent : MonoBehaviour
         action?.Invoke();
     }
 
-    public void OnClick_StartNewGame(int slotIndex)
+    public async void OnClick_StartNewGame(int slotIndex)
     {
         SaveContext.Instance.SelectSlot(slotIndex);
 
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            GameStartContext.SetStartType(GameStartType.NewGame);
-            SceneLoader.Instance?.LoadGardenScene();
-        }));
+        await TransitionController.instance.Transition_Out();
+        GameStartContext.SetStartType(GameStartType.NewGame);
+        SceneLoader.Instance?.LoadGardenScene();
 
         //OnClickShowSaveSlotPanel();
     }
@@ -74,7 +71,7 @@ public class UIClickEvent : MonoBehaviour
         OnClickShowSaveSlotPanel();
     }
 
-    public void OnClick_ContinueGameAfterEnding()
+    public async void OnClick_ContinueGameAfterEnding()
     {
         string path = SaveContext.Instance.CurrentSaveFilePath;
 
@@ -83,51 +80,36 @@ public class UIClickEvent : MonoBehaviour
 
         GameStartContext.SetStartType(saveData.gst);
 
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            //GameStartContext.SetStartType(GameStartType.ContinueGame);
-            SceneLoader.Instance?.LoadGardenScene();
-        }));
+        await TransitionController.instance.Transition_Out();
+        //GameStartContext.SetStartType(GameStartType.ContinueGame);
+        SceneLoader.Instance?.LoadGardenScene();
     }
 
-    public void OnClick_GoToTutorial()
+    public async void OnClick_GoToTutorial()
     {
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            SceneLoader.Instance?.LoadTutorialScene();
-        }));
+        await TransitionController.instance.Transition_Out();
+        SceneLoader.Instance?.LoadTutorialScene();
     }
 
-    public void OnClick_GoToIntro()
+    public async void OnClick_GoToIntro()
     {
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            SceneLoader.Instance?.LoadIntroScene();
-        }));
+        await TransitionController.instance.Transition_Out();
+        SceneLoader.Instance?.LoadIntroScene();
     }
 
-    public void OnClick_PlayAgain()
+    public async void OnClick_PlayAgain()
     {
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            SceneLoader.Instance?.LoadStartScene();
-        }));
+        await TransitionController.instance.Transition_Out();
+        SceneLoader.Instance?.LoadStartScene();
     }
 
-    public void OnClick_SaveAndReturnMain()
+    public async void OnClick_SaveAndReturnMain()
     {
         //GameEvents.RequestSaveGame();
-        TransitionController.instance.Transition_Out();
+        await TransitionController.instance.Transition_Out();
         //SceneLoader.Instance?.LoadStartScene();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            Debug.Log("Save And Return Main");
-            SceneLoader.Instance?.LoadStartScene();
-        }));
+        Debug.Log("Save And Return Main");
+        SceneLoader.Instance?.LoadStartScene();
     }
 
     public void OnClick_QuitGame()
