@@ -124,7 +124,7 @@ public class Grid : MonoBehaviour
     protected bool hasWeatherForecast = false;
 
     protected int additionalInheritance = 0;
-    protected float maxBreedTimer = 40.0f;
+    protected float maxBreedTimer = 50.0f;
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
 
@@ -261,6 +261,7 @@ public class Grid : MonoBehaviour
             plant.SetTrait(basicTrait);
             AddPlantToGrid(plant);
         }
+
     }
 
     public bool TryGetFertilizerType(int gridIndex, out WaveType type)

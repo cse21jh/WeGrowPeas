@@ -51,18 +51,32 @@ public class WeatherApp : MonoBehaviour
 
     public void UpdateNextWave(int stage, Wave wave)
     {
-        nextStageText.text = stage.ToString() + "일차 (내일)";
-        nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가\n예상됩니다.";
-        nextWaveImage.sprite = waveIcons[(int)wave.WaveType];
+        if (wave.WaveType == WaveType.None)
+        {
+            nextStageText.text = stage.ToString() + "일차 (내일)";
+            nextWaveText.text = "내일은 아무 일도 일어나지\n않을 예정입니다!";
+            nextWaveImage.sprite = waveIcons[0];
+        }
+        else
+        {
+            nextStageText.text = stage.ToString() + "일차 (내일)";
+            nextWaveText.text = "내일은 " + wave.WaveName + " 웨이브가\n예상됩니다.";
+            nextWaveImage.sprite = waveIcons[(int)wave.WaveType];
+        }
     }
 
     public void UpdateCurrentWave(int stage, Wave wave, int dangerousPlantCount)
     {
+        if (stage == 0)
+            stage++;
         if(wave.WaveType == WaveType.None)
         {
             stageText.text = stage.ToString() + "일차";
             waveText.text = "아무 일도 일어나지 않을 예정입니다!";
             dangerousPlantText.text = "";
+            waveImage.sprite = waveIcons[0];
+
+            currentWavePanel.color = waveColors[0];
             // 웨이브 이미지 삽입 필요
         }
         else
