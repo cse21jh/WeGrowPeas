@@ -27,6 +27,9 @@ public class StemController : MonoBehaviour
     [SerializeField] private Sprite[] normalSprites;    // 0: stem, 1: left_back, 2: left_front, 3: right_back, 4: right_front
     [SerializeField] private Sprite[] goldSprites;      // 0: stem, 1: left_back, 2: left_front, 3: right_back, 4: right_front
 
+    [SerializeField] private SpriteRenderer[] back;
+    [SerializeField] private SpriteRenderer[] front;
+
 
     private void Start()
     {
@@ -186,20 +189,36 @@ public class StemController : MonoBehaviour
         if (isG)
         {
             stem.sprite = goldSprites[0];
-            left_back.sprite = goldSprites[1];
-            left_front.sprite = goldSprites[2];
-            right_back.sprite = goldSprites[3];
-            right_front.sprite = goldSprites[4];
+            for(int i = 0; i < back.Length; i++)
+            {
+                back[i].sprite = goldSprites[i + 1];
+            }
+            for(int i = 0; i < front.Length; i++)
+            {
+                front[i].sprite = goldSprites[i + 3];
+            }
+            //left_back.sprite = goldSprites[1];
+            //left_front.sprite = goldSprites[2];
+            //right_back.sprite = goldSprites[3];
+            //right_front.sprite = goldSprites[4];
             goldCrown.SetActive(true);
             isGold = true;
         }
         else
         {
             stem.sprite = normalSprites[0];
-            left_back.sprite = normalSprites[1];
-            left_front.sprite = normalSprites[2];
-            right_back.sprite = normalSprites[3];
-            right_front.sprite = normalSprites[4];
+            for (int i = 0; i < back.Length; i++)
+            {
+                back[i].sprite = normalSprites[i + 1];
+            }
+            for (int i = 0; i < front.Length; i++)
+            {
+                front[i].sprite = normalSprites[i + 3];
+            }
+            //left_back.sprite = normalSprites[1];
+            //left_front.sprite = normalSprites[2];
+            //right_back.sprite = normalSprites[3];
+            //right_front.sprite = normalSprites[4];
             goldCrown.SetActive(false);
             isGold = false;
         }
