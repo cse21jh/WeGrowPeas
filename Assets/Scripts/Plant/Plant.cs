@@ -560,6 +560,8 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void ResistWave(WaveType waveType)
     {
+        if (isFrozen) return;
+
         resistWaveCount++;
 
         bool isGold = false;

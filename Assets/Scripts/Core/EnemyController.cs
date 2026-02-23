@@ -143,9 +143,6 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        // 웨이브 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
-        grid.UnfreezeAllPlants();
-
         // 저항력 흡수 비료 로직 실행 (상대 저항력을 흡수)
         grid.ProcessResistanceAbsorption();
 
@@ -179,6 +176,9 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
+
+        // 웨이브 처리 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
+        grid.UnfreezeAllPlants();
 
 
         SetNextSeason(); 
