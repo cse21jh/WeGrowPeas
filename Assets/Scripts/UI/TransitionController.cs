@@ -105,8 +105,8 @@ public class TransitionController : MonoBehaviour
         {
             blocker.SetActive(false);
             isFinished = true;
-            //DOTween.KillAll(true);
-            DOTween.Kill("Transition", true);
+            DOTween.KillAll(true);
+            //DOTween.Kill("Transition", true);
             StopAllCoroutines();
         });
     }
