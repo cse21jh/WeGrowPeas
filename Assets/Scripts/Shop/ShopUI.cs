@@ -456,6 +456,13 @@ public class ShopUI : MonoBehaviour
             session = new ShopSession();
         }
 
+        // 열려있던 팝업 즉시 닫기 (스테이지 전환 시 오래된 슬롯 참조 방지)
+        if (popupParent != null)
+        {
+            popupParent.DOKill();
+            popupParent.gameObject.SetActive(false);
+        }
+
         shopManager.ResetRerollCount(); // 날짜 변경 시 리롤 횟수 리셋
         shopManager.ResetDailyRerollCount(); // 매일 무료 리롤 횟수 초기화 및 상점 연락처 효과 적용
         session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)
