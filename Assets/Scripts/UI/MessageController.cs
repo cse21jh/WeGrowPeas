@@ -22,6 +22,7 @@ public class MessageController : MonoBehaviour
     private GameObject currentPeaMessage;
 
     private GameObject typingMessage;
+    private Coroutine _typingCoroutine;
 
     public void AddMessage(MessageSenderType sender, string messageContent, string bonusMessageContent = "", Action act1 = null, Action act2 = null)
     {
@@ -42,7 +43,7 @@ public class MessageController : MonoBehaviour
 
     public void AddTypingMessage(float time)
     {
-        StartCoroutine(Typing(time));
+        _typingCoroutine = StartCoroutine(Typing(time));
     }
 
     private IEnumerator Typing(float time)
@@ -53,15 +54,27 @@ public class MessageController : MonoBehaviour
         yield return new WaitForSeconds(time);
         Destroy(typingMessage);
         typingMessage = null;
+        _typingCoroutine = null;
     }
 
-    private void OnDisable()
+    /// <summary>타이핑 중인 "..." 버블을 즉시 제거합니다.</summary>
+    public void KillTypingMessage()
     {
+        if (_typingCoroutine != null)
+        {
+            StopCoroutine(_typingCoroutine);
+            _typingCoroutine = null;
+        }
         if (typingMessage != null)
         {
             Destroy(typingMessage);
             typingMessage = null;
         }
+    }
+
+    private void OnDisable()
+    {
+        KillTypingMessage();
     }
 
     public void AddDay(int stage)

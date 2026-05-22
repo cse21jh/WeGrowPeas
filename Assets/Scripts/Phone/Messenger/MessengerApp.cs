@@ -56,6 +56,9 @@ public class MessengerApp : MonoBehaviour
     private bool alreadyOpenChatRoom = false;
     public bool IsDisplayingMessages { get; private set; } = false;
 
+    // 타이핑 스킵 플래그 (클릭 시 현재 "..." 대기를 즉시 건너뜀)
+    private bool _skipTyping = false;
+
     void Awake()
     {
         progress = new MessengerProgress();
@@ -126,11 +129,20 @@ public class MessengerApp : MonoBehaviour
     void Start()
     {
         if (backTochatPartnersButton != null)
-        { 
+        {
             backTochatPartnersButton.onClick.AddListener(OpenchatPartnerList);
             backTochatPartnersButton.onClick.AddListener(PhoneManager.Instance.PhoneTouchEffect);
         }
-    }    
+    }
+
+    void Update()
+    {
+        // 채팅방에서 메시지 표시 중 클릭하면 현재 타이핑 대기를 스킵
+        if (IsDisplayingMessages && chatRoomPanel.activeSelf && Input.GetMouseButtonDown(0))
+        {
+            _skipTyping = true;
+        }
+    }
 
     public void UpdateMessenger()
     {
@@ -509,10 +521,36 @@ public class MessengerApp : MonoBehaviour
             else if (!isPast)
             {
                 float time = (message.messageText.Length / 10f);
-                // 두 번째 이후의 안 읽은 메시지는 타이핑 효과 적용
-                yield return new WaitForSeconds(time / 3);
-                mc.AddTypingMessage(time - (time / 3));
-                yield return new WaitForSeconds(time - (time / 3));
+                float preDelay = time / 3f;
+                float typingDelay = time - preDelay;
+
+                // 메시지 전 짧은 대기 (클릭 시 스킵)
+                _skipTyping = false;
+                float elapsed = 0f;
+                while (elapsed < preDelay && !_skipTyping)
+                {
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                // "..." 버블 표시 후 대기 (클릭 시 즉시 제거)
+                if (!_skipTyping)
+                {
+                    mc.AddTypingMessage(typingDelay);
+                    elapsed = 0f;
+                    while (elapsed < typingDelay && !_skipTyping)
+                    {
+                        elapsed += Time.deltaTime;
+                        yield return null;
+                    }
+                }
+
+                // 스킵됐으면 "..." 버블 강제 제거
+                if (_skipTyping)
+                {
+                    mc.KillTypingMessage();
+                }
+                _skipTyping = false;
             }
 
             if (currentChat == null) break;
