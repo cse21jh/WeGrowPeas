@@ -101,7 +101,7 @@ public class SaveData
     public WaveType curWaveType;
     public WaveType nextWaveType;
     public int remainWaveSkipCount;
-    public int[] waveKillCount = new int[7];
+    public int[] waveKillCount = new int[8];
     public List<WaveType> stageWaveRecord = new();
     public List<int> stageKillRecord = new();
     public List<int> stageNoTraitRecord = new();

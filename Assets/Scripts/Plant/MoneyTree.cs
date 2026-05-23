@@ -10,7 +10,7 @@ public class MoneyTree : Plant
     {
         speciesname = "돈나무";
         base.Init(gridIndex, grid);
-        plantID = 3; // 네펜데스가 2이므로 3으로 설정
+        plantID = 5; 
         
         // 이벤트 구독 (중복 방지)
         if (this.grid != null)

@@ -575,6 +575,7 @@ public class Grid : MonoBehaviour
             case "네펜데스": return Instantiate(nepenthesPrefab);
             case "고추": return Instantiate(chiliPepperPrefab);
             case "스프링클러": return Instantiate(sprinklerPrefab);
+            case "돈나무": return Instantiate(moneyTreePrefab);
             default: return Instantiate(peaPrefab);
         }
     }

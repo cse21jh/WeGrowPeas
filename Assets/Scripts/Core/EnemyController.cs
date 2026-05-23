@@ -27,7 +27,8 @@ public class EnemyController : MonoBehaviour
         { WaveType.HeavyRain, new HeavyRainWave() },
         { WaveType.Cold, new ColdWave() },
         { WaveType.Drought, new DroughtWave() },
-        { WaveType.Heat, new HeatWave() }
+        { WaveType.Heat, new HeatWave() },
+        { WaveType.None, new NoneWave() }
     };
 
     public Grid grid;
