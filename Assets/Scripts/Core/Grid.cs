@@ -202,6 +202,9 @@ public class Grid : MonoBehaviour
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
     public event System.Action OnGridStateChanged;
 
+    // LoadGrid 중에는 OnGridStateChanged 발생을 억제 (MoneyTree가 로드 순서에 따라 즉시 Die하는 버그 방지)
+    private bool isLoadingGrid = false;
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -553,9 +556,10 @@ public class Grid : MonoBehaviour
         enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
-        
-        // 그리드 상태 변경 알림
-        OnGridStateChanged?.Invoke();
+
+        // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
+        if (!isLoadingGrid)
+            OnGridStateChanged?.Invoke();
     }
 
     public void AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
@@ -1173,6 +1177,9 @@ public class Grid : MonoBehaviour
 
     public void LoadGrid(SaveData saveData)
     {
+        // 로딩 중 OnGridStateChanged 억제 (MoneyTree 등이 로드 순서에 따라 조기 사망하는 것 방지)
+        isLoadingGrid = true;
+
         List<PlantData> plantList = saveData.plantList;
         foreach (var item in plantList)
         {
@@ -1183,8 +1190,17 @@ public class Grid : MonoBehaviour
             plant.SetTrait(item.traits);
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
+
+            // MoneyTree 생존 턴 수 복원
+            if (plant is MoneyTree moneyTree)
+                moneyTree.SetSurvivedTurns(item.survivedTurns);
+
             PlantPlant(plant);
         }
+
+        // 모든 식물 로드 완료 후 OnGridStateChanged 한 번 발송
+        isLoadingGrid = false;
+        OnGridStateChanged?.Invoke();
         maxCol = saveData.maxCol;
         UpdateSoil();
         killBugCount = saveData.killBugCount;

@@ -130,13 +130,20 @@ public class MoneyTree : Plant
             if (adjacentIndex < 0 || adjacentIndex >= maxIndex)
                 continue;
 
-            // 좌우 이동 시 같은 행에 있는지 체크
+            // 좌우(±4): 같은 행인지 체크
             if (offset == -4 || offset == 4)
             {
-                // 좌우 이동은 열이 바뀌므로 행이 같아야 함
                 int currentRow = gridIndex % 4;
                 int adjacentRow = adjacentIndex % 4;
                 if (currentRow != adjacentRow)
+                    continue;
+            }
+            // 상하(±1): 같은 열인지 체크 (열 경계에서 wrap-around 방지)
+            else if (offset == -1 || offset == 1)
+            {
+                int currentCol = gridIndex / 4;
+                int adjacentCol = adjacentIndex / 4;
+                if (currentCol != adjacentCol)
                     continue;
             }
 

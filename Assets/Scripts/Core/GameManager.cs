@@ -175,6 +175,7 @@ public class PlantData
     public int gridIndex;
     public int taste;
     public int resistWaveCount;
+    public int survivedTurns; // MoneyTree 생존 턴 수
 }
 
 [System.Serializable]
@@ -509,7 +510,8 @@ public class GameManager : Singleton<GameManager>
                 traits = p.GetGeneticTrait(),
                 gridIndex = p.gridIndex,
                 taste = p.GetTaste(),
-                resistWaveCount = p.GetResistWaveCount()
+                resistWaveCount = p.GetResistWaveCount(),
+                survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0
             };
 
             saveData.plantList.Add(plantData);
