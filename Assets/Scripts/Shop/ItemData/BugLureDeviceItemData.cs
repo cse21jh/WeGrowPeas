@@ -7,7 +7,7 @@ public class BugLureDeviceItemData : ItemData
     [SerializeField] private float intervalReduction = 0.1f; // 10% 감소 (음수로 전달하여 간격 감소)
 
     [Header("Rotation")]
-    [Min(1)] public int unlockStageDay = PestWave.BugAppearStage; // 벌레가 실제로 등장하는 스테이지
+    [Min(1)] public int unlockStageDay = BugSchedule.DefaultAppearStage; // 벌레가 실제로 등장하는 스테이지
 
     private void OnEnable()
     {
@@ -23,18 +23,18 @@ public class BugLureDeviceItemData : ItemData
         FlowType = ShopFlowType.Instant;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정
-        // PestWave.BugAppearStage = 6, unlockStageDay = 6
+        // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
         // stage >= 6 조건으로 stage 6(6웨이브)부터 해금 (벌레 실제 등장 시점과 일치)
-        unlockStageDay = PestWave.BugAppearStage;
+        unlockStageDay = BugSchedule.DefaultAppearStage;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         int stage = GameManager.Instance.stage;
-        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (PestWave.BugAppearStage 상수 사용)
-        // PestWave.BugAppearStage = 6, unlockStageDay = 6
+        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
+        // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
         // stage >= 6이므로 stage 6(6웨이브)부터 해금됨
-        return stage >= unlockStageDay;
+        return stage >= BugSchedule.AppearStage;
     }
 
     public override int GetRotationWeight(ShopContext ctx) => 8;

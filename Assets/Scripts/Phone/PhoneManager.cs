@@ -189,12 +189,23 @@ public class PhoneManager : Singleton<PhoneManager>
         }
     }
 
+    // 벌레 엔티티 진행(첫 등장 + 종류 증가)에 묶인 경고 메시지를 발송한다.
+    // 발송 시점은 BugSchedule에서 파생되므로(벌레 등장 스테이지/주기 변경 시 자동으로 따라옴),
+    // 여기서는 BugSchedule이 알려주는 트리거를 그대로 쏘기만 한다.
+    private void FireBugTriggers(int stage)
+    {
+        string trigger = BugSchedule.GetMessageTrigger(stage);
+        if (!string.IsNullOrEmpty(trigger))
+            messengerApp.ActivateTrigger(trigger); // 해당 단계 메시지가 없으면 no-op
+    }
+
     public IEnumerator PhonePhase()
     {
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
         messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString()); // 숫자 트리거(플레이버 메시지)
-        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 웨이브 경고(명명 트리거)
+        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 날씨 웨이브 경고(명명 트리거)
+        FireBugTriggers(GameManager.Instance.stage);                          // 벌레 등장/종류 경고(명명 트리거)
 
         skipPhoneTimeButton.SetActive(true);
         phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();

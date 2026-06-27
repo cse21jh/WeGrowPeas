@@ -17,6 +17,16 @@ public class WaveScheduleConfig : ScriptableObject
     public int shopUnlockLeadStages = 2;
 
     public List<WaveScheduleEntry> waves = new List<WaveScheduleEntry>();
+
+    [Header("Bug (벌레 엔티티 — 해충 웨이브와 별개)")]
+    [Tooltip("벌레가 처음 스폰되기 시작하는 스테이지")]
+    public int bugAppearStage = 11;
+
+    [Tooltip("벌레 변종이 한 단계 늘어나는 주기(스테이지). 기본 5")]
+    public int bugVarietyStepStages = 5;
+
+    [Tooltip("벌레 단계 경고 메시지(Bug0,Bug1…)를 등장 며칠 전 밤에 보낼지. 기본 1")]
+    public int bugMessageLeadStages = 1;
 }
 
 [System.Serializable]

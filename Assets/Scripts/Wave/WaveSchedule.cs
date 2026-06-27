@@ -93,6 +93,7 @@ public static class WaveSchedule
     // ── 공개 API ─────────────────────────────────────────────────────────────
     public static int SeasonLength { get { EnsureLoaded(); return _seasonLength; } }
     public static int ShopUnlockLeadStages { get { EnsureLoaded(); return _shopUnlockLeadStages; } }
+    // 벌레 엔티티 타이밍은 별도 단일 기준 BugSchedule 참조.
 
     /// <summary>
     /// 상점에서 해당 형질/웨이브 아이템이 처음 해금되는 스테이지.
@@ -102,10 +103,6 @@ public static class WaveSchedule
     {
         return Mathf.Max(1, GetFirstAppearStage(type) - ShopUnlockLeadStages);
     }
-
-    // 벌레 엔티티 스폰 시작 스테이지. 단일 기준은 Pest 웨이브 클래스의 BugAppearStage 상수.
-    // (상점아이템 다수가 컴파일타임 상수로 이 값을 참조하므로 그쪽과 일치시킨다.)
-    public static int BugSpawnStartStage => PestWave.BugAppearStage;
 
     public static Season GetSeasonByStage(int stage)
     {

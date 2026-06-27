@@ -7,7 +7,7 @@ public class NepenthesPheromoneItemData : ItemData
     [SerializeField] private float spawnProbabilityIncrease = 0.05f; // 등장 확률 5% 증가
 
     [Header("Rotation")]
-    [Min(1)] public int unlockStageDay = PestWave.BugAppearStage; // 벌레가 실제로 등장하는 스테이지
+    [Min(1)] public int unlockStageDay = BugSchedule.DefaultAppearStage; // 벌레가 실제로 등장하는 스테이지
 
     private void OnEnable()
     {
@@ -23,19 +23,19 @@ public class NepenthesPheromoneItemData : ItemData
         FlowType = ShopFlowType.Instant;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정
-        unlockStageDay = PestWave.BugAppearStage;
+        unlockStageDay = BugSchedule.DefaultAppearStage;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         int stage = GameManager.Instance.stage;
-        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (PestWave.BugAppearStage 상수 사용)
+        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // 이미 페로몬이 활성화되어 있으면 표시하지 않음
         if (ctx?.Grid != null && ctx.Grid.HasNepenthesPheromone)
         {
             return false;
         }
-        return stage >= unlockStageDay;
+        return stage >= BugSchedule.AppearStage;
     }
 
     public override int GetRotationWeight(ShopContext ctx) => 2;
