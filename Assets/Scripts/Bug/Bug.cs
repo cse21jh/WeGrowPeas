@@ -22,10 +22,13 @@ public class Bug : MonoBehaviour
 
     private float rotationOffset = -90f;
 
-    private GameObject bugKillerPrefab;
-    private GameObject bugKiller;
+    private static GameObject s_bugKillerPrefab;
+    private static GameObject s_warningPrefab;
+    private static EconomyManager s_economyManager;
+    private static Grid s_grid;
+    private static Camera s_mainCamera;
 
-    private GameObject WarningPrefab;
+    private GameObject bugKiller;
     private GameObject WarningSign;
 
     protected bool eatingPlant = false;
@@ -44,10 +47,22 @@ public class Bug : MonoBehaviour
 
     protected virtual void Start()
     {
-        bugKillerPrefab = Resources.Load<GameObject>("BugKiller");
-        WarningPrefab = Resources.Load<GameObject>("Warning");
-        economyManager = GameObject.Find("EconomyManager").GetComponent<EconomyManager>();
-        grid = GameObject.Find("Grid").GetComponent<Grid>();
+        if (s_bugKillerPrefab == null) s_bugKillerPrefab = Resources.Load<GameObject>("BugKiller");
+        if (s_warningPrefab == null) s_warningPrefab = Resources.Load<GameObject>("Warning");
+        if (s_economyManager == null)
+        {
+            GameObject em = GameObject.Find("EconomyManager");
+            if (em != null) s_economyManager = em.GetComponent<EconomyManager>();
+        }
+        if (s_grid == null)
+        {
+            GameObject g = GameObject.Find("Grid");
+            if (g != null) s_grid = g.GetComponent<Grid>();
+        }
+        if (s_mainCamera == null) s_mainCamera = Camera.main;
+
+        economyManager = s_economyManager;
+        grid = s_grid;
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
         childMaterials = new Material[childSpriteRenderers.Length];
@@ -76,7 +91,8 @@ public class Bug : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));
+            if (s_mainCamera == null) s_mainCamera = Camera.main;
+            Vector3 mousePos = s_mainCamera.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));
             //Debug.Log(mousePos);
             if (Mathf.Abs(transform.position.x - mousePos.x) < hitRange && Mathf.Abs(transform.position.y - mousePos.y) < hitRange)
             { 
@@ -120,7 +136,7 @@ public class Bug : MonoBehaviour
 
     private void ShowWarningSign()
     {
-        WarningSign = Instantiate(WarningPrefab);
+        WarningSign = Instantiate(s_warningPrefab);
         Vector3 pos = this.transform.position;
 
         switch (spawnEdge)
@@ -273,8 +289,9 @@ public class Bug : MonoBehaviour
 
     protected IEnumerator ShowBugKiller()
     {
-        bugKiller = Instantiate(bugKillerPrefab);
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+        bugKiller = Instantiate(s_bugKillerPrefab);
+        if (s_mainCamera == null) s_mainCamera = Camera.main;
+        Vector3 mousePos = s_mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
         bugKiller.transform.position = new Vector3(mousePos.x + 0.3f, mousePos.y - 0.3f, transform.position.z);
         yield return new WaitForSeconds(0.1f);
         Destroy(bugKiller);

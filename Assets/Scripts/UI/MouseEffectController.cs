@@ -3,52 +3,70 @@ using UnityEngine.UI;
 
 public class MouseEffectController : MonoBehaviour
 {
+    private static readonly Color OpaqueWhite = new Color(1, 1, 1, 1);
+    private static readonly Color TransparentWhite = new Color(1, 1, 1, 0);
+
     private RectTransform rectTransform;
     private Image mouseWarningImage;
-    [SerializeField] private Vector3 offset; // 마우스 위치 오프셋
-    [SerializeField] private float minDistance = .5f; // 최소 거리 임계값
+    private Camera mainCamera;
+    private Color lastAppliedColor;
 
+    [SerializeField] private Vector3 offset;
+    [SerializeField] private float minDistance = .5f;
     [SerializeField] private Transform targetObject;
 
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         mouseWarningImage = GetComponent<Image>();
+        mainCamera = Camera.main;
+        lastAppliedColor = mouseWarningImage.color;
     }
 
     void Update()
     {
-        // 마우스 위치를 그대로 RectTransform 위치로 적용
         rectTransform.position = Input.mousePosition + offset;
-        rectTransform.rotation = RotationCalc();
-        rectTransform.rotation = Quaternion.Euler(0, 0, rectTransform.rotation.eulerAngles.z + 90f); // 90도 회전 보정
+        float z = RotationCalcZ();
+        rectTransform.rotation = Quaternion.Euler(0f, 0f, z + 90f);
     }
 
-    private Quaternion RotationCalc()
+    private float RotationCalcZ()
     {
         if (targetObject == null)
         {
-            mouseWarningImage.color = new Color(1, 1, 1, 0); // 투명하게
-            return Quaternion.identity;
+            ApplyColor(TransparentWhite);
+            return 0f;
+        }
+
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            ApplyColor(TransparentWhite);
+            return 0f;
+        }
+
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 targetPos = targetObject.position;
+        float dx = mouseWorldPos.x - targetPos.x;
+        float dy = mouseWorldPos.y - targetPos.y;
+
+        if ((dx * dx + dy * dy) < (minDistance * minDistance))
+        {
+            ApplyColor(TransparentWhite);
         }
         else
         {
-            mouseWarningImage.color = new Color(1, 1, 1, 1); // 불투명하게
+            ApplyColor(OpaqueWhite);
         }
 
-        Vector3 mousePos = Input.mousePosition;
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        mouseWorldPos.z = 0f; // 2D 평면에서 Z축 고정
+        return Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
+    }
 
-        Vector3 direction = mouseWorldPos - targetObject.position;  // 월드 좌표에서 방향 구하기
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        if(direction.magnitude < minDistance) // 너무 가까우면 투명하게
-        {
-            mouseWarningImage.color = new Color(1, 1, 1, 0); // 투명하게
-        }
-
-        return Quaternion.AngleAxis(angle, Vector3.forward);
+    private void ApplyColor(Color c)
+    {
+        if (lastAppliedColor == c) return;
+        mouseWarningImage.color = c;
+        lastAppliedColor = c;
     }
 
     public void SetTarget(Transform bugTarget)

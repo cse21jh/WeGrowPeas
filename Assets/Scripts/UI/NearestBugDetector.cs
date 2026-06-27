@@ -2,27 +2,33 @@ using UnityEngine;
 
 public class NearestBugDetector : MonoBehaviour
 {
-    public string bugTag = "Bug";   // 벌레 오브젝트에 "Bug" 태그를 붙여두면 됨
+    public string bugTag = "Bug";
+    [SerializeField] private float bugRefreshInterval = 0.1f;
+
     private Transform nearestBug;
     private MouseEffectController mouseEffectController;
+    private Camera mainCamera;
+    private GameObject[] cachedBugs;
+    private float nextBugRefreshTime;
 
     void Start()
     {
         mouseEffectController = GetComponent<MouseEffectController>();
+        mainCamera = Camera.main;
         if (mouseEffectController == null)
         {
-            Debug.LogError("MouseEffectController 컴포넌트를 찾을 수 없습니다!");
+            Debug.LogError("MouseEffectController not found!");
         }
     }
 
     void Update()
     {
+        if (mainCamera == null) mainCamera = Camera.main;
+
         nearestBug = FindNearestBug();
 
         if (nearestBug != null)
         {
-            // 디버그 라인 그리기 (Scene 뷰에서 확인 가능)
-            Debug.DrawLine(Camera.main.ScreenToWorldPoint(Input.mousePosition), nearestBug.position, Color.red);
             mouseEffectController.SetTarget(nearestBug);
         }
         else
@@ -33,23 +39,33 @@ public class NearestBugDetector : MonoBehaviour
 
     Transform FindNearestBug()
     {
-        GameObject[] bugs = GameObject.FindGameObjectsWithTag(bugTag);
+        if (Time.unscaledTime >= nextBugRefreshTime || cachedBugs == null)
+        {
+            cachedBugs = GameObject.FindGameObjectsWithTag(bugTag);
+            nextBugRefreshTime = Time.unscaledTime + bugRefreshInterval;
+        }
 
-        if (bugs.Length == 0) return null;
+        if (cachedBugs == null || cachedBugs.Length == 0) return null;
+        if (mainCamera == null) return null;
 
         Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 10f; // 카메라와의 거리 (2D 카메라일 때 적당히 설정)
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
+        mousePos.z = 10f;
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mousePos);
 
-        float minDist = Mathf.Infinity;
+        float minSqrDist = float.PositiveInfinity;
         Transform closest = null;
 
-        foreach (GameObject bug in bugs)
+        for (int i = 0; i < cachedBugs.Length; i++)
         {
-            float dist = Vector2.Distance(mouseWorldPos, bug.transform.position);
-            if (dist < minDist)
+            GameObject bug = cachedBugs[i];
+            if (bug == null) continue;
+            Vector3 bp = bug.transform.position;
+            float dx = mouseWorldPos.x - bp.x;
+            float dy = mouseWorldPos.y - bp.y;
+            float sqr = dx * dx + dy * dy;
+            if (sqr < minSqrDist)
             {
-                minDist = dist;
+                minSqrDist = sqr;
                 closest = bug.transform;
             }
         }
