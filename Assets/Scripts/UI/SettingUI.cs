@@ -17,7 +17,21 @@ public class SettingUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ToggleSettingPanel();
+            // 설정창이 열려 있으면 닫기 (기존 동작)
+            if (SettingPanel != null && SettingPanel.activeSelf)
+            {
+                HideSettingPanel();
+            }
+            // 폰이 열려 있으면 설정창 대신 폰을 닫기
+            else if (PhoneManager.Instance != null && PhoneManager.Instance.IsOpen)
+            {
+                PhoneManager.Instance.SetOpen(false);
+            }
+            // 아무것도 안 열려 있으면 설정창 열기 (기존 동작)
+            else
+            {
+                ShowSettingPanel();
+            }
         }
     }
 

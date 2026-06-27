@@ -107,6 +107,8 @@ public class PhoneManager : Singleton<PhoneManager>
             Toggle();
     }
 
+    public bool IsOpen => _isOpen;
+
     public void Toggle() => SetOpen(!_isOpen);
 
     public void SetOpen(bool open)
