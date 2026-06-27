@@ -981,6 +981,23 @@ public class Grid : MonoBehaviour
         MoveBreedButton(clickedObject.transform.position);        
     }
 
+    // 마우스 포인터가 교배 버튼 영역 위에 있는지 검사.
+    // 식물의 OnMouseUp(콜라이더 이벤트)은 UI를 존중하지 않으므로, 교배 버튼이
+    // 선택된 식물 위에 겹쳐 있을 때 식물 클릭이 선택을 취소하는 것을 막기 위해 직접 검사한다.
+    public bool IsPointerOverBreedButton()
+    {
+        if (breedButton == null || !breedButton.activeInHierarchy)
+            return false;
+
+        RectTransform rt = breedButton.GetComponent<RectTransform>();
+        Canvas canvas = breedButton.GetComponentInParent<Canvas>();
+        Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            ? canvas.worldCamera
+            : null;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(rt, Input.mousePosition, cam);
+    }
+
     public void MoveBreedButton(Vector3 pos)
     {
         RectTransform canvasRect = breedButton.GetComponentInParent<Canvas>().transform as RectTransform;

@@ -84,7 +84,7 @@ public abstract class MovablePlant : Plant
 
     private void OnMouseDown()
     {
-        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen)
+        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.IsPointerOverBreedButton())
             return;
         holdTime = 0f;
         isHolding = true;
@@ -101,7 +101,7 @@ public abstract class MovablePlant : Plant
         }
         else
         {
-            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen) return;
+            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.IsPointerOverBreedButton()) return;
             grid.RequestBreedSelect(this.gameObject);
         }
 
