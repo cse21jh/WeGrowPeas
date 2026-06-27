@@ -174,11 +174,27 @@ public class PhoneManager : Singleton<PhoneManager>
         SoundManager.Instance.PlayEffect("PhoneTouch");
     }
 
+    // 이 밤에 "처음 등장"하는 웨이브가 있으면 해당 경고 메시지(명명 트리거)를 발송한다.
+    // 트리거 발송 시점이 WaveSchedule.GetFirstAppearStage에서 파생되므로, 밸런스 변경 시 메시지도 자동으로 따라온다.
+    private void FireWaveUnlockTriggers(int stage)
+    {
+        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
+        {
+            if (type == WaveType.None || type == WaveType.Aging) continue;
+            if (stage != WaveSchedule.GetFirstAppearStage(type)) continue;
+
+            string trigger = WaveSchedule.GetUnlockTriggerId(type);
+            if (!string.IsNullOrEmpty(trigger))
+                messengerApp.ActivateTrigger(trigger);
+        }
+    }
+
     public IEnumerator PhonePhase()
-    {        
+    {
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
-        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString());
+        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString()); // 숫자 트리거(플레이버 메시지)
+        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 웨이브 경고(명명 트리거)
 
         skipPhoneTimeButton.SetActive(true);
         phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();

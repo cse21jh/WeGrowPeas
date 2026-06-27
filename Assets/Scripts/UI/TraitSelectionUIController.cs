@@ -333,40 +333,36 @@ public class TraitSelectionUIController : MonoBehaviour
         }
     }
 
+    // 형질 해금은 해당 웨이브의 "실제 첫 등장 스테이지"(=메신저 경고가 오는 밤)에 맞춘다.
+    // 그 값은 WaveSchedule(단일 기준)에서 파생한다. 계절 웨이브(가뭄/더위)도 자동으로 정확히 맞는다.
     private bool IsTraitUnlocked(TraitType traitType, int currentStage)
     {
-        // stage + 2 >= UnlockStage 조건으로 해금 여부 확인
-        // (EnemyController.InitBaseWeightsByStage 로직과 동일)
-        
+        if (traitType == TraitType.NaturalDeath) return true; // Aging은 항상 해금
+        return IsShopWaveUnlocked(TraitToWaveType(traitType), currentStage);
+    }
+
+    // 상점 해금 판정. 해금 스테이지 "당일 낮"이 아니라 "그날 밤(폰 타임)"부터 열리도록 한다.
+    // (이후 스테이지부터는 항상 해금.)
+    private bool IsShopWaveUnlocked(WaveType type, int currentStage)
+    {
+        int unlock = WaveSchedule.GetShopUnlockStage(type);
+        if (currentStage > unlock) return true;
+        if (currentStage < unlock) return false;
+        return PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime();
+    }
+
+    private static WaveType TraitToWaveType(TraitType traitType)
+    {
         switch (traitType)
         {
-            case TraitType.NaturalDeath:
-                // Aging은 항상 해금
-                return true;
-                
-            case TraitType.Pest:
-                return (currentStage + 2) >= PestWave.UnlockStage;
-                
-            case TraitType.Wind:
-                return (currentStage + 2) >= WindWave.UnlockStage;
-                
-            case TraitType.Flood:
-                return (currentStage + 2) >= FloodWave.UnlockStage;
-                
-            case TraitType.HeavyRain:
-                return (currentStage + 2) >= HeavyRainWave.UnlockStage;
-                
-            case TraitType.Drought:
-                return (currentStage + 2) >= DroughtWave.UnlockStage;
-                
-            case TraitType.Cold:
-                return (currentStage + 2) >= ColdWave.UnlockStage;
-                
-            case TraitType.Heat:
-                return (currentStage + 2) >= HeatWave.UnlockStage;
-                
-            default:
-                return false;
+            case TraitType.Pest:      return WaveType.Pest;
+            case TraitType.Wind:      return WaveType.Wind;
+            case TraitType.Flood:     return WaveType.Flood;
+            case TraitType.HeavyRain: return WaveType.HeavyRain;
+            case TraitType.Drought:   return WaveType.Drought;
+            case TraitType.Cold:      return WaveType.Cold;
+            case TraitType.Heat:      return WaveType.Heat;
+            default:                  return WaveType.None;
         }
     }
 
@@ -595,38 +591,10 @@ public class TraitSelectionUIController : MonoBehaviour
 
     private bool IsWaveUnlocked(WaveType waveType, int currentStage)
     {
-        // EnemyController.InitBaseWeightsByStage 로직 참고
-        // stage + 2 >= UnlockStage 조건으로 해금 여부 확인
-        
-        switch (waveType)
-        {
-            case WaveType.Aging:
-                return true; // 항상 해금
-
-            case WaveType.Pest:
-                return (currentStage + 2) >= PestWave.UnlockStage;
-
-            case WaveType.Wind:
-                return (currentStage + 2) >= WindWave.UnlockStage;
-
-            case WaveType.Flood:
-                return (currentStage + 2) >= FloodWave.UnlockStage;
-
-            case WaveType.HeavyRain:
-                return (currentStage + 2) >= HeavyRainWave.UnlockStage;
-
-            case WaveType.Drought:
-                return (currentStage + 2) >= DroughtWave.UnlockStage;
-
-            case WaveType.Cold:
-                return (currentStage + 2) >= ColdWave.UnlockStage;
-
-            case WaveType.Heat:
-                return (currentStage + 2) >= HeatWave.UnlockStage;
-
-            default:
-                return false;
-        }
+        // IsTraitUnlocked와 동일 기준(밤부터 해금)을 사용.
+        if (waveType == WaveType.Aging) return true; // 항상 해금
+        if (waveType == WaveType.None) return false;
+        return IsShopWaveUnlocked(waveType, currentStage);
     }
 
     private void SelectWave(WaveType waveType)

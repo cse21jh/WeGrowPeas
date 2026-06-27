@@ -374,7 +374,7 @@ public class Grid : MonoBehaviour
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
-        if (GameManager.Instance.stage == 6)
+        if (GameManager.Instance.stage == WaveSchedule.BugSpawnStartStage)
             lastBugSpawnTimeInterval = 0f;
 
         while (breedTimer > 0 && !isBreedSkipButtonPressed)
@@ -1064,7 +1064,7 @@ public class Grid : MonoBehaviour
     private void SpawnRandomBug()
     {
         int stage = GameManager.Instance.stage;
-        if (stage < 6) // 해충 웨이브 해금 전엔 등장 X
+        if (stage < WaveSchedule.BugSpawnStartStage) // 해충 웨이브 해금 전엔 등장 X
             return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
@@ -1072,14 +1072,14 @@ public class Grid : MonoBehaviour
             if (maxLadybugCount > 0 && ladybugs.Count >= maxLadybugCount)
             {
                 // 최대 수에 도달했으므로 일반 벌레 스폰
-                int bugIndex = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count));
+                int bugIndex = Random.Range(0, Mathf.Min(((((stage - 1) / WaveSchedule.SeasonLength) * 2) - 1),bugPrefabs.Count));
                 Instantiate(bugPrefabs[bugIndex]);
                 return;
             }
             Instantiate(ladybugPrefabs);
             return;
         }
-        int i = Random.Range(0, Mathf.Min(((((stage - 1) / 5) * 2) - 1),bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
+        int i = Random.Range(0, Mathf.Min(((((stage - 1) / WaveSchedule.SeasonLength) * 2) - 1),bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
         Instantiate(bugPrefabs[i]);
         return;
     }

@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3aed203feccb34aac5c17a8e485255, type: 3}
+  m_Name: WaveScheduleConfig
+  m_EditorClassIdentifier: Assembly-CSharp::WaveScheduleConfig
+  seasonLength: 5
+  shopUnlockLeadStages: 2
+  waves:
+  - waveType: 0
+    unlockStage: 1
+    allowedSeasons: 
+    unlockTriggerId: 
+  - waveType: 1
+    unlockStage: 6
+    allowedSeasons: 
+    unlockTriggerId: PestUnlock
+  - waveType: 2
+    unlockStage: 11
+    allowedSeasons: 
+    unlockTriggerId: WindUnlock
+  - waveType: 3
+    unlockStage: 16
+    allowedSeasons: 
+    unlockTriggerId: FloodUnlock
+  - waveType: 4
+    unlockStage: 21
+    allowedSeasons: 0000000001000000
+    unlockTriggerId: HeavyRainUnlock
+  - waveType: 5
+    unlockStage: 26
+    allowedSeasons: 0100000002000000
+    unlockTriggerId: ColdUnlock
+  - waveType: 6
+    unlockStage: 21
+    allowedSeasons: 0300000002000000
+    unlockTriggerId: DroughtUnlock
+  - waveType: 7
+    unlockStage: 26
+    allowedSeasons: 0000000003000000
+    unlockTriggerId: HeatUnlock
+  - waveType: 8
+    unlockStage: 999
+    allowedSeasons: 
+    unlockTriggerId: 

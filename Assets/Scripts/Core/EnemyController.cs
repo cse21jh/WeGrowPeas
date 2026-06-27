@@ -197,27 +197,22 @@ public class EnemyController : MonoBehaviour
 
     private void InitBaseWeightsByStage(int stage) // 첫 게임, 불러온 후 웨이브 해금
     {
-        // 초기화
-        baseWeights[WaveType.Aging] = 1f; // 항상 해금
-        baseWeights[WaveType.Pest] = (stage + 2 >= PestWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.Wind] = (stage + 2 >= WindWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.Flood] = (stage + 2 >= FloodWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.HeavyRain] = (stage + 2 >= HeavyRainWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.Cold] = (stage + 2 >= ColdWave.UnlockStage ) ? 1f : 0f;
-        baseWeights[WaveType.Drought] = (stage + 2 >= DroughtWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.Heat] = (stage + 2 >= HeatWave.UnlockStage) ? 1f : 0f;
-        baseWeights[WaveType.None] = 0f; // 리롤 버튼에서 제외
+        // 해금 기준은 WaveSchedule(단일 기준)에서 가져온다. (stage + 2 >= unlockStage 시 가중치 ON)
+        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
+        {
+            if (type == WaveType.None) { baseWeights[WaveType.None] = 0f; continue; } // 리롤에서 제외
+            baseWeights[type] = (stage + 2 >= WaveSchedule.GetUnlockStage(type)) ? 1f : 0f;
+        }
     }
 
     public void UnlockWave(int stage) // 다음 스테이지에서 해금 될 웨이브 해금
     {
-        switch (stage + 2)
+        // 이번 증가로 해금 스테이지에 도달한 웨이브의 가중치를 켠다. (기존 switch와 동일 동작)
+        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
         {
-            case PestWave.UnlockStage: baseWeights[WaveType.Pest] = 1f; break;
-            case WindWave.UnlockStage: baseWeights[WaveType.Wind] = 1f; break;
-            case FloodWave.UnlockStage: baseWeights[WaveType.Flood] = 1f; break;
-            case HeavyRainWave.UnlockStage: baseWeights[WaveType.HeavyRain] = 1f; baseWeights[WaveType.Drought] = 1f; break;
-            case ColdWave.UnlockStage: baseWeights[WaveType.Cold] = 1f; baseWeights[WaveType.Heat] = 1f; break;            
+            if (type == WaveType.None) continue;
+            if (stage + 2 == WaveSchedule.GetUnlockStage(type))
+                baseWeights[type] = 1f;
         }
     }
 
@@ -248,7 +243,7 @@ public class EnemyController : MonoBehaviour
 
     public Season GetSeasonByStage(int stage)
     {
-        return (Season)(((stage - 1) / 5) % 4);
+        return WaveSchedule.GetSeasonByStage(stage);
     }
 
     public Season GetSeason()
@@ -427,24 +422,12 @@ public class EnemyController : MonoBehaviour
         { 
             nextSeason = GetSeasonByStage(GameManager.Instance.stage + 2); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
         }
-        switch (nextSeason)
+        // 계절 제약은 WaveSchedule(단일 기준)에서 가져온다. 해당 계절에 허용되지 않는 웨이브는 0으로 제외.
+        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
         {
-            case Season.Spring:
-                map[WaveType.Cold] = 0;
-                map[WaveType.HeavyRain] = 0;
-                break;
-            case Season.Summer:
-                map[WaveType.Cold] = 0;
-                map[WaveType.Drought] = 0;
-                break;
-            case Season.Fall:
-                map[WaveType.Heat] = 0;
-                map[WaveType.Drought] = 0;
-                break;
-            case Season.Winter:
-                map[WaveType.Heat] = 0;
-                map[WaveType.HeavyRain] = 0;
-                break;
+            if (type == WaveType.None) continue;
+            if (map.ContainsKey(type) && !WaveSchedule.IsSeasonAllowed(type, nextSeason))
+                map[type] = 0f;
         }
 
         foreach (var t in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
