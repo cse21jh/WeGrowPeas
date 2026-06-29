@@ -62,13 +62,13 @@ public class FenceElementController : MonoBehaviour
 
             if (pairDatas[i].x == (int)currentTraitType)
             {
-                //Debug.Log("형질에 맞는 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
+                Debug.Log("형질에 맞는 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
 
                 foreach (GameObject pea in peas)
                 {
                     if(pea.activeSelf == true)
                     {
-                        // Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_pea = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_pea.Rebind();
                         anim_pea.SetInteger("faceIndex", (int)pairDatas[i].y);
@@ -90,7 +90,7 @@ public class FenceElementController : MonoBehaviour
                     {
                         Debug.Log("땅콩 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
 
-                        // Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_peanut = peanut.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_peanut.Rebind();
                         anim_peanut.SetInteger("faceIndex", (int)pairDatas[i].y);

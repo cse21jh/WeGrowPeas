@@ -15,38 +15,63 @@ public class GrassChunkController : MonoBehaviour
         public float phase;
         public float strength;
         public bool flipX;
+        public Rect uvRect;
     }
 
+
+    [Header("Texture Atlas")]
+        [SerializeField] private int atlasColumns = 3;
+        [SerializeField] private int atlasRows = 1;
+        [SerializeField] private int textureVariantCount = 3;
+
+        [Tooltip("Atlas 경계에서 옆 텍스처가 번지는 것을 줄이기 위한 UV 안쪽 여백")]
+        [SerializeField, Range(0f, 0.02f)] private float atlasUvPadding = 0.001f;
+
     [Header("Material")]
-    [SerializeField] private Material grassMaterial;
+        [SerializeField] private Material grassMaterial;
 
     [Header("Grass Density")]
-    [Tooltip("Area 1당 생성할 풀 개수. 예: Area Size 10x2에서 Density 25면 500개 생성")]
-    [SerializeField] private float grassDensity = 25f;
+        [Tooltip("Area 1당 생성할 풀 개수. 예: Area Size 10x2에서 Density 25면 500개 생성")]
+        [SerializeField] private float grassDensity = 25f;
 
     [Header("Placement Area")]
-    [SerializeField] private Vector2 areaSize = new Vector2(10f, 2f);
+       [SerializeField] private Vector2 areaSize = new Vector2(10f, 2f);
 
     [Header("Grass Size")]
-    [SerializeField] private Vector2 widthRange = new Vector2(0.6f, 1.0f);
-    [SerializeField] private Vector2 heightRange = new Vector2(0.6f, 1.2f);
+        [SerializeField] private Vector2 widthRange = new Vector2(0.6f, 1.0f);
+        [SerializeField] private Vector2 heightRange = new Vector2(0.6f, 1.2f);
 
     [Header("Mesh Subdivision")]
-    [SerializeField] private int xSegments = 4;
-    [SerializeField] private int ySegments = 6;
+        [SerializeField] private int xSegments = 4;
+        [SerializeField] private int ySegments = 6;
 
     [Header("Wind Random")]
-    [SerializeField] private Vector2 strengthRange = new Vector2(0.85f, 1.15f);
-    [SerializeField] private int seed = 1234;
+        [SerializeField] private Vector2 strengthRange = new Vector2(0.85f, 1.15f);
+        [SerializeField] private int seed = 1234;
 
     [Header("Renderer Sorting")]
-    [SerializeField] private string sortingLayerName = "Default";
-    [SerializeField] private int sortingOrder = 0;
+        [SerializeField] private string sortingLayerName = "Default";
+        [SerializeField] private int sortingOrder = 0;
+
+    [Header("Spawn Exclusion")]
+        [SerializeField] private bool useExclusion = true;
+
+        [Tooltip("이 Collider 안에는 풀/꽃을 생성하지 않음")]
+        [SerializeField] private Transform exclusionRoot;
+        [SerializeField] private List<Collider2D> exclusionColliders = new();
+
+        [Tooltip("한 개체를 배치하려고 재시도할 최대 횟수")]
+        [SerializeField] private int maxPlacementAttemptsPerInstance = 20;
+
+        [Tooltip("넓은 풀 이미지가 마스크에 살짝 걸치는 것까지 막기 위한 검사 반경")]
+        [SerializeField] private float exclusionCheckRadius = 0.15f;
 
     [Header("Debug")]
-    [SerializeField] private int calculatedGrassCount;
+        [SerializeField] private int calculatedGrassCount;
+        [SerializeField] private bool drawSpawnPoints = true;
+        private readonly List<Vector2> debugSpawnPoints = new();
 
-    private Mesh generatedMesh;
+        private Mesh generatedMesh;
 
     private void Awake()
     {
@@ -73,6 +98,12 @@ public class GrassChunkController : MonoBehaviour
         strengthRange.x = Mathf.Max(0f, strengthRange.x);
         strengthRange.y = Mathf.Max(strengthRange.x, strengthRange.y);
 
+        atlasColumns = Mathf.Max(1, atlasColumns);
+        atlasRows = Mathf.Max(1, atlasRows);
+
+        int maxVariantCount = atlasColumns * atlasRows;
+        textureVariantCount = Mathf.Clamp(textureVariantCount, 1, maxVariantCount);
+
         calculatedGrassCount = CalculateGrassCount();
     }
 #endif
@@ -80,6 +111,9 @@ public class GrassChunkController : MonoBehaviour
     [ContextMenu("Build Grass Chunk")]
     public void Build()
     {
+        RefreshExclusionColliders();
+        debugSpawnPoints.Clear();
+
         int actualGrassCount = CalculateGrassCount();
         calculatedGrassCount = actualGrassCount;
 
@@ -94,28 +128,10 @@ public class GrassChunkController : MonoBehaviour
 
         for (int i = 0; i < actualGrassCount; i++)
         {
-            Vector2 basePosition = new Vector2(
-                Range(rng, -areaSize.x * 0.5f, areaSize.x * 0.5f),
-                Range(rng, -areaSize.y * 0.5f, areaSize.y * 0.5f)
-            );
-
-            float width = Range(rng, widthRange.x, widthRange.y);
-            float height = Range(rng, heightRange.x, heightRange.y);
-
-            float phase = Range(rng, 0f, Mathf.PI * 2f);
-            float strength = Range(rng, strengthRange.x, strengthRange.y);
-
-            bool flipX = rng.NextDouble() < 0.5;
-
-            instances.Add(new GrassInstance
+            if (TryCreateGrassInstance(rng, out GrassInstance instance))
             {
-                basePosition = basePosition,
-                width = width,
-                height = height,
-                phase = phase,
-                strength = strength,
-                flipX = flipX
-            });
+                instances.Add(instance);
+            }
         }
 
         // y가 높은 풀을 먼저 그리고, y가 낮은 풀을 나중에 그린다.
@@ -134,7 +150,8 @@ public class GrassChunkController : MonoBehaviour
                 instance.height,
                 instance.phase,
                 instance.strength,
-                instance.flipX
+                instance.flipX,
+                instance.uvRect
             );
         }
 
@@ -200,7 +217,8 @@ public class GrassChunkController : MonoBehaviour
         float height,
         float phase,
         float strength,
-        bool flipX
+        bool flipX,
+        Rect uvRect
     )
     {
         int vertexStart = vertices.Count;
@@ -222,8 +240,11 @@ public class GrassChunkController : MonoBehaviour
                     0f
                 ));
 
-                float textureU = flipX ? 1f - u : u;
-                float textureV = v;
+                float textureU01 = flipX ? 1f - u : u;
+                float textureV01 = v;
+
+                float textureU = Mathf.Lerp(uvRect.xMin, uvRect.xMax, textureU01);
+                float textureV = Mathf.Lerp(uvRect.yMin, uvRect.yMax, textureV01);
 
                 uvs.Add(new Vector2(textureU, textureV));
 
@@ -257,6 +278,96 @@ public class GrassChunkController : MonoBehaviour
         }
     }
 
+    private bool TryCreateGrassInstance(System.Random rng, out GrassInstance instance)
+    {
+        for (int attempt = 0; attempt < maxPlacementAttemptsPerInstance; attempt++)
+        {
+            Vector2 basePosition = new Vector2(
+                Range(rng, -areaSize.x * 0.5f, areaSize.x * 0.5f),
+                Range(rng, -areaSize.y * 0.5f, areaSize.y * 0.5f)
+            );
+
+            float width = Range(rng, widthRange.x, widthRange.y);
+            float height = Range(rng, heightRange.x, heightRange.y);
+
+            if (IsBlockedByExclusion(basePosition, width, height))
+            {
+                continue;
+            }
+
+            instance = new GrassInstance
+            {
+                basePosition = basePosition,
+                width = width,
+                height = height,
+                phase = Range(rng, 0f, Mathf.PI * 2f),
+                strength = Range(rng, strengthRange.x, strengthRange.y),
+                flipX = rng.NextDouble() < 0.5,
+                uvRect = GetRandomAtlasRect(rng)
+            };
+
+            return true;
+        }
+
+        instance = default;
+        return false;
+    }
+
+    private bool IsBlockedByExclusion(Vector2 basePosition, float width, float height)
+    {
+        if (!useExclusion || exclusionColliders == null || exclusionColliders.Count == 0)
+        {
+            return false;
+        }
+
+        // 풀/꽃의 기준점은 로컬 좌표이므로 월드 좌표로 변환
+        Vector3 worldBase = transform.TransformPoint(new Vector3(basePosition.x, basePosition.y, 0f));
+
+        // 너무 중심점만 검사하면 넓은 풀 이미지가 돌에 걸칠 수 있으므로
+        // 주변 몇 점도 같이 검사한다.
+        float halfWidth = width * 0.5f;
+        float radius = Mathf.Max(exclusionCheckRadius, halfWidth * 0.35f);
+
+        Vector2[] checkPoints =
+        {
+        worldBase,
+        worldBase + Vector3.left * radius,
+        worldBase + Vector3.right * radius,
+        worldBase + Vector3.up * (height * 0.35f),
+        worldBase + Vector3.left * radius + Vector3.up * (height * 0.25f),
+        worldBase + Vector3.right * radius + Vector3.up * (height * 0.25f),
+    };
+
+        foreach (Collider2D collider in exclusionColliders)
+        {
+            if (collider == null)
+            {
+                continue;
+            }
+
+            foreach (Vector2 point in checkPoints)
+            {
+                if (collider.OverlapPoint(point))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void RefreshExclusionColliders()
+    {
+        if (exclusionRoot == null)
+        {
+            return;
+        }
+
+        exclusionColliders.Clear();
+        exclusionRoot.GetComponentsInChildren(true, exclusionColliders);
+    }
+
     private float Range(System.Random rng, float min, float max)
     {
         return min + (float)rng.NextDouble() * (max - min);
@@ -264,10 +375,64 @@ public class GrassChunkController : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+
+        Gizmos.matrix = transform.localToWorldMatrix;
+
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(
-            transform.position,
+            Vector3.zero,
             new Vector3(areaSize.x, areaSize.y, 0f)
         );
+
+        if (drawSpawnPoints)
+        {
+            Gizmos.color = Color.red;
+
+            foreach (Vector2 point in debugSpawnPoints)
+            {
+                Gizmos.DrawSphere(
+                    new Vector3(point.x, point.y, 0f),
+                    0.08f
+                );
+            }
+        }
+
+        Gizmos.matrix = oldMatrix;
     }
+
+    private Rect GetRandomAtlasRect(System.Random rng)
+    {
+        int index = rng.Next(textureVariantCount);
+
+        int column = index % atlasColumns;
+        int row = index / atlasColumns;
+
+        float cellWidth = 1f / atlasColumns;
+        float cellHeight = 1f / atlasRows;
+
+        float xMin = column * cellWidth;
+        float yMin = 1f - ((row + 1) * cellHeight);
+
+        Rect rect = new Rect(xMin, yMin, cellWidth, cellHeight);
+
+        return ShrinkRect(rect, atlasUvPadding);
+    }
+
+    private Rect ShrinkRect(Rect rect, float padding)
+    {
+        if (padding <= 0f)
+        {
+            return rect;
+        }
+
+        float xMin = rect.xMin + padding;
+        float xMax = rect.xMax - padding;
+        float yMin = rect.yMin + padding;
+        float yMax = rect.yMax - padding;
+
+        return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+    }
+
+    
 }

@@ -15,6 +15,7 @@ public class GrassChunkSwayTest : MonoBehaviour
         public float phase;
         public float strength;
         public bool flipX;
+        public float zOffset;
     }
 
     [Header("Material")]
@@ -107,6 +108,8 @@ public class GrassChunkSwayTest : MonoBehaviour
 
             bool flipX = rng.NextDouble() < 0.5;
 
+            float zOffset = basePosition.y * 0.001f;
+
             instances.Add(new GrassInstance
             {
                 basePosition = basePosition,
@@ -114,7 +117,8 @@ public class GrassChunkSwayTest : MonoBehaviour
                 height = height,
                 phase = phase,
                 strength = strength,
-                flipX = flipX
+                flipX = flipX,
+                zOffset = zOffset
             });
         }
 
@@ -134,7 +138,8 @@ public class GrassChunkSwayTest : MonoBehaviour
                 instance.height,
                 instance.phase,
                 instance.strength,
-                instance.flipX
+                instance.flipX,
+                instance.zOffset
             );
         }
 
@@ -167,7 +172,7 @@ public class GrassChunkSwayTest : MonoBehaviour
 
         // Vertex shader에서 좌우로 흔들리기 때문에 bounds를 조금 키운다.
         Bounds bounds = generatedMesh.bounds;
-        bounds.Expand(new Vector3(2f, 0.5f, 0f));
+        bounds.Expand(new Vector3(2f, 0.5f, 5f));
         generatedMesh.bounds = bounds;
 
         MeshFilter meshFilter = GetComponent<MeshFilter>();
@@ -200,7 +205,8 @@ public class GrassChunkSwayTest : MonoBehaviour
         float height,
         float phase,
         float strength,
-        bool flipX
+        bool flipX,
+        float zOffset
     )
     {
         int vertexStart = vertices.Count;
@@ -219,7 +225,7 @@ public class GrassChunkSwayTest : MonoBehaviour
                 vertices.Add(new Vector3(
                     basePosition.x + localX,
                     basePosition.y + localY,
-                    0f
+                    zOffset
                 ));
 
                 float textureU = flipX ? 1f - u : u;
