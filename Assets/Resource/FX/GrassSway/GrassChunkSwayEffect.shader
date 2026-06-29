@@ -184,14 +184,20 @@ Shader "Custom/2D/GrassChunkSwayEffect"
                 float strength = input.custom.y;
                 float localHeight = saturate(input.custom.z);
 
-                // 기존 Shader Graph는 UV.y를 사용했지만,
-                // 청크 메쉬에서는 atlas 대응을 위해 custom.z에 local height를 저장한다.
-                float heightMask = localHeight;
+                float heightMask = localHeight * localHeight;
 
-                float2 noiseUV = positionWS.xy + (_Time.y * _WindSpeed).xx + phase.xx;
-                float noise = GradientNoise(noiseUV, _SwayPower);
+                // 큰 바람: 월드 좌표 기반.
+                // 전체 풀이 하나의 바람장을 공유한다.
+                float2 windUV = positionWS.xy + (_Time.y * _WindSpeed).xx;
+                float windNoise = GradientNoise(windUV, _SwayPower);
+                float globalWind = windNoise - 0.5;
 
-                float sway = (noise - 0.5) * heightMask * strength;
+                // 작은 떨림: 풀마다 약간의 차이만 준다.
+                // 비중을 아주 낮게 둔다.
+                float localFlutter = sin(_Time.y * _WindSpeed * 1.7 + phase) * 0.05;
+
+                // 최종 흔들림
+                float sway = (globalWind + localFlutter) * heightMask * strength;
 
                 positionOS.x += sway;
 
