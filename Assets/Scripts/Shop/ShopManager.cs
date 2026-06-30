@@ -134,7 +134,8 @@ public class ShopManager : Singleton<ShopManager>
         foreach (var it in rotationPool) // 이제 rotationPool은 List<ItemData>
         {
             if (!it) continue;
-            if (!it.IsRotationUnlockOk(ctx)) continue;           // 해금 조건(각 아이템에서 override)
+            if (!UnlockManager.IsAvailable(it)) continue;        // 해금 시스템(해금 전엔 상점에 안 뜸)
+            if (!it.IsRotationUnlockOk(ctx)) continue;           // 스테이지 등 로테이션 해금 조건(각 아이템 override)
             if (it.GetRotationWeight(ctx) <= 0) continue;        // 가중치 0 이하는 제외
             if (!it.CanPurchaseByLimit()) continue;              // 구매 제한에 도달한 아이템 제외
             candidates.Add(it);

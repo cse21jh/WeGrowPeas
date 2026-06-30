@@ -39,6 +39,13 @@ public abstract class ItemData : ScriptableObject
     [Header("Flow")]
     public ShopFlowType FlowType;
 
+    [Header("Unlock")]
+    [Tooltip("체크 시 해금되기 전까지 상점에 뜨지 않음. UnlockManager.Unlock(...)로 해금.")]
+    public bool requiresUnlock = false;
+    [Tooltip("해금 식별 id. 비우면 에셋 이름을 사용.")]
+    public string unlockId;
+    public string UnlockId => string.IsNullOrEmpty(unlockId) ? name : unlockId;
+
     // �����̼� �ĺ� ����(���̺� �ر� ��), �⺻ true
     public virtual bool IsRotationUnlockOk(ShopContext ctx) => true;
 
