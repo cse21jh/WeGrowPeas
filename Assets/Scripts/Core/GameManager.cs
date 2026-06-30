@@ -16,6 +16,9 @@ public class SaveData
     public bool seenFirstGold;
     public string currentPlant;
 
+    //tax
+    public int lastPaidTaxStage;
+
     //grid
     public List<PlantData> plantList = new();
     public int remainBreedCount;
@@ -496,6 +499,7 @@ public class GameManager : Singleton<GameManager>
         stage = saveData.stage;
         seenFirstGold = saveData.seenFirstGold;
         currentPlant = saveData.currentPlant;
+        if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.lastPaidTaxStage);
         grid.LoadGrid(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
@@ -520,6 +524,7 @@ public class GameManager : Singleton<GameManager>
         saveData.stage = stage;
         saveData.seenFirstGold = seenFirstGold;
         saveData.currentPlant = currentPlant;
+        saveData.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
 
         //grid
         foreach (var p in grid.plantGrid.Values)
