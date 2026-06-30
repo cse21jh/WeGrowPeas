@@ -18,12 +18,15 @@ public enum AppKey
     Quest,
     Messenger,
     Info,
+    Tax,   // 국세청 앱 (5일마다 세금 납부). 맨 끝에 추가 — 기존 패널 인덱스 보존
 }
 
 public class PhoneManager : Singleton<PhoneManager>
 {
 
     private Dictionary<AppKey, AlarmState> appAlarmStates = new Dictionary<AppKey, AlarmState>();
+    private Dictionary<AppKey, bool> appAlarmPausing = new Dictionary<AppKey, bool>(); // 앱별: mandatory 알람이 게임을 멈출지 (기본 true)
+    private bool anyPausingMandatory = false;
     public AlarmState TotalPhoneAlarmState { get; private set; } = AlarmState.None;
 
     [SerializeField] private GameObject mandatoryAlarm;
@@ -63,6 +66,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
 
     public MessengerApp messengerApp;
+    [SerializeField] public TaxApp taxApp;
 
     //폰 페이즈 관련
     private float phoneTimer = 0;
@@ -168,6 +172,9 @@ public class PhoneManager : Singleton<PhoneManager>
         PhoneTouchEffect();
         transitionController.TransitionToIndex((int)key + 1);
         _current = key;
+
+        if (key == AppKey.Tax && taxApp != null)
+            taxApp.Refresh(); // 국세청 앱 열 때 이번 세금액/마감 갱신
     }
     public void PhoneTouchEffect()
     {
@@ -199,6 +206,15 @@ public class PhoneManager : Singleton<PhoneManager>
             messengerApp.ActivateTrigger(trigger); // 해당 단계 메시지가 없으면 no-op
     }
 
+    // 5n일(세금일)인데 세금이 미납 상태인가. (TaxManager 없으면 false → 안전)
+    private bool IsTaxUnpaidNight()
+    {
+        int stage = GameManager.Instance.stage;
+        return TaxSchedule.IsTaxStage(stage)
+            && TaxManager.Instance != null
+            && !TaxManager.Instance.IsPaidForStage(stage);
+    }
+
     public IEnumerator PhonePhase()
     {
         ClickRouter.Instance.IsBlockedByUI = true;
@@ -211,16 +227,32 @@ public class PhoneManager : Singleton<PhoneManager>
         phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
         phoneTimerUI.StartPhoneTimer();
 
+        // 세금 미납 경고: 국세청(Tax) 앱 아이콘에 빨간 red dot(Mandatory)을 띄우되,
+        // pauseIfMandatory:false 로 게임은 멈추지 않게 한다(밤 타이머는 계속 흘러 실패 판정 가능).
+        // 납부 시 TaxApp에서 None으로 해제.
+        if (IsTaxUnpaidNight())
+            UpdateAppAlarmState(AppKey.Tax, AlarmState.Mandatory, pauseIfMandatory: false);
+
         bool _warned15s = false;
         //int rerollCount = 0;
         isPhoneTime = true;
-        while (!skipPhoneTime && (phoneTimer > 0))
+        while (phoneTimer > 0)
         {
             if (GameManager.Instance.GetGameIsStopped())
             {
                 yield return null;
                 continue;
             }
+
+            // 세금 미납 밤에는 스킵 버튼만 막는다(밤을 일찍 끝낼 수 없음). 타이머는 그대로 흐름.
+            bool canSkip = !IsTaxUnpaidNight();
+            if (skipPhoneTimeButton.activeSelf != canSkip)
+                skipPhoneTimeButton.SetActive(canSkip);
+            if (!canSkip)
+                skipPhoneTime = false; // 스킵 입력 무효화(버튼/ S키 모두)
+
+            if (skipPhoneTime)
+                break;
 
             phoneTimer -= Time.deltaTime;
 
@@ -234,8 +266,7 @@ public class PhoneManager : Singleton<PhoneManager>
                         title = "내일이 얼마 남지 않았습니다",
                         message = "또 힘내봅시다.",
                         duration = 5f
-                    }
-                );
+                    });
             }
 
             if (Input.GetKeyDown(KeyCode.S))
@@ -250,6 +281,14 @@ public class PhoneManager : Singleton<PhoneManager>
         ClickRouter.Instance.IsBlockedByUI = false;
         skipPhoneTime = false;
         isPhoneTime = false;
+
+        // 시간 내 세금 미납으로 밤이 끝났으면 → 농장 전멸 연출 + 게임오버
+        if (IsTaxUnpaidNight())
+        {
+            yield return StartCoroutine(GameManager.Instance.TaxFailureRoutine());
+            yield break;
+        }
+
         yield return null;
     }
     
@@ -365,9 +404,11 @@ public class PhoneManager : Singleton<PhoneManager>
         topBar.SetTitle(title);
     }
     */
-    public void UpdateAppAlarmState(AppKey appKey, AlarmState newState)
+    // pauseIfMandatory: 이 알람이 Mandatory일 때 게임을 멈출지(기본 true). 세금 같은 "빨간 알림이지만 멈추지 않는" 용도로 false.
+    public void UpdateAppAlarmState(AppKey appKey, AlarmState newState, bool pauseIfMandatory = true)
     {
         appAlarmStates[appKey] = newState;
+        appAlarmPausing[appKey] = pauseIfMandatory;
         RefreshTotalAlarmState();
         UpdateAppIconUI(appKey, newState);
     }
@@ -375,24 +416,24 @@ public class PhoneManager : Singleton<PhoneManager>
     private void RefreshTotalAlarmState()
     {
         AlarmState highestState = AlarmState.None;
+        bool pausing = false;
 
-        foreach (var state in appAlarmStates.Values)
+        foreach (var kv in appAlarmStates)
         {
-            if (state == AlarmState.Mandatory)
+            if (kv.Value == AlarmState.Mandatory)
             {
-                highestState = AlarmState.Mandatory;                
-                break; // 하나라도 필수면 즉시 최상위 등급
+                highestState = AlarmState.Mandatory;
+                // 멈춤을 요청한 mandatory가 하나라도 있으면 폰 전체가 멈춤(기본 true)
+                if (!appAlarmPausing.TryGetValue(kv.Key, out bool p) || p)
+                    pausing = true;
             }
-            if (state == AlarmState.NonMandatory)
+            else if (kv.Value == AlarmState.NonMandatory && highestState != AlarmState.Mandatory)
             {
-                highestState = AlarmState.NonMandatory;                
+                highestState = AlarmState.NonMandatory;
             }
         }
-        if(TotalPhoneAlarmState == AlarmState.Mandatory &&  highestState != AlarmState.Mandatory)
-        {
-            
-        }
 
+        anyPausingMandatory = pausing;
         TotalPhoneAlarmState = highestState;
         ApplyPhoneAlarmUI();
     }
@@ -407,9 +448,17 @@ public class PhoneManager : Singleton<PhoneManager>
                 nonMandatoryAlarm.SetActive(false);
                 alarm.AlarmPermanent();
                 if(GameManager.Instance != null)
-                { 
-                    GameManager.Instance.StopGame();
-                    GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText();
+                {
+                    if (anyPausingMandatory) // 멈춤을 요청한 mandatory만 게임 정지
+                    {
+                        GameManager.Instance.StopGame();
+                        GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText();
+                    }
+                    else
+                    {
+                        GameManager.Instance.ResumeGame();
+                        GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
+                    }
                 }
                 break;
             case AlarmState.NonMandatory:
@@ -437,6 +486,11 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void UpdateAppIconUI(AppKey key, AlarmState state)
     {
+        int i = (int)key;
+        if (mandatoryAppAlarm == null || nonMandatoryAppAlarm == null
+            || i < 0 || i >= mandatoryAppAlarm.Count || i >= nonMandatoryAppAlarm.Count)
+            return; // 해당 앱의 아이콘 알람 UI 미등록(예: Tax 앱 아이콘 미배선) — 크래시 방지
+
         switch (state)
         {
             case AlarmState.Mandatory:

@@ -435,8 +435,28 @@ public class GameManager : Singleton<GameManager>
         yield return null;
     }
 
+    // 세금 미납 실패: 농장 전멸 연출 후 게임오버.
+    public IEnumerator TaxFailureRoutine()
+    {
+        // 모든 식물을 순차적으로 죽인다(페트병/익충에 막히지 않도록 Other 사용).
+        var plants = new System.Collections.Generic.List<Plant>(grid.plantGrid.Values);
+        foreach (var p in plants)
+        {
+            if (p != null) p.Die(DeathCause.Other);
+            yield return new WaitForSeconds(0.06f); // 순차적으로 시드는 연출
+        }
+
+        yield return new WaitForSeconds(1.0f);
+
+        // 게임오버 보장 (전멸로 자동 트리거됐으면 GameOver 내부 guard로 무시됨)
+        yield return StartCoroutine(GameOver());
+    }
+
     public IEnumerator GameOver()
     {
+        if (gameOver) yield break; // 중복 호출 방지(자동 트리거 + 명시 호출)
+        gameOver = true;
+
         //Debug.Log("게임오버");
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
         economyManager.PushEarnedGold();
