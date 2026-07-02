@@ -462,6 +462,9 @@ public class Grid : MonoBehaviour
             int p1Trait;
             int p2Trait;
 
+            float p1Resistance = 0f;
+            float p2Resistance = 0f;
+
             int childGenetic = 0;
 
             int traitNotInParent = 0;
@@ -469,6 +472,7 @@ public class Grid : MonoBehaviour
             if (parent1.Any(t => t.traitType == trait))
             {
                 p1Trait = parent1.First(t => t.traitType == trait).genetics;
+                p1Resistance = parent1.First(t => t.traitType == trait).resistance;
             }
             else
             {
@@ -479,6 +483,7 @@ public class Grid : MonoBehaviour
             if (parent2.Any(t => t.traitType == trait))
             {
                 p2Trait = parent2.First(t => t.traitType == trait).genetics;
+                p2Resistance = parent2.First(t => t.traitType == trait).resistance;
             }
             else
             {
@@ -511,7 +516,7 @@ public class Grid : MonoBehaviour
                 default: break;
             }
 
-            float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic);
+            float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
 
 
             if (trait == TraitType.Pest)

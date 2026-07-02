@@ -418,9 +418,13 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics)
+    public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics, float p1Resistance = 0f, float p2Resistance = 0f)
     {
         float resistance = 0.0f;
+
+        float minResistance = (p1Resistance + p2Resistance) * 0.45f;
+        float maxResistance = 0.9f;
+
         switch (GameManager.Instance.currentPlant)
         {
             case "완두콩":
@@ -428,18 +432,18 @@ public abstract class Plant : MonoBehaviour
                 {
                     switch (genetics)
                     {
-                        case 0: resistance += 0.5f; break;
-                        case 1: resistance += 0.65f; break;
-                        case 2: resistance += 0.8f; break;
+                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
+                        case 1: minResistance = Mathf.Max(0.5f, minResistance); maxResistance = 0.7f; break;
+                        case 2: minResistance = Mathf.Max(0.7f, minResistance); maxResistance = 0.9f; break;
                     }
                 }
                 else
                 {
                     switch (genetics)
                     {
-                        case 0:  resistance += 0.5f; break;
-                        case 1:  resistance += 0.5f; break;
-                        case 2:  resistance += 0.8f; break;
+                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
+                        case 1: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
+                        case 2: minResistance = Mathf.Max(0.5f, minResistance); maxResistance = 0.9f; break;
                     }
                 }
                 break;
@@ -448,22 +452,27 @@ public abstract class Plant : MonoBehaviour
                 {
                     switch (genetics)
                     {
-                        case 0:  resistance += 0.4f; break;
-                        case 1:  resistance += 0.55f; break;
-                        case 2:  resistance += 0.7f; break;
+                        case 0: minResistance = Mathf.Max(0.2f, minResistance); maxResistance = 0.4f; break;
+                        case 1: minResistance = Mathf.Max(0.4f, minResistance); maxResistance = 0.6f; break;
+                        case 2: minResistance = Mathf.Max(0.6f, minResistance); maxResistance = 0.8f; break;
                     }
                 }
                 else
                 {
                     switch (genetics)
                     {
-                        case 0:  resistance += 0.4f; break;
-                        case 1:  resistance += 0.4f; break;
-                        case 2:  resistance += 0.7f; break;
+                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.4f; break;
+                        case 1: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.4f; break;
+                        case 2: minResistance = Mathf.Max(0.4f, minResistance); maxResistance = 0.8f; break;
                     }
                 }
                 break;
         }
+
+        if(minResistance > maxResistance)
+            minResistance = maxResistance;
+
+        resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
 
         resistance += GameManager.Instance.grid.GetResistanceBonus();
 
