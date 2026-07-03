@@ -472,7 +472,12 @@ public abstract class Plant : MonoBehaviour
         if(minResistance > maxResistance)
             minResistance = maxResistance;
 
-        resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
+        if (UnityEngine.Random.Range(0, 100) < 1) // 변종 시 저항력 90~100 사이로 설정
+            resistance += Mathf.Round(UnityEngine.Random.Range(90, 101) / 100f);
+        else
+            resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
+
+
 
         resistance += GameManager.Instance.grid.GetResistanceBonus();
 
@@ -487,7 +492,10 @@ public abstract class Plant : MonoBehaviour
             resistance += GameManager.Instance.grid.GetWeakGenericsResistanceBonus();
         }
 
-        return resistance;
+        
+
+
+        return Mathf.Min(resistance, 1.0f);
     }
 
     public abstract int GetSellingPrice();
@@ -571,6 +579,7 @@ public abstract class Plant : MonoBehaviour
 
         resistWaveCount++;
 
+        /*
         bool isGold = false;
         if (stemController != null) //황금 완두콩이면 저항력 감소 아예 X
         {
@@ -601,6 +610,7 @@ public abstract class Plant : MonoBehaviour
                 }
             }
         }
+        */
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {
             FenceUIManager.Instance.SetFenceElements(plantID, this);
