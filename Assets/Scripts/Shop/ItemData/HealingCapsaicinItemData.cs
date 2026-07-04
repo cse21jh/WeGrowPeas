@@ -4,7 +4,7 @@ using UnityEngine;
 public class HealingCapsaicinItemData : ItemData
 {
     [Header("Effect")]
-    [SerializeField] private float healPercentPerPurchase = 0.03f; // 구매 횟수당 3% 회복
+    [SerializeField] private float healPercentPerPurchase = 0.01f; // 구매 횟수당 1% 회복
     [SerializeField] private float probabilityIncrease = 0.03f; // 등장 확률 3% 증가
 
     [Header("Rotation")]

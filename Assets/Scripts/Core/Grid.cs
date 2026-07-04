@@ -1602,7 +1602,7 @@ public class Grid : MonoBehaviour
     public void AddBadGuyMoreRiceLevel(int val)
     {
         badGuyMoreRiceLevel += val;
-        ShowAllPriceSign(); // 가격 변동 갱신
+        //ShowAllPriceSign(); // 가격 변동 갱신
     }
 
     public int GetBadGuyMoreRiceLevel()

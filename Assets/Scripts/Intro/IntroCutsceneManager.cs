@@ -51,7 +51,7 @@ public class IntroCutsceneManager : MonoBehaviour
     private void Update()
     {
         if (_isAutoAdvanceWaiting || _isAdvancing) return;
-        if (!Input.GetMouseButtonDown(0)) return;
+        if (!Input.GetMouseButtonDown(0) && !Input.GetKeyDown(KeyCode.Space)) return;
 
         if (_isTyping)
         {

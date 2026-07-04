@@ -109,21 +109,21 @@ public class TutorialManager : Singleton<TutorialManager>
             case 2: // 교배                
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f, 0f), new Vector2(75f, 150f));
                 break;
-            case 3: // 삽 클릭
-                shovel.SetActive(true);
-                spawnedCircle.ShowCircle(new Vector3(-8f, -3.9f, 0f), new Vector2(70f, 95f));
-                break;
-            case 4: // 특정 완두콩 판매
-                spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f, 0f), new Vector2(75f, 75f));
-                break;
-            case 5: // 웨이브 지나감
+            case 3: // 웨이브 지나감
                 ActivateWave();
                 break;
-            case 6: // 자유시간
+            case 4: // 자유시간
                 gcController.ToggleGlow(true);
                 waveManager.StartCoroutine(waveManager.StartNightCoroutine());
                 PhoneManager.Instance.TutorialPhonePhase();
                 break;
+            case 5: // 삽 클릭
+                shovel.SetActive(true);
+                spawnedCircle.ShowCircle(new Vector3(-8f, -3.9f, 0f), new Vector2(70f, 95f));
+                break;
+            case 6: // 특정 완두콩 판매
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.335f, 0f), new Vector2(75f, 75f));
+                break;            
             case 7: // 이제 실전으로 끝
                 // 
                 break;
@@ -154,28 +154,28 @@ public class TutorialManager : Singleton<TutorialManager>
                 yield return new WaitUntil(() => _breedSuccess);
                 _breedSuccess = false;
                 break;
-            case 3: // 삽 클릭
+            case 3: // 웨이브 지나감
+                yield return new WaitUntil(() =>
+                        tStage == 2
+                );
+                break;
+            case 4: // 자유시간
+                yield return new WaitUntil(() =>
+                        PhoneManager.Instance.GetIsPhoneTime() == true
+                );
+                break;
+            case 5: // 삽 클릭
                 yield return new WaitUntil(() =>
                     grid.isDraggingShovel == true
                 );
                 _lastClickedObject = null;
                 break;
 
-            case 4: // 특정 완두콩 판매
+            case 6: // 특정 완두콩 판매
                 yield return new WaitUntil(() =>
                     GameObject.Find("EconomyManager").GetComponent<EconomyManager>().PeaSellCount >= 1
                 );
                 _lastClickedObject = null;
-                break;
-            case 5: // 웨이브 지나감
-                yield return new WaitUntil(() =>
-                        tStage == 2
-                );
-                break;
-            case 6: // 자유시간
-                yield return new WaitUntil(() =>
-                        PhoneManager.Instance.GetIsPhoneTime() == true
-                );
                 break;
             case 7: // 이제 실전으로 끝
                 //yield return new WaitForSeconds(1f);
@@ -203,18 +203,18 @@ public class TutorialManager : Singleton<TutorialManager>
             case 2: // 교배
                 Instantiate(breedGraph, canvasTransform);
                 spawnedCircle.FlushSpawnedCircleCanvas();
-                break;
-            case 3: // 삽 클릭
+                break;            
+            case 3: // 웨이브 지나감
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;
-            case 4: // 특정 완두콩 판매
-                spawnedCircle.FlushSpawnedCircleCanvas();
-                break;
-            case 5: // 웨이브 지나감
-                spawnedCircle.FlushSpawnedCircleCanvas();
-                break;
-            case 6: // 자유시간
+            case 4: // 자유시간
                 PhoneManager.Instance.TutorialPhonePhase();
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 5: // 삽 클릭
+                spawnedCircle.FlushSpawnedCircleCanvas();
+                break;
+            case 6: // 특정 완두콩 판매
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;
             case 7: // 이제 실전으로 끝

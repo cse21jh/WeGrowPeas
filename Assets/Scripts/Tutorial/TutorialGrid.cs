@@ -30,23 +30,23 @@ public class TutorialGrid : Grid
     public void InitTGrid()
     {
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
-        new GeneticTrait(TraitType.Wind, 0.5f, 0, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.45f, 1, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.43f, 0, 0.0f)
         });
 
         SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 1, 0.0f),
-        new GeneticTrait(TraitType.Wind, 0.5f, 1, 0.0f)
-        });
-
-        SpawnTPea(new List<GeneticTrait> {
-        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f),
-        new GeneticTrait(TraitType.Wind, 0.5f, 1, 0.0f)
+        new GeneticTrait(TraitType.NaturalDeath, 0.37f, 1, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.47f, 1, 0.0f)
         });
 
         SpawnTPea(new List<GeneticTrait> {
         new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f),
-        new GeneticTrait(TraitType.Wind, 0.5f, 2, 0.0f)
+        new GeneticTrait(TraitType.Wind, 0.38f, 1, 0.0f)
+        });
+
+        SpawnTPea(new List<GeneticTrait> {
+        new GeneticTrait(TraitType.NaturalDeath, 0.5f, 0, 0.0f),
+        new GeneticTrait(TraitType.Wind, 0.75f, 2, 0.0f)
         });
     }
 
