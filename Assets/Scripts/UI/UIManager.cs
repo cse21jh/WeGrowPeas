@@ -21,7 +21,5 @@ public class UIManager : Singleton<UIManager>
 
         // UIManager의 초기화 시점에 팝업 서브시스템 인스턴스 생성
         Popup = new PopupSystem(defaultCloseablePrefab, defaultToastPrefab, popupCanvasParent);
-
-        Popup.ShowCloseablePopup("아털써", "아털써는..어쩌구저쩌구...");
     }
 }
