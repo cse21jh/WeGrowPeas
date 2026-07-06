@@ -345,6 +345,7 @@ public class AbilityUIController : MonoBehaviour
         }
         else
         {
+            DawnSystem.ClearSelection(); // 새벽 미선택 → 제약 없음(이전 런 선택 초기화)
             saveSlotUI.OnClickNewGame();
         }
     }

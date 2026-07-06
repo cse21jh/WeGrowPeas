@@ -359,7 +359,9 @@ public class Grid : MonoBehaviour
 
         //int breedCount = 0;
         int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
-        float effectiveBugSpawnTimeInterval = BugSpawnTimeInterval * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
+        // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 최소 0.5초 보장.
+        float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction);
+        float effectiveBugSpawnTimeInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
         float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
         //임시 알람

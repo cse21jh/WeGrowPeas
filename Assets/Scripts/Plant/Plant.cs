@@ -241,8 +241,10 @@ public abstract class Plant : MonoBehaviour
                 {
                     resistance += grid.ladybugs.Count * grid.AdditionalLadybugResistancePerUnit;
                 }
-                resistance += g.resistance + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
-                return resistance = resistance >= 1f ? 1f : resistance;
+                // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
+                float dawnBase = Mathf.Max(0f, g.resistance - DawnSystem.Current.resistanceCapReductionPercent / 100f);
+                resistance += dawnBase + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
+                return resistance = resistance >= 1f ? 1f : resistance; // 총합 상한은 1.0 유지
             }
         }
 
@@ -482,7 +484,7 @@ public abstract class Plant : MonoBehaviour
         if(minResistance > maxResistance)
             minResistance = maxResistance;
 
-        if (UnityEngine.Random.Range(0, 100) < 1) // 변종 시 저항력 90~100 사이로 설정
+        if (UnityEngine.Random.Range(0, 100) < 1f + DawnSystem.Current.mutationChanceAddPercent) // 변종 시 저항력 90~100 사이로 설정 (새벽: 변종 확률 증가)
             resistance += Mathf.Round(UnityEngine.Random.Range(90, 101) / 100f);
         else
             resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
@@ -621,6 +623,17 @@ public abstract class Plant : MonoBehaviour
             }
         }
         */
+
+        // 새벽: 매일(웨이브 통과 시) 모든 저항력 감소. (일반 모드는 위 블록이 폐기되어 감소 없음)
+        // 황금 완두콩은 기존 규칙대로 저항력 감소 제외.
+        float dawnDailyDecay = DawnSystem.Current.dailyResistanceDecayAddPercent / 100f;
+        bool isGoldPlant = stemController != null && stemController.IsGold();
+        if (dawnDailyDecay > 0f && !isGoldPlant)
+        {
+            for (int i = 0; i < Wave.NumberOfWave; i++)
+                ChangeResistance(i, -dawnDailyDecay);
+        }
+
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {
             FenceUIManager.Instance.SetFenceElements(plantID, this);

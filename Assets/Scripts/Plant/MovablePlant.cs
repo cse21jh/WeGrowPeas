@@ -38,7 +38,8 @@ public abstract class MovablePlant : Plant
             stemController.SetGold(true);
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);
         if(GameManager.Instance)
-            CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType); 
+            CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
+        TryRootByDawn(); // 새벽: 등장 시 확률로 뿌리
     }
 
     protected void Update()
@@ -98,6 +99,7 @@ public abstract class MovablePlant : Plant
         {
             grid.TryPlacePlant(this, Input.mousePosition);
             FenceUIManager.Instance.SetFenceElements(plantID, this);
+            TryRootByDawn(); // 새벽: 이동 시 확률로 뿌리
         }
         else
         {
@@ -139,6 +141,16 @@ public abstract class MovablePlant : Plant
     public void SetMovable(bool value)
     {
         isReallyMovable = value;
+    }
+
+    // 새벽: 등장/이동 시 확률로 뿌리를 내려 이동 불가가 됨
+    private void TryRootByDawn()
+    {
+        if (!isReallyMovable) return; // 이미 뿌리내림
+        float chance = DawnSystem.Current.rootChancePercent;
+        if (chance <= 0f) return;
+        if (UnityEngine.Random.Range(0f, 100f) < chance)
+            SetMovable(false); // TODO: 뿌리 시각효과
     }
 
     public void CheckResistanceScouterImage(WaveType wave)

@@ -54,8 +54,20 @@ public static class DawnSystem
     // ── 선택(이번 런) ─────────────────────────────────────────────────────────
     /// <summary>이번 런에 선택한 새벽 단계. 0 = 새벽 모드 아님(일반).</summary>
     public static int SelectedDawnStage { get; private set; } = 0;
-    public static void SetSelectedStage(int stage) => SelectedDawnStage = stage;
-    public static void ClearSelection() => SelectedDawnStage = 0;
+    public static void SetSelectedStage(int stage) { SelectedDawnStage = stage; _currentValid = false; }
+    public static void ClearSelection() { SelectedDawnStage = 0; _currentValid = false; }
+
+    private static bool _currentValid;
+    private static DawnCumulative _current;
+    /// <summary>선택된 새벽 단계의 누적 제약(런타임 각 시스템이 참조). 저주는 여기서 처리하지 않음.</summary>
+    public static DawnCumulative Current
+    {
+        get
+        {
+            if (!_currentValid) { _current = GetCumulative(SelectedDawnStage); _currentValid = true; }
+            return _current;
+        }
+    }
 
     // ── 누적 제약 ─────────────────────────────────────────────────────────────
     /// <summary>1..stage 의 제약 설명을 줄바꿈으로 이어붙여 반환(UI 표시용).</summary>

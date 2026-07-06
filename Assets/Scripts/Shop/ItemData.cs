@@ -74,7 +74,9 @@ public abstract class ItemData : ScriptableObject
 
     public virtual int GetDisplayPrice()
     {
-        return Price;
+        // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
+        float mul = DawnSystem.Current.shopPriceMultiplier;
+        return Mathf.RoundToInt(Price * (mul > 0f ? mul : 1f));
     }
 
     // ���� ��ü������ ���� Ƚ�� ��ȸ

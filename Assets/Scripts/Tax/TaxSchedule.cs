@@ -67,12 +67,23 @@ public static class TaxSchedule
 
         int idx = taxStage / _interval - 1; // 5→0, 10→1 …
         if (idx < 0) return 0;
-        if (idx < _schedule.Length) return _schedule[idx];
 
-        // 표 범위를 넘은 관문: 마지막 표값에서 지수적으로 계속 증가
-        int over = idx - (_schedule.Length - 1);
-        int last = _schedule[_schedule.Length - 1];
-        float growth = _beyondGrowth > 0 ? _beyondGrowth : DefaultBeyondGrowth;
-        return Mathf.RoundToInt(last * Mathf.Pow(growth, over));
+        int baseAmount;
+        if (idx < _schedule.Length)
+        {
+            baseAmount = _schedule[idx];
+        }
+        else
+        {
+            // 표 범위를 넘은 관문: 마지막 표값에서 지수적으로 계속 증가
+            int over = idx - (_schedule.Length - 1);
+            int last = _schedule[_schedule.Length - 1];
+            float growth = _beyondGrowth > 0 ? _beyondGrowth : DefaultBeyondGrowth;
+            baseAmount = Mathf.RoundToInt(last * Mathf.Pow(growth, over));
+        }
+
+        // 새벽 세금 배수 적용
+        float dawnMul = DawnSystem.Current.taxMultiplier;
+        return Mathf.RoundToInt(baseAmount * (dawnMul > 0f ? dawnMul : 1f));
     }
 }

@@ -281,7 +281,7 @@ public class Bug : MonoBehaviour
             grid.AddAdditionalPestResistance(0.002f);
             isDie = true;
             GameEvents.RaiseBugKilled();
-            economyManager.AddGold(gold + grid.GetAdditionalBugGold());
+            economyManager.AddGold(Mathf.Max(0, gold + grid.GetAdditionalBugGold() - DawnSystem.Current.bugPriceReduction)); // 새벽: 벌레 기본 가격 감소
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }

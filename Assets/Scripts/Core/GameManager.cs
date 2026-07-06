@@ -19,6 +19,9 @@ public class SaveData
     //tax
     public int lastPaidTaxStage;
 
+    //dawn
+    public int selectedDawnStage;
+
     //grid
     public List<PlantData> plantList = new();
     public int remainBreedCount;
@@ -579,6 +582,7 @@ public class GameManager : Singleton<GameManager>
         seenFirstGold = saveData.seenFirstGold;
         currentPlant = saveData.currentPlant;
         if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.lastPaidTaxStage);
+        DawnSystem.SetSelectedStage(saveData.selectedDawnStage); // 새벽 제약이 이어하기에도 적용되도록
         grid.LoadGrid(saveData);
         enemyController.LoadEnemyController(saveData);
         economyManager.LoadEconomyManager(saveData);
@@ -604,6 +608,7 @@ public class GameManager : Singleton<GameManager>
         saveData.seenFirstGold = seenFirstGold;
         saveData.currentPlant = currentPlant;
         saveData.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
+        saveData.selectedDawnStage = DawnSystem.SelectedDawnStage;
 
         //grid
         foreach (var p in grid.plantGrid.Values)
