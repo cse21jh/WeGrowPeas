@@ -11,6 +11,7 @@ public class AbilityUIController : MonoBehaviour
     private AbilityManager abilityManager;
 
     [SerializeField] private SaveSlotUI saveSlotUI;
+    [SerializeField] private DawnUIController dawnUIController; // 새벽 모드 해금 시 확인 후 새벽 단계 선택으로
 
     //각 특성 패널
     [SerializeField] private GameObject plantAbilityPanel;
@@ -334,8 +335,18 @@ public class AbilityUIController : MonoBehaviour
         abilityManager.SetPlantAbility(selectedPlantAbilities);
         abilityManager.SetGeneralAbility(selectedGeneralAbilities);
 
-        saveSlotUI.OnClickNewGame();
-        //게임 시작
+        // 새벽 모드가 해금됐으면 새벽 단계 선택 패널을 띄우고(거기서 시작),
+        // 미해금이면 기존대로 바로 게임 시작.
+        if (DawnSystem.IsDawnUnlocked && dawnUIController != null)
+        {
+            plantAbilityPanel.SetActive(false);
+            generalAbilityPanel.SetActive(false);
+            dawnUIController.OpenDawnPanel();
+        }
+        else
+        {
+            saveSlotUI.OnClickNewGame();
+        }
     }
 
 
