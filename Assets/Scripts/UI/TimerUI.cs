@@ -54,6 +54,35 @@ public class TimerUI : MonoBehaviour
         countdownRoutine = StartCoroutine(PhoneCountdown());
     }
 
+    // 세금 압류 유예용 카운트다운(고정 초). 폰 타이머와 동일 UI 재사용.
+    public void StartTaxTimer(int seconds)
+    {
+        if (countdownRoutine != null) StopCoroutine(countdownRoutine);
+        maxBreedingTime = seconds;
+        countdownRoutine = StartCoroutine(TaxCountdown(seconds));
+    }
+
+    private IEnumerator TaxCountdown(int seconds)
+    {
+        int timeLeft = seconds;
+        textTimer.color = Color.red;
+        breedTimerController.SetFillImmediately(1f);
+
+        while (timeLeft >= 0)
+        {
+            if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
+            {
+                yield return null;
+                continue;
+            }
+
+            textTimer.text = $"{timeLeft}s";
+            breedTimerController.SetFill(seconds > 0 ? timeLeft / (float)seconds : 0f);
+            yield return new WaitForSeconds(1f);
+            timeLeft--;
+        }
+    }
+
     public void StopTimer()
     {
         if (countdownRoutine != null)

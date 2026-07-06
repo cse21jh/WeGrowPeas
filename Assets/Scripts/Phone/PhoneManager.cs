@@ -236,23 +236,13 @@ public class PhoneManager : Singleton<PhoneManager>
         bool _warned15s = false;
         //int rerollCount = 0;
         isPhoneTime = true;
-        while (phoneTimer > 0)
+        while (!skipPhoneTime && (phoneTimer > 0))
         {
             if (GameManager.Instance.GetGameIsStopped())
             {
                 yield return null;
                 continue;
             }
-
-            // 세금 미납 밤에는 스킵 버튼만 막는다(밤을 일찍 끝낼 수 없음). 타이머는 그대로 흐름.
-            bool canSkip = !IsTaxUnpaidNight();
-            if (skipPhoneTimeButton.activeSelf != canSkip)
-                skipPhoneTimeButton.SetActive(canSkip);
-            if (!canSkip)
-                skipPhoneTime = false; // 스킵 입력 무효화(버튼/ S키 모두)
-
-            if (skipPhoneTime)
-                break;
 
             phoneTimer -= Time.deltaTime;
 
@@ -282,13 +272,7 @@ public class PhoneManager : Singleton<PhoneManager>
         skipPhoneTime = false;
         isPhoneTime = false;
 
-        // 시간 내 세금 미납으로 밤이 끝났으면 → 농장 전멸 연출 + 게임오버
-        if (IsTaxUnpaidNight())
-        {
-            yield return StartCoroutine(GameManager.Instance.TaxFailureRoutine());
-            yield break;
-        }
-
+        // 미납이어도 밤은 그대로 끝난다. 소비(강제징수/압류)는 다음 낮 시작에 처리(GameManager.TaxCollectionRoutine).
         yield return null;
     }
     
@@ -297,6 +281,10 @@ public class PhoneManager : Singleton<PhoneManager>
         breedTimerManager.SetPhoneTimer();
         phoneTimerText.text = "자기 전에\n핸드폰 봐야지...";
     }
+
+    // 세금 압류 유예 타이머(GameManager.TaxCollectionRoutine에서 사용)
+    public void StartTaxTimer(int seconds) => breedTimerManager.StartTaxTimer(seconds);
+    public void StopTaxTimer() => breedTimerManager.StopTaxTimer();
 
     public void SetPhoneTimerUI(TimerUI timerUI)
     {

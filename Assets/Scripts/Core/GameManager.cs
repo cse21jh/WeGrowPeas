@@ -332,6 +332,10 @@ public class GameManager : Singleton<GameManager>
 
     IEnumerator StartStage()
     {
+        // 세금 연체 시 낮 시작 직후(웨이브 전) 강제징수/압류
+        if (TaxManager.Instance != null && TaxManager.Instance.HasOverdueTax(stage))
+            yield return StartCoroutine(TaxCollectionRoutine());
+
         enemyController.ShowNextWaveText();
 
         if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
@@ -438,21 +442,96 @@ public class GameManager : Singleton<GameManager>
         yield return null;
     }
 
-    // 세금 미납 실패: 농장 전멸 연출 후 게임오버.
-    public IEnumerator TaxFailureRoutine()
+    // 세금 연체 강제징수(낮 시작): 있으면 강제 차감, 부족하면 음수 + 10초 압류 페이즈 → 강제매각.
+    public IEnumerator TaxCollectionRoutine()
     {
-        // 모든 식물을 순차적으로 죽인다(페트병/익충에 막히지 않도록 Other 사용).
-        var plants = new System.Collections.Generic.List<Plant>(grid.plantGrid.Values);
-        foreach (var p in plants)
+        int owed = TaxManager.Instance != null ? TaxManager.Instance.OverdueAmount : 0;
+        TaxManager.Instance?.MarkPaidForcibly(); // 세금 자체는 징수 처리(다음 세금일로)
+
+        // 강제징수 처리됐으니 국세청 앱 red dot(알람) 끔
+        if (phoneManager != null)
+            phoneManager.UpdateAppAlarmState(AppKey.Tax, AlarmState.None);
+
+        if (owed <= 0) yield break;
+
+        economyManager.SpendGold(owed); // 강제 차감(부족하면 음수)
+
+        if (economyManager.GetGold() >= 0)
         {
-            if (p != null) p.Die(DeathCause.Other);
-            yield return new WaitForSeconds(0.06f); // 순차적으로 시드는 연출
+            Debug.Log($"[Tax] 강제징수 {owed} 완료(잔액 충분).");
+            yield break;
         }
 
-        yield return new WaitForSeconds(1.0f);
+        // 부족 → 빚(음수). 압류 대상은 삽으로 팔 수 있는 Pea/Peanut만.
+        var seized = new System.Collections.Generic.HashSet<Plant>();
+        RefreshSeizure(seized);
+        Debug.Log($"[Tax] 세금 부족! 빚 {-economyManager.GetGold()}, 식물 {seized.Count}개 압류. 10초 내 상환 필요.");
 
-        // 게임오버 보장 (전멸로 자동 트리거됐으면 GameOver 내부 guard로 무시됨)
-        yield return StartCoroutine(GameOver());
+        // 10초 유예: 기존 타이머 UI 재사용. 삽으로 '안 압류' 식물을 팔면 골드↑ → 압류 스티커 실시간 갱신.
+        // (웨이브 전이라 StopGame 불필요 — 안 멈춰야 타이머가 흐르고 삽질 가능)
+        phoneManager.StartTaxTimer(10);
+        float t = 10f;
+        int lastGold = economyManager.GetGold();
+        while (t > 0f && economyManager.GetGold() < 0)
+        {
+            t -= Time.deltaTime;
+            int g = economyManager.GetGold();
+            if (g != lastGold) { lastGold = g; RefreshSeizure(seized); } // 골드 변할 때마다 스티커 갱신
+            yield return null;
+        }
+        phoneManager.StopTaxTimer();
+
+        if (economyManager.GetGold() >= 0)
+        {
+            foreach (var p in seized) if (p != null) p.SetSeized(false); // 상환 완료 → 압류 해제
+            Debug.Log("[Tax] 상환 완료 — 압류 해제.");
+        }
+        else
+        {
+            // 압류분 강제매각(비싼 것부터, 골드 0 이상 될 때까지)
+            var toSell = new System.Collections.Generic.List<Plant>(seized);
+            toSell.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
+            foreach (var p in toSell)
+            {
+                if (p == null) continue;
+                if (economyManager.GetGold() >= 0) { p.SetSeized(false); continue; }
+                economyManager.AddGold(p.GetSellingPrice());
+                p.Die(DeathCause.Other);
+                yield return new WaitForSeconds(0.12f); // 순차 매각 연출
+            }
+            Debug.Log("[Tax] 압류분 강제매각 완료.");
+        }
+
+        // 다 팔려 Pea/Peanut이 없으면 게임오버
+        if (grid.CheckGameOver())
+            yield return StartCoroutine(GameOver());
+    }
+
+    // 현재 빚(-gold)만큼 Pea/Peanut을 비싼 순으로 압류. seized 집합과 스티커를 갱신.
+    private void RefreshSeizure(System.Collections.Generic.HashSet<Plant> seized)
+    {
+        int debt = Mathf.Max(0, -economyManager.GetGold());
+
+        var seizable = new System.Collections.Generic.List<Plant>();
+        foreach (var p in grid.plantGrid.Values)
+            if (p != null && (p is Pea || p is Peanut)) seizable.Add(p);
+        seizable.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
+
+        var needed = new System.Collections.Generic.HashSet<Plant>();
+        int sum = 0;
+        foreach (var p in seizable)
+        {
+            if (sum >= debt) break;
+            needed.Add(p);
+            sum += p.GetSellingPrice();
+        }
+
+        // 더 이상 불필요한 압류 해제
+        foreach (var p in new System.Collections.Generic.List<Plant>(seized))
+            if (!needed.Contains(p)) { if (p != null) p.SetSeized(false); seized.Remove(p); }
+        // 새로 필요한 압류
+        foreach (var p in needed)
+            if (seized.Add(p)) p.SetSeized(true);
     }
 
     public IEnumerator GameOver()

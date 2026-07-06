@@ -37,7 +37,17 @@ public abstract class Plant : MonoBehaviour
     protected Grid grid;
 
     public bool isDying = false;
-    
+
+    // 세금 압류
+    [Header("압류")]
+    [SerializeField] private GameObject seizeSticker; // 압류 스티커(프리팹에서 연결). 없으면 시각효과만 생략
+    public bool IsSeized { get; private set; }
+    public void SetSeized(bool on)
+    {
+        IsSeized = on;
+        if (seizeSticker != null) seizeSticker.SetActive(on);
+    }
+
     // 급속 냉각기 관련
     protected bool isFrozen = false;
     protected int frozenPrice = 0;

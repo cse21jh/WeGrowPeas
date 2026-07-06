@@ -124,7 +124,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
             Plant target = plant;
             if (plant != null && !plant.isDying)
             {
-                SoundManager.Instance.PlayEffect("Shovel");                
+                SoundManager.Instance.PlayEffect("Shovel");
                 if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
                     economyManager.AddSellCount(plant.speciesname);

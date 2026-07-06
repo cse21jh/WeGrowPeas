@@ -36,6 +36,15 @@ public class TaxManager : Singleton<TaxManager>
     /// <summary>현재 스테이지 기준으로 이번 세금이 마감 도달(미납 상태)인가.</summary>
     public bool IsDueNow(int currentStage) => currentStage >= DueTaxStage;
 
+    /// <summary>세금 마감(밤)이 지났는데 미납 상태인가 → 낮에 강제징수 대상.</summary>
+    public bool HasOverdueTax(int currentStage) => currentStage > DueTaxStage;
+
+    /// <summary>연체된 세금액(강제징수 금액).</summary>
+    public int OverdueAmount => DueAmount;
+
+    /// <summary>강제징수 처리(납부 완료로 간주하고 다음 세금일로 넘어감).</summary>
+    public void MarkPaidForcibly() => lastPaidTaxStage = DueTaxStage;
+
     /// <summary>지금 보유 골드로 이번 세금을 낼 수 있는가.</summary>
     public bool CanPayNow() => Economy != null && Economy.HasGold(DueAmount);
 

@@ -95,4 +95,21 @@ public class BreedTimerManager : MonoBehaviour
         timerUIs[8].UpdatePhoneMaxTimerCount();
         grid.SetBreedTimerUI(timerUIs[8]);
     }
+
+    // 세금 압류 유예 타이머(폰 타이머 슬롯 재사용)
+    public void StartTaxTimer(int seconds)
+    {
+        foreach (GameObject timer in timers)
+            timer.SetActive(false);
+
+        timers[8].SetActive(true);
+        grid.SetBreedTimerUI(timerUIs[8]);
+        timerUIs[8].StartTaxTimer(seconds);
+    }
+
+    public void StopTaxTimer()
+    {
+        if (timerUIs != null && timerUIs.Length > 8 && timerUIs[8] != null)
+            timerUIs[8].StopTimerByPhone();
+    }
 }
