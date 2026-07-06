@@ -5,10 +5,10 @@ using DG.Tweening;
 public class PopupHideController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private RectTransform maximizedPanel; // ÀüÃ¼ ÆË¾÷
-    [SerializeField] private RectTransform minimizedPanel; // ÃÖ¼ÒÈ­ ÇÚµé
-    [SerializeField] private Button minimizeButton;        // ÃÖ¼ÒÈ­ ¹öÆ°
-    [SerializeField] private Button maximizeButton;         // ÀüÃ¼Ã¢ ¹öÆ°
+    [SerializeField] private RectTransform maximizedPanel; // ï¿½ï¿½Ã¼ ï¿½Ë¾ï¿½
+    [SerializeField] private RectTransform minimizedPanel; // ï¿½Ö¼ï¿½È­ ï¿½Úµï¿½
+    [SerializeField] private Button minimizeButton;        // ï¿½Ö¼ï¿½È­ ï¿½ï¿½Æ°
+    [SerializeField] private Button maximizeButton;         // ï¿½ï¿½Ã¼Ã¢ ï¿½ï¿½Æ°
 
     [Header("Animation Settings")]
     [SerializeField] private float duration = 0.3f;
@@ -22,26 +22,31 @@ public class PopupHideController : MonoBehaviour
         maxPanelOriginalScale = maximizedPanel.localScale;
         minPanelOriginalScale = minimizedPanel.localScale;
 
-        // ½ÃÀÛ »óÅÂ: ÀüÃ¼ ÆÐ³Î¸¸ ÄÑÁ® ÀÖ°í, ÇÚµéÀº ²¨Á® ÀÖÀ½
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½Ã¼ ï¿½Ð³Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö°ï¿½, ï¿½Úµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         minimizedPanel.gameObject.SetActive(false);
 
-        // ÀÌº¥Æ® ¿¬°á
+        // ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½
         minimizeButton.onClick.AddListener(MinimizePanel);
         maximizeButton.onClick.AddListener(MaximizePanel);
     }
 
     public void MinimizePanel()
     {
-        SoundManager.Instance.PlayEffect("Button");
-        minimizedPanel.localPosition = maximizedPanel.localPosition;
-        // ÀüÃ¼ ÆÐ³Î Ãà¼Ò
+        // ë‘ íŒ¨ë„ì˜ ìƒë‹¨(Top) ìœ„ì¹˜ë¥¼ ì¼ì¹˜ì‹œí‚¤ê¸° ìœ„í•œ ë³´ì •ê°’ ê³„ì‚°
+        float maxOffset = maximizedPanel.rect.height * (1f - maximizedPanel.pivot.y);
+        float minOffset = minimizedPanel.rect.height * (1f - minimizedPanel.pivot.y);
+
+        Vector3 targetPos = maximizedPanel.localPosition;
+        targetPos.y = targetPos.y + maxOffset - minOffset;
+        minimizedPanel.localPosition = targetPos;
+        // ï¿½ï¿½Ã¼ ï¿½Ð³ï¿½ ï¿½ï¿½ï¿½
         maximizedPanel.DOScale(Vector3.zero, duration)
             .SetEase(ease)
             .OnComplete(() =>
             {
                 maximizedPanel.gameObject.SetActive(false);
-                
-                // ÇÚµé µîÀå
+
+                // ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½
                 minimizedPanel.gameObject.SetActive(true);
                 minimizedPanel.localScale = Vector3.zero;
                 minimizedPanel.DOScale(minPanelOriginalScale, duration).SetEase(ease).SetUpdate(true);
@@ -50,16 +55,21 @@ public class PopupHideController : MonoBehaviour
 
     public void MaximizePanel()
     {
-        SoundManager.Instance.PlayEffect("Button");
-        maximizedPanel.localPosition = minimizedPanel.localPosition;
-        // ÇÚµé Ãà¼Ò
+        // ë‘ íŒ¨ë„ì˜ ìƒë‹¨(Top) ìœ„ì¹˜ë¥¼ ì¼ì¹˜ì‹œí‚¤ê¸° ìœ„í•œ ë³´ì •ê°’ ê³„ì‚°
+        float maxOffset = maximizedPanel.rect.height * (1f - maximizedPanel.pivot.y);
+        float minOffset = minimizedPanel.rect.height * (1f - minimizedPanel.pivot.y);
+
+        Vector3 targetPos = minimizedPanel.localPosition;
+        targetPos.y = targetPos.y + minOffset - maxOffset;
+        maximizedPanel.localPosition = targetPos;
+        // ï¿½Úµï¿½ ï¿½ï¿½ï¿½
         minimizedPanel.DOScale(Vector3.zero, duration)
             .SetEase(ease)
             .OnComplete(() =>
             {
                 minimizedPanel.gameObject.SetActive(false);
-                
-                // ÀüÃ¼ ÆÐ³Î º¹¿ø
+
+                // ï¿½ï¿½Ã¼ ï¿½Ð³ï¿½ ï¿½ï¿½ï¿½ï¿½
                 maximizedPanel.gameObject.SetActive(true);
                 maximizedPanel.localScale = Vector3.zero;
                 maximizedPanel.DOScale(maxPanelOriginalScale, duration).SetEase(ease).SetUpdate(true);
