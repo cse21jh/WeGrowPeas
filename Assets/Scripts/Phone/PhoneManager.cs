@@ -137,7 +137,7 @@ public class PhoneManager : Singleton<PhoneManager>
             nonMandatoryAlarm.SetActive(false);
             alarm.EnableAlarm();
         }
-        FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
+        //FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
         //if (open) RefreshTopBar();
     }
 
