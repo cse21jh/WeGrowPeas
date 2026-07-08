@@ -87,7 +87,8 @@ public abstract class Plant : MonoBehaviour
         this.grid = grid;
         taste = UnityEngine.Random.Range(0, 7);
 
-        holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
+        //holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
+        holdCanvas.worldCamera = FindAnyObjectByType<VcamManager>().holdCanvasCamera;
 
         childSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         stemController = GetComponentInChildren<StemController>();
