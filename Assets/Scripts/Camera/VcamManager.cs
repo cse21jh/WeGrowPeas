@@ -9,7 +9,7 @@ public class VcamManager : MonoBehaviour
     [SerializeField] private BoxCollider2D moveBounds;
     [SerializeField] private VcamController[] vcamControllers;
 
-    // 현재는 사용하지 않음
+    // 현재는 무시
     public Camera holdCanvasCamera;
 
     [Header("Drag")]
@@ -34,37 +34,58 @@ public class VcamManager : MonoBehaviour
 
     [SerializeField] private float zoomSensitivity = 0.5f;
 
+    [Tooltip("한 프레임에 처리할 최대 스크롤 양. 빠른 휠 입력으로 Bounds가 튀는 것을 방지")]
+    [SerializeField] private float maxScrollPerFrame = 3f;
+
     [Tooltip("true면 마우스 커서 위치를 기준으로 확대/축소")]
     [SerializeField] private bool zoomAroundMousePosition = true;
 
-    [Header("Bounds")]
-    [Tooltip("기존 호환용 옵션. 현재는 targetOrthographicSize 기준으로 Bounds를 계산함")]
-    [SerializeField] private bool useMainCameraSizeForBounds = true;
+    [Header("Smooth Zoom")]
+    [SerializeField] private bool enableSmoothZoom = true;
 
+    [Tooltip("작을수록 빠르게 따라감. 0.05~0.15 권장")]
+    [SerializeField] private float zoomSmoothTime = 0.08f;
+
+    [Tooltip("목표 줌값과 충분히 가까워지면 바로 스냅해서 미세 떨림 방지")]
+    [SerializeField] private float zoomSnapThreshold = 0.001f;
+
+    [Header("Bounds")]
     [Tooltip("targetOrthographicSize를 아직 얻지 못했을 때 사용할 임시 Orthographic Size")]
     [SerializeField] private float fallbackOrthographicSize = 5f;
 
     [Header("UI")]
-    [SerializeField] private bool ignoreDragOnUI = true;
+    [SerializeField] private bool ignoreInputOnUI = true;
 
     private bool isDragging;
     private Vector3 previousMousePosition;
+
     private Vector3 targetPosition;
+
+    // 휠 입력으로 정해지는 목표 줌값
     private float targetOrthographicSize;
+
+    // 실제 vcam에 적용되는 현재 줌값
+    private float currentOrthographicSize;
+
+    private float zoomVelocity;
 
     private void Awake()
     {
         InitializeReferences();
+
+        if (!enabled)
+        {
+            return;
+        }
+
         InitializeVcams();
 
-        targetOrthographicSize = GetCurrentOrthographicSize();
-        targetOrthographicSize = ClampOrthographicSize(targetOrthographicSize);
-
         targetPosition = sharedFollowTarget.position;
-        targetPosition = ClampPositionToBounds(targetPosition);
 
-        ApplyTargetPosition(targetPosition);
-        ApplyOrthographicSizeToAllVcams(targetOrthographicSize);
+        targetOrthographicSize = GetCurrentOrthographicSize();
+        currentOrthographicSize = targetOrthographicSize;
+
+        ApplyCameraState(true);
     }
 
     private void Update()
@@ -78,6 +99,11 @@ public class VcamManager : MonoBehaviour
         {
             HandleZoom();
         }
+
+        if (enableSmoothZoom)
+        {
+            ApplyCameraState(false);
+        }
     }
 
     private void InitializeReferences()
@@ -85,6 +111,13 @@ public class VcamManager : MonoBehaviour
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
+        }
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("[VcamManager] Main Camera가 필요합니다.");
+            enabled = false;
+            return;
         }
 
         if (sharedFollowTarget == null)
@@ -118,11 +151,6 @@ public class VcamManager : MonoBehaviour
 
     private void InitializeVcams()
     {
-        if (vcamControllers == null)
-        {
-            return;
-        }
-
         foreach (VcamController controller in vcamControllers)
         {
             if (controller == null)
@@ -164,27 +192,14 @@ public class VcamManager : MonoBehaviour
 
         Vector3 currentMousePosition = Input.mousePosition;
 
-        Vector3 previousWorld = ScreenToWorldOnFollowTargetPlane(previousMousePosition);
-        Vector3 currentWorld = ScreenToWorldOnFollowTargetPlane(currentMousePosition);
-
-        Vector3 worldDelta;
-
-        if (dragLikeSceneView)
-        {
-            worldDelta = previousWorld - currentWorld;
-        }
-        else
-        {
-            worldDelta = currentWorld - previousWorld;
-        }
-
-        worldDelta *= dragSensitivity;
-        worldDelta.z = 0f;
+        Vector3 worldDelta = GetMouseDragWorldDelta(
+            previousMousePosition,
+            currentMousePosition
+        );
 
         targetPosition += worldDelta;
-        targetPosition = ClampPositionToBounds(targetPosition);
 
-        ApplyTargetPosition(targetPosition);
+        ApplyCameraState(!enableSmoothZoom);
 
         previousMousePosition = currentMousePosition;
     }
@@ -196,7 +211,7 @@ public class VcamManager : MonoBehaviour
             return;
         }
 
-        float scroll = Input.mouseScrollDelta.y;
+        float scroll = GetScrollInput();
 
         if (Mathf.Approximately(scroll, 0f))
         {
@@ -207,6 +222,8 @@ public class VcamManager : MonoBehaviour
         {
             return;
         }
+
+        scroll = Mathf.Clamp(scroll, -maxScrollPerFrame, maxScrollPerFrame);
 
         Vector3 mousePosition = Input.mousePosition;
 
@@ -228,25 +245,49 @@ public class VcamManager : MonoBehaviour
             targetPosition += correction;
         }
 
-        targetPosition = ClampPositionToBounds(targetPosition);
-
-        ApplyTargetPosition(targetPosition);
-        ApplyOrthographicSizeToAllVcams(targetOrthographicSize);
+        ApplyCameraState(!enableSmoothZoom);
     }
 
-    private Vector3 ScreenToWorldOnFollowTargetPlane(Vector3 screenPosition)
+    private Vector3 GetMouseDragWorldDelta(Vector3 previousScreenPosition, Vector3 currentScreenPosition)
     {
-        float distanceFromCamera = Mathf.Abs(
-            sharedFollowTarget.position.z - mainCamera.transform.position.z
+        Vector3 screenDelta = currentScreenPosition - previousScreenPosition;
+
+        float orthographicSize = currentOrthographicSize > 0f
+            ? currentOrthographicSize
+            : fallbackOrthographicSize;
+
+        float worldHeight = orthographicSize * 2f;
+        float worldWidth = worldHeight * mainCamera.aspect;
+
+        float worldPerPixelX = worldWidth / Screen.width;
+        float worldPerPixelY = worldHeight / Screen.height;
+
+        Vector3 worldDelta = new Vector3(
+            screenDelta.x * worldPerPixelX,
+            screenDelta.y * worldPerPixelY,
+            0f
         );
 
-        Vector3 screenPoint = new Vector3(
-            screenPosition.x,
-            screenPosition.y,
-            distanceFromCamera
-        );
+        if (dragLikeSceneView)
+        {
+            worldDelta = -worldDelta;
+        }
 
-        return mainCamera.ScreenToWorldPoint(screenPoint);
+        worldDelta *= dragSensitivity;
+
+        return worldDelta;
+    }
+
+    private float GetScrollInput()
+    {
+        float scroll = Input.mouseScrollDelta.y;
+
+        if (Mathf.Approximately(scroll, 0f))
+        {
+            scroll = Input.GetAxisRaw("Mouse ScrollWheel") * 10f;
+        }
+
+        return scroll;
     }
 
     private Vector3 ScreenToWorldByOrthographicSize(
@@ -266,11 +307,50 @@ public class VcamManager : MonoBehaviour
         return new Vector3(worldX, worldY, cameraCenter.z);
     }
 
+    private void ApplyCameraState(bool instant)
+    {
+        targetOrthographicSize = ClampOrthographicSize(targetOrthographicSize);
+
+        if (instant || !enableSmoothZoom)
+        {
+            currentOrthographicSize = targetOrthographicSize;
+            zoomVelocity = 0f;
+        }
+        else
+        {
+            currentOrthographicSize = Mathf.SmoothDamp(
+                currentOrthographicSize,
+                targetOrthographicSize,
+                ref zoomVelocity,
+                zoomSmoothTime
+            );
+
+            if (Mathf.Abs(currentOrthographicSize - targetOrthographicSize) <= zoomSnapThreshold)
+            {
+                currentOrthographicSize = targetOrthographicSize;
+                zoomVelocity = 0f;
+            }
+        }
+
+        currentOrthographicSize = ClampOrthographicSize(currentOrthographicSize);
+
+        // 위치는 목표 줌값 기준으로 먼저 제한.
+        // 빠른 줌아웃 시 최종 화면 크기가 Bounds 밖으로 나가는 것을 방지한다.
+        targetPosition = ClampPositionToBounds(targetPosition, targetOrthographicSize);
+
+        ApplyOrthographicSizeToAllVcams(currentOrthographicSize);
+        ApplyTargetPosition(targetPosition);
+    }
+
     private Vector3 ClampPositionToBounds(Vector3 position)
+    {
+        return ClampPositionToBounds(position, targetOrthographicSize);
+    }
+
+    private Vector3 ClampPositionToBounds(Vector3 position, float orthographicSize)
     {
         Bounds bounds = moveBounds.bounds;
 
-        float orthographicSize = GetBoundsOrthographicSize();
         float halfHeight = orthographicSize;
         float halfWidth = orthographicSize * mainCamera.aspect;
 
@@ -325,21 +405,6 @@ public class VcamManager : MonoBehaviour
         float allowedMinSize = Mathf.Min(minOrthographicSize, allowedMaxSize);
 
         return Mathf.Clamp(size, allowedMinSize, allowedMaxSize);
-    }
-
-    private float GetBoundsOrthographicSize()
-    {
-        if (targetOrthographicSize > 0f)
-        {
-            return targetOrthographicSize;
-        }
-
-        if (useMainCameraSizeForBounds && mainCamera != null)
-        {
-            return mainCamera.orthographicSize;
-        }
-
-        return fallbackOrthographicSize;
     }
 
     private float GetCurrentOrthographicSize()
@@ -399,7 +464,7 @@ public class VcamManager : MonoBehaviour
 
     private bool IsPointerOverUI()
     {
-        if (!ignoreDragOnUI)
+        if (!ignoreInputOnUI)
         {
             return false;
         }
