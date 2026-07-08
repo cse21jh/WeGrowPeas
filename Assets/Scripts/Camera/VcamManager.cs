@@ -54,7 +54,7 @@ public class VcamManager : MonoBehaviour
     [SerializeField] private float fallbackOrthographicSize = 5f;
 
     [Header("UI")]
-    [SerializeField] private bool ignoreInputOnUI = true;
+    [SerializeField] private bool ignoreInputOnUI = false;
 
     private bool isDragging;
     private Vector3 previousMousePosition;
