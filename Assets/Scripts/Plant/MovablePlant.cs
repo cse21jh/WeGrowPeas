@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public abstract class MovablePlant : Plant
 {
+    private static readonly HashSet<MovablePlant> activePlants = new HashSet<MovablePlant>();
+    public static bool IsAnyPlantHeldOrDragged => activePlants.Count > 0;
+
     //이동을 위한 변수
     private float holdTime = 0f;
     private bool isHolding = false;
@@ -44,6 +47,8 @@ public abstract class MovablePlant : Plant
 
     protected void Update()
     {
+        bool stateChanged = false;
+
         if (isHolding)
         {
             if (ClickRouter.Instance.IsBlockedByUI)
@@ -54,6 +59,7 @@ public abstract class MovablePlant : Plant
                 holdGaugeImage.fillAmount = 0f;
                 holdGaugeCanvasObj.SetActive(false);
                 grid.TryPlacePlant(this, Input.mousePosition);
+                stateChanged = true;
             }
             holdTime += Time.deltaTime;
             holdGaugeImage.fillAmount = Mathf.Clamp01(holdTime / HoldDuration);
@@ -75,11 +81,20 @@ public abstract class MovablePlant : Plant
 
         if (!grid.GetIsBreeding() || isFrozen)
         {
-            isDragging = false;
-            isHolding = false;
-            holdTime = 0f;
-            holdGaugeImage.fillAmount = 0f;
-            holdGaugeCanvasObj.SetActive(false);
+            if (isDragging || isHolding)
+            {
+                isDragging = false;
+                isHolding = false;
+                holdTime = 0f;
+                holdGaugeImage.fillAmount = 0f;
+                holdGaugeCanvasObj.SetActive(false);
+                stateChanged = true;
+            }
+        }
+
+        if (stateChanged)
+        {
+            UpdateActiveState();
         }
     }
 
@@ -112,6 +127,7 @@ public abstract class MovablePlant : Plant
         holdTime = 0f;
         holdGaugeImage.fillAmount = 0f;
         holdGaugeCanvasObj.SetActive(false);
+        UpdateActiveState();
     }
 
     private void StartDragging()
@@ -121,6 +137,7 @@ public abstract class MovablePlant : Plant
 
         Vector3 pos = transform.position;
         transform.position = new Vector3(pos.x, pos.y, pos.z - 0.1f);
+        UpdateActiveState();
     }
 
     public override bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
@@ -208,5 +225,24 @@ public abstract class MovablePlant : Plant
     public void SetIceEffect(bool val)
     {
         iceEffect.SetActive(val);
+    }
+
+    private void UpdateActiveState()
+    {
+        if (isDragging)
+        {
+            activePlants.Add(this);
+        }
+        else
+        {
+            activePlants.Remove(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        isHolding = false;
+        isDragging = false;
+        activePlants.Remove(this);
     }
 }

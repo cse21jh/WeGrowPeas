@@ -169,6 +169,12 @@ public class VcamManager : MonoBehaviour
             return;
         }
 
+        if (MovablePlant.IsAnyPlantHeldOrDragged)
+        {
+            isDragging = false;
+            return;
+        }
+
         if (Input.GetMouseButtonDown(dragMouseButton))
         {
             if (IsPointerOverUI())
