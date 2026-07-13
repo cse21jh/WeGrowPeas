@@ -18,6 +18,7 @@ public class CurseManager : Singleton<CurseManager>
     private readonly List<int> _foggedTiles = new();    // 안개 낀 타일(저항 확인 불가)
     private readonly List<int> _mushroomTiles = new();   // 버섯 타일(웨이브 시 피해)
     public bool IsFogged(int idx) => _foggedTiles.Contains(idx);
+    public bool IsMushroom(int idx) => _mushroomTiles.Contains(idx);
 
     [Header("Debug")]
     [Tooltip("좌상단에 현재 적용 중인 저주 오버레이 표시 (F9로 토글)")]

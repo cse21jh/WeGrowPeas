@@ -14,6 +14,8 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
     [SerializeField] private GameObject coolerIndicator;
     [SerializeField] private GameObject sprinklerIndicator;
     [SerializeField] private GameObject absorbFertilizerIndicator;
+    [SerializeField] private GameObject fogIndicator;       // 저주: 안개
+    [SerializeField] private GameObject mushroomIndicator;  // 저주: 버섯
 
     [Header("Colors")]
     [SerializeField] private Color[] fertilizerColors; // WaveType 순서와 일치해야 함
@@ -112,6 +114,26 @@ public class InfoAppGridSlot : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (isAbsorbFertilizer)
         {
             sb.AppendLine("- 저항력 흡수 비료: 주변 식물의 저항력을 지속 흡수");
+            hasEffect = true;
+        }
+
+        // 8. 저주: 안개
+        bool isFog = CurseManager.Instance != null && CurseManager.Instance.IsFogged(gridIndex);
+        if (fogIndicator) fogIndicator.SetActive(isFog);
+
+        if (isFog)
+        {
+            sb.AppendLine("- 안개: 이 땅 식물의 저항력을 확인할 수 없음");
+            hasEffect = true;
+        }
+
+        // 9. 저주: 버섯
+        bool isMushroom = CurseManager.Instance != null && CurseManager.Instance.IsMushroom(gridIndex);
+        if (mushroomIndicator) mushroomIndicator.SetActive(isMushroom);
+
+        if (isMushroom)
+        {
+            sb.AppendLine("- 버섯: 이번 웨이브에 이 땅의 식물이 피해를 입음");
             hasEffect = true;
         }
 
