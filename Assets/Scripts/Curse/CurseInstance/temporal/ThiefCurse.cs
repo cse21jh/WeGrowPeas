@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class ThiefCurse : CurseInstance
 {
-    public ThiefCurse(CurseScriptable data) : base(data)
+    public ThiefCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("도둑이야! 실행");
+        int count = Mathf.RoundToInt(Lv != null ? Lv.valueA : 0f);
+        GameManager.Instance?.grid?.StealPlants(count);
     }
 
     public override void Deactivate()
     {
-        Debug.Log("도둑이야! 끝");
+        // 단발성: 해제 시 별도 처리 없음
     }
 }

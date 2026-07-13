@@ -1,19 +1,22 @@
 using UnityEngine;
 
+// 201 벌레 대발생: 벌레가 2마리씩, 등장 딜레이 감소(초). 스폰 로직(Grid)이 CurseState를 읽어 반영.
 public class BugFestivalCurse : CurseInstance
 {
-    public BugFestivalCurse(CurseScriptable data) : base(data)
+    public BugFestivalCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("벌레 대발생 실행");
+        CurseState.BugFestival = true;
+        CurseState.BugFestivalDelayReduce = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        Debug.Log("벌레 대발생 끝");
+        CurseState.BugFestival = false;
+        CurseState.BugFestivalDelayReduce = 0f;
     }
 }

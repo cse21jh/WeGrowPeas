@@ -77,6 +77,10 @@ public abstract class Plant : MonoBehaviour
 
     public virtual bool IsMovable => false;
 
+    // 저주(꽃가루 실종): 교배 불가 상태
+    private bool breedable = true;
+    public bool IsBreedable => breedable;
+
     protected int plantID = -1;
 
     protected float bonusGoldRatio = 0.2f; // 웨이브를 버틸 수록 추가되는 골드 비율
@@ -244,6 +248,10 @@ public abstract class Plant : MonoBehaviour
                 // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
                 float dawnBase = Mathf.Max(0f, g.resistance - DawnSystem.Current.resistanceCapReductionPercent / 100f);
                 resistance += dawnBase + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
+                // 저주: 반란 — 우성(genetics 0·1) 저항 +%p / 열성(genetics 2) -%p
+                if (CurseState.ReversePercent > 0f)
+                    resistance += (g.genetics <= 1 ? 1f : -1f) * (CurseState.ReversePercent / 100f);
+                if (resistance < 0f) resistance = 0f;
                 return resistance = resistance >= 1f ? 1f : resistance; // 총합 상한은 1.0 유지
             }
         }
@@ -335,6 +343,16 @@ public abstract class Plant : MonoBehaviour
     {
         IsSelected = false;
         ChangeLayerOfAllChild(gameObject, "Default"); // "Default" 레이어로 변경
+    }
+
+    // 저주(꽃가루 실종): 교배 가능 여부 설정. 불가 시 어둡게 표시.
+    public void SetBreedable(bool value)
+    {
+        breedable = value;
+        if (childSpriteRenderers == null) return;
+        Color tint = value ? Color.white : new Color(0.45f, 0.45f, 0.45f, 1f);
+        foreach (var sr in childSpriteRenderers)
+            if (sr != null) sr.color = tint;
     }
 
     private void ChangeLayerOfAllChild(GameObject obj, string layerName)
@@ -484,7 +502,7 @@ public abstract class Plant : MonoBehaviour
         if(minResistance > maxResistance)
             minResistance = maxResistance;
 
-        if (UnityEngine.Random.Range(0, 100) < 1f + DawnSystem.Current.mutationChanceAddPercent) // 변종 시 저항력 90~100 사이로 설정 (새벽: 변종 확률 증가)
+        if (UnityEngine.Random.Range(0, 100) < 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent) // 변종 시 저항력 90~100 (새벽 + 저주 돌연변이로 확률 증가)
             resistance += Mathf.Round(UnityEngine.Random.Range(90, 101) / 100f);
         else
             resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
@@ -627,12 +645,18 @@ public abstract class Plant : MonoBehaviour
         // 새벽: 매일(웨이브 통과 시) 모든 저항력 감소. (일반 모드는 위 블록이 폐기되어 감소 없음)
         // 황금 완두콩은 기존 규칙대로 저항력 감소 제외.
         float dawnDailyDecay = DawnSystem.Current.dailyResistanceDecayAddPercent / 100f;
+        float curseDailyDecay = CurseState.RadiationDecayPercent / 100f; // 저주: 방사능
+        float totalDailyDecay = dawnDailyDecay + curseDailyDecay;
         bool isGoldPlant = stemController != null && stemController.IsGold();
-        if (dawnDailyDecay > 0f && !isGoldPlant)
+        if (totalDailyDecay > 0f && !isGoldPlant)
         {
             for (int i = 0; i < Wave.NumberOfWave; i++)
-                ChangeResistance(i, -dawnDailyDecay);
+                ChangeResistance(i, -totalDailyDecay);
         }
+
+        // 저주(집중포화): 이번(현재) 웨이브에 대한 저항력 추가 감소
+        if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant)
+            ChangeResistance((int)waveType, -CurseState.HeavyFireExtraDecayPercent / 100f);
 
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {

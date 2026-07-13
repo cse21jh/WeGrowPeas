@@ -1,19 +1,20 @@
 using UnityEngine;
 
+// 203 방사능: 매일 모든 저항력 추가 감소 %p. Plant의 일일 저항 감소(ResistWave)가 CurseState를 읽어 반영.
 public class RadiationCurse : CurseInstance
 {
-    public RadiationCurse(CurseScriptable data) : base(data)
+    public RadiationCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("방사능 실행");
+        CurseState.RadiationDecayPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        Debug.Log("방사능 끝");
+        CurseState.RadiationDecayPercent = 0f;
     }
 }

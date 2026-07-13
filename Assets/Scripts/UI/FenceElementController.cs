@@ -335,7 +335,15 @@ public class FenceElementController : MonoBehaviour
 
         surviveProbability.gameObject.SetActive(true);
 
-        if (trait.traitType == TraitType.HeavyRain)
+        // 저주(안개): 안개 낀 타일의 식물은 저항력 확인 불가 → ??%
+        bool fogged = CurseManager.Instance != null && CurseManager.Instance.IsFogged(plant.gridIndex);
+
+        if (fogged)
+        {
+            bool twoLine = trait.traitType == TraitType.HeavyRain || trait.traitType == TraitType.Cold;
+            surviveProbability.text = twoLine ? "??%\n??%" : "??%";
+        }
+        else if (trait.traitType == TraitType.HeavyRain)
         {
             surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Drought) * 100f) .ToString("F0") + "%";
         }

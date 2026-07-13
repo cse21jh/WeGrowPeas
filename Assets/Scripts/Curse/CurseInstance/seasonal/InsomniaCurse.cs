@@ -1,19 +1,20 @@
 using UnityEngine;
 
+// 206 불면증: 자유시간이 짧아짐(배율). 교배/자유시간 타이머가 CurseState.InsomniaFreeTimeRatio를 읽어 반영.
 public class InsomniaCurse : CurseInstance
 {
-    public InsomniaCurse(CurseScriptable data) : base(data)
+    public InsomniaCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("불면증 실행");
+        CurseState.InsomniaFreeTimeRatio = (Lv != null ? Lv.valueA : 100f) / 100f;
     }
 
     public override void Deactivate()
     {
-        Debug.Log("불면증 끝");
+        CurseState.InsomniaFreeTimeRatio = 1f;
     }
 }

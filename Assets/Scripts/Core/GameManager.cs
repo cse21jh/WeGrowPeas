@@ -159,6 +159,7 @@ public class SaveData
     //CurseManager
     public string[] curseId = new string[2]; //0:temp 1:season
     public int remainSeasonCurseDay;
+    public int remainTempCurseDay;
 
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
@@ -206,6 +207,9 @@ public class GameManager : Singleton<GameManager>
 
     private int gameMode = 0; //0: normal 1: endless
 
+    /// <summary>저주가 이번 런에서 도는가. 무한모드(1) 또는 새벽 모드(저주 레벨 &gt; 0)일 때.</summary>
+    private bool CurseActive => gameMode == 1 || DawnSystem.Current.curseLevel > 0;
+
     public Grid grid;
     public EnemyController enemyController;
     public WaveManager waveManager;
@@ -243,6 +247,7 @@ public class GameManager : Singleton<GameManager>
                 economyManager.InitEconomyManager();
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
+                CurseState.ResetAll(); // 저주 상태 초기화
                 gameMode = 0;
                 StageUpdate();
                 break;
@@ -286,6 +291,9 @@ public class GameManager : Singleton<GameManager>
         while (!gameOver)
         {
             UpdateStageUI();
+
+            if (CurseActive) curseManager.ApplyCurse(); // 새벽: 전날 밤 선택된 저주 발동
+
             yield return StartCoroutine(StartStage());
 
             if (stage == endStage)
@@ -370,7 +378,7 @@ public class GameManager : Singleton<GameManager>
         gcController.ToggleGlow(true);
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
 
-        if (gameMode == 1) curseManager.SelectCurse(stage);
+        if (CurseActive) curseManager.SelectCurse(stage);
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
@@ -791,6 +799,7 @@ public class GameManager : Singleton<GameManager>
         //curseManager
         saveData.curseId = curseManager.SaveCurseManager();
         saveData.remainSeasonCurseDay = curseManager.RemainingCurseDay;
+        saveData.remainTempCurseDay = curseManager.RemainingTempCurseDay;
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(GetSavePath(), json);

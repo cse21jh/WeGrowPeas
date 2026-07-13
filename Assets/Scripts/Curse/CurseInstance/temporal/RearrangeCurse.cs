@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class RearrangeCurse : CurseInstance
 {
-    public RearrangeCurse(CurseScriptable data) : base(data)
+    public RearrangeCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("대격변 실행");
+        float ratio = (Lv != null ? Lv.valueA : 0f) / 100f;
+        GameManager.Instance?.grid?.RearrangePlants(ratio);
     }
 
     public override void Deactivate()
     {
-        Debug.Log("대격변 끝");
+        // 단발성: 해제 시 별도 처리 없음
     }
 }
