@@ -242,6 +242,8 @@ public class ShopManager : Singleton<ShopManager>
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
 
+        CodexProgress.Discover(CodexProgress.Category.Item, data.UnlockId); // 도감: 아이템 발견
+
         // 효과 확정 반영
         data.Commit(ctx);
 

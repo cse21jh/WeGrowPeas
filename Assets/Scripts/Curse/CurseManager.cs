@@ -284,6 +284,7 @@ public class CurseManager : Singleton<CurseManager>
         if(currentTempCurse == null) return;
 
         currentTempCurse.Activate();
+        CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId); // 도감: 저주 발견
         //단발형 저주 발동 UI
     }
 
@@ -304,6 +305,7 @@ public class CurseManager : Singleton<CurseManager>
         if(currentSeasonCurse == null) return;
 
         currentSeasonCurse.Activate();
+        CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId); // 도감: 저주 발견
     }
 
     private void RemoveCurse()

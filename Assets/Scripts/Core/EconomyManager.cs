@@ -100,11 +100,15 @@ public class EconomyManager : MonoBehaviour
         if(plantName == "완두콩")
         {
             peaSellCount++;
+            CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
+            CodexProgress.AddSold(true);
             return;
         }
         else if(plantName == "땅콩")
         {
             peanutSellCount++;
+            CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
+            CodexProgress.AddSold(false);
             return;
         }
     }
