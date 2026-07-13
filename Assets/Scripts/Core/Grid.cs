@@ -303,7 +303,24 @@ public class Grid : MonoBehaviour
 
             if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
             {                        
-                AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait()));
+                // 저주: 씨 없는 수박 — 확률적으로 교배 실패(시도는 소모)
+                if (CurseState.SeedlessFailPercent > 0f && Random.Range(0f, 100f) < CurseState.SeedlessFailPercent)
+                {
+                    breedCount++;
+                    Debug.Log("씨 없는 수박 저주로 교배 실패");
+                    SoundManager.Instance.PlayEffect("WrongSelect"); // TODO: 실패 전용 효과음/연기 이펙트
+                    UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
+                    breedObj1.GetComponent<Plant>().MakeDefaultSprite();
+                    breedObj2.GetComponent<Plant>().MakeDefaultSprite();
+                    breedObj1 = null;
+                    breedObj2 = null;
+                    DeactivateBreed();
+                    return;
+                }
+
+                // 저주: 광란 — 확률적으로 랜덤 교배
+                bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
+                AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
                 breedCount++;
                 GameEvents.RaisePeaBreeded();
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
@@ -359,10 +376,11 @@ public class Grid : MonoBehaviour
 
         //int breedCount = 0;
         int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
-        // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 최소 0.5초 보장.
-        float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction);
+        // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
+        float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
         float effectiveBugSpawnTimeInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
-        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
+        // 저주: 불면증 — 자유시간(교배 페이즈) 단축
+        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1) * CurseState.InsomniaFreeTimeRatio;
 
         //임시 알람
         bool _warned15s = false;
@@ -371,6 +389,9 @@ public class Grid : MonoBehaviour
         UpdateBreedCountUI(effectiveMaxBreedCount);
         breedTimer = effectiveMaxBreedTimer;
         breedTimerUI.StartBreedingTimer();
+
+        // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
+        if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
 
         breedSkipButton.SetActive(true);
         enemyController.ShowWaveSkipButton();
@@ -420,6 +441,7 @@ public class Grid : MonoBehaviour
                 if (targetIdx.Count > 0)
                 {
                     SpawnRandomBug();
+                    if (CurseState.BugFestival) SpawnRandomBug(); // 저주: 벌레 대발생(한 번에 2마리)
                     lastBugSpawnTimeInterval = 0f;
                 }
             }
@@ -452,7 +474,7 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
-    protected List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2)
+    protected List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, bool randomBreed = false)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
@@ -517,6 +539,8 @@ public class Grid : MonoBehaviour
                     break;
                 default: break;
             }
+
+            if (randomBreed) childGenetic = Random.Range(0, 3); // 저주: 광란(부모 무시, 유전자 무작위)
 
             float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
 
@@ -945,6 +969,12 @@ public class Grid : MonoBehaviour
         Plant clickedPea = clickedObject.GetComponent<Plant>();
         if (clickedPea == null) return;
 
+        // 저주(꽃가루 실종): 교배 불가 식물은 부모로 새로 선택 불가(이미 선택된 건 취소 허용)
+        if (clickedObject != breedObj1 && clickedObject != breedObj2 && !clickedPea.IsBreedable)
+        {
+            SoundManager.Instance.PlayEffect("WrongSelect");
+            return;
+        }
 
         if (breedObj1 == clickedObject)
         {
@@ -985,7 +1015,88 @@ public class Grid : MonoBehaviour
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
         breedButtonPlant = (breedObj1 != null && breedObj2 != null) ? clickedPea : null;
         
-        MoveBreedButton(clickedObject.transform.position);        
+        MoveBreedButton(clickedObject.transform.position);
+    }
+
+    // ───── 저주 액션 (CurseInstance.Activate에서 호출) ─────
+
+    /// <summary>저주(꽃가루 실종): 필드 식물 중 ratio(0~1)만큼 무작위로 교배 불가. 나머지는 복구.</summary>
+    public void ApplyPollenLost(float ratio)
+    {
+        var plants = new List<Plant>(plantGrid.Values);
+        foreach (var p in plants) if (p != null) p.SetBreedable(true);
+        if (ratio <= 0f || plants.Count == 0) return;
+
+        int count = Mathf.FloorToInt(plants.Count * ratio); // 소수점 버림
+        ShuffleList(plants);
+        for (int i = 0; i < count && i < plants.Count; i++)
+            if (plants[i] != null) plants[i].SetBreedable(false);
+    }
+
+    /// <summary>저주(도둑): 페트병으로 보호되지 않은 무작위 식물 count개 제거.</summary>
+    public void StealPlants(int count)
+    {
+        if (count <= 0) return;
+        var candidates = new List<int>();
+        foreach (var kv in plantGrid)
+            if (kv.Value != null && !HasPetBottle(kv.Key)) candidates.Add(kv.Key);
+        ShuffleList(candidates);
+
+        int removed = 0;
+        for (int i = 0; i < candidates.Count && removed < count; i++)
+        {
+            int idx = candidates[i];
+            if (plantGrid.TryGetValue(idx, out Plant p) && p != null)
+            {
+                plantGrid.Remove(idx);
+                Destroy(p.gameObject); // TODO: 식물 날아가는 이펙트
+                removed++;
+            }
+        }
+        if (removed > 0)
+        {
+            OnGridStateChanged?.Invoke();
+            if (CheckGameOver()) StartCoroutine(GameManager.Instance.GameOver());
+        }
+    }
+
+    /// <summary>저주(대격변): 이동 가능하고 페트병 없는 식물 중 ratio만큼을 무작위로 위치 교환.</summary>
+    public void RearrangePlants(float ratio)
+    {
+        if (ratio <= 0f) return;
+        var idxs = new List<int>();
+        foreach (var kv in plantGrid)
+            if (kv.Value != null && kv.Value.IsMovable && !HasPetBottle(kv.Key)) idxs.Add(kv.Key);
+        if (idxs.Count < 2) return;
+
+        int affected = Mathf.FloorToInt(idxs.Count * ratio);
+        if (affected < 2) affected = 2; // 최소 2개는 섞어야 의미
+        affected = Mathf.Min(affected, idxs.Count);
+
+        ShuffleList(idxs);
+        var slots = idxs.GetRange(0, affected);
+        var plants = new List<Plant>();
+        foreach (var idx in slots) plants.Add(plantGrid[idx]);
+        ShuffleList(plants);
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            int idx = slots[i];
+            Plant p = plants[i];
+            plantGrid[idx] = p;
+            p.SetGridIndex(idx);
+            p.transform.position = GetSoilTransform(idx).position;
+        }
+        OnGridStateChanged?.Invoke(); // TODO: 연기 이펙트
+    }
+
+    private static void ShuffleList<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 
     // 마우스 포인터가 교배 버튼 영역 위에 있는지 검사.

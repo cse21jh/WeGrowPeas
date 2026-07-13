@@ -76,7 +76,27 @@ public abstract class ItemData : ScriptableObject
     {
         // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
         float mul = DawnSystem.Current.shopPriceMultiplier;
-        return Mathf.RoundToInt(Price * (mul > 0f ? mul : 1f));
+        float price = Price * (mul > 0f ? mul : 1f);
+
+        // 저주(독점시장): 품목별 가격이 무작위 배율(하루 동안 고정)로 변동
+        if (CurseState.ShopMonopoly)
+        {
+            int day = GameManager.Instance != null ? GameManager.Instance.stage : 0;
+            float h = StableHash01(name + "#" + day);
+            price *= Mathf.Lerp(CurseState.ShopPriceMinMul, CurseState.ShopPriceMaxMul, h);
+        }
+        return Mathf.RoundToInt(price);
+    }
+
+    // 문자열 → 0~1 결정적 해시(같은 품목·같은 날엔 항상 동일 → 가격 깜빡임 없음)
+    private static float StableHash01(string s)
+    {
+        unchecked
+        {
+            uint h = 2166136261u;
+            foreach (char c in s) { h ^= c; h *= 16777619u; }
+            return (h % 10000u) / 10000f;
+        }
     }
 
     // ���� ��ü������ ���� Ƚ�� ��ȸ

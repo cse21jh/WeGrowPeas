@@ -178,6 +178,30 @@ public class EnemyController : MonoBehaviour
             }
         }
 
+        // 저주(이중 웨이브): 서로 다른 두 번째 웨이브도 동시 판정. 저항 감소 중복 방지 위해 '죽이는 판정'만.
+        if (CurseState.DoubleWave && currentWave != noneWave)
+        {
+            Wave second = PickSecondWave(currentWave.WaveType);
+            if (second != null && second != noneWave)
+            {
+                for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+                {
+                    if (grid.plantGrid.ContainsKey(idx))
+                    {
+                        Plant plant = grid.plantGrid[idx];
+                        if (!plant.CanResist(second.WaveType))
+                        {
+                            GameEvents.RaisePeaDied();
+                            plant.Die(); // TODO: 두 번째 웨이브 시각효과
+                        }
+                    }
+                }
+            }
+        }
+
+        // 저주(버섯): 버섯 타일 위 식물은 이번 웨이브에 피해(페트병은 방어)
+        CurseManager.Instance?.ResolveMushroomWave();
+
         // 웨이브 처리 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
         grid.UnfreezeAllPlants();
 
@@ -301,7 +325,8 @@ public class EnemyController : MonoBehaviour
 
     public void ShowNextWaveText()
     {
-        nextWaveText.text = currentWave.WaveDescription;
+        // 저주(기상이변): 웨이브 유형 확인 불가
+        nextWaveText.text = CurseState.WaveBlind ? "???" : currentWave.WaveDescription;
     }
 
     public void SetNextWaveText(string text)
@@ -449,6 +474,10 @@ public class EnemyController : MonoBehaviour
 
     private WaveType PickNextByWeight()
     {
+        // 저주(집중포화): 5턴간 같은(현재 None이 아닌) 웨이브 고정
+        if (CurseState.HeavyFire && currentWave != null && currentWave.WaveType != WaveType.None)
+            return currentWave.WaveType;
+
         var map = BuildEffectiveWeights();
 
         // 총 합계
@@ -467,6 +496,17 @@ public class EnemyController : MonoBehaviour
             if (r <= acc) return kv.Key;
         }
         return WaveType.Aging; // 예외처리용 기본값
+    }
+
+    // 저주(이중 웨이브): 현재 웨이브와 다른, 해금된 웨이브 하나를 무작위 선택.
+    private Wave PickSecondWave(WaveType exclude)
+    {
+        var candidates = new List<WaveType>();
+        foreach (var kv in BuildEffectiveWeights())
+            if (kv.Value > 0f && kv.Key != exclude && kv.Key != WaveType.None)
+                candidates.Add(kv.Key);
+        if (candidates.Count == 0) return null;
+        return GetWaveFromWaveType(candidates[Random.Range(0, candidates.Count)]);
     }
 
     public void TutorialWave()

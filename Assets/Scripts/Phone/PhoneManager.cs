@@ -113,7 +113,26 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public bool IsOpen => _isOpen;
 
-    public void Toggle() => SetOpen(!_isOpen);
+    private float _empBlockEndTime = -1f; // 저주(통신장애): 이 시각(Time.time)까지 폰 차단
+
+    /// <summary>저주(통신장애): 자유시간 시작 시 호출 — 낮 시간의 일부(EmpBlockRatio) 동안 폰을 차단.</summary>
+    public void BeginEmpBlockIfActive(float freeTimeDuration)
+    {
+        _empBlockEndTime = CurseState.EmpBlockRatio > 0f
+            ? Time.time + freeTimeDuration * CurseState.EmpBlockRatio
+            : -1f;
+    }
+
+    public void Toggle()
+    {
+        // 저주(통신장애): 낮 시간의 앞부분 동안 폰이 안 열림(사용자 조작만 차단; 강제 개방/닫기는 영향 없음)
+        if (!_isOpen && CurseState.EmpBlockRatio > 0f && Time.time < _empBlockEndTime)
+        {
+            PhoneTouchEffect(); // TODO: 치지직 노이즈 표시
+            return;
+        }
+        SetOpen(!_isOpen);
+    }
 
     public void SetOpen(bool open)
     {

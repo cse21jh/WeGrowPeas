@@ -1,19 +1,20 @@
 using UnityEngine;
 
+// 207 씨 없는 수박: 교배 시 실패할 확률. Grid의 교배 로직이 CurseState.SeedlessFailPercent를 읽어 반영.
 public class SeedlessCurse : CurseInstance
 {
-    public SeedlessCurse(CurseScriptable data) : base(data)
+    public SeedlessCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("꽃가루 실종 실행");
+        CurseState.SeedlessFailPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        Debug.Log("꽃가루 실종 끝");
+        CurseState.SeedlessFailPercent = 0f;
     }
 }

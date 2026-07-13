@@ -1,19 +1,20 @@
 using UnityEngine;
 
+// 106 광란: 이번 라운드 교배가 확률적으로 랜덤 교배가 됨. Grid의 교배 로직이 CurseState.BreedMadnessPercent를 읽어 반영.
 public class BreedMadnessCurse : CurseInstance
 {
-    public BreedMadnessCurse(CurseScriptable data) : base(data)
+    public BreedMadnessCurse(CurseScriptable data, int level) : base(data, level)
     {
 
     }
 
     public override void Activate()
     {
-        Debug.Log("광란 실행");
+        CurseState.BreedMadnessPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        Debug.Log("광란 끝");
+        CurseState.BreedMadnessPercent = 0f;
     }
 }
