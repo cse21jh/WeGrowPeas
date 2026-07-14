@@ -5,18 +5,19 @@ public class PopupSystem
 {
     private CloseablePopup defaultCloseablePrefab;
     private ToastPopup defaultToastPrefab;
+    private HoverTooltipUI defaultTooltipPrefab;
     private Transform canvasParent;
 
     private Dictionary<GameObject, Queue<BasePopup>> popupPools = new Dictionary<GameObject, Queue<BasePopup>>();
 
-    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, Transform parent)
+    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, HoverTooltipUI tooltipPrefab, Transform parent)
     {
         defaultCloseablePrefab = closeablePrefab;
         defaultToastPrefab = toastPrefab;
+        defaultTooltipPrefab = tooltipPrefab;
         canvasParent = parent;
     }
 
-    /// X 버튼이 있는 유연한 일반 팝업을 표시합니다.
     public CloseablePopup ShowCloseablePopup(string title, string content, Sprite sprite = null, System.Action onClose = null)
     {
         CloseablePopup popup = ShowPopup(defaultCloseablePrefab);
@@ -24,7 +25,6 @@ public class PopupSystem
         return popup;
     }
 
-    /// 지정된 시간이 지난 후 자동으로 페이드아웃되며 사라지는 토스트 팝업을 표시합니다.
     public ToastPopup ShowToastPopup(string title, string content, Sprite sprite = null, float duration = 2.0f, System.Action onClose = null)
     {
         ToastPopup popup = ShowPopup(defaultToastPrefab);
@@ -32,7 +32,20 @@ public class PopupSystem
         return popup;
     }
 
-    /// 어떤 팝업 프리팹이든 넘겨주면 알아서 풀링하여 띄워줍니다.
+    public HoverTooltipUI ShowHoverTooltip(Vector2 position, Sprite iconSprite, string description, System.Action onClose = null)
+    {
+        HoverTooltipUI popup = ShowPopup(defaultTooltipPrefab);
+        popup.Setup(iconSprite, description, onClose);
+
+        RectTransform rectTransform = popup.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            rectTransform.anchoredPosition = position;
+        }
+
+        return popup;
+    }
+
     public T ShowPopup<T>(T prefab) where T : BasePopup
     {
         if (prefab == null) return null;
@@ -61,5 +74,35 @@ public class PopupSystem
 
         popup.Open();
         return popup;
+    }
+
+
+    public void CleanupOnSceneChange()
+    {
+        foreach (var pair in popupPools)
+        {
+            Queue<BasePopup> pool = pair.Value;
+            while (pool.Count > 0)
+            {
+                BasePopup popup = pool.Dequeue();
+                if (popup != null)
+                {
+                    Object.Destroy(popup.gameObject);
+                }
+            }
+        }
+        popupPools.Clear();
+
+        if (canvasParent != null)
+        {
+            BasePopup[] activePopups = canvasParent.GetComponentsInChildren<BasePopup>(true);
+            foreach (var popup in activePopups)
+            {
+                if (popup != null)
+                {
+                    Object.Destroy(popup.gameObject);
+                }
+            }
+        }
     }
 }

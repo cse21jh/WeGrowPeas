@@ -1,13 +1,14 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIManager : Singleton<UIManager>
 {
-    // 각 UI 서브시스템들을 제공하는 프로퍼티
     public PopupSystem Popup { get; private set; }
 
     [Header("Popup Settings")]
     [SerializeField] private CloseablePopup defaultCloseablePrefab;
     [SerializeField] private ToastPopup defaultToastPrefab;
+    [SerializeField] private HoverTooltipUI defaultTooltipPrefab;
     [SerializeField] private Transform popupCanvasParent;
 
     private void Awake()
@@ -19,7 +20,21 @@ public class UIManager : Singleton<UIManager>
         }
         DontDestroyOnLoad(gameObject);
 
-        // UIManager의 초기화 시점에 팝업 서브시스템 인스턴스 생성
-        Popup = new PopupSystem(defaultCloseablePrefab, defaultToastPrefab, popupCanvasParent);
+        Popup = new PopupSystem(defaultCloseablePrefab, defaultToastPrefab, defaultTooltipPrefab, popupCanvasParent);
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        Popup?.CleanupOnSceneChange();
     }
 }

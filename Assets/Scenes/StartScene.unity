@@ -346,6 +346,7 @@ GameObject:
   - component: {fileID: 14609706}
   - component: {fileID: 14609705}
   - component: {fileID: 14609707}
+  - component: {fileID: 14609708}
   m_Layer: 5
   m_Name: Cursor
   m_TagString: Untagged
@@ -431,6 +432,29 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: e7a9863185e78ae4f8ff397d2e7bd061, type: 3}
   - type: 2
     sprite: {fileID: 21300000, guid: 6eeb5d43d1412f64b8daa0a96f0d5910, type: 3}
+--- !u!223 &14609708
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14609703}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 1500
+  m_TargetDisplay: 0
 --- !u!1 &33237680
 GameObject:
   m_ObjectHideFlags: 0
@@ -1248,7 +1272,7 @@ RectTransform:
   m_Father: {fileID: 1179115210}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.25, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -12033,6 +12057,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   defaultCloseablePrefab: {fileID: 6174041837863606105, guid: f93859bca95b64c44a3c261e4a8f7fea, type: 3}
   defaultToastPrefab: {fileID: 4330969908153942637, guid: 71003d3c44aa30c4d8463cbe4f626e8a, type: 3}
+  defaultTooltipPrefab: {fileID: 2618776425803315878, guid: 1789c7f4b5104e04b8478b7250ac92b0, type: 3}
   popupCanvasParent: {fileID: 1154312594}
 --- !u!114 &1154312591
 MonoBehaviour:
@@ -18977,7 +19002,7 @@ RectTransform:
   m_Father: {fileID: 67338085}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.25, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
