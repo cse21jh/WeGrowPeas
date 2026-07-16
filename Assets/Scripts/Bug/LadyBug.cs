@@ -62,11 +62,16 @@ public class Ladybug : Bug
         StopCoroutine(movingCoroutine);
         StartCoroutine(CantHitForOneSecond());
         StartCoroutine(bug.CantHitForOneSecond());
-        while (bug != null) // ¹ú·¹ ¾ø¾îÁö¸é Å»Ãâ
+        while (bug != null) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å»ï¿½ï¿½
         {
             MoveToward(bug.gameObject.transform.position, 50f);
             yield return null;
         }
+    }
+
+    protected override IEnumerator Warning()
+    {
+        yield return null;
     }
 
     private Vector2 SetRandomPos()
@@ -77,7 +82,7 @@ public class Ladybug : Bug
     protected override void OnTriggerEnter(Collider obj)
     {
         Bug bug = obj.GetComponent<Bug>();
-        if(bug != null)
+        if (bug != null)
         {
             if (bug.GetType() != typeof(Ladybug))
             {
