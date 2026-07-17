@@ -67,7 +67,8 @@ public class Sprinkler : Plant
             // 단, 저항 횟수(ResistWaveCount) 자체는 올리지 않고 보너스 배수만 추가
             if (luckyPlant is MovablePlant p) // 일반 판매 식물인 경우에만 골드 추가
             {
-                p.AddBonusGoldMultiplier(1);
+                // 특수(마법부여자): 밤낮 전환 발동형 아이템 수치 2배
+                p.AddBonusGoldMultiplier(SpecialItemSystem.Has("enchanter") ? 2 : 1);
                 // UI 갱신 (가격표)
                 p.PlayWaterParticle();
                 p.ShowPriceSign();

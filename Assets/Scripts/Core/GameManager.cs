@@ -161,6 +161,11 @@ public class SaveData
     public int remainSeasonCurseDay;
     public int remainTempCurseDay;
 
+    //SpecialItem (특수 아이템)
+    public List<string> ownedSpecialItems = new();
+    public int pendingSpecialGifts;
+    public List<float> columnGoldMulBonusList = new(); // 특수(땅부자) 세로줄 배수 (index = col)
+
     //종료 시 저장
     //GameRecordHolder에 저장할 내용
 }
@@ -183,6 +188,7 @@ public class PlantData
     public int taste;
     public int resistWaveCount;
     public int survivedTurns; // MoneyTree 생존 턴 수
+    public float travelSellBonus; // 특수(세계여행) 누적 배수
 }
 
 [System.Serializable]
@@ -248,6 +254,7 @@ public class GameManager : Singleton<GameManager>
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
                 CurseState.ResetAll(); // 저주 상태 초기화
+                SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 gameMode = 0;
                 StageUpdate();
                 break;
@@ -350,6 +357,18 @@ public class GameManager : Singleton<GameManager>
         enemyController.ShowNextWaveText();
 
         if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
+
+        // 특수 아이템: 엔딩 전 10·20·30일의 자유시간에 선물 도착 (수령 전까지 유지)
+        if (stage % 10 == 0 && stage < endStage)
+        {
+            SpecialItemSystem.AddGift();
+            PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
+            {
+                title = "완두콩의 선물이 도착했습니다!",
+                message = "선물 버튼을 눌러 특수 아이템을 수령하세요.",
+                duration = 5f
+            });
+        }
 
         yield return StartCoroutine(grid.Breeding());
 
@@ -599,6 +618,7 @@ public class GameManager : Singleton<GameManager>
         requestManager.LoadRequestManager(saveData);
         phoneManager.LoadPhoneManager(saveData);
         curseManager.LoadCurseManager(saveData);
+        SpecialItemSystem.LoadFromSave(saveData.ownedSpecialItems, saveData.pendingSpecialGifts);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData);
@@ -628,7 +648,8 @@ public class GameManager : Singleton<GameManager>
                 gridIndex = p.gridIndex,
                 taste = p.GetTaste(),
                 resistWaveCount = p.GetResistWaveCount(),
-                survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0
+                survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0,
+                travelSellBonus = p.GetTravelSellBonus()
             };
 
             saveData.plantList.Add(plantData);
@@ -798,6 +819,9 @@ public class GameManager : Singleton<GameManager>
 
         //curseManager
         saveData.curseId = curseManager.SaveCurseManager();
+        saveData.ownedSpecialItems = SpecialItemSystem.GetSaveOwned();
+        saveData.pendingSpecialGifts = SpecialItemSystem.GetSavePending();
+        saveData.columnGoldMulBonusList = grid.GetColumnGoldMulBonusForSave();
         saveData.remainSeasonCurseDay = curseManager.RemainingCurseDay;
         saveData.remainTempCurseDay = curseManager.RemainingTempCurseDay;
 

@@ -161,6 +161,11 @@ public class EnemyController : MonoBehaviour
 
                     if (plant.CanResist(wave.WaveType))
                     {
+                        // 특수(도박꾼): 저항력 40% 이하 웨이브를 스스로 버티면 가격의 20% 골드
+                        if (SpecialItemSystem.Has("gambler") && !plant.IsFrozen()
+                            && plant.GetResistanceValue((int)wave.WaveType) <= 0.4f)
+                            GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.2f));
+
                         // Debug.Log(idx + "번째 식물이 웨이브를 버틸 수 있습니다");
                         plant.ResistWave(wave.WaveType);
                     }

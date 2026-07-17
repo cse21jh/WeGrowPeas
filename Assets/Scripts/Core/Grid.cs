@@ -282,7 +282,7 @@ public class Grid : MonoBehaviour
             //자식 완두콩 형질 계산 후 Instantiate
 
             // 교배 횟수 증가 아이템이 구매되었을 때 바로 적용되도록 매번 재계산
-            int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+            int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
 
             bool canBreed = false;
             for (int idx = 0; idx < maxCol * 4; idx++) // 빈 칸이 있는가
@@ -325,7 +325,9 @@ public class Grid : MonoBehaviour
                 {
                     UIManager.Instance.Popup.ShowBreedPopup(plant);
                 }
-                breedCount++;
+                // 특수(밑장빼기): 25% 확률로 교배 횟수 미소모
+                if (!(SpecialItemSystem.Has("bottom_deal") && Random.Range(0f, 100f) < 25f))
+                    breedCount++;
                 GameEvents.RaisePeaBreeded();
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
                 SoundManager.Instance.PlayEffect("Breed");
@@ -379,7 +381,7 @@ public class Grid : MonoBehaviour
         breedObj2 = null;
 
         //int breedCount = 0;
-        int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
+        int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
         // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
         float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
         float effectiveBugSpawnTimeInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
@@ -396,6 +398,11 @@ public class Grid : MonoBehaviour
 
         // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
         if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
+
+        // 특수(세계여행): 낮 시작 시 각 식물의 위치 마킹 (웨이브 후 이동 거리 계산용)
+        if (SpecialItemSystem.Has("world_travel"))
+            foreach (var p in plantGrid.Values)
+                if (p != null) p.MarkDayStartPosition();
 
         breedSkipButton.SetActive(true);
         enemyController.ShowWaveSkipButton();
@@ -482,6 +489,18 @@ public class Grid : MonoBehaviour
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
 
+        // 변종 판정(식물 단위, 악성:양성 = 80:20)
+        // - 악성: 부모 무관 유전자 무작위, 저항력은 해당 유전자의 일반 범위 롤
+        // - 양성: 유전자는 부모 상속, 모든 저항력 90~100%
+        bool malignant = false, benign = false;
+        if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
+        {
+            if (SpecialItemSystem.Has("peanut_special_8")) malignant = true; // 특수(임시땅콩B): 교배 시 악성만
+            else if (Random.value < 0.8f) malignant = true;
+            else benign = true;
+            Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!"); // TODO: 변종 이펙트/사운드
+        }
+
         foreach (TraitType trait in System.Enum.GetValues(typeof(TraitType)))
         {
             if (trait == TraitType.None || trait == TraitType.Drought || trait == TraitType.Heat)
@@ -544,9 +563,15 @@ public class Grid : MonoBehaviour
                 default: break;
             }
 
-            if (randomBreed) childGenetic = Random.Range(0, 3); // 저주: 광란(부모 무시, 유전자 무작위)
+            if (randomBreed || malignant) childGenetic = Random.Range(0, 3); // 저주: 광란 / 악성 변종(유전자 무작위)
+
+            // 특수(임시완두C): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로 변경
+            if (benign && SpecialItemSystem.Has("pea_special_12"))
+                childGenetic = GetSeasonFavoredGenetics(trait);
 
             float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
+
+            if (benign) resistance = Random.Range(90, 101) / 100f; // 양성 변종: 모든 저항 90~100%
 
 
             if (trait == TraitType.Pest)
@@ -603,7 +628,118 @@ public class Grid : MonoBehaviour
         Plant plant = obj.GetComponent<Plant>();
         plant.SetTrait(trait);
         AddPlantToGrid(plant, grididx);
+
+        // 특수(임시땅콩A): 새 식물이 생겨날 때 가격의 50% 골드 (실제로 심어진 경우만)
+        if (SpecialItemSystem.Has("peanut_special_4")
+            && plantGrid.TryGetValue(plant.gridIndex, out Plant placed) && placed == plant)
+            GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.5f));
+
         return plant;
+    }
+
+    /// <summary>
+    /// 특수(임시완두C): 양성 변종의 계절 유리 유전자.
+    /// 앞쪽 4개(자연사·해충·바람·홍수) = 금색 2개(genetics 2).
+    /// 뒤쪽 2개(장마·추위) = 계절 따라: 겨울·가을 → 금색(2, 장마/추위 저항↑), 여름·봄 → 회색(0, 짝 형질 가뭄/더위 저항↑).
+    /// // 계절→유불리 매핑은 기획 확정 시 조정
+    /// </summary>
+    private int GetSeasonFavoredGenetics(TraitType trait)
+    {
+        if (trait != TraitType.HeavyRain && trait != TraitType.Cold) return 2;
+        Season season = enemyController.CurrentSeason;
+        bool coldSide = season == Season.Winter || season == Season.Fall;
+        return coldSide ? 2 : 0;
+    }
+
+    /// <summary>특수(왕의 귀환): 기본 교배 횟수 -2, 누적 획득 골드 5000당 +1.</summary>
+    private int GetKingReturnBreedDelta()
+    {
+        if (!SpecialItemSystem.Has("king_return")) return 0;
+        int total = GameManager.Instance != null ? GameManager.Instance.economyManager.TotalGold : 0;
+        return -2 + total / 5000;
+    }
+
+    /// <summary>특수(알록달록): 해당 칸에 적용 중인 땅/식물 효과 개수 (정보 UI 기준과 동일).</summary>
+    public int CountTileEffects(int idx)
+    {
+        int count = 0;
+        if (HasGoldSoil(idx)) count++;
+        if (TryGetFertilizerType(idx, out _)) count++;
+        if (HasPetBottle(idx)) count++;
+        if (IsAffectedByChiliPepper(idx)) count++;
+        if (IsPlantFrozen(idx)) count++;
+        if (IsAffectedBySprinkler(idx)) count++;
+        if (HasAbsorbFertilizer(idx)) count++;
+        return count;
+    }
+
+    /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
+    public int CountDistinctNeighborSpecies(int idx)
+    {
+        var species = new HashSet<string>();
+        int row = idx % 4;
+        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
+        foreach (int n in neighbors)
+        {
+            if (n < 0 || n >= maxCol * 4) continue;
+            if (plantGrid.TryGetValue(n, out Plant p) && p != null && !string.IsNullOrEmpty(p.speciesname))
+                species.Add(p.speciesname);
+        }
+        return species.Count;
+    }
+
+    // 특수(땅부자): 세로줄별 고속 숙성 배수 보너스 (col → +mul, 중첩 가능)
+    private Dictionary<int, float> columnGoldMulBonus = new Dictionary<int, float>();
+
+    /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
+    public void AddLandRichColumn()
+    {
+        int col = Random.Range(0, maxCol);
+        if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
+        columnGoldMulBonus[col] += 0.5f;
+        Debug.Log($"[SpecialItem] 땅부자: {col + 1}번째 세로줄에 고속 숙성 효과 (+0.5, 누적 {columnGoldMulBonus[col]})");
+    }
+
+    public float GetColumnGoldMulBonus(int idx)
+        => columnGoldMulBonus.TryGetValue(idx / 4, out float v) ? v : 0f;
+
+    // 특수(땅부자) 세로줄 배수 저장/복원 (index = col)
+    public List<float> GetColumnGoldMulBonusForSave()
+    {
+        var list = new List<float>();
+        for (int col = 0; col < maxCol; col++)
+            list.Add(columnGoldMulBonus.TryGetValue(col, out float v) ? v : 0f);
+        return list;
+    }
+
+    public void LoadColumnGoldMulBonus(List<float> list)
+    {
+        columnGoldMulBonus.Clear();
+        if (list == null) return;
+        for (int col = 0; col < list.Count; col++)
+            if (list[col] > 0f) columnGoldMulBonus[col] = list[col];
+    }
+
+    /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
+    public void HealNeighborsBySell(int idx)
+    {
+        if (!SpecialItemSystem.Has("circulation")) return;
+
+        int row = idx % 4;
+        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
+        foreach (int n in neighbors)
+        {
+            if (n < 0 || n >= maxCol * 4) continue;
+            if (!plantGrid.TryGetValue(n, out Plant p) || p == null) continue;
+
+            var traits = p.GetGeneticTrait();
+            for (int i = 0; i < traits.Count; i++)
+            {
+                float cur = traits[i].resistance;
+                if (cur >= 0.9f) continue;
+                p.ChangeResistance((int)traits[i].traitType, Mathf.Min(0.05f, 0.9f - cur));
+            }
+        }
     }
 
     public GameObject InstantiatePlant(string plantName)
@@ -1330,6 +1466,7 @@ public class Grid : MonoBehaviour
             plant.SetTrait(item.traits);
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
+            plant.SetTravelSellBonus(item.travelSellBonus); // 특수(세계여행) 복원
 
             // MoneyTree 생존 턴 수 복원
             if (plant is MoneyTree moneyTree)
@@ -1343,6 +1480,7 @@ public class Grid : MonoBehaviour
         OnGridStateChanged?.Invoke();
         maxCol = saveData.maxCol;
         UpdateSoil();
+        LoadColumnGoldMulBonus(saveData.columnGoldMulBonusList); // 특수(땅부자) 세로줄 배수 복원
         killBugCount = saveData.killBugCount;
         totalBreedCount = saveData.totalBreedCount;
         totalPeaBreedcount = saveData.totalPeaBreedcount;
@@ -2098,6 +2236,11 @@ public class Grid : MonoBehaviour
 
     public float GetAdditionalPlantGoldMultiplier()
     {
+        // 특수(마법부여자): 밤낮 전환 발동형 아이템(고속 숙성 등)의 수치 2배 — 기본값(0.2) 초과분만 2배
+        const float baseMul = 0.2f;
+        float added = additionalPlantGoldMultiplier - baseMul;
+        if (added > 0f && SpecialItemSystem.Has("enchanter"))
+            return baseMul + added * 2f;
         return additionalPlantGoldMultiplier;
     }
 

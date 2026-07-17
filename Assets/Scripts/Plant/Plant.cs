@@ -33,6 +33,10 @@ public abstract class Plant : MonoBehaviour
     protected int resistWaveCount = 0;
     protected int bonusGoldMultiplierCount = 0; // 스프링클러 등으로 인한 추가 배수 카운트
 
+    // 특수(세계여행): 낮 이동 거리 누적 배수(웨이브 저항 횟수당 골드 배수에 가산). 낮 시작 위치는 Grid.Breeding에서 마킹.
+    protected float travelSellBonus = 0f;
+    private int dayStartGridIndex = -1;
+
 
     protected Grid grid;
 
@@ -208,10 +212,17 @@ public abstract class Plant : MonoBehaviour
         {
             return true;
         }
-        else
+
+        // 특수(이중 시도): 생존 시도를 2회 시행 (1회 실패 시 재시도)
+        if (SpecialItemSystem.Has("double_try"))
         {
-            return false;
+            // TODO: 파란색 배리어 이펙트
+            randomNumber = UnityEngine.Random.Range(0, 100);
+            if (randomNumber <= (int)(GetResistanceValue((int)wave) * 100))
+                return true;
         }
+
+        return false;
     }
 
     public virtual float GetResistanceValue(int traitNum) // (int)waveType 혹은 (int)traitType으로 가능
@@ -503,10 +514,8 @@ public abstract class Plant : MonoBehaviour
         if(minResistance > maxResistance)
             minResistance = maxResistance;
 
-        if (UnityEngine.Random.Range(0, 100) < 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent) // 변종 시 저항력 90~100 (새벽 + 저주 돌연변이로 확률 증가)
-            resistance += Mathf.Round(UnityEngine.Random.Range(90, 101) / 100f);
-        else
-            resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
+        // 변종 판정은 식물 단위로 이동(Grid.Breed / Peanut 자가번식) — 여기서는 일반 롤만
+        resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
 
 
 
@@ -526,7 +535,26 @@ public abstract class Plant : MonoBehaviour
         
 
 
+        // 특수(이중 시도): 최초 저항력이 결정된 직후 35% 감소 (대신 생존 시도 2회)
+        if (SpecialItemSystem.Has("double_try"))
+            resistance *= 0.65f;
+
         return Mathf.Min(resistance, 1.0f);
+    }
+
+    // ───── 변종 (식물 단위) ─────
+
+    /// <summary>변종 발생 확률(%) = 기본 1% + 새벽(2·10단계) + 저주(돌연변이).</summary>
+    public static float GetMutationChancePercent()
+        => 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent;
+
+    /// <summary>양성 변종: 모든 형질의 저항력을 90~100%로 설정 (유전자는 유지).</summary>
+    public static void ApplyBenignResistance(List<GeneticTrait> traitList)
+    {
+        for (int i = 0; i < traitList.Count; i++)
+            traitList[i] = new GeneticTrait(traitList[i].traitType,
+                UnityEngine.Random.Range(90, 101) / 100f,
+                traitList[i].genetics, traitList[i].additionalResistance);
     }
 
     public abstract int GetSellingPrice();
@@ -610,6 +638,13 @@ public abstract class Plant : MonoBehaviour
 
         resistWaveCount++;
 
+        // 특수(세계여행): 낮 동안 이동한 맨해튼 거리(최초↔최종 위치) 한 칸마다 판매 골드 배수 +0.1
+        if (SpecialItemSystem.Has("world_travel") && dayStartGridIndex >= 0)
+        {
+            int dist = Mathf.Abs(gridIndex / 4 - dayStartGridIndex / 4) + Mathf.Abs(gridIndex % 4 - dayStartGridIndex % 4);
+            if (dist > 0) travelSellBonus += 0.1f * dist;
+        }
+
         /*
         bool isGold = false;
         if (stemController != null) //황금 완두콩이면 저항력 감소 아예 X
@@ -678,6 +713,10 @@ public abstract class Plant : MonoBehaviour
                 float var = traits[i].resistance;
                 var += amount;
 
+                // 특수(프로모션): 저항력이 10% 이하가 되면 해당 저항력을 90%로 변경
+                if (var <= 0.1f && SpecialItemSystem.Has("promotion"))
+                    var = 0.9f;
+
                 if (var < 0.1f)
                     var = 0.1f;
 
@@ -730,12 +769,29 @@ public abstract class Plant : MonoBehaviour
     protected int CalculateSellingPrice(int basePrice, float multiplier)
     {
         if (grid == null) return 0;
-        
+
         int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
         int badGeneBonus = grid.GetBadGuyMoreRiceLevel() * 5 * GetBadGenesCount();
 
+        multiplier += travelSellBonus; // 특수(세계여행): 이동 거리 누적 배수
+        multiplier += grid.GetColumnGoldMulBonus(gridIndex); // 특수(땅부자): 세로줄 고속 숙성 효과
+
+        // 특수(알록달록): 땅에 적용 중인 효과 1개당 판매 배수 +0.1
+        if (SpecialItemSystem.Has("colorful"))
+            multiplier += 0.1f * grid.CountTileEffects(gridIndex);
+
         return (int)((basePrice + grid.GetAdditionalPlantGold() + badGeneBonus) * (1f + (multiplier * totalMultiplierCount)));
     }
+
+    /// <summary>특수(세계여행): 낮(교배 페이즈) 시작 시 위치 기록. Grid.Breeding에서 호출.</summary>
+    public void MarkDayStartPosition()
+    {
+        dayStartGridIndex = gridIndex;
+    }
+
+    // 특수(세계여행) 누적 배수 저장/복원용
+    public float GetTravelSellBonus() => travelSellBonus;
+    public void SetTravelSellBonus(float value) => travelSellBonus = Mathf.Max(0f, value);
 
     public void SetResistWaveCount(int val)
     {

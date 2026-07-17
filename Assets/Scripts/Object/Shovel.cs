@@ -130,6 +130,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(plant.GetSellingPrice());
                     grid.TryUpdateMostExpensivePlant(plant.GetSellingPrice());
+                    grid.HealNeighborsBySell(plant.gridIndex); // 특수(순환): 주변 저항 회복
                     GameEvents.RaisePeaSold(target);
                 }
                 return;

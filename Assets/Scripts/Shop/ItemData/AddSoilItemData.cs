@@ -16,21 +16,25 @@ public class AddSoilItemData : ItemData
     private void OnValidate()
     {
         FlowType = ShopFlowType.Instant;
-        MaxPurchaseCount = maxPurchase; // MaxPurchaseCount 설정
+        // 구매 한도는 CanPurchase(EffectiveMaxPurchase)가 담당 — 땅부자 보유 시 +8이라 공통 캡은 무제한으로
+        MaxPurchaseCount = -1;
     }
+
+    // 특수(땅부자): 추가 구매 가능 횟수 +8 (구매마다 무작위 세로줄 고속 숙성)
+    private int EffectiveMaxPurchase => maxPurchase + (SpecialItemSystem.Has("land_rich") ? 8 : 0);
 
     private void UpdatePrice(ShopContext ctx)
     {
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용
         var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
-        
+
         if (!ctx.Shop.PurchaseHistory.ContainsKey(key))
             ctx.Shop.PurchaseHistory[key] = 0;
 
         int purchaseCount = ctx.Shop.PurchaseHistory[key];
         // Commit 시점에는 이미 구매 이력이 증가했으므로, 다음 구매 가격 계산
-        if (purchaseCount < maxPurchase)
-            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000
+        if (purchaseCount < EffectiveMaxPurchase)
+            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
         else
             Price = int.MaxValue; // 더 이상 구매 불가
     }
@@ -45,8 +49,8 @@ public class AddSoilItemData : ItemData
             return false;
         }
 
-        // maxCol이 이미 최대치인지 확인
-        if (ctx.Grid.maxCol >= MAX_COL)
+        // maxCol이 이미 최대치인지 확인 — 땅부자 보유 시엔 확장 없이도 구매 가능(고속 숙성 부여)
+        if (ctx.Grid.maxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
         {
             reason = "최대 확장 횟수에 도달했습니다.";
             return false;
@@ -57,7 +61,7 @@ public class AddSoilItemData : ItemData
         if (!ctx.Shop.PurchaseHistory.ContainsKey(key))
             ctx.Shop.PurchaseHistory[key] = 0;
 
-        if (ctx.Shop.PurchaseHistory[key] >= maxPurchase)
+        if (ctx.Shop.PurchaseHistory[key] >= EffectiveMaxPurchase)
         {
             reason = "최대 구매 횟수에 도달했습니다.";
             return false;
@@ -77,14 +81,13 @@ public class AddSoilItemData : ItemData
             return;
         }
 
-        // maxCol이 최대치인지 다시 확인
-        if (ctx.Grid.maxCol >= MAX_COL)
-        {
-            Debug.LogWarning("농장이 이미 최대 크기입니다.");
-            return;
-        }
+        // 땅 확장은 최대 크기(8열) 한도 내에서만
+        if (ctx.Grid.maxCol < MAX_COL)
+            ctx.Grid.AddSoil();
 
-        ctx.Grid.AddSoil();
+        // 특수(땅부자): 구매할 때마다 무작위 세로줄에 고속 숙성 효과 추가
+        if (SpecialItemSystem.Has("land_rich"))
+            ctx.Grid.AddLandRichColumn();
 
         // 가격 업데이트 (구매 이력이 업데이트된 후)
         UpdatePrice(ctx);
@@ -106,8 +109,8 @@ public class AddSoilItemData : ItemData
             purchaseCount = 0;
 
         // 다음 구매 가격 계산
-        if (purchaseCount < maxPurchase)
-            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000
+        if (purchaseCount < EffectiveMaxPurchase)
+            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
         else
             Price = int.MaxValue; // 더 이상 구매 불가
     }
