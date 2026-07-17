@@ -6,11 +6,21 @@ using UnityEngine.UI;
 public class SettingUI : MonoBehaviour
 {
     [SerializeField] private GameObject SettingPanel;
+    [SerializeField] private Toggle showBreedPopupToggle;
 
     void Start()
     {
-        if (SettingPanel != null) 
+        if (SettingPanel != null)
             SettingPanel.SetActive(false);
+
+        if (showBreedPopupToggle != null && UIManager.Instance != null)
+        {
+            showBreedPopupToggle.isOn = UIManager.Instance.ShowBreedPopupSetting;
+            showBreedPopupToggle.onValueChanged.AddListener((isOn) =>
+            {
+                UIManager.Instance.SetBreedPopupSetting(isOn);
+            });
+        }
     }
 
     void Update()
@@ -40,7 +50,7 @@ public class SettingUI : MonoBehaviour
         if (SettingPanel == null)
             return;
         SettingPanel.SetActive(true);
-        SoundManager.Instance.ConnectSlider(SettingPanel.transform.Find("BGMVolumeBar").GetComponent<Slider>(), SettingPanel.transform.Find("EffectVolumeBar").GetComponent<Slider>());        
+        SoundManager.Instance.ConnectSlider(SettingPanel.transform.Find("BGMVolumeBar").GetComponent<Slider>(), SettingPanel.transform.Find("EffectVolumeBar").GetComponent<Slider>());
         Time.timeScale = 0;
         ClickRouter.Instance.IsBlockedByUI = true;
         return;

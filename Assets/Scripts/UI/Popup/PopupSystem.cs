@@ -6,15 +6,25 @@ public class PopupSystem
     private CloseablePopup defaultCloseablePrefab;
     private ToastPopup defaultToastPrefab;
     private HoverTooltipUI defaultTooltipPrefab;
+    private BreedPopup defaultBreedPopupPrefab;
+    private FloatingPopup defaultFloatingPopupPrefab;
+    private UnlockPopup defaultUnlockPopupPrefab;
     private Transform canvasParent;
+
+    private BreedPopup activeBreedPopupInstance;
+    private FloatingPopup activeFloatingPopupInstance;
+    private UnlockPopup activeUnlockPopupInstance;
 
     private Dictionary<GameObject, Queue<BasePopup>> popupPools = new Dictionary<GameObject, Queue<BasePopup>>();
 
-    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, HoverTooltipUI tooltipPrefab, Transform parent)
+    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, HoverTooltipUI tooltipPrefab, BreedPopup breedPrefab, FloatingPopup floatingPrefab, UnlockPopup unlockPrefab, Transform parent)
     {
         defaultCloseablePrefab = closeablePrefab;
         defaultToastPrefab = toastPrefab;
         defaultTooltipPrefab = tooltipPrefab;
+        defaultBreedPopupPrefab = breedPrefab;
+        defaultFloatingPopupPrefab = floatingPrefab;
+        defaultUnlockPopupPrefab = unlockPrefab;
         canvasParent = parent;
     }
 
@@ -44,6 +54,95 @@ public class PopupSystem
         }
 
         return popup;
+    }
+
+    public BreedPopup ShowBreedPopup(Plant plant, System.Action onClose = null)
+    {
+        return ShowBreedPopup(defaultBreedPopupPrefab, plant, onClose);
+    }
+
+    public BreedPopup ShowBreedPopup(BreedPopup prefab, Plant plant, System.Action onClose = null)
+    {
+        if (prefab == null) return null;
+
+        if (activeBreedPopupInstance == null)
+        {
+            activeBreedPopupInstance = Object.Instantiate(prefab, canvasParent);
+            activeBreedPopupInstance.OnPopupClosed = (closedPopup) => {
+                // Do not pool this instance to preserve its position
+            };
+        }
+
+        activeBreedPopupInstance.Setup(plant, onClose);
+
+        if (!activeBreedPopupInstance.gameObject.activeSelf)
+        {
+            activeBreedPopupInstance.Open();
+        }
+
+        return activeBreedPopupInstance;
+    }
+
+    public void CloseBreedPopup()
+    {
+        if (activeBreedPopupInstance != null && activeBreedPopupInstance.gameObject.activeSelf)
+        {
+            activeBreedPopupInstance.Close();
+        }
+    }
+
+    public FloatingPopup ShowFloatingPopup(string text, float delay = 2.0f, System.Action onClose = null)
+    {
+        return ShowFloatingPopup(defaultFloatingPopupPrefab, text, delay, onClose);
+    }
+
+    public FloatingPopup ShowFloatingPopup(FloatingPopup prefab, string text, float delay = 2.0f, System.Action onClose = null)
+    {
+        if (prefab == null) return null;
+
+        if (activeFloatingPopupInstance == null)
+        {
+            activeFloatingPopupInstance = Object.Instantiate(prefab, canvasParent);
+            activeFloatingPopupInstance.OnPopupClosed = (closedPopup) => {
+                // Do not pool this instance to preserve its position
+            };
+        }
+
+        activeFloatingPopupInstance.SetupAndPlay(text, delay, onClose);
+
+        if (!activeFloatingPopupInstance.gameObject.activeSelf)
+        {
+            activeFloatingPopupInstance.Open();
+        }
+
+        return activeFloatingPopupInstance;
+    }
+
+    public UnlockPopup ShowUnlockPopup(List<ItemData> items, System.Action onClose = null)
+    {
+        return ShowUnlockPopup(defaultUnlockPopupPrefab, items, onClose);
+    }
+
+    public UnlockPopup ShowUnlockPopup(UnlockPopup prefab, List<ItemData> items, System.Action onClose = null)
+    {
+        if (prefab == null) return null;
+
+        if (activeUnlockPopupInstance == null)
+        {
+            activeUnlockPopupInstance = Object.Instantiate(prefab, canvasParent);
+            activeUnlockPopupInstance.OnPopupClosed = (closedPopup) => {
+                // Do not pool this instance to preserve its position
+            };
+        }
+
+        activeUnlockPopupInstance.Setup(items, onClose);
+
+        if (!activeUnlockPopupInstance.gameObject.activeSelf)
+        {
+            activeUnlockPopupInstance.Open();
+        }
+
+        return activeUnlockPopupInstance;
     }
 
     public T ShowPopup<T>(T prefab) where T : BasePopup
@@ -79,6 +178,9 @@ public class PopupSystem
 
     public void CleanupOnSceneChange()
     {
+        activeBreedPopupInstance = null;
+        activeFloatingPopupInstance = null;
+        activeUnlockPopupInstance = null;
         foreach (var pair in popupPools)
         {
             Queue<BasePopup> pool = pair.Value;

@@ -17,7 +17,7 @@ public class ProfileData
     public List<string> generalAbilityDataName = new();
     public List<bool> isGeneralAbilityDataUnlocked = new();
 
-    public int generalAbilityPoint;  
+    public int generalAbilityPoint;
 
     //SoundManager
     public float BGMVolume;
@@ -25,6 +25,8 @@ public class ProfileData
 
     //TutorialManager
     public bool hasSeenTutorial;
+
+    public bool showBreedPopupSetting = true;
 
 }
 
@@ -62,6 +64,8 @@ public class SaveManager : MonoBehaviour
         SoundManager.Instance.LoadSoundManager(profileData);
         AbilityManager.Instance.LoadAbilityManager(profileData);
 
+        UIManager.Instance.LoadUIManager(profileData);
+
         //각 로드하기 
     }
 
@@ -95,6 +99,8 @@ public class SaveManager : MonoBehaviour
         //SoundManager
         profileData.BGMVolume = SoundManager.Instance.BGMVolume;
         profileData.EffectVolume = SoundManager.Instance.EffectVolume;
+
+        profileData.showBreedPopupSetting = UIManager.Instance.ShowBreedPopupSetting;
 
         //TutorialManager
 

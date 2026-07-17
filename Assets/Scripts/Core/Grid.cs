@@ -43,14 +43,14 @@ public class Grid : MonoBehaviour
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
     [SerializeField] protected GameObject scouterButton; // 스카우터 온오프 버튼
-    [SerializeField] protected bool isScouterOn = false; 
+    [SerializeField] protected bool isScouterOn = false;
 
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
     [SerializeField] private GameObject goldSoilMarkerPrefab;
-    
+
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
     protected List<int> goldSoilTiles = new List<int>(); // 황금 비료가 뿌려진 타일들
     private Dictionary<int, GameObject> goldSoilMarkers = new Dictionary<int, GameObject>(); // 황금 비료 마커들
@@ -88,12 +88,12 @@ public class Grid : MonoBehaviour
     protected bool hasNepenthesPheromone = false; // 네펜데스 페로몬 활성화 여부
     protected float additionalNepenthesPheromoneSizeMultiplier = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
     protected float nepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
-    
+
     protected float weakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
     protected float strongGeneticsResistanceBonus = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
     protected float goldenGeneticsProbabilityBonus = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
 
-    
+
     protected float additionalPlantGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
 
     protected float additionalPestResistance = 0f;
@@ -161,7 +161,7 @@ public class Grid : MonoBehaviour
     public float NepenthesSpawnProbability => nepenthesSpawnProbability;
     public float WeakGeneticsResistanceBonus => weakGeneticsResistanceBonus;
     public float StrongGeneticsResistanceBonus => strongGeneticsResistanceBonus;
-    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;    
+    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;
 
     //식물 공통 특성
     public float ResistanceBonus => resistanceBonus;
@@ -172,7 +172,7 @@ public class Grid : MonoBehaviour
     public float ResistanceAdaptation => resistanceAdaptation;
     //땅콩 특성
     public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
-    public float BonusRatioWhenDie =>  bonusRatioWhenDie;
+    public float BonusRatioWhenDie => bonusRatioWhenDie;
 
     //일반 특성
     public bool HasResistanceScouter => hasResistanceScouter;
@@ -234,7 +234,7 @@ public class Grid : MonoBehaviour
                 {
                     kvp.Value.SetActive(true);
                 }
-                
+
                 // SpriteRenderer가 있으면 강제로 렌더링 활성화
                 var sr = kvp.Value.GetComponent<SpriteRenderer>();
                 if (sr != null && !sr.enabled)
@@ -275,7 +275,7 @@ public class Grid : MonoBehaviour
 
     private void ExecuteBreeding()
     {
-        if (breedObj1 != null && breedObj2 != null) 
+        if (breedObj1 != null && breedObj2 != null)
         {
             Plant parent1 = breedObj1.GetComponent<Plant>();
             Plant parent2 = breedObj2.GetComponent<Plant>();
@@ -302,7 +302,7 @@ public class Grid : MonoBehaviour
 
 
             if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
-            {                        
+            {
                 // 저주: 씨 없는 수박 — 확률적으로 교배 실패(시도는 소모)
                 if (CurseState.SeedlessFailPercent > 0f && Random.Range(0f, 100f) < CurseState.SeedlessFailPercent)
                 {
@@ -320,7 +320,11 @@ public class Grid : MonoBehaviour
 
                 // 저주: 광란 — 확률적으로 랜덤 교배
                 bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
-                AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                Plant plant = AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                if (UIManager.Instance.ShowBreedPopupSetting)
+                {
+                    UIManager.Instance.Popup.ShowBreedPopup(plant);
+                }
                 breedCount++;
                 GameEvents.RaisePeaBreeded();
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
@@ -341,26 +345,26 @@ public class Grid : MonoBehaviour
             }
             else if (breedCount >= currentEffectiveMaxBreedCount)
             {
-                Debug.Log("최대 교배 횟수 초과");
+                UIManager.Instance.Popup.ShowFloatingPopup("교배 횟수를 모두 소진했습니다.", 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
             else if (isEqualPlant)
             {
-                Debug.Log("두 종이 일치하지 않습니다");
+                UIManager.Instance.Popup.ShowFloatingPopup("두 종이 일치하지 않습니다.", 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
             else
             {
-                Debug.Log("키울 공간이 부족합니다");
+                UIManager.Instance.Popup.ShowFloatingPopup("키울 공간이 부족합니다.", 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
         }
         else
         {
-            Debug.Log("아직 두 콩을 모두 선택하지 않았습니다");
+            UIManager.Instance.Popup.ShowFloatingPopup("아직 두 식물을 선택하지 않았습니다.", 1);
             isBreedButtonPressed = false;
         }
     }
@@ -402,7 +406,7 @@ public class Grid : MonoBehaviour
 
         while (breedTimer > 0 && !isBreedSkipButtonPressed)
         {
-            if(GameManager.Instance.GetGameIsStopped())
+            if (GameManager.Instance.GetGameIsStopped())
             {
                 yield return null;
                 continue;
@@ -521,10 +525,10 @@ public class Grid : MonoBehaviour
             switch (p1Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: 
+                case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p1Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (additionalInheritance + 50 + p1Bonus <= Random.Range(1, 101) ? 0 : 1); 
+                    childGenetic += (additionalInheritance + 50 + p1Bonus <= Random.Range(1, 101) ? 0 : 1);
                     break;
                 default: break;
             }
@@ -532,10 +536,10 @@ public class Grid : MonoBehaviour
             switch (p2Trait)
             {
                 case 2: childGenetic += 1; break;
-                case 1: 
+                case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p2Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (additionalInheritance + 50 + p2Bonus <= Random.Range(1, 101) ? 0 : 1); 
+                    childGenetic += (additionalInheritance + 50 + p2Bonus <= Random.Range(1, 101) ? 0 : 1);
                     break;
                 default: break;
             }
@@ -593,12 +597,13 @@ public class Grid : MonoBehaviour
             OnGridStateChanged?.Invoke();
     }
 
-    public void AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
+    public Plant AddMovablePlant(List<GeneticTrait> trait, int grididx = -1)
     {
         GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
         Plant plant = obj.GetComponent<Plant>();
-        plant.SetTrait(trait);        
+        plant.SetTrait(trait);
         AddPlantToGrid(plant, grididx);
+        return plant;
     }
 
     public GameObject InstantiatePlant(string plantName)
@@ -709,7 +714,7 @@ public class Grid : MonoBehaviour
 
     public void ClearGridIndex(int gridIndex)
     {
-        if (plantGrid.ContainsKey(gridIndex)) 
+        if (plantGrid.ContainsKey(gridIndex))
         {
             plantGrid.Remove(gridIndex);
             OnGridStateChanged?.Invoke();
@@ -740,7 +745,7 @@ public class Grid : MonoBehaviour
     {
         maxBreedTimer += time;
         //breedTimerUI.UpdateMaxTimerCount();
-        
+
         // 교배 중이면 현재 타이머도 증가
         if (isBreeding && breedTimer > 0)
         {
@@ -768,7 +773,7 @@ public class Grid : MonoBehaviour
     public void AddMaxBreedCount(int count)
     {
         maxBreedCount += count;
-        
+
         // 교배 중이면 현재 교배 횟수도 증가 (남은 횟수 증가)
         if (isBreeding)
         {
@@ -928,7 +933,7 @@ public class Grid : MonoBehaviour
                 // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
                 // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
                 // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함. (기존 InfoAppGridSlot 구현과 동일하게)
-                 if (plantGrid.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
+                if (plantGrid.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
                 {
                     if (chiliPepper is ChiliPepper) return true;
                 }
@@ -939,7 +944,7 @@ public class Grid : MonoBehaviour
             // 왼쪽 위(-5), 오른쪽 위(+3), 왼쪽 아래(-3), 오른쪽 아래(+5) 가 맞음.
 
             // 왼쪽 아래
-             if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
+            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
             {
                 if (plantGrid.TryGetValue(gridIndex - 3, out chiliPepper))
                 {
@@ -1014,7 +1019,7 @@ public class Grid : MonoBehaviour
 
         breedButton.SetActive(breedObj1 != null && breedObj2 != null);
         breedButtonPlant = (breedObj1 != null && breedObj2 != null) ? clickedPea : null;
-        
+
         MoveBreedButton(clickedObject.transform.position);
     }
 
@@ -1131,7 +1136,7 @@ public class Grid : MonoBehaviour
 
     public void CheckBreedButtonBeforeDie(GameObject plant)
     {
-        if(breedObj1 == plant || breedObj2 == plant)
+        if (breedObj1 == plant || breedObj2 == plant)
         {
             breedButton.SetActive(false);
             breedButtonPlant = null;
@@ -1190,18 +1195,18 @@ public class Grid : MonoBehaviour
             if (maxLadybugCount > 0 && ladybugs.Count >= maxLadybugCount)
             {
                 // 최대 수에 도달했으므로 일반 벌레 스폰
-                int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage),bugPrefabs.Count));
+                int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
                 Instantiate(bugPrefabs[bugIndex]);
                 return;
             }
             Instantiate(ladybugPrefabs);
             return;
         }
-        int i = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage),bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
+        int i = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
         Instantiate(bugPrefabs[i]);
         return;
     }
-    
+
 
 
     public bool GetIsBreeding()
@@ -1239,7 +1244,7 @@ public class Grid : MonoBehaviour
 
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
-            targetPlant.SetGridIndex(fromIndex);            
+            targetPlant.SetGridIndex(fromIndex);
 
             // 위치 바꾸기
             Transform fromSoil = GetSoilTransform(fromIndex);
@@ -1252,7 +1257,7 @@ public class Grid : MonoBehaviour
             plantGrid[fromIndex] = targetPlant;
 
             //스카우터 확인 (고추, 비료 때문)
-            if(plant is MovablePlant p1)
+            if (plant is MovablePlant p1)
             {
                 p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
@@ -1299,7 +1304,7 @@ public class Grid : MonoBehaviour
             }
         }
         return null;
-    }   
+    }
     public void SetBreedTimerUI(TimerUI timerUI)
     {
         breedTimerUI = timerUI;
@@ -1363,7 +1368,7 @@ public class Grid : MonoBehaviour
 
         resistanceDecayReduction = saveData.resistanceDecayReduction; // 완두콩 특성
         resistanceAdaptation = saveData.resistanceAdaptation;
-        
+
         additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability; // 땅콩 특성
         bonusRatioWhenDie = saveData.bonusRatioWhenDie;
 
@@ -1389,7 +1394,7 @@ public class Grid : MonoBehaviour
                 absorbFertilizerTiles.Add(idx);
             }
         }
-        
+
         // 네펜데스 페로몬 업데이트
         foreach (var plant in plantGrid.Values)
         {
@@ -1399,7 +1404,7 @@ public class Grid : MonoBehaviour
                 nepenthes.UpdatePheromoneSize();
             }
         }
-                
+
         additionalPlantGoldMultiplier = saveData.additionalPlantGoldMultiplier;
 
         additionalPestResistance = saveData.additionalPestResistance;
@@ -1407,7 +1412,7 @@ public class Grid : MonoBehaviour
         additionalInheritance = saveData.additionalInheritance;
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
-        
+
         // 페트병 관련 변수 로드
         petBottleInitialStockBonus = saveData.petBottleInitialStockBonus;
         petBottlePriceReduction = saveData.petBottlePriceReduction;
@@ -1418,19 +1423,19 @@ public class Grid : MonoBehaviour
                 petBottleBlockCount[-1] = 0;
             petBottleBlockCount[-1] = saveData.petBottleBlockCountBonus;
         }
-        
+
         // 고추 관련 변수 로드
         chiliPepperRangeLevel = saveData.chiliPepperRangeLevel;
         chiliPepperSpawnProbability = saveData.chiliPepperSpawnProbability;
         chiliPepperHealPercent = saveData.chiliPepperHealPercent;
-        
+
         // 황금 비료 로드
-        foreach(var i in saveData.goldSoilTiles)
+        foreach (var i in saveData.goldSoilTiles)
             TryPlaceGoldSoil(i);
-        
-        foreach(var i in saveData.perBottleTiles)
+
+        foreach (var i in saveData.perBottleTiles)
             PlacePetBottle(i);
-        for(int i = 0;i<saveData.fertilizerColumns.Count; i++)
+        for (int i = 0; i < saveData.fertilizerColumns.Count; i++)
             TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
 
         mostExpensivePlant = saveData.mostExpensivePlant;
@@ -1509,13 +1514,13 @@ public class Grid : MonoBehaviour
         if (!hasResistanceScouter && !hasGoldScouter)
             return;
 
-        if(isScouterOn)
+        if (isScouterOn)
         {
             isScouterOn = false;
             if (hasResistanceScouter)
                 HideResistanceScouterImageInGrid();
             if (hasGoldScouter)
-                HideGoldScouterImageInGrid();            
+                HideGoldScouterImageInGrid();
         }
         else
         {
@@ -1523,7 +1528,7 @@ public class Grid : MonoBehaviour
             if (hasResistanceScouter)
                 UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
             if (hasGoldScouter)
-                UpdateGoldScouterImageInGrid();            
+                UpdateGoldScouterImageInGrid();
         }
     }
 
@@ -1544,8 +1549,8 @@ public class Grid : MonoBehaviour
     {
         if (!hasGoldScouter || !isScouterOn)
             return;
-        List<MovablePlant> sortedPlants = plantGrid.Values 
-                                                   .OfType<MovablePlant>() 
+        List<MovablePlant> sortedPlants = plantGrid.Values
+                                                   .OfType<MovablePlant>()
                                                    .OrderByDescending(p => p.GetSellingPrice()) // GetSellingPrice() 결과가 높은 순으로 정렬
                                                    .ToList(); // 정렬된 결과를 리스트로 변환
 
@@ -1557,7 +1562,7 @@ public class Grid : MonoBehaviour
             {
                 currentPlant.ShowGoldScouterImage();
             }
-            else 
+            else
             {
                 currentPlant.HideGoldScouterImage();
             }
@@ -1768,7 +1773,7 @@ public class Grid : MonoBehaviour
                     {
                         plantGrid[targetIdx].SetFrozen(true);
 
-                        if(plantGrid[targetIdx].gameObject == breedObj1)
+                        if (plantGrid[targetIdx].gameObject == breedObj1)
                         {
                             plantGrid[targetIdx].MakeDefaultSprite();
                             breedObj1 = null;
@@ -1781,9 +1786,9 @@ public class Grid : MonoBehaviour
                             breedObj2 = null;
                             breedButton.SetActive(false);
                             breedButtonPlant = null;
-                        }                        
+                        }
                     }
-                    
+
                     // 시각적 피드백 (얼음 이펙트 등) 추가 가능
                     // 현재는 Plant.SetFrozen 내부에서 색상 변경 처리
                 }
@@ -1851,7 +1856,7 @@ public class Grid : MonoBehaviour
             if (centerPlant.isDying) continue;
 
             List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait().ToList();
-            
+
             // 상하좌우 인접 타일 검사
             int[] neighborIndices = GetNeighborIndices(centerIdx);
 
@@ -1882,62 +1887,62 @@ public class Grid : MonoBehaviour
                             // 그냥 -0.03f를 호출하면 됨. 
                             // 단, "뺏어옴"이므로, 상대가 잃은 만큼 내가 가져와야 함.
                             // 만약 상대가 이미 0.1f라서 못 잃으면? 나도 못 가져오는 게 맞음.
-                            
+
                             // -> ChangeResistance는 bool을 리턴하지 않고 void였음 (수정 전).
                             // 아까 public bool ChangeResistance로 바꿨음! 
                             // ChangeResistance 내부에서: var < 0.1f 면 var = 0.1f로 보정함.
                             // 근데 "실제로 깎였는지"를 알아야 내가 가져올 수 있음.
-                            
+
                             // 로직 개선:
                             // 1. 상대의 현재 raw 저항력을 안쪽에서 알기 어려우므로(public 접근자 부족),
                             //    ChangeResistance가 "실제 변동량"을 리턴하거나, 
                             //    외부에서 예측해야 함.
-                            
+
                             // 여기서는 간단하게 구현: "일단 깎아보고, 깎는데 성공했으면 나도 올린다"
                             // 근데 ChangeResistance는 "변동 후 값"을 리턴하거나 하지 않음.
                             // bool 리턴도 그냥 "amount != 0"이면 true였음 (수정 전 추측).
-                            
+
                             // Plant.ChangeResistance를 다시 보자.
                             // if (var < 0.1f) var = 0.1f;
                             // 이렇게 되어있음. 
                             // 즉, 이미 0.1이면 더 안 깎임.
-                            
+
                             // 정확한 흡수를 위해선 상대 줄이기 -> 성공 여부/량 확인 -> 나 늘리기 순서가 필요.
                             // 지금 Plant 구조상 private List<GeneticTrait> traits; 이고 GetGeneticTrait()는 리스트 반환.
                             // 리스트의 요소는 struct면 복사본.. class면 참조.
                             // GeneticTrait는 struct인가 class인가? -> 확인 필요.
-                            
+
                             // 보통 struct로 구현했을 가능성 높음. Plant.cs 보면 traits[i] = new GeneticTrait(...) 이렇게 덮어쓰고 있음. struct임.
-                            
+
                             // 따라서 ChangeResistance를 믿어야 함.
                             // ChangeResistance를 조금 더 똑똑하게 수정해서 "실제 적용된 수치"를 반환하게 하거나
                             // 아니면 "줄일 수 있는지 확인"하는 메서드가 필요함.
-                            
+
                             // 여기서는 "하한선 10%" 규칙이 있으므로,
                             // 상대방의 해당 형질 저항력이 0.13f 이상일 때만 흡수 가능하다고 가정.
                             // 근데 GetResistanceValue는 보정된 값(비료 등 포함)이라 raw resistance가 아님.
-                            
+
                             // -> 정밀한 구현을 위해 ChangeResistance를 활용하되,
                             // 이번 기획은 "3%p씩 뺏어옴"이므로, 
                             // 그냥 -0.03f 호출하고, +0.03f 호출하는 식으로 진행. (상대가 0.1f여도 나는 오르면 '창조 흡수'가 되지만, 게임적 허용범위일 수 있음)
                             // "하한선 10%"는 뺏기는 쪽에 적용되는 룰.
                             // "뺏어옴"이라는 워딩을 엄격하게 지키려면 상대가 잃어야만 얻어야 함.
-                            
+
                             // 로직:
                             // 1. nTrait의 resistance가 0.1f보다 큰지 확인 (traits 리스트 순회해서 직접 확인해야 함)
                             // 2. 크다면 0.03f 감소 시도. (0.1f 밑으로는 안 내려가게)
                             // 3. 감소된 실제 양만큼 내 저항력 증가.
-                            
+
                             float amountToAbsorb = 0.03f;
-                            
+
                             // 이웃 식물의 해당 형질 raw resistance 찾기
                             float neighborRawRes = 0f;
-                             // GetGeneticTrait()로 리스트 가져와서 찾기
+                            // GetGeneticTrait()로 리스트 가져와서 찾기
                             var nTargetTrait = neighborTraits.FirstOrDefault(t => t.traitType == cTrait.traitType);
                             // default(struct) 체크
                             // GeneticTrait가 struct라면 traitType 비교가 애매할 수 있으니 loop로 찾자. (어차피 위에서 찾음)
                             neighborRawRes = nTargetTrait.resistance;
-                            
+
                             // 흡수 가능량 계산
                             float actualAbsorb = 0f;
                             if (neighborRawRes > 0.1f)
@@ -1951,7 +1956,7 @@ public class Grid : MonoBehaviour
                                     actualAbsorb = amountToAbsorb;
                                 }
                             }
-                            
+
                             if (actualAbsorb > 0.0001f)
                             {
                                 neighborPlant.ChangeResistance((int)nTrait.traitType, -actualAbsorb);
@@ -2000,7 +2005,7 @@ public class Grid : MonoBehaviour
         if (!petBottleBlockCount.ContainsKey(-1))
             petBottleBlockCount[-1] = 0;
         petBottleBlockCount[-1] += value;
-        
+
         // 기존 페트병에도 보호 횟수 추가
         foreach (var idx in petBottleTiles)
         {
@@ -2137,7 +2142,7 @@ public class Grid : MonoBehaviour
 
     public void SetResistanceScouter(bool val)
     {
-        if(hasResistanceScouter = val)
+        if (hasResistanceScouter = val)
         {
             ShowScouterButton();
         }
@@ -2150,7 +2155,7 @@ public class Grid : MonoBehaviour
 
     public void SetGoldScouter(bool val)
     {
-        if(hasGoldScouter = val)
+        if (hasGoldScouter = val)
         {
             ShowScouterButton();
         }
@@ -2169,7 +2174,7 @@ public class Grid : MonoBehaviour
     public void SetWeatherForecast(bool val)
     {
         if (hasWeatherForecast = val)
-        { 
+        {
             GameManager.Instance.phoneManager.SetWeatherForecastPanel();
         }
     }
@@ -2303,7 +2308,7 @@ public class Grid : MonoBehaviour
                 return true;
             }
         }
-        
+
         if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
         {
             StartCoroutine(ladybugs[0].KillFuckingBug(killer));
@@ -2324,13 +2329,13 @@ public class Grid : MonoBehaviour
             return true;
         return false;
     }
-    
+
     public Dictionary<int, WaveType> GetFertilizerColumns()
     {
         return fertilizerColumns;
     }
 
-    public WaveType GetFertilizerType (int idx)
+    public WaveType GetFertilizerType(int idx)
     {
         return fertilizerColumns[GetCol(idx)];
     }
@@ -2471,13 +2476,13 @@ public class Grid : MonoBehaviour
             new GeneticTrait(TraitType.Drought, 1f , 2, 0.0f),
             new GeneticTrait(TraitType.Heat, 1f , 2, 0.0f)
         };
-        AddMovablePlant(peaTrait);        
+        AddMovablePlant(peaTrait);
     }
 
     public void ShowAllPriceSign()
     {
         showingAllPrice = true;
-        foreach(var p in plantGrid)
+        foreach (var p in plantGrid)
         {
             p.Value.ShowPriceSign();
         }
@@ -2511,7 +2516,7 @@ public class Grid : MonoBehaviour
 
     public void TryUpdateMostExpensivePlant(int price)
     {
-        if(mostExpensivePlant < price)
+        if (mostExpensivePlant < price)
         {
             mostExpensivePlant = price;
         }
