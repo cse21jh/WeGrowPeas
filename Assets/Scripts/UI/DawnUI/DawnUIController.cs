@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,23 +11,43 @@ using UnityEngine.UI;
 public class DawnUIController : MonoBehaviour
 {
     [SerializeField] private GameObject dawnPanel;
-    [SerializeField] private Transform stageListContent;     // 단계 버튼 부모
-    [SerializeField] private GameObject stageButtonPrefab;   // 단계 버튼 프리팹(Button + TMP 라벨)
+    [SerializeField] private Transform stageListContent;     // 단계 버튼 부모 (ScrollRect Content)
+    [SerializeField] private GameObject stageButtonPrefab;   // 단계 버튼 프리팹(Button + TMP 라벨 + 자물쇠)
 
-    [SerializeField] private TextMeshProUGUI currentStageText; // 현재 선택 단계(화살표 선택기)
+    [SerializeField] private TextMeshProUGUI currentStageText; // 현재 선택 단계(화살표 선택기 / 헤더)
     [SerializeField] private TextMeshProUGUI constraintText;   // 누적 제약(병합, 변경분 색 강조)
     [SerializeField] private TextMeshProUGUI geneticsMultText; // 유전자 배율
+    [SerializeField] private TextMeshProUGUI unlockItemText;   // 최초 클리어 시 해금 아이템
 
     [SerializeField] private Button confirmButton;
+    [SerializeField] private Button closeButton;              // 닫기 버튼
+    [SerializeField] private Button prevButton;               // 이전 버튼 (일반 특성 패널로 돌아가기)
+    [SerializeField] private AbilityUIController abilityUIController;
     [SerializeField] private SaveSlotUI saveSlotUI;           // 게임 시작
 
     private int selectedStage = -1;
+    private readonly List<DawnStageItemUI> stageItems = new List<DawnStageItemUI>();
+
+    private void Start()
+    {
+        if (closeButton != null)
+        {
+            closeButton.onClick.RemoveAllListeners();
+            closeButton.onClick.AddListener(OnClickClose);
+        }
+
+        if (prevButton != null)
+        {
+            prevButton.onClick.RemoveAllListeners();
+            prevButton.onClick.AddListener(OnClickPrev);
+        }
+    }
 
     public void OpenDawnPanel()
     {
         if (dawnPanel != null) dawnPanel.SetActive(true);
         BuildStageList();
-        SelectStage(Mathf.Max(1, 1)); // 기본 1단계
+        SelectStage(Mathf.Max(0, DawnSystem.MaxUnlockedDawnStage)); // 해금된 최대 스테이지로 UI 띄워줌
     }
 
     public void CloseDawnPanel()
@@ -35,29 +56,75 @@ public class DawnUIController : MonoBehaviour
         selectedStage = -1;
     }
 
+    public void OnClickClose()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+        CloseDawnPanel();
+    }
+
+    public void OnClickPrev()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+        CloseDawnPanel();
+
+        if (abilityUIController == null)
+        {
+            abilityUIController = FindObjectOfType<AbilityUIController>();
+        }
+
+        if (abilityUIController != null)
+        {
+            abilityUIController.OpenGeneralAbilityPanel();
+        }
+    }
+
     private void BuildStageList()
     {
         if (stageListContent == null || stageButtonPrefab == null) return;
-        foreach (Transform c in stageListContent) Destroy(c.gameObject);
 
-        int maxUnlocked = DawnSystem.MaxUnlockedDawnStage;
-        foreach (var data in DawnSystem.AllStages())
+        foreach (Transform c in stageListContent) Destroy(c.gameObject);
+        stageItems.Clear();
+
+        var stages = DawnSystem.AllStages();
+        foreach (var data in stages)
         {
             if (data == null) continue;
             GameObject go = Instantiate(stageButtonPrefab, stageListContent);
             go.SetActive(true);
 
-            var label = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (label != null) label.text = data.stage.ToString();
-
-            var btn = go.GetComponent<Button>();
-            if (btn != null)
+            DawnStageItemUI item = go.GetComponent<DawnStageItemUI>();
+            if (item == null)
             {
-                btn.interactable = data.stage <= maxUnlocked; // 해금된 단계만 선택 가능
-                int s = data.stage;
-                btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => SelectStage(s));
+                item = go.AddComponent<DawnStageItemUI>();
             }
+
+            bool isUnlocked = DawnSystem.IsStageUnlocked(data.stage);
+            int stageNum = data.stage;
+            string constraintDesc = data.constraintDescription;
+
+            item.Setup(
+                stage: stageNum,
+                constraintDescription: constraintDesc,
+                isUnlocked: isUnlocked,
+                isSelected: false,
+                onClickUnlocked: (s) => SelectStage(s),
+                onClickLocked: () => OnLockedStageClicked()
+            );
+
+            stageItems.Add(item);
+        }
+    }
+
+    private void OnLockedStageClicked()
+    {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayEffect("Button");
+        }
+
+        if (UIManager.Instance != null && UIManager.Instance.Popup != null)
+        {
+            UIManager.Instance.Popup.ShowFloatingPopup("아직 해금되지 않은 단계입니다.", 2.0f);
         }
     }
 
@@ -69,7 +136,7 @@ public class DawnUIController : MonoBehaviour
 
     public void PrevStage()
     {
-        if (selectedStage - 1 >= 1) SelectStage(selectedStage - 1);
+        if (selectedStage - 1 >= 0) SelectStage(selectedStage - 1);
     }
 
     public void SelectStage(int stage)
@@ -82,13 +149,33 @@ public class DawnUIController : MonoBehaviour
             constraintText.text = DawnSystem.GetConstraintSummaryRich(stage); // 병합 + 변경분 색 강조
         if (geneticsMultText != null)
             geneticsMultText.text = $"유전자 배율 x{DawnSystem.GetGeneticsMultiplier(stage):0.##}";
+
+        var stageData = DawnSystem.GetStage(stage);
+        if (unlockItemText != null)
+        {
+            string unlockItem = (stageData != null && !string.IsNullOrWhiteSpace(stageData.unlockItemName))
+                ? stageData.unlockItemName
+                : "X";
+            unlockItemText.text = unlockItem;
+        }
+
+        // 선택 하이라이트 동기화
+        var stages = DawnSystem.AllStages();
+        for (int i = 0; i < stageItems.Count && i < stages.Count; i++)
+        {
+            if (stageItems[i] != null && stages[i] != null)
+            {
+                stageItems[i].SetSelected(stages[i].stage == selectedStage);
+            }
+        }
+
         if (confirmButton != null) confirmButton.interactable = true;
     }
 
     // 확인 버튼 → 선택 저장 후 게임 시작
     public void ConfirmDawn()
     {
-        if (selectedStage < 1) return;
+        if (selectedStage < 0) return;
         DawnSystem.SetSelectedStage(selectedStage);
         if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
         if (saveSlotUI != null) saveSlotUI.OnClickNewGame(); // 게임 시작

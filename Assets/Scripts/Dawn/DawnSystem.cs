@@ -44,7 +44,7 @@ public static class DawnSystem
     /// <summary>새벽 모드 자체가 해금됐는가(1단계 이상 열림).</summary>
     public static bool IsDawnUnlocked => MaxUnlockedDawnStage >= 1;
 
-    public static bool IsStageUnlocked(int stage) => stage >= 1 && stage <= MaxUnlockedDawnStage;
+    public static bool IsStageUnlocked(int stage) => stage >= 0 && stage <= MaxUnlockedDawnStage;
 
     public static void UnlockUpTo(int stage)
     {
