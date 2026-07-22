@@ -4,10 +4,11 @@ using UnityEngine.EventSystems;
 using TMPro;
 using DG.Tweening;
 
-public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandler
+public class CurseTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Icon Elements")]
     [SerializeField] private Image iconImage;
+    [SerializeField] private TextMeshProUGUI durationText;
 
     [Header("Tooltip Panel")]
     [SerializeField] private RectTransform tooltipPanel;
@@ -15,27 +16,34 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
     [SerializeField] private CanvasGroup tooltipCanvasGroup;
 
     [Header("Animation Settings")]
-    [SerializeField] private float startLocalX = 0f;     // 말풍선이 튀어나오기 시작할 안쪽 X 좌표
     [SerializeField] private float animDuration = 0.25f; // 애니메이션 재생 시간
     [SerializeField] private Ease showEase = Ease.OutBack; // 튀어나올 때 탄성 효과
     [SerializeField] private Ease hideEase = Ease.InQuad;  // 들어갈 때 가속 효과
 
-    private float targetLocalX;
     private Tween fadeTween;
     private Tween scaleTween;
-    private Tween moveTween;
 
     protected override void Awake()
     {
         base.Awake();
         if (tooltipPanel != null)
         {
-            targetLocalX = tooltipPanel.localPosition.x;
+            SetPivotLeft(tooltipPanel);
         }
         ResetTooltipState();
     }
 
-    public void Setup(Sprite iconSprite, string description, System.Action onClose = null)
+    private void SetPivotLeft(RectTransform rect)
+    {
+        if (rect == null) return;
+        Vector2 size = rect.rect.size;
+        Vector2 deltaPivot = rect.pivot - new Vector2(0f, rect.pivot.y);
+        Vector3 deltaPosition = new Vector3(deltaPivot.x * size.x * rect.localScale.x, deltaPivot.y * size.y * rect.localScale.y);
+        rect.pivot = new Vector2(0f, rect.pivot.y);
+        rect.localPosition -= deltaPosition;
+    }
+
+    public void Setup(Sprite iconSprite, string description, int daysLeft = -1, System.Action onClose = null)
     {
         onCloseCallback = onClose;
 
@@ -46,15 +54,24 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
                 iconImage.gameObject.SetActive(true);
                 iconImage.sprite = iconSprite;
             }
-            else
-            {
-                iconImage.gameObject.SetActive(false);
-            }
         }
 
         if (descriptionText != null)
         {
             descriptionText.text = description;
+        }
+
+        if (durationText != null)
+        {
+            if (daysLeft > 0)
+            {
+                durationText.gameObject.SetActive(true);
+                durationText.text = $"{daysLeft}일";
+            }
+            else
+            {
+                durationText.gameObject.SetActive(false);
+            }
         }
 
         ResetTooltipState();
@@ -68,15 +85,9 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
 
         fadeTween?.Kill();
         scaleTween?.Kill();
-        moveTween?.Kill();
-
-        Vector3 pos = tooltipPanel.localPosition;
-        pos.x = startLocalX;
-        tooltipPanel.localPosition = pos;
 
         fadeTween = tooltipCanvasGroup.DOFade(1f, animDuration).SetUpdate(true);
         scaleTween = tooltipPanel.DOScale(Vector3.one, animDuration).SetEase(showEase).SetUpdate(true);
-        moveTween = tooltipPanel.DOLocalMoveX(targetLocalX, animDuration).SetEase(showEase).SetUpdate(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -90,13 +101,11 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
 
         fadeTween?.Kill();
         scaleTween?.Kill();
-        moveTween?.Kill();
 
         float duration = animDuration * 0.8f;
 
         fadeTween = tooltipCanvasGroup.DOFade(0f, duration).SetUpdate(true);
-        scaleTween = tooltipPanel.DOScale(new Vector3(0f, 1f, 1f), duration).SetEase(hideEase).SetUpdate(true);
-        moveTween = tooltipPanel.DOLocalMoveX(startLocalX, duration).SetEase(hideEase).SetUpdate(true)
+        scaleTween = tooltipPanel.DOScale(new Vector3(0f, 1f, 1f), duration).SetEase(hideEase).SetUpdate(true)
             .OnComplete(() => tooltipPanel.gameObject.SetActive(false));
     }
 
@@ -104,7 +113,6 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
     {
         fadeTween?.Kill();
         scaleTween?.Kill();
-        moveTween?.Kill();
 
         if (tooltipCanvasGroup != null)
         {
@@ -115,10 +123,6 @@ public class HoverTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
         {
             tooltipPanel.gameObject.SetActive(false);
             tooltipPanel.localScale = new Vector3(0f, 1f, 1f);
-
-            Vector3 pos = tooltipPanel.localPosition;
-            pos.x = startLocalX;
-            tooltipPanel.localPosition = pos;
         }
     }
 

@@ -5,7 +5,7 @@ public class PopupSystem
 {
     private CloseablePopup defaultCloseablePrefab;
     private ToastPopup defaultToastPrefab;
-    private HoverTooltipUI defaultTooltipPrefab;
+    private CurseTooltipUI defaultTooltipPrefab;
     private BreedPopup defaultBreedPopupPrefab;
     private FloatingPopup defaultFloatingPopupPrefab;
     private UnlockPopup defaultUnlockPopupPrefab;
@@ -17,7 +17,7 @@ public class PopupSystem
 
     private Dictionary<GameObject, Queue<BasePopup>> popupPools = new Dictionary<GameObject, Queue<BasePopup>>();
 
-    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, HoverTooltipUI tooltipPrefab, BreedPopup breedPrefab, FloatingPopup floatingPrefab, UnlockPopup unlockPrefab, Transform parent)
+    public PopupSystem(CloseablePopup closeablePrefab, ToastPopup toastPrefab, CurseTooltipUI tooltipPrefab, BreedPopup breedPrefab, FloatingPopup floatingPrefab, UnlockPopup unlockPrefab, Transform parent)
     {
         defaultCloseablePrefab = closeablePrefab;
         defaultToastPrefab = toastPrefab;
@@ -42,10 +42,10 @@ public class PopupSystem
         return popup;
     }
 
-    public HoverTooltipUI ShowHoverTooltip(Vector2 position, Sprite iconSprite, string description, System.Action onClose = null)
+    public CurseTooltipUI ShowCurseTooltip(Vector2 position, Sprite iconSprite, string description, int daysLeft = -1, System.Action onClose = null)
     {
-        HoverTooltipUI popup = ShowPopup(defaultTooltipPrefab);
-        popup.Setup(iconSprite, description, onClose);
+        CurseTooltipUI popup = ShowPopup(defaultTooltipPrefab);
+        popup.Setup(iconSprite, description, daysLeft, onClose);
 
         RectTransform rectTransform = popup.GetComponent<RectTransform>();
         if (rectTransform != null)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,12 +16,11 @@ public class UIManager : Singleton<UIManager>
     [Header("Popup Settings")]
     [SerializeField] private CloseablePopup defaultCloseablePrefab;
     [SerializeField] private ToastPopup defaultToastPrefab;
-    [SerializeField] private HoverTooltipUI defaultTooltipPrefab;
+    [SerializeField] private CurseTooltipUI defaultTooltipPrefab;
     [SerializeField] private BreedPopup defaultBreedPopupPrefab;
     [SerializeField] private FloatingPopup defaultFloatingPopupPrefab;
     [SerializeField] private UnlockPopup defaultUnlockPopupPrefab;
     [SerializeField] private Transform popupCanvasParent;
-
     private void Awake()
     {
         if (Instance != null && Instance != this)

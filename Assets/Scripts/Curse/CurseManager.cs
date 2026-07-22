@@ -25,6 +25,10 @@ public class CurseManager : Singleton<CurseManager>
     [SerializeField] private bool showCurseDebug = true;
     [Tooltip("특정 저주 강제 적용 패널 (F10으로 토글)")]
     [SerializeField] private bool showForcePanel = false;
+    [Header("Curse UI Positioning")]
+    [SerializeField] private Vector2 seasonalTooltipPos = new Vector2(0f, -80f);
+    [SerializeField] private Vector2 temporalTooltipPos = new Vector2(0f, -130f);
+
     [Tooltip("강제 적용 시 사용할 저주 레벨")]
     [Range(1, 3)]
     [SerializeField] private int debugForceLevel = 1;
@@ -38,10 +42,14 @@ public class CurseManager : Singleton<CurseManager>
     public CurseInstance currentTempCurse = null;
     public CurseInstance currentSeasonCurse = null;
 
+    private CurseTooltipUI _activeCurseTooltip;
+    private CurseTooltipUI _activeTempCurseTooltip;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        UpdateCurseUI();
+        UpdateTempCurseUI();
     }
     private void OnEnable()
     {
@@ -75,6 +83,7 @@ public class CurseManager : Singleton<CurseManager>
             var lv = data.GetLevel(debugForceLevel);
             remainingTempCurseDay = Mathf.Max(1, lv != null ? lv.days : 0);
             currentTempCurse.Activate();
+            UpdateTempCurseUI();
         }
         else
         {
@@ -82,6 +91,7 @@ public class CurseManager : Singleton<CurseManager>
             currentSeasonCurse = inst;
             remainingCurseDay = seasonInterval;
             currentSeasonCurse.Activate();
+            UpdateCurseUI();
         }
         Debug.Log($"[Curse][강제] {data.title} 적용 (레벨 {debugForceLevel})");
     }
@@ -95,6 +105,8 @@ public class CurseManager : Singleton<CurseManager>
         currentSeasonCurse = null;
         remainingCurseDay = 0;
         remainingTempCurseDay = 0;
+        UpdateCurseUI();
+        UpdateTempCurseUI();
         Debug.Log("[Curse][강제] 모든 저주 해제");
     }
 
@@ -281,11 +293,12 @@ public class CurseManager : Singleton<CurseManager>
 
     private void ApplyTemporalCurse()
     {
-        if(currentTempCurse == null) return;
-
-        currentTempCurse.Activate();
-        CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId); // 도감: 저주 발견
-        //단발형 저주 발동 UI
+        if (currentTempCurse != null)
+        {
+            currentTempCurse.Activate();
+            CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId); // 도감: 저주 발견
+        }
+        UpdateTempCurseUI();
     }
 
     private void SelectSeasonalCurse()
@@ -302,10 +315,12 @@ public class CurseManager : Singleton<CurseManager>
 
     private void ApplySeasonalCurse()
     {
-        if(currentSeasonCurse == null) return;
-
-        currentSeasonCurse.Activate();
-        CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId); // 도감: 저주 발견
+        if (currentSeasonCurse != null)
+        {
+            currentSeasonCurse.Activate();
+            CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId); // 도감: 저주 발견
+        }
+        UpdateCurseUI();
     }
 
     private void RemoveCurse()
@@ -318,6 +333,7 @@ public class CurseManager : Singleton<CurseManager>
             currentTempCurse.Deactivate();
             currentTempCurse = null;
         }
+        UpdateTempCurseUI();
     }
 
     private void UpdateSeasonalCurse()
@@ -332,6 +348,7 @@ public class CurseManager : Singleton<CurseManager>
             currentSeasonCurse.Deactivate();
             currentSeasonCurse = null;
         }
+        UpdateCurseUI();
     }
 
     private CurseInstance CreateInstanceById(CurseScriptable data, int level)
@@ -386,7 +403,7 @@ public class CurseManager : Singleton<CurseManager>
 
         var scriptable = FindTempScriptableById(saveData.curseId[0]); //temp
 
-        if(scriptable != null) currentTempCurse = CreateInstanceById(scriptable, level);
+        if (scriptable != null) currentTempCurse = CreateInstanceById(scriptable, level);
         else currentTempCurse = null;
 
         scriptable = FindSeasonScriptableById(saveData.curseId[1]); //season
@@ -396,6 +413,9 @@ public class CurseManager : Singleton<CurseManager>
 
         remainingCurseDay = saveData.remainSeasonCurseDay;
         remainingTempCurseDay = saveData.remainTempCurseDay;
+
+        UpdateCurseUI();
+        UpdateTempCurseUI();
     }
 
     private CurseScriptable FindTempScriptableById(string id)
@@ -406,5 +426,81 @@ public class CurseManager : Singleton<CurseManager>
     private CurseScriptable FindSeasonScriptableById(string id)
     {
         return seasonalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
+    }
+
+    public void UpdateCurseUI()
+    {
+        if (_activeCurseTooltip != null)
+        {
+            try
+            {
+                _activeCurseTooltip.Close();
+            }
+            catch (System.Exception) { /* ignored */ }
+            _activeCurseTooltip = null;
+        }
+
+        if (currentSeasonCurse != null && currentSeasonCurse.Data != null)
+        {
+            Sprite icon = currentSeasonCurse.Data.icon;
+            string title = currentSeasonCurse.Data.title;
+            string description = currentSeasonCurse.Data.description;
+
+            string tooltipDesc = $"<b>{title}</b>\n{description}";
+
+            if (UIManager.Instance != null && UIManager.Instance.Popup != null)
+            {
+                _activeCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(seasonalTooltipPos, icon, tooltipDesc, remainingCurseDay);
+                if (_activeCurseTooltip != null)
+                {
+                    RectTransform rect = _activeCurseTooltip.GetComponent<RectTransform>();
+                    if (rect != null)
+                    {
+                        rect.anchorMin = new Vector2(0f, 1f);
+                        rect.anchorMax = new Vector2(0f, 1f);
+                        rect.pivot = new Vector2(0f, 1f);
+                        rect.anchoredPosition = seasonalTooltipPos;
+                    }
+                }
+            }
+        }
+    }
+
+    public void UpdateTempCurseUI()
+    {
+        if (_activeTempCurseTooltip != null)
+        {
+            try
+            {
+                _activeTempCurseTooltip.Close();
+            }
+            catch (System.Exception) { /* ignored */ }
+            _activeTempCurseTooltip = null;
+        }
+
+        if (currentTempCurse != null && currentTempCurse.Data != null)
+        {
+            Sprite icon = currentTempCurse.Data.icon;
+            string title = currentTempCurse.Data.title;
+            string description = currentTempCurse.Data.description;
+
+            string tooltipDesc = $"<b>{title}</b>\n{description}";
+
+            if (UIManager.Instance != null && UIManager.Instance.Popup != null)
+            {
+                _activeTempCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(temporalTooltipPos, icon, tooltipDesc, remainingTempCurseDay);
+                if (_activeTempCurseTooltip != null)
+                {
+                    RectTransform rect = _activeTempCurseTooltip.GetComponent<RectTransform>();
+                    if (rect != null)
+                    {
+                        rect.anchorMin = new Vector2(0f, 1f);
+                        rect.anchorMax = new Vector2(0f, 1f);
+                        rect.pivot = new Vector2(0f, 1f);
+                        rect.anchoredPosition = temporalTooltipPos;
+                    }
+                }
+            }
+        }
     }
 }

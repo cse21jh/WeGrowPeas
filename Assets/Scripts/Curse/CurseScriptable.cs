@@ -17,6 +17,8 @@ public class CurseScriptable : ScriptableObject
 
     public string title;
 
+    public Sprite icon;
+
     [TextArea] public string description;
 
     [Tooltip("1/2/3단계 수치. index 0 = 1단계. 새벽 저주 레벨로 선택됨.")]
