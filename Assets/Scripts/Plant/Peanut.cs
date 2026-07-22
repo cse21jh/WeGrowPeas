@@ -120,11 +120,11 @@ public class Peanut : MovablePlant
 
     public void TrySpawnCopy()
     {
-        if (Random.Range(0, 100) > 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25���� Ȯ���� ����
+        if (Random.Range(0, 100) >= 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25% 확률로 복사
             return;
         int spawnGridIdx = FindEmptyGridToCopy();
 
-        if (spawnGridIdx == -1) // ������ �� �ִ� ��ġ�� ����
+        if (spawnGridIdx == -1) // 복사할 수 있는 위치가 없음
             return;
 
         List<GeneticTrait> copyTriats = traits.ToList();

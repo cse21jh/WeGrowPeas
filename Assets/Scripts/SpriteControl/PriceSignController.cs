@@ -4,17 +4,17 @@ using TMPro;
 public class PriceSignController : MonoBehaviour
 {
     Animator anim;
-    [SerializeField] private TextMeshPro priceText;
+    [SerializeField] private TextMeshProUGUI priceText;
 
-    [SerializeField] private bool tasteDisplayMode = true; // true: ¼ıÀÚ, false: º° ¾ÆÀÌÄÜ
+    [SerializeField] private bool tasteDisplayMode = true; // true: ìˆ«ì, false: ë³„ ì´ë¯¸ì§€
     [SerializeField] private GameObject tasteDisplay_text;
     [SerializeField] private GameObject tasteDisplay_icon;
 
-    [Header("¼ıÀÚ·Î ¸À Ç¥±â")]
-    [SerializeField] private TextMeshPro tasteText;
+    [Header("ìˆ«ìë¡œ ë§› í‘œì‹œ")]
+    [SerializeField] private TextMeshProUGUI tasteText;
 
-    [Header("º° ¾ÆÀÌÄÜÀ¸·Î ¸À Ç¥±â")]
-    [SerializeField] private GameObject[] tasteStars; // ¸ÀÀ» º° ¾ÆÀÌÄÜÀ¸·Î Ç¥½Ã
+    [Header("ë³„ ì•„ì´ì½˜ìœ¼ë¡œ ë§› í‘œì‹œ")]
+    [SerializeField] private GameObject[] tasteStars; // ë§›ì˜ ë³„ ì•„ì´ì½˜ìœ¼ë¡œ í‘œì‹œ
 
 
     private void Awake()

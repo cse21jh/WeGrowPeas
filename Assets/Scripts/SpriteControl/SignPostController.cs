@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class SignPostController : MonoBehaviour
 {
     Animator anim;
-    [SerializeField] private SpriteRenderer waveSpriteRenderer;
+    [SerializeField] private Image waveImage;
     [SerializeField] private List<Sprite> waveSprite;
 
     private void Awake()
@@ -23,9 +24,9 @@ public class SignPostController : MonoBehaviour
         anim.SetBool("isShow", true);
         //Debug.Log(price);
 
-        if (waveSpriteRenderer != null)
+        if (waveImage != null)
         {
-            waveSpriteRenderer.sprite = waveSprite[waveType]; // Format to 2 decimal places
+            waveImage.sprite = waveSprite[waveType]; // Format to 2 decimal places
         }
     }
 

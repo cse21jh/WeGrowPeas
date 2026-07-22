@@ -208,7 +208,7 @@ public abstract class Plant : MonoBehaviour
         int randomNumber = UnityEngine.Random.Range(0, 100);
         if (isFrozen) return true; // 얼어있으면 무조건 저항 성공
 
-        if (randomNumber <= (int)(GetResistanceValue((int)wave) * 100))
+        if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
         {
             return true;
         }
@@ -218,7 +218,7 @@ public abstract class Plant : MonoBehaviour
         {
             // TODO: 파란색 배리어 이펙트
             randomNumber = UnityEngine.Random.Range(0, 100);
-            if (randomNumber <= (int)(GetResistanceValue((int)wave) * 100))
+            if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
                 return true;
         }
 

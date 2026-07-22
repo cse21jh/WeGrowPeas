@@ -547,7 +547,7 @@ public class Grid : MonoBehaviour
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p1Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (additionalInheritance + 50 + p1Bonus <= Random.Range(1, 101) ? 0 : 1);
+                    childGenetic += (Random.Range(1, 101) <= (additionalInheritance + 50 + p1Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
@@ -558,7 +558,7 @@ public class Grid : MonoBehaviour
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p2Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (additionalInheritance + 50 + p2Bonus <= Random.Range(1, 101) ? 0 : 1);
+                    childGenetic += (Random.Range(1, 101) <= (additionalInheritance + 50 + p2Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
