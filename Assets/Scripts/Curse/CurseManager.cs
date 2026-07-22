@@ -26,8 +26,8 @@ public class CurseManager : Singleton<CurseManager>
     [Tooltip("특정 저주 강제 적용 패널 (F10으로 토글)")]
     [SerializeField] private bool showForcePanel = false;
     [Header("Curse UI Positioning")]
-    [SerializeField] private Vector2 seasonalTooltipPos = new Vector2(0f, -80f);
-    [SerializeField] private Vector2 temporalTooltipPos = new Vector2(0f, -130f);
+    [SerializeField] private Vector2 seasonalTooltipPos = new Vector2(0f, -70f);
+    [SerializeField] private Vector2 temporalTooltipPos = new Vector2(0f, -120f);
 
     [Tooltip("강제 적용 시 사용할 저주 레벨")]
     [Range(1, 3)]

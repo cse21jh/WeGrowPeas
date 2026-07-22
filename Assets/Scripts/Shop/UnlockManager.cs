@@ -15,41 +15,33 @@ public static class UnlockManager
 {
     private static HashSet<string> _unlocked;
 
-    private static string FilePath => Path.Combine(Application.persistentDataPath, "unlocks.json");
+    public static List<string> GetUnlockedList()
+    {
+        EnsureLoaded();
+        return new List<string>(_unlocked);
+    }
 
-    [Serializable]
-    private class UnlockSaveData { public List<string> unlocked = new List<string>(); }
+    public static void SetUnlockedList(List<string> list)
+    {
+        if (list == null)
+        {
+            _unlocked = new HashSet<string>();
+        }
+        else
+        {
+            _unlocked = new HashSet<string>(list);
+        }
+    }
 
     private static void EnsureLoaded()
     {
-        if (_unlocked != null) return;
-        _unlocked = new HashSet<string>();
-        try
-        {
-            if (File.Exists(FilePath))
-            {
-                var data = JsonUtility.FromJson<UnlockSaveData>(File.ReadAllText(FilePath));
-                if (data != null && data.unlocked != null)
-                    foreach (var id in data.unlocked) _unlocked.Add(id);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[Unlock] 로드 실패: {e.Message}");
-        }
+        if (_unlocked == null)
+            _unlocked = new HashSet<string>();
     }
 
     private static void Save()
     {
-        try
-        {
-            var data = new UnlockSaveData { unlocked = new List<string>(_unlocked) };
-            File.WriteAllText(FilePath, JsonUtility.ToJson(data));
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[Unlock] 저장 실패: {e.Message}");
-        }
+        // 글로벌 프로필 저장은 게임 종료 시(SaveManager)에 일괄 수행됩니다.
     }
 
     // ── 조회 ──────────────────────────────────────────────────────────────────

@@ -32,6 +32,15 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private GameObject mandatoryAlarm;
     [SerializeField] private GameObject nonMandatoryAlarm;
 
+    // 저장 요소
+
+    public bool PlayAlarmForSeenMessages => MessengerSaveSystem.PlayAlarmForSeenMessages;
+
+    public void SetPlayAlarmForSeenMessages(bool val)
+    {
+        MessengerSaveSystem.PlayAlarmForSeenMessages = val;
+    }
+
     [SerializeField] private List<GameObject> mandatoryAppAlarm;
     [SerializeField] private List<GameObject> nonMandatoryAppAlarm;
 
@@ -72,7 +81,7 @@ public class PhoneManager : Singleton<PhoneManager>
     private float phoneTimer = 0;
     private bool skipPhoneTime = false;
     private bool isPhoneTime = false;
-    
+
     [SerializeField] private GameObject skipPhoneTimeButton;
     [SerializeField] private BreedTimerManager breedTimerManager;
     [SerializeField] private TimerUI phoneTimerUI;
@@ -110,6 +119,8 @@ public class PhoneManager : Singleton<PhoneManager>
         if (Input.GetKeyDown(toggleKey) && !isTutorial)
             Toggle();
     }
+
+
 
     public bool IsOpen => _isOpen;
 
@@ -294,7 +305,7 @@ public class PhoneManager : Singleton<PhoneManager>
         // 미납이어도 밤은 그대로 끝난다. 소비(강제징수/압류)는 다음 낮 시작에 처리(GameManager.TaxCollectionRoutine).
         yield return null;
     }
-    
+
     public void SetPhoneTimer()
     {
         breedTimerManager.SetPhoneTimer();
@@ -312,7 +323,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public float GetMaxPhoneTimer()
     {
-        if(GameManager.Instance != null)
+        if (GameManager.Instance != null)
             return GameManager.Instance.grid.GetMaxBreedTimer();
         return 30f;
     }
@@ -446,7 +457,7 @@ public class PhoneManager : Singleton<PhoneManager>
     }
 
     private void ApplyPhoneAlarmUI()
-    {        
+    {
         // 폰 외부 버튼이나 전체 루트 UI에 알람 수위 적용
         switch (TotalPhoneAlarmState)
         {
@@ -454,7 +465,7 @@ public class PhoneManager : Singleton<PhoneManager>
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
                 alarm.AlarmPermanent();
-                if(GameManager.Instance != null)
+                if (GameManager.Instance != null)
                 {
                     if (anyPausingMandatory) // 멈춤을 요청한 mandatory만 게임 정지
                     {
@@ -528,7 +539,7 @@ public class PhoneManager : Singleton<PhoneManager>
             string partnerName = saveData.dayChatPartners[i];
 
             ChatDayData chatDayData = saveData.dayByChatPartners[i];
-            
+
 
             Dictionary<int, int> separatorsForPartner = new Dictionary<int, int>();
             for (int j = 0; j < chatDayData.index.Count; j++)
@@ -565,7 +576,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public void SetWeatherForecastPanel()
     {
-        if(!GameManager.Instance.grid.GetHasWeatherForecast())
+        if (!GameManager.Instance.grid.GetHasWeatherForecast())
         {
             weatherApp_Default.SetActive(true);
             weatherApp_Tomorrow.SetActive(false);
@@ -578,6 +589,7 @@ public class PhoneManager : Singleton<PhoneManager>
             GameManager.Instance.enemyController.SetWeatherApp(weatherApp_Tomorrow.GetComponent<WeatherApp>());
         }
     }
+
 }
 
 

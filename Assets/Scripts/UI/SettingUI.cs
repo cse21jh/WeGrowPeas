@@ -7,6 +7,7 @@ public class SettingUI : MonoBehaviour
 {
     [SerializeField] private GameObject SettingPanel;
     [SerializeField] private Toggle showBreedPopupToggle;
+    [SerializeField] private Toggle playAlarmForSeenMessagesToggle;
 
     void Start()
     {
@@ -19,6 +20,15 @@ public class SettingUI : MonoBehaviour
             showBreedPopupToggle.onValueChanged.AddListener((isOn) =>
             {
                 UIManager.Instance.SetBreedPopupSetting(isOn);
+            });
+        }
+
+        if (playAlarmForSeenMessagesToggle != null)
+        {
+            playAlarmForSeenMessagesToggle.isOn = MessengerSaveSystem.PlayAlarmForSeenMessages;
+            playAlarmForSeenMessagesToggle.onValueChanged.AddListener((isOn) =>
+            {
+                MessengerSaveSystem.PlayAlarmForSeenMessages = isOn;
             });
         }
     }

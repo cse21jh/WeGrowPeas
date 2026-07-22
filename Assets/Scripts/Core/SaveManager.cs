@@ -28,12 +28,15 @@ public class ProfileData
 
     public bool showBreedPopupSetting = true;
 
+    //PhoneManager & Messenger
+    public List<string> readMessengerKeys = new List<string>();
+    public List<string> unlockedItems = new List<string>();
+    public bool playAlarmForSeenMessages = true;
 }
 
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -66,7 +69,10 @@ public class SaveManager : MonoBehaviour
 
         UIManager.Instance.LoadUIManager(profileData);
 
-        //각 로드하기 
+        // 로드하기
+        MessengerSaveSystem.PlayAlarmForSeenMessages = profileData.playAlarmForSeenMessages;
+        UnlockManager.SetUnlockedList(profileData.unlockedItems);
+        MessengerSaveSystem.SetReadKeys(profileData.readMessengerKeys);
     }
 
     public void SaveProfileData()
@@ -101,6 +107,11 @@ public class SaveManager : MonoBehaviour
         profileData.EffectVolume = SoundManager.Instance.EffectVolume;
 
         profileData.showBreedPopupSetting = UIManager.Instance.ShowBreedPopupSetting;
+
+        //PhoneManager & Messenger
+        profileData.playAlarmForSeenMessages = MessengerSaveSystem.PlayAlarmForSeenMessages;
+        profileData.readMessengerKeys = MessengerSaveSystem.GetReadKeys();
+        profileData.unlockedItems = UnlockManager.GetUnlockedList();
 
         //TutorialManager
 
