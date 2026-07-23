@@ -25,7 +25,7 @@ public class PeaSurviveRequest : RequestInstance
     public override void Stop()
     {
         GameEvents.OnPeaDied -= HandlePeaDied;
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
+        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
     }
 
     public override string GetProgressText()

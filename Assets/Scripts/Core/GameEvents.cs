@@ -29,4 +29,15 @@ public static class GameEvents
 
     public static event Action<Plant> OnPeaSold;
     public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
+
+    public static void Reset()
+    {
+        OnSaveGameRequested = null;
+        OnBugKilled = null;
+        OnPeaBreeded = null;
+        OnPeaDied = null;
+        OnShopBought = null;
+        OnDayPassedForRequest = null;
+        OnPeaSold = null;
+    }
 }

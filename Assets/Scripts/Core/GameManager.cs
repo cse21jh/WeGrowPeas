@@ -235,6 +235,9 @@ public class GameManager : Singleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
+        // 이전 플레이 세션의 static 이벤트 리스너들을 모두 강제 청소하여 메모리 누수 및 오작동 예방
+        GameEvents.Reset();
+
         SoundManager.Instance.StopBgm();
         SoundManager.Instance.PlayBgm("Farm");
 
@@ -781,8 +784,15 @@ public class GameManager : Singleton<GameManager>
         saveData.earnedGolds = PlayerRecordForGraph.earnedGolds;
         saveData.waveEachDay = PlayerRecordForGraph.waveEachDay;
 
-        //GameStartType
-        saveData.gst = GameStartContext.StartType;
+        // 불러올 때 무조건 이어하기 상태로 시작하도록 정규화 저장
+        if (stage > endStage)
+        {
+            saveData.gst = GameStartType.ContinueAfterEnding;
+        }
+        else
+        {
+            saveData.gst = GameStartType.ContinueGame;
+        }
 
         //PhoneManager
         MessengerProgress progress = phoneManager.messengerApp.GetProgress();

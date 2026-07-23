@@ -24,7 +24,7 @@ public class SaveSlotUI : MonoBehaviour
 
     public void SetSlots()
     {
-        for(int i = 0; i < slotItems.Length; i++)
+        for (int i = 0; i < slotItems.Length; i++)
         {
             var tmp = slotItems[i].GetComponentInChildren<TextMeshProUGUI>();
 
@@ -56,7 +56,7 @@ public class SaveSlotUI : MonoBehaviour
 
         path = SaveContext.Instance.CurrentSaveFilePath;
 
-        if(path != null && File.Exists(path)) //continue
+        if (path != null && File.Exists(path)) //continue
         {
             ShowSavePopup();
         }
@@ -84,7 +84,13 @@ public class SaveSlotUI : MonoBehaviour
         string json = File.ReadAllText(path);
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
-        GameStartContext.SetStartType(saveData.gst);
+        // 안전장치: 파일에 잘못 기록된 새 게임/게임오버 상태를 이어하기 상태로 보정
+        GameStartType startType = saveData.gst;
+        if (startType == GameStartType.NewGame || startType == GameStartType.GameOver || startType == GameStartType.None)
+        {
+            startType = GameStartType.ContinueGame;
+        }
+        GameStartContext.SetStartType(startType);
 
         ActivateBlocker();
 

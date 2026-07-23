@@ -159,11 +159,15 @@ public class RequestManager : Singleton<RequestManager>
 
     public List<RequestInstanceSaveData> getSaveData()
     {
-        var data = new List<RequestInstanceSaveData> { new RequestInstanceSaveData() };
+        var data = new List<RequestInstanceSaveData>();
 
-        if (activeReq.Count == 0) return data;
-
-        foreach (var req in activeReq) data.Add(req.ToSaveData());
+        foreach (var req in activeReq)
+        {
+            if (req != null)
+            {
+                data.Add(req.ToSaveData());
+            }
+        }
 
         return data;
     }
@@ -175,7 +179,7 @@ public class RequestManager : Singleton<RequestManager>
         cycleEndRound = saveData.cycleEndRound;
         dayPassed = saveData.dayPassed;
 
-        if (saveData.activeRequests.Count == 0) return;
+        if (saveData.activeRequests == null || saveData.activeRequests.Count == 0) return;
 
         foreach (var reqSave in saveData.activeRequests)
         {
