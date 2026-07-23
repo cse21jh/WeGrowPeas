@@ -10,6 +10,13 @@ using UnityEngine.UI;
 /// </summary>
 public class DawnUIController : MonoBehaviour
 {
+    public struct UnlockItemInfo
+    {
+        public string displayName;
+        public string description;
+        public Sprite icon;
+        public bool isSpecial;
+    }
     [SerializeField] private GameObject dawnPanel;
     [SerializeField] private Transform stageListContent;     // 단계 버튼 부모 (ScrollRect Content)
     [SerializeField] private GameObject stageButtonPrefab;   // 단계 버튼 프리팹(Button + TMP 라벨 + 자물쇠)
@@ -17,7 +24,13 @@ public class DawnUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI currentStageText; // 현재 선택 단계(화살표 선택기 / 헤더)
     [SerializeField] private TextMeshProUGUI constraintText;   // 누적 제약(병합, 변경분 색 강조)
     [SerializeField] private TextMeshProUGUI geneticsMultText; // 유전자 배율
-    [SerializeField] private TextMeshProUGUI unlockItemText;   // 최초 클리어 시 해금 아이템
+
+    [Header("Unlock Item Icon Settings")]
+    [SerializeField] private Transform unlockItemContainer;   // 해금 아이템 아이콘들을 담을 컨테이너
+    [SerializeField] private GameObject unlockItemPrefab;     // 해금 아이템 아이콘 프리팹 (DawnUnlockItemSlot 컴포넌트 포함)
+    [SerializeField] private RectTransform tooltipPanel;      // 툴팁 패널
+    [SerializeField] private TextMeshProUGUI tooltipText;     // 툴팁 텍스트
+    [SerializeField] private GameObject unlockItemArea;       // 해금 아이템 전체 영역 부모 오브젝트 (텍스트 + 스크롤 뷰)
 
     [SerializeField] private Button confirmButton;
     [SerializeField] private Button closeButton;              // 닫기 버튼
@@ -54,6 +67,7 @@ public class DawnUIController : MonoBehaviour
     {
         if (dawnPanel != null) dawnPanel.SetActive(false);
         selectedStage = -1;
+        HideTooltip();
     }
 
     public void OnClickClose()
@@ -143,6 +157,7 @@ public class DawnUIController : MonoBehaviour
     {
         if (!DawnSystem.IsStageUnlocked(stage)) return;
         selectedStage = stage;
+        HideTooltip();
 
         if (currentStageText != null) currentStageText.text = $"{stage} 단계";
         if (constraintText != null)
@@ -151,12 +166,91 @@ public class DawnUIController : MonoBehaviour
             geneticsMultText.text = $"유전자 배율 x{DawnSystem.GetGeneticsMultiplier(stage):0.##}";
 
         var stageData = DawnSystem.GetStage(stage);
-        if (unlockItemText != null)
+
+        // 기존 생성된 아이콘 제거
+        if (unlockItemContainer != null)
         {
-            string unlockItem = (stageData != null && !string.IsNullOrWhiteSpace(stageData.unlockItemName))
-                ? stageData.unlockItemName
-                : "X";
-            unlockItemText.text = unlockItem;
+            foreach (Transform child in unlockItemContainer)
+            {
+                if (child != null) Destroy(child.gameObject);
+            }
+        }
+
+        // 아이템 정보 모으기
+        List<UnlockItemInfo> itemsToShow = new List<UnlockItemInfo>();
+        if (stageData != null)
+        {
+            // 특수 아이템 먼저 추가 (특수 아이템이 앞으로 정렬된다)
+            if (stageData.unlockSpecialItems != null)
+            {
+                foreach (var spec in stageData.unlockSpecialItems)
+                {
+                    if (spec == null) continue;
+                    itemsToShow.Add(new UnlockItemInfo
+                    {
+                        displayName = spec.displayName,
+                        description = spec.description,
+                        icon = spec.icon,
+                        isSpecial = true
+                    });
+                }
+            }
+
+            // 일반 아이템 추가
+            if (stageData.unlockItems != null)
+            {
+                foreach (var norm in stageData.unlockItems)
+                {
+                    if (norm == null) continue;
+                    itemsToShow.Add(new UnlockItemInfo
+                    {
+                        displayName = norm.DisplayName,
+                        description = norm.Description,
+                        icon = norm.Icon,
+                        isSpecial = false
+                    });
+                }
+            }
+        }
+
+        // 해금 아이템 리스트가 존재할 경우 아이콘으로 노출
+        if (itemsToShow.Count > 0)
+        {
+            if (unlockItemArea != null) unlockItemArea.SetActive(true);
+            if (unlockItemContainer != null)
+            {
+                var scrollRect = unlockItemContainer.GetComponentInParent<ScrollRect>();
+                GameObject toggleTarget = scrollRect != null ? scrollRect.gameObject : unlockItemContainer.gameObject;
+                toggleTarget.SetActive(true);
+
+                if (unlockItemPrefab != null)
+                {
+                    foreach (var info in itemsToShow)
+                    {
+                        GameObject go = Instantiate(unlockItemPrefab, unlockItemContainer);
+                        go.SetActive(true);
+                        var slotScript = go.GetComponent<DawnUnlockItemSlot>();
+                        if (slotScript == null) slotScript = go.AddComponent<DawnUnlockItemSlot>();
+                        slotScript.Setup(info, this);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (unlockItemArea != null)
+            {
+                unlockItemArea.SetActive(false);
+            }
+            else
+            {
+                if (unlockItemContainer != null)
+                {
+                    var scrollRect = unlockItemContainer.GetComponentInParent<ScrollRect>();
+                    GameObject toggleTarget = scrollRect != null ? scrollRect.gameObject : unlockItemContainer.gameObject;
+                    toggleTarget.SetActive(false);
+                }
+            }
         }
 
         // 선택 하이라이트 동기화
@@ -170,6 +264,38 @@ public class DawnUIController : MonoBehaviour
         }
 
         if (confirmButton != null) confirmButton.interactable = true;
+    }
+
+    public void ShowTooltip(string nameLine, string itemDesc, Vector3 slotWorldPosition)
+    {
+        if (tooltipPanel == null || tooltipText == null) return;
+
+        tooltipText.text = $"{nameLine}<size=50%>\n\n</size>{itemDesc}";
+        tooltipPanel.gameObject.SetActive(true);
+
+        Canvas canvas = GetComponentInParent<Canvas>();
+        Camera uiCamera = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay) ? canvas.worldCamera : null;
+
+        RectTransform parentRect = tooltipPanel.parent as RectTransform;
+        if (parentRect != null)
+        {
+            Vector2 localPoint;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect,
+                RectTransformUtility.WorldToScreenPoint(uiCamera, slotWorldPosition),
+                uiCamera,
+                out localPoint
+            );
+            tooltipPanel.anchoredPosition = localPoint + new Vector2(0f, 50f);
+        }
+    }
+
+    public void HideTooltip()
+    {
+        if (tooltipPanel != null)
+        {
+            tooltipPanel.gameObject.SetActive(false);
+        }
     }
 
     // 확인 버튼 → 선택 저장 후 게임 시작

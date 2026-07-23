@@ -31,6 +31,12 @@ public class DawnStageData
     [Tooltip("이 단계 클리어 시 해금되는 아이템(표시용, 없으면 빈칸)")]
     public string unlockItemName;
 
+    [Tooltip("이 단계 클리어 시 해금되는 아이템 리스트")]
+    public List<ItemData> unlockItems = new List<ItemData>();
+
+    [Tooltip("이 단계 클리어 시 해금되는 특수 아이템 리스트")]
+    public List<SpecialItemData> unlockSpecialItems = new List<SpecialItemData>();
+
     // ── 향후 제약 적용용 수치(지금은 데이터로만 보관, 누적은 DawnSystem에서 합/곱) ──
     [Header("제약 수치 (향후 적용용)")]
     [Tooltip("저주 단계(0=없음). 저주 로직은 추후 구현")]
