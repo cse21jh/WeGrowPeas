@@ -116,10 +116,12 @@ public class MessengerApp : MonoBehaviour
                         progress.daySeparators[partnerName] = new Dictionary<int, int>();
                     }
 
-                    // 방어 코드
-                    if (!progress.daySeparators[partnerName].ContainsKey(firstIndexOfTriggerZero))
+                    for (int i = firstIndexOfTriggerZero; i <= lastIndexOfTriggerZero; i++)
                     {
-                        progress.daySeparators[partnerName].Add(firstIndexOfTriggerZero, 0);
+                        if (chat.messages[i].triggerId == "Default")
+                        {
+                            progress.daySeparators[partnerName][i] = 1;
+                        }
                     }
                 }
             }
@@ -171,6 +173,23 @@ public class MessengerApp : MonoBehaviour
         if (!progress.activatedTriggersOrdered.Contains(triggerId))
         {
             progress.activatedTriggersOrdered.Add(triggerId);
+            
+            int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
+            foreach (var chat in allChats)
+            {
+                if (chat == null || chat.messages == null) continue;
+                string partnerName = chat.chatPartner.chatPartnerName;
+                for (int i = 0; i < chat.messages.Count; i++)
+                {
+                    if (chat.messages[i].triggerId == triggerId)
+                    {
+                        if (!progress.daySeparators.ContainsKey(partnerName))
+                            progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                        if (!progress.daySeparators[partnerName].ContainsKey(i))
+                            progress.daySeparators[partnerName][i] = currentDay;
+                    }
+                }
+            }
             // TODO: 세이브
         }
 
@@ -257,7 +276,8 @@ public class MessengerApp : MonoBehaviour
             }
 
             ChatMessage lastMessage = arrivedMessages.Last();
-            return GetMessageDay(lastMessage.triggerId);
+            int originalIndex = chat.messages.IndexOf(lastMessage);
+            return GetMessageDay(chat.chatPartner.chatPartnerName, originalIndex, lastMessage.triggerId);
 
         }).ToList();
 
@@ -506,19 +526,11 @@ public class MessengerApp : MonoBehaviour
             for (int i = 0; i < seenMessageCount; i++)
             {
                 int originalIndex = currentChat.messages.IndexOf(messagesToShow[i]);
-                int day = -1;
-                if (progress.daySeparators.ContainsKey(partnerName) &&
-                    progress.daySeparators[partnerName].ContainsKey(originalIndex))
-                {
-                    day = progress.daySeparators[partnerName][originalIndex];
-                }
-                else
-                {
-                    day = GetMessageDay(messagesToShow[i].triggerId);
-                    if (!progress.daySeparators.ContainsKey(partnerName))
-                        progress.daySeparators[partnerName] = new Dictionary<int, int>();
-                    progress.daySeparators[partnerName][originalIndex] = day;
-                }
+                int day = GetMessageDay(partnerName, originalIndex, messagesToShow[i].triggerId);
+                
+                if (!progress.daySeparators.ContainsKey(partnerName))
+                    progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                progress.daySeparators[partnerName][originalIndex] = day;
 
                 if (day != -1 && lastDisplayedDay != day && !PhoneManager.Instance.isTutorial)
                 {
@@ -538,7 +550,7 @@ public class MessengerApp : MonoBehaviour
         {
             ChatMessage message = messagesToShow[i];
             int originalIndex = currentChat.messages.IndexOf(message);
-            int currentDay = GetMessageDay(message.triggerId);
+            int currentDay = GetMessageDay(partnerName, originalIndex, message.triggerId);
 
             // --- 날짜 변경 감지 및 저장/표시 로직 ---
             if (lastDay != currentDay && !PhoneManager.Instance.isTutorial)
@@ -550,7 +562,7 @@ public class MessengerApp : MonoBehaviour
                 // TODO: 세이브
                 lastDay = currentDay;
             }
-            bool isPast = IsPastDayMessage(message.triggerId);
+            bool isPast = IsPastDayMessage(partnerName, originalIndex, message.triggerId);
 
             if (isFirstUnreadInThisSession && isPast)
             {
@@ -637,9 +649,20 @@ public class MessengerApp : MonoBehaviour
         // 런타임 기록도, 저장된 기록도 없으면 -1 반환
         return -1;
     }
-    private int GetMessageDay(string triggerId)
+    private bool IsPastDayMessage(string partnerName, int originalIndex, string triggerId)
     {
-        // int.TryParse는 문자열을 정수로 변환 시도, 성공하면 true 반환
+        int arrivalDay = GetMessageDay(partnerName, originalIndex, triggerId);
+        int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
+        return arrivalDay < currentDay;
+    }
+
+    private int GetMessageDay(string partnerName, int originalIndex, string triggerId)
+    {
+        if (progress.daySeparators.ContainsKey(partnerName) && progress.daySeparators[partnerName].TryGetValue(originalIndex, out int savedDay))
+        {
+            return savedDay;
+        }
+
         if (int.TryParse(triggerId, out int day) && day != 0)
         {
             return day; // 숫자로 변환 성공 시 해당 날짜 반환
@@ -651,15 +674,6 @@ public class MessengerApp : MonoBehaviour
             return GameManager.Instance.stage;
         }
         return 1; // GameManager가 없을 경우 기본값
-    }
-    private bool IsPastDayMessage(string triggerId)
-    {
-        if (int.TryParse(triggerId, out int day) && day != 0)
-        {
-            int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
-            return day < currentDay;
-        }        
-        return false; // 숫자가 아닌 트리거는 과거 메시지로 취급하지 않음
     }
 
     private void CreateMessageBubble(string text)
