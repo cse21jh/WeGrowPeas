@@ -178,39 +178,34 @@ public class DawnUIController : MonoBehaviour
 
         // 아이템 정보 모으기
         List<UnlockItemInfo> itemsToShow = new List<UnlockItemInfo>();
-        if (stageData != null)
-        {
-            // 특수 아이템 먼저 추가 (특수 아이템이 앞으로 정렬된다)
-            if (stageData.unlockSpecialItems != null)
-            {
-                foreach (var spec in stageData.unlockSpecialItems)
-                {
-                    if (spec == null) continue;
-                    itemsToShow.Add(new UnlockItemInfo
-                    {
-                        displayName = spec.displayName,
-                        description = spec.description,
-                        icon = spec.icon,
-                        isSpecial = true
-                    });
-                }
-            }
+        string plant = DawnSystem.CurrentPlant;
 
-            // 일반 아이템 추가
-            if (stageData.unlockItems != null)
+        // 특수 아이템 먼저 추가 (특수 아이템이 앞으로 정렬된다).
+        // 현재 식물로 이 단계를 클리어하면 해금되는 식물별 특수 아이템을 자동으로 모은다.
+        foreach (var spec in SpecialItemSystem.GetItemsUnlockedAtStage(stage, plant))
+        {
+            if (spec == null) continue;
+            itemsToShow.Add(new UnlockItemInfo
             {
-                foreach (var norm in stageData.unlockItems)
-                {
-                    if (norm == null) continue;
-                    itemsToShow.Add(new UnlockItemInfo
-                    {
-                        displayName = norm.DisplayName,
-                        description = norm.Description,
-                        icon = norm.Icon,
-                        isSpecial = false
-                    });
-                }
-            }
+                displayName = spec.displayName,
+                description = spec.description,
+                icon = spec.icon,
+                isSpecial = true
+            });
+        }
+
+        // 일반 아이템: 현재 식물로 이 단계를 클리어하면 해금되는 상점 아이템을 자동으로 모은다.
+        // (에셋의 unlockItems 수동 목록 대신, 각 ItemData의 metaRequiredDawnStage/Plant를 역으로 조회)
+        foreach (var norm in UnlockRunTracker.GetItemsUnlockedAtStage(stage, plant))
+        {
+            if (norm == null) continue;
+            itemsToShow.Add(new UnlockItemInfo
+            {
+                displayName = norm.DisplayName,
+                description = norm.Description,
+                icon = norm.Icon,
+                isSpecial = false
+            });
         }
 
         // 해금 아이템 리스트가 존재할 경우 아이콘으로 노출

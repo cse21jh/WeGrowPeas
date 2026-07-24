@@ -14,7 +14,7 @@ using UnityEngine;
 public static class UnlockManager
 {
     /// <summary>
-    /// 인게임 사건으로 해금되는 아이템의 해금 id. (새벽 단계 클리어 조건은 <see cref="DawnSystem.IsStageCleared"/> 사용)
+    /// 인게임 사건으로 해금되는 아이템의 해금 id. (사건 발생 시 UnlockGrants.GrantEventUnlocks가 기록)
     /// </summary>
     public static class Ids
     {

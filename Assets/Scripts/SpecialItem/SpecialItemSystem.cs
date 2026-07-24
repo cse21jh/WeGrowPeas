@@ -28,6 +28,17 @@ public static class SpecialItemSystem
     public static SpecialItemData GetData(string id)
         => All.FirstOrDefault(d => d != null && d.id == id);
 
+    /// <summary>
+    /// 지정한 식물로 "새벽 N단계를 클리어하면" 새로 해금되는 식물별 특수 아이템 목록.
+    /// (새벽 UI에서 단계별 해금 특수 아이템을 자동 표시하는 데 사용)
+    /// </summary>
+    public static List<SpecialItemData> GetItemsUnlockedAtStage(int stage, string plant)
+    {
+        if (stage <= 0) return new List<SpecialItemData>();
+        return All.Where(d => d != null && d.plantSpecific
+            && d.unlockDawnStage == stage && d.plantName == plant).ToList();
+    }
+
     // ── 선물 지급/수령 ─────────────────────────────────────────────────────────
     /// <summary>10·20·30일 자유시간 시작 시 호출 — 선물 +1 (수령 전까지 유지·누적).</summary>
     public static void AddGift()
@@ -46,7 +57,7 @@ public static class SpecialItemSystem
             if (d.plantSpecific)
             {
                 if (d.plantName != currentPlant) continue;
-                if (!UnlockManager.IsUnlocked(d.UnlockId)) continue;
+                if (!d.IsUnlocked()) continue; // 그 식물로 새벽 unlockDawnStage 클리어 필요
             }
             pool.Add(d);
         }

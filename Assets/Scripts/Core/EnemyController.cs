@@ -329,7 +329,7 @@ public class EnemyController : MonoBehaviour
                 break;
             case Season.Winter:
                 tempSeasonText.text = "겨울";
-                UnlockManager.Unlock(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
+                UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
                 break;
         }
         currentSeason = season;

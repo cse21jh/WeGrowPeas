@@ -93,27 +93,9 @@ public static class DawnSystem
     /// <summary>
     /// 지정한 식물로 클리어한 최대 새벽 단계. 0 = 그 식물로 새벽 단계를 클리어한 적 없음.
     /// N단계를 클리어하면 N+1단계가 해금되므로 해금 단계 - 1이 곧 클리어 단계다.
+    /// (아이템 해금 판정은 UnlockManager로 옮겨졌고, 이 값은 진행도 표시/디버그에 사용)
     /// </summary>
     public static int GetMaxClearedStage(string plant) => Mathf.Max(0, GetMaxUnlockedStage(plant) - 1);
-
-    /// <summary>현재 식물 기준 클리어한 최대 새벽 단계.</summary>
-    public static int MaxClearedDawnStage => GetMaxClearedStage(CurrentPlant);
-
-    /// <summary>"(현재 식물로) 새벽 N단계 클리어" 충족 여부. (stage 0 = 조건 없음)</summary>
-    public static bool IsStageCleared(int stage) => IsStageCleared(stage, CurrentPlant);
-
-    /// <summary>"지정한 식물로 새벽 N단계 클리어" 충족 여부. (stage 0 = 조건 없음)</summary>
-    public static bool IsStageCleared(int stage, string plant)
-        => stage <= 0 || GetMaxClearedStage(plant) >= stage;
-
-    /// <summary>"어느 식물로든 새벽 N단계 클리어" 충족 여부. 식물이 명시되지 않은 해금 조건에 사용.</summary>
-    public static bool IsStageClearedByAnyPlant(int stage)
-    {
-        if (stage <= 0) return true;
-        foreach (var p in Plants)
-            if (GetMaxClearedStage(p) >= stage) return true;
-        return false;
-    }
 
     /// <summary>
     /// 이번 런을 엔딩까지 클리어했을 때 호출. 이번 런의 식물에 대해 다음 새벽 단계를 해금한다.
@@ -123,6 +105,10 @@ public static class DawnSystem
     {
         string plant = CurrentPlant;
         UnlockUpTo(SelectedDawnStage + 1, plant);
+
+        // 이번 런에서 클리어한 새벽 단계에 맞춰, 조건을 만족하는 상점/특수 아이템을 실제로 해금(기록).
+        UnlockGrants.GrantDawnClearUnlocks(plant, SelectedDawnStage);
+
         Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
     }
 

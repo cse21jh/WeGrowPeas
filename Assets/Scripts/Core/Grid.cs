@@ -2709,7 +2709,7 @@ public class Grid : MonoBehaviour
 
         // 전용 비료가 4줄 이상 존재하면 저항력 흡수 비료 해금
         if (fertilizerColumns.Count >= 4)
-            UnlockManager.Unlock(UnlockManager.Ids.FertilizerFourColumns);
+            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.FertilizerFourColumns);
 
         return true;
     }

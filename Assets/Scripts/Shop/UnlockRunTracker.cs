@@ -53,6 +53,21 @@ public static class UnlockRunTracker
         runStartUnlocked = null;
     }
 
+    /// <summary>
+    /// 지정한 식물로 "새벽 N단계를 클리어하면" 새로 해금되는 상점 아이템 목록.
+    /// (새벽 UI에서 단계별 해금 아이템을 자동 표시하는 데 사용)
+    /// 식물 조건이 없는 아이템(무당벌레·페트병 등)은 어느 식물이든 포함된다.
+    /// </summary>
+    public static List<ItemData> GetItemsUnlockedAtStage(int stage, string plant)
+    {
+        if (stage <= 0) return new List<ItemData>();
+
+        return LoadAllItems()
+            .Where(item => item.metaRequiredDawnStage == stage
+                && (string.IsNullOrEmpty(item.metaRequiredDawnPlant) || item.metaRequiredDawnPlant == plant))
+            .ToList();
+    }
+
     private static IEnumerable<ItemData> LoadAllItems()
     {
         return Resources.LoadAll<ItemData>(ItemResourcePath).Where(i => i != null);

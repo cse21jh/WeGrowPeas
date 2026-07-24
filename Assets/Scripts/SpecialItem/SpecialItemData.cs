@@ -27,4 +27,17 @@ public class SpecialItemData : ScriptableObject
 
     /// <summary>식물별 아이템의 언락 id (UnlockManager 재활용).</summary>
     public string UnlockId => $"special_{id}";
+
+    /// <summary>
+    /// 메타 진행만으로 판정한 해금 여부. 공용 아이템은 항상 해금,
+    /// 식물별 아이템은 "그 식물(plantName)로 새벽 unlockDawnStage 단계를 클리어"해야 해금된다.
+    /// (상점 <see cref="ItemData.IsMetaUnlocked"/>와 동일한 식물별 판정)
+    /// </summary>
+    public bool IsUnlocked()
+    {
+        // 공용 아이템은 항상 해금. 식물별 아이템은 UnlockManager에 실제 해금 기록이 있어야 한다.
+        // (해당 식물로 새벽 unlockDawnStage 클리어 시 UnlockGrants가 기록. 판정은 UnlockManager로 통일.)
+        if (!plantSpecific) return true;
+        return UnlockManager.IsUnlocked(UnlockId);
+    }
 }

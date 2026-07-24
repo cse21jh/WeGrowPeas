@@ -46,12 +46,16 @@ public class GameDebugPanel : MonoBehaviour
         GUILayout.Label("[특수 아이템]");
         GUILayout.Label($"미수령 선물: {SpecialItemSystem.PendingGifts}개");
         if (GUILayout.Button("선물 +1")) SpecialItemSystem.AddGift();
-        if (GUILayout.Button("식물별 아이템 전부 언락"))
+        // 식물별 특수 아이템은 이제 "그 식물로 새벽 unlockDawnStage(4/8/12) 클리어" 시 자동 해금된다.
+        // (아래 [새벽] 섹션에서 각 식물 12단계로 올리면 해당 식물 특수 아이템이 전부 열림)
+        if (GUILayout.Button("식물별 특수 아이템 해금 (양쪽 새벽 12단계)"))
         {
-            foreach (var d in Resources.LoadAll<SpecialItemData>(SpecialItemSystem.ResourcePath))
-                if (d != null && d.plantSpecific)
-                    UnlockManager.Unlock(d.UnlockId);
-            Debug.Log("[Debug] 식물별 특수 아이템 전부 언락");
+            foreach (var plant in DawnSystem.Plants)
+            {
+                DawnSystem.SetMaxUnlockedStage(plant, 13);       // 12단계 클리어 = 해금 13단계
+                UnlockGrants.GrantDawnClearUnlocks(plant, 12);   // 상점+특수 아이템 실제 해금 기록
+            }
+            Debug.Log("[Debug] 양쪽 식물 새벽 12단계 클리어 처리 → 식물별 아이템 전부 해금");
         }
         GUILayout.Label("보유: " + (SpecialItemSystem.OwnedIds.Count > 0
             ? string.Join(", ", SpecialItemSystem.OwnedIds) : "없음"), wrapLabel);
@@ -113,8 +117,9 @@ public class GameDebugPanel : MonoBehaviour
         {
             GUILayout.Label($"[{plant}] 해금 {DawnSystem.GetMaxUnlockedStage(plant)}단계 / 클리어 {DawnSystem.GetMaxClearedStage(plant)}단계");
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("1단계")) DawnSystem.UnlockUpTo(1, plant);
-            if (GUILayout.Button("12단계")) DawnSystem.UnlockUpTo(12, plant);
+            // "N클리어" = N단계까지 클리어 처리(선택 해금 N+1) + 조건 아이템 실제 해금
+            if (GUILayout.Button("1클리어")) { DawnSystem.SetMaxUnlockedStage(plant, 2); UnlockGrants.GrantDawnClearUnlocks(plant, 1); }
+            if (GUILayout.Button("12클리어")) { DawnSystem.SetMaxUnlockedStage(plant, 13); UnlockGrants.GrantDawnClearUnlocks(plant, 12); }
             if (GUILayout.Button("잠금")) DawnSystem.SetMaxUnlockedStage(plant, 0);
             GUILayout.EndHorizontal();
         }
@@ -127,9 +132,9 @@ public class GameDebugPanel : MonoBehaviour
             + (UnlockManager.IsUnlocked(UnlockManager.Ids.FertilizerFourColumns) ? "비료4줄 " : ""), wrapLabel);
         if (GUILayout.Button("사건 해금 전부 적용"))
         {
-            UnlockManager.Unlock(UnlockManager.Ids.GoldenPlantCreated);
-            UnlockManager.Unlock(UnlockManager.Ids.WinterReached);
-            UnlockManager.Unlock(UnlockManager.Ids.FertilizerFourColumns);
+            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.GoldenPlantCreated);
+            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.WinterReached);
+            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.FertilizerFourColumns);
             Debug.Log("[Debug] 사건 기반 해금 전부 적용");
         }
         if (GUILayout.Button("도감 진행 초기화")) CodexProgress.ResetAll();

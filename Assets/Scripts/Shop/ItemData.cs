@@ -61,14 +61,14 @@ public abstract class ItemData : ScriptableObject
     /// </summary>
     public bool IsMetaUnlocked()
     {
-        // 새벽 조건: 식물이 지정돼 있으면 "그 식물로" 클리어해야 하고, 없으면 어느 식물이든 인정.
-        bool dawnOk = string.IsNullOrEmpty(metaRequiredDawnPlant)
-            ? DawnSystem.IsStageClearedByAnyPlant(metaRequiredDawnStage)
-            : DawnSystem.IsStageCleared(metaRequiredDawnStage, metaRequiredDawnPlant);
-        if (!dawnOk) return false;
+        // 해금 조건이 아예 없으면 항상 사용 가능.
+        if (metaRequiredDawnStage <= 0 && string.IsNullOrEmpty(metaRequiredEventId))
+            return true;
 
-        if (!string.IsNullOrEmpty(metaRequiredEventId) && !UnlockManager.IsUnlocked(metaRequiredEventId)) return false;
-        return true;
+        // 조건이 있는 아이템은 UnlockManager에 실제 해금 기록이 있어야 한다.
+        // (새벽 단계 조건 → 40일 클리어 시 UnlockGrants가 기록,
+        //  사건 조건 → 사건 발생 시 UnlockGrants가 기록. 판정은 여기 한 곳으로 통일.)
+        return UnlockManager.IsUnlocked(UnlockId);
     }
 
     // �����̼� �ĺ� ����(���̺� �ر� ��), �⺻ true
