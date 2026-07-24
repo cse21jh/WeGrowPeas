@@ -226,6 +226,7 @@ GameObject:
   - component: {fileID: 8382250930647343918}
   - component: {fileID: 4473735546093840550}
   - component: {fileID: 2515684903782611635}
+  - component: {fileID: 2710405229203178852}
   m_Layer: 0
   m_Name: MsgBtn
   m_TagString: Untagged
@@ -337,7 +338,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8382250930647343918}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: MsgCanvasController, Assembly-CSharp
+        m_MethodName: OpenChatPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2515684903782611635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,6 +371,25 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2710405229203178852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6034361532576686563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73726357fc33ce445a712f4541ae7912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  profileImage: {fileID: 5824245288222225828}
+  senderName: {fileID: 9172259603498244807}
+  messageText: {fileID: 9106058077442752522}
+  unreadCount: {fileID: 5258680297909627130}
+  unreadMarkImage: {fileID: 8278795114512575433}
+  unreadMark: {fileID: 21300000, guid: 9fa2bf53739529a4980ec21bf4e281f4, type: 3}
+  readMark: {fileID: 21300000, guid: fa59b0972f604a6478a6b9495946ddbd, type: 3}
 --- !u!1 &7110496599956999491
 GameObject:
   m_ObjectHideFlags: 0
