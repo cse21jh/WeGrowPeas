@@ -18,6 +18,7 @@ public class SprinklerRangeUpgradeItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = 3; 
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 5;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

@@ -35,6 +35,28 @@ public class ShopManager : Singleton<ShopManager>
     // 이 플래그가 true면 가중치를 강제로 8로 설정
     public bool isProbabilityEqualized = false;
 
+    // 신용카드: 상점 1회 방문(하루) 동안의 구매 슬롯 수 / 소모 골드. 다음 자유시간에 정산·초기화.
+    public const int CreditCardRequiredPurchaseCount = 3;
+    private int dailyPurchaseCount = 0;
+    private int dailySpentGold = 0;
+    public int DailyPurchaseCount => dailyPurchaseCount;
+    public int DailySpentGold => dailySpentGold;
+
+    /// <summary>
+    /// 신용카드: 3슬롯 이상 구매한 날이면 소모 비용 * refundPercent 를 환급액으로 반환한다.
+    /// 호출과 동시에 일일 구매 집계를 초기화하므로 자유시간 시작 시 1회만 호출할 것.
+    /// </summary>
+    public int ConsumeDailyPurchaseRefund(float refundPercent)
+    {
+        int refund = 0;
+        if (refundPercent > 0f && dailyPurchaseCount >= CreditCardRequiredPurchaseCount)
+            refund = Mathf.RoundToInt(dailySpentGold * refundPercent);
+
+        dailyPurchaseCount = 0;
+        dailySpentGold = 0;
+        return refund;
+    }
+
 
     /// <summary>
     /// 매일 상점 무료 리롤 가능 횟수를 추가합니다.
@@ -135,6 +157,7 @@ public class ShopManager : Singleton<ShopManager>
         {
             if (!it) continue;
             if (!UnlockManager.IsAvailable(it)) continue;        // 해금 시스템(해금 전엔 상점에 안 뜸)
+            if (!it.IsMetaUnlocked()) continue;                  // 메타 해금(새벽 클리어·인게임 사건)
             if (!it.IsRotationUnlockOk(ctx)) continue;           // 스테이지 등 로테이션 해금 조건(각 아이템 override)
             if (it.GetRotationWeight(ctx) <= 0) continue;        // 가중치 0 이하는 제외
             if (!it.CanPurchaseByLimit()) continue;              // 구매 제한에 도달한 아이템 제외
@@ -226,16 +249,22 @@ public class ShopManager : Singleton<ShopManager>
             return false;
         }
 
+        int price = data.GetDisplayPrice();
+
         // 골드 체크
-        if (!ctx?.Economy?.HasGold(data.GetDisplayPrice()) ?? true)
+        if (!ctx?.Economy?.HasGold(price) ?? true)
         {
             error = "골드 부족";
             return false;
         }
 
         // 결제
-        ctx.Economy.SpendGold(data.GetDisplayPrice());
+        ctx.Economy.SpendGold(price);
         GameEvents.RaiseShopBought(data);
+
+        // 신용카드 정산용 일일 집계
+        dailyPurchaseCount++;
+        dailySpentGold += price;
 
         // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
         var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;

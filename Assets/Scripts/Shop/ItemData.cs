@@ -46,6 +46,31 @@ public abstract class ItemData : ScriptableObject
     public string unlockId;
     public string UnlockId => string.IsNullOrEmpty(unlockId) ? name : unlockId;
 
+    [Header("Meta Unlock (런과 무관한 영구 해금 조건)")]
+    [Tooltip("해금에 필요한 새벽 클리어 단계. 0 = 조건 없음.")]
+    public int metaRequiredDawnStage = 0;
+    [Tooltip("새벽 단계를 클리어해야 하는 식물(\"완두콩\"/\"땅콩\"). 비우면 어느 식물로 클리어하든 인정.")]
+    public string metaRequiredDawnPlant;
+    [Tooltip("해금에 필요한 인게임 사건 id. 비우면 조건 없음. UnlockManager.Ids 참고.")]
+    public string metaRequiredEventId;
+
+    /// <summary>
+    /// 메타 진행(새벽 클리어·인게임 사건)만으로 판정한 해금 여부.
+    /// 런 중에만 성립하는 조건(현재 스테이지·재배 중인 식물 종류 등)은 <see cref="IsRotationUnlockOk"/>가 담당한다.
+    /// 결과창의 "새로 해금된 아이템" 판정도 이 값을 기준으로 한다.
+    /// </summary>
+    public bool IsMetaUnlocked()
+    {
+        // 새벽 조건: 식물이 지정돼 있으면 "그 식물로" 클리어해야 하고, 없으면 어느 식물이든 인정.
+        bool dawnOk = string.IsNullOrEmpty(metaRequiredDawnPlant)
+            ? DawnSystem.IsStageClearedByAnyPlant(metaRequiredDawnStage)
+            : DawnSystem.IsStageCleared(metaRequiredDawnStage, metaRequiredDawnPlant);
+        if (!dawnOk) return false;
+
+        if (!string.IsNullOrEmpty(metaRequiredEventId) && !UnlockManager.IsUnlocked(metaRequiredEventId)) return false;
+        return true;
+    }
+
     // �����̼� �ĺ� ����(���̺� �ر� ��), �⺻ true
     public virtual bool IsRotationUnlockOk(ShopContext ctx) => true;
 
@@ -113,6 +138,14 @@ public abstract class ItemData : ScriptableObject
     }
 
     // === 공통 헬퍼 메서드 ===
+
+    /// <summary>
+    /// 전용 아이템용: 이번 런에서 키우는 식물이 지정한 종인지 확인. (예: "완두콩", "땅콩")
+    /// </summary>
+    protected static bool IsCurrentPlant(string speciesName)
+    {
+        return GameManager.Instance != null && GameManager.Instance.currentPlant == speciesName;
+    }
 
     /// <summary>
     /// Grid null 체크 및 에러 처리 헬퍼

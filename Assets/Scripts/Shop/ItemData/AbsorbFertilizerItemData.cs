@@ -19,6 +19,7 @@ public class AbsorbFertilizerItemData : ItemData
         OnePerShopIfNotStackable = false; // 소모품
         MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
+        metaRequiredEventId = UnlockManager.Ids.FertilizerFourColumns;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

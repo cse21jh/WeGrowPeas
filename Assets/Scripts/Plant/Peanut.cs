@@ -120,7 +120,12 @@ public class Peanut : MovablePlant
 
     public void TrySpawnCopy()
     {
-        if (Random.Range(0, 100) >= 100 * (peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability())) // 25% 확률로 복사
+        float copyProbability = peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability();
+        // 활성형 껍질: 한 번도 교배를 시도하지 않은 식물은 자가번식 확률 증가
+        if (!HasTriedBreed)
+            copyProbability += grid.GetActiveShellProbability();
+
+        if (Random.Range(0f, 100f) >= 100f * copyProbability) // 25% 확률로 복사
             return;
         int spawnGridIdx = FindEmptyGridToCopy();
 
@@ -137,7 +142,16 @@ public class Peanut : MovablePlant
             Debug.Log("[변종] 자가번식 양성 변종 발생!"); // TODO: 변종 이펙트/사운드
         }
 
-        grid.AddMovablePlant(copyTriats, spawnGridIdx);
+        Plant child = grid.AddMovablePlant(copyTriats, spawnGridIdx);
+
+        // 왕위 계승: 자가번식한 자식이 부모 가격 배율의 일부를 계승 (유전자로 인한 최종 가격은 계승 X)
+        float inheritRatio = grid.GetSuccessionInheritRatio();
+        if (child != null && inheritRatio > 0f)
+        {
+            int inherited = Mathf.FloorToInt((GetResistWaveCount() + GetBonusGoldMultiplierCount()) * inheritRatio);
+            if (inherited > 0) child.AddBonusGoldMultiplier(inherited);
+        }
+
         grid.totalPeanutBreedCount++;
         return;
     }

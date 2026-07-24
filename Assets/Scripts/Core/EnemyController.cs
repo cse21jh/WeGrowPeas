@@ -256,6 +256,39 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(picked);
     }
 
+    /// <summary>
+    /// 디버그 전용: 일차를 강제로 점프시킬 때, 일차별 기록 리스트를 목표 일차까지 0으로 채운다.
+    /// (stageKillRecord[stage] 등은 일차를 인덱스로 직접 접근하므로 크기가 맞지 않으면 IndexOutOfRange가 난다)
+    /// 이미 채워진 앞쪽 기록은 건드리지 않고 부족한 뒤쪽만 더미로 메운다.
+    /// </summary>
+    public void DebugPadStageRecords(int targetStage)
+    {
+        while (stageWaveRecord.Count <= targetStage) stageWaveRecord.Add(WaveType.Aging);
+        while (stageKillRecord.Count <= targetStage) stageKillRecord.Add(0);
+        while (stageNoTraitRecord.Count <= targetStage) stageNoTraitRecord.Add(0);
+    }
+
+    /// <summary>디버그 전용: 다음 웨이브를 지정한 종류로 바꾼다.</summary>
+    public void DebugSetNextWave(WaveType waveType)
+    {
+        nextWave = GetWaveFromWaveType(waveType);
+        ShowNextWaveText();
+
+        // 날씨 앱(폰 UI)의 "내일 예상 웨이브" 표시도 갱신.
+        // 폰/자유시간에는 currentWave가 곧 오늘(stage), 아니면 다음 날(stage+1) 웨이브를 보여주므로
+        // UpdateCurrentWave 쪽 규칙과 동일하게 내일 일차를 계산한다.
+        if (weatherApp != null)
+        {
+            int day = GameManager.Instance != null ? GameManager.Instance.stage : 0;
+            bool showsNextDay = PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime()
+                                || (grid != null && !grid.GetIsBreeding());
+            int nextDay = showsNextDay ? day + 2 : day + 1;
+            weatherApp.UpdateNextWave(nextDay, nextWave);
+        }
+
+        Debug.Log($"[Debug] 다음 웨이브 → {waveType}");
+    }
+
     public void SetCurrentWaveTimer()
     {
         breedTimerManager.SetTimer(currentWave.WaveType);
@@ -296,6 +329,7 @@ public class EnemyController : MonoBehaviour
                 break;
             case Season.Winter:
                 tempSeasonText.text = "겨울";
+                UnlockManager.Unlock(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
                 break;
         }
         currentSeason = season;

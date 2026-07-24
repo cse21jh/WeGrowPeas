@@ -21,6 +21,7 @@ public class PetBottleItemData : ItemData
 
         OnePerShopIfNotStackable = false;
         FlowType = ShopFlowType.SelectExistingPlant;
+        metaRequiredDawnStage = 9;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

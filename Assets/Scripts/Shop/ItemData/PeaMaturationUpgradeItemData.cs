@@ -18,9 +18,12 @@ public class PeaMaturationUpgradeItemData : ItemData
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
         MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 2;
+        metaRequiredDawnPlant = "완두콩";
     }
 
-    public override bool IsRotationUnlockOk(ShopContext ctx) => true;
+    // 완두콩 전용 (새벽 2단계 클리어 조건은 metaRequiredDawnStage)
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant("완두콩");
 
     public override int GetRotationWeight(ShopContext ctx) => 8;
 

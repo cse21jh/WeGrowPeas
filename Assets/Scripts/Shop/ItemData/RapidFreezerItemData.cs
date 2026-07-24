@@ -19,6 +19,7 @@ public class RapidFreezerItemData : ItemData
         OnePerShopIfNotStackable = false; // 소모품이므로 상점에 여러 번 뜰 수 있음 (일일 제한은 별도)
         MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
+        metaRequiredEventId = UnlockManager.Ids.WinterReached;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

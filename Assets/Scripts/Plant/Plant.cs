@@ -37,6 +37,11 @@ public abstract class Plant : MonoBehaviour
     protected float travelSellBonus = 0f;
     private int dayStartGridIndex = -1;
 
+    // 완두커피: 완두커피 보유 중에 지나간 자유시간 횟수(판매 골드 배수에 가산)
+    protected int freeTimePassedCount = 0;
+    // 활성형 껍질: 한 번이라도 교배를 시도했는가(시도한 식물은 자가번식 확률 보너스 제외)
+    protected bool hasTriedBreed = false;
+
 
     protected Grid grid;
 
@@ -544,9 +549,11 @@ public abstract class Plant : MonoBehaviour
 
     // ───── 변종 (식물 단위) ─────
 
-    /// <summary>변종 발생 확률(%) = 기본 1% + 새벽(2·10단계) + 저주(돌연변이).</summary>
+    /// <summary>변종 발생 확률(%) = 기본 1% + 새벽(2·10단계) + 저주(돌연변이) + 슈퍼 변종.</summary>
     public static float GetMutationChancePercent()
-        => 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent;
+        => 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
+           + (GameManager.Instance != null && GameManager.Instance.grid != null
+              ? GameManager.Instance.grid.SuperMutationChanceBonus : 0f);
 
     /// <summary>양성 변종: 모든 형질의 저항력을 90~100%로 설정 (유전자는 유지).</summary>
     public static void ApplyBenignResistance(List<GeneticTrait> traitList)
@@ -780,8 +787,33 @@ public abstract class Plant : MonoBehaviour
         if (SpecialItemSystem.Has("colorful"))
             multiplier += 0.1f * grid.CountTileEffects(gridIndex);
 
-        return (int)((basePrice + grid.GetAdditionalPlantGold() + badGeneBonus) * (1f + (multiplier * totalMultiplierCount)));
+        // 완두커피: 자유시간이 지난 횟수만큼 판매 골드 배수 추가
+        float freeTimeBonus = grid.GetPeaCoffeeMultiplier() * freeTimePassedCount;
+
+        int price = (int)((basePrice + grid.GetAdditionalPlantGold() + badGeneBonus)
+                          * (1f + (multiplier * totalMultiplierCount) + freeTimeBonus));
+
+        // 땅과 콩: 뿌리를 내린 식물의 가격 증가 (다른 효과와 곱적용)
+        if (this is MovablePlant && !IsMovable)
+            price = (int)(price * grid.GetRootedPriceMultiplier());
+
+        return price;
     }
+
+    /// <summary>완두커피: 자유시간이 지날 때마다 호출되어 판매 골드 배수를 누적한다. (Grid.Breeding 종료 시)</summary>
+    public void OnFreeTimePassed()
+    {
+        freeTimePassedCount++;
+        priceSign.SetPrice(GetSellingPrice());
+    }
+
+    public int GetFreeTimePassedCount() => freeTimePassedCount;
+    public void SetFreeTimePassedCount(int value) => freeTimePassedCount = Mathf.Max(0, value);
+
+    /// <summary>활성형 껍질: 교배를 시도한 식물로 표시. (Grid.ExecuteBreeding에서 호출)</summary>
+    public void MarkBreedAttempted() => hasTriedBreed = true;
+    public bool HasTriedBreed => hasTriedBreed;
+    public void SetHasTriedBreed(bool value) => hasTriedBreed = value;
 
     /// <summary>특수(세계여행): 낮(교배 페이즈) 시작 시 위치 기록. Grid.Breeding에서 호출.</summary>
     public void MarkDayStartPosition()

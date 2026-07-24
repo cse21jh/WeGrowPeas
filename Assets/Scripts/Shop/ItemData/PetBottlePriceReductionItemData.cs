@@ -22,6 +22,7 @@ public class PetBottlePriceReductionItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = 3; // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 9;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

@@ -45,6 +45,22 @@ public class UIGameRecord : MonoBehaviour
         SetPeaEmotion();
         SetEndingMailContent();
         AddGeneticsInEnding();
+        ShowNewlyUnlockedItems();
+    }
+
+    /// <summary>이번 판에 새로 해금된 아이템이 있으면 해금 팝업으로 보여준다.</summary>
+    private void ShowNewlyUnlockedItems()
+    {
+        List<ItemData> newlyUnlocked = UnlockRunTracker.GetNewlyUnlocked();
+        if (newlyUnlocked.Count == 0) return;
+
+        if (UIManager.Instance == null || UIManager.Instance.Popup == null)
+        {
+            Debug.LogWarning("[UIGameRecord] UIManager가 없어 해금 팝업을 띄우지 못했습니다");
+            return;
+        }
+
+        UIManager.Instance.Popup.ShowUnlockPopup(newlyUnlocked);
     }
         
     private void SetPeaEmotion()

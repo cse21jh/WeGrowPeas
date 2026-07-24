@@ -21,6 +21,7 @@ public class LadybugLureDeviceItemData : ItemData
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
         MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 1;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정
         unlockStageDay = BugSchedule.DefaultAppearStage;
@@ -29,7 +30,7 @@ public class LadybugLureDeviceItemData : ItemData
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         int stage = GameManager.Instance.stage;
-        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
+        // 벌레가 실제로 나오기 시작하는 시점부터 해금 (새벽 1단계 클리어 조건은 metaRequiredDawnStage)
         return stage >= BugSchedule.AppearStage;
     }
 

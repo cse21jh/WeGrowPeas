@@ -140,6 +140,21 @@ public class Grid : MonoBehaviour
     protected float chiliPepperSpawnProbability = 0f; // 고추 등장 확률 (rotation weight 증가로 구현)
     protected float chiliPepperHealPercent = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
 
+    // 신용카드: 하루에 3슬롯 이상 구매 시 자유시간에 환급받는 소모 비용 비율
+    protected float creditCardRefundPercent = 0f;
+    // 쌍둥이: 교배 시 식물이 하나 더 생성될 확률(0~1)
+    protected float twinBreedProbability = 0f;
+
+    //완두콩 전용 아이템
+    protected float peaCoffeeMultiplier = 0f;      // 완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수
+    protected float superMutationChanceBonus = 0f; // 슈퍼 변종: 변종 발생 확률 가산(%p)
+    protected bool hasSuperMutation = false;       // 슈퍼 변종: 양성/악성 변종 확률 반전
+
+    //땅콩 전용 아이템
+    protected float activeShellProbability = 0f;   // 활성형 껍질: 미교배 식물의 자가번식 확률 가산
+    protected float successionInheritRatio = 0f;   // 왕위 계승: 자가번식 시 계승되는 가격 배율 비율
+    protected int landAndBeanLevel = 0;            // 땅과 콩: 뿌리 확률 2배 + 뿌리내린 식물 가격 증가
+
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
     private int mostExpensivePlant = 0;
@@ -197,6 +212,16 @@ public class Grid : MonoBehaviour
     public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
     public float ChiliPepperHealPercent => chiliPepperHealPercent;
     public int MostExpensivePlant => mostExpensivePlant;
+
+    // 신규 아이템(신용카드·쌍둥이·완두커피·슈퍼 변종·활성형 껍질·왕위 계승·땅과 콩)
+    public float CreditCardRefundPercent => creditCardRefundPercent;
+    public float TwinBreedProbability => twinBreedProbability;
+    public float PeaCoffeeMultiplier => peaCoffeeMultiplier;
+    public float SuperMutationChanceBonus => superMutationChanceBonus;
+    public bool HasSuperMutation => hasSuperMutation;
+    public float ActiveShellProbability => activeShellProbability;
+    public float SuccessionInheritRatio => successionInheritRatio;
+    public int LandAndBeanLevel => landAndBeanLevel;
 
 
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
@@ -303,6 +328,10 @@ public class Grid : MonoBehaviour
 
             if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
             {
+                // 활성형 껍질: 교배를 시도한 식물은 이후 자가번식 확률 보너스를 받지 못함
+                parent1.MarkBreedAttempted();
+                parent2.MarkBreedAttempted();
+
                 // 저주: 씨 없는 수박 — 확률적으로 교배 실패(시도는 소모)
                 if (CurseState.SeedlessFailPercent > 0f && Random.Range(0f, 100f) < CurseState.SeedlessFailPercent)
                 {
@@ -325,6 +354,20 @@ public class Grid : MonoBehaviour
                 {
                     UIManager.Instance.Popup.ShowBreedPopup(plant);
                 }
+
+                // 쌍둥이: 확률적으로 교배를 한 번 더 실행해 유전자가 다른 이란성 쌍둥이를 생성
+                if (twinBreedProbability > 0f && Random.Range(0f, 1f) < twinBreedProbability && HasEmptyGrid())
+                {
+                    // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
+                    AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                    UIManager.Instance.Popup.ShowFloatingPopup("쌍둥이가 태어났습니다!", 1);
+                    totalBreedCount++;
+                    if (GameManager.Instance.currentPlant == "완두콩")
+                        totalPeaBreedcount++;
+                    else if (GameManager.Instance.currentPlant == "땅콩")
+                        totalPeanutBreedCount++;
+                }
+
                 // 특수(밑장빼기): 25% 확률로 교배 횟수 미소모
                 if (!(SpecialItemSystem.Has("bottom_deal") && Random.Range(0f, 100f) < 25f))
                     breedCount++;
@@ -398,6 +441,17 @@ public class Grid : MonoBehaviour
 
         // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
         if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
+
+        // 신용카드: 어제 상점에서 3슬롯 이상 구매했다면 소모 비용의 일부를 환급 (없어도 일일 집계는 초기화)
+        if (ShopManager.Instance != null)
+        {
+            int refund = ShopManager.Instance.ConsumeDailyPurchaseRefund(creditCardRefundPercent);
+            if (refund > 0)
+            {
+                GameManager.Instance.economyManager.AddGold(refund);
+                UIManager.Instance.Popup.ShowFloatingPopup($"신용카드 환급: {refund}골드", 1);
+            }
+        }
 
         // 특수(세계여행): 낮 시작 시 각 식물의 위치 마킹 (웨이브 후 이동 거리 계산용)
         if (SpecialItemSystem.Has("world_travel"))
@@ -480,6 +534,13 @@ public class Grid : MonoBehaviour
         enemyController.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
+
+        // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
+        if (peaCoffeeMultiplier > 0f)
+        {
+            foreach (var p in plantGrid.Values)
+                if (p != null) p.OnFreeTimePassed();
+        }
         //GardenGrid 리로드
 
         yield return null;
@@ -496,7 +557,8 @@ public class Grid : MonoBehaviour
         if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
         {
             if (SpecialItemSystem.Has("peanut_special_8")) malignant = true; // 특수(임시땅콩B): 교배 시 악성만
-            else if (Random.value < 0.8f) malignant = true;
+            // 슈퍼 변종: 양성:악성 비율이 반전(80:20)
+            else if (Random.value < (hasSuperMutation ? 0.2f : 0.8f)) malignant = true;
             else benign = true;
             Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!"); // TODO: 변종 이펙트/사운드
         }
@@ -1320,10 +1382,44 @@ public class Grid : MonoBehaviour
         breedCountUI.text = $"{count}회";
     }
 
-    private void SpawnRandomBug()
+    /// <summary>디버그 전용: 벌레(또는 확률에 따라 무당벌레) 1마리를 즉시 소환한다. 등장 스테이지 제한 무시.</summary>
+    public void DebugSpawnBug()
+    {
+        SpawnRandomBug(ignoreStageGate: true);
+    }
+
+    /// <summary>디버그 전용: 현재 재배 중인 식물을 무작위 형질로 1개 추가한다.</summary>
+    public Plant DebugSpawnRandomPlant()
+    {
+        if (!HasEmptyGrid())
+        {
+            Debug.LogWarning("[Debug] 빈 칸이 없어 식물을 추가할 수 없습니다.");
+            return null;
+        }
+
+        // 대응 형질(가뭄·더위)은 SetTrait에서 자동으로 채워주므로 여기서는 제외한다.
+        TraitType[] pickable =
+        {
+            TraitType.NaturalDeath, TraitType.Pest, TraitType.Wind,
+            TraitType.Flood, TraitType.HeavyRain, TraitType.Cold
+        };
+        TraitType trait = pickable[Random.Range(0, pickable.Length)];
+        int genetics = Random.Range(0, 3);
+
+        var traits = new List<GeneticTrait>
+        {
+            new GeneticTrait(trait, Plant.GetResistanceBasedOnGenetics(trait, genetics), genetics, 0f)
+        };
+
+        Plant plant = AddMovablePlant(traits);
+        Debug.Log($"[Debug] {GameManager.Instance.currentPlant} 추가: {trait} (유전자 {genetics})");
+        return plant;
+    }
+
+    private void SpawnRandomBug(bool ignoreStageGate = false)
     {
         int stage = GameManager.Instance.stage;
-        if (stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
+        if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;
         if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
         {
@@ -1467,6 +1563,12 @@ public class Grid : MonoBehaviour
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
             plant.SetTravelSellBonus(item.travelSellBonus); // 특수(세계여행) 복원
+            plant.SetFreeTimePassedCount(item.freeTimePassedCount); // 완두커피 복원
+            plant.SetHasTriedBreed(item.hasTriedBreed); // 활성형 껍질 복원
+
+            // 뿌리 상태 복원. Init()의 TryRootByDawn이 로드 중 새로 뿌리를 내릴 수 있으므로 반드시 그 뒤에 덮어쓴다.
+            if (plant is MovablePlant movablePlant)
+                movablePlant.SetMovable(!item.isRooted);
 
             // MoneyTree 생존 턴 수 복원
             if (plant is MoneyTree moneyTree)
@@ -1523,6 +1625,16 @@ public class Grid : MonoBehaviour
         badGuyMoreRiceLevel = saveData.badGuyMoreRiceLevel;
         sprinklerRangeBonus = saveData.sprinklerRangeBonus;
         sprinklerFertilizerSynergyBonus = saveData.sprinklerFertilizerSynergyBonus;
+
+        // 신규 아이템 스탯 로드
+        creditCardRefundPercent = saveData.creditCardRefundPercent;
+        twinBreedProbability = saveData.twinBreedProbability;
+        peaCoffeeMultiplier = saveData.peaCoffeeMultiplier;
+        superMutationChanceBonus = saveData.superMutationChanceBonus;
+        hasSuperMutation = saveData.hasSuperMutation;
+        activeShellProbability = saveData.activeShellProbability;
+        successionInheritRatio = saveData.successionInheritRatio;
+        landAndBeanLevel = saveData.landAndBeanLevel;
 
         absorbFertilizerTiles.Clear();
         if (saveData.absorbFertilizerTiles != null)
@@ -2254,6 +2366,78 @@ public class Grid : MonoBehaviour
         return additionalPeanutCopyProbability;
     }
 
+    // ───── 신규 아이템 ─────
+
+    /// <summary>신용카드: 3슬롯 이상 구매한 날의 소모 비용 환급 비율 증가.</summary>
+    public void AddCreditCardRefundPercent(float value)
+    {
+        creditCardRefundPercent += value;
+    }
+
+    /// <summary>쌍둥이: 교배 시 식물이 하나 더 생성될 확률 증가.</summary>
+    public void AddTwinBreedProbability(float value)
+    {
+        twinBreedProbability += value;
+    }
+
+    /// <summary>완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수 증가.</summary>
+    public void AddPeaCoffeeMultiplier(float value)
+    {
+        peaCoffeeMultiplier += value;
+    }
+
+    public float GetPeaCoffeeMultiplier()
+    {
+        return peaCoffeeMultiplier;
+    }
+
+    /// <summary>슈퍼 변종: 양성/악성 변종 확률을 반전시키고 변종 발생 확률(%p)을 증가.</summary>
+    public void AddSuperMutation(float chanceBonusPercent)
+    {
+        hasSuperMutation = true;
+        superMutationChanceBonus += chanceBonusPercent;
+    }
+
+    /// <summary>활성형 껍질: 한 번도 교배를 시도하지 않은 식물의 자가번식 확률 증가.</summary>
+    public void AddActiveShellProbability(float value)
+    {
+        activeShellProbability += value;
+    }
+
+    public float GetActiveShellProbability()
+    {
+        return activeShellProbability;
+    }
+
+    /// <summary>왕위 계승: 자가번식 시 계승되는 가격 배율 비율 증가.</summary>
+    public void AddSuccessionInheritRatio(float value)
+    {
+        successionInheritRatio += value;
+    }
+
+    public float GetSuccessionInheritRatio()
+    {
+        return successionInheritRatio;
+    }
+
+    /// <summary>땅과 콩: 뿌리 확률 2배 + 뿌리내린 식물의 가격 증가.</summary>
+    public void AddLandAndBeanLevel(int value)
+    {
+        landAndBeanLevel += value;
+    }
+
+    /// <summary>땅과 콩: 뿌리를 내릴 확률 배수(보유 시 2배).</summary>
+    public float GetRootChanceMultiplier()
+    {
+        return landAndBeanLevel > 0 ? 2f : 1f;
+    }
+
+    /// <summary>땅과 콩: 뿌리내린 식물의 가격 배수(구매 1회당 +10%p, 다른 효과와 곱적용).</summary>
+    public float GetRootedPriceMultiplier()
+    {
+        return 1f + 0.1f * landAndBeanLevel;
+    }
+
     public void AddResistanceDecayReduction(float value)
     {
         resistanceDecayReduction += value;
@@ -2503,6 +2687,11 @@ public class Grid : MonoBehaviour
 
         Debug.Log($"[Grid] Fertilizer placed: col={col}, wave={wave}");
         UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+
+        // 전용 비료가 4줄 이상 존재하면 저항력 흡수 비료 해금
+        if (fertilizerColumns.Count >= 4)
+            UnlockManager.Unlock(UnlockManager.Ids.FertilizerFourColumns);
+
         return true;
     }
 

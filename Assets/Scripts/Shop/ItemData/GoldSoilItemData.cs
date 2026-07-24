@@ -21,6 +21,7 @@ public class GoldSoilItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
+        metaRequiredEventId = UnlockManager.Ids.GoldenPlantCreated;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

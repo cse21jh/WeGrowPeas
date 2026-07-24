@@ -13,6 +13,19 @@ using UnityEngine;
 /// </summary>
 public static class UnlockManager
 {
+    /// <summary>
+    /// 인게임 사건으로 해금되는 아이템의 해금 id. (새벽 단계 클리어 조건은 <see cref="DawnSystem.IsStageCleared"/> 사용)
+    /// </summary>
+    public static class Ids
+    {
+        /// <summary>"황금 식물"을 최초 1회 만들었을 때 — 황금 비료</summary>
+        public const string GoldenPlantCreated = "event_golden_plant_created";
+        /// <summary>겨울에 최초로 도달했을 때 — 급속 냉각기 / 냉각 방패</summary>
+        public const string WinterReached = "event_winter_reached";
+        /// <summary>토양에 전용 비료가 4줄 이상 존재했을 때 — 저항력 흡수 비료</summary>
+        public const string FertilizerFourColumns = "event_fertilizer_four_columns";
+    }
+
     private static HashSet<string> _unlocked;
 
     public static List<string> GetUnlockedList()

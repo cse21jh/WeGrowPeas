@@ -21,6 +21,7 @@ public class BugProcessingUpgradeItemData : ItemData
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
         MaxPurchaseCount = 4; // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 3;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정
         // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
@@ -34,7 +35,7 @@ public class BugProcessingUpgradeItemData : ItemData
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
         // stage >= 6이므로 stage 6(6웨이브)부터 해금됨
-        return stage >= BugSchedule.AppearStage;
+        return stage >= BugSchedule.AppearStage; // 새벽 3단계 클리어 조건은 metaRequiredDawnStage
     }
 
     public override int GetRotationWeight(ShopContext ctx) => 8;

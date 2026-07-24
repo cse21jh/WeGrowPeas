@@ -33,22 +33,129 @@ public static class DawnSystem
         return d != null ? d.geneticsMultiplier : 1f;
     }
 
-    // ── 해금(메타) ────────────────────────────────────────────────────────────
-    /// <summary>해금된 최대 새벽 단계. 0 = 새벽 모드 미해금(40스테이지 엔딩 전).</summary>
-    public static int MaxUnlockedDawnStage
+    // ── 식물 ──────────────────────────────────────────────────────────────────
+    /// <summary>새벽 진행도를 따로 관리하는 식물 목록.</summary>
+    public static readonly string[] Plants = { "완두콩", "땅콩" };
+
+    /// <summary>
+    /// 진행도를 조회·기록할 기준 식물.
+    /// 시작 화면(특성·새벽 선택)에서는 AbilityManager, 인게임에서는 GameManager가 기준이 된다.
+    /// </summary>
+    public static string CurrentPlant
     {
-        get => PlayerPrefs.GetInt(PrefKeyMaxUnlocked, 0); // 기본 0 = 미해금
-        set { PlayerPrefs.SetInt(PrefKeyMaxUnlocked, Mathf.Max(0, value)); PlayerPrefs.Save(); }
+        get
+        {
+            if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.currentPlant))
+                return GameManager.Instance.currentPlant;
+            if (AbilityManager.Instance != null && !string.IsNullOrEmpty(AbilityManager.Instance.CurrentPlantName))
+                return AbilityManager.Instance.CurrentPlantName;
+            return Plants[0];
+        }
     }
 
-    /// <summary>새벽 모드 자체가 해금됐는가(1단계 이상 열림).</summary>
+    // ── 해금(메타) ────────────────────────────────────────────────────────────
+    // 새벽 진행도는 식물별로 따로 저장된다. ("Dawn_MaxUnlockedStage_완두콩" 등)
+    private static string PrefKeyFor(string plant) => PrefKeyMaxUnlocked + "_" + plant;
+
+    /// <summary>지정한 식물의 해금된 최대 새벽 단계. 0 = 그 식물로는 새벽 모드 미해금.</summary>
+    public static int GetMaxUnlockedStage(string plant)
+    {
+        MigrateLegacyProgressIfNeeded();
+        return PlayerPrefs.GetInt(PrefKeyFor(plant), 0);
+    }
+
+    public static void SetMaxUnlockedStage(string plant, int stage)
+    {
+        MigrateLegacyProgressIfNeeded();
+        PlayerPrefs.SetInt(PrefKeyFor(plant), Mathf.Max(0, stage));
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>현재 식물 기준 해금된 최대 새벽 단계.</summary>
+    public static int MaxUnlockedDawnStage
+    {
+        get => GetMaxUnlockedStage(CurrentPlant);
+        set => SetMaxUnlockedStage(CurrentPlant, value);
+    }
+
+    /// <summary>현재 식물로 새벽 모드가 해금됐는가(1단계 이상 열림).</summary>
     public static bool IsDawnUnlocked => MaxUnlockedDawnStage >= 1;
 
     public static bool IsStageUnlocked(int stage) => stage >= 0 && stage <= MaxUnlockedDawnStage;
 
-    public static void UnlockUpTo(int stage)
+    public static void UnlockUpTo(int stage) => UnlockUpTo(stage, CurrentPlant);
+
+    public static void UnlockUpTo(int stage, string plant)
     {
-        if (stage > MaxUnlockedDawnStage) MaxUnlockedDawnStage = stage;
+        if (stage > GetMaxUnlockedStage(plant)) SetMaxUnlockedStage(plant, stage);
+    }
+
+    /// <summary>
+    /// 지정한 식물로 클리어한 최대 새벽 단계. 0 = 그 식물로 새벽 단계를 클리어한 적 없음.
+    /// N단계를 클리어하면 N+1단계가 해금되므로 해금 단계 - 1이 곧 클리어 단계다.
+    /// </summary>
+    public static int GetMaxClearedStage(string plant) => Mathf.Max(0, GetMaxUnlockedStage(plant) - 1);
+
+    /// <summary>현재 식물 기준 클리어한 최대 새벽 단계.</summary>
+    public static int MaxClearedDawnStage => GetMaxClearedStage(CurrentPlant);
+
+    /// <summary>"(현재 식물로) 새벽 N단계 클리어" 충족 여부. (stage 0 = 조건 없음)</summary>
+    public static bool IsStageCleared(int stage) => IsStageCleared(stage, CurrentPlant);
+
+    /// <summary>"지정한 식물로 새벽 N단계 클리어" 충족 여부. (stage 0 = 조건 없음)</summary>
+    public static bool IsStageCleared(int stage, string plant)
+        => stage <= 0 || GetMaxClearedStage(plant) >= stage;
+
+    /// <summary>"어느 식물로든 새벽 N단계 클리어" 충족 여부. 식물이 명시되지 않은 해금 조건에 사용.</summary>
+    public static bool IsStageClearedByAnyPlant(int stage)
+    {
+        if (stage <= 0) return true;
+        foreach (var p in Plants)
+            if (GetMaxClearedStage(p) >= stage) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// 이번 런을 엔딩까지 클리어했을 때 호출. 이번 런의 식물에 대해 다음 새벽 단계를 해금한다.
+    /// (일반 모드 클리어 → 새벽 1단계 해금, 새벽 N단계 클리어 → N+1단계 해금)
+    /// </summary>
+    public static void RecordRunCleared()
+    {
+        string plant = CurrentPlant;
+        UnlockUpTo(SelectedDawnStage + 1, plant);
+        Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
+    }
+
+    // ── 레거시 마이그레이션 ───────────────────────────────────────────────────
+    // 식물 구분이 없던 시절의 단일 키를 각 식물로 1회 이관한다(진행도 손실 방지).
+    private const string PrefKeyMigrated = "Dawn_MaxUnlockedStage_Migrated";
+    private static bool _migrationChecked;
+
+    private static void MigrateLegacyProgressIfNeeded()
+    {
+        if (_migrationChecked) return;
+        _migrationChecked = true;
+
+        if (PlayerPrefs.GetInt(PrefKeyMigrated, 0) == 1) return;
+        PlayerPrefs.SetInt(PrefKeyMigrated, 1);
+
+        int legacy = PlayerPrefs.GetInt(PrefKeyMaxUnlocked, 0);
+        if (legacy > 0)
+        {
+            foreach (var p in Plants)
+                if (PlayerPrefs.GetInt(PrefKeyFor(p), 0) < legacy)
+                    PlayerPrefs.SetInt(PrefKeyFor(p), legacy);
+            Debug.Log($"[Dawn] 기존 새벽 진행도({legacy}단계)를 식물별로 이관했습니다.");
+        }
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>테스트용: 모든 식물의 새벽 진행도 초기화.</summary>
+    public static void ResetAllPlantProgress()
+    {
+        MigrateLegacyProgressIfNeeded();
+        foreach (var p in Plants) PlayerPrefs.SetInt(PrefKeyFor(p), 0);
+        PlayerPrefs.Save();
     }
 
     // ── 선택(이번 런) ─────────────────────────────────────────────────────────

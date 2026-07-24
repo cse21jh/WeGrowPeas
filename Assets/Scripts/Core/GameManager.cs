@@ -99,6 +99,16 @@ public class SaveData
     // 저항력 흡수 비료 타일 인덱스 리스트
     public List<int> absorbFertilizerTiles = new List<int>();
 
+    // 신규 아이템(신용카드·쌍둥이·완두커피·슈퍼 변종·활성형 껍질·왕위 계승·땅과 콩)
+    public float creditCardRefundPercent;
+    public float twinBreedProbability;
+    public float peaCoffeeMultiplier;
+    public float superMutationChanceBonus;
+    public bool hasSuperMutation;
+    public float activeShellProbability;
+    public float successionInheritRatio;
+    public int landAndBeanLevel;
+
     //public float remainBreedTime;
 
     //enemyController
@@ -189,6 +199,9 @@ public class PlantData
     public int resistWaveCount;
     public int survivedTurns; // MoneyTree 생존 턴 수
     public float travelSellBonus; // 특수(세계여행) 누적 배수
+    public int freeTimePassedCount; // 완두커피: 자유시간 경과 횟수
+    public bool hasTriedBreed; // 활성형 껍질: 교배 시도 여부
+    public bool isRooted; // 뿌리내림(이동 불가). 새벽 뿌리 효과 + 땅과 콩 가격 보너스 판정에 사용
 }
 
 [System.Serializable]
@@ -244,6 +257,9 @@ public class GameManager : Singleton<GameManager>
         Time.timeScale = 1;
 
         ClickRouter.Instance.IsBlockedByUI = false;
+
+        // 결과창에서 "이번 판에 새로 해금된 아이템"을 뽑기 위한 시작 시점 스냅샷
+        UnlockRunTracker.CaptureRunStart();
 
         switch (GameStartContext.StartType)
         {
@@ -421,6 +437,23 @@ public class GameManager : Singleton<GameManager>
         textStage.text = $"{stage}";
     }
 
+    /// <summary>엔딩(클리어) 일차.</summary>
+    public int EndStage => endStage;
+
+    /// <summary>
+    /// 디버그 전용: 현재 일차를 강제로 변경한다.
+    /// 진행 중인 하루는 그대로 끝나고, 그 뒤 일차 판정부터 새 값이 적용된다.
+    /// (endStage로 맞추면 이번 날이 끝나는 즉시 엔딩으로 진입)
+    /// </summary>
+    public void DebugSetStage(int newStage)
+    {
+        stage = Mathf.Clamp(newStage, 1, endStage);
+        // 일차별 기록 리스트(kill/wave/noTrait)를 새 일차 크기까지 0으로 채워 인덱스 접근 오류를 막는다.
+        enemyController?.DebugPadStageRecords(stage);
+        UpdateStageUI();
+        Debug.Log($"[Debug] 일차를 {stage}일차로 변경했습니다.");
+    }
+
     public IEnumerator BreedEndRoutine()
     {
         Plant plant;
@@ -590,6 +623,8 @@ public class GameManager : Singleton<GameManager>
     {
         PassRecordToGameRecordHolder();
 
+        DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)
+
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Ending);
         //File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
@@ -652,7 +687,10 @@ public class GameManager : Singleton<GameManager>
                 taste = p.GetTaste(),
                 resistWaveCount = p.GetResistWaveCount(),
                 survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0,
-                travelSellBonus = p.GetTravelSellBonus()
+                travelSellBonus = p.GetTravelSellBonus(),
+                freeTimePassedCount = p.GetFreeTimePassedCount(),
+                hasTriedBreed = p.HasTriedBreed,
+                isRooted = (p is MovablePlant movable) && !movable.IsMovable
             };
 
             saveData.plantList.Add(plantData);
@@ -725,6 +763,16 @@ public class GameManager : Singleton<GameManager>
         saveData.badGuyMoreRiceLevel = grid.GetBadGuyMoreRiceLevel();
         saveData.sprinklerRangeBonus = grid.GetSprinklerRangeBonus();
         saveData.sprinklerFertilizerSynergyBonus = grid.GetSprinklerFertilizerSynergyBonus();
+
+        // 신규 아이템 스탯 저장
+        saveData.creditCardRefundPercent = grid.CreditCardRefundPercent;
+        saveData.twinBreedProbability = grid.TwinBreedProbability;
+        saveData.peaCoffeeMultiplier = grid.PeaCoffeeMultiplier;
+        saveData.superMutationChanceBonus = grid.SuperMutationChanceBonus;
+        saveData.hasSuperMutation = grid.HasSuperMutation;
+        saveData.activeShellProbability = grid.ActiveShellProbability;
+        saveData.successionInheritRatio = grid.SuccessionInheritRatio;
+        saveData.landAndBeanLevel = grid.LandAndBeanLevel;
 
         saveData.mostExpensivePlant = grid.MostExpensivePlant;
 

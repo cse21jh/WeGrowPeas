@@ -15,6 +15,7 @@ public class CoolingShieldItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = 1; // 이번 게임동안 단 1회만 구매 가능
         FlowType = ShopFlowType.Instant;
+        metaRequiredEventId = UnlockManager.Ids.WinterReached;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

@@ -25,14 +25,16 @@ public class HighQualityPlantItemData : ItemData
     }
 
     /// <summary>
-    /// 등장하는 웨이브만 구매 가능
+    /// 완두콩 전용 아이템. 등장하는 웨이브만 구매 가능 (별도 새벽 해금 조건 없음)
     /// </summary>
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
+        if (!IsCurrentPlant("완두콩")) return false;
+
         // 현재 웨이브가 None이 아니면 등장하는 웨이브가 있음
         if (GameManager.Instance == null || GameManager.Instance.enemyController == null)
             return false;
-        
+
         var currentWave = GameManager.Instance.enemyController.CurrentWave;
         return currentWave != null && currentWave.WaveType != WaveType.None;
     }

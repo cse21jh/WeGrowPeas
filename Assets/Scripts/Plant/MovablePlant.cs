@@ -165,6 +165,8 @@ public abstract class MovablePlant : Plant
     {
         if (!isReallyMovable) return; // 이미 뿌리내림
         float chance = DawnSystem.Current.rootChancePercent;
+        // 땅과 콩: 뿌리를 내릴 확률 2배
+        if (grid != null) chance *= grid.GetRootChanceMultiplier();
         if (chance <= 0f) return;
         if (UnityEngine.Random.Range(0f, 100f) < chance)
         {

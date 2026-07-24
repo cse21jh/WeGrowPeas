@@ -23,6 +23,7 @@ public class PetBottleSupplyIncreaseItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = -1; // 최대 구매 제한 없음 (X)
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 9;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

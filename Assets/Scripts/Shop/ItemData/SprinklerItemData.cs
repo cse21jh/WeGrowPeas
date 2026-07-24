@@ -19,6 +19,7 @@ public class SprinklerItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = -1; // 최대 구매 제한 없음 (여러 번 구매 가능)
         FlowType = ShopFlowType.PlaceOnTile;
+        metaRequiredDawnStage = 5;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;

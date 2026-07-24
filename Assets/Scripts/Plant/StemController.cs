@@ -179,6 +179,7 @@ public class StemController : MonoBehaviour
         if (n == (int)TraitType.None)
         {
             FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
+            UnlockManager.Unlock(UnlockManager.Ids.GoldenPlantCreated); // 황금 비료 해금
             return isGold = true;
         }
         return isGold = false;

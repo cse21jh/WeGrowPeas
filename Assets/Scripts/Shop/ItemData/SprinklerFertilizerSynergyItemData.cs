@@ -18,6 +18,7 @@ public class SprinklerFertilizerSynergyItemData : ItemData
         OnePerShopIfNotStackable = true;
         MaxPurchaseCount = 5; 
         FlowType = ShopFlowType.Instant;
+        metaRequiredDawnStage = 5;
     }
 
     public override bool IsRotationUnlockOk(ShopContext ctx) => true;
