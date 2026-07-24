@@ -50,6 +50,7 @@ public class Grid : MonoBehaviour
 
     [SerializeField] private GameObject petBottleMarkerPrefab;
     [SerializeField] private GameObject goldSoilMarkerPrefab;
+    [SerializeField] private Material soilHighlightMaterial;
 
     private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
     protected List<int> goldSoilTiles = new List<int>(); // 황금 비료가 뿌려진 타일들
@@ -64,6 +65,7 @@ public class Grid : MonoBehaviour
     public bool isDraggingShovel = false;
 
     private Plant breedButtonPlant = null;
+    private int hoveredSoilIndex = -1;
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -1448,6 +1450,7 @@ public class Grid : MonoBehaviour
 
     public bool TryPlacePlant(Plant plant, Vector3 screenPosition)
     {
+        ClearHoverHighlight();
         int? targetIndex = GetGridIndexFromPosition(screenPosition);
 
         // 토양 감지 실패
@@ -1519,24 +1522,81 @@ public class Grid : MonoBehaviour
         }
     }
 
+    private RaycastHit2D[] raycastHits = new RaycastHit2D[10]; // GC 할당 방지용 캐싱 배열
+
     public int? GetGridIndexFromPosition(Vector3 screenPosition)
     {
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPosition);
         Vector2 worldPos2D = new Vector2(worldPos.x, worldPos.y);
 
-        RaycastHit2D hit = Physics2D.Raycast(worldPos2D, Vector2.zero);
-        //Debug.Log(hit.transform.name + hit.transform.position);
+        // RaycastAll 대신 NonAlloc을 사용하여 매 프레임 발생하는 배열 생성(Garbage) 방지
+        int hitCount = Physics2D.RaycastNonAlloc(worldPos2D, Vector2.zero, raycastHits);
 
-        if (hit.collider != null)
+        for (int i = 0; i < hitCount; i++)
         {
-            Soil soil = hit.collider.GetComponent<Soil>();
-            if (soil != null)
+            if (raycastHits[i].collider != null)
             {
-                return soil.GridIndex;
+                // 게임 로직적으로 Soil 자체에 있는 콜라이더를 정확히 감지하도록 원상복구
+                Soil soil = raycastHits[i].collider.GetComponent<Soil>();
+                if (soil != null)
+                {
+                    return soil.GridIndex;
+                }
             }
         }
         return null;
     }
+
+    public void HighlightHoveredTile(int? targetIndex, Material customMaterial = null, UnityEngine.Color? customOutlineColor = null)
+    {
+        // 1. Un-highlight previous
+        if (hoveredSoilIndex != -1 && (!targetIndex.HasValue || hoveredSoilIndex != targetIndex.Value))
+        {
+            Transform oldSoilT = GetSoilTransform(hoveredSoilIndex);
+            if (oldSoilT != null)
+            {
+                Soil oldSoil = oldSoilT.GetComponent<Soil>();
+                if (oldSoil != null) oldSoil.SetHighlight(false);
+            }
+            hoveredSoilIndex = -1;
+        }
+
+        // 2. Highlight new
+        if (targetIndex.HasValue)
+        {
+            int idx = targetIndex.Value;
+            if (hoveredSoilIndex != idx)
+            {
+                Transform newSoilT = GetSoilTransform(idx);
+                if (newSoilT != null)
+                {
+                    Soil newSoil = newSoilT.GetComponent<Soil>();
+                    if (newSoil != null) 
+                    {
+                        Material matToUse = customMaterial != null ? customMaterial : soilHighlightMaterial;
+                        newSoil.SetHighlight(true, matToUse, customOutlineColor);
+                    }
+                }
+                hoveredSoilIndex = idx;
+            }
+        }
+    }
+
+    public void ClearHoverHighlight()
+    {
+        if (hoveredSoilIndex != -1)
+        {
+            Transform oldSoilT = GetSoilTransform(hoveredSoilIndex);
+            if (oldSoilT != null)
+            {
+                Soil oldSoil = oldSoilT.GetComponent<Soil>();
+                if (oldSoil != null) oldSoil.SetHighlight(false);
+            }
+            hoveredSoilIndex = -1;
+        }
+    }
+
+
     public void SetBreedTimerUI(TimerUI timerUI)
     {
         breedTimerUI = timerUI;
