@@ -469,7 +469,10 @@ public class GameManager : Singleton<GameManager>
         }
         for (int i = 0; i < peanutList.Count; i++)
             peanutList[i].TrySpawnCopy();
-        
+
+        // 땅과 콩: 웨이브가 지나간 후 식물이 확률적으로 뿌리를 내림
+        grid?.ProcessLandAndBeanRooting();
+
         // 무당벌레당 골드 지급 (웨이브 종료 시)
         if (grid != null && grid.AdditionalLadybugGoldPerUnit > 0 && grid.ladybugs != null)
         {

@@ -153,7 +153,7 @@ public class Grid : MonoBehaviour
     //땅콩 전용 아이템
     protected float activeShellProbability = 0f;   // 활성형 껍질: 미교배 식물의 자가번식 확률 가산
     protected float successionInheritRatio = 0f;   // 왕위 계승: 자가번식 시 계승되는 가격 배율 비율
-    protected int landAndBeanLevel = 0;            // 땅과 콩: 뿌리 확률 2배 + 뿌리내린 식물 가격 증가
+    protected int landAndBeanLevel = 0;            // 땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매
 
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
@@ -2420,22 +2420,41 @@ public class Grid : MonoBehaviour
         return successionInheritRatio;
     }
 
-    /// <summary>땅과 콩: 뿌리 확률 2배 + 뿌리내린 식물의 가격 증가.</summary>
+    /// <summary>땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매.</summary>
     public void AddLandAndBeanLevel(int value)
     {
         landAndBeanLevel += value;
     }
 
-    /// <summary>땅과 콩: 뿌리를 내릴 확률 배수(보유 시 2배).</summary>
-    public float GetRootChanceMultiplier()
+    /// <summary>땅과 콩: 웨이브가 지나간 후 식물이 뿌리를 내릴 확률(0~1). 구매 1회당 +10%p.</summary>
+    public float GetLandAndBeanRootChance()
     {
-        return landAndBeanLevel > 0 ? 2f : 1f;
+        return 0.1f * landAndBeanLevel;
     }
 
     /// <summary>땅과 콩: 뿌리내린 식물의 가격 배수(구매 1회당 +10%p, 다른 효과와 곱적용).</summary>
     public float GetRootedPriceMultiplier()
     {
         return 1f + 0.1f * landAndBeanLevel;
+    }
+
+    /// <summary>
+    /// 땅과 콩: 웨이브가 지나간 후, 아직 뿌리내리지 않은 식물이 확률적으로 뿌리를 내려 이동 불가가 된다.
+    /// (GameManager.BreedEndRoutine에서 웨이브 정산 시 호출)
+    /// </summary>
+    public void ProcessLandAndBeanRooting()
+    {
+        float chance = GetLandAndBeanRootChance();
+        if (chance <= 0f) return;
+
+        foreach (var p in plantGrid.Values)
+        {
+            if (p is MovablePlant mp && mp.IsMovable && !mp.isDying)
+            {
+                if (Random.value < chance)
+                    mp.SetMovable(false); // TODO: 뿌리 시각효과
+            }
+        }
     }
 
     public void AddResistanceDecayReduction(float value)

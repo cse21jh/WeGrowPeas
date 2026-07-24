@@ -7,7 +7,7 @@ public class LandAndBeanItemData : ItemData
     private void OnEnable()
     {
         if (string.IsNullOrEmpty(DisplayName)) DisplayName = "땅과 콩";
-        if (string.IsNullOrEmpty(Description)) Description = "식물이 웨이브가 지나간 후 뿌리를 내릴 확률이 2배가 되고, 뿌리를 내린 식물의 가격이 증가합니다.";
+        if (string.IsNullOrEmpty(Description)) Description = "식물이 웨이브가 지나간 후 뿌리를 내릴 확률이 증가하고, 뿌리를 내린 식물의 가격이 증가합니다.";
         if (Price <= 0) Price = 2500;
         Rarity = ItemRarity.Special;
 
@@ -40,7 +40,7 @@ public class LandAndBeanItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        // 뿌리 확률 2배 + 뿌리내린 식물의 가격 +10%p
+        // 웨이브 후 뿌리 확률 +10%p + 뿌리내린 식물의 가격 +10%p
         ctx.Grid.AddLandAndBeanLevel(1);
     }
 }
