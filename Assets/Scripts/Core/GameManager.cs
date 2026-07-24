@@ -374,18 +374,6 @@ public class GameManager : Singleton<GameManager>
 
         if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
 
-        // 특수 아이템: 엔딩 전 10·20·30일의 자유시간에 선물 도착 (수령 전까지 유지)
-        if (stage % 10 == 0 && stage < endStage)
-        {
-            SpecialItemSystem.AddGift();
-            PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
-            {
-                title = "완두콩의 선물이 도착했습니다!",
-                message = "선물 버튼을 눌러 특수 아이템을 수령하세요.",
-                duration = 5f
-            });
-        }
-
         yield return StartCoroutine(grid.Breeding());
 
         yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
@@ -414,6 +402,19 @@ public class GameManager : Singleton<GameManager>
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
 
         if (CurseActive) curseManager.SelectCurse(stage);
+
+        // 특수 아이템: 엔딩 전 10·20·30일 밤에 선물 도착 (수령 전까지 유지).
+        // 폰에서 수령하므로 폰 페이즈 직전에 지급한다.
+        if (stage % 10 == 0 && stage < endStage)
+        {
+            SpecialItemSystem.AddGift();
+            PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
+            {
+                title = "완두콩의 선물이 도착했습니다!",
+                message = "선물 버튼을 눌러 특수 아이템을 수령하세요.",
+                duration = 5f
+            });
+        }
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
