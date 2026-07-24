@@ -10,15 +10,6 @@ public class PlacementController : MonoBehaviour
     [SerializeField] private Grid grid;                 // 네 Grid 클래스
     [SerializeField] private Camera worldCamera;        // 보통 Camera.main
     [SerializeField] private GameObject ghostPrefab;    // 배치 미리보기 프리팹(선택)
-    [SerializeField] private TMP_Text guideText;       // 가이드 텍스트 UI
-
-    /// <summary>
-    /// 가이드 텍스트 UI를 설정합니다 (ShopUI에서 호출)
-    /// </summary>
-    public void SetGuideText(TMP_Text text)
-    {
-        guideText = text;
-    }
 
     [Header("Ghost")]
     [SerializeField] private float ghostInvalidAlpha = 0.4f;
@@ -66,11 +57,6 @@ public class PlacementController : MonoBehaviour
         {
             ghost = Instantiate(ghostPrefab);
             ghostSr = ghost.GetComponentInChildren<SpriteRenderer>();
-        }
-
-        if (guideText != null)
-        {
-            guideText.text = "토양을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
         }
 
         Vector3? confirmedPos = null;
@@ -138,10 +124,6 @@ public class PlacementController : MonoBehaviour
         if (ghost != null) Destroy(ghost);
         isPlacing = false;
         placingCo = null;
-        if (guideText != null)
-        {
-            guideText.text = "";
-        }
 
         shovel.IsEnabled = true;
         shovelButton.enabled = true;
@@ -246,11 +228,6 @@ public class PlacementController : MonoBehaviour
         }
 
         hovered = null;
-        
-        if (guideText != null)
-        {
-            guideText.text = "식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
-        }
 
         Plant confirmedPlant = null;
         bool shouldCancel = false;
@@ -407,11 +384,6 @@ public class PlacementController : MonoBehaviour
         isPlacing = false;
         placingCo = null;
 
-        if (guideText != null)
-        {
-            guideText.text = "";
-        }
-        
         if (shovel != null)
         {
             shovel.IsEnabled = true;

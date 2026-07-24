@@ -47,6 +47,42 @@ public class FloatingPopup : BasePopup
             .SetUpdate(true); // timeScale의 영향을 받지 않음
     }
 
+    /// <summary>
+    /// 자동으로 사라지지 않고 계속 떠 있는 안내 모드로 표시한다. HideNow()를 부를 때까지 유지된다.
+    /// (설치형 아이템 구매 후 "식물/토양을 선택해주세요" 안내 등. 밑의 타일·식물 클릭을 막지 않도록 raycast 비차단)
+    /// </summary>
+    public void SetupPersistent(string text)
+    {
+        onCloseCallback = null;
+
+        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+        if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+
+        if (contentText != null) contentText.text = text;
+
+        // 자동 닫힘 시퀀스가 돌고 있으면 정리(일반 토스트로 쓰였던 잔여 방지)
+        if (autoCloseSequence != null && autoCloseSequence.IsActive())
+            autoCloseSequence.Kill();
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOKill();
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = false; // 안내 텍스트가 배치용 클릭을 가리지 않도록
+        }
+        gameObject.SetActive(true);
+        // AppendInterval 시퀀스를 만들지 않으므로 계속 떠 있는다.
+    }
+
+    /// <summary>지속 안내를 즉시(페이드/사운드 없이) 숨긴다.</summary>
+    public void HideNow()
+    {
+        if (autoCloseSequence != null && autoCloseSequence.IsActive())
+            autoCloseSequence.Kill();
+        if (canvasGroup != null) canvasGroup.DOKill();
+        gameObject.SetActive(false);
+    }
+
     private void FadeOutAndClose(float fadeDuration)
     {
         Debug.Log($"[FloatingPopup] FadeOutAndClose called. duration: {fadeDuration}");

@@ -39,6 +39,20 @@ public abstract class ItemData : ScriptableObject
     [Header("Flow")]
     public ShopFlowType FlowType;
 
+    /// <summary>
+    /// 설치형 아이템 구매 후, 위치/식물을 고를 때까지 계속 표시할 안내 문구.
+    /// 선택을 완료하거나 취소하면 사라진다. 필요하면 아이템별로 override.
+    /// </summary>
+    public virtual string GetPlacementGuide()
+    {
+        switch (FlowType)
+        {
+            case ShopFlowType.PlaceOnTile: return "토양을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
+            case ShopFlowType.SelectExistingPlant: return "식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
+            default: return null;
+        }
+    }
+
     [Header("Unlock")]
     [Tooltip("체크 시 해금되기 전까지 상점에 뜨지 않음. UnlockManager.Unlock(...)로 해금.")]
     public bool requiresUnlock = false;

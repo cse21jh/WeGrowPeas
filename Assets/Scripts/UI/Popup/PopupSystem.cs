@@ -13,6 +13,7 @@ public class PopupSystem
 
     private BreedPopup activeBreedPopupInstance;
     private FloatingPopup activeFloatingPopupInstance;
+    private FloatingPopup activeGuidePopupInstance; // 지속 안내(설치형 아이템 선택 대기 등)
     private UnlockPopup activeUnlockPopupInstance;
 
     private Dictionary<GameObject, Queue<BasePopup>> popupPools = new Dictionary<GameObject, Queue<BasePopup>>();
@@ -118,6 +119,32 @@ public class PopupSystem
         return activeFloatingPopupInstance;
     }
 
+    /// <summary>
+    /// 지속 안내를 표시한다. HideGuide()를 부를 때까지 계속 떠 있는다.
+    /// (설치형 아이템 구매 후 "식물/토양을 선택해주세요" 등. FloatingPopup 프리팹을 재사용한다.)
+    /// </summary>
+    public FloatingPopup ShowGuide(string text)
+    {
+        if (defaultFloatingPopupPrefab == null) return null;
+
+        if (activeGuidePopupInstance == null)
+        {
+            activeGuidePopupInstance = Object.Instantiate(defaultFloatingPopupPrefab, canvasParent);
+            activeGuidePopupInstance.OnPopupClosed = (closedPopup) => { }; // 풀에 반환하지 않음
+        }
+
+        // SetupPersistent가 SetActive(true) + raycast 비차단까지 처리(Open을 부르면 raycast를 다시 막으므로 호출 X)
+        activeGuidePopupInstance.SetupPersistent(text);
+        return activeGuidePopupInstance;
+    }
+
+    /// <summary>지속 안내를 즉시 숨긴다.</summary>
+    public void HideGuide()
+    {
+        if (activeGuidePopupInstance != null)
+            activeGuidePopupInstance.HideNow();
+    }
+
     public UnlockPopup ShowUnlockPopup(List<ItemData> items, System.Action onClose = null)
     {
         return ShowUnlockPopup(defaultUnlockPopupPrefab, items, onClose);
@@ -180,6 +207,7 @@ public class PopupSystem
     {
         activeBreedPopupInstance = null;
         activeFloatingPopupInstance = null;
+        activeGuidePopupInstance = null;
         activeUnlockPopupInstance = null;
         foreach (var pair in popupPools)
         {

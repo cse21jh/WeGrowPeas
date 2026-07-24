@@ -52,13 +52,7 @@ public class ShopUI : MonoBehaviour
         var placementObj = GameObject.Find("PlacementController");
         if (placementObj != null) placement = placementObj.GetComponent<PlacementController>();
         if (placement == null) placement = FindAnyObjectByType<PlacementController>();
-        
-        // PlacementController에 guideText 설정
-        if (placement != null && footerText != null)
-        {
-            placement.SetGuideText(footerText);
-        }
-        
+
         ctx = new ShopContext
         {
             Grid = grid,
@@ -200,15 +194,22 @@ public class ShopUI : MonoBehaviour
                     break;
 
                 case ShopFlowType.PlaceOnTile:
+                    // 선택을 완료/취소할 때까지 계속 떠 있는 안내 표시
+                    UIManager.Instance?.Popup?.ShowGuide(data.GetPlacementGuide());
                     placement?.BeginTilePlacement(
                         ctx,
                         validate: (pos) => data.ValidatePosition(ctx, pos, out _),
                         onConfirm: (pos) =>
                         {
+                            UIManager.Instance?.Popup?.HideGuide();
                             data.SetPlacedPosition(pos);
                             TryChargeAndCommit(data, slot);
                         },
-                        onCancel: () => data.Cancel(ctx)
+                        onCancel: () =>
+                        {
+                            UIManager.Instance?.Popup?.HideGuide();
+                            data.Cancel(ctx);
+                        }
                     );
                     break;
 
@@ -221,9 +222,11 @@ public class ShopUI : MonoBehaviour
                     }
                     try
                     {
+                        // 선택을 완료/취소할 때까지 계속 떠 있는 안내 표시
+                        UIManager.Instance?.Popup?.ShowGuide(data.GetPlacementGuide());
                         placement.BeginPlantSelection(
                             ctx,
-                            validate: (plant) => 
+                            validate: (plant) =>
                             {
                                 try
                                 {
@@ -237,6 +240,7 @@ public class ShopUI : MonoBehaviour
                             },
                             onConfirm: (plant) =>
                             {
+                                UIManager.Instance?.Popup?.HideGuide();
                                 try
                                 {
                                     data.SetSelectedPlant(plant);
@@ -248,8 +252,9 @@ public class ShopUI : MonoBehaviour
                                     ShowError($"구매 처리 중 오류가 발생했습니다: {e.Message}");
                                 }
                             },
-                            onCancel: () => 
+                            onCancel: () =>
                             {
+                                UIManager.Instance?.Popup?.HideGuide();
                                 try
                                 {
                                     data.Cancel(ctx);
@@ -263,6 +268,7 @@ public class ShopUI : MonoBehaviour
                     }
                     catch (System.Exception e)
                     {
+                        UIManager.Instance?.Popup?.HideGuide();
                         Debug.LogError($"[ShopUI] BeginPlantSelection error: {e.Message}\n{e.StackTrace}");
                         ShowError($"식물 선택 모드 시작 중 오류가 발생했습니다: {e.Message}");
                     }
