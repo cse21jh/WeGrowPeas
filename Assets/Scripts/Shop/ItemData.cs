@@ -73,6 +73,23 @@ public abstract class ItemData : ScriptableObject
     /// 런 중에만 성립하는 조건(현재 스테이지·재배 중인 식물 종류 등)은 <see cref="IsRotationUnlockOk"/>가 담당한다.
     /// 결과창의 "새로 해금된 아이템" 판정도 이 값을 기준으로 한다.
     /// </summary>
+    /// <summary>도감/안내용: 이 아이템이 어떻게 해금되는지 한국어로 설명. 조건이 없으면 빈 문자열.</summary>
+    public string GetUnlockConditionText()
+    {
+        // 사건 해금이 우선(황금 식물·겨울·비료 4줄 등)
+        if (!string.IsNullOrEmpty(metaRequiredEventId))
+            return UnlockManager.GetEventDescription(metaRequiredEventId);
+
+        // 새벽 단계 해금
+        if (metaRequiredDawnStage > 0)
+        {
+            string p = string.IsNullOrEmpty(metaRequiredDawnPlant) ? "" : metaRequiredDawnPlant + "(으)로 ";
+            return $"{p}새벽 {metaRequiredDawnStage}단계 클리어 시 해금됩니다.";
+        }
+
+        return "";
+    }
+
     public bool IsMetaUnlocked()
     {
         // 해금 조건이 아예 없으면 항상 사용 가능.

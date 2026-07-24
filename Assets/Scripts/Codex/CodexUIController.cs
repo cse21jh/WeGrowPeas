@@ -110,13 +110,27 @@ public class CodexUIController : MonoBehaviour
         }
 
         var e = _entries[index];
-        if (detailName) detailName.text = e.discovered ? e.displayName : "???";
-        if (detailText) detailText.text = e.discovered ? e.detail : "아직 발견하지 못했습니다.";
-        if (detailIcon)
+
+        if (e.locked)
         {
-            bool show = e.discovered && e.icon != null;
-            detailIcon.enabled = show;
-            if (show) detailIcon.sprite = e.icon;
+            // 잠김: 이름 대신 "잠김", 상세엔 무엇을 해야 해금되는지 안내
+            if (detailName) detailName.text = "잠김";
+            if (detailText)
+                detailText.text = string.IsNullOrEmpty(e.unlockHint)
+                    ? "특정 조건을 만족하면 해금됩니다."
+                    : e.unlockHint;
+            if (detailIcon) detailIcon.enabled = false;
+        }
+        else
+        {
+            if (detailName) detailName.text = e.discovered ? e.displayName : "???";
+            if (detailText) detailText.text = e.discovered ? e.detail : "아직 발견하지 못했습니다.";
+            if (detailIcon)
+            {
+                bool show = e.discovered && e.icon != null;
+                detailIcon.enabled = show;
+                if (show) detailIcon.sprite = e.icon;
+            }
         }
         UpdatePage();
     }

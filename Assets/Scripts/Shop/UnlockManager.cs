@@ -26,6 +26,15 @@ public static class UnlockManager
         public const string FertilizerFourColumns = "event_fertilizer_four_columns";
     }
 
+    /// <summary>인게임 사건 해금 id를 도감/안내용 한국어 설명으로 변환.</summary>
+    public static string GetEventDescription(string eventId)
+    {
+        if (eventId == Ids.GoldenPlantCreated) return "황금 식물을 처음 만들면 해금됩니다.";
+        if (eventId == Ids.WinterReached) return "겨울에 처음 도달하면 해금됩니다.";
+        if (eventId == Ids.FertilizerFourColumns) return "전용 비료를 4줄 이상 설치하면 해금됩니다.";
+        return "특정 조건을 만족하면 해금됩니다.";
+    }
+
     private static HashSet<string> _unlocked;
 
     public static List<string> GetUnlockedList()

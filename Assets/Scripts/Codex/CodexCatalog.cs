@@ -11,6 +11,9 @@ public class CodexEntry
     public Sprite icon;
     public bool discovered;
     public string detail; // 우측 상세(리치텍스트)
+
+    public bool locked;      // 아직 해금되지 않음(등장 조건 미충족). 발견 여부와 별개.
+    public string unlockHint; // 잠김일 때 상세에 보여줄 해금 조건 설명
 }
 
 /// <summary>
@@ -42,8 +45,8 @@ public static class CodexCatalog
             if (!string.IsNullOrEmpty(it.GradeTagText)) sb.AppendLine($"[{it.GradeTagText}] {it.Rarity}");
             sb.AppendLine($"가격: {it.Price}골드");
             if (!string.IsNullOrEmpty(it.Description)) sb.AppendLine(it.Description);
-            if (it.requiresUnlock && !UnlockManager.IsUnlocked(id))
-                sb.AppendLine("<color=#FFD24F>※ 해금 필요</color>");
+
+            bool locked = !it.IsMetaUnlocked();
 
             list.Add(new CodexEntry
             {
@@ -52,7 +55,9 @@ public static class CodexCatalog
                 displayName = it.DisplayName,
                 icon = it.Icon,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Item, id),
-                detail = sb.ToString().TrimEnd()
+                detail = sb.ToString().TrimEnd(),
+                locked = locked,
+                unlockHint = locked ? it.GetUnlockConditionText() : null
             });
         }
         return list;
