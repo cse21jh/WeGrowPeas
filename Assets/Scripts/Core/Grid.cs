@@ -529,6 +529,11 @@ public class Grid : MonoBehaviour
         if (breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
 
         breedTimerUI.StopTimer();
+        
+        int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
+        int remainingBreeds = Mathf.Max(0, currentEffectiveMaxBreedCount - breedCount);
+        GameEvents.RaiseDayEndedWithRemainingBreeds(remainingBreeds);
+        
         breedCount = 0;
         // Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
@@ -1502,6 +1507,7 @@ public class Grid : MonoBehaviour
             }
 
             OnGridStateChanged?.Invoke();
+            if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;
         }
         else
@@ -1518,6 +1524,7 @@ public class Grid : MonoBehaviour
                 p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
             OnGridStateChanged?.Invoke();
+            if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;
         }
     }
