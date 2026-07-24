@@ -691,14 +691,21 @@ public abstract class Plant : MonoBehaviour
         float curseDailyDecay = CurseState.RadiationDecayPercent / 100f; // 저주: 방사능
         float totalDailyDecay = dawnDailyDecay + curseDailyDecay;
         bool isGoldPlant = stemController != null && stemController.IsGold();
+
+        bool hasMatchingFertilizer = grid != null && grid.HasFertilizerAt(gridIndex) && (int)grid.GetFertilizerColumns()[gridIndex / 4] == (int)waveType;
+
         if (totalDailyDecay > 0f && !isGoldPlant)
         {
             for (int i = 0; i < Wave.NumberOfWave; i++)
+            {
+                if (hasMatchingFertilizer && i == (int)waveType)
+                    continue; // 해당 웨이브와 동일한 비료가 깔려 있다면, 해당 웨이브 저항력은 감소하지 않음
                 ChangeResistance(i, -totalDailyDecay);
+            }
         }
 
         // 저주(집중포화): 이번(현재) 웨이브에 대한 저항력 추가 감소
-        if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant)
+        if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant && !hasMatchingFertilizer)
             ChangeResistance((int)waveType, -CurseState.HeavyFireExtraDecayPercent / 100f);
 
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))

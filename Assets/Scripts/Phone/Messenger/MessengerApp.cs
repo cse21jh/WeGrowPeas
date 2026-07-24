@@ -308,6 +308,18 @@ public class MessengerApp : MonoBehaviour
             }
             ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
             lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
+            
+            if (lastSeenPositionInArrivedList == -1)
+            {
+                for (int i = arrivedMessages.Count - 1; i >= 0; i--)
+                {
+                    if (chat.messages.IndexOf(arrivedMessages[i]) <= lastSeenIndex)
+                    {
+                        lastSeenPositionInArrivedList = i;
+                        break;
+                    }
+                }
+            }
         }
 
         // 3. 아직 안 본 메시지가 있는지 확인
@@ -463,7 +475,24 @@ public class MessengerApp : MonoBehaviour
             {
                 ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
                 int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
-                if (positionInShowList > -1) seenMessageCount = positionInShowList + 1;
+                if (positionInShowList > -1) {
+                    seenMessageCount = positionInShowList + 1;
+                } else {
+                    int fallbackPos = -1;
+                    for (int i = messagesToShow.Count - 1; i >= 0; i--)
+                    {
+                        if (currentChat.messages.IndexOf(messagesToShow[i]) <= lastSeenIndex)
+                        {
+                            fallbackPos = i;
+                            break;
+                        }
+                    }
+                    if (fallbackPos > -1) seenMessageCount = fallbackPos + 1;
+                }
+            }
+            else
+            {
+                seenMessageCount = messagesToShow.Count;
             }
         }
 
@@ -477,15 +506,24 @@ public class MessengerApp : MonoBehaviour
             for (int i = 0; i < seenMessageCount; i++)
             {
                 int originalIndex = currentChat.messages.IndexOf(messagesToShow[i]);
+                int day = -1;
                 if (progress.daySeparators.ContainsKey(partnerName) &&
                     progress.daySeparators[partnerName].ContainsKey(originalIndex))
                 {
-                    int day = progress.daySeparators[partnerName][originalIndex];
-                    if (lastDisplayedDay != day)
-                    {
-                        mc.AddDay(day);
-                        lastDisplayedDay = day;
-                    }
+                    day = progress.daySeparators[partnerName][originalIndex];
+                }
+                else
+                {
+                    day = GetMessageDay(messagesToShow[i].triggerId);
+                    if (!progress.daySeparators.ContainsKey(partnerName))
+                        progress.daySeparators[partnerName] = new Dictionary<int, int>();
+                    progress.daySeparators[partnerName][originalIndex] = day;
+                }
+
+                if (day != -1 && lastDisplayedDay != day && !PhoneManager.Instance.isTutorial)
+                {
+                    mc.AddDay(day);
+                    lastDisplayedDay = day;
                 }
                 CreateMessageBubble(messagesToShow[i].messageText);
             }
@@ -495,9 +533,6 @@ public class MessengerApp : MonoBehaviour
         bool isFirstUnreadInThisSession = isFreshEntry;
         bool afterPast = false;
         int lastDay = GetLastDisplayedDayForChat(partnerName);
-
-        if(seenMessageCount == messagesToShow.Count)
-            mc.AddNewChatSeperator();
 
         for (int i = seenMessageCount; i < messagesToShow.Count; i++)
         {
@@ -536,7 +571,8 @@ public class MessengerApp : MonoBehaviour
             {
                 afterPast = false;
             }
-            else if (!isPast)
+
+            if (!isPast)
             {
                 float time = (message.messageText.Length / 10f);
                 float preDelay = time / 3f;
@@ -664,6 +700,18 @@ public class MessengerApp : MonoBehaviour
 
         ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
         int lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
+        
+        if (lastSeenPositionInArrivedList == -1)
+        {
+            for (int i = arrivedMessages.Count - 1; i >= 0; i--)
+            {
+                if (chat.messages.IndexOf(arrivedMessages[i]) <= lastSeenIndex)
+                {
+                    lastSeenPositionInArrivedList = i;
+                    break;
+                }
+            }
+        }
 
         // 3. 도착한 메시지 수와 마지막으로 본 메시지의 위치를 비교
         return arrivedMessages.Count > lastSeenPositionInArrivedList + 1;
@@ -707,24 +755,24 @@ public class MessengerApp : MonoBehaviour
             arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
         }
 
-        int lastSeenIndex = GetLastSeenIndex(chat);
-        if (lastSeenIndex == -1)
+        string partnerName = chat.chatPartner.chatPartnerName;
+        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
+        
+        int slotSeenIndex = -1;
+        if (progress.conversationSeenIndices.TryGetValue(partnerName, out int index))
         {
-            return false;
+            slotSeenIndex = index;
         }
 
-        if (lastSeenIndex >= chat.messages.Count)
+        foreach (var msg in arrivedMessages)
         {
-            return arrivedMessages.Any(msg => msg.isMandatory);
+            int originalIndex = chat.messages.IndexOf(msg);
+            if (originalIndex > slotSeenIndex && originalIndex <= profileSeenIndex && msg.isMandatory)
+            {
+                return true;
+            }
         }
-
-        ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
-        int lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
-        if (lastSeenPositionInArrivedList == -1) return false;
-
-        return arrivedMessages
-            .Take(lastSeenPositionInArrivedList + 1)
-            .Any(msg => msg.isMandatory);
+        return false;
     }
 
     private bool HasUnreadMessagesForAllChats()
@@ -741,6 +789,7 @@ public class MessengerApp : MonoBehaviour
         }
         return false;
     }
+
     private bool HasUnreadMandatoryMessagesInChat(Chat chat)
     {
         if (chat == null || chat.messages == null) return false;
@@ -768,6 +817,18 @@ public class MessengerApp : MonoBehaviour
 
         ChatMessage profileSeenMessage = chat.messages[profileSeenIndex];
         int positionInArrivedList = arrivedMessages.IndexOf(profileSeenMessage);
+        
+        if (positionInArrivedList == -1)
+        {
+            for (int i = arrivedMessages.Count - 1; i >= 0; i--)
+            {
+                if (chat.messages.IndexOf(arrivedMessages[i]) <= profileSeenIndex)
+                {
+                    positionInArrivedList = i;
+                    break;
+                }
+            }
+        }
         if (positionInArrivedList == -1) return false;
 
         // 3. 아직 프로필 기준으로도 안 본 메시지들 중에 필수 메시지가 있는지 확인
@@ -775,64 +836,6 @@ public class MessengerApp : MonoBehaviour
             .Skip(positionInArrivedList + 1)
             .Any(msg => msg.isMandatory);
     }
-
-    private bool HasSeenMandatoryMessagesTriggeringAlarm()
-    {
-        foreach (var chat in allChats)
-        {
-            if (HasSeenMandatoryMessagesTriggeringAlarmInChat(chat))
-                return true;
-        }
-        return false;
-    }
-
-    private bool HasSeenMandatoryMessagesTriggeringAlarmInChat(Chat chat)
-    {
-        if (chat == null || chat.messages == null) return false;
-
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
-        {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        string partnerName = chat.chatPartner.chatPartnerName;
-        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-        
-        int slotSeenIndex = -1;
-        if (progress.conversationSeenIndices.TryGetValue(partnerName, out int index))
-        {
-            slotSeenIndex = index;
-        }
-
-        // 슬롯에서도 이미 다 읽은 경우 알람 안 울림
-        if (slotSeenIndex >= profileSeenIndex)
-        {
-            return false;
-        }
-
-        int startPos = -1;
-        if (slotSeenIndex > -1 && slotSeenIndex < chat.messages.Count)
-        {
-            ChatMessage slotSeenMessage = chat.messages[slotSeenIndex];
-            startPos = arrivedMessages.IndexOf(slotSeenMessage);
-        }
-
-        int endPos = -1;
-        if (profileSeenIndex > -1 && profileSeenIndex < chat.messages.Count)
-        {
-            ChatMessage profileSeenMessage = chat.messages[profileSeenIndex];
-            endPos = arrivedMessages.IndexOf(profileSeenMessage);
-        }
-        if (endPos == -1) endPos = arrivedMessages.Count - 1;
-
-        // 슬롯 읽음 상태 초과 ~ 프로필 읽음 상태 이하 영역에 필수 메시지가 있는지 체크
-        return arrivedMessages
-            .Skip(startPos + 1)
-            .Take(endPos - startPos)
-            .Any(msg => msg.isMandatory);
-    }
-
 
     private int GetLastSeenIndex(Chat chat)
     {

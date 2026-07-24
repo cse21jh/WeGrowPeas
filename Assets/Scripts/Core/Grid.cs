@@ -350,7 +350,7 @@ public class Grid : MonoBehaviour
                 // 저주: 광란 — 확률적으로 랜덤 교배
                 bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
                 Plant plant = AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
-                if (UIManager.Instance.ShowBreedPopupSetting)
+                if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting)
                 {
                     UIManager.Instance.Popup.ShowBreedPopup(plant);
                 }
