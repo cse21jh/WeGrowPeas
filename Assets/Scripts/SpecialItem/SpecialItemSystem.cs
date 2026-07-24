@@ -28,6 +28,18 @@ public static class SpecialItemSystem
     public static SpecialItemData GetData(string id)
         => All.FirstOrDefault(d => d != null && d.id == id);
 
+    /// <summary>이번 런에 획득한 특수 아이템의 데이터 목록. (정보 앱 표시용)</summary>
+    public static List<SpecialItemData> GetOwnedItems()
+    {
+        var list = new List<SpecialItemData>();
+        foreach (var id in _owned)
+        {
+            var d = GetData(id);
+            if (d != null) list.Add(d);
+        }
+        return list;
+    }
+
     /// <summary>
     /// 지정한 식물로 "새벽 N단계를 클리어하면" 새로 해금되는 식물별 특수 아이템 목록.
     /// (새벽 UI에서 단계별 해금 특수 아이템을 자동 표시하는 데 사용)

@@ -12,6 +12,7 @@ public class InfoApp : BasePhoneApp
     [SerializeField] private Button characteristicsTabButton;
     [SerializeField] private Button purchasesTabButton;
     [SerializeField] private Button gridInfoTabButton;
+    [SerializeField] private Button dawnTabButton; // 승천(새벽) 탭
 
     [SerializeField] private Color activeTabColor = Color.white;
     [SerializeField] private Color inactiveTabColor = Color.black;
@@ -21,6 +22,12 @@ public class InfoApp : BasePhoneApp
     [SerializeField] private GameObject characteristicsPanel;
     [SerializeField] private GameObject purchasesPanel;
     [SerializeField] private GameObject gridInfoPanel;
+    [SerializeField] private GameObject dawnPanel; // 승천(새벽) 패널
+
+    [Header("Dawn(승천) UI")]
+    [SerializeField] private TMP_Text dawnStageText;      // "승천 N단계" / "일반 모드"
+    [SerializeField] private TMP_Text dawnConstraintText; // 누적 제약 요약(리치텍스트)
+    [SerializeField] private TMP_Text dawnGeneticsText;   // 유전자 배율
 
     [Header("Characteristics UI")]
     [SerializeField] private Image currentPlantIcon;
@@ -51,6 +58,7 @@ public class InfoApp : BasePhoneApp
         if (characteristicsTabButton) characteristicsTabButton.onClick.AddListener(ShowCharacteristics);
         if (purchasesTabButton) purchasesTabButton.onClick.AddListener(ShowPurchases);
         if (gridInfoTabButton) gridInfoTabButton.onClick.AddListener(ShowGridInfo);
+        if (dawnTabButton) dawnTabButton.onClick.AddListener(ShowDawn);
 
         // Build Item Lookup Dictionary once
         BuildItemLookup();
@@ -113,6 +121,12 @@ public class InfoApp : BasePhoneApp
 
         gridInfoTabButton.GetComponentInChildren<Image>().DOColor((index == 2) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
         gridInfoTabButton.GetComponentInChildren<TMP_Text>().DOColor((index == 2) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+
+        if (dawnTabButton != null)
+        {
+            dawnTabButton.GetComponentInChildren<Image>().DOColor((index == 3) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+            dawnTabButton.GetComponentInChildren<TMP_Text>().DOColor((index == 3) ? activeTabColor : inactiveTabColor, 0.3f).SetEase(Ease.InOutQuad);
+        }
     }
 
     private void ShowCharacteristics()
@@ -265,6 +279,18 @@ public class InfoApp : BasePhoneApp
                 }
             }
         }
+
+        // 특수 아이템(선물로 획득한 것)도 같은 탭에 이어서 표시. count는 0으로 두어 수량 숫자를 숨긴다.
+        if (purchaseSlotPrefab != null)
+        {
+            foreach (var sp in SpecialItemSystem.GetOwnedItems())
+            {
+                if (sp == null) continue;
+                var slot = Instantiate(purchaseSlotPrefab, purchasesContainer);
+                slot.Setup(sp.icon, sp.displayName, 0, sp.description, UpdateDescription, ClearDescription);
+                slot.gameObject.SetActive(true);
+            }
+        }
     }
 
     private void ShowGridInfo()
@@ -308,11 +334,31 @@ public class InfoApp : BasePhoneApp
         }
     }
 
+    private void ShowDawn()
+    {
+        SetTabButton(3);
+        SetActivePanel(dawnPanel);
+        ClearDescription();
+
+        int stage = DawnSystem.SelectedDawnStage;
+        bool isDawn = stage > 0;
+
+        if (dawnStageText != null)
+            dawnStageText.text = isDawn ? $"승천 {stage}단계" : "일반 모드 (승천 없음)";
+
+        if (dawnConstraintText != null)
+            dawnConstraintText.text = isDawn ? DawnSystem.GetConstraintSummaryRich(stage) : "";
+
+        if (dawnGeneticsText != null)
+            dawnGeneticsText.text = isDawn ? $"유전자 배율 x{DawnSystem.GetGeneticsMultiplier(stage):0.##}" : "";
+    }
+
     private void SetActivePanel(GameObject activePanel)
     {
         if (characteristicsPanel) characteristicsPanel.SetActive(characteristicsPanel == activePanel);
         if (purchasesPanel) purchasesPanel.SetActive(purchasesPanel == activePanel);
         if (gridInfoPanel) gridInfoPanel.SetActive(gridInfoPanel == activePanel);
+        if (dawnPanel) dawnPanel.SetActive(dawnPanel == activePanel);
     }
 
     private void UpdateDescription(string text)
