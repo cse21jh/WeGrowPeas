@@ -53,14 +53,19 @@ public class CurseManager : Singleton<CurseManager>
     }
     private void OnEnable()
     {
-        GameEvents.OnDayPassedForRequest += RemoveCurse;
-        GameEvents.OnDayPassedForRequest += UpdateSeasonalCurse;
+        GameEvents.OnDayPassedForRequest += OnDayPassed;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnDayPassedForRequest -= RemoveCurse;
-        GameEvents.OnDayPassedForRequest -= UpdateSeasonalCurse;
+        GameEvents.OnDayPassedForRequest -= OnDayPassed;
+    }
+
+    /// <summary>하루가 끝날 때(OnDayPassedForRequest) 단발형 만료 + 지속형 일수 차감.</summary>
+    public void OnDayPassed()
+    {
+        RemoveCurse();
+        UpdateSeasonalCurse();
     }
 
     private void Update()
@@ -84,6 +89,11 @@ public class CurseManager : Singleton<CurseManager>
             remainingTempCurseDay = Mathf.Max(1, lv != null ? lv.days : 0);
             currentTempCurse.Activate();
             UpdateTempCurseUI();
+
+            // 자유시간 시작 때만 도는 초기화를 디버그 강제 적용 시에도 태워준다.
+            // (통신장애는 여기서 지속 시간이 정해지므로, 없으면 다음 날 자유시간까지 효과가 안 보임)
+            if (PhoneManager.Instance != null && GameManager.Instance != null && GameManager.Instance.grid != null)
+                PhoneManager.Instance.BeginEmpBlockIfActive(GameManager.Instance.grid.MaxBreedTimer);
         }
         else
         {

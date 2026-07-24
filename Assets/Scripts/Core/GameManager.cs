@@ -248,9 +248,6 @@ public class GameManager : Singleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
-        // 이전 플레이 세션의 static 이벤트 리스너들을 모두 강제 청소하여 메모리 누수 및 오작동 예방
-        GameEvents.Reset();
-
         SoundManager.Instance.StopBgm();
         SoundManager.Instance.PlayBgm("Farm");
 
@@ -409,7 +406,7 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(BreedEndRoutine());
 
-        GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check
+        GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check + 저주 만료 처리
 
 
         // 여기다가 밤으로 바뀌는 이펙트 추가해야 함

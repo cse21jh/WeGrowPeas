@@ -118,30 +118,52 @@ public class PhoneManager : Singleton<PhoneManager>
     {
         if (Input.GetKeyDown(toggleKey) && !isTutorial)
             Toggle();
+
+        UpdateEmpNoise(); // 통신장애 시간이 끝나면 노이즈가 자동으로 꺼지도록
     }
 
 
 
     public bool IsOpen => _isOpen;
 
-    private float _empBlockEndTime = -1f; // 저주(통신장애): 이 시각(Time.time)까지 폰 차단
+    private float _empBlockEndTime = -1f; // 저주(통신장애): 이 시각(Time.time)까지 통신장애 지속
 
-    /// <summary>저주(통신장애): 자유시간 시작 시 호출 — 낮 시간의 일부(EmpBlockRatio) 동안 폰을 차단.</summary>
+    [Header("저주(통신장애)")]
+    [Tooltip("통신장애 중 폰 위에 켜지는 노이즈 오브젝트(검은 네모/스프라이트 등). 비워두면 표시 없음.")]
+    [SerializeField] private GameObject empNoiseOverlay;
+
+    /// <summary>저주(통신장애)가 지금 적용 중인가.</summary>
+    public bool IsEmpActive => CurseState.EmpBlockRatio > 0f && Time.time < _empBlockEndTime;
+
+    /// <summary>저주(통신장애): 자유시간 시작 시 호출 — 낮 시간의 일부(EmpBlockRatio) 동안 통신장애.</summary>
     public void BeginEmpBlockIfActive(float freeTimeDuration)
     {
         _empBlockEndTime = CurseState.EmpBlockRatio > 0f
             ? Time.time + freeTimeDuration * CurseState.EmpBlockRatio
             : -1f;
+        UpdateEmpNoise();
+    }
+
+    /// <summary>자유시간이 끝나면(스킵 포함) 통신장애를 즉시 해제한다.</summary>
+    public void EndEmpBlock()
+    {
+        _empBlockEndTime = -1f;
+        UpdateEmpNoise();
+    }
+
+    /// <summary>통신장애 지속 시간에 맞춰 노이즈 오브젝트를 켜고 끈다.</summary>
+    private void UpdateEmpNoise()
+    {
+        if (empNoiseOverlay == null) return;
+
+        bool active = IsEmpActive;
+        if (empNoiseOverlay.activeSelf != active)
+            empNoiseOverlay.SetActive(active);
     }
 
     public void Toggle()
     {
-        // 저주(통신장애): 낮 시간의 앞부분 동안 폰이 안 열림(사용자 조작만 차단; 강제 개방/닫기는 영향 없음)
-        if (!_isOpen && CurseState.EmpBlockRatio > 0f && Time.time < _empBlockEndTime)
-        {
-            PhoneTouchEffect(); // TODO: 치지직 노이즈 표시
-            return;
-        }
+        // 저주(통신장애) 중에도 폰은 정상적으로 열린다. 대신 화면 위에 노이즈 오버레이가 켜진다.
         SetOpen(!_isOpen);
     }
 

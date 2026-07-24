@@ -535,6 +535,9 @@ public class Grid : MonoBehaviour
         isBreeding = false;
         breedSkipButton.SetActive(false);
 
+        // 저주(통신장애): 자유시간이 끝나면(스킵 포함) 노이즈도 바로 끈다
+        if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
+
         // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
         if (peaCoffeeMultiplier > 0f)
         {

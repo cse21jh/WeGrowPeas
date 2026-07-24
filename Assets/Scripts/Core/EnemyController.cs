@@ -537,13 +537,20 @@ public class EnemyController : MonoBehaviour
         return WaveType.Aging; // 예외처리용 기본값
     }
 
-    // 저주(이중 웨이브): 현재 웨이브와 다른, 해금된 웨이브 하나를 무작위 선택.
+    // 저주(이중 웨이브): 현재 웨이브와 다른, 이미 정식 등장 중인 웨이브 하나를 무작위 선택.
     private Wave PickSecondWave(WaveType exclude)
     {
+        // baseWeights는 등장 2스테이지 전부터 미리 켜지므로(예고용), 그대로 쓰면 아직 안 나온 웨이브가
+        // 두 번째로 겹칠 수 있다. 자연사만 나오는 초반 등에서 이중 웨이브가 뜨지 않도록,
+        // 현재 스테이지 기준으로 이미 정식 해금된 웨이브만 후보로 삼는다.
+        int stage = GameManager.Instance != null ? GameManager.Instance.stage : 0;
         var candidates = new List<WaveType>();
         foreach (var kv in BuildEffectiveWeights())
-            if (kv.Value > 0f && kv.Key != exclude && kv.Key != WaveType.None)
-                candidates.Add(kv.Key);
+        {
+            if (kv.Value <= 0f || kv.Key == exclude || kv.Key == WaveType.None) continue;
+            if (stage < WaveSchedule.GetUnlockStage(kv.Key)) continue; // 아직 정식 등장 전이면 제외
+            candidates.Add(kv.Key);
+        }
         if (candidates.Count == 0) return null;
         return GetWaveFromWaveType(candidates[Random.Range(0, candidates.Count)]);
     }
