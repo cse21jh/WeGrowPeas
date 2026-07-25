@@ -21,6 +21,13 @@ public sealed class ChatMessageList : MonoBehaviour
     [SerializeField]
     private ChatMessageItem normalMessagePrefab;
 
+    [Header("Separator Prefabs")]
+    [SerializeField]
+    private GameObject dateSeparatorPrefab;
+
+    [SerializeField]
+    private GameObject readUntilHereSeparatorPrefab;
+
     [Header("Sender")]
     [SerializeField]
     private string senderName = "정부";
@@ -37,16 +44,8 @@ public sealed class ChatMessageList : MonoBehaviour
 
     private Coroutine layoutRefreshCoroutine;
 
-    [SerializeField] private ChatMessageData[] initialMessages;
+    private GameObject currentTypingMessageObj;
 
-
-    private void Start()
-    {
-        foreach (var messageData in initialMessages)
-        {
-            AddMessage(messageData.StageId, messageData.Message);
-        }
-    }
 
     /// <summary>
     /// 메시지를 추가한다.
@@ -57,6 +56,22 @@ public sealed class ChatMessageList : MonoBehaviour
         bool isFirstMessageOfStage =
             !hasPreviousMessage ||
             previousStageId != stageId;
+
+        // 스테이지 변경 시 날짜 구분선 추가 (튜토리얼이 아닐 때)
+        if (isFirstMessageOfStage && dateSeparatorPrefab != null && !PhoneManager.Instance.isTutorial)
+        {
+            GameObject dateObj = Instantiate(dateSeparatorPrefab, content, false);
+            var btnCtrl = dateObj.GetComponent<MessageBoxBtnController>();
+            if (btnCtrl != null)
+            {
+                btnCtrl.SetText($"{stageId} 일차");
+            }
+            else
+            {
+                var tmp = dateObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                if (tmp != null) tmp.text = $"{stageId} 일차";
+            }
+        }
 
         ChatMessageItem selectedPrefab =
             isFirstMessageOfStage
@@ -91,6 +106,36 @@ public sealed class ChatMessageList : MonoBehaviour
         senderProfileSprite = newProfileSprite;
     }
 
+    public void AddNewChatSeparator()
+    {
+        if (readUntilHereSeparatorPrefab != null)
+        {
+            Instantiate(readUntilHereSeparatorPrefab, content, false);
+            RequestLayoutRefresh();
+        }
+    }
+
+    public void ShowTypingMessage()
+    {
+        if (currentTypingMessageObj == null)
+        {
+            ChatMessageItem item = Instantiate(normalMessagePrefab, content, false);
+            item.Setup("...", senderName, senderProfileSprite);
+            currentTypingMessageObj = item.gameObject;
+            RequestLayoutRefresh();
+        }
+    }
+
+    public void HideTypingMessage()
+    {
+        if (currentTypingMessageObj != null)
+        {
+            Destroy(currentTypingMessageObj);
+            currentTypingMessageObj = null;
+            RequestLayoutRefresh();
+        }
+    }
+
     public void ClearMessages()
     {
         for (int i = content.childCount - 1; i >= 0; i--)
@@ -103,6 +148,7 @@ public sealed class ChatMessageList : MonoBehaviour
 
         hasPreviousMessage = false;
         previousStageId = 0;
+        currentTypingMessageObj = null;
 
         RequestLayoutRefresh();
     }

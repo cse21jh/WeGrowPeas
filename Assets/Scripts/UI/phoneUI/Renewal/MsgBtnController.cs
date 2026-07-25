@@ -20,7 +20,7 @@ public class MsgBtnController : MonoBehaviour
         messageText.text = text;
         unreadCount.text = cnt.ToString();
 
-        if(cnt > 0)
+        if (cnt > 0)
         {
             unreadMarkImage.sprite = unreadMark;
             messageText.gameObject.SetActive(true);

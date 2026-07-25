@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 8382250930647343918}
   - component: {fileID: 4473735546093840550}
   - component: {fileID: 2515684903782611635}
-  - component: {fileID: 2710405229203178852}
+  - component: {fileID: 8282310407727982601}
   m_Layer: 0
   m_Name: MsgBtn
   m_TagString: Untagged
@@ -255,7 +255,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 128.23}
-  m_SizeDelta: {x: 0, y: 35}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6886006918555227402
 CanvasRenderer:
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &2710405229203178852
+--- !u!114 &8282310407727982601
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -380,16 +380,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6034361532576686563}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73726357fc33ce445a712f4541ae7912, type: 3}
+  m_Script: {fileID: 11500000, guid: e4f3b7e1e40073d4580bbfa873b3b051, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  profileImage: {fileID: 5824245288222225828}
-  senderName: {fileID: 9172259603498244807}
-  messageText: {fileID: 9106058077442752522}
+  m_EditorClassIdentifier: Assembly-CSharp::ChatPartnerUI
+  chatPartnerImage: {fileID: 5824245288222225828}
+  chatPartnerNameText: {fileID: 9172259603498244807}
+  lastMessageText: {fileID: 9106058077442752522}
+  UnreadStatus: {fileID: 8278795114512575433}
   unreadCount: {fileID: 5258680297909627130}
-  unreadMarkImage: {fileID: 8278795114512575433}
-  unreadMark: {fileID: 21300000, guid: 9fa2bf53739529a4980ec21bf4e281f4, type: 3}
-  readMark: {fileID: 21300000, guid: fa59b0972f604a6478a6b9495946ddbd, type: 3}
+  mandatoryunreadIndicator: {fileID: 21300000, guid: 9fa2bf53739529a4980ec21bf4e281f4, type: 3}
+  notMandatoryUnreadIndicator: {fileID: 21300000, guid: 9fa2bf53739529a4980ec21bf4e281f4, type: 3}
+  allReadIndicator: {fileID: 21300000, guid: fa59b0972f604a6478a6b9495946ddbd, type: 3}
 --- !u!1 &7110496599956999491
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,8 +713,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 35, y: -14}
-  m_SizeDelta: {x: 110, y: 16}
+  m_AnchoredPosition: {x: 35, y: -14.111}
+  m_SizeDelta: {x: 110.7036, y: 16.778}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3430296656860257284
 CanvasRenderer:
@@ -771,8 +772,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 8
+  m_fontSizeBase: 8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -790,7 +791,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
