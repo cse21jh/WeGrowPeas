@@ -357,10 +357,17 @@ public class GameManager : Singleton<GameManager>
         enemyController.UnlockWave(stage);
         
         // 매일 상점 자동 리롤 (비활성화된 오브젝트도 포함해서 찾기)
+        // 구 UI(ShopUI)와 신규 UI(ShopCanvasController)를 모두 갱신 — 한쪽만 씬에 있어도 동작.
         var shopUIs = FindObjectsOfType<ShopUI>(true);
         if (shopUIs != null && shopUIs.Length > 0 && shopUIs[0] != null)
         {
             shopUIs[0].DailyReroll();
+        }
+
+        var shopCanvases = FindObjectsOfType<ShopCanvasController>(true);
+        if (shopCanvases != null && shopCanvases.Length > 0 && shopCanvases[0] != null)
+        {
+            shopCanvases[0].DailyReroll();
         }
     }
 
