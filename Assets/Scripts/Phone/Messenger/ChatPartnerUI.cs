@@ -8,15 +8,18 @@ public class ChatPartnerUI : MonoBehaviour
     [SerializeField] private TMP_Text chatPartnerNameText;
     [SerializeField] private TMP_Text lastMessageText;
 
-    [SerializeField] private GameObject mandatoryunreadIndicator; // 필수 메시지 알림
-    [SerializeField] private GameObject notMandatoryUnreadIndicator; // 선택 메시지 알림
+    [SerializeField] private Image UnreadStatus; // 메세지 알림 스프라이트 
+    [SerializeField] private TMP_Text unreadCount; // 안 읽은 메시지 갯수
+    [SerializeField] private Sprite mandatoryunreadIndicator; // 필수 메시지 알림 스프라이트    
+    [SerializeField] private Sprite notMandatoryUnreadIndicator; // 선택 메시지 알림  스프라이트
+    [SerializeField] private Sprite allReadIndicator; // 모두 읽음 알림 스프라이트
 
     private Chat chat;
     private MessengerApp messengerApp;
 
     // *** 변경점 2: Setup 메서드 파라미터 변경 ***
     // bool hasUnread 대신 UnreadInfo를 받아 더 많은 정보를 처리
-    public void Setup(Chat chat, string previewMessage, UnreadInfo unreadInfo, MessengerApp appController)
+    public void Setup(Chat chat, string previewMessage, UnreadInfo unreadInfo, MessengerApp appController, int cnt)
     {
         this.chat = chat;
         this.messengerApp = appController;
@@ -25,21 +28,24 @@ public class ChatPartnerUI : MonoBehaviour
         chatPartnerNameText.text = chat.chatPartner.chatPartnerName;
         lastMessageText.text = previewMessage; // 미리보기 메시지로 텍스트 설정
 
-        // 모든 알림을 일단 끈다
-        mandatoryunreadIndicator.SetActive(false);
-        notMandatoryUnreadIndicator.SetActive(false);
 
         // 안 읽은 메시지 정보에 따라 적절한 알림을 켠다
         if (unreadInfo.hasUnread)
         {
             if (unreadInfo.hasMandatory)
             {
-                mandatoryunreadIndicator.SetActive(true);
+                if (mandatoryunreadIndicator != null) UnreadStatus.sprite = mandatoryunreadIndicator;
             }
             else
             {
-                notMandatoryUnreadIndicator.SetActive(true);
+                if (notMandatoryUnreadIndicator != null) UnreadStatus.sprite = notMandatoryUnreadIndicator;
             }
+            if (unreadCount != null) unreadCount.text = cnt.ToString();
+        }
+        else
+        {
+            if (allReadIndicator != null) UnreadStatus.sprite = allReadIndicator;
+            if (unreadCount != null) unreadCount.text = "";
         }
 
         GetComponent<Button>().onClick.AddListener(OnItemClick);

@@ -719,6 +719,7 @@ GameObject:
   - component: {fileID: 6622345085152695391}
   - component: {fileID: 2717751069292549987}
   - component: {fileID: 3400256475650214750}
+  - component: {fileID: 4017725339287069507}
   m_Layer: 0
   m_Name: QuestTab
   m_TagString: Untagged
@@ -798,6 +799,30 @@ MonoBehaviour:
   animationEase: 4
   useUnscaledTime: 1
   initiallyExpanded: 0
+--- !u!114 &4017725339287069507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144529077952853603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b634e66a7b79cc4fbe534352963b5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  baseFrame: {fileID: 746272628835688509}
+  rewardFrame: {fileID: 6849545603814135483}
+  activeColor: {r: 1, g: 1, b: 1, a: 1}
+  finishedColor: {r: 0, g: 0, b: 0, a: 1}
+  finishedColor_sub: {r: 0, g: 0, b: 0, a: 0}
+  getBtnImage: {fileID: 8178450422918434832}
+  activeSprite: {fileID: 21300000, guid: 4900b3e7f6f906c4dbbf8cd2460381fc, type: 3}
+  finishedSprite: {fileID: 21300000, guid: 85c05ded8759ab14d90173a989fdc904, type: 3}
+  questTabRect: {fileID: 5461379728157938585}
+  effectDuration: 0.25
+  effectStrength: {x: 0.1, y: 0.1, z: 0.1}
+  effectEase: 4
 --- !u!1 &2279560573774240499
 GameObject:
   m_ObjectHideFlags: 0
@@ -1044,7 +1069,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8178450422918434832}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4017725339287069507}
+        m_TargetAssemblyTypeName: QuestTabController, Assembly-CSharp
+        m_MethodName: UpdateStatus
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2944937189380462922
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,10 +1141,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -1121,7 +1158,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 4078327587774588196}
   m_FillRect: {fileID: 6146768518363847924}
   m_HandleRect: {fileID: 0}

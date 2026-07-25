@@ -76,7 +76,10 @@ public abstract class MovablePlant : Plant
             if (!grid.GetIsBreeding() || isDying)
                 grid.TryPlacePlant(this, Input.mousePosition);
             else
+            {
                 FollowMouse();
+                grid.HighlightHoveredTile(grid.GetGridIndexFromPosition(Input.mousePosition));
+            }
         }
 
         if (!grid.GetIsBreeding() || isFrozen)
@@ -112,6 +115,7 @@ public abstract class MovablePlant : Plant
     {
         if (isDragging)
         {
+            grid.ClearHoverHighlight();
             grid.TryPlacePlant(this, Input.mousePosition);
             FenceUIManager.Instance.SetFenceElements(plantID, this);
             TryRootByDawn(); // 새벽: 이동 시 확률로 뿌리

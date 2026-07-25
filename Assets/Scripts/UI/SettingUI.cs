@@ -11,26 +11,27 @@ public class SettingUI : MonoBehaviour
 
     void Start()
     {
-        if (SettingPanel != null)
-            SettingPanel.SetActive(false);
-
-        if (showBreedPopupToggle != null && UIManager.Instance != null)
+        if (showBreedPopupToggle != null)
         {
-            showBreedPopupToggle.isOn = UIManager.Instance.ShowBreedPopupSetting;
             showBreedPopupToggle.onValueChanged.AddListener((isOn) =>
             {
-                UIManager.Instance.SetBreedPopupSetting(isOn);
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.SetBreedPopupSetting(isOn);
+                }
             });
         }
 
         if (playAlarmForSeenMessagesToggle != null)
         {
-            playAlarmForSeenMessagesToggle.isOn = MessengerSaveSystem.PlayAlarmForSeenMessages;
             playAlarmForSeenMessagesToggle.onValueChanged.AddListener((isOn) =>
             {
                 MessengerSaveSystem.PlayAlarmForSeenMessages = isOn;
             });
         }
+
+        if (SettingPanel != null)
+            SettingPanel.SetActive(false);
     }
 
     void Update()
@@ -59,7 +60,21 @@ public class SettingUI : MonoBehaviour
     {
         if (SettingPanel == null)
             return;
+
         SettingPanel.SetActive(true);
+
+        if (showBreedPopupToggle != null && UIManager.Instance != null)
+        {
+            Debug.Log("1234");
+            showBreedPopupToggle.isOn = UIManager.Instance.ShowBreedPopupSetting;
+        }
+
+        if (playAlarmForSeenMessagesToggle != null)
+        {
+            Debug.Log("5678");
+            playAlarmForSeenMessagesToggle.isOn = MessengerSaveSystem.PlayAlarmForSeenMessages;
+        }
+
         SoundManager.Instance.ConnectSlider(SettingPanel.transform.Find("BGMVolumeBar").GetComponent<Slider>(), SettingPanel.transform.Find("EffectVolumeBar").GetComponent<Slider>());
         Time.timeScale = 0;
         ClickRouter.Instance.IsBlockedByUI = true;

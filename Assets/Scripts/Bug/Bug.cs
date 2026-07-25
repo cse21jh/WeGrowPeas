@@ -237,7 +237,10 @@ public class Bug : MonoBehaviour
                 return;
             }
             
-            plant.Die(DeathCause.Bug, this);
+            if (plant.Die(DeathCause.Bug, this))
+            {
+                GameEvents.RaisePeaDiedByBug();
+            }
             eatingPlant = true;
         }
     }

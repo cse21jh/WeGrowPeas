@@ -30,6 +30,15 @@ public static class GameEvents
     public static event Action<Plant> OnPeaSold;
     public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
 
+    public static event Action OnPlantMoved;
+    public static void RaisePlantMoved() => OnPlantMoved?.Invoke();
+
+    public static event Action<int> OnDayEndedWithRemainingBreeds;
+    public static void RaiseDayEndedWithRemainingBreeds(int remainingBreeds) => OnDayEndedWithRemainingBreeds?.Invoke(remainingBreeds);
+
+    public static event Action OnPeaDiedByBug;
+    public static void RaisePeaDiedByBug() => OnPeaDiedByBug?.Invoke();
+
     /// <summary>
     /// 모든 구독을 강제로 끊는다. ⚠ 평상시 호출 금지.
     ///
@@ -48,5 +57,8 @@ public static class GameEvents
         OnShopBought = null;
         OnDayPassedForRequest = null;
         OnPeaSold = null;
+        OnPlantMoved = null;
+        OnDayEndedWithRemainingBreeds = null;
+        OnPeaDiedByBug = null;
     }
 }
