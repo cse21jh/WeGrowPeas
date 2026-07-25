@@ -17,7 +17,7 @@ public class PanelTranstionController : MonoBehaviour
     private void Start()
     {
         isPanelActive = new bool[panels.Length];
-        for(int i = 0 ; i < panels.Length; i++)
+        for (int i = 0; i < panels.Length; i++)
         {
             isPanelActive[i] = panels[i].gameObject.activeSelf;
         }
@@ -27,7 +27,7 @@ public class PanelTranstionController : MonoBehaviour
 
     private void Update()
     {
-        for(int i = 0; i < panels.Length; i++)
+        for (int i = 0; i < panels.Length; i++)
         {
             if (Input.GetKeyDown(toggleKey + i))
             {
@@ -48,7 +48,7 @@ public class PanelTranstionController : MonoBehaviour
 
     private void TransitionOut(RectTransform panel)
     {
-        if(panel.gameObject.activeSelf == false)
+        if (panel.gameObject.activeSelf == false)
             return;
         panel.DOKill();
 
@@ -58,9 +58,9 @@ public class PanelTranstionController : MonoBehaviour
             panel.gameObject.SetActive(false);
         });
 
-        if(panel == panels[3])
+        if (panel == panels[3])
         {
-            FindAnyObjectByType<RequestUI>().OnClickHidePopup();
+            //FindAnyObjectByType<RequestUI>().OnClickHidePopup();
         }
     }
 
@@ -81,7 +81,7 @@ public class PanelTranstionController : MonoBehaviour
             {
                 TransitionOut(panels[i]);
             }
-            if(lastActiveIndex != 0)
+            if (lastActiveIndex != 0)
                 TransitionIn(panels[0]);
         }
         else

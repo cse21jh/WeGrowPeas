@@ -37,6 +37,7 @@ public class RequestManager : Singleton<RequestManager>
     public int CycleEndRound => cycleEndRound;
 
     public event Action OnBoardUpdated;
+    public event Action OnProgressUpdated;
 
     private int completeRequestCount = 0;
 
@@ -140,7 +141,7 @@ public class RequestManager : Singleton<RequestManager>
 
     private void HandleRequestChanged(RequestInstance _)
     {
-        OnBoardUpdated?.Invoke();
+        OnProgressUpdated?.Invoke();
     }
 
     private void GrantRewardsForCompleted()
@@ -239,7 +240,7 @@ public class RequestManager : Singleton<RequestManager>
 
     public void OnCheckedNewRequest()
     {
-        if(newRequestArrived)
+        if (newRequestArrived)
         {
             newRequestArrived = false;
             PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
@@ -250,7 +251,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "퀘스트 - " + (cycle - dayPassed) +"일 남음";
+        appTitle.text = "퀘스트 - " + (cycle - dayPassed) + "일 남음";
     }
 
     public void AddCompleteRequestCount()

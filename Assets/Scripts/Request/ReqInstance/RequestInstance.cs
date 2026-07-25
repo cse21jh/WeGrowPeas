@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum RequestState
@@ -48,24 +49,22 @@ public abstract class RequestInstance
 
     public string GetRewardText()
     {
-        string t = string.Empty;
+        List<string> rewardStrings = new List<string>();
 
         foreach (var r in Data.rewards)
         {
             switch (r.type)
             {
                 case RewardType.Gold:
-                    t += r.amount.ToString() + "G ";
+                    rewardStrings.Add(r.amount.ToString() + "G");
                     break;
                 case RewardType.Gene:
-                    //t += "유전자 아이템" + r.amount.ToString() + " ";
+                    rewardStrings.Add(r.amount.ToString() + "유전자");
                     break;
             }
         }
 
-        //t += "치장 아이템1";
-
-        return t;
+        return string.Join(" + ", rewardStrings);
     }
 
     protected void CompleteOnce()
@@ -99,7 +98,7 @@ public abstract class RequestInstance
 
         foreach (var r in Data.rewards)
         {
-            switch(r.type)
+            switch (r.type)
             {
                 case RewardType.Gold:
                     GameManager.Instance.economyManager.AddGold(r.amount);
@@ -110,7 +109,7 @@ public abstract class RequestInstance
             }
         }
 
-        switch(Data.requestDifficulty)
+        switch (Data.requestDifficulty)
         {
             case RequestDifficulty.Easy:
                 break;

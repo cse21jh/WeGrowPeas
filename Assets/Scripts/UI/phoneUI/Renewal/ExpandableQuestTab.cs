@@ -89,6 +89,148 @@ public sealed class ExpandableQuestTab : MonoBehaviour
     /// </summary>
     public bool IsExpanded => _isExpanded;
 
+    [Header("Quest Content")]
+    [SerializeField] private TextMeshProUGUI title;
+    [SerializeField] private TextMeshProUGUI reward;
+    [SerializeField] private TextMeshProUGUI progress;
+    [SerializeField] private Slider progressBarFill;
+    [SerializeField] private TextMeshProUGUI descriptionText;
+
+    [Header("State Effects")]
+    [SerializeField] private GameObject complete_panel;
+    [SerializeField] private GameObject failed_panel;
+    [SerializeField] private TextMeshProUGUI stateText;
+
+    private RequestInstance RI;
+    public RequestInstance RequestInstance => RI;
+    private RequestUI owner;
+    private CanvasGroup canvasGroup;
+
+    public void Set(RequestInstance request, RequestUI ownerUI)
+    {
+        RI = request;
+        owner = ownerUI;
+
+        title.text = request.GetTitleText();
+
+        if (reward != null)
+        {
+            int goldAmount = 0;
+            if (request.Data != null && request.Data.rewards != null)
+            {
+                foreach (var r in request.Data.rewards)
+                {
+                    if (r.type == RewardType.Gold)
+                    {
+                        goldAmount += r.amount;
+                    }
+                }
+            }
+
+            if (goldAmount > 0)
+            {
+                reward.text = goldAmount + " G";
+            }
+            else
+            {
+                reward.text = "";
+            }
+        }
+
+        if (descriptionText != null)
+            descriptionText.text = request.GetDescriptionText() + "\n보상 : " + request.GetRewardText();
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            }
+        }
+
+        UpdateProgress();
+    }
+
+    public void UpdateProgress()
+    {
+        if (RI == null) return;
+
+        progress.text = RI.GetProgressText();
+
+        // Parse progress string like "0/8" to update progress bar fill
+        if (progressBarFill != null && !string.IsNullOrEmpty(progress.text))
+        {
+            string[] parts = progress.text.Split('/');
+            if (parts.Length == 2 && float.TryParse(parts[0], out float current) && float.TryParse(parts[1], out float total) && total > 0)
+            {
+                progressBarFill.value = current / total;
+            }
+            else
+            {
+                progressBarFill.value = 0f;
+            }
+        }
+
+        switch (RI.State)
+        {
+            case RequestState.InProgress:
+                if (complete_panel != null) complete_panel.SetActive(false);
+                if (failed_panel != null) failed_panel.SetActive(false);
+                stateText.text = "진행 중";
+                stateText.color = Color.black;
+                if (canvasGroup != null) canvasGroup.alpha = 1f;
+                break;
+            case RequestState.Complete:
+                if (complete_panel != null) complete_panel.SetActive(false);
+                if (failed_panel != null) failed_panel.SetActive(false);
+                stateText.text = "보상 받기";
+                stateText.color = Color.black;
+                if (canvasGroup != null) canvasGroup.alpha = 1f;
+                break;
+            case RequestState.Granted:
+                if (complete_panel != null) complete_panel.SetActive(true);
+                if (failed_panel != null) failed_panel.SetActive(false);
+                stateText.text = "수령 완료";
+                stateText.color = Color.black;
+                if (canvasGroup != null) canvasGroup.alpha = 0.5f;
+                break;
+            case RequestState.Fail:
+                if (complete_panel != null) complete_panel.SetActive(false);
+                if (failed_panel != null) failed_panel.SetActive(true);
+                stateText.text = "실패";
+                stateText.color = Color.red;
+                if (canvasGroup != null) canvasGroup.alpha = 0.5f;
+                break;
+        }
+    }
+
+    public void OnClickReceiveReward()
+    {
+        if (RI == null) return;
+
+        if (!RI.CanAcceptReward)
+        {
+            SoundManager.Instance.PlayEffect("WrongSelect");
+            // Show floating text
+            PhoneNotificationBus.OnShow?.Invoke(
+                new PhoneNotificationData
+                {
+                    title = "알림",
+                    message = "아직 퀘스트가 완료되지 않았습니다.",
+                    duration = 2f
+                }
+            );
+            return;
+        }
+
+        RI.GrantRewardOnce();
+
+        // Note: The UI update for all quests should be triggered by the caller or an event, 
+        // but we can locally update this one as well.
+        UpdateProgress();
+    }
+
     private void Reset()
     {
         rootLayoutElement = GetComponent<LayoutElement>();

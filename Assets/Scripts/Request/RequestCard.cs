@@ -33,7 +33,7 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
         reward.text = "보상 - " + request.GetRewardText();
         progress.text = request.GetProgressText();
 
-        switch(request.State)
+        switch (request.State)
         {
             case RequestState.InProgress:
                 bg_image.sprite = bg_white;
@@ -69,6 +69,6 @@ public class RequestCard : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         owner.SetPopupRequestInfo(RI);
-        FindAnyObjectByType<RequestUI>().OnClickShowPopup();
+        //FindAnyObjectByType<RequestUI>().OnClickShowPopup();
     }
 }
