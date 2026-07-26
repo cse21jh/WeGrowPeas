@@ -12,10 +12,12 @@ public class WaveBlindCurse : CurseInstance
     public override void Activate()
     {
         CurseState.WaveBlind = true;
+        CurseEffectManager.Instance?.SetWaveBlind(true);
     }
 
     public override void Deactivate()
     {
         CurseState.WaveBlind = false;
+        CurseEffectManager.Instance?.SetWaveBlind(false);
     }
 }

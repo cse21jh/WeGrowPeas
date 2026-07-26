@@ -34,27 +34,15 @@ public class RebellionEffectController : MonoBehaviour
             _downArrowStartPosition = downArrow.anchoredPosition;
     }
 
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayArrowAnimation();
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetArrowPosition();
-        }
-    }
     public void PlayArrowAnimation()
     {
+        ResetArrowPosition();
+
         if (upArrow == null || downArrow == null)
         {
             Debug.LogWarning("화살표 RectTransform이 연결되지 않았습니다.", this);
             return;
         }
-
-        KillTweens();
 
         upArrow.anchoredPosition = _upArrowStartPosition;
         downArrow.anchoredPosition = _downArrowStartPosition;

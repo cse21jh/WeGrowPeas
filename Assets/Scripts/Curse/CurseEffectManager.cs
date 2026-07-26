@@ -1,5 +1,8 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// 저주 시각 이펙트 제어. Assets/Resource/Sprites/Curse/CurseEffectManager 프리팹에 붙여 씬에 배치한다.
@@ -23,8 +26,29 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
     [Tooltip("씨 없는 수박")]
     [SerializeField] private ParticleSystem[] watermelonEffects;
 
+    [Tooltip("반란")]
+    [SerializeField] private RebellionEffectController rebellion;
+
+    // [Tooltip("안개")]
+
+    [Tooltip("도둑이야!")]
+    [SerializeField] private ThiefEffectController thief;
+
+    [Tooltip("기상 이변")]
+    [SerializeField] private Volume[] volumes;
+    [SerializeField] private float targetValue = -75f; // 목표 채도 값
+    [SerializeField] private float[] originalValues; // 원래 채도 값
+    [SerializeField] private float duration = 1f; // 채도 변화 시간
+    [SerializeField] private Ease ease = Ease.Linear; // 채도 변화 이징
+
     private void Start()
     {
+        volumes = FindObjectsByType<Volume>(
+            FindObjectsSortMode.None
+        );
+
+        originalValues = new float[volumes.Length];
+
         // 프리팹 파티클들이 Play On Awake로 설정돼 있어 배치만 해도 재생된다.
         // 저주가 걸리기 전까지는 아무 이펙트도 보이지 않아야 하므로 시작 시 전부 정지.
         StopAll();
@@ -40,6 +64,74 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
 
     /// <summary>207 씨 없는 수박.</summary>
     public void SetWatermelon(bool on) => SetEffects(watermelonEffects, on);
+
+    /// <summary>101 반란.</summary>
+    public void SetReverseCurse(bool on)
+    {
+        if (on)
+            rebellion.PlayArrowAnimation();
+    }
+
+    /// <summary>102 안개.</summary>
+    ///
+
+    /// <summary>103 도둑이야!.</summary>
+    public void SetThiefCurse(bool on)
+    {
+        if (on)
+            thief.PlayLineAnimation();
+    }
+
+    /// <summary>104 기상 이변.</summary>
+    public void SetWaveBlind(bool on)
+    {
+        for (int i = 0; i < volumes.Length; i++)
+        {
+            if (volumes[i] == null) continue;
+
+            VolumeProfile profile = volumes[i].profile;
+            originalValues[i] = profile.TryGet<ColorAdjustments>(out var colorAdjustments) ? colorAdjustments.saturation.value : 0f;
+
+            if (colorAdjustments == null) continue;
+
+            if (on)
+            {
+                originalValues[i] = colorAdjustments.saturation.value;
+                DOTween.To(
+                    () => colorAdjustments.saturation.value,
+                    value => colorAdjustments.saturation.value = value,
+                    targetValue,
+                    duration
+                )
+                .SetEase(ease);
+            }
+            else
+            {
+                DOTween.To(
+                    () => colorAdjustments.saturation.value,
+                    value => colorAdjustments.saturation.value = value,
+                    originalValues[i],
+                    duration
+                )
+                .SetEase(ease);
+            }
+        }
+
+    }
+
+    /// <summary>105 버섯 발생.</summary>
+    ///
+
+    /// <summary>106 광란.</summary>
+    ///
+
+    /// <summary>107 대격변.</summary>
+    ///
+
+    /// <summary>108 이중 웨이브.</summary>
+    ///
+
+    /// <summary>109 통신장애.</summary>
 
     /// <summary>
     /// 204 꽃가루 실종. 전용 파티클 + 교배 불가 식물 색 변화(각 식물의 PlantCurseManager)를 함께 적용.
