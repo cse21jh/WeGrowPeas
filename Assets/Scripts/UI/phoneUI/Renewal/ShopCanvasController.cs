@@ -56,7 +56,15 @@ public class ShopCanvasController : MonoBehaviour
     [SerializeField] private TMP_Dropdown optionDropdown;
 
     // 상점 로직(뷰 비의존). 구매/리롤/인벤토리 생성은 전부 여기로 위임.
-    private ShopController shop;
+    private ShopController _shop;
+    private ShopController shop
+    {
+        get
+        {
+            if (_shop == null) _shop = new ShopController();
+            return _shop;
+        }
+    }
 
     // 현재 목록에 표시 중인 슬롯들
     private readonly List<ItemController> slots = new();
@@ -69,7 +77,6 @@ public class ShopCanvasController : MonoBehaviour
 
     private void Awake()
     {
-        shop = new ShopController();
     }
 
     private void OnEnable()

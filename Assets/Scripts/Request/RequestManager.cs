@@ -262,7 +262,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "퀘스트 - " + (cycle - dayPassed) + "일 남음";
+        appTitle.text = "금주의 퀘스트 - " + (cycle - dayPassed) + "일 남음";
     }
 
     public void AddCompleteRequestCount()
