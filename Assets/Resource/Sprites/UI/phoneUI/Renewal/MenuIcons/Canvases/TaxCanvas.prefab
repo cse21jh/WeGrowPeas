@@ -2652,7 +2652,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3524150258788405447}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4134671813551647021}
+        m_TargetAssemblyTypeName: TaxCanvasController, Assembly-CSharp
+        m_MethodName: OnClickPay
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7156875791359662360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3780,6 +3792,7 @@ GameObject:
   - component: {fileID: 6733509459208382158}
   - component: {fileID: 8539792116254898876}
   - component: {fileID: 2585842765189252218}
+  - component: {fileID: 4134671813551647021}
   m_Layer: 0
   m_Name: TaxCanvas
   m_TagString: Untagged
@@ -3849,6 +3862,36 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4134671813551647021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8377361490317372717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89678e0c0ff20284fb508dfe2fced7fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TaxCanvasController
+  deadlineText: {fileID: 3609555000862496343}
+  leftDayText: {fileID: 6031765292347548254}
+  amountText: {fileID: 5260216974081651451}
+  amountPercentageText: {fileID: 7221405622468726133}
+  amountSlider: {fileID: 4468528850663729846}
+  currentPayText: {fileID: 2399537522019629102}
+  nextAmountText: {fileID: 959544491024831349}
+  gradeIcon: {fileID: 89693113309596380}
+  gradeSprites:
+  - {fileID: -120522343, guid: c90ec5f35a141424bb28bd757e3b378b, type: 3}
+  - {fileID: -537136444, guid: c90ec5f35a141424bb28bd757e3b378b, type: 3}
+  - {fileID: -1764731192, guid: c90ec5f35a141424bb28bd757e3b378b, type: 3}
+  - {fileID: 1512779188, guid: c90ec5f35a141424bb28bd757e3b378b, type: 3}
+  payBtn_Payable: {fileID: 6671500723930368320}
+  payBtn_NotPayable: {fileID: 4598391473754760064}
+  currentGoldTexts:
+  - {fileID: 1564806360215954994}
+  - {fileID: 3073276100921818994}
 --- !u!1 &8995942580842719123
 GameObject:
   m_ObjectHideFlags: 0

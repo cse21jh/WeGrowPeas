@@ -45,6 +45,26 @@ public class TaxManager : Singleton<TaxManager>
     /// <summary>강제징수 처리(납부 완료로 간주하고 다음 세금일로 넘어감).</summary>
     public void MarkPaidForcibly() => lastPaidTaxStage = DueTaxStage;
 
+    /// <summary>다음 회차(이번 것을 낸 뒤) 세금액. 미리보기용.</summary>
+    public int NextAmount => TaxSchedule.GetTaxAmount(DueTaxStage + Interval);
+
+    /// <summary>마감까지 남은 일수. 0이면 오늘이 마감, 음수면 연체.</summary>
+    public int DaysLeft(int currentStage) => DueTaxStage - currentStage;
+
+    /// <summary>현재 보유 골드.</summary>
+    public int CurrentGold => Economy != null ? Economy.GetGold() : 0;
+
+    /// <summary>이번 세금액 대비 보유 골드 비율(0~1). 납부 진행도 표시용.</summary>
+    public float PayProgress
+    {
+        get
+        {
+            int due = DueAmount;
+            if (due <= 0) return 1f;
+            return Mathf.Clamp01((float)CurrentGold / due);
+        }
+    }
+
     /// <summary>지금 보유 골드로 이번 세금을 낼 수 있는가.</summary>
     public bool CanPayNow() => Economy != null && Economy.HasGold(DueAmount);
 

@@ -13,7 +13,18 @@ public class TaxApp : MonoBehaviour
     [SerializeField] private TMP_Text statusText;  // 납부 결과 안내
     [SerializeField] private Button payButton;     // 납부 버튼 (onClick → OnClickPay)
 
-    private void OnEnable() => Refresh();
+    private void OnEnable()
+    {
+        GameEvents.OnGoldChanged += OnGoldChanged;
+        Refresh();
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnGoldChanged -= OnGoldChanged;
+    }
+
+    private void OnGoldChanged(int _) => Refresh();
 
     /// <summary>화면 표시 갱신. 앱을 열 때 / 납부 후 호출.</summary>
     public void Refresh()

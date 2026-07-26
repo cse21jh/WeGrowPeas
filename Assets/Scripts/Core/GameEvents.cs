@@ -30,6 +30,10 @@ public static class GameEvents
     public static event Action<Plant> OnPeaSold;
     public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
 
+    /// <summary>보유 골드가 변할 때(획득/사용/로드). 인자 = 변경 후 보유량.</summary>
+    public static event Action<int> OnGoldChanged;
+    public static void RaiseGoldChanged(int gold) => OnGoldChanged?.Invoke(gold);
+
     public static event Action OnPlantMoved;
     public static void RaisePlantMoved() => OnPlantMoved?.Invoke();
 
@@ -60,5 +64,6 @@ public static class GameEvents
         OnPlantMoved = null;
         OnDayEndedWithRemainingBreeds = null;
         OnPeaDiedByBug = null;
+        OnGoldChanged = null;
     }
 }

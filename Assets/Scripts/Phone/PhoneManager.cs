@@ -72,6 +72,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public MessengerApp messengerApp;
     [SerializeField] public TaxApp taxApp;
+    [SerializeField] public TaxCanvasController taxCanvas; // Renewal 국세청 UI
 
     //폰 페이즈 관련
     private float phoneTimer = 0;
@@ -209,6 +210,7 @@ public class PhoneManager : Singleton<PhoneManager>
             case 1: // 국세청
                 mappedKey = AppKey.Tax;
                 if (taxApp != null) taxApp.Refresh();
+                if (taxCanvas != null) taxCanvas.Refresh(); // Renewal 국세청 UI
                 break;
             case 2: // 홈
                 if (isTutorial && isTutorialEnd)

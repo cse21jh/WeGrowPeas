@@ -78,6 +78,8 @@ public class EconomyManager : MonoBehaviour
     private void UpdateCoinUI(int val)
     {
         CoinUI.text = $"{ToAbbreviatedString(val)}";
+        // 골드가 바뀌는 모든 경로(획득/사용/로드)가 여기를 지나므로 여기서 한 번만 알린다.
+        GameEvents.RaiseGoldChanged(val);
     }
 
     public int GetGold()
