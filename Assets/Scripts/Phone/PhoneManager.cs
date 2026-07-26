@@ -60,11 +60,7 @@ public class PhoneManager : Singleton<PhoneManager>
     [Header("UI Roots")]
     [SerializeField] private GameObject phoneRoot;   // 폰 전체 루트 (열고/닫기)
     [SerializeField] private GameObject phoneBtn;    // 폰 열기 버튼
-    [SerializeField] private GameObject homePanel;   // 홈 패널(고정 UI)
-    [SerializeField] private Transform appContainer; // 앱 인스턴스 부모(빈 RectTransform)
-    [SerializeField] private PhoneTopBar topBar;     // (선택) 제목/뒤로/홈
-
-    [SerializeField] private PanelTranstionController transitionController;
+    [SerializeField] private PhoneMenuPageSwitcher pageSwitcher;
 
     [Header("Input")]
     [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
@@ -193,40 +189,43 @@ public class PhoneManager : Singleton<PhoneManager>
         //if (open) RefreshTopBar();
     }
 
-    public void OpenHome()
+
+    public void OpenAppByIndex(int index)
     {
-        _current = null;
         PhoneTouchEffect();
-        transitionController.TransitionToIndex(0);
-        //RefreshTopBar();
-    }
 
-    public void OpenApp(AppKey key)
-    {
-        /*
-        EnsureOpen();
-
-        if (!_instances.TryGetValue(key, out var go) || go == null)
+        if (pageSwitcher != null)
         {
-            Debug.LogWarning($"[Phone] App instance not found: {key}");
-            return;
+            pageSwitcher.ShowPage(index);
         }
 
-        if (homePanel != null) homePanel.SetActive(false);
+        AppKey? mappedKey = null;
+        switch (index)
+        {
+            case 0: // 메신저
+                mappedKey = AppKey.Messenger;
+                if (messengerApp != null) messengerApp.CheckCoroutineByTab(true);
+                break;
+            case 1: // 국세청
+                mappedKey = AppKey.Tax;
+                if (taxApp != null) taxApp.Refresh();
+                break;
+            case 2: // 홈
+                if (isTutorial && isTutorialEnd)
+                    return;
+                messengerApp.CheckCoroutineByTab(false);
+                mappedKey = null;
+                if (messengerApp != null) messengerApp.CheckCoroutineByTab(false);
+                break;
+            case 3: // 상점
+                mappedKey = AppKey.Shop;
+                break;
+            case 4: // 퀘스트
+                mappedKey = AppKey.Quest;
+                break;
+        }
 
-        HideCurrentApp();
-
-        go.SetActive(true);
-        _current = key;
-        */
-
-        //RefreshTopBar();
-        PhoneTouchEffect();
-        transitionController.TransitionToIndex((int)key + 1);
-        _current = key;
-
-        if (key == AppKey.Tax && taxApp != null)
-            taxApp.Refresh(); // 국세청 앱 열 때 이번 세금액/마감 갱신
+        _current = mappedKey;
     }
     public void PhoneTouchEffect()
     {

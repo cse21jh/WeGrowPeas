@@ -15,6 +15,7 @@ public sealed class PhoneMenuPageSwitcher : MonoBehaviour
     /// </summary>
     public void ShowPage(int pageIndex)
     {
+        Debug.Log(pageIndex);
         if (pages == null ||
             pageIndex < 0 ||
             pageIndex >= pages.Length)
