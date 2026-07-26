@@ -54,8 +54,12 @@ public sealed class ChatMessageItem : MonoBehaviour
     private float minimumBubbleWidth;
     private float minimumBubbleHeight;
 
-    private void Awake()
+    private bool isInitialized = false;
+
+    private void EnsureInitialized()
     {
+        if (isInitialized) return;
+
         if (layoutElement == null)
         {
             layoutElement = GetComponent<LayoutElement>();
@@ -66,6 +70,23 @@ public sealed class ChatMessageItem : MonoBehaviour
         // 프리팹에 직접 설정한 말풍선 크기를 최소 크기로 사용한다.
         minimumBubbleWidth = bubbleRect.rect.width;
         minimumBubbleHeight = bubbleRect.rect.height;
+
+        isInitialized = true;
+    }
+
+    private void Awake()
+    {
+        EnsureInitialized();
+    }
+
+    private void OnEnable()
+    {
+        EnsureInitialized();
+        if (messageText != null && !string.IsNullOrEmpty(messageText.text))
+        {
+            ResizeBubble();
+            UpdateItemHeight();
+        }
     }
 
     /// <summary>
@@ -78,6 +99,7 @@ public sealed class ChatMessageItem : MonoBehaviour
         Sprite profileSprite,
         System.Action onClick = null)
     {
+        EnsureInitialized();
         messageText.text = message ?? string.Empty;
 
         if (isInitMsg)

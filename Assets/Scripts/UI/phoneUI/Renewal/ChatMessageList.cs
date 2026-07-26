@@ -154,6 +154,11 @@ public sealed class ChatMessageList : MonoBehaviour
         RequestLayoutRefresh();
     }
 
+    private void OnEnable()
+    {
+        RequestLayoutRefresh();
+    }
+
     private void RequestLayoutRefresh()
     {
         if (layoutRefreshCoroutine != null)
@@ -161,8 +166,10 @@ public sealed class ChatMessageList : MonoBehaviour
             StopCoroutine(layoutRefreshCoroutine);
         }
 
-        layoutRefreshCoroutine =
-            StartCoroutine(RefreshLayoutNextFrame());
+        if (gameObject.activeInHierarchy)
+        {
+            layoutRefreshCoroutine = StartCoroutine(RefreshLayoutNextFrame());
+        }
     }
 
     private IEnumerator RefreshLayoutNextFrame()

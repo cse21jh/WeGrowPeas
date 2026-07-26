@@ -235,6 +235,8 @@ public class MessengerApp : MonoBehaviour
     }
 
 
+    private Tween currentPanelTween;
+
     public void OpenchatPartnerList()
     {
         if (PhoneManager.Instance.isTutorial && PhoneManager.Instance.isTutorialEnd)
@@ -246,14 +248,13 @@ public class MessengerApp : MonoBehaviour
         chatPartnerListPanel.SetActive(true); // 이동 시작 전에 미리 켜서 갱신이 동작하도록 함
         PeoplePanel.gameObject.SetActive(true);
 
-        Sequence seq = DOTween.Sequence();
-
-        seq.Append(ChatPanel.DOAnchorPosX(Panel_CloseRect.anchoredPosition.x, OpenCloseDuration).SetEase(OpenCloseEase));
-
-        seq.OnComplete(() =>
-        {
-            chatRoomPanel.SetActive(false); // 이동 완료 후 가림
-        });
+        if (currentPanelTween != null) currentPanelTween.Kill();
+        currentPanelTween = ChatPanel.DOAnchorPosX(Panel_CloseRect.anchoredPosition.x, OpenCloseDuration)
+            .SetEase(OpenCloseEase)
+            .OnComplete(() =>
+            {
+                chatRoomPanel.SetActive(false); // 이동 완료 후 가림
+            });
 
         alreadyOpenChatRoom = false;
         currentChat = null;
@@ -272,14 +273,13 @@ public class MessengerApp : MonoBehaviour
         chatRoomPanel.SetActive(true); // 이동 시작 전에 미리 켜서 코루틴(Scroll View 등)이 동작하도록 함
         ChatPanel.gameObject.SetActive(true);
 
-        Sequence seq = DOTween.Sequence();
-
-        seq.Append(ChatPanel.DOAnchorPosX(Panel_OpenRect.anchoredPosition.x, OpenCloseDuration).SetEase(OpenCloseEase));
-
-        seq.OnComplete(() =>
-        {
-            chatPartnerListPanel.SetActive(false); // 이동 완료 후 가림
-        });
+        if (currentPanelTween != null) currentPanelTween.Kill();
+        currentPanelTween = ChatPanel.DOAnchorPosX(Panel_OpenRect.anchoredPosition.x, OpenCloseDuration)
+            .SetEase(OpenCloseEase)
+            .OnComplete(() =>
+            {
+                chatPartnerListPanel.SetActive(false); // 이동 완료 후 가림
+            });
 
         alreadyOpenChatRoom = true;
         DisplayChatMessages();
