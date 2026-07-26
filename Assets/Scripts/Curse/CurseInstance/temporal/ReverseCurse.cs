@@ -11,6 +11,7 @@ public class ReverseCurse : CurseInstance
     public override void Activate()
     {
         CurseState.ReversePercent = Lv != null ? Lv.valueA : 0f;
+        CurseEffectManager.Instance?.SetReverseCurse(true);
     }
 
     public override void Deactivate()

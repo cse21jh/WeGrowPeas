@@ -10,7 +10,7 @@ public class BreedTimerManager : MonoBehaviour
     private void Awake()
     {
         grid = FindAnyObjectByType<Grid>();
-        if(grid == null)
+        if (grid == null)
         {
             Debug.LogError("Grid not found in the scene.");
             return;
@@ -35,61 +35,34 @@ public class BreedTimerManager : MonoBehaviour
             type = WaveType.Aging;
         }
 
-        foreach(GameObject timer in timers)
+        foreach (GameObject timer in timers)
         {
             timer.SetActive(false);
         }
 
+        int index = -1;
         switch (type)
         {
-            case WaveType.Aging:
-                timers[0].SetActive(true);
-                timerUIs[0].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[0]);
-                break;
-            case WaveType.Wind:
-                timers[1].SetActive(true);
-                timerUIs[1].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[1]);
-                break;
-            case WaveType.Flood:
-                timers[2].SetActive(true);
-                timerUIs[2].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[2]);
-                break;
-            case WaveType.Pest:
-                timers[3].SetActive(true);
-                timerUIs[3].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[3]);
-                break;
-            case WaveType.Cold:
-                timers[4].SetActive(true);
-                timerUIs[4].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[4]);
-                break;
-            case WaveType.HeavyRain:
-                timers[5].SetActive(true);
-                timerUIs[5].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[5]);
-                break;
-            case WaveType.Drought:
-                timers[6].SetActive(true);
-                timerUIs[6].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[6]);
-                break;
-            case WaveType.Heat:
-                timers[7].SetActive(true);
-                timerUIs[7].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[7]);
-                break;
-            case WaveType.None:
-                timers[8].SetActive(true);
-                timerUIs[8].UpdateMaxTimerCount();
-                grid.SetBreedTimerUI(timerUIs[8]);
-                break;
+            case WaveType.Aging: index = 0; break;
+            case WaveType.Wind: index = 1; break;
+            case WaveType.Flood: index = 2; break;
+            case WaveType.Pest: index = 3; break;
+            case WaveType.Cold: index = 4; break;
+            case WaveType.HeavyRain: index = 5; break;
+            case WaveType.Drought: index = 6; break;
+            case WaveType.Heat: index = 7; break;
+            case WaveType.None: index = 8; break;
             default:
                 Debug.LogWarning("Unhandled wave type: " + type);
                 break;
+        }
+
+        if (index != -1)
+        {
+            timers[index].SetActive(true);
+            if (grid != null && grid.GetIsBreeding()) timerUIs[index].StartBreedingTimer();
+            else timerUIs[index].UpdateMaxTimerCount();
+            grid.SetBreedTimerUI(timerUIs[index]);
         }
     }
 

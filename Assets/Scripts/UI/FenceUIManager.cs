@@ -151,6 +151,17 @@ public class FenceUIManager : MonoBehaviour
         {
             fenceElements[i].SetFaceAnim(pairDatas);
         }
+
+        RefreshCurseEffects();
+    }
+
+    public void RefreshCurseEffects()
+    {
+        if (showingPlantGridIndex != -1)
+        {
+            bool isFogged = CurseManager.Instance != null && CurseManager.Instance.IsFogged(showingPlantGridIndex);
+            SetFogEffect(isFogged);
+        }
     }
 
     public void HideFenceElements()
@@ -262,5 +273,13 @@ public class FenceUIManager : MonoBehaviour
         if(showingPlantGridIndex == gridNum) return true;
 
         return false;
+    }
+
+    public void SetFogEffect(bool on)
+    {
+        foreach (var element in fenceElements)
+        {
+            if (element != null) element.SetFogEffect(on);
+        }
     }
 }

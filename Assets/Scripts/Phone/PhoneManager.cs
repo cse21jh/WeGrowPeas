@@ -31,6 +31,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     [SerializeField] private GameObject mandatoryAlarm;
     [SerializeField] private GameObject nonMandatoryAlarm;
+    [SerializeField] private GameObject empEffect;
 
     // 저장 요소
 
@@ -617,6 +618,13 @@ public class PhoneManager : Singleton<PhoneManager>
         }
     }
 
+    public void SetEMPEffect(bool isOn)
+    {
+        if (empEffect != null)
+        {
+            empEffect.SetActive(isOn);
+        }
+    }
 }
 
 

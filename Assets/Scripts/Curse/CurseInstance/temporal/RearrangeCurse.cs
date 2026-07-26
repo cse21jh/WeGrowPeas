@@ -12,6 +12,7 @@ public class RearrangeCurse : CurseInstance
         float ratio = (Lv != null ? Lv.valueA : 0f) / 100f;
         if (ratio <= 0f) ratio = 1f; // 데이터 세팅 누락 시 전체(100%) 이동
         GameManager.Instance?.grid?.RearrangePlants(ratio);
+        CurseEffectManager.Instance?.PlayAppearParticle();
     }
 
     public override void Deactivate()

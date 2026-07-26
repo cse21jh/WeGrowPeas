@@ -294,7 +294,11 @@ public class CurseManager : Singleton<CurseManager>
     {
         if (temporalCursePool == null || temporalCursePool.Count == 0) return;
 
-        var data = temporalCursePool[UnityEngine.Random.Range(0, temporalCursePool.Count)];
+        int currentStage = GameManager.Instance != null ? GameManager.Instance.stage : 1;
+        var validCurses = temporalCursePool.Where(c => c != null && currentStage >= c.unlockStage).ToList();
+        if (validCurses.Count == 0) return;
+
+        var data = validCurses[UnityEngine.Random.Range(0, validCurses.Count)];
         int level = GetCurseLevel();
         currentTempCurse = CreateInstanceById(data, level);
         var lv = data.GetLevel(level);

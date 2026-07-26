@@ -21,6 +21,9 @@ public class CurseScriptable : ScriptableObject
 
     [TextArea] public string description;
 
+    [Tooltip("해금 스테이지 (이 스테이지 이상부터 등장)")]
+    public int unlockStage = 1;
+
     [Tooltip("1/2/3단계 수치. index 0 = 1단계. 새벽 저주 레벨로 선택됨.")]
     public List<CurseLevel> levels = new List<CurseLevel>();
 

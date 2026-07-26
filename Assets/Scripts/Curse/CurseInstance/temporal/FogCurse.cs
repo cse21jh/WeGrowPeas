@@ -12,10 +12,12 @@ public class FogCurse : CurseInstance
     {
         int count = Mathf.RoundToInt(Lv != null ? Lv.valueA : 0f);
         CurseManager.Instance?.SpawnFog(count);
+        CurseEffectManager.Instance?.SetFogCurse(true);
     }
 
     public override void Deactivate()
     {
         CurseManager.Instance?.ClearFog();
+        CurseEffectManager.Instance?.SetFogCurse(false);
     }
 }

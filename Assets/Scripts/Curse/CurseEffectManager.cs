@@ -34,12 +34,18 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
     [Tooltip("도둑이야!")]
     [SerializeField] private ThiefEffectController thief;
 
-    [Tooltip("기상 이변")]
+    [Tooltip("기상 이변 채도 변경")]
     [SerializeField] private Volume[] volumes;
     [SerializeField] private float targetValue = -75f; // 목표 채도 값
     [SerializeField] private float[] originalValues; // 원래 채도 값
     [SerializeField] private float duration = 1f; // 채도 변화 시간
     [SerializeField] private Ease ease = Ease.Linear; // 채도 변화 이징
+
+    [Header("대격변 연출")]
+    [Tooltip("대격변 등장 파티클 (CurseEffectManager 프리팹 내부)")]
+    [SerializeField] private ParticleSystem appearParticle;
+
+    private Coroutine doubleWaveCoroutine;
 
     private void Start()
     {
@@ -174,6 +180,98 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
 
         if (benign) pcm.SetMutantPlusEffect(true);
         else pcm.SetMutantMinusEffect(true);
+    }
+
+    /// <summary>안개 연출 (102)</summary>
+    public void SetFogCurse(bool on)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.grid != null)
+        {
+            GameManager.Instance.grid.RefreshCurseEffects();
+        }
+    }
+
+    /// <summary>버섯 연출</summary>
+    public void SetMushroomCurse(bool on)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.grid != null)
+        {
+            GameManager.Instance.grid.RefreshCurseEffects();
+        }
+    }
+
+    /// <summary>광란 연출 (일회성 재생)</summary>
+    public void PlayMadnessCurse()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.grid != null)
+        {
+            GameManager.Instance.grid.PlayAllPlantsMadness();
+        }
+    }
+
+    /// <summary>대격변 연출 (일회성 재생)</summary>
+    public void PlayAppearParticle()
+    {
+        if (appearParticle != null)
+        {
+            appearParticle.gameObject.SetActive(true);
+            appearParticle.Play(true);
+        }
+    }
+
+    /// <summary>통신장애 연출</summary>
+    public void SetEMPCurse(bool on)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.phoneManager != null)
+        {
+            GameManager.Instance.phoneManager.SetEMPEffect(on);
+        }
+    }
+
+    /// <summary>이중 웨이브 연출 (타임바 교차)</summary>
+    public void SetDoubleWaveCurse(bool on)
+    {
+        if (on)
+        {
+            if (doubleWaveCoroutine == null)
+            {
+                doubleWaveCoroutine = StartCoroutine(DoubleWaveTimerRoutine());
+            }
+        }
+        else
+        {
+            if (doubleWaveCoroutine != null)
+            {
+                StopCoroutine(doubleWaveCoroutine);
+                doubleWaveCoroutine = null;
+            }
+            if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
+            {
+                // Restore to original timer
+                GameManager.Instance.enemyController.SetCurrentWaveTimer();
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator DoubleWaveTimerRoutine()
+    {
+        bool showFirstWave = true;
+        while (true)
+        {
+            var breedTimerManager = FindAnyObjectByType<BreedTimerManager>();
+            if (GameManager.Instance != null && GameManager.Instance.enemyController != null && breedTimerManager != null)
+            {
+                Wave wave1 = GameManager.Instance.enemyController.GetNextWave();
+                Wave wave2 = GameManager.Instance.enemyController.GetNextSecondWave();
+                
+                if (wave1 != null && wave2 != null && wave2.WaveType != WaveType.None)
+                {
+                    breedTimerManager.SetTimer(showFirstWave ? wave1.WaveType : wave2.WaveType);
+                    showFirstWave = !showFirstWave;
+                }
+            }
+            yield return new WaitForSeconds(1.5f);
+        }
     }
 
     /// <summary>모든 필드 이펙트 정지 (새 게임/저주 해제 시).</summary>

@@ -48,8 +48,11 @@ public abstract class Plant : MonoBehaviour
     public bool isDying = false;
 
     // 세금 압류
-    [Header("압류")]
-    [SerializeField] private GameObject seizeSticker; // 압류 스티커(프리팹에서 연결). 없으면 시각효과만 생략
+    [Header("시각 효과")]
+    [SerializeField] private GameObject seizeSticker; // 세금 압류 스티커
+    [SerializeField] private ParticleSystem fogEffect; // 안개 연출 (102)
+    [SerializeField] private GameObject mushroomEffect; // 버섯 연출
+    [SerializeField] private ParticleSystem madnessEffect; // 광란 연출
     public bool IsSeized { get; private set; }
     public void SetSeized(bool on)
     {
@@ -57,11 +60,38 @@ public abstract class Plant : MonoBehaviour
         if (seizeSticker != null) seizeSticker.SetActive(on);
     }
 
+    public void SetFogEffect(bool on)
+    {
+        if (on) fogEffect?.Play(true);
+        else fogEffect?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
+
+    public void SetMushroomEffect(bool on)
+    {
+        if (mushroomEffect != null)
+        {
+            DOTween.Kill(mushroomEffect.transform);
+            if (on)
+            {
+                mushroomEffect.SetActive(true);
+                mushroomEffect.transform.DOScale(Vector3.one, 0.5f).From(Vector3.zero);
+            }
+            else
+            {
+                mushroomEffect.transform.DOScale(Vector3.zero, 0.5f).OnComplete(() => mushroomEffect.SetActive(false));
+            }
+        }
+    }
+
+    public void PlayMadnessEffect()
+    {
+        madnessEffect?.Play(true);
+    }
+
     // 급속 냉각기 관련
     protected bool isFrozen = false;
     protected int frozenPrice = 0;
 
-    //각종 효과 관련
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
     private SpriteRenderer[] childSpriteRenderers;
     private Material[] childMaterials;
@@ -205,6 +235,12 @@ public abstract class Plant : MonoBehaviour
         if (isOnGoldenSoil())
         {
             stemController.SetGold(true);
+        }
+
+        if (CurseManager.Instance != null)
+        {
+            SetFogEffect(CurseManager.Instance.IsFogged(idx));
+            SetMushroomEffect(CurseManager.Instance.IsMushroom(idx));
         }
     }
 

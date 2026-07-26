@@ -12,10 +12,12 @@ public class MushroomCurse : CurseInstance
     {
         int count = Mathf.RoundToInt(Lv != null ? Lv.valueA : 0f);
         CurseManager.Instance?.SpawnMushroom(count);
+        CurseEffectManager.Instance?.SetMushroomCurse(true);
     }
 
     public override void Deactivate()
     {
         CurseManager.Instance?.ClearMushroom();
+        CurseEffectManager.Instance?.SetMushroomCurse(false);
     }
 }

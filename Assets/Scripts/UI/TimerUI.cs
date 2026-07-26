@@ -125,7 +125,20 @@ public class TimerUI : MonoBehaviour
     private IEnumerator BreedingCountdown()
     {
         textTimer.color = Color.white;
-        breedTimerController.SetFillImmediately(1f);
+        
+        if (GameManager.Instance?.grid != null)
+        {
+            float currentTimer = GameManager.Instance.grid.GetBreedTimer();
+            float currentMaxTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+            if (currentMaxTimer > 0)
+                breedTimerController.SetFillImmediately(currentTimer / currentMaxTimer);
+            else
+                breedTimerController.SetFillImmediately(1f);
+        }
+        else
+        {
+            breedTimerController.SetFillImmediately(1f);
+        }
 
         while (true)
         {

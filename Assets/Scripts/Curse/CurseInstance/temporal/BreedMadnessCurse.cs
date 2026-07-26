@@ -11,6 +11,7 @@ public class BreedMadnessCurse : CurseInstance
     public override void Activate()
     {
         CurseState.BreedMadnessPercent = Lv != null ? Lv.valueA : 0f;
+        CurseEffectManager.Instance?.PlayMadnessCurse();
     }
 
     public override void Deactivate()

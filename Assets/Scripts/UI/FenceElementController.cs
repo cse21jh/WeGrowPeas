@@ -24,6 +24,10 @@ public class FenceElementController : MonoBehaviour
     [SerializeField] private string[] peanutNames;
 
     [Space(10)]
+    [Header("시각 효과")]
+    [SerializeField] private ParticleSystem fogEffect;
+
+    [Space(10)]
     [Header("UI 요소들")]
     [SerializeField] private TextMeshProUGUI elementName;
     [SerializeField] private TextMeshProUGUI surviveProbability;
@@ -378,5 +382,9 @@ public class FenceElementController : MonoBehaviour
         //star.gameObject.SetActive(isTaste);
     }
 
-
+    public void SetFogEffect(bool on)
+    {
+        if (on) fogEffect?.Play(true);
+        else fogEffect?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
 }

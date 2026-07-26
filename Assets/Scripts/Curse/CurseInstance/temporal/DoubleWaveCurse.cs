@@ -12,10 +12,13 @@ public class DoubleWaveCurse : CurseInstance
     public override void Activate()
     {
         CurseState.DoubleWave = true;
+        GameManager.Instance?.enemyController?.UpdateSecondWaveIfNull();
+        CurseEffectManager.Instance?.SetDoubleWaveCurse(true);
     }
 
     public override void Deactivate()
     {
         CurseState.DoubleWave = false;
+        CurseEffectManager.Instance?.SetDoubleWaveCurse(false);
     }
 }

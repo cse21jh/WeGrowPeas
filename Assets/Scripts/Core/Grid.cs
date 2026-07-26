@@ -2995,6 +2995,33 @@ public class Grid : MonoBehaviour
         }
         return;
     }
+
+    public void RefreshCurseEffects()
+    {
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant != null)
+            {
+                bool isFogged = CurseManager.Instance != null && CurseManager.Instance.IsFogged(plant.gridIndex);
+                bool isMushroom = CurseManager.Instance != null && CurseManager.Instance.IsMushroom(plant.gridIndex);
+                plant.SetFogEffect(isFogged);
+                plant.SetMushroomEffect(isMushroom);
+            }
+        }
+        
+        if (FenceUIManager.Instance != null)
+        {
+            FenceUIManager.Instance.RefreshCurseEffects();
+        }
+    }
+
+    public void PlayAllPlantsMadness()
+    {
+        foreach (var plant in plantGrid.Values)
+        {
+            if (plant != null) plant.PlayMadnessEffect();
+        }
+    }
 }
 
 

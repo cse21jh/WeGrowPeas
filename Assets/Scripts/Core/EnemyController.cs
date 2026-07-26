@@ -73,6 +73,7 @@ public class EnemyController : MonoBehaviour
     private Wave lastWave;
     private Wave currentWave = new AgingWave();
     private Wave nextWave;
+    private Wave nextSecondWave;
     private int waveSkipCount = 0;
     private int[] waveKillCount;
 
@@ -83,6 +84,9 @@ public class EnemyController : MonoBehaviour
     public Season CurrentSeason => currentSeason;
     public Wave CurrentWave => currentWave;
     public Wave NextWave => nextWave;
+    
+    public Wave GetNextWave() => nextWave;
+    public Wave GetNextSecondWave() => nextSecondWave;
     public Wave LastWave => lastWave;
     public int WaveSkipCount => waveSkipCount;
     public int[] WaveKillCount => waveKillCount;
@@ -112,6 +116,11 @@ public class EnemyController : MonoBehaviour
         lastWave = GetWaveFromWaveType(WaveType.Aging);
         currentWave = lastWave;
         nextWave = GetWaveFromWaveType(PickNextByWeight());
+        
+        if (CurseState.DoubleWave)
+            nextSecondWave = PickSecondWave(nextWave.WaveType);
+        else
+            nextSecondWave = null;
 
         weatherApp.InitApp(1, currentWave, nextWave, grid.CountNoTraitPlant(currentWave.WaveType));
 
@@ -186,7 +195,7 @@ public class EnemyController : MonoBehaviour
         // 저주(이중 웨이브): 서로 다른 두 번째 웨이브도 동시 판정. 저항 감소 중복 방지 위해 '죽이는 판정'만.
         if (CurseState.DoubleWave && currentWave != noneWave)
         {
-            Wave second = PickSecondWave(currentWave.WaveType);
+            Wave second = nextSecondWave ?? PickSecondWave(currentWave.WaveType);
             if (second != null && second != noneWave)
             {
                 for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
@@ -254,6 +263,19 @@ public class EnemyController : MonoBehaviour
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         WaveType picked = PickNextByWeight();
         nextWave = GetWaveFromWaveType(picked);
+        
+        if (CurseState.DoubleWave)
+            nextSecondWave = PickSecondWave(nextWave.WaveType);
+        else
+            nextSecondWave = null;
+    }
+
+    public void UpdateSecondWaveIfNull()
+    {
+        if (CurseState.DoubleWave && nextSecondWave == null && nextWave != null)
+        {
+            nextSecondWave = PickSecondWave(nextWave.WaveType);
+        }
     }
 
     /// <summary>
