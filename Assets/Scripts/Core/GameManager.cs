@@ -434,6 +434,7 @@ public class GameManager : Singleton<GameManager>
         
         yield return StartCoroutine(shopManager.ShopPhase(grid));
         */
+        GameEvents.RaiseQuestDayPassed();
         economyManager.PushEarnedGold();
     }
 
@@ -629,6 +630,11 @@ public class GameManager : Singleton<GameManager>
      
     private IEnumerator ClearNormalMode()
     {
+        if (TaxManager.Instance != null && TaxManager.Instance.DueTaxStage == 40)
+        {
+            TaxManager.Instance.MarkPaidForcibly();
+        }
+
         PassRecordToGameRecordHolder();
 
         DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)

@@ -130,7 +130,7 @@ public class WaveManager : MonoBehaviour
     private IEnumerator WaveEffect(WaveType type)
     {
         float t;
-        if (waveEffectSkipButton != null) waveEffectSkipButton.SetActive(true);
+        waveEffectSkipButton.SetActive(true);
         switch (type)
         {
             case WaveType.Aging:
@@ -190,8 +190,8 @@ public class WaveManager : MonoBehaviour
                 {
                     plant.PlayFoamEffect();
                 }
-                DOTween.To(()=> floodEffect.transform.position.x, x => floodEffect.transform.position = new Vector3(x, floodEffect.transform.position.y, floodEffect.transform.position.z), floodEndPosX, waveDuration).SetEase(floodEase);
-                
+                DOTween.To(() => floodEffect.transform.position.x, x => floodEffect.transform.position = new Vector3(x, floodEffect.transform.position.y, floodEffect.transform.position.z), floodEndPosX, waveDuration).SetEase(floodEase);
+
                 t = 0f;
                 while (t < waveDuration)
                 {
@@ -323,7 +323,7 @@ public class WaveManager : MonoBehaviour
 
                 droughtEffect.SetActive(false);
 
-                break;                
+                break;
             case WaveType.Heat:
 
                 heatEffect.SetActive(true);
@@ -391,6 +391,6 @@ public class WaveManager : MonoBehaviour
 
     public void SkipWaveEffect()
     {
-        waveDuration = 0f;        
+        waveDuration = 0f;
     }
 }

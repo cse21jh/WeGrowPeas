@@ -59,13 +59,18 @@ public static class TaxSchedule
         return (stage / _interval + 1) * _interval;
     }
 
-    /// <summary>해당 세금일(interval 배수)의 세금액. 표를 넘으면 지수적으로 확장.</summary>
     public static int GetTaxAmount(int taxStage)
     {
         EnsureLoaded();
         if (_interval <= 0 || taxStage < _interval) return 0;
 
-        int idx = taxStage / _interval - 1; // 5→0, 10→1 …
+        int effectiveTaxStage = taxStage;
+        if (taxStage > 40)
+        {
+            effectiveTaxStage -= _interval; // 40 스테이지 건너뜀으로 인한 인덱스 조정
+        }
+
+        int idx = effectiveTaxStage / _interval - 1; // 5→0, 10→1 …
         if (idx < 0) return 0;
 
         int baseAmount;

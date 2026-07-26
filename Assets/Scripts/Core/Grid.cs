@@ -279,14 +279,21 @@ public class Grid : MonoBehaviour
 
     public void InitGrid()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 10; i++)
         {
             GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
             Plant plant = obj.GetComponent<Plant>();
             List<GeneticTrait> basicTrait = new List<GeneticTrait>
-        {
-            new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f),
-        };
+            {
+                new GeneticTrait(TraitType.NaturalDeath, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Pest, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Wind, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Flood, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.HeavyRain, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Cold, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Drought, 1f, 2, 0.0f),
+                new GeneticTrait(TraitType.Heat, 1f, 2, 0.0f)
+            };
             //FenceUIManager.Instance.SetFenceElements(0, plant);
             plant.SetTrait(basicTrait);
             AddPlantToGrid(plant);
@@ -432,8 +439,8 @@ public class Grid : MonoBehaviour
         // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
         float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
         float effectiveBugSpawnTimeInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
-        // 저주: 불면증 — 자유시간(교배 페이즈) 단축
-        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1) * CurseState.InsomniaFreeTimeRatio;
+        // 저주: 불면증 — 밤시간(폰 페이즈) 단축으로 변경되어 교배시간 영향 제거
+        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
         //임시 알람
         bool _warned15s = false;
@@ -1307,27 +1314,45 @@ public class Grid : MonoBehaviour
         var idxs = new List<int>();
         foreach (var kv in plantGrid)
             if (kv.Value != null && kv.Value.IsMovable && !HasPetBottle(kv.Key)) idxs.Add(kv.Key);
-        if (idxs.Count < 2) return;
+        if (idxs.Count < 1) return;
 
         int affected = Mathf.FloorToInt(idxs.Count * ratio);
-        if (affected < 2) affected = 2; // 최소 2개는 섞어야 의미
+        if (affected < 1) affected = 1;
         affected = Mathf.Min(affected, idxs.Count);
 
         ShuffleList(idxs);
-        var slots = idxs.GetRange(0, affected);
-        var plants = new List<Plant>();
-        foreach (var idx in slots) plants.Add(plantGrid[idx]);
-        ShuffleList(plants);
+        var selectedPlantsIdx = idxs.GetRange(0, affected);
+        var plantsToMove = new List<Plant>();
+        foreach (var idx in selectedPlantsIdx) plantsToMove.Add(plantGrid[idx]);
 
-        for (int i = 0; i < slots.Count; i++)
+        // Remove from grid temporarily to free up space
+        foreach (var idx in selectedPlantsIdx)
         {
-            int idx = slots[i];
-            Plant p = plants[i];
-            plantGrid[idx] = p;
-            p.SetGridIndex(idx);
-            p.transform.position = GetSoilTransform(idx).position;
+            plantGrid.Remove(idx);
         }
-        OnGridStateChanged?.Invoke(); // TODO: 연기 이펙트
+
+        // Find all empty spaces including the ones we just vacated
+        var emptySpaces = new List<int>();
+        for (int i = 0; i < maxCol * 4; i++)
+        {
+            if (!plantGrid.TryGetValue(i, out Plant p) || p == null)
+            {
+                emptySpaces.Add(i);
+            }
+        }
+
+        ShuffleList(emptySpaces);
+
+        // Place them in new random empty spaces
+        for (int i = 0; i < plantsToMove.Count; i++)
+        {
+            int newIdx = emptySpaces[i];
+            Plant p = plantsToMove[i];
+            plantGrid[newIdx] = p;
+            p.SetGridIndex(newIdx);
+            p.transform.position = GetSoilTransform(newIdx).position;
+        }
+        OnGridStateChanged?.Invoke(); 
     }
 
     private static void ShuffleList<T>(List<T> list)

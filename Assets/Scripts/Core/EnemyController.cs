@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 public enum Season
-{    
+{
     Summer,
     Fall,
     Winter,
@@ -125,7 +125,7 @@ public class EnemyController : MonoBehaviour
         Wave wave = currentWave;
         // Debug.Log("현재 웨이브 타입 : " + currentWave);
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
-        SoundManager.Instance.PlayEffect(wave.WaveSoundString);        
+        SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
         if (waveManager != null)
         {
@@ -140,7 +140,7 @@ public class EnemyController : MonoBehaviour
             yield return null;
             if (Input.GetKeyDown(KeyCode.S))
             {
-                SkipWaveEffect();                
+                SkipWaveEffect();
             }
         }
 
@@ -211,15 +211,15 @@ public class EnemyController : MonoBehaviour
         grid.UnfreezeAllPlants();
 
 
-        SetNextSeason(); 
+        SetNextSeason();
         SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
 
         grid.UpdateGoldScouterImageInGrid(); // 웨이브로 인해 단체로 죽을 때는 한 번만 갱신해서 연산량 줄이기
         grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
 
         int stage = GameManager.Instance.stage;
-        if(weatherApp != null)
-            weatherApp.LoadNextDay(stage, lastWave, currentWave,nextWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
+        if (weatherApp != null)
+            weatherApp.LoadNextDay(stage, lastWave, currentWave, nextWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
         //FlushNextWaveText();
         yield return null;
     }
@@ -339,17 +339,17 @@ public class EnemyController : MonoBehaviour
 
     public void WaveSkip()
     {
-        if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave!=noneWave)
+        if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave != noneWave)
         {
             currentWave = noneWave;
             waveSkipCount--;
-            SetWaveSkipCountText();            
+            SetWaveSkipCountText();
             ShowNextWaveText();
             if (weatherApp != null)
                 weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, 0);
         }
 
-        if(waveSkipCount <= 0)
+        if (waveSkipCount <= 0)
             HideWaveSkipButton();
         return;
     }
@@ -375,7 +375,7 @@ public class EnemyController : MonoBehaviour
 
     public string GetNextWaveText()
     {
-        return nextWaveText.text;   
+        return nextWaveText.text;
     }
 
     private void FlushNextWaveText()
@@ -396,7 +396,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = "추가 스킵 "+ waveSkipCount.ToString() + "회";
+        waveSkipCountText.text = "추가 스킵 " + waveSkipCount.ToString() + "회";
         return;
     }
 
@@ -405,7 +405,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipButton == null)
             return;
 
-        if(waveSkipCount > 0) 
+        if (waveSkipCount > 0)
             waveSkipButton.SetActive(true);
         return;
     }
@@ -446,14 +446,14 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(saveData.nextWaveType);
 
         waveSkipCount = saveData.remainWaveSkipCount;
-        for(int i =0;i< Wave.NumberOfWave; i++)
+        for (int i = 0; i < Wave.NumberOfWave; i++)
             waveKillCount[i] = saveData.waveKillCount[i];
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         ShowNextWaveText();
         breedTimerManager.SetTimer(currentWave.WaveType);
 
         SetSeason(saveData.currentSeason);
-        
+
         stageWaveRecord = saveData.stageWaveRecord;
         stageKillRecord = saveData.stageKillRecord;
         stageNoTraitRecord = saveData.stageNoTraitRecord;
@@ -483,7 +483,7 @@ public class EnemyController : MonoBehaviour
         if (GameManager.Instance == null)
             nextSeason = Season.Summer;
         else
-        { 
+        {
             nextSeason = GetSeasonByStage(GameManager.Instance.stage + 2); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
         }
         // 계절 제약은 WaveSchedule(단일 기준)에서 가져온다. 해당 계절에 허용되지 않는 웨이브는 0으로 제외.

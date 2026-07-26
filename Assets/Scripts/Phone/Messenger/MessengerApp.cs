@@ -889,7 +889,6 @@ public class MessengerApp : MonoBehaviour
                 }
             }
         }
-        if (positionInArrivedList == -1) return false;
 
         // 3. 아직 프로필 기준으로도 안 본 메시지들 중에 필수 메시지가 있는지 확인
         return arrivedMessages

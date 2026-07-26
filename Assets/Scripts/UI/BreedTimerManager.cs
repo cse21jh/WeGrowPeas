@@ -30,6 +30,11 @@ public class BreedTimerManager : MonoBehaviour
 
     public void SetTimer(WaveType type)
     {
+        if (CurseState.WaveBlind)
+        {
+            type = WaveType.Aging;
+        }
+
         foreach(GameObject timer in timers)
         {
             timer.SetActive(false);
@@ -76,6 +81,11 @@ public class BreedTimerManager : MonoBehaviour
                 timers[7].SetActive(true);
                 timerUIs[7].UpdateMaxTimerCount();
                 grid.SetBreedTimerUI(timerUIs[7]);
+                break;
+            case WaveType.None:
+                timers[8].SetActive(true);
+                timerUIs[8].UpdateMaxTimerCount();
+                grid.SetBreedTimerUI(timerUIs[8]);
                 break;
             default:
                 Debug.LogWarning("Unhandled wave type: " + type);

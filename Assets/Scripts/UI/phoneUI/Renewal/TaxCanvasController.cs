@@ -55,6 +55,8 @@ public class TaxCanvasController : MonoBehaviour
         int due = tax.DueAmount;
         int gold = tax.CurrentGold;
 
+        bool isStage40 = tax.DueTaxStage == 40;
+
         // ── 마감 기한 ──
         if (deadlineText != null) deadlineText.text = $"{tax.DueTaxStage}일차 밤";
         if (leftDayText != null)
@@ -66,21 +68,46 @@ public class TaxCanvasController : MonoBehaviour
         }
 
         // ── 납부할 금액 / 진행도 ──
-        if (amountText != null) amountText.text = $"{due} G";
+        if (amountText != null) amountText.text = isStage40 ? "세금 X" : $"{due} G";
 
         float progress = tax.PayProgress;
         if (amountSlider != null) amountSlider.value = progress; // 0~1 (Slider Min0/Max1 기준)
-        if (amountPercentageText != null) amountPercentageText.text = $"{Mathf.RoundToInt(progress * 100f)}%";
+        if (amountPercentageText != null) amountPercentageText.text = isStage40 ? "0%" : $"{Mathf.RoundToInt(progress * 100f)}%";
         if (currentPayText != null) currentPayText.text = $"{gold:N0} G";
 
         // ── 다음 납부 예상액 + 표정 ──
-        if (nextAmountText != null) nextAmountText.text = $"{tax.NextAmount} G";
+        if (nextAmountText != null) 
+        {
+            if (tax.DueTaxStage == 35)
+                nextAmountText.text = "세금 X";
+            else
+                nextAmountText.text = $"{tax.NextAmount} G";
+        }
         UpdateGradeIcon(progress);
 
         // ── 납부 버튼 ──
-        bool canPay = tax.CanPayNow();
-        if (payBtn_Payable != null) payBtn_Payable.SetActive(canPay);
-        if (payBtn_NotPayable != null) payBtn_NotPayable.SetActive(!canPay);
+        if (isStage40)
+        {
+            if (payBtn_Payable != null) payBtn_Payable.SetActive(false);
+            if (payBtn_NotPayable != null)
+            {
+                payBtn_NotPayable.SetActive(true);
+                var cg = payBtn_NotPayable.GetComponent<CanvasGroup>();
+                if (cg == null) cg = payBtn_NotPayable.AddComponent<CanvasGroup>();
+                cg.alpha = 0.5f;
+            }
+        }
+        else
+        {
+            bool canPay = tax.CanPayNow();
+            if (payBtn_Payable != null) payBtn_Payable.SetActive(canPay);
+            if (payBtn_NotPayable != null)
+            {
+                payBtn_NotPayable.SetActive(!canPay);
+                var cg = payBtn_NotPayable.GetComponent<CanvasGroup>();
+                if (cg != null) cg.alpha = 1f;
+            }
+        }
 
         if (currentGoldTexts != null)
             foreach (var t in currentGoldTexts)
@@ -100,11 +127,10 @@ public class TaxCanvasController : MonoBehaviour
         }
     }
 
-    /// <summary>납부 버튼(PayBtn_Payable) onClick에 연결.</summary>
     public void OnClickPay()
     {
         var tax = TaxManager.Instance;
-        if (tax == null) return;
+        if (tax == null || tax.DueTaxStage == 40) return;
 
         PhoneManager.Instance?.PhoneTouchEffect();
 

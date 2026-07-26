@@ -27,6 +27,9 @@ public static class GameEvents
     public static event Action OnDayPassedForRequest; //NoSellPea & remaining day check
     public static void RaiseDayPassedForRequest() => OnDayPassedForRequest?.Invoke();
 
+    public static event Action OnQuestDayPassed;
+    public static void RaiseQuestDayPassed() => OnQuestDayPassed?.Invoke();
+
     public static event Action<Plant> OnPeaSold;
     public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
 
@@ -60,6 +63,7 @@ public static class GameEvents
         OnPeaDied = null;
         OnShopBought = null;
         OnDayPassedForRequest = null;
+        OnQuestDayPassed = null;
         OnPeaSold = null;
         OnPlantMoved = null;
         OnDayEndedWithRemainingBreeds = null;

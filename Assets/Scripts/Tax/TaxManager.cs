@@ -37,7 +37,10 @@ public class TaxManager : Singleton<TaxManager>
     public bool IsDueNow(int currentStage) => currentStage >= DueTaxStage;
 
     /// <summary>세금 마감(밤)이 지났는데 미납 상태인가 → 낮에 강제징수 대상.</summary>
-    public bool HasOverdueTax(int currentStage) => currentStage > DueTaxStage;
+    public bool HasOverdueTax(int currentStage)
+    {
+        return currentStage > DueTaxStage;
+    }
 
     /// <summary>연체된 세금액(강제징수 금액).</summary>
     public int OverdueAmount => DueAmount;
@@ -71,6 +74,8 @@ public class TaxManager : Singleton<TaxManager>
     /// <summary>이번 세금 납부 시도. 성공 시 골드 차감 + 납부 처리.</summary>
     public bool TryPay()
     {
+        if (DueTaxStage == 40) return false;
+
         int taxStage = DueTaxStage;
         int amount = TaxSchedule.GetTaxAmount(taxStage);
 

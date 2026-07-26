@@ -77,7 +77,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     //폰 페이즈 관련
     private float phoneTimer = 0;
-    public bool IsPhonePhase => phoneTimer > 0;
+    public bool IsPhonePhase => isPhoneTime;
     private bool skipPhoneTime = false;
     private bool isPhoneTime = false;
 
@@ -265,6 +265,8 @@ public class PhoneManager : Singleton<PhoneManager>
     private bool IsTaxUnpaidNight()
     {
         int stage = GameManager.Instance.stage;
+        if (stage == 40) return false; // 40스테이지 밤은 세금을 내지 않으므로 알람 표시 안 함
+
         return TaxSchedule.IsTaxStage(stage)
             && TaxManager.Instance != null
             && !TaxManager.Instance.IsPaidForStage(stage);
@@ -272,14 +274,15 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public IEnumerator PhonePhase()
     {
+        isPhoneTime = true;
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
-        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString()); // 숫자 트리거(플레이버 메시지)
-        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 날씨 웨이브 경고(명명 트리거)
-        FireBugTriggers(GameManager.Instance.stage);                          // 벌레 등장/종류 경고(명명 트리거)
+        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString()); // 챗 트리거(플라이바이 메시지)
+        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 앱 해금 처리(폰 트리거)
+        FireBugTriggers(GameManager.Instance.stage);                          // 첫 해충/익충(폰 트리거)
 
         skipPhoneTimeButton.SetActive(true);
-        phoneTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+        phoneTimer = GetMaxPhoneTimer();
         phoneTimerUI.StartPhoneTimer();
 
         // 세금 미납 경고: 국세청(Tax) 앱 아이콘에 빨간 red dot(Mandatory)을 띄우되,
@@ -290,7 +293,6 @@ public class PhoneManager : Singleton<PhoneManager>
 
         bool _warned15s = false;
         //int rerollCount = 0;
-        isPhoneTime = true;
         while (!skipPhoneTime && (phoneTimer > 0))
         {
             if (GameManager.Instance.GetGameIsStopped())
@@ -348,9 +350,10 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public float GetMaxPhoneTimer()
     {
+        float ratio = IsPhonePhase ? CurseState.InsomniaFreeTimeRatio : 1f;
         if (GameManager.Instance != null)
-            return GameManager.Instance.grid.GetMaxBreedTimer();
-        return 30f;
+            return GameManager.Instance.grid.GetMaxBreedTimer() * ratio;
+        return 30f * ratio;
     }
 
     public void SkipPhoneTime()
@@ -584,14 +587,13 @@ public class PhoneManager : Singleton<PhoneManager>
     }
     public void TutorialPhonePhase()
     {
+        isPhoneTime = true;
         ClickRouter.Instance.IsBlockedByUI = true;
         SetPhoneTimer();
 
         skipPhoneTimeButton.SetActive(true);
         phoneTimer = GetMaxPhoneTimer();
         phoneTimerUI.StartPhoneTimer();
-
-        isPhoneTime = true;
     }
 
     public bool GetIsPhoneTime()

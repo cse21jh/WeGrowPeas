@@ -9,7 +9,7 @@ public class RequestInstanceSaveData
 {
     public string requestId;
     public string typeCode;
-    public int progressCount; // 진행도 저장
+    public int progressCount; // 진행???�??
     public int state;
     public List<string> extraStrings; //buymerch
     public int extraInt; //sellspecificpea & peasurvive
@@ -45,12 +45,12 @@ public class RequestManager : Singleton<RequestManager>
 
     private void OnEnable()
     {
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
+        GameEvents.OnQuestDayPassed += HandleDayPassed;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
+        GameEvents.OnQuestDayPassed -= HandleDayPassed;
         ClearActive();
     }
 
@@ -81,7 +81,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         ClearRequestAlarm();
 
-        // requestId 중복 방지 및 특정 퀘스트 필터링
+        // requestId 중복 방�? �??�정 ?�스???�터�?
         var valid = requestPool.Where(p => p != null && !(p.requestId.StartsWith("002") && GameManager.Instance.stage < 11)).ToList();
 
         if (valid.Count == 0) return;
@@ -232,8 +232,8 @@ public class RequestManager : Singleton<RequestManager>
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "새 퀘스트 도착!",
-                        message = "퀘스트 앱에서 확인해 주세요.",
+                        title = "???�스???�착!",
+                        message = "?�스???�에???�인??주세??",
                         duration = 5f
                     }
                 );
@@ -262,7 +262,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "금주의 퀘스트 - " + (cycle - dayPassed) + "일 남음";
+        appTitle.text = "금주???�스??- " + (cycle - dayPassed) + "???�음";
     }
 
     public void AddCompleteRequestCount()

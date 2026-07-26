@@ -18,14 +18,14 @@ public class LegacyPeaSurviveRequest : RequestInstance
         date = 5;
 
         GameEvents.OnPeaDied += HandlePeaDied;
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
+        GameEvents.OnQuestDayPassed += HandleDayPassed;
         RaiseChanged();
     }
 
     public override void Stop()
     {
         GameEvents.OnPeaDied -= HandlePeaDied;
-        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
+        GameEvents.OnQuestDayPassed -= HandleDayPassed;
     }
 
     public override string GetProgressText()

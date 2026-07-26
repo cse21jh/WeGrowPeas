@@ -76,7 +76,7 @@ public abstract class Plant : MonoBehaviour
 
     [SerializeField] protected PriceTagController priceSign;
     [SerializeField] protected StemController stemController;
-    
+
     [SerializeField] protected Canvas holdCanvas;
 
     [SerializeField] protected GameObject foamEffect;
@@ -119,7 +119,7 @@ public abstract class Plant : MonoBehaviour
     public virtual void SetTrait(List<GeneticTrait> newTraits)
     {
         traits = newTraits;
-        
+
         EnsurePairedTraitExists(TraitType.HeavyRain, TraitType.Drought);
         EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
     }
@@ -140,7 +140,7 @@ public abstract class Plant : MonoBehaviour
         bool hasTraitA = traits.Any(t => t.traitType == traitA);
         bool hasTraitB = traits.Any(t => t.traitType == traitB);
 
-        
+
         // 둘 다 있거나 둘 다 없으면 스탑
         if (hasTraitA && hasTraitB || !hasTraitA && !hasTraitB)
         {
@@ -202,7 +202,7 @@ public abstract class Plant : MonoBehaviour
     public void SetGridIndex(int idx)
     {
         gridIndex = idx;
-        if(isOnGoldenSoil())
+        if (isOnGoldenSoil())
         {
             stemController.SetGold(true);
         }
@@ -263,7 +263,7 @@ public abstract class Plant : MonoBehaviour
                     resistance += grid.ladybugs.Count * grid.AdditionalLadybugResistancePerUnit;
                 }
                 // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
-                float dawnBase = Mathf.Max(0f, g.resistance - DawnSystem.Current.resistanceCapReductionPercent / 100f);
+                float dawnBase = Mathf.Max(0f, g.resistance);
                 resistance += dawnBase + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
                 // 저주: 반란 — 우성(genetics 0·1) 저항 +%p / 열성(genetics 2) -%p
                 if (CurseState.ReversePercent > 0f)
@@ -297,13 +297,13 @@ public abstract class Plant : MonoBehaviour
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
         grid.CheckBreedButtonBeforeDie(this.gameObject);
-        if(cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
+        if (cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
             grid.UpdateGoldScouterImageInGrid();
-        if(this is ChiliPepper)
+        if (this is ChiliPepper)
             grid.UpdateResistanceScouterImageInGrid(GameManager.Instance.enemyController.CurrentWave.WaveType);
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
-        if(GameManager.Instance != null)
+        if (GameManager.Instance != null)
             GameManager.Instance.economyManager.AddGold((int)(GetSellingPrice() * grid.GetBonusRatioWhenDie()));
         Destroy(this.gameObject, dissolveDuration);
         return true;
@@ -413,7 +413,7 @@ public abstract class Plant : MonoBehaviour
 
                 if (stemController != null)
                 {
-                    if(stemController.CheckGold(traits))
+                    if (stemController.CheckGold(traits))
                         stemController.SetGold(true);
                 }
 
@@ -431,7 +431,7 @@ public abstract class Plant : MonoBehaviour
     {
         for (int i = 0; i < traits.Count; i++)
         {
-            ChangeResistance((int)traits[i].traitType,bonus);
+            ChangeResistance((int)traits[i].traitType, bonus);
         }
     }
 
@@ -475,7 +475,7 @@ public abstract class Plant : MonoBehaviour
         switch (GameManager.Instance.currentPlant)
         {
             case "완두콩":
-                if ((int)traitType >= (int)TraitType.HeavyRain) 
+                if ((int)traitType >= (int)TraitType.HeavyRain)
                 {
                     switch (genetics)
                     {
@@ -516,7 +516,7 @@ public abstract class Plant : MonoBehaviour
                 break;
         }
 
-        if(minResistance > maxResistance)
+        if (minResistance > maxResistance)
             minResistance = maxResistance;
 
         // 변종 판정은 식물 단위로 이동(Grid.Breed / Peanut 자가번식) — 여기서는 일반 롤만
@@ -537,7 +537,7 @@ public abstract class Plant : MonoBehaviour
             resistance += GameManager.Instance.grid.GetWeakGenericsResistanceBonus();
         }
 
-        
+
 
 
         // 특수(이중 시도): 최초 저항력이 결정된 직후 35% 감소 (대신 생존 시도 2회)
@@ -745,7 +745,7 @@ public abstract class Plant : MonoBehaviour
                     if (stemController.CheckGold(traits))
                         stemController.SetGold(true);
                 }
-                if(this is MovablePlant p && traitNum == (int)GameManager.Instance.enemyController.CurrentWave.WaveType) // 바뀐 저항력이 현 웨이브랑 동일한 저항력이면 스카우터 체크 
+                if (this is MovablePlant p && traitNum == (int)GameManager.Instance.enemyController.CurrentWave.WaveType) // 바뀐 저항력이 현 웨이브랑 동일한 저항력이면 스카우터 체크 
                 {
                     p.CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
                 }
@@ -773,8 +773,8 @@ public abstract class Plant : MonoBehaviour
         foreach (var trait in traits)
         {
             // 자연사, 해충, 바람, 홍수 중 우성(genetics <= 1)인 경우
-            if (trait.genetics <= 1 && 
-               (trait.traitType == TraitType.NaturalDeath || 
+            if (trait.genetics <= 1 &&
+               (trait.traitType == TraitType.NaturalDeath ||
                 trait.traitType == TraitType.Pest ||
                 trait.traitType == TraitType.Wind ||
                 trait.traitType == TraitType.Flood))
@@ -866,7 +866,7 @@ public abstract class Plant : MonoBehaviour
 
     public bool HasTrait(WaveType wave)
     {
-        for(int i = 0; i < traits.Count; i++)
+        for (int i = 0; i < traits.Count; i++)
         {
             if ((int)traits[i].traitType == (int)wave)
                 return true;

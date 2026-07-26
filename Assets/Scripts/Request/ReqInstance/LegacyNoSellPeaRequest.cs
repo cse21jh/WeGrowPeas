@@ -17,14 +17,14 @@ public class LegacyNoSellPeaRequest : RequestInstance
         currentCount = 0;
         isPeaSoldToday = false;
 
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
+        GameEvents.OnQuestDayPassed += HandleDayPassed;
         GameEvents.OnPeaSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
+        GameEvents.OnQuestDayPassed -= HandleDayPassed;
         GameEvents.OnPeaSold -= HandlePeaSold;
     }
 

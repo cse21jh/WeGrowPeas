@@ -206,22 +206,28 @@ public sealed class ExpandableQuestTab : MonoBehaviour
         }
     }
 
+    private static float lastUncompletedNotificationTime = -1f;
+
     public void OnClickReceiveReward()
     {
         if (RI == null) return;
 
         if (!RI.CanAcceptReward)
         {
-            SoundManager.Instance.PlayEffect("WrongSelect");
-            // Show floating text
-            PhoneNotificationBus.OnShow?.Invoke(
-                new PhoneNotificationData
-                {
-                    title = "알림",
-                    message = "아직 퀘스트가 완료되지 않았습니다.",
-                    duration = 2f
-                }
-            );
+            if (Time.unscaledTime - lastUncompletedNotificationTime > 0.5f)
+            {
+                lastUncompletedNotificationTime = Time.unscaledTime;
+                SoundManager.Instance.PlayEffect("WrongSelect");
+                // Show floating text
+                PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = "알림",
+                        message = "아직 퀘스트가 완료되지 않았습니다.",
+                        duration = 2f
+                    }
+                );
+            }
             return;
         }
 

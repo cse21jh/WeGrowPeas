@@ -81,12 +81,13 @@ public static class DawnSystem
     /// <summary>현재 식물로 새벽 모드가 해금됐는가(1단계 이상 열림).</summary>
     public static bool IsDawnUnlocked => MaxUnlockedDawnStage >= 1;
 
-    public static bool IsStageUnlocked(int stage) => stage >= 0 && stage <= MaxUnlockedDawnStage;
+    public static bool IsStageUnlocked(int stage) => stage >= 0 && stage <= MaxUnlockedDawnStage && stage <= StageCount;
 
     public static void UnlockUpTo(int stage) => UnlockUpTo(stage, CurrentPlant);
 
     public static void UnlockUpTo(int stage, string plant)
     {
+        stage = Mathf.Min(stage, 12);
         if (stage > GetMaxUnlockedStage(plant)) SetMaxUnlockedStage(plant, stage);
     }
 

@@ -19,7 +19,7 @@ public static class CurseState
     public static float ShopPriceMinMul = 1f;
     public static float ShopPriceMaxMul = 1f;
     public static bool ShopMonopoly;
-    /// <summary>206 불면증: 자유시간 배율(0~1, 1=영향 없음).</summary>
+    /// <summary>206 불면증: 밤(폰 페이즈) 자유시간 배율(0~1, 1=영향 없음).</summary>
     public static float InsomniaFreeTimeRatio = 1f;
     /// <summary>207 씨 없는 수박: 교배 실패 확률 %.</summary>
     public static float SeedlessFailPercent;

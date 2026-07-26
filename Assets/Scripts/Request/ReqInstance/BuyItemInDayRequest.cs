@@ -4,6 +4,7 @@ public class BuyItemInDayRequest : RequestInstance
 {
     private int requiredCount;
     private int currentCount;
+    private int startDayPassed = -1;
 
     public BuyItemInDayRequest(RequestScriptable data) : base(data)
     {
@@ -14,16 +15,16 @@ public class BuyItemInDayRequest : RequestInstance
     {
         base.Start();
         currentCount = 0;
+        if (RequestManager.Instance != null)
+            startDayPassed = RequestManager.Instance.DayPassed;
 
         GameEvents.OnShopBought += HandleShopBought;
-        GameEvents.OnDayPassedForRequest += HandleDayPassed;
         RaiseChanged();
     }
 
     public override void Stop()
     {
         GameEvents.OnShopBought -= HandleShopBought;
-        GameEvents.OnDayPassedForRequest -= HandleDayPassed;
     }
 
     public override string GetProgressText()
@@ -35,17 +36,16 @@ public class BuyItemInDayRequest : RequestInstance
     {
         if (IsCompleted || IsFailed) return;
 
+        if (RequestManager.Instance != null && RequestManager.Instance.DayPassed != startDayPassed)
+        {
+            currentCount = 0;
+            startDayPassed = RequestManager.Instance.DayPassed;
+        }
+
         currentCount++;
         
         if (currentCount >= requiredCount) CompleteOnce();
         else RaiseChanged();
-    }
-
-    private void HandleDayPassed()
-    {
-        if (IsCompleted || IsFailed) return;
-        currentCount = 0;
-        RaiseChanged();
     }
 
     private int SetDifficulty(string requestId)
@@ -77,6 +77,9 @@ public class BuyItemInDayRequest : RequestInstance
     {
         currentCount = data.progressCount;
         State = (RequestState)data.state;
+
+        if (RequestManager.Instance != null)
+            startDayPassed = RequestManager.Instance.DayPassed;
 
         RaiseChanged();
     }
