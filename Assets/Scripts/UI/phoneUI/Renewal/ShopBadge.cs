@@ -18,7 +18,7 @@ public static class ShopBadge
 
         // 고정 상품 / 로테이션 상품
         if (typeObj != null) typeObj.SetActive(true);
-        if (typeText != null) typeText.text = isFixed ? "고정 상품" : "로테이션 상품";
+        if (typeText != null) typeText.text = isFixed ? "고정" : "로테이션";
 
         // 등급 (GradeTagText가 있으면 우선, 없으면 Rarity로 S/A/B/C)
         if (gradeObj != null) gradeObj.SetActive(true);

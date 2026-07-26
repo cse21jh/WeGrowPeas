@@ -208,7 +208,7 @@ public class ShopController
     {
         InitializeIfNeeded();
         int free = shopManager != null ? shopManager.DailyRerollCount : 0;
-        return free > 0 ? $"리롤 (무료 {free}회)" : $"리롤 ({RerollPrice}골드)";
+        return free > 0 ? $"무료 {free}회" : $"{RerollPrice} G";
     }
 
     /// <summary>사용자가 리롤 요청. 성공 시 true(호출 측에서 목록 다시 그림).</summary>
