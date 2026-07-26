@@ -52,7 +52,6 @@ public class GlowCanvasController : MonoBehaviour
             else
             {
                 glowTransform[i].gameObject.SetActive(false);
-                SyncUI(originalTransform[i], glowTransform[i]);
             }
         }
 
