@@ -44,14 +44,15 @@ public class GlowCanvasController : MonoBehaviour
         {
             if (isGlowActive)
             {
-                SyncUI(originalTransform[i], glowTransform[i]);
                 //glowTransform[i].position = originalTransform[i].position;
                 //glowTransform[i].sizeDelta = originalTransform[i].sizeDelta;
                 glowTransform[i].gameObject.SetActive(true);
+                SyncUI(originalTransform[i], glowTransform[i]);
             }
             else
             {
                 glowTransform[i].gameObject.SetActive(false);
+                SyncUI(originalTransform[i], glowTransform[i]);
             }
         }
 
