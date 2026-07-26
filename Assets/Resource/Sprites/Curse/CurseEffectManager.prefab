@@ -24380,6 +24380,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6819815091833132714}
+  - component: {fileID: 8647645701703735710}
   m_Layer: 0
   m_Name: CurseEffectManager
   m_TagString: Untagged
@@ -24406,6 +24407,30 @@ Transform:
   - {fileID: 3557783907369228747}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8647645701703735710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3899989994827455042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e53d85c01cf9f4c90dc337117e962a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CurseEffectManager
+  bugEffects:
+  - {fileID: 5012496095097257548}
+  - {fileID: 5913833804170615268}
+  - {fileID: 1954420264025590735}
+  - {fileID: 314042285684218366}
+  radioActiveEffects:
+  - {fileID: 7404564118890008513}
+  pollenEffects:
+  - {fileID: 8445963285450082590}
+  - {fileID: 591155836513321526}
+  watermelonEffects:
+  - {fileID: 4588146685108728069}
 --- !u!1 &4086097138180345750
 GameObject:
   m_ObjectHideFlags: 0
