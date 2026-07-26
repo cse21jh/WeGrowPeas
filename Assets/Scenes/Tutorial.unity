@@ -770,6 +770,7 @@ MonoBehaviour:
   - "\uD574\uCDA9 \uC800\uD56D"
   - "\uCD94\uC704 \uC800\uD56D"
   - "\uD3ED\uC6B0 \uC800"
+  fogEffect: {fileID: 0}
   elementName: {fileID: 161347106}
   surviveProbability: {fileID: 300100077}
   dnaImages:
@@ -2302,7 +2303,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 1000
@@ -2393,6 +2394,7 @@ MonoBehaviour:
   - "\uD574\uCDA9 \uC800\uD56D"
   - "\uCD94\uC704 \uC800\uD56D"
   - "\uD3ED\uC6B0 \uC800"
+  fogEffect: {fileID: 0}
   elementName: {fileID: 1269299148}
   surviveProbability: {fileID: 635787700}
   dnaImages:
@@ -4015,6 +4017,18 @@ PrefabInstance:
     - target: {fileID: 592057454527702072, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6714094760314778127, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -11880,7 +11894,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 3.8}
+  m_AnchoredPosition: {x: 0, y: -0.0000076293945}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &165768189
@@ -26249,6 +26263,18 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6509563148559615005, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_Material
       value: 
@@ -29761,6 +29787,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6714094760314778127, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
@@ -32704,6 +32742,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mandatoryAlarm: {fileID: 1858708261}
   nonMandatoryAlarm: {fileID: 348189877}
+  empEffect: {fileID: 0}
   mandatoryAppAlarm:
   - {fileID: 0}
   - {fileID: 109997029}
@@ -44267,6 +44306,7 @@ MonoBehaviour:
   - "\uD574\uCDA9 \uC800\uD56D"
   - "\uCD94\uC704 \uC800\uD56D"
   - "\uD3ED\uC6B0 \uC800"
+  fogEffect: {fileID: 0}
   elementName: {fileID: 1328807736}
   surviveProbability: {fileID: 464284141}
   dnaImages:
@@ -57513,6 +57553,18 @@ PrefabInstance:
     - target: {fileID: 592057454527702072, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6714094760314778127, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -71987,6 +72039,18 @@ PrefabInstance:
     - target: {fileID: 592057454527702072, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6714094760314778127, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -88030,6 +88094,7 @@ MonoBehaviour:
   - "\uD574\uCDA9 \uC800\uD56D"
   - "\uCD94\uC704 \uC800\uD56D"
   - "\uD3ED\uC6B0 \uC800"
+  fogEffect: {fileID: 0}
   elementName: {fileID: 1071516909}
   surviveProbability: {fileID: 1943722160}
   dnaImages:
@@ -149154,6 +149219,7 @@ MonoBehaviour:
   - "\uD574\uCDA9 \uC800\uD56D"
   - "\uCD94\uC704 \uC800\uD56D"
   - "\uD3ED\uC6B0 \uC800"
+  fogEffect: {fileID: 0}
   elementName: {fileID: 1998829184}
   surviveProbability: {fileID: 991229071}
   dnaImages:
@@ -150502,6 +150568,18 @@ PrefabInstance:
     - target: {fileID: 592057454527702072, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5176143406133236744, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6714094760314778127, guid: 90af6e0b50b7fa0449aa8a92766c3156, type: 3}
       propertyPath: m_AnchoredPosition.x
