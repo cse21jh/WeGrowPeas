@@ -551,9 +551,14 @@ public abstract class Plant : MonoBehaviour
 
     /// <summary>변종 발생 확률(%) = 기본 1% + 새벽(2·10단계) + 저주(돌연변이) + 슈퍼 변종.</summary>
     public static float GetMutationChancePercent()
-        => 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (MutationDebug.HasChanceOverride) return MutationDebug.ChanceOverride; // 디버그 패널(F11)
+#endif
+        return 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
            + (GameManager.Instance != null && GameManager.Instance.grid != null
               ? GameManager.Instance.grid.SuperMutationChanceBonus : 0f);
+    }
 
     /// <summary>양성 변종: 모든 형질의 저항력을 90~100%로 설정 (유전자는 유지).</summary>
     public static void ApplyBenignResistance(List<GeneticTrait> traitList)

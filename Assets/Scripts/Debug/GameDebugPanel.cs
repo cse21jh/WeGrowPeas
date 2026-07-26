@@ -62,6 +62,28 @@ public class GameDebugPanel : MonoBehaviour
 
         GUILayout.Space(8);
 
+        // ── 변종 (악성/양성) ──
+        GUILayout.Label("[변종]");
+        GUILayout.Label(MutationDebug.HasChanceOverride
+            ? $"발생 확률: {MutationDebug.ChanceOverride:0.#}% (강제)"
+            : "발생 확률: 기본(1% + 새벽/저주)");
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("기본")) MutationDebug.ChanceOverride = -1f;
+        if (GUILayout.Button("50%")) MutationDebug.ChanceOverride = 50f;
+        if (GUILayout.Button("100%")) MutationDebug.ChanceOverride = 100f;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Label(MutationDebug.HasRatioOverride
+            ? $"악성 : 양성 = {MutationDebug.MalignantRatioOverride * 100f:0}% : {(1f - MutationDebug.MalignantRatioOverride) * 100f:0}% (강제)"
+            : "악성 : 양성 = 80% : 20% (기본)");
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("기본")) MutationDebug.MalignantRatioOverride = -1f;
+        if (GUILayout.Button("악성만")) MutationDebug.MalignantRatioOverride = 1f;
+        if (GUILayout.Button("양성만")) MutationDebug.MalignantRatioOverride = 0f;
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8);
+
         // ── 경제 ──
         GUILayout.Label("[경제]");
         GUILayout.BeginHorizontal();

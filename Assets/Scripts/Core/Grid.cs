@@ -577,9 +577,14 @@ public class Grid : MonoBehaviour
         bool malignant = false, benign = false;
         if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
         {
+            // 악성 비율: 기본 0.8, 슈퍼 변종이면 반전(0.2), 디버그 패널이 지정하면 그 값
+            float malignantRatio = hasSuperMutation ? 0.2f : 0.8f;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
+#endif
+
             if (SpecialItemSystem.Has("peanut_special_8")) malignant = true; // 특수(임시땅콩B): 교배 시 악성만
-            // 슈퍼 변종: 양성:악성 비율이 반전(80:20)
-            else if (Random.value < (hasSuperMutation ? 0.2f : 0.8f)) malignant = true;
+            else if (Random.value < malignantRatio) malignant = true;
             else benign = true;
             Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!");
         }
