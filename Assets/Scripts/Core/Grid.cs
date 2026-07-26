@@ -279,21 +279,11 @@ public class Grid : MonoBehaviour
 
     public void InitGrid()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 2; i++)
         {
             GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
             Plant plant = obj.GetComponent<Plant>();
-            List<GeneticTrait> basicTrait = new List<GeneticTrait>
-            {
-                new GeneticTrait(TraitType.NaturalDeath, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Pest, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Wind, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Flood, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.HeavyRain, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Cold, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Drought, 1f, 2, 0.0f),
-                new GeneticTrait(TraitType.Heat, 1f, 2, 0.0f)
-            };
+            List<GeneticTrait> basicTrait = new List<GeneticTrait> { new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f), };
             //FenceUIManager.Instance.SetFenceElements(0, plant);
             plant.SetTrait(basicTrait);
             AddPlantToGrid(plant);
@@ -538,11 +528,11 @@ public class Grid : MonoBehaviour
         if (breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
 
         breedTimerUI.StopTimer();
-        
+
         int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
         int remainingBreeds = Mathf.Max(0, currentEffectiveMaxBreedCount - breedCount);
         GameEvents.RaiseDayEndedWithRemainingBreeds(remainingBreeds);
-        
+
         breedCount = 0;
         // Debug.Log("교배 페이즈 종료");
         breedButton.SetActive(false);
@@ -1352,7 +1342,7 @@ public class Grid : MonoBehaviour
             p.SetGridIndex(newIdx);
             p.transform.position = GetSoilTransform(newIdx).position;
         }
-        OnGridStateChanged?.Invoke(); 
+        OnGridStateChanged?.Invoke();
     }
 
     private static void ShuffleList<T>(List<T> list)
@@ -1633,7 +1623,7 @@ public class Grid : MonoBehaviour
                 if (newSoilT != null)
                 {
                     Soil newSoil = newSoilT.GetComponent<Soil>();
-                    if (newSoil != null) 
+                    if (newSoil != null)
                     {
                         Material matToUse = customMaterial != null ? customMaterial : soilHighlightMaterial;
                         newSoil.SetHighlight(true, matToUse, customOutlineColor);
@@ -3008,7 +2998,7 @@ public class Grid : MonoBehaviour
                 plant.SetMushroomEffect(isMushroom);
             }
         }
-        
+
         if (FenceUIManager.Instance != null)
         {
             FenceUIManager.Instance.RefreshCurseEffects();

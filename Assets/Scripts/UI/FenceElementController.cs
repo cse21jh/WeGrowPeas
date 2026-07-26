@@ -53,11 +53,11 @@ public class FenceElementController : MonoBehaviour
 
         for (int i = 0; i < pairDatas.Count; i++)
         {
-            if(isSet == true)
+            if (isSet == true)
             {
                 break;
             }
-            Debug.Log("페어데이터 확인 중... " + i + " / " + pairDatas[i].x + " " + pairDatas[i].y);
+            //Debug.Log("페어데이터 확인 중... " + i + " / " + pairDatas[i].x + " " + pairDatas[i].y);
 
             if ((int)pairDatas[i].x == -1 || (int)pairDatas[i].y == -1)
             {
@@ -66,13 +66,13 @@ public class FenceElementController : MonoBehaviour
 
             if (pairDatas[i].x == (int)currentTraitType)
             {
-                Debug.Log("형질에 맞는 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
+                //Debug.Log("형질에 맞는 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
 
                 foreach (GameObject pea in peas)
                 {
-                    if(pea.activeSelf == true)
+                    if (pea.activeSelf == true)
                     {
-                        Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        //Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_pea = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_pea.Rebind();
                         anim_pea.SetInteger("faceIndex", (int)pairDatas[i].y);
@@ -92,9 +92,9 @@ public class FenceElementController : MonoBehaviour
                 {
                     if (peanut.activeSelf == true)
                     {
-                        Debug.Log("땅콩 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
+                        //Debug.Log("땅콩 얼굴 애니메이션 설정 시도! 타입 : " + currentTraitType + " / 페어데이터 : " + pairDatas[i].x + " " + pairDatas[i].y);
 
-                        Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
+                        //Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_peanut = peanut.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_peanut.Rebind();
                         anim_peanut.SetInteger("faceIndex", (int)pairDatas[i].y);
@@ -143,7 +143,7 @@ public class FenceElementController : MonoBehaviour
                 case TraitType.NaturalDeath:
                     peas[1].SetActive(true);
                     elementName.text = peaNames[1];
-                    if(currentWaveType == WaveType.Aging)
+                    if (currentWaveType == WaveType.Aging)
                     {
                         isWaveResistance = true;
                     }
@@ -174,7 +174,7 @@ public class FenceElementController : MonoBehaviour
                     break;
                 case TraitType.Cold:
 
-                    if(trait.genetics == 0)
+                    if (trait.genetics == 0)
                     {
                         // 유전자 0개
                         // heat
@@ -185,7 +185,7 @@ public class FenceElementController : MonoBehaviour
                             isWaveResistance = true;
                         }
                     }
-                    else if(trait.genetics == 1)
+                    else if (trait.genetics == 1)
                     {
                         // 유전자 1개
                         // 반반
@@ -246,42 +246,42 @@ public class FenceElementController : MonoBehaviour
 
 
 
-                    
+
                     break;
-                    /*
-                case TraitType.Drought:
-                    peas[7].SetActive(true);
-                    elementName.text = peaNames[7];
-                    if (currentWaveType == WaveType.Drought)
-                    {
-                        isWaveResistance = true;
-                    }
-                    break;
-                case TraitType.Heat:
-                    peas[8].SetActive(true);
-                    elementName.text = peaNames[8];
-                    if (currentWaveType == WaveType.Heat)
-                    {
-                        isWaveResistance = true;
-                    }
-                    break;
-                case TraitType.FD:
-                    peas[9].SetActive(true);
-                    elementName.text = peaNames[9];
-                    if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.Flood)
-                    {
-                        isWaveResistance = true;
-                    }
-                    break;
-                case TraitType.CH:
-                    peas[10].SetActive(true);
-                    elementName.text = peaNames[10];
-                    if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
-                    {
-                        isWaveResistance = true;
-                    }
-                    break;
-                    */
+                /*
+            case TraitType.Drought:
+                peas[7].SetActive(true);
+                elementName.text = peaNames[7];
+                if (currentWaveType == WaveType.Drought)
+                {
+                    isWaveResistance = true;
+                }
+                break;
+            case TraitType.Heat:
+                peas[8].SetActive(true);
+                elementName.text = peaNames[8];
+                if (currentWaveType == WaveType.Heat)
+                {
+                    isWaveResistance = true;
+                }
+                break;
+            case TraitType.FD:
+                peas[9].SetActive(true);
+                elementName.text = peaNames[9];
+                if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.Flood)
+                {
+                    isWaveResistance = true;
+                }
+                break;
+            case TraitType.CH:
+                peas[10].SetActive(true);
+                elementName.text = peaNames[10];
+                if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
+                {
+                    isWaveResistance = true;
+                }
+                break;
+                */
                 default:
                     peas[0].SetActive(true); // 기본 완두콩
                     elementName.text = peaNames[0];
@@ -349,9 +349,9 @@ public class FenceElementController : MonoBehaviour
         }
         else if (trait.traitType == TraitType.HeavyRain)
         {
-            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Drought) * 100f) .ToString("F0") + "%";
+            surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Drought) * 100f).ToString("F0") + "%";
         }
-        else if(trait.traitType == TraitType.Cold)
+        else if (trait.traitType == TraitType.Cold)
         {
             surviveProbability.text = (surviveProb * 100f).ToString("F0") + "%\n" + (plant.GetResistanceValue((int)TraitType.Heat) * 100f).ToString("F0") + "%";
         }
