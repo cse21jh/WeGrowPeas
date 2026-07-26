@@ -75,13 +75,33 @@ public sealed class ChatMessageItem : MonoBehaviour
     public void Setup(
         string message,
         string senderName,
-        Sprite profileSprite)
+        Sprite profileSprite,
+        System.Action onClick = null)
     {
         messageText.text = message ?? string.Empty;
 
         if (isInitMsg)
         {
             ApplySenderInfo(senderName, profileSprite);
+        }
+
+        if (onClick != null)
+        {
+            Button btn = bubbleRect.GetComponent<Button>();
+            if (btn == null)
+            {
+                btn = bubbleRect.gameObject.AddComponent<Button>();
+            }
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => onClick());
+        }
+        else
+        {
+            Button btn = bubbleRect.GetComponent<Button>();
+            if (btn != null)
+            {
+                Destroy(btn);
+            }
         }
 
         ResizeBubble();

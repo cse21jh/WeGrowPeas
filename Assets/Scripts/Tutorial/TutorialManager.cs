@@ -30,7 +30,8 @@ public class TutorialManager : Singleton<TutorialManager>
     [SerializeField] private GameObject breedGraph;
     [SerializeField] private SpawnedCircle spawnedCircle;
     [SerializeField] private GameObject rc;
-    [SerializeField] private MessageController mc;
+    [SerializeField] private ChatMessageList chatMessageList;
+    [SerializeField] private GameObject gameStartUI;
 
 
     private bool _narrationClickedThisFrame = false;
@@ -54,7 +55,7 @@ public class TutorialManager : Singleton<TutorialManager>
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private IEnumerator RunTutorial()
@@ -75,7 +76,7 @@ public class TutorialManager : Singleton<TutorialManager>
         {
             // 1. 해당 단계의 메신저 트리거 발송 (0, 1, 2...)
             PhoneManager.Instance.messengerApp.ActivateTrigger(currentStep.ToString());
-            
+
 
             yield return new WaitUntil(() => PhoneManager.Instance.messengerApp.IsTriggerFullySeen(currentStep.ToString()));
 
@@ -86,7 +87,7 @@ public class TutorialManager : Singleton<TutorialManager>
             yield return WaitForTrigger(currentStep);
 
             ExecuteAfterStepAction(currentStep);
-           
+
             currentStep++;
         }
 
@@ -102,7 +103,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 2.335f, 0f), new Vector2(75f, 75f));
                 break;
             case 1: // 완두콩 클릭
-                spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f,0f), new Vector2(75f, 150f));
+                spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f, 0f), new Vector2(75f, 150f));
                 grid.StartTutorialBreeding();
                 grid.MakeMovable();
                 break;
@@ -119,11 +120,11 @@ public class TutorialManager : Singleton<TutorialManager>
                 break;
             case 5: // 삽 클릭
                 shovel.SetActive(true);
-                spawnedCircle.ShowCircle(new Vector3(-8f, -3.9f, 0f), new Vector2(70f, 95f));
+                spawnedCircle.ShowUICircle(new Vector2(-355f, -160f), new Vector2(80f, 110f));
                 break;
             case 6: // 특정 완두콩 판매
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.335f, 0f), new Vector2(75f, 75f));
-                break;            
+                break;
             case 7: // 이제 실전으로 끝
                 // 
                 break;
@@ -141,13 +142,10 @@ public class TutorialManager : Singleton<TutorialManager>
                 yield return new WaitUntil(() =>
                         FenceUIManager.Instance.CheckFenceIsShowingMe(0) == true
                     );
-            break;
+                break;
 
             case 1: // 완두콩 클릭
-                yield return new WaitUntil(() =>
-                    _lastClickedObject != null &&
-                    _lastClickedObject.GetComponent<WhiteCircle>() != null
-                );
+                yield return new WaitUntil(() => grid.IsBreedObj1Selected());
                 _lastClickedObject = null;
                 break;
             case 2: // 교배
@@ -182,9 +180,10 @@ public class TutorialManager : Singleton<TutorialManager>
                 PhoneManager.Instance.isTutorialEnd = true;
                 gcController.ToggleGlow(false);
                 waveManager.StartCoroutine(waveManager.StopNightCoroutine());
-                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 0에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(0));
-                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 1에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(1));
-                mc.AddMessage(MessageController.MessageSenderType.player, "저장소 2에 키우러 갈래!", "", () => FindAnyObjectByType<UIClickEvent>().OnClick_StartNewGame(2));
+                if (gameStartUI != null)
+                {
+                    gameStartUI.SetActive(true);
+                }
                 break;
         }
     }
@@ -203,7 +202,7 @@ public class TutorialManager : Singleton<TutorialManager>
             case 2: // 교배
                 Instantiate(breedGraph, canvasTransform);
                 spawnedCircle.FlushSpawnedCircleCanvas();
-                break;            
+                break;
             case 3: // 웨이브 지나감
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;

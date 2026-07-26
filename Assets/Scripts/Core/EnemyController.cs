@@ -592,7 +592,7 @@ public class EnemyController : MonoBehaviour
         //SetNextWave();
         //breedTimerManager 의 null reference issue를 에디터에서 함수 분리해서 해결
         lastWave = currentWave;
-        currentWave = nextWave;
+        currentWave = nextWave ?? GetWaveFromWaveType(WaveType.None);
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
         //breedTimerManager.SetTimer(currentWave.WaveType);

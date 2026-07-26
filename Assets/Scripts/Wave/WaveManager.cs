@@ -130,7 +130,7 @@ public class WaveManager : MonoBehaviour
     private IEnumerator WaveEffect(WaveType type)
     {
         float t;
-        waveEffectSkipButton.SetActive(true);
+        if (waveEffectSkipButton != null) waveEffectSkipButton.SetActive(true);
         switch (type)
         {
             case WaveType.Aging:

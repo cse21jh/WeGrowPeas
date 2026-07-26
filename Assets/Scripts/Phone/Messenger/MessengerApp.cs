@@ -566,7 +566,7 @@ public class MessengerApp : MonoBehaviour
                 {
                     lastDisplayedDay = day;
                 }
-                CreateMessageBubble(day, messagesToShow[i].messageText);
+                CreateMessageBubble(day, messagesToShow[i].messageText, messagesToShow[i].triggerId);
             }
         }
 
@@ -662,7 +662,7 @@ public class MessengerApp : MonoBehaviour
 
             if (currentChat == null) break;
 
-            CreateMessageBubble(currentDay, message.messageText);
+            CreateMessageBubble(currentDay, message.messageText, message.triggerId);
             SetLastSeenIndex(currentChat, originalIndex);
 
             ReportAlarmState();
@@ -717,9 +717,14 @@ public class MessengerApp : MonoBehaviour
         return 1; // GameManager가 없을 경우 기본값
     }
 
-    private void CreateMessageBubble(int stage, string text)
+    private void CreateMessageBubble(int stage, string text, string triggerId = null)
     {
-        chatMessageList.AddMessage(stage, text);
+        int stageToPass = stage;
+        if (PhoneManager.Instance != null && PhoneManager.Instance.isTutorial && !string.IsNullOrEmpty(triggerId))
+        {
+            stageToPass = triggerId.GetHashCode();
+        }
+        chatMessageList.AddMessage(stageToPass, text);
     }
 
 

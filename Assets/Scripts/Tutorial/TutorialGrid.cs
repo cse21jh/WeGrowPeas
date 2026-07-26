@@ -308,4 +308,9 @@ public class TutorialGrid : Grid
             }
         }
     }
+
+    public bool IsBreedObj1Selected()
+    {
+        return breedObj1 != null;
+    }
 }

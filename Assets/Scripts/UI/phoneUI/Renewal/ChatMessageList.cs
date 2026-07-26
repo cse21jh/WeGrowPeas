@@ -51,7 +51,7 @@ public sealed class ChatMessageList : MonoBehaviour
     /// 메시지를 추가한다.
     /// 해당 스테이지의 첫 메시지는 Initial 프리팹을 사용한다.
     /// </summary>
-    public void AddMessage(int stageId, string message)
+    public void AddMessage(int stageId, string message, System.Action onClick = null)
     {
         bool isFirstMessageOfStage =
             !hasPreviousMessage ||
@@ -86,7 +86,8 @@ public sealed class ChatMessageList : MonoBehaviour
         item.Setup(
             message,
             senderName,
-            senderProfileSprite);
+            senderProfileSprite,
+            onClick);
 
         previousStageId = stageId;
         hasPreviousMessage = true;
