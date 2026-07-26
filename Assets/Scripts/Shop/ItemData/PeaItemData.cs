@@ -30,45 +30,20 @@ public class PeaItemData : ItemData
         return CheckHasEmptyGrid(ctx, out reason);
     }
 
+    // 형질은 상세 패널의 드롭다운으로 고른다. (별도 형질 선택 UI를 쓰지 않음)
+    public override string[] GetSelectableOptions() => TraitOptions.GetNames(CurrentStage);
+
+    public override void SetSelectedOption(int index)
+    {
+        pendingTraits = TraitOptions.BuildTraits(index, CurrentStage);
+    }
+
+    private static int CurrentStage => GameManager.Instance != null ? GameManager.Instance.stage : 0;
+
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
     {
-        // 형질 선택 UI 표시
-        if (TraitSelectionUIController.Instance == null)
-        {
-            onError?.Invoke("형질 선택 UI를 찾을 수 없습니다");
-            return;
-        }
-
-        TraitSelectionUIController.Instance.ShowSingleTraitSelection(
-            onConfirm: (selectedTraits) => {
-                Debug.Log($"[PeaItemData] onConfirm 호출됨. selectedTraits: {(selectedTraits == null ? "null" : selectedTraits.Count.ToString())}개");
-                
-                // 형질이 선택되지 않은 경우 기본 형질 사용
-                if (selectedTraits == null || selectedTraits.Count == 0)
-                {
-                    Debug.LogWarning("[PeaItemData] 형질이 선택되지 않아 기본 형질을 사용합니다.");
-                    pendingTraits = new List<GeneticTrait>
-                    {
-                        new GeneticTrait(TraitType.NaturalDeath, Plant.GetResistanceBasedOnGenetics(TraitType.NaturalDeath, 1), 1, 0.0f)
-                    };
-                }
-                else
-                {
-                    // 형질 리스트 복사 (참조 문제 방지)
-                    pendingTraits = new List<GeneticTrait>(selectedTraits);
-                    Debug.Log($"[PeaItemData] 형질 {pendingTraits.Count}개 설정됨");
-                    foreach (var trait in pendingTraits)
-                    {
-                        Debug.Log($"[PeaItemData] - {trait.traitType}, genetics: {trait.genetics}, resistance: {trait.resistance}");
-                    }
-                }
-                onReady?.Invoke(); // 형질 선택 후 onReady 호출 → Instant 플로우로 즉시 설치
-            },
-            onCancel: () => {
-                pendingTraits = null;
-                //onError?.Invoke("구매 취소");
-            }
-        );
+        // 드롭다운에서 고른 형질을 그대로 사용. 선택이 없으면 Commit에서 기본 형질로 보정된다.
+        onReady?.Invoke();
     }
 
     public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason) 

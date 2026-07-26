@@ -64,46 +64,34 @@ public class HighQualityPlantItemData : ItemData
         return true;
     }
 
+    // 상세 패널 드롭다운용. 이 아이템은 "현재 등장 중인 웨이브"만 대상이라 그 웨이브 하나만 노출한다.
+    public override string[] GetSelectableOptions()
+    {
+        var wave = GameManager.Instance != null && GameManager.Instance.enemyController != null
+            ? GameManager.Instance.enemyController.CurrentWave
+            : null;
+        if (wave == null || wave.WaveType == WaveType.None) return null;
+        return new[] { WaveSchedule.GetWaveDisplayName(wave.WaveType) };
+    }
+
+    public override void SetSelectedOption(int index)
+    {
+        var wave = GameManager.Instance != null && GameManager.Instance.enemyController != null
+            ? GameManager.Instance.enemyController.CurrentWave
+            : null;
+        pendingWave = (index == 0 && wave != null && wave.WaveType != WaveType.None)
+            ? wave.WaveType
+            : (WaveType?)null;
+    }
+
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
-        // 웨이브 선택 UI 표시 (현재 등장하는 웨이브만 표시)
-        if (TraitSelectionUIController.Instance == null)
+        if (!pendingWave.HasValue)
         {
-            onError?.Invoke("웨이브 선택 UI를 찾을 수 없습니다");
+            onError?.Invoke("등장하는 웨이브가 없습니다");
             return;
         }
-
-        // 현재 등장하는 웨이브만 필터링하여 표시
-        // ShowWaveSelection은 해금된 웨이브만 표시하므로, 
-        // 현재 웨이브가 등장 중인지 확인은 TraitSelectionUIController에서 처리
-        
-        TraitSelectionUIController.Instance.ShowWaveSelection(
-            onConfirm: (selectedWave) => {
-                // 현재 등장하는 웨이브인지 확인
-                if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
-                {
-                    var currentWave = GameManager.Instance.enemyController.CurrentWave;
-                    if (currentWave != null && currentWave.WaveType == selectedWave)
-                    {
-                        pendingWave = selectedWave;
-                        onReady?.Invoke();
-                    }
-                    else
-                    {
-                        onError?.Invoke("현재 등장하는 웨이브만 선택할 수 있습니다");
-                    }
-                }
-                else
-                {
-                    onError?.Invoke("게임 상태를 확인할 수 없습니다");
-                }
-            },
-            onCancel: () => {
-                pendingWave = null;
-                onError?.Invoke("구매 취소");
-            },
-            title: "고품질 식물: 등장하는 웨이브를 선택하세요"
-        );
+        onReady?.Invoke();
     }
 
     public override void Commit(ShopContext ctx)

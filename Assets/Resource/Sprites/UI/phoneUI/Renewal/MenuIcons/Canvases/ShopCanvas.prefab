@@ -3795,7 +3795,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6231274901309604350}
   m_HandleRect: {fileID: 5998066953669509355}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4328,6 +4328,23 @@ MonoBehaviour:
   boldColor: {r: 0, g: 0, b: 0, a: 1}
   pretendard_Medium: {fileID: 11400000, guid: f4d07032c6ac1e24eacd81c9c38ee8c0, type: 2}
   mediumColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  itemListContent: {fileID: 2927551186205145527}
+  itemPrefab: {fileID: 4956844633256569282, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
+  rerollButton: {fileID: 5080351104280076665}
+  rerollButtonText: {fileID: 7926051024258888346}
+  detailImage: {fileID: 1383544539274815774}
+  detailName: {fileID: 8196315386562685814}
+  detailDescription: {fileID: 4420219164889248486}
+  detailPrice: {fileID: 4543075717262680337}
+  buyButton: {fileID: 2918919941115447081}
+  closeButton: {fileID: 6870280292599410185}
+  detail_ItemType: {fileID: 304798685937317212}
+  detail_ItemTypeText: {fileID: 8212180507725349656}
+  detail_ItemGrade: {fileID: 7235193056734724919}
+  detail_ItemGradeText: {fileID: 517195993490556887}
+  detail_ItemLimit: {fileID: 7276823178045738859}
+  detail_ItemLimitText: {fileID: 9178858783211400446}
+  optionDropdown: {fileID: 7615293370156121260}
 --- !u!1 &5777064182375052237
 GameObject:
   m_ObjectHideFlags: 0
@@ -4638,7 +4655,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 10
   m_Viewport: {fileID: 3550194634194201398}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 5756131112694620409}
@@ -6695,33 +6712,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 2927551186205145527}
     m_Modifications:
     - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 5469321775092948445}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ShowItemDetailPanel
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ShopCanvasController, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 1579387285151456637, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 1649945238338305367, guid: eb4c06d18304595419ed767baa00b6ea, type: 3}
       propertyPath: m_Name
       value: ItemPrefab

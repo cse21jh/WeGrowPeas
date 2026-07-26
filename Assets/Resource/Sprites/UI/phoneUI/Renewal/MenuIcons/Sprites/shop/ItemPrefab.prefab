@@ -554,7 +554,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7162681872956390261}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: ShopCanvasController, Assembly-CSharp
+        m_MethodName: ShowItemDetailPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4956844633256569282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,6 +579,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18820a705cf8fbb48b564dbff4eb7bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  itemImage: {fileID: 1130427908979126647}
+  detail_ItemType: {fileID: 3140712869471536695}
+  detail_ItemGrade: {fileID: 809501770520649040}
+  detail_ItemLimit: {fileID: 8961109663941738746}
+  itemName: {fileID: 2097588297948963843}
+  itemPrice: {fileID: 8160815315966669654}
+  itemPurchaseLimit: {fileID: 8892095855515692482}
+  itemTypeText: {fileID: 7249581817732881203}
+  itemGradeText: {fileID: 8500353648093879389}
+  itemStockText: {fileID: 8892312250585863485}
+  itemTags:
+  - {fileID: 8490715744018663204}
+  - {fileID: 4074644105752565720}
+  - {fileID: 2957108395600062060}
+  itemTagTexts:
+  - {fileID: 4033106201783583046}
+  - {fileID: 3752586848866228487}
+  - {fileID: 2502279854072929866}
+  buyButton: {fileID: 5829922299842219623}
+  buyButtonText: {fileID: 4225545204697713950}
+  slotButton: {fileID: 0}
 --- !u!1 &2902735910171363594
 GameObject:
   m_ObjectHideFlags: 0

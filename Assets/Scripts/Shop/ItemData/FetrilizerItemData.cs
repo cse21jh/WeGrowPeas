@@ -40,27 +40,21 @@ public class FertilizerItemData : ItemData
         return true;
     }
 
+    // 웨이브는 상세 패널의 드롭다운으로 고른다.
+    public override string[] GetSelectableOptions()
+        => WaveSchedule.GetSelectableWaveNames(GameManager.Instance != null ? GameManager.Instance.stage : 0);
+
+    public override void SetSelectedOption(int index)
+        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, GameManager.Instance != null ? GameManager.Instance.stage : 0);
+
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
-        // 형질 선택 UI를 재사용하여 웨이브 선택 UI 표시
-        if (TraitSelectionUIController.Instance == null)
+        if (!pendingWave.HasValue)
         {
-            onError?.Invoke("웨이브 선택 UI를 찾을 수 없습니다");
+            onError?.Invoke("웨이브를 선택해주세요");
             return;
         }
-
-        TraitSelectionUIController.Instance.ShowWaveSelection(
-            onConfirm: (selectedWave) => {
-                pendingWave = selectedWave;
-                // 웨이브 선택 후 위치 선택으로 진행
-                onReady?.Invoke();
-            },
-            onCancel: () => {
-                pendingWave = null;
-                onError?.Invoke("구매 취소");
-            },
-            title: "전용 비료: 웨이브를 선택하세요"
-        );
+        onReady?.Invoke(); // 이후 위치(토양) 선택으로 진행
     }
 
     public override void Commit(ShopContext ctx)

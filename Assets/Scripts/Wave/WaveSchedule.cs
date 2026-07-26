@@ -104,6 +104,64 @@ public static class WaveSchedule
         return Mathf.Max(1, GetFirstAppearStage(type) - ShopUnlockLeadStages);
     }
 
+    /// <summary>
+    /// 상점에서 해당 웨이브를 선택할 수 있는가(해금 당일은 밤/폰 시간부터).
+    /// 웨이브 선택 UI와 상점 드롭다운이 같은 기준을 쓰도록 여기로 모았다.
+    /// </summary>
+    public static bool IsShopWaveUnlocked(WaveType type, int currentStage)
+    {
+        int unlock = GetShopUnlockStage(type);
+        if (currentStage > unlock) return true;
+        if (currentStage < unlock) return false;
+        return PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime();
+    }
+
+    /// <summary>현재 스테이지에서 선택 가능한 웨이브 목록(None 제외).</summary>
+    public static List<WaveType> GetSelectableWaves(int currentStage)
+    {
+        var list = new List<WaveType>();
+        foreach (WaveType type in System.Enum.GetValues(typeof(WaveType)))
+        {
+            if (type == WaveType.None) continue;
+            if (type != WaveType.Aging && !IsShopWaveUnlocked(type, currentStage)) continue;
+            list.Add(type);
+        }
+        return list;
+    }
+
+    /// <summary>현재 선택 가능한 웨이브들의 표시명 배열. (상점 드롭다운용)</summary>
+    public static string[] GetSelectableWaveNames(int currentStage)
+    {
+        var waves = GetSelectableWaves(currentStage);
+        var names = new string[waves.Count];
+        for (int i = 0; i < waves.Count; i++) names[i] = GetWaveDisplayName(waves[i]);
+        return names;
+    }
+
+    /// <summary>드롭다운 인덱스 → 웨이브. 범위를 벗어나면 null.</summary>
+    public static WaveType? GetSelectableWaveAt(int index, int currentStage)
+    {
+        var waves = GetSelectableWaves(currentStage);
+        return (index >= 0 && index < waves.Count) ? waves[index] : (WaveType?)null;
+    }
+
+    /// <summary>웨이브 한국어 표시명.</summary>
+    public static string GetWaveDisplayName(WaveType waveType)
+    {
+        switch (waveType)
+        {
+            case WaveType.Aging: return "자연사";
+            case WaveType.Pest: return "해충";
+            case WaveType.Wind: return "바람";
+            case WaveType.Flood: return "홍수";
+            case WaveType.HeavyRain: return "폭우";
+            case WaveType.Cold: return "추위";
+            case WaveType.Drought: return "가뭄";
+            case WaveType.Heat: return "더위";
+            default: return waveType.ToString();
+        }
+    }
+
     public static Season GetSeasonByStage(int stage)
     {
         int len = SeasonLength <= 0 ? DefaultSeasonLength : SeasonLength;

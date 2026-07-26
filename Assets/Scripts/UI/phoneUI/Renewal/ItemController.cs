@@ -14,8 +14,20 @@ public class ItemController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemPrice;
     [SerializeField] private TextMeshProUGUI itemPurchaseLimit;
 
+    [Header("Badge Texts (고정 상품 / 등급 / 품목 제한)")]
+    [SerializeField] private TextMeshProUGUI itemTypeText;
+    [SerializeField] private TextMeshProUGUI itemGradeText;
+    [Tooltip("배지 옆 재고 문구 (예: 재고 제한 없음 / 남은 수량 2)")]
+    [SerializeField] private TextMeshProUGUI itemStockText;
+
     [SerializeField] private GameObject[] itemTags;
     [SerializeField] private TextMeshProUGUI[] itemTagTexts;
+
+    [Header("Buy")]
+    [SerializeField] private Button buyButton;
+    [SerializeField] private TextMeshProUGUI buyButtonText;
+    [Tooltip("슬롯 전체를 눌렀을 때 상세를 여는 버튼. 비우면 이 오브젝트의 Button을 사용.")]
+    [SerializeField] private Button slotButton;
 
     private ItemData data;
     private ShopCanvasController owner;
@@ -29,27 +41,25 @@ public class ItemController : MonoBehaviour
     /// </summary>
     /// <param name="item"> 표시할 아이템 데이터 </param>
     /// <param name="shop"> 클릭 콜백을 받을 상점 컨트롤러 </param>
-    public void Bind(ItemData item, ShopCanvasController shop)
+    /// <param name="isFixed"> 고정 상품인가(아니면 로테이션 상품) </param>
+    public void Bind(ItemData item, ShopCanvasController shop, bool isFixed)
     {
         data = item;
         owner = shop;
         if (item == null) return;
-
-        // 등급 태그가 비어 있으면 Rarity로 자동 생성(S/A/B/C)
-        string grade = !string.IsNullOrEmpty(item.GradeTagText)
-            ? item.GradeTagText
-            : GetRarityGradeText(item.Rarity);
 
         SetItemDetail(
             item.Icon,
             item.DisplayName,
             item.GetDisplayPrice(),
             GetRemainingPurchaseCount(item),
-            new[] { grade });
+            ShopBadge.GetTags(item));
 
-        // 슬롯 클릭 → 상세 패널
-        var btn = GetComponent<Button>();
-        if (btn != null)
+        SetBadges(item, isFixed);
+
+        // 슬롯 클릭 → 상세 패널 (구매 버튼과 겹치지 않도록 별도 지정 가능)
+        var btn = slotButton != null ? slotButton : GetComponent<Button>();
+        if (btn != null && btn != buyButton)
         {
             btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() =>
@@ -58,6 +68,45 @@ public class ItemController : MonoBehaviour
                 owner?.OnClickItem(this);
             });
         }
+
+        SetupBuyButton(item);
+    }
+
+    /// <summary>
+    /// 슬롯의 구매 버튼. 선택지가 필요한 아이템(드롭다운 보유)은 바로 사지 않고 상세 패널을 연다.
+    /// </summary>
+    private void SetupBuyButton(ItemData item)
+    {
+        if (buyButton == null) return;
+
+        var options = item.GetSelectableOptions();
+        bool needsSelection = options != null && options.Length > 0;
+
+        if (buyButtonText != null)
+            buyButtonText.text = needsSelection ? "선택하기" : "구매하기";
+
+        // 더 이상 살 수 없는 아이템(가격 숨김)은 비활성화
+        buyButton.interactable = item.GetDisplayPrice() != int.MaxValue;
+
+        buyButton.onClick.RemoveAllListeners();
+        buyButton.onClick.AddListener(() =>
+        {
+            PhoneManager.Instance?.PhoneTouchEffect();
+
+            if (needsSelection) owner?.OnClickItem(this);  // 상세에서 옵션 고르고 구매
+            else owner?.BuyItemDirect(this);               // 옵션 없으면 즉시 구매
+        });
+    }
+
+    /// <summary>배지 3종(고정 상품 / 등급 / 품목 제한)과 재고 문구 표시.</summary>
+    private void SetBadges(ItemData item, bool isFixed)
+    {
+        ShopBadge.Apply(item, isFixed,
+            typeObj: detail_ItemType, typeText: itemTypeText,
+            gradeObj: detail_ItemGrade, gradeText: itemGradeText,
+            limitObj: detail_ItemLimit, limitText: itemPurchaseLimit);
+
+        if (itemStockText != null) itemStockText.text = ShopBadge.GetStockText(item);
     }
 
     /// <summary>
@@ -86,10 +135,14 @@ public class ItemController : MonoBehaviour
             if (!priceHidden) itemPrice.text = $"{price} G";
         }
 
-        // 구매 제한: 0 이하면 무제한으로 보고 숨김
-        bool hasLimit = countLimit > 0;
-        if (detail_ItemLimit != null) detail_ItemLimit.SetActive(hasLimit);
-        if (itemPurchaseLimit != null && hasLimit) itemPurchaseLimit.text = $"{countLimit}";
+        // 재고/구매 제한 문구는 Bind에서 배지와 함께 설정한다(SetBadges).
+        // 데이터 없이 호출된 경우에만 여기서 직접 표시.
+        if (data == null && itemPurchaseLimit != null)
+        {
+            bool hasLimit = countLimit > 0;
+            if (detail_ItemLimit != null) detail_ItemLimit.SetActive(hasLimit);
+            if (hasLimit) itemPurchaseLimit.text = $"{countLimit}";
+        }
 
         // 태그: 있는 만큼만 켜기
         if (itemTags != null)
@@ -103,7 +156,6 @@ public class ItemController : MonoBehaviour
             }
         }
 
-        if (detail_ItemGrade != null) detail_ItemGrade.SetActive(tags != null && tags.Length > 0);
     }
     #endregion
 
@@ -112,17 +164,5 @@ public class ItemController : MonoBehaviour
     {
         if (item.MaxPurchaseCount < 0) return 0;
         return Mathf.Max(0, item.MaxPurchaseCount - item.GetTotalPurchaseCount());
-    }
-
-    private static string GetRarityGradeText(ItemRarity rarity)
-    {
-        return rarity switch
-        {
-            ItemRarity.Legendary => "S",
-            ItemRarity.Special => "A",
-            ItemRarity.Rare => "B",
-            ItemRarity.Common => "C",
-            _ => ""
-        };
     }
 }

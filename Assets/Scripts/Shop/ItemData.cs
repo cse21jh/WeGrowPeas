@@ -53,6 +53,16 @@ public abstract class ItemData : ScriptableObject
         }
     }
 
+    /// <summary>
+    /// 구매 전에 상세 패널의 드롭다운으로 고를 수 있는 선택지.
+    /// null/빈 배열이면 드롭다운을 숨긴다. (예: 전용 비료 = 웨이브 목록)
+    /// 선택 결과는 <see cref="SetSelectedOption"/>로 전달된다.
+    /// </summary>
+    public virtual string[] GetSelectableOptions() => null;
+
+    /// <summary>드롭다운에서 고른 항목의 인덱스를 전달. 옵션이 있는 아이템만 override.</summary>
+    public virtual void SetSelectedOption(int index) { }
+
     [Header("Unlock")]
     [Tooltip("체크 시 해금되기 전까지 상점에 뜨지 않음. UnlockManager.Unlock(...)로 해금.")]
     public bool requiresUnlock = false;

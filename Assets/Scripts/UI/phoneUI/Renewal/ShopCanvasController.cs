@@ -42,6 +42,18 @@ public class ShopCanvasController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI detailDescription;
     [SerializeField] private TextMeshProUGUI detailPrice;
     [SerializeField] private Button buyButton;
+    [SerializeField] private Button closeButton;
+
+    [Header("Detail Badges (고정 상품 / 등급 / 품목 제한)")]
+    [SerializeField] private GameObject detail_ItemType;
+    [SerializeField] private TextMeshProUGUI detail_ItemTypeText;
+    [SerializeField] private GameObject detail_ItemGrade;
+    [SerializeField] private TextMeshProUGUI detail_ItemGradeText;
+    [SerializeField] private GameObject detail_ItemLimit;
+    [SerializeField] private TextMeshProUGUI detail_ItemLimitText;
+
+    [Header("Detail Option Dropdown (예: 전용 비료 웨이브 선택)")]
+    [SerializeField] private TMP_Dropdown optionDropdown;
 
     // 상점 로직(뷰 비의존). 구매/리롤/인벤토리 생성은 전부 여기로 위임.
     private ShopController shop;
@@ -177,6 +189,14 @@ public class ShopCanvasController : MonoBehaviour
             if (!priceHidden) detailPrice.text = $"{price} G";
         }
 
+        // 배지 3종 (슬롯과 동일 규칙)
+        ShopBadge.Apply(data, IsFixedItem(data),
+            typeObj: detail_ItemType, typeText: detail_ItemTypeText,
+            gradeObj: detail_ItemGrade, gradeText: detail_ItemGradeText,
+            limitObj: detail_ItemLimit, limitText: detail_ItemLimitText);
+
+        SetupOptionDropdown(data);
+
         if (buyButton != null)
         {
             buyButton.interactable = !priceHidden && !shop.WasBoughtThisShop(data);
@@ -184,7 +204,48 @@ public class ShopCanvasController : MonoBehaviour
             buyButton.onClick.AddListener(BuyItem);
         }
 
+        if (closeButton != null)
+        {
+            closeButton.onClick.RemoveAllListeners();
+            closeButton.onClick.AddListener(() =>
+            {
+                PhoneManager.Instance?.PhoneTouchEffect();
+                CloseItemDetailPanel();
+            });
+        }
+
         ShowItemDetailPanel();
+    }
+
+    /// <summary>
+    /// 아이템이 선택지를 제공하면 드롭다운을 채우고, 없으면 숨긴다.
+    /// 선택 결과는 즉시 아이템에 전달되어 구매 시 별도 선택 UI를 건너뛴다.
+    /// </summary>
+    private void SetupOptionDropdown(ItemData data)
+    {
+        if (optionDropdown == null) return;
+
+        string[] options = data.GetSelectableOptions();
+        bool hasOptions = options != null && options.Length > 0;
+
+        optionDropdown.gameObject.SetActive(hasOptions);
+        optionDropdown.onValueChanged.RemoveAllListeners();
+        if (!hasOptions) return;
+
+        optionDropdown.ClearOptions();
+        optionDropdown.AddOptions(new List<string>(options));
+        optionDropdown.value = 0;
+        optionDropdown.RefreshShownValue();
+
+        data.SetSelectedOption(0); // 기본 선택 반영
+        optionDropdown.onValueChanged.AddListener(idx => data.SetSelectedOption(idx));
+    }
+
+    /// <summary>현재 인벤토리에서 고정 상품인지 판별.</summary>
+    private bool IsFixedItem(ItemData data)
+    {
+        var inv = shop.GetInventory();
+        return inv != null && inv.Fixed.Contains(data);
     }
 
 
@@ -193,9 +254,23 @@ public class ShopCanvasController : MonoBehaviour
     /// </summary>
     public void BuyItem()
     {
-        if (selectedSlot == null || selectedSlot.Data == null) return;
+        if (selectedSlot == null) return;
+        Purchase(selectedSlot.Data);
+    }
 
-        var data = selectedSlot.Data;
+    /// <summary>
+    /// 슬롯의 구매 버튼에서 바로 구매. (선택지가 없는 아이템 전용 — 있으면 슬롯이 상세를 연다)
+    /// </summary>
+    public void BuyItemDirect(ItemController slot)
+    {
+        if (slot == null) return;
+        selectedSlot = slot;
+        Purchase(slot.Data);
+    }
+
+    private void Purchase(ItemData data)
+    {
+        if (data == null) return;
 
         // 배치/선택형은 농장을 봐야 하므로 상세 패널을 먼저 닫는다.
         if (data.FlowType != ShopFlowType.Instant)
@@ -226,13 +301,15 @@ public class ShopCanvasController : MonoBehaviour
 
         if (items == null) return;
 
+        var inv = shop.GetInventory();
+
         foreach (var data in items)
         {
             if (data == null) continue;
 
             var slot = Instantiate(itemPrefab, itemListContent);
             slot.gameObject.SetActive(true);
-            slot.Bind(data, this);
+            slot.Bind(data, this, inv != null && inv.Fixed.Contains(data));
             slots.Add(slot);
         }
     }
