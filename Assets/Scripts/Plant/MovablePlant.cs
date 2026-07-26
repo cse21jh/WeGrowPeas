@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(PlantCurseManager))]
 public abstract class MovablePlant : Plant
 {
     private static readonly HashSet<MovablePlant> activePlants = new HashSet<MovablePlant>();
