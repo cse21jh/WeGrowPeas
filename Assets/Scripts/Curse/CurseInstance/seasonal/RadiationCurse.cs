@@ -11,10 +11,12 @@ public class RadiationCurse : CurseInstance
     public override void Activate()
     {
         CurseState.RadiationDecayPercent = Lv != null ? Lv.valueA : 0f;
+        CurseEffectManager.Instance?.SetRadioActive(true);
     }
 
     public override void Deactivate()
     {
         CurseState.RadiationDecayPercent = 0f;
+        CurseEffectManager.Instance?.SetRadioActive(false);
     }
 }

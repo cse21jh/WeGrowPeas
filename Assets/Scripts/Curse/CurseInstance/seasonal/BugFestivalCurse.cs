@@ -12,11 +12,13 @@ public class BugFestivalCurse : CurseInstance
     {
         CurseState.BugFestival = true;
         CurseState.BugFestivalDelayReduce = Lv != null ? Lv.valueA : 0f;
+        CurseEffectManager.Instance?.SetBugFestival(true);
     }
 
     public override void Deactivate()
     {
         CurseState.BugFestival = false;
         CurseState.BugFestivalDelayReduce = 0f;
+        CurseEffectManager.Instance?.SetBugFestival(false);
     }
 }

@@ -135,14 +135,16 @@ public class Peanut : MovablePlant
         List<GeneticTrait> copyTriats = traits.ToList();
 
         // 특수(임시땅콩B): 자가번식 시 양성 변종만 등장 (변종 확률로 판정, 유전자 유지 + 모든 저항 90~100%)
-        if (SpecialItemSystem.Has("peanut_special_8")
-            && Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
+        bool benignMutation = SpecialItemSystem.Has("peanut_special_8")
+            && Random.Range(0f, 100f) < Plant.GetMutationChancePercent();
+        if (benignMutation)
         {
             Plant.ApplyBenignResistance(copyTriats);
-            Debug.Log("[변종] 자가번식 양성 변종 발생!"); // TODO: 변종 이펙트/사운드
+            Debug.Log("[변종] 자가번식 양성 변종 발생!");
         }
 
         Plant child = grid.AddMovablePlant(copyTriats, spawnGridIdx);
+        if (benignMutation) CurseEffectManager.PlayMutation(child, benign: true); // 변종 이펙트
 
         // 왕위 계승: 자가번식한 자식이 부모 가격 배율의 일부를 계승 (유전자로 인한 최종 가격은 계승 X)
         float inheritRatio = grid.GetSuccessionInheritRatio();

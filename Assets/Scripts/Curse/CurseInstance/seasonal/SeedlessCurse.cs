@@ -11,10 +11,12 @@ public class SeedlessCurse : CurseInstance
     public override void Activate()
     {
         CurseState.SeedlessFailPercent = Lv != null ? Lv.valueA : 0f;
+        CurseEffectManager.Instance?.SetWatermelon(true);
     }
 
     public override void Deactivate()
     {
         CurseState.SeedlessFailPercent = 0f;
+        CurseEffectManager.Instance?.SetWatermelon(false);
     }
 }

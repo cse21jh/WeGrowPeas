@@ -1,0 +1,116 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// 저주 시각 이펙트 제어. Assets/Resource/Sprites/Curse/CurseEffectManager 프리팹에 붙여 씬에 배치한다.
+/// 각 저주 인스턴스(Activate/Deactivate)가 여기 함수를 호출한다.
+///
+/// 식물 개별 이펙트(돌연변이·꽃가루 실종)는 각 MovablePlant의 <see cref="PlantCurseManager"/>가 담당하며,
+/// 여기서는 필드 전체 이펙트와 "모든 식물에 일괄 적용"을 처리한다.
+/// </summary>
+public class CurseEffectManager : Singleton<CurseEffectManager>
+{
+    [Header("Field Effects (파티클 Play/Stop)")]
+    [Tooltip("벌레 대발생 — 화면 전체 파티클 (여러 개면 모두 등록)")]
+    [SerializeField] private ParticleSystem[] bugEffects;
+
+    [Tooltip("방사능")]
+    [SerializeField] private ParticleSystem[] radioActiveEffects;
+
+    [Tooltip("꽃가루 실종 — 전용 파티클 (식물 색 변화와 함께 사용)")]
+    [SerializeField] private ParticleSystem[] pollenEffects;
+
+    [Tooltip("씨 없는 수박")]
+    [SerializeField] private ParticleSystem[] watermelonEffects;
+
+    private void Start()
+    {
+        // 프리팹 파티클들이 Play On Awake로 설정돼 있어 배치만 해도 재생된다.
+        // 저주가 걸리기 전까지는 아무 이펙트도 보이지 않아야 하므로 시작 시 전부 정지.
+        StopAll();
+    }
+
+    // ── 저주별 on/off ─────────────────────────────────────────────────────────
+
+    /// <summary>201 벌레 대발생.</summary>
+    public void SetBugFestival(bool on) => SetEffects(bugEffects, on);
+
+    /// <summary>203 방사능.</summary>
+    public void SetRadioActive(bool on) => SetEffects(radioActiveEffects, on);
+
+    /// <summary>207 씨 없는 수박.</summary>
+    public void SetWatermelon(bool on) => SetEffects(watermelonEffects, on);
+
+    /// <summary>
+    /// 204 꽃가루 실종. 전용 파티클 + 교배 불가 식물 색 변화(각 식물의 PlantCurseManager)를 함께 적용.
+    /// </summary>
+    public void SetPollenLost(bool on)
+    {
+        SetEffects(pollenEffects, on);
+        RefreshPollenPlants(on);
+    }
+
+    /// <summary>
+    /// 꽃가루 실종: 현재 교배 불가 상태인 식물만 색을 바꾼다.
+    /// 저주가 꺼지면(on=false) 전부 원래 색으로 되돌린다.
+    /// 매 턴 대상이 새로 굴려지므로 Grid에서 갱신 후에도 호출한다.
+    /// </summary>
+    public void RefreshPollenPlants(bool on)
+    {
+        var grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
+        if (grid == null) return;
+
+        foreach (var plant in grid.plantGrid.Values)
+        {
+            if (plant == null) continue;
+            var pcm = plant.GetComponent<PlantCurseManager>();
+            if (pcm == null) continue;
+
+            pcm.SetPolenSpritesColor(on && !plant.IsBreedable);
+        }
+    }
+
+    /// <summary>
+    /// 202 돌연변이(변종 발생 시 해당 식물에 1회 재생).
+    /// 악성이면 minus, 양성이면 plus 이펙트.
+    /// </summary>
+    public static void PlayMutation(Plant plant, bool benign)
+    {
+        if (plant == null) return;
+        var pcm = plant.GetComponent<PlantCurseManager>();
+        if (pcm == null) return;
+
+        if (benign) pcm.SetMutantPlusEffect(true);
+        else pcm.SetMutantMinusEffect(true);
+    }
+
+    /// <summary>모든 필드 이펙트 정지 (새 게임/저주 해제 시).</summary>
+    public void StopAll()
+    {
+        SetEffects(bugEffects, false);
+        SetEffects(radioActiveEffects, false);
+        SetEffects(pollenEffects, false);
+        SetEffects(watermelonEffects, false);
+        RefreshPollenPlants(false);
+    }
+
+    private static void SetEffects(IReadOnlyList<ParticleSystem> effects, bool on)
+    {
+        if (effects == null) return;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            var ps = effects[i];
+            if (ps == null) continue;
+
+            if (on)
+            {
+                ps.Play(true); // 하위 파티클까지 함께
+            }
+            else
+            {
+                // 이미 화면에 남아있는 파티클까지 제거해야 저주가 꺼진 게 보인다.
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+        }
+    }
+}

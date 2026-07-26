@@ -352,6 +352,7 @@ public class Grid : MonoBehaviour
                 // 저주: 광란 — 확률적으로 랜덤 교배
                 bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
                 Plant plant = AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                PlayMutationEffectIfAny(plant); // 변종(돌연변이) 이펙트
                 if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting)
                 {
                     UIManager.Instance.Popup.ShowBreedPopup(plant);
@@ -361,7 +362,8 @@ public class Grid : MonoBehaviour
                 if (twinBreedProbability > 0f && Random.Range(0f, 1f) < twinBreedProbability && HasEmptyGrid())
                 {
                     // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
-                    AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                    PlayMutationEffectIfAny(
+                        AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
                     UIManager.Instance.Popup.ShowFloatingPopup("쌍둥이가 태어났습니다!", 1);
                     totalBreedCount++;
                     if (GameManager.Instance.currentPlant == "완두콩")
@@ -556,6 +558,15 @@ public class Grid : MonoBehaviour
         yield return null;
     }
 
+    // 직전 Breed()의 변종 결과. 생성된 식물에 이펙트를 재생하기 위해 호출부가 참조한다.
+    // (0 = 변종 없음, 1 = 악성, 2 = 양성)
+    private int lastMutationKind = 0;
+
+    /// <summary>직전 교배에서 변종이 발생했는가.</summary>
+    public bool LastBreedWasMutation => lastMutationKind != 0;
+    /// <summary>직전 변종이 양성이었는가. (변종이 아니면 의미 없음)</summary>
+    public bool LastBreedWasBenign => lastMutationKind == 2;
+
     protected List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, bool randomBreed = false)
     {
         List<GeneticTrait> childTrait = new List<GeneticTrait>();
@@ -570,8 +581,9 @@ public class Grid : MonoBehaviour
             // 슈퍼 변종: 양성:악성 비율이 반전(80:20)
             else if (Random.value < (hasSuperMutation ? 0.2f : 0.8f)) malignant = true;
             else benign = true;
-            Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!"); // TODO: 변종 이펙트/사운드
+            Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!");
         }
+        lastMutationKind = malignant ? 1 : (benign ? 2 : 0);
 
         foreach (TraitType trait in System.Enum.GetValues(typeof(TraitType)))
         {
@@ -707,6 +719,13 @@ public class Grid : MonoBehaviour
             GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.5f));
 
         return plant;
+    }
+
+    /// <summary>직전 교배가 변종이었다면 해당 식물에 변종 이펙트를 재생한다.</summary>
+    public void PlayMutationEffectIfAny(Plant plant)
+    {
+        if (plant == null || !LastBreedWasMutation) return;
+        CurseEffectManager.PlayMutation(plant, LastBreedWasBenign);
     }
 
     /// <summary>
@@ -1244,6 +1263,9 @@ public class Grid : MonoBehaviour
         ShuffleList(plants);
         for (int i = 0; i < count && i < plants.Count; i++)
             if (plants[i] != null) plants[i].SetBreedable(false);
+
+        // 대상이 새로 굴려졌으므로 교배 불가 식물의 색 표시도 갱신
+        CurseEffectManager.Instance?.RefreshPollenPlants(true);
     }
 
     /// <summary>저주(도둑): 페트병으로 보호되지 않은 무작위 식물 count개 제거.</summary>
