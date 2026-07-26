@@ -100,6 +100,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
     [SerializeField] private GameObject complete_panel;
     [SerializeField] private GameObject failed_panel;
     [SerializeField] private TextMeshProUGUI stateText;
+    [SerializeField] private Button receiveRewardBtn;
 
     private RequestInstance RI;
     public RequestInstance RequestInstance => RI;
@@ -244,6 +245,12 @@ public sealed class ExpandableQuestTab : MonoBehaviour
     private void Awake()
     {
         CacheReferences();
+
+        if (receiveRewardBtn != null)
+        {
+            receiveRewardBtn.onClick.RemoveAllListeners();
+            receiveRewardBtn.onClick.AddListener(OnClickReceiveReward);
+        }
 
         _isExpanded = initiallyExpanded;
         ApplyStateImmediately(_isExpanded);

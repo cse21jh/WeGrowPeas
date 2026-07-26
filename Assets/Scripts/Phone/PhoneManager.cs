@@ -67,6 +67,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     //private readonly Dictionary<AppKey, GameObject> _instances = new();
     private AppKey? _current = null;
+    public AppKey? CurrentApp => _current;
     private bool _isOpen;
 
 
@@ -76,6 +77,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     //폰 페이즈 관련
     private float phoneTimer = 0;
+    public bool IsPhonePhase => phoneTimer > 0;
     private bool skipPhoneTime = false;
     private bool isPhoneTime = false;
 

@@ -81,12 +81,17 @@ public class RequestManager : Singleton<RequestManager>
     {
         ClearRequestAlarm();
 
-        var valid = requestPool.Where(p => p != null).ToList();
+        // requestId 중복 방지 및 특정 퀘스트 필터링
+        var valid = requestPool.Where(p => p != null && !(p.requestId.StartsWith("002") && GameManager.Instance.stage < 11)).ToList();
 
         if (valid.Count == 0) return;
 
-        // requestId �ߺ� ����
-        var rng = new System.Random();
+        int seed = Environment.TickCount;
+        if (GameManager.Instance != null && ShopManager.Instance != null)
+        {
+            seed = ShopManager.Instance.GetGameUniqueSeed() + GameManager.Instance.stage * 100;
+        }
+        var rng = new System.Random(seed);
         var picked = new List<RequestScriptable>();
         int safety = 2000;
 
@@ -224,8 +229,6 @@ public class RequestManager : Singleton<RequestManager>
 
     private void PushRequestGenerateAlarm()
     {
-        newRequestArrived = true;
-
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
@@ -235,7 +238,15 @@ public class RequestManager : Singleton<RequestManager>
                     }
                 );
 
-        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+        if (PhoneManager.Instance.CurrentApp == AppKey.Quest)
+        {
+            newRequestArrived = false;
+        }
+        else
+        {
+            newRequestArrived = true;
+            PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+        }
     }
 
     public void OnCheckedNewRequest()

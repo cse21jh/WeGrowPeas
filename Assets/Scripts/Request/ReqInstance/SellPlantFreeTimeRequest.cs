@@ -33,8 +33,8 @@ public class SellPlantFreeTimeRequest : RequestInstance
     {
         if (IsCompleted || IsFailed) return;
 
-        // 자유시간인지 체크 (isBreeding == true)
-        if (GameManager.Instance != null && GameManager.Instance.grid != null && GameManager.Instance.grid.GetIsBreeding())
+        // 자유시간인지 체크 (핸드폰 페이즈)
+        if (PhoneManager.Instance != null && PhoneManager.Instance.IsPhonePhase)
         {
             currentCount++;
             if (currentCount >= requiredCount) CompleteOnce();

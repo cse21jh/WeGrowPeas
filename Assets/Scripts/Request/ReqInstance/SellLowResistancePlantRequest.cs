@@ -36,9 +36,9 @@ public class SellLowResistancePlantRequest : RequestInstance
         if (IsCompleted || IsFailed) return;
 
         bool hasLowRes = false;
-        for (int i = 0; i < 8; i++)
+        foreach (var t in p.GetGeneticTrait())
         {
-            if (p.GetResistanceValue(i) <= targetResistance)
+            if (p.GetResistanceValue((int)t.traitType) <= targetResistance)
             {
                 hasLowRes = true;
                 break;
