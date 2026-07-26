@@ -31,23 +31,9 @@ public class PhoneAlarmEffectController : MonoBehaviour
     [SerializeField] private Color permanentColor;
     [SerializeField] private Color periodColor;
 
-
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            AlarmPermanent();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            AlarmImpermanent();
-        }
-    }
-
-
     public void AlarmPermanent()
     {
-        if(isPermanentOn || !isAlarmAble) return;
+        if (isPermanentOn || !isAlarmAble) return;
         StopAlarm();
 
         isPermanentOn = true;
@@ -62,7 +48,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void AlarmImpermanent()
     {
-        if(isImpermanentOn || !isAlarmAble) return;
+        if (isImpermanentOn || !isAlarmAble) return;
         StopAlarm();
 
         isImpermanentOn = true;
@@ -100,8 +86,9 @@ public class PhoneAlarmEffectController : MonoBehaviour
     public void EnableAlarm()
     {
         isAlarmAble = true;
-        if(PhoneManager.Instance.TotalPhoneAlarmState != AlarmState.None) {
-            if(PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.Mandatory)
+        if (PhoneManager.Instance.TotalPhoneAlarmState != AlarmState.None)
+        {
+            if (PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.Mandatory)
             {
                 AlarmPermanent();
             }
