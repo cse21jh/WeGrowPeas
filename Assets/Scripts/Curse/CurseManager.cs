@@ -70,8 +70,8 @@ public class CurseManager : Singleton<CurseManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F9)) showCurseDebug = !showCurseDebug;
-        if (Input.GetKeyDown(KeyCode.F10)) showForcePanel = !showForcePanel;
+        // if (Input.GetKeyDown(KeyCode.F9)) showCurseDebug = !showCurseDebug;
+        // if (Input.GetKeyDown(KeyCode.F10)) showForcePanel = !showForcePanel;
     }
 
     /// <summary>[디버그] 특정 저주를 지정 레벨로 즉시 적용(테스트용).</summary>

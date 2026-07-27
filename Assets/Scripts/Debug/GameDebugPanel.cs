@@ -26,7 +26,7 @@ public class GameDebugPanel : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(ToggleKey)) show = !show;
+        // if (Input.GetKeyDown(ToggleKey)) show = !show;
     }
 
     private void OnGUI()
