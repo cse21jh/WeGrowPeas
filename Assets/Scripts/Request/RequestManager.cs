@@ -232,8 +232,8 @@ public class RequestManager : Singleton<RequestManager>
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "? ??? ??!",
-                        message = "??? ??? ??? ???.",
+                        title = "새 퀘스트 도착!",
+                        message = "퀘스트 앱에서 확인해 주세요.",
                         duration = 5f
                     }
                 );
@@ -262,7 +262,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "??? ??? - " + (cycle - dayPassed) + "? ??";
+        appTitle.text = "금주의 퀘스트 - " + (cycle - dayPassed) + "일 남음";
     }
 
     public void AddCompleteRequestCount()
