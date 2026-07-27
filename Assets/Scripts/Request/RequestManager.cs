@@ -9,7 +9,7 @@ public class RequestInstanceSaveData
 {
     public string requestId;
     public string typeCode;
-    public int progressCount; // ÏßÑÌñâ???Ä??
+    public int progressCount; // ??? ??
     public int state;
     public List<string> extraStrings; //buymerch
     public int extraInt; //sellspecificpea & peasurvive
@@ -81,7 +81,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         ClearRequestAlarm();
 
-        // requestId Ï§ëÎ≥µ Î∞©Ï? Î∞??πÏ†ï ?òÏä§???ÑÌÑ∞Îß?
+        // requestId ?? ?? ? ?? ??? ???
         var valid = requestPool.Where(p => p != null && !(p.requestId.StartsWith("002") && GameManager.Instance.stage < 11)).ToList();
 
         if (valid.Count == 0) return;
@@ -232,8 +232,8 @@ public class RequestManager : Singleton<RequestManager>
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "???òÏä§???ÑÏ∞©!",
-                        message = "?òÏä§???±Ïóê???ïÏù∏??Ï£ºÏÑ∏??",
+                        title = "? ??? ??!",
+                        message = "??? ??? ??? ???.",
                         duration = 5f
                     }
                 );
@@ -262,7 +262,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "Í∏àÏ£º???òÏä§??- " + (cycle - dayPassed) + "???®Ïùå";
+        appTitle.text = "??? ??? - " + (cycle - dayPassed) + "? ??";
     }
 
     public void AddCompleteRequestCount()
