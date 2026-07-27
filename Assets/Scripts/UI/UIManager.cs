@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class UIManager : Singleton<UIManager>
 {
     public PopupSystem Popup { get; private set; }
-    private bool showBreedPopupSetting = true;
+    private bool showBreedPopupSetting = false;
 
 
     //프로필 데이터 저장    

@@ -26,7 +26,7 @@ public class ProfileData
     //TutorialManager
     public bool hasSeenTutorial;
 
-    public bool showBreedPopupSetting = true;
+    public bool showBreedPopupSetting = false;
 
     //PhoneManager & Messenger
     public List<string> readMessengerKeys = new List<string>();
