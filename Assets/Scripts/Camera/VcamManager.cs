@@ -54,7 +54,13 @@ public class VcamManager : MonoBehaviour
     [SerializeField] private float fallbackOrthographicSize = 5f;
 
     [Header("UI")]
-    [SerializeField] private bool ignoreInputOnUI = false;
+    [SerializeField] private bool ignoreInputOnPhoneUI = true;
+
+    [Tooltip("카메라 입력을 막을 휴대폰 UI의 실제 화면 영역")]
+    [SerializeField] private RectTransform phoneUIInputArea;
+
+    [Tooltip("Screen Space - Camera 또는 World Space Canvas에서 사용하는 카메라")]
+    [SerializeField] private Camera phoneUICamera;
 
     private bool isDragging;
     private Vector3 previousMousePosition;
@@ -177,7 +183,7 @@ public class VcamManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(dragMouseButton))
         {
-            if (IsPointerOverUI())
+            if (IsPointerOverPhoneUI())
             {
                 return;
             }
@@ -224,7 +230,7 @@ public class VcamManager : MonoBehaviour
             return;
         }
 
-        if (IsPointerOverUI())
+        if (IsPointerOverPhoneUI())
         {
             return;
         }
@@ -468,19 +474,39 @@ public class VcamManager : MonoBehaviour
         }
     }
 
-    private bool IsPointerOverUI()
+    private bool IsPointerOverPhoneUI()
     {
-        if (!ignoreInputOnUI)
+        if (!ignoreInputOnPhoneUI)
         {
             return false;
         }
 
-        if (EventSystem.current == null)
+        if (phoneUIInputArea == null)
         {
             return false;
         }
 
-        return EventSystem.current.IsPointerOverGameObject();
+        if (!phoneUIInputArea.gameObject.activeInHierarchy)
+        {
+            return false;
+        }
+
+        Canvas canvas = phoneUIInputArea.GetComponentInParent<Canvas>();
+
+        Camera eventCamera = null;
+
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            eventCamera = canvas.worldCamera != null
+                ? canvas.worldCamera
+                : phoneUICamera;
+        }
+
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            phoneUIInputArea,
+            Input.mousePosition,
+            eventCamera
+        );
     }
 
     private void OnDrawGizmosSelected()
