@@ -186,8 +186,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -26.5}
-  m_SizeDelta: {x: 450, y: 250}
+  m_AnchoredPosition: {x: 0, y: -13.25}
+  m_SizeDelta: {x: 396, y: 223.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1492202882568369879
 CanvasRenderer:
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 17824334298bdef469fa3b8470648a92, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4f21ce59aa6e02e4384326973f27a4e9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -346,10 +346,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a3f855b0215edd47b8c605fb1a74a65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popupPanel: {fileID: 0}
-  popupHandle: {fileID: 0}
+  maximizedPanel: {fileID: 0}
+  minimizedPanel: {fileID: 0}
   minimizeButton: {fileID: 0}
-  handleButton: {fileID: 0}
+  maximizeButton: {fileID: 0}
   duration: 0.3
   ease: 7
 --- !u!1 &6317410844840125096
@@ -530,6 +530,7 @@ MonoBehaviour:
   m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

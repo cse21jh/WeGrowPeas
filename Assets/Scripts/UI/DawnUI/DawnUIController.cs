@@ -60,7 +60,17 @@ public class DawnUIController : MonoBehaviour
     {
         if (dawnPanel != null) dawnPanel.SetActive(true);
         BuildStageList();
-        SelectStage(Mathf.Max(0, DawnSystem.MaxUnlockedDawnStage)); // 해금된 최대 스테이지로 UI 띄워줌
+        
+        int targetStage = 0;
+        foreach (var data in DawnSystem.AllStages())
+        {
+            if (data != null && DawnSystem.IsStageUnlocked(data.stage))
+            {
+                targetStage = Mathf.Max(targetStage, data.stage);
+            }
+        }
+        
+        SelectStage(targetStage); // 해금된 최대 스테이지(현재 구성된 단계 내에서)로 UI 띄워줌
     }
 
     public void CloseDawnPanel()
