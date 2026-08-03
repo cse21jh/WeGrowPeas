@@ -59,10 +59,7 @@ public static class SpecialItemUISceneSetup
         var hl = cardRow.AddComponent<HorizontalLayoutGroup>();
         hl.spacing = 30; hl.childForceExpandWidth = true; hl.childControlWidth = true; hl.childControlHeight = true; hl.childForceExpandHeight = true;
 
-        var cardButtons = new Button[3];
-        var cardNames = new TMP_Text[3];
-        var cardDescs = new TMP_Text[3];
-        var cardIcons = new Image[3];
+        var cards = new SpecialItemCard[3];
 
         for (int i = 0; i < 3; i++)
         {
@@ -70,19 +67,37 @@ public static class SpecialItemUISceneSetup
             var cardImg = AddImage(card, new Color(1f, 1f, 1f, 0.08f));
             var btn = card.AddComponent<Button>();
             btn.targetGraphic = cardImg;
-            cardButtons[i] = btn;
 
             var iconGo = NewUI("Icon", card.transform);
             Anchor(iconGo, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(-60, -160), new Vector2(60, -40));
-            cardIcons[i] = AddImage(iconGo, Color.white);
+            var iconImg = AddImage(iconGo, Color.white);
 
             var nameGo = NewText("Name", card.transform, "", 30, TextAlignmentOptions.Center);
             Anchor(nameGo, new Vector2(0, 1), new Vector2(1, 1), new Vector2(10, -230), new Vector2(-10, -170));
-            cardNames[i] = nameGo.GetComponent<TMP_Text>();
 
             var descGo = NewText("Desc", card.transform, "", 22, TextAlignmentOptions.Top);
-            Anchor(descGo, new Vector2(0, 0), new Vector2(1, 1), new Vector2(15, 15), new Vector2(-15, -245));
-            cardDescs[i] = descGo.GetComponent<TMP_Text>();
+            Anchor(descGo, new Vector2(0, 0), new Vector2(1, 1), new Vector2(15, 75), new Vector2(-15, -245));
+
+            // 카드 하단 리롤 버튼
+            var rerollGo = NewUI("RerollButton", card.transform);
+            Anchor(rerollGo, new Vector2(0, 0), new Vector2(1, 0), new Vector2(15, 15), new Vector2(-15, 65));
+            var rerollImg = AddImage(rerollGo, new Color(1f, 1f, 1f, 0.15f));
+            var rerollBtn = rerollGo.AddComponent<Button>();
+            rerollBtn.targetGraphic = rerollImg;
+            var rerollLabel = NewText("Label", rerollGo.transform, "다시 뽑기", 20, TextAlignmentOptions.Center);
+            Stretch(rerollLabel);
+
+            // 카드 스크립트 연결 (표시/버튼은 카드가 스스로 관리)
+            var cardScript = card.AddComponent<SpecialItemCard>();
+            var cso = new SerializedObject(cardScript);
+            cso.FindProperty("selectButton").objectReferenceValue = btn;
+            cso.FindProperty("icon").objectReferenceValue = iconImg;
+            cso.FindProperty("nameText").objectReferenceValue = nameGo.GetComponent<TMP_Text>();
+            cso.FindProperty("descText").objectReferenceValue = descGo.GetComponent<TMP_Text>();
+            cso.FindProperty("rerollButton").objectReferenceValue = rerollBtn;
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            cards[i] = cardScript;
         }
 
         var closeBtn = NewUI("CloseButton", panel.transform);
@@ -98,10 +113,7 @@ public static class SpecialItemUISceneSetup
         so.FindProperty("giftButtonRoot").objectReferenceValue = giftRoot;
         so.FindProperty("giftCountText").objectReferenceValue = giftCount.GetComponent<TMP_Text>();
         so.FindProperty("choicePanel").objectReferenceValue = panel;
-        FillArray(so, "cardButtons", cardButtons);
-        FillArray(so, "cardNames", cardNames);
-        FillArray(so, "cardDescs", cardDescs);
-        FillArray(so, "cardIcons", cardIcons);
+        FillArray(so, "cards", cards);
         so.ApplyModifiedPropertiesWithoutUndo();
 
         UnityEventTools.AddPersistentListener(giftBtn.onClick, controller.OpenChoicePanel);

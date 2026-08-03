@@ -174,6 +174,7 @@ public class SaveData
     //SpecialItem (특수 아이템)
     public List<string> ownedSpecialItems = new();
     public int pendingSpecialGifts;
+    public List<int> specialItemRerolls = new(); // 선택지 칸별 남은 리롤
     public List<float> columnGoldMulBonusList = new(); // 특수(땅부자) 세로줄 배수 (index = col)
 
     //종료 시 저장
@@ -669,7 +670,7 @@ public class GameManager : Singleton<GameManager>
         requestManager.LoadRequestManager(saveData);
         phoneManager.LoadPhoneManager(saveData);
         curseManager.LoadCurseManager(saveData);
-        SpecialItemSystem.LoadFromSave(saveData.ownedSpecialItems, saveData.pendingSpecialGifts);
+        SpecialItemSystem.LoadFromSave(saveData.ownedSpecialItems, saveData.pendingSpecialGifts, saveData.specialItemRerolls);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData);
@@ -892,6 +893,7 @@ public class GameManager : Singleton<GameManager>
         saveData.curseId = curseManager.SaveCurseManager();
         saveData.ownedSpecialItems = SpecialItemSystem.GetSaveOwned();
         saveData.pendingSpecialGifts = SpecialItemSystem.GetSavePending();
+        saveData.specialItemRerolls = SpecialItemSystem.GetSaveRerolls();
         saveData.columnGoldMulBonusList = grid.GetColumnGoldMulBonusForSave();
         saveData.remainSeasonCurseDay = curseManager.RemainingCurseDay;
         saveData.remainTempCurseDay = curseManager.RemainingTempCurseDay;

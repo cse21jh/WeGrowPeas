@@ -51,6 +51,43 @@ public static class SpecialItemSystem
             && d.unlockDawnStage == stage && d.plantName == plant).ToList();
     }
 
+    // ── 리롤 ──────────────────────────────────────────────────────────────────
+    /// <summary>선택지 한 칸당 사용할 수 있는 리롤 횟수.</summary>
+    public const int RerollPerSlot = 1;
+
+    /// <summary>선택지 칸 수(카드 개수).</summary>
+    public const int SlotCount = 3;
+
+    // 칸별 남은 리롤 횟수
+    private static readonly int[] _slotRerolls = CreateSlotRerolls();
+
+    private static int[] CreateSlotRerolls()
+    {
+        var arr = new int[SlotCount];
+        for (int i = 0; i < arr.Length; i++) arr[i] = RerollPerSlot;
+        return arr;
+    }
+
+    /// <summary>해당 칸의 남은 리롤 횟수.</summary>
+    public static int GetSlotRerolls(int slot)
+        => (slot >= 0 && slot < _slotRerolls.Length) ? _slotRerolls[slot] : 0;
+
+    public static bool CanRerollSlot(int slot) => GetSlotRerolls(slot) > 0;
+
+    /// <summary>해당 칸의 리롤 1회 소모. 성공하면 true.</summary>
+    public static bool UseSlotReroll(int slot)
+    {
+        if (!CanRerollSlot(slot)) return false;
+        _slotRerolls[slot]--;
+        return true;
+    }
+
+    /// <summary>모든 칸의 리롤 횟수 회복 (새 선물).</summary>
+    private static void ResetSlotRerolls()
+    {
+        for (int i = 0; i < _slotRerolls.Length; i++) _slotRerolls[i] = RerollPerSlot;
+    }
+
     // ── 선물 지급/수령 ─────────────────────────────────────────────────────────
     /// <summary>10·20·30일 자유시간 시작 시 호출 — 선물 +1 (수령 전까지 유지·누적).</summary>
     public static void AddGift()
@@ -61,6 +98,36 @@ public static class SpecialItemSystem
 
     /// <summary>선택 후보 3개 롤. 공용 전체 + (현재 식물 + 언락된) 식물별 − 이미 보유.</summary>
     public static List<SpecialItemData> RollCandidates(string currentPlant, int count = 3)
+    {
+        var pool = GetAvailablePool(currentPlant);
+
+        // 셔플 후 앞에서 count개
+        for (int i = pool.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (pool[i], pool[j]) = (pool[j], pool[i]);
+        }
+        return pool.GetRange(0, Mathf.Min(count, pool.Count));
+    }
+
+    /// <summary>
+    /// 후보 한 자리만 다른 아이템으로 교체(카드별 리롤).
+    /// 현재 화면에 떠 있는 다른 후보와는 겹치지 않게 고른다. 바꿀 게 없으면 null.
+    /// </summary>
+    public static SpecialItemData RollReplacement(string currentPlant, List<SpecialItemData> current, int index)
+    {
+        var pool = GetAvailablePool(currentPlant);
+
+        // 지금 보여주고 있는 후보들 제외 (교체 대상 자기 자신 포함)
+        if (current != null)
+            pool.RemoveAll(d => current.Contains(d));
+
+        if (pool.Count == 0) return null;
+        return pool[Random.Range(0, pool.Count)];
+    }
+
+    /// <summary>획득 가능한(미보유 + 조건 충족) 아이템 목록.</summary>
+    private static List<SpecialItemData> GetAvailablePool(string currentPlant)
     {
         var pool = new List<SpecialItemData>();
         foreach (var d in All)
@@ -73,14 +140,7 @@ public static class SpecialItemSystem
             }
             pool.Add(d);
         }
-
-        // 셔플 후 앞에서 count개
-        for (int i = pool.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (pool[i], pool[j]) = (pool[j], pool[i]);
-        }
-        return pool.GetRange(0, Mathf.Min(count, pool.Count));
+        return pool;
     }
 
     /// <summary>3택에서 하나 선택 — 보유 등록 + 선물 1개 소모.</summary>
@@ -89,18 +149,25 @@ public static class SpecialItemSystem
         if (item == null || string.IsNullOrEmpty(item.id)) return;
         _owned.Add(item.id);
         PendingGifts = Mathf.Max(0, PendingGifts - 1);
+        ResetSlotRerolls(); // 다음 선물을 위해 칸별 리롤 횟수 회복
         Debug.Log($"[SpecialItem] 획득: {item.displayName} ({item.id})");
     }
 
     // ── 저장/로드 (per-run) ────────────────────────────────────────────────────
     public static List<string> GetSaveOwned() => new List<string>(_owned);
     public static int GetSavePending() => PendingGifts;
+    public static List<int> GetSaveRerolls() => new List<int>(_slotRerolls);
 
-    public static void LoadFromSave(List<string> owned, int pending)
+    public static void LoadFromSave(List<string> owned, int pending, List<int> slotRerolls = null)
     {
         _owned.Clear();
         if (owned != null) foreach (var id in owned) if (!string.IsNullOrEmpty(id)) _owned.Add(id);
         PendingGifts = Mathf.Max(0, pending);
+
+        ResetSlotRerolls();
+        if (slotRerolls != null)
+            for (int i = 0; i < _slotRerolls.Length && i < slotRerolls.Count; i++)
+                _slotRerolls[i] = Mathf.Clamp(slotRerolls[i], 0, RerollPerSlot);
     }
 
     /// <summary>새 게임 시작 시 초기화.</summary>
@@ -108,5 +175,6 @@ public static class SpecialItemSystem
     {
         _owned.Clear();
         PendingGifts = 0;
+        ResetSlotRerolls();
     }
 }
