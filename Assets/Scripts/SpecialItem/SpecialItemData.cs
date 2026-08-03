@@ -5,6 +5,7 @@ using UnityEngine;
 /// 10·20·30일 자유시간에 도착하는 선물에서 3택 1로 획득. 공용 / 식물별(새벽 클리어 언락)로 나뉜다.
 /// </summary>
 [CreateAssetMenu(menuName = "SpecialItem/Special Item Data")]
+[BalanceGroup("SpecialItem", "SpecialItems")]
 public class SpecialItemData : ScriptableObject
 {
     [Tooltip("고유 id (효과 코드에서 SpecialItemState.Has(id)로 조회)")]
@@ -22,6 +23,7 @@ public class SpecialItemData : ScriptableObject
     [Tooltip("plantSpecific일 때 대상 식물 이름 (GameManager.currentPlant와 비교: 완두콩/땅콩)")]
     public string plantName;
 
+    [Balance("해금 새벽단계")]
     [Tooltip("plantSpecific일 때 해금에 필요한 새벽 클리어 단계 (4/8/12)")]
     public int unlockDawnStage;
 

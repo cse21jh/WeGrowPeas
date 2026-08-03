@@ -12,16 +12,17 @@ public enum ItemRarity
     Legendary = 1    // 전설 등급 (가중치 1)
 }
 
+[BalanceGroup("Shop", "Items")] // 서브클래스 전부 Shop/Items.csv 한 파일로
 public abstract class ItemData : ScriptableObject
 {
     [Header("Meta")]
     public string DisplayName;
     public Sprite Icon;
     [TextArea] public string Description;
-    public int Price;
-    
+    [Balance("가격")] public int Price;
+
     [Header("Rarity")]
-    public ItemRarity Rarity = ItemRarity.Common;
+    [Balance("등급")] public ItemRarity Rarity = ItemRarity.Common;
     
     [Header("Grade Tag")]
     [Tooltip("등급 태그 텍스트 (예: S, A, B, C)")]
@@ -31,8 +32,9 @@ public abstract class ItemData : ScriptableObject
 
     [Header("Rule")]
     public bool IsStackable = false;
-    public int InitialStock = 1;
+    [Balance("초기 재고")] public int InitialStock = 1;
     public bool OnePerShopIfNotStackable = true;
+    [Balance("최대 구매")]
     [Tooltip("-1 = ������, 0 �̻� = ���� ��ü���� �ִ� ���� Ƚ��")]
     public int MaxPurchaseCount = -1;
 

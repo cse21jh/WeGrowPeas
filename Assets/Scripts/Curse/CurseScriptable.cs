@@ -9,6 +9,7 @@ public enum CurseType { Temporal, Seasonal }
 /// 필드 의미는 저주마다 다르므로 각 Curse 인스턴스 클래스 주석 참고.
 /// </summary>
 [CreateAssetMenu(menuName = "Curse/CurseItem")]
+[BalanceGroup("Curse", "Curses")]
 public class CurseScriptable : ScriptableObject
 {
     public string curseId;
@@ -21,9 +22,11 @@ public class CurseScriptable : ScriptableObject
 
     [TextArea] public string description;
 
+    [Balance("해금 스테이지")]
     [Tooltip("해금 스테이지 (이 스테이지 이상부터 등장)")]
     public int unlockStage = 1;
 
+    [BalanceRows("level")] // 저주 1/2/3단계를 한 행씩 표에 펼침 (키 = 순번)
     [Tooltip("1/2/3단계 수치. index 0 = 1단계. 새벽 저주 레벨로 선택됨.")]
     public List<CurseLevel> levels = new List<CurseLevel>();
 
@@ -46,9 +49,9 @@ public class CurseScriptable : ScriptableObject
 [System.Serializable]
 public class CurseLevel
 {
-    public float valueA;
-    public float valueB;
-    public int days;
+    [Balance("수치A")] public float valueA;
+    [Balance("수치B")] public float valueB;
+    [Balance("일수")] public int days;
 
     [TextArea]
     [Tooltip("인스펙터 메모용. 로직에 영향 없음.")]
