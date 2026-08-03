@@ -38,9 +38,9 @@ public class CodexUIController : MonoBehaviour
     // 컨트롤러는 항상 켜진 루트에 있어야 함(패널만 토글). 그래야 닫힌 상태에서도 F8이 동작.
     private void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.F8)) Toggle();
-        // else 
-        if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseCodex();
+        // F8은 디버그용 단축키(정식 진입은 버튼). 디버그 패널이 꺼져 있으면 동작하지 않는다.
+        if (DebugPanels.Enabled && Input.GetKeyDown(KeyCode.F8)) Toggle();
+        else if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseCodex();
     }
 
     public void Toggle()

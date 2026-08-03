@@ -70,8 +70,11 @@ public class CurseManager : Singleton<CurseManager>
 
     private void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.F9)) showCurseDebug = !showCurseDebug;
-        // if (Input.GetKeyDown(KeyCode.F10)) showForcePanel = !showForcePanel;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (!DebugPanels.Enabled) return;
+        if (Input.GetKeyDown(KeyCode.F9)) showCurseDebug = !showCurseDebug;
+        if (Input.GetKeyDown(KeyCode.F10)) showForcePanel = !showForcePanel;
+#endif
     }
 
     /// <summary>[디버그] 특정 저주를 지정 레벨로 즉시 적용(테스트용).</summary>
@@ -192,6 +195,7 @@ public class CurseManager : Singleton<CurseManager>
     private GUIStyle _dbgStyle;
     private void OnGUI()
     {
+        if (!DebugPanels.Enabled) return; // 릴리즈 빌드에선 항상 false
         if (!showCurseDebug) return;
 
         if (_dbgStyle == null)

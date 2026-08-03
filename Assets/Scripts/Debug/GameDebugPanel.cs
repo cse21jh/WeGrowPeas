@@ -26,19 +26,22 @@ public class GameDebugPanel : MonoBehaviour
 
     private void Update()
     {
-        // if (Input.GetKeyDown(ToggleKey)) show = !show;
+        DebugPanels.HandleToggleKey(); // F12: 디버그 패널 전체 on/off
+
+        if (!DebugPanels.Enabled) { show = false; return; }
+        if (Input.GetKeyDown(ToggleKey)) show = !show;
     }
 
     private void OnGUI()
     {
-        if (!show) return;
+        if (!DebugPanels.Enabled || !show) return;
 
         if (wrapLabel == null)
             wrapLabel = new GUIStyle(GUI.skin.label) { wordWrap = true };
 
         GUILayout.BeginArea(new Rect(Screen.width - 330, 10, 320, Screen.height - 20), GUI.skin.box);
         GUILayout.Label("── 디버그 패널 (F11) ──");
-        GUILayout.Label("F8 도감 · F9 저주 상태 · F10 저주 강제", wrapLabel);
+        GUILayout.Label("F8 도감 · F9 저주 상태 · F10 저주 강제 · F12 전체 끄기", wrapLabel);
 
         scroll = GUILayout.BeginScrollView(scroll);
 
