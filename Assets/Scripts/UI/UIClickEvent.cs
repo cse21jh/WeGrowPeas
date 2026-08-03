@@ -39,11 +39,11 @@ public class UIClickEvent : MonoBehaviour
         action?.Invoke();
     }
 
-    public async void OnClick_StartNewGame(int slotIndex)
+    // 씬 전환 연출(덮기/열기)은 SceneLoader가 담당한다. 여기서 Transition_Out을 직접 부르지 않는다.
+    public void OnClick_StartNewGame(int slotIndex)
     {
         SaveContext.Instance.SelectSlot(slotIndex);
 
-        await TransitionController.instance.Transition_Out();
         GameStartContext.SetStartType(GameStartType.NewGame);
         SceneLoader.Instance?.LoadGardenScene();
 
@@ -71,7 +71,7 @@ public class UIClickEvent : MonoBehaviour
         OnClickShowSaveSlotPanel();
     }
 
-    public async void OnClick_ContinueGameAfterEnding()
+    public void OnClick_ContinueGameAfterEnding()
     {
         string path = SaveContext.Instance.CurrentSaveFilePath;
 
@@ -86,34 +86,28 @@ public class UIClickEvent : MonoBehaviour
         }
         GameStartContext.SetStartType(startType);
 
-        await TransitionController.instance.Transition_Out();
         //GameStartContext.SetStartType(GameStartType.ContinueGame);
         SceneLoader.Instance?.LoadGardenScene();
     }
 
-    public async void OnClick_GoToTutorial()
+    public void OnClick_GoToTutorial()
     {
-        await TransitionController.instance.Transition_Out();
         SceneLoader.Instance?.LoadTutorialScene();
     }
 
-    public async void OnClick_GoToIntro()
+    public void OnClick_GoToIntro()
     {
-        await TransitionController.instance.Transition_Out();
         SceneLoader.Instance?.LoadIntroScene();
     }
 
-    public async void OnClick_PlayAgain()
+    public void OnClick_PlayAgain()
     {
-        await TransitionController.instance.Transition_Out();
         SceneLoader.Instance?.LoadStartScene();
     }
 
-    public async void OnClick_SaveAndReturnMain()
+    public void OnClick_SaveAndReturnMain()
     {
         //GameEvents.RequestSaveGame();
-        await TransitionController.instance.Transition_Out();
-        //SceneLoader.Instance?.LoadStartScene();
         Debug.Log("Save And Return Main");
         SceneLoader.Instance?.LoadStartScene();
     }

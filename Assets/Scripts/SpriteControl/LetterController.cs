@@ -9,8 +9,8 @@ public class LetterController : MonoBehaviour
     public AnimationCurve curveY;
     public AnimationCurve curveZ;
 
-    public float speed = 1f; // Ä¿ºê°¡ Àç»ıµÇ´Â ¼Óµµ
-    public float amplitude = 1f; // ¿òÁ÷ÀÓÀÇ ¼¼±â
+    public float speed = 1f; // Ä¿ï¿½ê°¡ ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½Óµï¿½
+    public float amplitude = 1f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     private Vector3 startPos;
     private float time;
@@ -35,9 +35,9 @@ public class LetterController : MonoBehaviour
 
     private void OnMouseDown()
     {
-        TransitionController.instance.Transition_Out();
+        // í™”ë©´ ë®ê¸°/ì—´ê¸° ì—°ì¶œì€ SceneLoaderê°€ ë‹´ë‹¹í•œë‹¤.
 
-        //¿©±â¿¡ ¿£µù¾ÀÀ¸·Î ³Ñ¾î°¡´Â ÄÚµå ÀÛ¼º
+        //ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¾î°¡ï¿½ï¿½ ï¿½Úµï¿½ ï¿½Û¼ï¿½
         StartCoroutine(EndScene(1.1f));
 
         Debug.Log("Letter Clicked!");

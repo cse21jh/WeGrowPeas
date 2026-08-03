@@ -618,9 +618,8 @@ public class GameManager : Singleton<GameManager>
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
         economyManager.PushEarnedGold();
         yield return new WaitForSeconds(1.0f);
-        TransitionController.instance.Transition_Out();
-        yield return new WaitForSeconds(1.0f);
         PassRecordToGameRecordHolder();
+        // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
         SceneLoader.Instance.LoadGameOverScene();
         File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;

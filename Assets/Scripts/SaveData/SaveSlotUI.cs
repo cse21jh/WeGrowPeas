@@ -71,12 +71,9 @@ public class SaveSlotUI : MonoBehaviour
     {
         File.Delete(path);
         ActivateBlocker();
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            GameStartContext.SetStartType(GameStartType.NewGame);
-            SceneLoader.Instance?.LoadGardenScene();
-        }));
+        // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
+        GameStartContext.SetStartType(GameStartType.NewGame);
+        SceneLoader.Instance?.LoadGardenScene();
     }
 
     public void OnClickContinueGame()
@@ -94,12 +91,8 @@ public class SaveSlotUI : MonoBehaviour
 
         ActivateBlocker();
 
-        TransitionController.instance.Transition_Out();
-        StartCoroutine(DelayAction(1.1f, () =>
-        {
-            //GameStartContext.SetStartType(GameStartType.ContinueGame);
-            SceneLoader.Instance?.LoadGardenScene();
-        }));
+        //GameStartContext.SetStartType(GameStartType.ContinueGame);
+        SceneLoader.Instance?.LoadGardenScene();
     }
 
     public void ShowSavePopup()
