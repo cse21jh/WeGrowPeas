@@ -87,7 +87,17 @@ public class EconomyManager : MonoBehaviour
         return gold;
     }
 
-    public void LoadEconomyManager(SaveData saveData)
+    /// <summary>골드/판매 집계를 저장 데이터에 담는다. <see cref="LoadEconomyManager"/>와 짝.</summary>
+    public void SaveEconomyManager(EconomySave save)
+    {
+        save.gold = gold;
+        save.sellCount[0] = peaSellCount;
+        save.sellCount[1] = peanutSellCount;
+        save.totalGold = totalGold;
+        save.consumeGold = consumeGold;
+    }
+
+    public void LoadEconomyManager(EconomySave saveData)
     {
         gold = saveData.gold;
         UpdateCoinUI(gold);

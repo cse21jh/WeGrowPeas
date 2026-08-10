@@ -457,9 +457,25 @@ public class EnemyController : MonoBehaviour
         };
     }
 
-    public void LoadEnemyController(SaveData saveData)
+    /// <summary>현재 웨이브/계절 상태를 저장 데이터에 담는다. <see cref="LoadEnemyController"/>와 짝.</summary>
+    public void SaveEnemyController(WaveSave save)
     {
-        InitBaseWeightsByStage(saveData.stage);
+        save.currentSeason = CurrentSeason;
+        save.curWaveType = CurrentWave.WaveType;
+        save.nextWaveType = NextWave.WaveType;
+        save.lastWaveType = LastWave.WaveType;
+        save.remainWaveSkipCount = WaveSkipCount;
+        save.waveKillCount = WaveKillCount;
+
+        save.stageWaveRecord = StageWaveRecord;
+        save.stageKillRecord = StageKillRecord;
+        save.stageNoTraitRecord = StageNoTraitRecord;
+    }
+
+    /// <param name="stage">웨이브 가중치 초기화에 필요한 현재 스테이지(ProgressSave.stage).</param>
+    public void LoadEnemyController(WaveSave saveData, int stage)
+    {
+        InitBaseWeightsByStage(stage);
 
         currentWave = GetWaveFromWaveType(saveData.curWaveType);
         grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType);

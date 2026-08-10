@@ -218,10 +218,19 @@ public class AbilityManager : MonoBehaviour
         return false;
     }
 
-    // 각 세이브 파일별 저장이 필요한 AbilityManager를 Load
-    public void LoadCurrentAbilityManager(SaveData saveData) 
+    /// <summary>보유 능력과 유전자 저장고를 저장 데이터에 담는다. <see cref="LoadCurrentAbilityManager"/>와 짝.</summary>
+    public void SaveCurrentAbilityManager(AbilitySave save)
     {
-        SetPlant(saveData.currentPlant);
+        save.currentPlantAbility = CurrentPlantAbility;
+        save.currentGeneralAbility = CurrentGeneralAbility;
+        save.geneStorage = Storage;
+    }
+
+    // 각 세이브 파일별 저장이 필요한 AbilityManager를 Load
+    /// <param name="currentPlant">선택한 작물 이름(ProgressSave.currentPlant).</param>
+    public void LoadCurrentAbilityManager(AbilitySave saveData, string currentPlant)
+    {
+        SetPlant(currentPlant);
         SetPlantAbility(saveData.currentPlantAbility);
         SetGeneralAbility(saveData.currentGeneralAbility);
         storage = saveData.geneStorage;

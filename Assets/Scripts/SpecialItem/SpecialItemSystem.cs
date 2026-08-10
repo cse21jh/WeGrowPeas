@@ -154,20 +154,28 @@ public static class SpecialItemSystem
     }
 
     // ── 저장/로드 (per-run) ────────────────────────────────────────────────────
-    public static List<string> GetSaveOwned() => new List<string>(_owned);
-    public static int GetSavePending() => PendingGifts;
-    public static List<int> GetSaveRerolls() => new List<int>(_slotRerolls);
 
-    public static void LoadFromSave(List<string> owned, int pending, List<int> slotRerolls = null)
+    /// <summary>보유 아이템/미수령 선물/칸별 리롤을 저장 데이터에 담는다. <see cref="LoadFromSave"/>와 짝.</summary>
+    public static void SaveTo(SpecialItemSave save)
+    {
+        save.ownedSpecialItems = new List<string>(_owned);
+        save.pendingSpecialGifts = PendingGifts;
+        save.specialItemRerolls = new List<int>(_slotRerolls);
+    }
+
+    public static void LoadFromSave(SpecialItemSave save)
     {
         _owned.Clear();
-        if (owned != null) foreach (var id in owned) if (!string.IsNullOrEmpty(id)) _owned.Add(id);
-        PendingGifts = Mathf.Max(0, pending);
+        if (save.ownedSpecialItems != null)
+            foreach (var id in save.ownedSpecialItems)
+                if (!string.IsNullOrEmpty(id)) _owned.Add(id);
+
+        PendingGifts = Mathf.Max(0, save.pendingSpecialGifts);
 
         ResetSlotRerolls();
-        if (slotRerolls != null)
-            for (int i = 0; i < _slotRerolls.Length && i < slotRerolls.Count; i++)
-                _slotRerolls[i] = Mathf.Clamp(slotRerolls[i], 0, RerollPerSlot);
+        if (save.specialItemRerolls != null)
+            for (int i = 0; i < _slotRerolls.Length && i < save.specialItemRerolls.Count; i++)
+                _slotRerolls[i] = Mathf.Clamp(save.specialItemRerolls[i], 0, RerollPerSlot);
     }
 
     /// <summary>새 게임 시작 시 초기화.</summary>

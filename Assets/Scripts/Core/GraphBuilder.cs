@@ -28,7 +28,15 @@ public static class PlayerRecordForGraph
     public static void SetEG(int n) => earnedGolds.Add(n);
     public static void SetWED(int n) => waveEachDay.Add(n);
 
-    public static void SetDataFromLoad(SaveData saveData)
+    /// <summary>일자별 기록을 저장 데이터에 담는다. <see cref="SetDataFromLoad"/>와 짝.</summary>
+    public static void SaveTo(GraphSave save)
+    {
+        save.survivedPlants = survivedPlants;
+        save.earnedGolds = earnedGolds;
+        save.waveEachDay = waveEachDay;
+    }
+
+    public static void SetDataFromLoad(GraphSave saveData)
     {
         survivedPlants = saveData.survivedPlants;
         earnedGolds = saveData.earnedGolds;

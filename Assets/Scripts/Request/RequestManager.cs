@@ -173,22 +173,24 @@ public class RequestManager : Singleton<RequestManager>
         rewardGranted.Clear();
     }
 
-    public List<RequestInstanceSaveData> getSaveData()
+    /// <summary>진행 중인 의뢰를 저장 데이터에 담는다. <see cref="LoadRequestManager"/>와 짝.</summary>
+    public void SaveRequestManager(RequestSave save)
     {
-        var data = new List<RequestInstanceSaveData>();
+        save.cycleEndRound = cycleEndRound;
+        save.dayPassed = dayPassed;
+        save.completeRequestCount = completeRequestCount;
 
+        save.activeRequests.Clear();
         foreach (var req in activeReq)
         {
             if (req != null)
             {
-                data.Add(req.ToSaveData());
+                save.activeRequests.Add(req.ToSaveData());
             }
         }
-
-        return data;
     }
 
-    public void LoadRequestManager(SaveData saveData)
+    public void LoadRequestManager(RequestSave saveData)
     {
         ClearActive();
 

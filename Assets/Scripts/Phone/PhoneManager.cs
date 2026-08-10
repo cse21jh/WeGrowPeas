@@ -555,7 +555,39 @@ public class PhoneManager : Singleton<PhoneManager>
         }
     }
 
-    public void LoadPhoneManager(SaveData saveData)
+    /// <summary>메신저 진행을 저장 데이터에 담는다. <see cref="LoadPhoneManager"/>와 짝.</summary>
+    public void SavePhoneManager(PhoneSave save)
+    {
+        MessengerProgress progress = messengerApp.GetProgress();
+
+        save.chatPartners.Clear();
+        save.conversationSeenIndices.Clear();
+        foreach (KeyValuePair<string, int> p in progress.conversationSeenIndices)
+        {
+            save.chatPartners.Add(p.Key);
+            save.conversationSeenIndices.Add(p.Value);
+        }
+
+        save.dayChatPartners.Clear();
+        save.dayByChatPartners.Clear();
+        foreach (KeyValuePair<string, Dictionary<int, int>> p in progress.daySeparators)
+        {
+            save.dayChatPartners.Add(p.Key);
+
+            ChatDayData chatDayData = new ChatDayData { index = new List<int>(), day = new List<int>() };
+            foreach (KeyValuePair<int, int> separator in p.Value)
+            {
+                chatDayData.index.Add(separator.Key);
+                chatDayData.day.Add(separator.Value);
+            }
+            save.dayByChatPartners.Add(chatDayData);
+        }
+
+        save.activatedTriggers.Clear();
+        save.activatedTriggers.AddRange(progress.activatedTriggersOrdered);
+    }
+
+    public void LoadPhoneManager(PhoneSave saveData)
     {
         MessengerProgress progress = new MessengerProgress();
 

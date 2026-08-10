@@ -405,17 +405,17 @@ public class CurseManager : Singleton<CurseManager>
         return lv < 1 ? 1 : lv;
     }
 
-    public string[] SaveCurseManager()
+    /// <summary>진행 중인 저주를 저장 데이터에 담는다. <see cref="LoadCurseManager"/>와 짝.</summary>
+    public void SaveCurseManager(CurseSave save)
     {
-        string[] cId = new string[2];
+        save.curseId[0] = currentTempCurse != null ? currentTempCurse.Data.curseId : null;
+        save.curseId[1] = currentSeasonCurse != null ? currentSeasonCurse.Data.curseId : null;
 
-        cId[0] = currentTempCurse != null ? currentTempCurse.Data.curseId : null;
-        cId[1] = currentSeasonCurse != null ? currentSeasonCurse.Data.curseId : null;
-
-        return cId;
+        save.remainSeasonCurseDay = RemainingCurseDay;
+        save.remainTempCurseDay = RemainingTempCurseDay;
     }
 
-    public void LoadCurseManager(SaveData saveData)
+    public void LoadCurseManager(CurseSave saveData)
     {
         int level = GetCurseLevel();
 

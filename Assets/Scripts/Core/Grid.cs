@@ -1659,7 +1659,124 @@ public class Grid : MonoBehaviour
         return breedTimerUI;
     }
 
-    public void LoadGrid(SaveData saveData)
+    /// <summary>
+    /// 현재 밭 상태와 누적 보정치를 저장 데이터에 담는다. <see cref="LoadGrid"/>와 짝이므로
+    /// 한쪽에 항목을 추가하면 반드시 다른 쪽도 같이 고칠 것.
+    /// </summary>
+    public void SaveGrid(GridSave save)
+    {
+        // 밭 / 교배
+        save.plantList.Clear();
+        foreach (var p in plantGrid.Values)
+        {
+            save.plantList.Add(new PlantData
+            {
+                speciesname = p.speciesname,
+                traits = p.GetGeneticTrait(),
+                gridIndex = p.gridIndex,
+                taste = p.GetTaste(),
+                resistWaveCount = p.GetResistWaveCount(),
+                survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0,
+                travelSellBonus = p.GetTravelSellBonus(),
+                freeTimePassedCount = p.GetFreeTimePassedCount(),
+                hasTriedBreed = p.HasTriedBreed,
+                isRooted = (p is MovablePlant movable) && !movable.IsMovable
+            });
+        }
+        save.maxCol = maxCol;
+        save.maxBreedTimer = maxBreedTimer;
+        save.maxBreedCount = maxBreedCount;
+        save.additionalInheritance = additionalInheritance;
+
+        save.totalBreedCount = totalBreedCount;
+        save.totalPeaBreedcount = totalPeaBreedcount;
+        save.totalPeanutBreedCount = totalPeanutBreedCount;
+        save.mostExpensivePlant = mostExpensivePlant;
+
+        // 벌레 / 무당벌레 / 네펜데스
+        save.killBugCount = killBugCount;
+        save.bugSpawnTimeInterval = bugSpawnTimeInterval;
+        save.lastBugSpawnTimeInterval = lastBugSpawnTimeInterval;
+        save.bugSpeedDecreasement = bugSpeedDecreasement;
+        save.bugSpawnIntervalIncreasement = bugSpawnIntervalIncreasement;
+        save.additionalBugGold = additionalBugGold;
+
+        save.ladybugSpawnProbability = ladybugSpawnProbability;
+        save.maxLadybugCount = maxLadybugCount;
+        save.additionalLadybugGoldPerUnit = additionalLadybugGoldPerUnit;
+        save.additionalLadybugResistancePerUnit = additionalLadybugResistancePerUnit;
+
+        save.nepenthesSpawnProbability = nepenthesSpawnProbability;
+        save.additionalNepenthesGold = additionalNepenthesGold;
+        save.hasNepenthesPheromone = hasNepenthesPheromone;
+        save.additionalNepenthesPheromoneSizeMultiplier = additionalNepenthesPheromoneSizeMultiplier;
+
+        // 유전자 보너스
+        save.weakGeneticsResistanceBonus = weakGeneticsResistanceBonus;
+        save.strongGeneticsResistanceBonus = strongGeneticsResistanceBonus;
+        save.goldenGeneticsProbabilityBonus = goldenGeneticsProbabilityBonus;
+
+        // 식물 일반 특성
+        save.resistanceBonus = resistanceBonus;
+        save.additionalPlantGold = additionalPlantGold;
+        save.additionalPlantGoldMultiplier = additionalPlantGoldMultiplier;
+        save.additionalPestResistance = additionalPestResistance;
+
+        // 완두콩 특성
+        save.resistanceDecayReduction = resistanceDecayReduction;
+        save.resistanceAdaptation = resistanceAdaptation;
+
+        // 땅콩 특성
+        save.additionalPeanutCopyProbability = additionalPeanutCopyProbability;
+        save.bonusRatioWhenDie = bonusRatioWhenDie;
+
+        // 일반 특성 (정보 표시)
+        save.hasResistanceScouter = hasResistanceScouter;
+        save.hasGoldScouter = hasGoldScouter;
+        save.hasWeatherForecast = hasWeatherForecast;
+
+        // 페트병
+        save.perBottleTiles = new List<int>(petBottleTiles);
+        save.petBottleInitialStockBonus = petBottleInitialStockBonus;
+        save.petBottlePriceReduction = petBottlePriceReduction;
+        save.petBottleSpawnProbability = petBottleSpawnProbability;
+        save.petBottleBlockCountBonus = GetPetBottleBlockCountBonus();
+
+        // 고추
+        save.chiliPepperRangeLevel = chiliPepperRangeLevel;
+        save.chiliPepperSpawnProbability = chiliPepperSpawnProbability;
+        save.chiliPepperHealPercent = chiliPepperHealPercent;
+
+        // 타일 / 비료
+        save.goldSoilTiles = new List<int>(goldSoilTiles);
+        save.fertilizerColumns.Clear();
+        save.fertilizerType.Clear();
+        foreach (KeyValuePair<int, WaveType> fer in GetFertilizerColumns())
+        {
+            save.fertilizerColumns.Add(fer.Key);
+            save.fertilizerType.Add(fer.Value);
+        }
+        save.absorbFertilizerTiles = new List<int>(absorbFertilizerTiles);
+
+        // 신규 아이템 스탯
+        save.timeIsGoldLevel = timeIsGoldLevel;
+        save.badGuyMoreRiceLevel = badGuyMoreRiceLevel;
+        save.sprinklerRangeBonus = sprinklerRangeBonus;
+        save.sprinklerFertilizerSynergyBonus = sprinklerFertilizerSynergyBonus;
+
+        save.creditCardRefundPercent = creditCardRefundPercent;
+        save.twinBreedProbability = twinBreedProbability;
+        save.peaCoffeeMultiplier = peaCoffeeMultiplier;
+        save.superMutationChanceBonus = superMutationChanceBonus;
+        save.hasSuperMutation = hasSuperMutation;
+        save.activeShellProbability = activeShellProbability;
+        save.successionInheritRatio = successionInheritRatio;
+        save.landAndBeanLevel = landAndBeanLevel;
+
+        save.columnGoldMulBonusList = GetColumnGoldMulBonusForSave();
+    }
+
+    public void LoadGrid(GridSave saveData)
     {
         // 로딩 중 OnGridStateChanged 억제 (MoneyTree 등이 로드 순서에 따라 조기 사망하는 것 방지)
         isLoadingGrid = true;

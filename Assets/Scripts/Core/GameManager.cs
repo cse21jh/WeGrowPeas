@@ -8,209 +8,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
 
-[System.Serializable]
-public class SaveData
-{
-    //gameManager
-    public int stage;
-    public bool seenFirstGold;
-    public string currentPlant;
-
-    //tax
-    public int lastPaidTaxStage;
-
-    //dawn
-    public int selectedDawnStage;
-
-    //grid
-    public List<PlantData> plantList = new();
-    public int remainBreedCount;
-
-    public int maxCol;
-
-    public int killBugCount;
-    public int totalBreedCount;
-    public int totalPeaBreedcount;
-    public int totalPeanutBreedCount;
-
-    public float bugSpawnTimeInterval;
-    public float lastBugSpawnTimeInterval;
-
-    public float bugSpeedDecreasement;
-    public float bugSpawnIntervalIncreasement;
-    public float ladybugSpawnProbability;
-    public int maxLadybugCount;
-    public int additionalLadybugGoldPerUnit;
-    public float additionalLadybugResistancePerUnit;
-    public int additionalBugGold;
-    public int additionalNepenthesGold;
-    public bool hasNepenthesPheromone;
-    public float additionalNepenthesPheromoneSizeMultiplier;
-    public float nepenthesSpawnProbability;
-
-    public float weakGeneticsResistanceBonus;
-    public float strongGeneticsResistanceBonus;
-    public float goldenGeneticsProbabilityBonus;
-
-    public float resistanceBonus; // 식물 일반 특성
-    public int additionalPlantGold;
-
-    public float resistanceDecayReduction; // 완두콩 특성
-    public float resistanceAdaptation;
-
-    public float additionalPeanutCopyProbability; // 땅콩 특성
-    public float bonusRatioWhenDie;
-
-    public bool hasResistanceScouter; // 일반 특성
-    public bool hasGoldScouter;
-    public bool hasWeatherForecast;
-
-    public float additionalPlantGoldMultiplier;
-
-    public float additionalPestResistance;
-
-    public int additionalInheritance;
-    public float maxBreedTimer;
-    public int maxBreedCount;
-    public int breedCount;
-    public List<int> perBottleTiles = new();
-    public int petBottleInitialStockBonus = 0;
-    public int petBottlePriceReduction = 0;
-    public float petBottleSpawnProbability = 0f;
-    public int petBottleBlockCountBonus = 0; // 페트병 보호 횟수 보너스 (전체)
-
-    public int chiliPepperRangeLevel = 0;
-    public float chiliPepperSpawnProbability = 0f;
-    public float chiliPepperHealPercent = 0f;
-
-    public List<int> goldSoilTiles = new();
-
-    public List<int> fertilizerColumns = new();
-    public List<WaveType> fertilizerType = new();
-
-    public int mostExpensivePlant;
-
-    // 신규 아이템 스탯
-    public int timeIsGoldLevel;
-    public int badGuyMoreRiceLevel;
-    public int sprinklerRangeBonus;
-    public float sprinklerFertilizerSynergyBonus;
-    
-    // 저항력 흡수 비료 타일 인덱스 리스트
-    public List<int> absorbFertilizerTiles = new List<int>();
-
-    // 신규 아이템(신용카드·쌍둥이·완두커피·슈퍼 변종·활성형 껍질·왕위 계승·땅과 콩)
-    public float creditCardRefundPercent;
-    public float twinBreedProbability;
-    public float peaCoffeeMultiplier;
-    public float superMutationChanceBonus;
-    public bool hasSuperMutation;
-    public float activeShellProbability;
-    public float successionInheritRatio;
-    public int landAndBeanLevel;
-
-    //public float remainBreedTime;
-
-    //enemyController
-    public Season currentSeason;
-    public WaveType lastWaveType;
-    public WaveType curWaveType;
-    public WaveType nextWaveType;
-    public int remainWaveSkipCount;
-    public int[] waveKillCount = new int[8];
-    public List<WaveType> stageWaveRecord = new();
-    public List<int> stageKillRecord = new();
-    public List<int> stageNoTraitRecord = new();
-
-    //economyManager
-    public int gold;
-    public int[] sellCount = new int[2];
-    public int totalGold;
-    public int consumeGold;
-
-    //shopManager
-    public List<string> itemName = new();
-    public List<int> itemPurchaseCount = new();
-    public List<int> shopSeedDays = new(); // 날짜 리스트
-    public List<int> shopSeeds = new(); // 해당 날짜의 시드 리스트 (인덱스 매칭)
-    public int gameUniqueShopSeed = -1; // 게임별 고유 시드 (게임마다 다르게 생성, 저장/불러오기 시 유지)
-
-    //ModManager
-    public List<Mod> mods = new();
-
-    //RequestManager
-    public int cycleEndRound;
-    public int dayPassed;
-    public List<RequestInstanceSaveData> activeRequests = new();
-    public int completeRequestCount;
-
-    //PlayerRecordForGraph
-    public List<int> survivedPlants = new();
-    public List<int> earnedGolds = new();
-    public List<int> waveEachDay = new();
-
-    //GameStartType
-    public GameStartType gst = GameStartType.None;
-
-
-    //PhoneManager
-    public List<string> chatPartners = new();
-    public List<int> conversationSeenIndices = new();
-    public List<string> activatedTriggers = new();
-
-    public List<string> dayChatPartners = new();
-    public List<ChatDayData> dayByChatPartners = new();
-
-    //AbilityManager
-    public List<PlantAbilityData> currentPlantAbility = new();
-    public List<GeneralAbilityData> currentGeneralAbility = new();
-    public int geneStorage;
-
-    //CurseManager
-    public string[] curseId = new string[2]; //0:temp 1:season
-    public int remainSeasonCurseDay;
-    public int remainTempCurseDay;
-
-    //SpecialItem (특수 아이템)
-    public List<string> ownedSpecialItems = new();
-    public int pendingSpecialGifts;
-    public List<int> specialItemRerolls = new(); // 선택지 칸별 남은 리롤
-    public List<float> columnGoldMulBonusList = new(); // 특수(땅부자) 세로줄 배수 (index = col)
-
-    //종료 시 저장
-    //GameRecordHolder에 저장할 내용
-}
-
-[System.Serializable]
-public class ConstantSaveData
-{
-    public int geneToken;
-    public int customizeToken;
-
-    //setting data
-}
-
-[System.Serializable]
-public class PlantData
-{
-    public string speciesname;
-    public List<GeneticTrait> traits = new List<GeneticTrait>();
-    public int gridIndex;
-    public int taste;
-    public int resistWaveCount;
-    public int survivedTurns; // MoneyTree 생존 턴 수
-    public float travelSellBonus; // 특수(세계여행) 누적 배수
-    public int freeTimePassedCount; // 완두커피: 자유시간 경과 횟수
-    public bool hasTriedBreed; // 활성형 껍질: 교배 시도 여부
-    public bool isRooted; // 뿌리내림(이동 불가). 새벽 뿌리 효과 + 땅과 콩 가격 보너스 판정에 사용
-}
-
-[System.Serializable]
-public class ChatDayData
-{
-    public List<int> index;
-    public List<int> day;
-}
 
 public class GameManager : Singleton<GameManager>
 {
@@ -655,27 +452,30 @@ public class GameManager : Singleton<GameManager>
         string json = File.ReadAllText(GetSavePath());
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
-        //grid.plantGrid.Clear(); //if needed......
+        // 진행 상황
+        stage = saveData.progress.stage;
+        seenFirstGold = saveData.progress.seenFirstGold;
+        currentPlant = saveData.progress.currentPlant;
+        if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.progress.lastPaidTaxStage);
+        DawnSystem.SetSelectedStage(saveData.progress.selectedDawnStage); // 새벽 제약이 이어하기에도 적용되도록
 
-        stage = saveData.stage;
-        seenFirstGold = saveData.seenFirstGold;
-        currentPlant = saveData.currentPlant;
-        if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.lastPaidTaxStage);
-        DawnSystem.SetSelectedStage(saveData.selectedDawnStage); // 새벽 제약이 이어하기에도 적용되도록
-        grid.LoadGrid(saveData);
-        enemyController.LoadEnemyController(saveData);
-        economyManager.LoadEconomyManager(saveData);
-        shopManager.LoadShopManager(saveData);
-        modManager.LoadModManager(saveData);
-        requestManager.LoadRequestManager(saveData);
-        phoneManager.LoadPhoneManager(saveData);
-        curseManager.LoadCurseManager(saveData);
-        SpecialItemSystem.LoadFromSave(saveData.ownedSpecialItems, saveData.pendingSpecialGifts, saveData.specialItemRerolls);
+        // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadXxx가 안다.
+        // 순서를 바꾸면 로드 중 초기화 순서가 달라지므로 주의.
+        grid.LoadGrid(saveData.grid);
+        enemyController.LoadEnemyController(saveData.wave, saveData.progress.stage);
+        economyManager.LoadEconomyManager(saveData.economy);
+        shopManager.LoadShopManager(saveData.shop);
+        modManager.LoadModManager(saveData.mod);
+        requestManager.LoadRequestManager(saveData.request);
+        phoneManager.LoadPhoneManager(saveData.phone);
+        curseManager.LoadCurseManager(saveData.curse);
+        SpecialItemSystem.LoadFromSave(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
-            AbilityManager.Instance.LoadCurrentAbilityManager(saveData);
+            AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
         }
-        PlayerRecordForGraph.SetDataFromLoad(saveData);
+        PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
+
         Debug.Log("불러옴");
     }
 
@@ -683,224 +483,32 @@ public class GameManager : Singleton<GameManager>
     {
         var saveData = new SaveData();
 
-        //gameManager
-        saveData.stage = stage;
-        saveData.seenFirstGold = seenFirstGold;
-        saveData.currentPlant = currentPlant;
-        saveData.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
-        saveData.selectedDawnStage = DawnSystem.SelectedDawnStage;
+        // 진행 상황
+        saveData.progress.stage = stage;
+        saveData.progress.seenFirstGold = seenFirstGold;
+        saveData.progress.currentPlant = currentPlant;
+        saveData.progress.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
+        saveData.progress.selectedDawnStage = DawnSystem.SelectedDawnStage;
+        // 불러올 때 무조건 이어하기 상태로 시작하도록 정규화해서 저장
+        saveData.progress.gst = stage > endStage ? GameStartType.ContinueAfterEnding : GameStartType.ContinueGame;
 
-        //grid
-        foreach (var p in grid.plantGrid.Values)
-        {
-            var plantData = new PlantData
-            {
-                speciesname = p.speciesname,
-                traits = p.GetGeneticTrait(),
-                gridIndex = p.gridIndex,
-                taste = p.GetTaste(),
-                resistWaveCount = p.GetResistWaveCount(),
-                survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0,
-                travelSellBonus = p.GetTravelSellBonus(),
-                freeTimePassedCount = p.GetFreeTimePassedCount(),
-                hasTriedBreed = p.HasTriedBreed,
-                isRooted = (p is MovablePlant movable) && !movable.IsMovable
-            };
-
-            saveData.plantList.Add(plantData);
-        }
-        saveData.maxCol = grid.maxCol;
-        saveData.killBugCount = grid.killBugCount;
-        saveData.totalBreedCount = grid.totalBreedCount;
-        saveData.totalPeaBreedcount = grid.totalPeaBreedcount;
-        saveData.totalPeanutBreedCount = grid.totalPeanutBreedCount;
-
-        saveData.bugSpawnTimeInterval = grid.BugSpawnTimeInterval;
-        saveData.lastBugSpawnTimeInterval = grid.LastBugSpawnTimeInterval;
-
-        saveData.bugSpeedDecreasement = grid.BugSpeedDecreasement;
-        saveData.bugSpawnIntervalIncreasement = grid.BugSpawnIntervalIncreasement;
-        saveData.ladybugSpawnProbability = grid.LadybugSpawnProbability;
-        saveData.maxLadybugCount = grid.MaxLadybugCount;
-        saveData.additionalLadybugGoldPerUnit = grid.AdditionalLadybugGoldPerUnit;
-        saveData.additionalLadybugResistancePerUnit = grid.AdditionalLadybugResistancePerUnit;
-        saveData.additionalBugGold = grid.AdditionalBugGold;
-        saveData.additionalNepenthesGold = grid.AdditionalNepenthesGold;
-        saveData.hasNepenthesPheromone = grid.HasNepenthesPheromone;
-        saveData.additionalNepenthesPheromoneSizeMultiplier = grid.AdditionalNepenthesPheromoneSizeMultiplier;
-        saveData.nepenthesSpawnProbability = grid.NepenthesSpawnProbability;
-
-        saveData.weakGeneticsResistanceBonus = grid.WeakGeneticsResistanceBonus;
-        saveData.strongGeneticsResistanceBonus = grid.StrongGeneticsResistanceBonus;
-        saveData.goldenGeneticsProbabilityBonus = grid.GoldenGeneticsProbabilityBonus;
-
-        saveData.resistanceBonus = grid.ResistanceBonus; // 식물 일반 특성
-        saveData.additionalPlantGold = grid.AdditionalPlantGold;
-
-        saveData.resistanceDecayReduction = grid.ResistanceDecayReduction;// 완두콩 특성
-        saveData.resistanceAdaptation = grid.ResistanceAdaptation;
-
-        saveData.additionalPeanutCopyProbability = grid.AdditionalPeanutCopyProbability; // 땅콩 특성
-        saveData.bonusRatioWhenDie = grid.BonusRatioWhenDie;
-
-        saveData.hasResistanceScouter = grid.HasResistanceScouter;
-        saveData.hasGoldScouter = grid.HasGoldScouter;
-        saveData.hasWeatherForecast = grid.HasWeatherForecast;
-
-        saveData.additionalPlantGoldMultiplier = grid.AdditionalPlantGoldMultiplier;
-
-
-        saveData.additionalPestResistance = grid.AdditionalPestResistance;
-
-        saveData.additionalInheritance = grid.AdditionalInheritance;
-        saveData.maxBreedTimer = grid.MaxBreedTimer;
-        saveData.maxBreedCount = grid.MaxBreedCount;
-
-        saveData.perBottleTiles = grid.PetBottleTiles;
-        saveData.petBottleInitialStockBonus = grid.PetBottleInitialStockBonus;
-        saveData.petBottlePriceReduction = grid.PetBottlePriceReduction;
-        saveData.petBottleSpawnProbability = grid.PetBottleSpawnProbability;
-        // petBottleBlockCountBonus는 Grid에서 getter로 제공해야 함
-        saveData.petBottleBlockCountBonus = grid.GetPetBottleBlockCountBonus();
-        saveData.chiliPepperRangeLevel = grid.ChiliPepperRangeLevel;
-        saveData.chiliPepperSpawnProbability = grid.ChiliPepperSpawnProbability;
-        saveData.chiliPepperHealPercent = grid.ChiliPepperHealPercent;
-        saveData.goldSoilTiles = grid.GoldSoilTiles;
-        foreach (KeyValuePair<int, WaveType> fer in grid.GetFertilizerColumns())
-        {
-            saveData.fertilizerColumns.Add(fer.Key);
-            saveData.fertilizerType.Add(fer.Value);
-        }
-
-        // 신규 아이템 스탯 저장
-        saveData.timeIsGoldLevel = grid.GetTimeIsGoldLevel();
-        saveData.badGuyMoreRiceLevel = grid.GetBadGuyMoreRiceLevel();
-        saveData.sprinklerRangeBonus = grid.GetSprinklerRangeBonus();
-        saveData.sprinklerFertilizerSynergyBonus = grid.GetSprinklerFertilizerSynergyBonus();
-
-        // 신규 아이템 스탯 저장
-        saveData.creditCardRefundPercent = grid.CreditCardRefundPercent;
-        saveData.twinBreedProbability = grid.TwinBreedProbability;
-        saveData.peaCoffeeMultiplier = grid.PeaCoffeeMultiplier;
-        saveData.superMutationChanceBonus = grid.SuperMutationChanceBonus;
-        saveData.hasSuperMutation = grid.HasSuperMutation;
-        saveData.activeShellProbability = grid.ActiveShellProbability;
-        saveData.successionInheritRatio = grid.SuccessionInheritRatio;
-        saveData.landAndBeanLevel = grid.LandAndBeanLevel;
-
-        saveData.mostExpensivePlant = grid.MostExpensivePlant;
-
-        //enemyController
-        saveData.currentSeason = enemyController.CurrentSeason;
-        saveData.remainWaveSkipCount = enemyController.WaveSkipCount;
-        saveData.waveKillCount = enemyController.WaveKillCount;
-        saveData.curWaveType = enemyController.CurrentWave.WaveType;
-        saveData.nextWaveType = enemyController.NextWave.WaveType;
-        saveData.lastWaveType = enemyController.LastWave.WaveType;
-        saveData.stageKillRecord = enemyController.StageKillRecord;
-        saveData.stageWaveRecord = enemyController.StageWaveRecord;
-        saveData.stageNoTraitRecord = enemyController.StageNoTraitRecord;
-
-        //economyManager
-        saveData.gold = economyManager.GetGold();
-        saveData.sellCount[0] = economyManager.PeaSellCount;
-        saveData.sellCount[1] = economyManager.PeanutSellCount;
-        saveData.totalGold = economyManager.TotalGold;
-        saveData.consumeGold = economyManager.ConsumeGold;
-
-        //shopManager
-        Dictionary<string, int> pHistory = shopManager.PurchaseHistory;
-        foreach (KeyValuePair<string, int> p in pHistory)
-        {
-            saveData.itemName.Add(p.Key);
-            saveData.itemPurchaseCount.Add(p.Value);
-        }
-
-        // 저항력 흡수 비료 타일 저장
-        saveData.absorbFertilizerTiles.Clear();
-        saveData.absorbFertilizerTiles.AddRange(grid.GetAbsorbFertilizerTiles());
-
-        // 상점 시드 저장
-        saveData.shopSeedDays.Clear();
-        saveData.shopSeeds.Clear();
-        var shopSeeds = shopManager.GetShopSeeds();
-        foreach (var kvp in shopSeeds)
-        {
-            saveData.shopSeedDays.Add(kvp.Key);
-            saveData.shopSeeds.Add(kvp.Value);
-        }
-        // 게임 고유 시드 저장
-        saveData.gameUniqueShopSeed = shopManager.GetGameUniqueSeed();
-
-        //modManager
-        saveData.mods = modManager.Mods;
-
-        //RequestManager
-        saveData.cycleEndRound = requestManager.CycleEndRound;
-        saveData.dayPassed = requestManager.DayPassed;
-        saveData.activeRequests = requestManager.getSaveData();
-        saveData.completeRequestCount = requestManager.CompleteRequestCount;
-
-        //PlayerRecordForGraph
-        saveData.survivedPlants = PlayerRecordForGraph.survivedPlants;
-        saveData.earnedGolds = PlayerRecordForGraph.earnedGolds;
-        saveData.waveEachDay = PlayerRecordForGraph.waveEachDay;
-
-        // 불러올 때 무조건 이어하기 상태로 시작하도록 정규화 저장
-        if (stage > endStage)
-        {
-            saveData.gst = GameStartType.ContinueAfterEnding;
-        }
-        else
-        {
-            saveData.gst = GameStartType.ContinueGame;
-        }
-
-        //PhoneManager
-        MessengerProgress progress = phoneManager.messengerApp.GetProgress();
-        foreach (KeyValuePair<string, int> p in progress.conversationSeenIndices)
-        {
-            saveData.chatPartners.Add(p.Key);
-            saveData.conversationSeenIndices.Add(p.Value);
-        }
-        foreach (KeyValuePair<string, Dictionary<int, int>> p in progress.daySeparators)
-        {
-            saveData.dayChatPartners.Add(p.Key);
-            ChatDayData tmp = new();
-            tmp.index = new();
-            tmp.day = new();
-            foreach (KeyValuePair<int, int> p2 in p.Value)
-            {
-                tmp.index.Add(p2.Key);
-                tmp.day.Add(p2.Value);
-            }
-            saveData.dayByChatPartners.Add(tmp);
-        }
-        foreach (var r in progress.activatedTriggersOrdered)
-        {
-            saveData.activatedTriggers.Add(r);
-        }
-
-        //AbilityManager
+        // 시스템별 저장. LoadGame과 같은 순서로 두어 짝을 눈으로 확인할 수 있게 한다.
+        grid.SaveGrid(saveData.grid);
+        enemyController.SaveEnemyController(saveData.wave);
+        economyManager.SaveEconomyManager(saveData.economy);
+        shopManager.SaveShopManager(saveData.shop);
+        modManager.SaveModManager(saveData.mod);
+        requestManager.SaveRequestManager(saveData.request);
+        phoneManager.SavePhoneManager(saveData.phone);
+        curseManager.SaveCurseManager(saveData.curse);
+        SpecialItemSystem.SaveTo(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
-            saveData.currentPlantAbility = AbilityManager.Instance.CurrentPlantAbility;
-            saveData.currentGeneralAbility = AbilityManager.Instance.CurrentGeneralAbility;
-            saveData.geneStorage = AbilityManager.Instance.Storage;
+            AbilityManager.Instance.SaveCurrentAbilityManager(saveData.ability);
         }
+        PlayerRecordForGraph.SaveTo(saveData.graph);
 
-        //curseManager
-        saveData.curseId = curseManager.SaveCurseManager();
-        saveData.ownedSpecialItems = SpecialItemSystem.GetSaveOwned();
-        saveData.pendingSpecialGifts = SpecialItemSystem.GetSavePending();
-        saveData.specialItemRerolls = SpecialItemSystem.GetSaveRerolls();
-        saveData.columnGoldMulBonusList = grid.GetColumnGoldMulBonusForSave();
-        saveData.remainSeasonCurseDay = curseManager.RemainingCurseDay;
-        saveData.remainTempCurseDay = curseManager.RemainingTempCurseDay;
-
-        string json = JsonUtility.ToJson(saveData, true);
-        File.WriteAllText(GetSavePath(), json);
-
+        File.WriteAllText(GetSavePath(), JsonUtility.ToJson(saveData, true));
         GameStartContext.SetStartType(GameStartType.ContinueGame);
 
         Debug.Log("저장됨");

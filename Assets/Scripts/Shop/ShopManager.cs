@@ -291,7 +291,29 @@ public class ShopManager : Singleton<ShopManager>
         return mostSold.Key;
     }
 
-    public void LoadShopManager(SaveData saveData)
+    /// <summary>구매 이력과 시드를 저장 데이터에 담는다. <see cref="LoadShopManager"/>와 짝.</summary>
+    public void SaveShopManager(ShopSave save)
+    {
+        save.itemName.Clear();
+        save.itemPurchaseCount.Clear();
+        foreach (KeyValuePair<string, int> p in purchaseHistory)
+        {
+            save.itemName.Add(p.Key);
+            save.itemPurchaseCount.Add(p.Value);
+        }
+
+        save.shopSeedDays.Clear();
+        save.shopSeeds.Clear();
+        foreach (var kvp in shopSeeds)
+        {
+            save.shopSeedDays.Add(kvp.Key);
+            save.shopSeeds.Add(kvp.Value);
+        }
+
+        save.gameUniqueShopSeed = gameUniqueSeed;
+    }
+
+    public void LoadShopManager(ShopSave saveData)
     {
         for(int i = 0; i < saveData.itemName.Count; i++)
         {

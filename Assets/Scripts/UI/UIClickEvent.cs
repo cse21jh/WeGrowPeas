@@ -79,7 +79,7 @@ public class UIClickEvent : MonoBehaviour
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
         // 안전장치: 파일에 잘못 기록된 새 게임/게임오버 상태를 이어하기 상태로 보정
-        GameStartType startType = saveData.gst;
+        GameStartType startType = saveData.progress.gst;
         if (startType == GameStartType.NewGame || startType == GameStartType.GameOver || startType == GameStartType.None)
         {
             startType = GameStartType.ContinueGame;
@@ -141,7 +141,7 @@ public class UIClickEvent : MonoBehaviour
         string json = File.ReadAllText(Application.dataPath + "/UserData.json");
         SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
-        GameStartContext.SetStartType(saveData.gst);
+        GameStartContext.SetStartType(saveData.progress.gst);
     }
     public void PlayButtonClickSound()
     {

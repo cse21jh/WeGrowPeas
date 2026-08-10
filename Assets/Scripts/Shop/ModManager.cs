@@ -159,7 +159,13 @@ public class ModManager : Singleton<ModManager>
         return bestOverride != null ? overrideValue : sum;
     }
 
-    public void LoadModManager(SaveData saveData)
+    /// <summary>보유 모드를 저장 데이터에 담는다. <see cref="LoadModManager"/>와 짝.</summary>
+    public void SaveModManager(ModSave save)
+    {
+        save.mods = Mods;
+    }
+
+    public void LoadModManager(ModSave saveData)
     {
         foreach (var m in saveData.mods)
         {
