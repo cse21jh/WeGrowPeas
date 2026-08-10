@@ -12,9 +12,9 @@ public class FixCameraAspect : MonoBehaviour
         float windowAspect = (float)Screen.width / Screen.height;
         float scaleHeight = windowAspect / targetAspect;
 
-        if (scaleHeight < 1f)  // ¼¼·Î ±âÁØ(ÁÂ¿ì¿¡ ¿©¹é)
+        if (scaleHeight < 1f)  // ì„¸ë¡œ ê¸°ì¤€(ì¢Œìš°ì— ì—¬ë°±)
             cam.rect = new Rect(0f, (1f - scaleHeight) * 0.5f, 1f, scaleHeight);
-        else                   // °¡·Î ±âÁØ(À§¾Æ·¡¿¡ ¿©¹é)
+        else                   // ê°€ë¡œ ê¸°ì¤€(ìœ„ì•„ëž˜ì— ì—¬ë°±)
         {
             float scaleWidth = 1f / scaleHeight;
             cam.rect = new Rect((1f - scaleWidth) * 0.5f, 0f, scaleWidth, 1f);

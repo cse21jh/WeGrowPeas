@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NewspaperAdditionalData", menuName = "Scriptable Objects/NewspaperAdditionalData")]
 public class NewspaperAdditionalData : ScriptableObject
 {
-    [Header("Ãß°¡ ¼³¸í")]
+    [Header("ì¶”ê°€ ì„¤ëª…")]
     [TextArea(3, 5)]
     public List<string> TMI;
 }

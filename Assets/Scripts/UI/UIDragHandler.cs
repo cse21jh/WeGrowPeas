@@ -3,11 +3,11 @@ using UnityEngine.EventSystems;
 
 public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 {
-    [SerializeField] private RectTransform handleArea;  // µå·¡±× °¡´ÉÇÑ ¿µ¿ª (¿¹: »ó´Ü¹Ù)
+    [SerializeField] private RectTransform handleArea;  // ë“œë˜ê·¸ ê°€ëŠ¥í•œ ì˜ì—­ (ì˜ˆ: ìƒë‹¨ë°”)
 
-    private RectTransform rectTransform;   // ÆĞ³Î ÀÚÃ¼
-    private Canvas canvas;                 // ÃÖ»óÀ§ Canvas
-    private Vector2 pointerOffset;         // ¸¶¿ì½º Å¬¸¯ ½Ã ÆĞ³Î ¾È¿¡¼­ÀÇ »ó´ë ÁÂÇ¥
+    private RectTransform rectTransform;   // íŒ¨ë„ ìì²´
+    private Canvas canvas;                 // ìµœìƒìœ„ Canvas
+    private Vector2 pointerOffset;         // ë§ˆìš°ìŠ¤ í´ë¦­ ì‹œ íŒ¨ë„ ì•ˆì—ì„œì˜ ìƒëŒ€ ì¢Œí‘œ
     private bool isDragging = false;
 
     private void Awake()
@@ -18,7 +18,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // ÇÚµé ¿µ¿ª ¾È¿¡¼­¸¸ µå·¡±× ½ÃÀÛ Çã¿ë
+        // í•¸ë“¤ ì˜ì—­ ì•ˆì—ì„œë§Œ ë“œë˜ê·¸ ì‹œì‘ í—ˆìš©
         if (!RectTransformUtility.RectangleContainsScreenPoint(handleArea, eventData.position, eventData.pressEventCamera))
         {
             isDragging = false;
@@ -46,7 +46,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         RectTransform canvasRect = canvas.transform as RectTransform;
 
-        // ¸ÕÀú ¸¶¿ì½º À§Ä¡¸¦ Canvas È­¸é Å©±â ¾ÈÀ¸·Î Clamp
+        // ë¨¼ì € ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ Canvas í™”ë©´ í¬ê¸° ì•ˆìœ¼ë¡œ Clamp
         Vector2 clampedScreenPos = eventData.position;
 
         float minX = 0f;
@@ -57,11 +57,11 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
         clampedScreenPos.x = Mathf.Clamp(clampedScreenPos.x, minX, maxX);
         clampedScreenPos.y = Mathf.Clamp(clampedScreenPos.y, minY, maxY);
 
-        // ÀÌÁ¦ ClampµÈ ¸¶¿ì½º ÁÂÇ¥¸¦ ÀÌ¿ëÇØ¼­ ÆĞ³Î ÀÌµ¿
+        // ì´ì œ Clampëœ ë§ˆìš°ìŠ¤ ì¢Œí‘œë¥¼ ì´ìš©í•´ì„œ íŒ¨ë„ ì´ë™
         Vector2 localPointerPos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect,
-            clampedScreenPos, // ¡ç Á¦ÇÑµÈ ¸¶¿ì½º ÁÂÇ¥
+            clampedScreenPos, // â† ì œí•œëœ ë§ˆìš°ìŠ¤ ì¢Œí‘œ
             eventData.pressEventCamera,
             out localPointerPos))
         {

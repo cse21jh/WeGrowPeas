@@ -35,10 +35,10 @@ public class DialogueStep : ScriptableObject
 
     public DialogueTriggerType triggerType = DialogueTriggerType.NarrationClick;
 
-    // KeyPress ÀÏ ¶§¸¸ »ç¿ë
+    // KeyPress ì¼ ë•Œë§Œ ì‚¬ìš©
     //public KeyCode triggerKey = KeyCode.None;
 
-    // ObjectClick ÀÏ ¶§¸¸ »ç¿ë (ÀÌ ¿ÀºêÁ§Æ®¸¦ Å¬¸¯ÇØ¾ß ÁøÇà)
+    // ObjectClick ì¼ ë•Œë§Œ ì‚¬ìš© (ì´ ì˜¤ë¸Œì íŠ¸ë¥¼ í´ë¦­í•´ì•¼ ì§„í–‰)
     public GameObject targetObject;
 
     public TutorialActions[] actions;

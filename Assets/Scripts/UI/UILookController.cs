@@ -9,7 +9,7 @@ public class UILookController : MonoBehaviour
     [SerializeField] private Vector2 moveRange = Vector2.zero;
     [SerializeField] private Vector2 originPos = Vector2.zero;
 
-    [SerializeField] private float minDistance = 0.1f; // ÃÖ¼Ò °Å¸® ÀÓ°è°ª
+    [SerializeField] private float minDistance = 0.1f; // ìµœì†Œ ê±°ë¦¬ ìž„ê³„ê°’
 
     private void Awake()
     {
@@ -32,17 +32,17 @@ public class UILookController : MonoBehaviour
             canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
             out mousePos);
 
-        // ¸¶¿ì½º - Å¸°Ù °Å¸® (local ÁÂÇ¥ ±âÁØ)
+        // ë§ˆìš°ìŠ¤ - íƒ€ê²Ÿ ê±°ë¦¬ (local ì¢Œí‘œ ê¸°ì¤€)
         Vector2 dir = mousePos - (Vector2)target.localPosition;
 
-        // °Å¸® Á¦ÇÑ
+        // ê±°ë¦¬ ì œí•œ
         dir = Vector2.ClampMagnitude(dir, Mathf.Max(moveRange.x, moveRange.y));
 
-        // dead zone Ã³¸® (³Ê¹« °¡±î¿ì¸é 0À¸·Î)
+        // dead zone ì²˜ë¦¬ (ë„ˆë¬´ ê°€ê¹Œìš°ë©´ 0ìœ¼ë¡œ)
         //if (Mathf.Abs(dir.x) < minDistance) dir.x = 0f;
         //if (Mathf.Abs(dir.y) < minDistance) dir.y = 0f;
 
-        // ÃÖÁ¾ À§Ä¡ Àû¿ë
+        // ìµœì¢… ìœ„ì¹˜ ì ìš©
         target.anchoredPosition = originPos + dir;
         */
 
@@ -50,12 +50,12 @@ public class UILookController : MonoBehaviour
         Vector2 mousePos = Input.mousePosition;
         Vector2 targetPos = (Vector2)target.position;
 
-        Vector2 dir = mousePos - targetPos; // ¿ùµå ÁÂÇ¥ ±âÁØ ¹æÇâ º¤ÅÍ °è»ê
-        dir = Vector2.ClampMagnitude(dir, Mathf.Max(moveRange.x, moveRange.y)); // °Å¸® Á¦ÇÑ
+        Vector2 dir = mousePos - targetPos; // ì›”ë“œ ì¢Œí‘œ ê¸°ì¤€ ë°©í–¥ ë²¡í„° ê³„ì‚°
+        dir = Vector2.ClampMagnitude(dir, Mathf.Max(moveRange.x, moveRange.y)); // ê±°ë¦¬ ì œí•œ
 
         if (Mathf.Abs(dir.x) < minDistance) dir.x = 0f;
         if (Mathf.Abs(dir.y) < minDistance) dir.y = 0f;
 
-        target.localPosition = (Vector2)originPos + dir; // ÃÖÁ¾ À§Ä¡ Àû¿ë
+        target.localPosition = (Vector2)originPos + dir; // ìµœì¢… ìœ„ì¹˜ ì ìš©
     }
 }

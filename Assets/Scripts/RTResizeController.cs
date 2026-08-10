@@ -60,11 +60,11 @@ public class RTResizeController : MonoBehaviour
 
         if (Screen.width != previousWidth || Screen.height != previousHeight)
         {
-            // ÇØ»óµµ º¯°æ °¨Áö ½Ã ·ÎÁ÷ ½ÇÇà
-            Debug.Log($"ÇØ»óµµ º¯°æ °¨Áö: {Screen.width}x{Screen.height}");
+            // í•´ìƒë„ ë³€ê²½ ê°ì§€ ì‹œ ë¡œì§ ì‹¤í–‰
+            Debug.Log($"í•´ìƒë„ ë³€ê²½ ê°ì§€: {Screen.width}x{Screen.height}");
             ResizeRenderTextures();
 
-            // ¿¹: UI Àç¹èÄ¡, Ä«¸Ş¶ó Á¶Á¤ µî
+            // ì˜ˆ: UI ì¬ë°°ì¹˜, ì¹´ë©”ë¼ ì¡°ì • ë“±
             previousWidth = Screen.width;
             previousHeight = Screen.height;
         }

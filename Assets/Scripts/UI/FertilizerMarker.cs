@@ -26,7 +26,7 @@ public class FertilizerMarker : MonoBehaviour
                 iconMap.Add(fi.waveType, fi.icon);
         }
 
-        fertilizerMarker.enabled = false; // ±âº»Àº ¼û±è
+        fertilizerMarker.enabled = false; // ê¸°ë³¸ì€ ìˆ¨ê¹€
     }
 
     public void SetFertilizer(WaveType wavetype)

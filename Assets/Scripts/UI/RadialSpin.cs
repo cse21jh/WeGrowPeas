@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class RadialSpin : MonoBehaviour
 {
-    public float spinDuration = 2f;   // ÇÑ ¹ÙÄû µµ´Â µ¥ °É¸®´Â ½Ã°£ (2ÃÊ)
+    public float spinDuration = 2f;   // í•œ ë°”í€´ ë„ëŠ” ë° ê±¸ë¦¬ëŠ” ì‹œê°„ (2ì´ˆ)
     public float minScale = 0.8f;
     public float maxScale = 1.2f;
-    public float scaleSpeed = 2f;     // Å©±â º¯È­ ¼Óµµ
+    public float scaleSpeed = 2f;     // í¬ê¸° ë³€í™” ì†ë„
 
     void Update()
     {
-        // 1. È¸Àü (2ÃÊ¿¡ ÇÑ ¹ø)
-        float spinSpeed = 360f / spinDuration; // 2ÃÊ¿¡ 360µµ
+        // 1. íšŒì „ (2ì´ˆì— í•œ ë²ˆ)
+        float spinSpeed = 360f / spinDuration; // 2ì´ˆì— 360ë„
         transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime);
 
-        // 2. Å©±â º¯È­ (sinÀ¸·Î ºÎµå·´°Ô ¿Õº¹)
-        float t = (Mathf.Sin(Time.time * scaleSpeed) + 1f) / 2f; // 0~1 »çÀÌ °ª
+        // 2. í¬ê¸° ë³€í™” (sinìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ ì™•ë³µ)
+        float t = (Mathf.Sin(Time.time * scaleSpeed) + 1f) / 2f; // 0~1 ì‚¬ì´ ê°’
         float scaleFactor = Mathf.Lerp(minScale, maxScale, t);
         transform.localScale = Vector3.one * scaleFactor;
     }

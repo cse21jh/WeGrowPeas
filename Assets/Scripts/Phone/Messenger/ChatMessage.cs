@@ -4,15 +4,15 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ChatMessage
 {
-    [Tooltip("¸Ş½ÃÁö µµÂøÀ» À¯¹ßÇÏ´Â Æ®¸®°Å ID. ¿¹: '3', 'GoldPlant'")]
+    [Tooltip("ë©”ì‹œì§€ ë„ì°©ì„ ìœ ë°œí•˜ëŠ” íŠ¸ë¦¬ê±° ID. ì˜ˆ: '3', 'GoldPlant'")]
     public string triggerId;
 
-    [Tooltip("ÀÌ ¸Ş½ÃÁö¸¦ ¹İµå½Ã È®ÀÎÇØ¾ß °ÔÀÓÀÌ ÁøÇàµÇ¸é Ã¼Å©")]
+    [Tooltip("ì´ ë©”ì‹œì§€ë¥¼ ë°˜ë“œì‹œ í™•ì¸í•´ì•¼ ê²Œì„ì´ ì§„í–‰ë˜ë©´ ì²´í¬")]
     public bool isMandatory = false;
 
     [TextArea(3, 5)]
     public string messageText;
 
-    [Tooltip("ÀÌÀü ¸Ş½ÃÁö Ç¥½Ã ÈÄ ÀÌ ¸Ş½ÃÁö°¡ ³ªÅ¸³ª±â±îÁöÀÇ ½Ã°£(ÃÊ)")]
+    [Tooltip("ì´ì „ ë©”ì‹œì§€ í‘œì‹œ í›„ ì´ ë©”ì‹œì§€ê°€ ë‚˜íƒ€ë‚˜ê¸°ê¹Œì§€ì˜ ì‹œê°„(ì´ˆ)")]
     public float delayAfterPrevious = 1.5f;
 }

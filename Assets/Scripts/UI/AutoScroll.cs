@@ -5,20 +5,20 @@ public class AutoScroll : MonoBehaviour
 {
     [SerializeField] private ScrollRect scrollRect;
 
-    // »ç¿ëÀÚ°¡ ½ºÅ©·ÑÀ» À§·Î ¿Ã·Á³ù´ÂÁö È®ÀÎ
+    // ì‚¬ìš©ìê°€ ìŠ¤í¬ë¡¤ì„ ìœ„ë¡œ ì˜¬ë ¤ë†¨ëŠ”ì§€ í™•ì¸
     private bool IsAtBottom()
     {
-        // verticalNormalizedPositionÀº 1 = ¸Ç À§, 0 = ¸Ç ¾Æ·¡
+        // verticalNormalizedPositionì€ 1 = ë§¨ ìœ„, 0 = ë§¨ ì•„ë˜
         return scrollRect.verticalNormalizedPosition <= 0.01f;
     }
 
-    // »õ·Î¿î ¸Ş½ÃÁö°¡ Ãß°¡µÉ ¶§ È£Ãâ
+    // ìƒˆë¡œìš´ ë©”ì‹œì§€ê°€ ì¶”ê°€ë  ë•Œ í˜¸ì¶œ
     public void OnNewMessage()
     {
-        // »ç¿ëÀÚ°¡ ¸Ç ¾Æ·¡¸¦ º¸°í ÀÖÀ» ¶§¸¸ ÀÚµ¿ ½ºÅ©·Ñ
+        // ì‚¬ìš©ìê°€ ë§¨ ì•„ë˜ë¥¼ ë³´ê³  ìˆì„ ë•Œë§Œ ìë™ ìŠ¤í¬ë¡¤
         if (IsAtBottom())
         {
-            Canvas.ForceUpdateCanvases(); // ·¹ÀÌ¾Æ¿ô °­Á¦ °»½Å
+            Canvas.ForceUpdateCanvases(); // ë ˆì´ì•„ì›ƒ ê°•ì œ ê°±ì‹ 
             scrollRect.verticalNormalizedPosition = 0f;
         }
     }

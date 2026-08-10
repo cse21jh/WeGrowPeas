@@ -6,7 +6,7 @@ public class NoneWave : Wave
 {
     public override WaveType WaveType => WaveType.None;
     public override string WaveName => "";
-    public override string WaveDescription => "¿À´ÃÀº ¾Æ¹« ÀÏµµ ÀÏ¾î³ªÁö ¾ÊÀ» °Í °°½À´Ï´Ù..";
+    public override string WaveDescription => "ì˜¤ëŠ˜ì€ ì•„ë¬´ ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•Šì„ ê²ƒ ê°™ìŠµë‹ˆë‹¤..";
     public override string WaveSoundString => "Aging";
     public const int UnlockStage = 999;
 }

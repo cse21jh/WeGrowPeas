@@ -3,7 +3,7 @@ using TMPro;
 
 public class DummyApp : BasePhoneApp
 {
-    [SerializeField] private string appTitle = "´õ¹Ì ¾Û";
+    [SerializeField] private string appTitle = "ë”ë¯¸ ì•±";
     [SerializeField] private TMP_Text label;
 
     public override string Title => appTitle;
@@ -13,18 +13,18 @@ public class DummyApp : BasePhoneApp
         base.OnCreate(phone);
 
         if (label != null)
-            label.text = $"{appTitle}\n(»ı¼ºµÊ)";
+            label.text = $"{appTitle}\n(ìƒì„±ë¨)";
     }
 
     public override void OnShow()
     {
         if (label != null)
-            label.text = $"{appTitle}\n(OnShow È£Ãâ)";
+            label.text = $"{appTitle}\n(OnShow í˜¸ì¶œ)";
     }
 
     public override void OnHide()
     {
-        // ±»ÀÌ ¾È ½áµµ µÇÁö¸¸, È®ÀÎ¿ëÀ¸·Î ³²°ÜµÒ
+        // êµ³ì´ ì•ˆ ì¨ë„ ë˜ì§€ë§Œ, í™•ì¸ìš©ìœ¼ë¡œ ë‚¨ê²¨ë‘ 
         Debug.Log($"[DummyApp] {appTitle} OnHide");
     }
 }

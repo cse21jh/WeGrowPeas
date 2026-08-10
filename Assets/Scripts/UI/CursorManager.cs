@@ -14,8 +14,8 @@ public class CursorManager : MonoBehaviour
 
 
 
-    public Image cursorImage;   // ÀÎ½ºÆåÅÍ¿¡¼­ ÇÒ´ç
-    public Vector2 offset;      // Ä¿¼­ Áß½É À§Ä¡ Á¶Á¤¿ë (¿¹: (16, -16))
+    public Image cursorImage;   // ì¸ìŠ¤í™í„°ì—ì„œ í• ë‹¹
+    public Vector2 offset;      // ì»¤ì„œ ì¤‘ì‹¬ ìœ„ì¹˜ ì¡°ì •ìš© (ì˜ˆ: (16, -16))
 
 
     [System.Serializable]
@@ -61,11 +61,11 @@ public class CursorManager : MonoBehaviour
         }
     }
 
-    // °ÔÀÓ Ã¢ÀÌ Æ÷Ä¿½º¸¦ ÀÒ¾úÀ» ¶§ (Ã¢À» ¹ş¾î³ª°Å³ª Alt+Tab µî)
+    // ê²Œì„ ì°½ì´ í¬ì»¤ìŠ¤ë¥¼ ìƒì—ˆì„ ë•Œ (ì°½ì„ ë²—ì–´ë‚˜ê±°ë‚˜ Alt+Tab ë“±)
     void OnApplicationFocus(bool hasFocus)
     {
-        Cursor.visible = !hasFocus; // Ã¢À» ¹ş¾î³ª¸é ½Ã½ºÅÛ Ä¿¼­ º¸ÀÌ°Ô
-        cursorImage.enabled = hasFocus; // UI Ä¿¼­ ÀÌ¹ÌÁö ¼û±è/Ç¥½Ã
+        Cursor.visible = !hasFocus; // ì°½ì„ ë²—ì–´ë‚˜ë©´ ì‹œìŠ¤í…œ ì»¤ì„œ ë³´ì´ê²Œ
+        cursorImage.enabled = hasFocus; // UI ì»¤ì„œ ì´ë¯¸ì§€ ìˆ¨ê¹€/í‘œì‹œ
     }
 
     public void SetCursor(CursorType type)

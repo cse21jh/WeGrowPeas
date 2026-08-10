@@ -7,11 +7,11 @@ public enum ModOp { Multiply, Add, Override }
 
 public enum StatId
 {
-    BugSpeedMul = 1,             // ÀüÃ¼ ¹ú·¹ ¼Óµµ °ö
-    WaveWeightMul = 2,           // ¿şÀÌºêº° °¡ÁßÄ¡ °ö (param = (int)WaveType)
-    BugSpawnIntervalMul = 3,     // ½ºÆù °£°İ¿¡ °ö (0.5¸é 2¹è »¡¸® ½ºÆù)
-    BreedingPhaseDurationMul = 4,// ±³¹è ´Ü°è ½Ã°£¿¡ °ö (2¸é 2¹è ±æ¾îÁü)
-    BreedingAttemptsMul = 5,     // ±³¹è °¡´É È½¼ö¿¡ °ö (2¸é 2¹è)
+    BugSpeedMul = 1,             // ì „ì²´ ë²Œë ˆ ì†ë„ ê³±
+    WaveWeightMul = 2,           // ì›¨ì´ë¸Œë³„ ê°€ì¤‘ì¹˜ ê³± (param = (int)WaveType)
+    BugSpawnIntervalMul = 3,     // ìŠ¤í° ê°„ê²©ì— ê³± (0.5ë©´ 2ë°° ë¹¨ë¦¬ ìŠ¤í°)
+    BreedingPhaseDurationMul = 4,// êµë°° ë‹¨ê³„ ì‹œê°„ì— ê³± (2ë©´ 2ë°° ê¸¸ì–´ì§)
+    BreedingAttemptsMul = 5,     // êµë°° ê°€ëŠ¥ íšŸìˆ˜ì— ê³± (2ë©´ 2ë°°)
 
 }
 
@@ -19,7 +19,7 @@ public enum StatId
 public struct ModKey
 {
     public StatId stat;
-    public int param; // ´ë»ó ½ºÄÚÇÁ (¾øÀ¸¸é -1)
+    public int param; // ëŒ€ìƒ ìŠ¤ì½”í”„ (ì—†ìœ¼ë©´ -1)
     public ModKey(StatId s, int p = -1) { stat = s; param = p; }
 }
 
@@ -29,10 +29,10 @@ public class Mod
     public int id;
     public ModKey key;
     public ModOp op;
-    public float value;      // Multiply¸é °ö(¿¹: 0.5), Add¸é °¡»ê°ª, Override¸é Àı´ë°ª
-    public int expireDay;    // ÀÌ ³¯ 'ÀÌÀü'±îÁö À¯È¿ (GameManager.stage ±âÁØ)
-    public string sourceTag; // "BugSpray", "SignPost_Wind" °°ÀÌ ÃßÀû¿ë
-    public int priority;     // Override Ãæµ¹ ½Ã ¿ì¼±¼øÀ§(³ôÀ»¼ö·Ï ¿ì¼±)
+    public float value;      // Multiplyë©´ ê³±(ì˜ˆ: 0.5), Addë©´ ê°€ì‚°ê°’, Overrideë©´ ì ˆëŒ€ê°’
+    public int expireDay;    // ì´ ë‚  'ì´ì „'ê¹Œì§€ ìœ íš¨ (GameManager.stage ê¸°ì¤€)
+    public string sourceTag; // "BugSpray", "SignPost_Wind" ê°™ì´ ì¶”ì ìš©
+    public int priority;     // Override ì¶©ëŒ ì‹œ ìš°ì„ ìˆœìœ„(ë†’ì„ìˆ˜ë¡ ìš°ì„ )
 }
 
 public class ModManager : Singleton<ModManager>
@@ -42,12 +42,12 @@ public class ModManager : Singleton<ModManager>
     private int Day => GameManager.Instance.stage;
 
 
-    // ÀúÀå ÇÊ¿ä
+    // ì €ì¥ í•„ìš”
     private readonly List<Mod> mods = new();
 
     public List<Mod> Mods => mods;
 
-    // -------- µî·Ï/ÇØÁ¦/¸¸·á --------
+    // -------- ë“±ë¡/í•´ì œ/ë§Œë£Œ --------
     public int AddTimedMultiplier(StatId stat, int param, float multiplier, int durationDays, string sourceTag = null)
         => Add(new Mod
         {
@@ -81,7 +81,7 @@ public class ModManager : Singleton<ModManager>
 
     public void Remove(int id) => mods.RemoveAll(x => x.id == id);
 
-    public void OnNewDay(int day) // ÇÏ·ç °æ°ú ½Ã È£Ãâ
+    public void OnNewDay(int day) // í•˜ë£¨ ê²½ê³¼ ì‹œ í˜¸ì¶œ
     {
         foreach(var m in mods.ToList())
         {
@@ -94,7 +94,7 @@ public class ModManager : Singleton<ModManager>
         }
     }
 
-    // -------- Á¶È¸(ÇÕ¼º) --------
+    // -------- ì¡°íšŒ(í•©ì„±) --------
     public float GetMul(StatId stat, int param = -1, float minCap = 0f, float maxCap = float.PositiveInfinity)
     {
         float mul = 1f;
@@ -121,7 +121,7 @@ public class ModManager : Singleton<ModManager>
             }
             else if (m.op == ModOp.Add)
             {
-                // °ö ½ºÅÈ¿¡ Add¸¦ Çã¿ëÇÏ°í ½ÍÁö ¾ÊÀ¸¸é »©µµ µÊ.
+                // ê³± ìŠ¤íƒ¯ì— Addë¥¼ í—ˆìš©í•˜ê³  ì‹¶ì§€ ì•Šìœ¼ë©´ ë¹¼ë„ ë¨.
                 mul *= Mathf.Max(0f, 1f + m.value);
             }
         }
@@ -153,7 +153,7 @@ public class ModManager : Singleton<ModManager>
                 }
             }
             else if (m.op == ModOp.Add) sum += m.value;
-            else if (m.op == ModOp.Multiply) sum += (m.value - 1f); // ÇÊ¿ä ½Ã Á¤Ã¥ Á¶Á¤
+            else if (m.op == ModOp.Multiply) sum += (m.value - 1f); // í•„ìš” ì‹œ ì •ì±… ì¡°ì •
         }
 
         return bestOverride != null ? overrideValue : sum;

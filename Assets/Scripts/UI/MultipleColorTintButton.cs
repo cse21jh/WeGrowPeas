@@ -9,8 +9,8 @@ public class MultipleColorTintButton : Button
     {
         get
         {
-            if (m_graphics == null) //Ä³½ÌÀÌ µÇÁö ¾Ê¾Ò´Ù¸é
-                m_graphics = targetGraphic.transform.GetComponentsInChildren<Graphic>(); //ÀÚ½Ä ¿ÀºêÁ§Æ®·ÎºÎÅÍ Graphic ÄÄÆ÷³ÍÆ® ÁöÁ¤
+            if (m_graphics == null) //ìºì‹±ì´ ë˜ì§€ ì•Šì•˜ë‹¤ë©´
+                m_graphics = targetGraphic.transform.GetComponentsInChildren<Graphic>(); //ìì‹ ì˜¤ë¸Œì íŠ¸ë¡œë¶€í„° Graphic ì»´í¬ë„ŒíŠ¸ ì§€ì •
             return m_graphics;
         }
     }

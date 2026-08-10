@@ -5,16 +5,16 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NewspaperData", menuName = "Scriptable Objects/NewspaperData")]
 public class NewspaperData : ScriptableObject
 {
-    [Header("½ºÅ×ÀÌÁö")]
+    [Header("ìŠ¤í…Œì´ì§€")]
     public int stage;
 
-    [Header("¿şÀÌºê")]
+    [Header("ì›¨ì´ë¸Œ")]
     public string waveTitle;
     [TextArea(3, 5)]
     public string waveDescription;
     public Sprite waveIcon;
 
-    [Header("¹ú·¹")]
+    [Header("ë²Œë ˆ")]
     public string bugTitle;
     [TextArea(3, 5)]
     public string additionalBugDescription;
@@ -22,7 +22,7 @@ public class NewspaperData : ScriptableObject
     public List<string> bugDescription = new List<string>();
     public List<Sprite> bugIcon = new List<Sprite>();
 
-    [Header("¾÷±×·¹ÀÌµå")]
+    [Header("ì—…ê·¸ë ˆì´ë“œ")]
     public string upgradeTitle;
     [TextArea(3, 5)]
     public List<string> upgradeDescription = new List<string>();

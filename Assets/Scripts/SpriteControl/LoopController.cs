@@ -3,27 +3,27 @@ using UnityEngine;
 public class LoopController : MonoBehaviour
 {
     [Header("Loop Settings")]
-    public float bounds = 10f;          // ÀÌµ¿ °¡´ÉÇÑ ¹üÀ§
-    [Range(0f, 10f)] public float speed = 2f;            // ±âº» ÀÌµ¿ ¼Óµµ
-    public bool randomizeSpeed = false; // ½ÃÀÛ ½Ã ·£´ý ¼Óµµ ¿©ºÎ
+    public float bounds = 10f;          // ì´ë™ ê°€ëŠ¥í•œ ë²”ìœ„
+    [Range(0f, 10f)] public float speed = 2f;            // ê¸°ë³¸ ì´ë™ ì†ë„
+    public bool randomizeSpeed = false; // ì‹œìž‘ ì‹œ ëžœë¤ ì†ë„ ì—¬ë¶€
 
     private float moveSpeed;
 
     void Start()
     {
-        // ½ÃÀÛ ½Ã ¼Óµµ ÁöÁ¤
+        // ì‹œìž‘ ì‹œ ì†ë„ ì§€ì •
         moveSpeed = randomizeSpeed ? Random.Range(0, speed) : speed;
-        // ·£´ý ¼ÓµµÀÏ ¶§ 0ÀÌ ³ª¿À¸é ¸ØÃâ ¼ö ÀÖÀ¸´Ï º¸Á¤
+        // ëžœë¤ ì†ë„ì¼ ë•Œ 0ì´ ë‚˜ì˜¤ë©´ ë©ˆì¶œ ìˆ˜ ìžˆìœ¼ë‹ˆ ë³´ì •
         if (Mathf.Approximately(moveSpeed, 0f))
             moveSpeed = speed;
     }
 
     void Update()
     {
-        // ÀÌµ¿
+        // ì´ë™
         transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
 
-        // ¹üÀ§ Ã¼Å© ÈÄ ·çÇÁ Ã³¸®
+        // ë²”ìœ„ ì²´í¬ í›„ ë£¨í”„ ì²˜ë¦¬
         if (transform.position.x > bounds)
         {
             transform.position = new Vector2(-bounds, transform.position.y);

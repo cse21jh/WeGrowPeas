@@ -24,22 +24,22 @@ public class Newspaper : MonoBehaviour
 
     private List<GameObject> articleList = new List<GameObject>();
 
-    // ¼³¸íµé UIµé ±î´Â À§Ä¡
+    // ì„¤ëª…ë“¤ UIë“¤ ê¹ŒëŠ” ìœ„ì¹˜
     private float xPos = -140f;
     private float yPos = 70f;
 
-    // ¼³¸íµé °£ÀÇ ±âº» °£°İ
+    // ì„¤ëª…ë“¤ ê°„ì˜ ê¸°ë³¸ ê°„ê²©
     private float yInterval = 30f;
 
-    // ¼³¸íµé ÁÂÃø ±ò¸®´Â Ã¹À§Ä¡
+    // ì„¤ëª…ë“¤ ì¢Œì¸¡ ê¹”ë¦¬ëŠ” ì²«ìœ„ì¹˜
     private float xLeftPos = -140f;
     private float yLeftPos = 70f;
 
-    // ¼³¸íµé ¿ìÃøÀ¸·Î ³Ñ¾î°¬À» ¶§ÀÇ Ã¹ À§Ä¡
+    // ì„¤ëª…ë“¤ ìš°ì¸¡ìœ¼ë¡œ ë„˜ì–´ê°”ì„ ë•Œì˜ ì²« ìœ„ì¹˜
     private float xRightPos = 130f;
     private float yRightPos = 150f;
 
-    // ÀÌ¹Ì ºôµåµÇ¾ú´ÂÁö ¿©ºÎ
+    // ì´ë¯¸ ë¹Œë“œë˜ì—ˆëŠ”ì§€ ì—¬ë¶€
     private bool _isBuilt = false;
 
     public bool UpdateNewspaper()
@@ -51,7 +51,7 @@ public class Newspaper : MonoBehaviour
                 data = newspaperData[i];
         }
 
-        if (data == null) // ½Å¹® µ¥ÀÌÅÍ ¾øÀ¸¸é ¾Æ¿¹ ½Å¹®ÀÌ ¶ßÁö ¾Êµµ·Ï
+        if (data == null) // ì‹ ë¬¸ ë°ì´í„° ì—†ìœ¼ë©´ ì•„ì˜ˆ ì‹ ë¬¸ì´ ëœ¨ì§€ ì•Šë„ë¡
             return false;
 
         if (_isBuilt) return true;
@@ -61,7 +61,7 @@ public class Newspaper : MonoBehaviour
         xPos = xLeftPos;
         yPos = yLeftPos;
 
-        // ¿şÀÌºê ¼³¸í
+        // ì›¨ì´ë¸Œ ì„¤ëª…
         if (data.waveTitle != null)
         {
             MakeTitle(data.waveTitle);

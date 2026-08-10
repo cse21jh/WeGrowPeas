@@ -7,11 +7,11 @@ public static class ResourceLoader
     private static readonly Dictionary<string, Sprite> spriteCache = new();
 
     /// <summary>
-    /// Resources/UpgradeIcons.png ¾È¿¡ Àß¶ó³õÀº Sprite¸¦ ÀÌ¸§À¸·Î ·Îµå
+    /// Resources/UpgradeIcons.png ì•ˆì— ì˜ë¼ë†“ì€ Spriteë¥¼ ì´ë¦„ìœ¼ë¡œ ë¡œë“œ
     /// </summary>
     public static Sprite LoadUpgradeIcon(string name)
     {
-        // ÃÖÃÊ ÇÑ ¹ø¸¸ LoadAll
+        // ìµœì´ˆ í•œ ë²ˆë§Œ LoadAll
         if (spriteCache.Count == 0)
         {
             var sprites = Resources.LoadAll<Sprite>("Sprites/UI/Icons/UpgradeIcons/upgradeIconsSheet");
@@ -21,11 +21,11 @@ public static class ResourceLoader
             }
         }
 
-        // ¾øÀ¸¸é null
+        // ì—†ìœ¼ë©´ null
         if (spriteCache.TryGetValue(name, out var result))
             return result;
 
-        Debug.LogWarning($"[ResourceLoader] ½ºÇÁ¶óÀÌÆ® '{name}'À» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+        Debug.LogWarning($"[ResourceLoader] ìŠ¤í”„ë¼ì´íŠ¸ '{name}'ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         return null;
     }
 }

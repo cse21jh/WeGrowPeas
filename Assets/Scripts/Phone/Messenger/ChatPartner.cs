@@ -5,5 +5,5 @@ public class ChatPartner : ScriptableObject
 {
     public string chatPartnerName;
     public Sprite chatPartnerImage;
-    // ÇÊ¿äÇÏ´Ù¸é ´Ù¸¥ Á¤º¸ Ãß°¡ (¿¹: ÇÁ·ÎÇÊ ¸Þ½ÃÁö)
+    // í•„ìš”í•˜ë‹¤ë©´ ë‹¤ë¥¸ ì •ë³´ ì¶”ê°€ (ì˜ˆ: í”„ë¡œí•„ ë©”ì‹œì§€)
 }
