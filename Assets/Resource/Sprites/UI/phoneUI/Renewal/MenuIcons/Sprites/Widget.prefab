@@ -377,6 +377,7 @@ GameObject:
   - component: {fileID: 1817946350101661795}
   - component: {fileID: 2946570059451643857}
   - component: {fileID: 8993549195379787744}
+  - component: {fileID: 3989072469123509323}
   m_Layer: 0
   m_Name: Widget
   m_TagString: Untagged
@@ -488,13 +489,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 3989072469123509323}
+        m_TargetAssemblyTypeName: WidgetController, Assembly-CSharp
+        m_MethodName: ShowPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -518,13 +519,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e51ac81e214b89b4e8b74ec4e9a3716e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonController
-  hoverScale: 1.1
+  hoverScale: 1.05
   enableShake: 0
   shakeStrength: 1
   animationDuration: 0.2
   easeType: 22
   onMouseIcon: {fileID: 0}
   cursorType: 1
+--- !u!114 &3989072469123509323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6844903052432961187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 750641c1144167e4fbca93e5ada3d12e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  popupRect: {fileID: 0}
+  animationDuration: 0.5
+  animationEase: 27
 --- !u!1 &7385242549832663336
 GameObject:
   m_ObjectHideFlags: 0

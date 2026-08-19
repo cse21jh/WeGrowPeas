@@ -57,7 +57,7 @@ public class ButtonController : MonoBehaviour, ICursorHover, IPointerEnterHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         // 마우스가 버튼 위에 올려졌을 때
-        Debug.Log("Test");
+        //Debug.Log("Test");
 
         if(CursorManager.Instance != null)
             CursorManager.Instance.SetCursor(cursorType);

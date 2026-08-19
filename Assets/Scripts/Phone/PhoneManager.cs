@@ -62,6 +62,7 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private GameObject phoneRoot;   // 폰 전체 루트 (열고/닫기)
     [SerializeField] private GameObject phoneBtn;    // 폰 열기 버튼
     [SerializeField] private PhoneMenuPageSwitcher pageSwitcher;
+    [SerializeField] private BottomMenuCarousel bottomMenu;  // Renewal 하단 메뉴 (하단 버튼 클릭을 재현할 때 사용)
 
     [Header("Input")]
     [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
@@ -231,6 +232,46 @@ public class PhoneManager : Singleton<PhoneManager>
         }
 
         _current = mappedKey;
+    }
+
+    // 하단 메뉴 인덱스. BottomMenuCarousel의 Items 순서와 위 switch가 이 순서를 공유한다.
+    public const int MENU_INDEX_MESSENGER = 0;
+    public const int MENU_INDEX_TAX = 1;
+    public const int MENU_INDEX_HOME = 2;
+    public const int MENU_INDEX_SHOP = 3;
+    public const int MENU_INDEX_QUEST = 4;
+
+    /// <summary>
+    /// 하단 메뉴 버튼을 실제로 누른 것과 동일하게 동작한다.
+    /// 버튼 강조 연출은 캐러셀이 처리하고, 그 결과로 OpenAppByIndex가 호출된다.
+    /// OpenAppByIndex를 직접 부르면 페이지만 바뀌고 하단 메뉴 강조가 어긋난다.
+    /// </summary>
+    public void SelectBottomMenu(int menuIndex)
+    {
+        if (bottomMenu == null)
+        {
+            // 폰이 닫혀 있으면 하단 메뉴도 비활성 상태이므로 Include로 찾는다.
+            bottomMenu = FindAnyObjectByType<BottomMenuCarousel>(
+                FindObjectsInactive.Include);
+        }
+
+        if (bottomMenu == null)
+        {
+            Debug.LogWarning(
+                "[PhoneManager] BottomMenuCarousel을 찾을 수 없어 페이지만 전환합니다.",
+                this);
+
+            OpenAppByIndex(menuIndex);
+            return;
+        }
+
+        bottomMenu.SelectIndex(menuIndex);
+    }
+
+    /// <summary>국세청 앱 열기. 하단 메뉴의 MenuBtn_tax를 누른 것과 동일하다.</summary>
+    public void OpenTaxApp()
+    {
+        SelectBottomMenu(MENU_INDEX_TAX);
     }
     public void PhoneTouchEffect()
     {
