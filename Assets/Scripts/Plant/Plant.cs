@@ -130,6 +130,10 @@ public abstract class Plant : MonoBehaviour
         this.grid = grid;
         taste = UnityEngine.Random.Range(0, 7);
 
+        // 밭에 등장했으면 도감에 발견 처리. 하위 클래스가 speciesname을 정한 뒤 base.Init을 부르므로
+        // 여기가 모든 식물이 거치는 유일한 지점이다. (이미 발견된 종이면 아무 일도 하지 않는다)
+        CodexProgress.Discover(CodexProgress.Category.Plant, speciesname);
+
         //holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
         holdCanvas.worldCamera = FindAnyObjectByType<VcamManager>().holdCanvasCamera;
 

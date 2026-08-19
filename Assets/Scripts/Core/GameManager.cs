@@ -67,6 +67,7 @@ public class GameManager : Singleton<GameManager>
                 economyManager.InitEconomyManager();
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
+                RecallRecorder.ResetRun(); // 회상: 일자별 스냅샷 초기화
                 CurseState.ResetAll(); // 저주 상태 초기화
                 SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 gameMode = 0;
@@ -233,6 +234,11 @@ public class GameManager : Singleton<GameManager>
         yield return StartCoroutine(shopManager.ShopPhase(grid));
         */
         GameEvents.RaiseQuestDayPassed();
+
+        // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
+        // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
+        RecallRecorder.CaptureDay();
+
         economyManager.PushEarnedGold();
     }
 
@@ -414,14 +420,24 @@ public class GameManager : Singleton<GameManager>
 
         //Debug.Log("게임오버");
         PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+
+        // 회상: 게임오버 당일은 자유시간을 채우지 못하고 끝나므로 여기서 마지막 스냅샷을 찍는다.
+        // PushEarnedGold보다 앞이어야 오늘 번 골드가 아직 남아 있다.
+        RecallRecorder.CaptureDay(isFinalPartial: true);
+
         economyManager.PushEarnedGold();
         yield return new WaitForSeconds(1.0f);
-        PassRecordToGameRecordHolder();
+
+        // 요약의 일수 보정(stage - 1)이 걸리도록 결과 종류를 먼저 확정한다.
+        GameStartContext.SetStartType(GameStartType.GameOver);
+
+        // 런 종료 공통 처리 — 세이브 파일을 지우기 전에 끝나야 타임라인이 살아 있다.
+        yield return StartCoroutine(FinishRunRoutine());
+
         // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
         SceneLoader.Instance.LoadGameOverScene();
         File.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
-        GameStartContext.SetStartType(GameStartType.GameOver);
         Debug.Log("GameOver");
     }
      
@@ -432,9 +448,11 @@ public class GameManager : Singleton<GameManager>
             TaxManager.Instance.MarkPaidForcibly();
         }
 
-        PassRecordToGameRecordHolder();
-
         DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)
+
+        // 런 종료 공통 처리. 엔딩 연출(카메라 전환 + 편지)이 시작되기 전이라
+        // 게임오버 때와 같은 농장 시점으로 사진이 남는다.
+        yield return StartCoroutine(FinishRunRoutine());
 
         FindAnyObjectByType<UIAnimationManager>().SwitchCameras(CameraManager.CameraType.Ending);
         //File.Delete(GetSavePath());
@@ -445,6 +463,23 @@ public class GameManager : Singleton<GameManager>
         Debug.Log("40일 클리어했습니다. YEAH!");
         while(true)
             yield return null;
+    }
+
+    /// <summary>
+    /// 런 종료 공통 처리. 끝난 방식(엔딩/게임오버)을 가리지 않는다.
+    /// 요약 확정 → 유전자 지급 → 농장 사진 + 회상 기록 순서.
+    ///
+    /// 유전자 지급이 결과 화면이 아니라 여기 있는 이유는, 결과 화면을 회상으로 다시 열어도
+    /// 다시 지급되지 않게 하기 위해서다. 지급 결과는 회상 기록에도 그대로 남는다.
+    /// </summary>
+    private IEnumerator FinishRunRoutine()
+    {
+        PassRecordToGameRecordHolder();
+        RunRecordFormatter.AwardGenetics(GameRecordHolder.Current);
+
+        byte[] png = null;
+        yield return StartCoroutine(RecallScreenshot.CaptureRoutine(bytes => png = bytes));
+        RecallStore.Commit(png);
     }
 
     private void LoadGame()
@@ -475,6 +510,7 @@ public class GameManager : Singleton<GameManager>
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
         }
         PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
+        RecallRecorder.LoadFromSave(saveData.recall);
 
         Debug.Log("불러옴");
     }
@@ -507,6 +543,7 @@ public class GameManager : Singleton<GameManager>
             AbilityManager.Instance.SaveCurrentAbilityManager(saveData.ability);
         }
         PlayerRecordForGraph.SaveTo(saveData.graph);
+        RecallRecorder.SaveTo(saveData.recall);
 
         File.WriteAllText(GetSavePath(), JsonUtility.ToJson(saveData, true));
         GameStartContext.SetStartType(GameStartType.ContinueGame);

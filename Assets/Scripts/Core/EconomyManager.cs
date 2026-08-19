@@ -21,6 +21,8 @@ public class EconomyManager : MonoBehaviour
     private int earnedGoldToday = 0;
     public int TotalGold => totalGold;
     public int ConsumeGold => consumeGold;
+    /// <summary>오늘 번 골드. <see cref="PushEarnedGold"/>로 그래프에 밀어넣으면 0으로 초기화된다.</summary>
+    public int EarnedGoldToday => earnedGoldToday;
 
     private void Start()
     {

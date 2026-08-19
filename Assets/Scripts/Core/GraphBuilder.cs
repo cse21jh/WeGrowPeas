@@ -56,6 +56,9 @@ public class GraphBuilder : MonoBehaviour
     private int wtop = 40;
     private int countPerPage = 40;
 
+    /// <summary>그릴 대상 기록. null이면 Start에서 이번 런(<see cref="PlayerRecordForGraph"/>)을 담는다.</summary>
+    private GraphSave data;
+
     private static readonly string[] WaveNames =
     {
         "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위"
@@ -76,16 +79,40 @@ public class GraphBuilder : MonoBehaviour
     {
         /*for (int i = 0; i < 112; i++)
         {
-            PlayerRecordForGraph.survivedPlants.Add(UnityEngine.Random.Range(5, 20));
-            PlayerRecordForGraph.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));
-            PlayerRecordForGraph.waveEachDay.Add(UnityEngine.Random.Range(0, 8));
+            data.survivedPlants.Add(UnityEngine.Random.Range(5, 20));
+            data.earnedGolds.Add(UnityEngine.Random.Range(50, 1500));
+            data.waveEachDay.Add(UnityEngine.Random.Range(0, 8));
         }*/
 
-        ptop = PlayerRecordForGraph.survivedPlants.Count > 40 ? 40 : PlayerRecordForGraph.survivedPlants.Count;
-        gtop = PlayerRecordForGraph.earnedGolds.Count > 40 ? 40 : PlayerRecordForGraph.earnedGolds.Count;
-        wtop = PlayerRecordForGraph.waveEachDay.Count > 40 ? 40 : PlayerRecordForGraph.waveEachDay.Count;
+        if (data == null)
+        {
+            data = new GraphSave();
+            PlayerRecordForGraph.SaveTo(data); // 이번 런 기록
+        }
 
+        ResetPage();
         LoadChart();
+    }
+
+    /// <summary>
+    /// 과거 기록(회상)을 그린다. Start 전후 어느 쪽에서 불러도 된다.
+    /// </summary>
+    public void SetData(GraphSave save)
+    {
+        if (save == null) return;
+
+        data = save;
+        ResetPage();
+        LoadChart();
+    }
+
+    /// <summary>첫 페이지로 되돌린다.</summary>
+    private void ResetPage()
+    {
+        bottom = 0;
+        ptop = Math.Min(countPerPage, data.survivedPlants.Count);
+        gtop = Math.Min(countPerPage, data.earnedGolds.Count);
+        wtop = Math.Min(countPerPage, data.waveEachDay.Count);
     }
 
     private void LoadChart()
@@ -138,7 +165,7 @@ public class GraphBuilder : MonoBehaviour
         }
 
         for (int d = bottom; d < ptop; d++)
-            plantChart.AddData(0, d+1, PlayerRecordForGraph.survivedPlants[d]);
+            plantChart.AddData(0, d+1, data.survivedPlants[d]);
     }
 
     private void BuildGold()
@@ -184,7 +211,7 @@ public class GraphBuilder : MonoBehaviour
         }
 
         for (int d = bottom; d < gtop; d++)
-            goldChart.AddData(0, d+1, PlayerRecordForGraph.earnedGolds[d]);
+            goldChart.AddData(0, d+1, data.earnedGolds[d]);
     }
 
     private void BuildWaves()
@@ -224,7 +251,7 @@ public class GraphBuilder : MonoBehaviour
 
             for (int day = bottom; day < top; day++)
             {
-                if (PlayerRecordForGraph.waveEachDay[day] == w)
+                if (data.waveEachDay[day] == w)
                 {
                     s.AddXYData(day + 1, w);
                 }
@@ -233,9 +260,9 @@ public class GraphBuilder : MonoBehaviour
 
         for (int day = bottom; day < wtop; day++)
         {
-            int w = PlayerRecordForGraph.waveEachDay[day];
+            int w = data.waveEachDay[day];
 
-            if (PlayerRecordForGraph.waveEachDay[day] == 8) continue;
+            if (data.waveEachDay[day] == 8) continue;
 
             var s = waveChart.AddSerie<Line>();
             s.lineStyle.show = false;
@@ -262,12 +289,12 @@ public class GraphBuilder : MonoBehaviour
 
     public void MoveNext()
     {
-        if (ptop >= PlayerRecordForGraph.survivedPlants.Count) return;
+        if (ptop >= data.survivedPlants.Count) return;
 
         bottom = bottom + countPerPage;
-        ptop = Math.Min(ptop + countPerPage, PlayerRecordForGraph.survivedPlants.Count);
-        gtop = Math.Min(gtop + countPerPage, PlayerRecordForGraph.earnedGolds.Count);
-        wtop = Math.Min(wtop + countPerPage, PlayerRecordForGraph.waveEachDay.Count);
+        ptop = Math.Min(ptop + countPerPage, data.survivedPlants.Count);
+        gtop = Math.Min(gtop + countPerPage, data.earnedGolds.Count);
+        wtop = Math.Min(wtop + countPerPage, data.waveEachDay.Count);
 
         LoadChart();
     }

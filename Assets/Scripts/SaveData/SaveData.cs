@@ -31,6 +31,7 @@ public class SaveData
     public AbilitySave ability = new();
     public CurseSave curse = new();
     public SpecialItemSave specialItem = new();
+    public RecallSave recall = new();
 }
 
 /// <summary>진행 상황 전반 (GameManager / TaxManager / DawnSystem / 시작 방식).</summary>
@@ -261,6 +262,58 @@ public class SpecialItemSave
     public int pendingSpecialGifts;
     /// <summary>선택지 칸별 남은 리롤 횟수.</summary>
     public List<int> specialItemRerolls = new();
+}
+
+/// <summary>회상용 일자별 스냅샷 (RecallRecorder).</summary>
+[Serializable]
+public class RecallSave
+{
+    public List<DaySnapshot> days = new();
+}
+
+/// <summary>
+/// 하루치 농장 상태. 자유시간이 끝난 시점(= 그날의 마지막 상태)을 기준으로 찍는다.
+///
+/// 아이콘·설명은 회상 화면에서 id로 다시 조회하므로 여기엔 id와 수치만 담는다.
+/// 추가·판매·구매 수는 누적값만 담고, 전날 스냅샷과의 차이로 "그날의 수치"를 계산한다.
+/// (시스템마다 일별 카운터를 새로 심지 않아도 되고, 중간에 이어하기를 해도 값이 어긋나지 않는다)
+/// </summary>
+[Serializable]
+public class DaySnapshot
+{
+    public int day;
+
+    /// <summary>그날이 끝난 시점의 보유 골드. 전날과의 차이가 델타 골드.</summary>
+    public int gold;
+    /// <summary>그날 번 골드.</summary>
+    public int earnedGold;
+
+    /// <summary>그날 지나간 웨이브.</summary>
+    public WaveType waveType;
+    /// <summary>그날 웨이브로 죽은 식물 수.</summary>
+    public int diedCount;
+
+    /// <summary>그날의 밭 가로 길이. 칸 수는 maxCol * 4.</summary>
+    public int maxCol;
+    /// <summary>칸별 식물 종(Plant.speciesname). 빈 칸은 "".</summary>
+    public string[] cellSpecies = new string[0];
+
+    // 누적 구매 내역: itemNames[i]를 itemCounts[i]번 구매 (인덱스 매칭).
+    public string[] itemNames = new string[0];
+    public int[] itemCounts = new int[0];
+
+    /// <summary>그 시점까지 보유한 특수 아이템 id.</summary>
+    public string[] specialItemIds = new string[0];
+    /// <summary>그날 효과가 적용된 저주 id (일시 + 계절).</summary>
+    public string[] curseIds = new string[0];
+
+    /// <summary>누적 교배 수. 전날과의 차이가 그날 추가된 식물 수.</summary>
+    public int cumBreedCount;
+    /// <summary>누적 판매 수. 전날과의 차이가 그날 판매한 식물 수.</summary>
+    public int cumSellCount;
+
+    /// <summary>게임오버 당일처럼 자유시간을 채우지 못하고 찍힌 스냅샷.</summary>
+    public bool isFinalPartial;
 }
 
 /// <summary>밭에 심긴 식물 1개의 저장 형태.</summary>

@@ -73,9 +73,11 @@ public static class CodexCatalog
             if (!string.IsNullOrEmpty(p.description)) sb.AppendLine(p.description);
             if (!string.IsNullOrEmpty(p.traitInfo)) sb.AppendLine($"특성: {p.traitInfo}");
             if (!string.IsNullOrEmpty(p.resistanceNote)) sb.AppendLine(p.resistanceNote);
-            int sold = p.plantId == "완두콩" ? CodexProgress.GetStat(CodexProgress.StatSoldPea)
-                     : p.plantId == "땅콩" ? CodexProgress.GetStat(CodexProgress.StatSoldPeanut) : 0;
-            sb.AppendLine($"판매한 수: {sold}");
+            // 판매 수를 세는 것은 완두콩·땅콩뿐이다. 나머지는 "판매한 수: 0"이 늘 붙어 헷갈리므로 뺀다.
+            if (p.plantId == "완두콩")
+                sb.AppendLine($"판매한 수: {CodexProgress.GetStat(CodexProgress.StatSoldPea)}");
+            else if (p.plantId == "땅콩")
+                sb.AppendLine($"판매한 수: {CodexProgress.GetStat(CodexProgress.StatSoldPeanut)}");
 
             list.Add(new CodexEntry
             {
