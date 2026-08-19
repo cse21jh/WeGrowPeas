@@ -375,7 +375,8 @@ GameObject:
   - component: {fileID: 6826739483362488968}
   - component: {fileID: 4283351852524289159}
   - component: {fileID: 1817946350101661795}
-  - component: {fileID: 1764856679209312684}
+  - component: {fileID: 2946570059451643857}
+  - component: {fileID: 8993549195379787744}
   m_Layer: 0
   m_Name: Widget
   m_TagString: Untagged
@@ -443,7 +444,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3.5
---- !u!114 &1764856679209312684
+--- !u!114 &2946570059451643857
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -452,9 +453,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6844903052432961187}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 654b1a092120a244fb2fc74176239373, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_EditorClassIdentifier: Assembly-CSharp::MultiTargetButton
   m_Navigation:
     m_Mode: 3
     m_WrapAround: 0
@@ -486,7 +487,44 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1817946350101661795}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  additionalTargetGraphics:
+  - {fileID: 3909351160739853488}
+  - {fileID: 9184140866807487916}
+  - {fileID: 5440181612659825411}
+  - {fileID: 3369794262739745323}
+  - {fileID: 1337846475935998955}
+--- !u!114 &8993549195379787744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6844903052432961187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e51ac81e214b89b4e8b74ec4e9a3716e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonController
+  hoverScale: 1.1
+  enableShake: 0
+  shakeStrength: 1
+  animationDuration: 0.2
+  easeType: 22
+  onMouseIcon: {fileID: 0}
+  cursorType: 1
 --- !u!1 &7385242549832663336
 GameObject:
   m_ObjectHideFlags: 0
