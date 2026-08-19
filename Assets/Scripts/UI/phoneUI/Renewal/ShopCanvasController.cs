@@ -52,6 +52,11 @@ public class ShopCanvasController : MonoBehaviour
     [SerializeField] private GameObject detail_ItemLimit;
     [SerializeField] private TextMeshProUGUI detail_ItemLimitText;
 
+    [Header("Detail Tags (설치 / 수익성 등)")]
+    [Tooltip("태그 칸 오브젝트. 아이템이 가진 태그 수만큼만 켜진다. 현재 최대 2개까지 붙는다.")]
+    [SerializeField] private GameObject[] detail_ItemTags;
+    [SerializeField] private TextMeshProUGUI[] detail_ItemTagTexts;
+
     [Header("Detail Option Dropdown (예: 전용 비료 웨이브 선택)")]
     [SerializeField] private TMP_Dropdown optionDropdown;
 
@@ -201,6 +206,9 @@ public class ShopCanvasController : MonoBehaviour
             typeObj: detail_ItemType, typeText: detail_ItemTypeText,
             gradeObj: detail_ItemGrade, gradeText: detail_ItemGradeText,
             limitObj: detail_ItemLimit, limitText: detail_ItemLimitText);
+
+        // 성격 태그 (슬롯과 동일 규칙)
+        ShopBadge.ApplyTags(ShopBadge.GetTags(data), detail_ItemTags, detail_ItemTagTexts);
 
         SetupOptionDropdown(data);
 

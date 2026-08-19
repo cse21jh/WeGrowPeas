@@ -67,13 +67,21 @@ public class RecallTooltip : MonoBehaviour
                 _canvasRect, Input.mousePosition, cam, out Vector2 local))
             return;
 
-        // pivot이 좌상단이라 오른쪽 아래로 펼쳐진다. 캔버스를 벗어나지 않게 자른다.
+        // pivot이 좌상단이라 기본은 커서의 오른쪽 아래로 펼쳐진다.
         Vector2 size = panel.rect.size;
         float halfW = _canvasRect.rect.width * 0.5f;
         float halfH = _canvasRect.rect.height * 0.5f;
 
-        float x = Mathf.Clamp(local.x + offset.x, -halfW, Mathf.Max(-halfW, halfW - size.x));
-        float y = Mathf.Clamp(local.y + offset.y, Mathf.Min(halfH, -halfH + size.y), halfH);
+        // 아래(오른쪽)에 자리가 모자라면 커서 반대편으로 뒤집는다.
+        float x = local.x + offset.x;
+        if (x + size.x > halfW) x = local.x - offset.x - size.x;
+
+        float y = local.y + offset.y; // y는 위쪽 변
+        if (y - size.y < -halfH) y = local.y - offset.y + size.y;
+
+        // 뒤집어도 넘치면(툴팁이 화면보다 클 때) 마지막으로 안쪽에 붙인다.
+        x = Mathf.Clamp(x, -halfW, Mathf.Max(-halfW, halfW - size.x));
+        y = Mathf.Clamp(y, Mathf.Min(halfH, -halfH + size.y), halfH);
 
         panel.anchoredPosition = new Vector2(x, y);
     }

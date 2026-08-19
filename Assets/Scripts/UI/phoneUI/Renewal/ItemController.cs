@@ -144,17 +144,8 @@ public class ItemController : MonoBehaviour
             if (hasLimit) itemPurchaseLimit.text = $"{countLimit}";
         }
 
-        // 태그: 있는 만큼만 켜기
-        if (itemTags != null)
-        {
-            for (int i = 0; i < itemTags.Length; i++)
-            {
-                bool show = tags != null && i < tags.Length && !string.IsNullOrEmpty(tags[i]);
-                if (itemTags[i] != null) itemTags[i].SetActive(show);
-                if (show && itemTagTexts != null && i < itemTagTexts.Length && itemTagTexts[i] != null)
-                    itemTagTexts[i].text = tags[i];
-            }
-        }
+        // 태그: 있는 만큼만 켜기 (상세 패널과 같은 규칙)
+        ShopBadge.ApplyTags(tags, itemTags, itemTagTexts);
 
     }
     #endregion

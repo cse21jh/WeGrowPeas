@@ -43,11 +43,60 @@ public static class ShopBadge
     /// <summary>슬롯 하단에 표시할 태그 목록. (등급 배지와 별개)</summary>
     public static string[] GetTags(ItemData item)
     {
-        if (item == null) return null;
-        // 현재 ItemData에 별도 태그 필드가 없어 등급 태그만 노출한다.
-        // 태그 데이터가 생기면 여기서 반환 목록을 확장하면 슬롯 UI가 자동 반영된다.
-        string grade = item.GradeTagText;
-        return string.IsNullOrEmpty(grade) ? null : new[] { grade };
+        if (item == null || item.Tags == null || item.Tags.Count == 0) return null;
+
+        var names = new string[item.Tags.Count];
+        for (int i = 0; i < item.Tags.Count; i++)
+            names[i] = item.Tags[i].ToDisplayName();
+
+        return names;
+    }
+
+    /// <summary>
+    /// 태그 칸을 있는 만큼만 켠다. 칸 수보다 태그가 많으면 앞에서부터 채운다.
+    /// 슬롯(ItemController)과 상세 패널(ShopCanvasController)이 같은 규칙을 쓰도록 한 곳에 둔다.
+    ///
+    /// 마우스를 올리면 그 태그의 설명이 <see cref="HoverTooltip"/>으로 뜬다.
+    /// 호버 처리는 여기서 붙이므로 씬에는 태그 칸만 연결해 두면 된다.
+    /// </summary>
+    public static void ApplyTags(string[] tags, GameObject[] tagObjects, TMP_Text[] tagTexts)
+    {
+        if (tagObjects == null) return;
+
+        for (int i = 0; i < tagObjects.Length; i++)
+        {
+            bool show = tags != null && i < tags.Length && !string.IsNullOrEmpty(tags[i]);
+
+            if (tagObjects[i] != null) tagObjects[i].SetActive(show);
+
+            if (!show) continue;
+
+            if (tagTexts != null && i < tagTexts.Length && tagTexts[i] != null)
+                tagTexts[i].text = tags[i];
+
+            if (tagObjects[i] != null) SetupTagHover(tagObjects[i], tags[i]);
+        }
+    }
+
+    /// <summary>태그 칸에 호버 설명을 붙인다. 이미 붙어 있으면 내용만 갈아끼운다.</summary>
+    private static void SetupTagHover(GameObject tagObject, string displayName)
+    {
+        var hover = tagObject.GetComponent<UIHoverHandler>();
+        if (hover == null) hover = tagObject.AddComponent<UIHoverHandler>();
+
+        string description = ItemTagExtensions.TryParseDisplayName(displayName, out var tag)
+            ? tag.ToDescription()
+            : "";
+
+        // 설명이 없으면 굳이 띄우지 않는다.
+        if (string.IsNullOrEmpty(description))
+        {
+            hover.Setup(null, null);
+            return;
+        }
+
+        string content = $"{displayName}\n{description}";
+        hover.Setup(() => HoverTooltip.ShowFor(content), HoverTooltip.HideCurrent);
     }
 
     public static string GetGrade(ItemData item)

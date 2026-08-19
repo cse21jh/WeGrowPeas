@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening.Core.Easing;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,6 +11,75 @@ public enum ItemRarity
     Rare = 4,        // 희귀 등급 (가중치 4)
     Special = 2,     // 특수 등급 (가중치 2)
     Legendary = 1    // 전설 등급 (가중치 1)
+}
+
+/// <summary>
+/// 아이템의 성격 태그. 등급(<see cref="ItemRarity"/>)과는 별개로,
+/// 이 아이템이 어떤 식으로 동작하는지를 상점 슬롯에서 한눈에 보여준다.
+/// </summary>
+public enum ItemTag
+{
+    /// <summary>설치: 토양을 클릭해 새로운 오브젝트를 배치한다.</summary>
+    Install,
+    /// <summary>선택: 이미 있는 식물을 골라야 한다.</summary>
+    Select,
+    /// <summary>발동형: 효과가 발동하면 사라진다.</summary>
+    Trigger,
+    /// <summary>기간제: 일정 기간 동안만 지속된다.</summary>
+    Timed,
+    /// <summary>수익성: 골드와 직접적인 연관이 있다.</summary>
+    Profit,
+    /// <summary>강화: 이미 있는 아이템의 성능을 올린다.</summary>
+    Upgrade
+}
+
+public static class ItemTagExtensions
+{
+    /// <summary>상점 슬롯에 찍히는 이름.</summary>
+    public static string ToDisplayName(this ItemTag tag)
+    {
+        switch (tag)
+        {
+            case ItemTag.Install: return "설치";
+            case ItemTag.Select: return "선택";
+            case ItemTag.Trigger: return "발동형";
+            case ItemTag.Timed: return "기간제";
+            case ItemTag.Profit: return "수익성";
+            case ItemTag.Upgrade: return "강화";
+            default: return tag.ToString();
+        }
+    }
+
+    /// <summary>태그에 마우스를 올렸을 때 보여줄 설명.</summary>
+    public static string ToDescription(this ItemTag tag)
+    {
+        switch (tag)
+        {
+            case ItemTag.Install: return "토양을 클릭해 새로운 오브젝트를 배치합니다.";
+            case ItemTag.Select: return "이미 있는 식물을 선택해야 합니다.";
+            case ItemTag.Trigger: return "효과가 발동하면 사라집니다.";
+            case ItemTag.Timed: return "일정 기간 동안만 지속됩니다.";
+            case ItemTag.Profit: return "골드와 직접적인 연관이 있습니다.";
+            case ItemTag.Upgrade: return "이미 있는 아이템의 성능을 향상시킵니다.";
+            default: return "";
+        }
+    }
+
+    /// <summary>표시 이름으로 태그를 되찾는다. UI가 문자열만 들고 있을 때 쓴다.</summary>
+    public static bool TryParseDisplayName(string displayName, out ItemTag tag)
+    {
+        foreach (ItemTag t in System.Enum.GetValues(typeof(ItemTag)))
+        {
+            if (t.ToDisplayName() == displayName)
+            {
+                tag = t;
+                return true;
+            }
+        }
+
+        tag = default;
+        return false;
+    }
 }
 
 [BalanceGroup("Shop", "Items")] // 서브클래스 전부 Shop/Items.csv 한 파일로
@@ -29,6 +99,10 @@ public abstract class ItemData : ScriptableObject
     public string GradeTagText;
     [Tooltip("등급 태그 이미지")]
     public Sprite GradeTagImage;
+
+    [Header("Tags")]
+    [Tooltip("아이템 성격 태그. 상점 슬롯 하단에 표시된다. 없는 아이템도 있다.")]
+    public List<ItemTag> Tags = new List<ItemTag>();
 
     [Header("Rule")]
     public bool IsStackable = false;
@@ -304,4 +378,4 @@ public class ShopContext
     public System.Action<string> ShowInfo;
     public System.Action<string> ShowError;
     public System.Action<string> ShowGuide;
-}
+}
