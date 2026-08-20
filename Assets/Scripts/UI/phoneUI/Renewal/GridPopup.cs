@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>밭 한 칸에 걸려 있을 수 있는 효과. <see cref="GridPopup.effectIcons"/>의 순서와 같다.</summary>
 public enum TileEffect
@@ -22,26 +20,31 @@ public enum TileEffect
 ///
 /// 왼쪽에 밭을 세로 4칸 × 가로 maxCol로 깔고, 칸을 누르면 오른쪽에 그 칸의 효과를 나열한다.
 /// 효과 판정과 설명 문구는 정보 앱(<see cref="InfoAppGridSlot"/>)과 같다.
+///
+/// 칸과 상세 줄은 각각 <see cref="GridCellSlot"/> / <see cref="GridDetailRow"/>가 채운다.
+/// (Tools/Grid/Setup Grid Prefabs 로 붙이고 연결할 수 있다)
 /// </summary>
 public class GridPopup : MonoBehaviour
 {
     /// <summary>밭 세로 칸 수. Grid의 인덱스 계산(col = idx / 4)에 묶여 있다.</summary>
     private const int FarmRows = 4;
 
-    /// <summary>칸 하나에 보여줄 아이콘 자리. GridPrefab의 자식 이름과 같아야 한다.</summary>
-    private static readonly string[] IconSlotNames = { "Icon_1", "Icon_2", "Icon_2 (1)" };
-
     [Header("밭 (GridPanel > Scroll View > Viewport > Content)")]
     [SerializeField] private Transform gridContent;
-    [Tooltip("세로 한 줄을 담는 그릇 (GridLinePrefab)")]
+
+    [Tooltip("세로 한 줄 (GridLinePrefab). 안에 칸이 들어 있으면 그것을 그대로 쓴다.\n" +
+             "비우면 아래 Cell Prefab으로 칸을 직접 찍어 Content에 넣는다.")]
     [SerializeField] private GameObject gridLinePrefab;
-    [Tooltip("칸 하나 (GridPrefab)")]
+
+    [Tooltip("칸 하나 (GridPrefab). 줄 프리팹이 칸을 갖고 있으면 쓰이지 않는다.")]
     [SerializeField] private GameObject gridCellPrefab;
 
     [Header("상세 (DetailPanel > Scroll View > Viewport > Content)")]
     [SerializeField] private Transform detailContent;
+
     [Tooltip("효과 한 줄 (GridDetailPrefab)")]
     [SerializeField] private GameObject detailRowPrefab;
+
     [Tooltip("칸을 고르기 전에 띄울 안내. 없으면 생략")]
     [SerializeField] private GameObject detailEmptyText;
 
@@ -50,8 +53,11 @@ public class GridPopup : MonoBehaviour
 
     // 비료 아이콘 색은 웨이브 색(WavePalette)을 그대로 쓴다. 여기서 따로 지정하지 않는다.
 
-    private readonly List<GameObject> cells = new List<GameObject>();
+    private readonly List<GridCellSlot> cells = new List<GridCellSlot>();
     private int selectedIndex = -1;
+
+    /// <summary>구독해 둔 Grid. 껐다 켜는 사이에 바뀔 수 있어 따로 들고 있는다.</summary>
+    private Grid subscribedGrid;
 
     public void Open()
     {
@@ -61,34 +67,50 @@ public class GridPopup : MonoBehaviour
 
     public void Close() => gameObject.SetActive(false);
 
-    /// <summary>구독해 둔 Grid. 껐다 켜는 사이에 바뀔 수 있어 따로 들고 있는다.</summary>
-    private Grid subscribedGrid;
-
     private void OnEnable()
     {
-        // 식물이 심기고 뽑히고 옮겨질 때마다 밭이 바뀐다.
-        // OnShopBought는 "결제" 시점이라 설치형 아이템(고추·비료 등)은 아직 놓기 전이다.
-        // 실제로 놓인 뒤를 잡으려면 Grid 쪽 알림을 들어야 한다.
-        subscribedGrid = GameManager.Instance != null ? GameManager.Instance.grid : null;
-        if (subscribedGrid != null) subscribedGrid.OnGridStateChanged += Refresh;
-
         // 저주 만료·빙결 해제처럼 밭 밖에서 바뀌는 것들.
         GameEvents.OnDayStarted += Refresh;
 
-        Refresh();
+        Refresh(); // 여기서 Grid 구독도 함께 시도한다
     }
 
     private void OnDisable()
     {
+        Unsubscribe();
+        GameEvents.OnDayStarted -= Refresh;
+    }
+
+    /// <summary>
+    /// Grid 알림에 붙는다. 식물이 심기고 뽑히고 옮겨질 때, 비료·페트병 등을 놓을 때 발생한다.
+    /// (OnShopBought는 "결제" 시점이라 설치형 아이템은 아직 놓기 전이다)
+    ///
+    /// OnEnable 한 번만으로는 놓치는 경우가 있다. 팝업이 처음부터 켜져 있으면
+    /// 그 시점엔 GameManager/Grid가 아직 없고, 계속 켜져 있으니 OnEnable이 다시 돌지도 않는다.
+    /// 그래서 갱신할 때마다 확인해서 아직 안 붙었으면 붙는다.
+    /// </summary>
+    private void EnsureSubscribed()
+    {
+        Grid grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
+        if (grid == subscribedGrid) return; // 이미 이 Grid에 붙어 있음
+
+        Unsubscribe();
+
+        subscribedGrid = grid;
+        if (subscribedGrid != null) subscribedGrid.OnGridStateChanged += Refresh;
+    }
+
+    private void Unsubscribe()
+    {
         if (subscribedGrid != null) subscribedGrid.OnGridStateChanged -= Refresh;
         subscribedGrid = null;
-
-        GameEvents.OnDayStarted -= Refresh;
     }
 
     /// <summary>밭을 다시 깔고, 고른 칸이 있으면 상세도 다시 채운다.</summary>
     public void Refresh()
     {
+        EnsureSubscribed();
+
         BuildGrid();
         ShowDetail(selectedIndex);
     }
@@ -101,68 +123,99 @@ public class GridPopup : MonoBehaviour
         cells.Clear();
 
         Grid grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
-        if (grid == null || gridContent == null || gridCellPrefab == null) return;
+        if (grid == null)
+        {
+            // 농장 씬 밖이거나 아직 초기화 전. 다음 Refresh에서 다시 시도한다.
+            Debug.LogWarning("[GridPopup] Grid를 찾지 못해 밭을 그리지 못했습니다.");
+            return;
+        }
+
+        if (gridContent == null || gridCellPrefab == null)
+        {
+            Debug.LogWarning("[GridPopup] Grid Content 또는 Cell Prefab이 연결되지 않았습니다.");
+            return;
+        }
 
         int maxCol = grid.GetMaxCol();
 
         for (int col = 0; col < maxCol; col++)
         {
-            // 줄 그릇이 없으면 칸을 Content에 바로 넣는다(레이아웃은 Content가 알아서).
             Transform parent = gridContent;
+            List<GridCellSlot> lineSlots = null;
+
             if (gridLinePrefab != null)
             {
                 GameObject line = Instantiate(gridLinePrefab, gridContent);
                 line.SetActive(true);
                 parent = line.transform;
+
+                // 줄 프리팹이 칸을 이미 갖고 있으면 그대로 쓴다.
+                // 새로 찍어 넣으면 프리팹에 잡아 둔 간격·정렬이 무너지고 칸이 두 배로 생긴다.
+                lineSlots = new List<GridCellSlot>(line.GetComponentsInChildren<GridCellSlot>(true));
             }
 
             for (int row = 0; row < FarmRows; row++)
             {
                 int index = col * FarmRows + row; // Grid와 같은 열 우선 인덱스
-                BuildCell(grid, index, parent);
+
+                GridCellSlot slot = (lineSlots != null && row < lineSlots.Count)
+                    ? lineSlots[row]
+                    : SpawnCell(parent);
+
+                if (slot == null) continue;
+
+                slot.gameObject.SetActive(true);
+                FillCell(grid, index, slot);
             }
+
+            // 줄에 칸이 더 있으면 남는 것은 끈다.
+            if (lineSlots != null)
+                for (int i = FarmRows; i < lineSlots.Count; i++)
+                    if (lineSlots[i] != null) lineSlots[i].gameObject.SetActive(false);
         }
     }
 
-    private void BuildCell(Grid grid, int index, Transform parent)
+    /// <summary>줄 프리팹이 칸을 안 갖고 있을 때만 새로 찍는다.</summary>
+    private GridCellSlot SpawnCell(Transform parent)
     {
+        if (gridCellPrefab == null)
+        {
+            Debug.LogWarning("[GridPopup] 줄 프리팹에 칸이 없고 Cell Prefab도 비어 있습니다.");
+            return null;
+        }
+
         GameObject cell = Instantiate(gridCellPrefab, parent);
         cell.SetActive(true);
 
+        var slot = cell.GetComponent<GridCellSlot>();
+        if (slot == null)
+            Debug.LogWarning("[GridPopup] Cell Prefab에 GridCellSlot이 없습니다. " +
+                             "Tools/Grid/Setup Grid Prefabs 로 붙일 수 있습니다.");
+
+        return slot;
+    }
+
+    private void FillCell(Grid grid, int index, GridCellSlot slot)
+    {
         while (cells.Count <= index) cells.Add(null);
-        cells[index] = cell;
+        cells[index] = slot;
 
         List<TileEffect> effects = GetEffects(grid, index);
 
-        // 아이콘 자리는 세 개뿐이다. 넘치면 개수로 표시한다.
-        for (int i = 0; i < IconSlotNames.Length; i++)
+        // 아이콘 칸만큼만 보여주고, 넘치는 만큼은 개수로 표시한다.
+        int shown = Mathf.Min(effects.Count, slot.IconCapacity);
+
+        for (int i = 0; i < slot.IconCapacity; i++)
         {
-            Transform slot = FindDeep(cell.transform, IconSlotNames[i]);
-            var image = slot != null ? slot.GetComponent<Image>() : null;
-            if (image == null) continue;
-
-            bool show = i < effects.Count;
-            image.gameObject.SetActive(show);
-
-            if (!show) continue;
-
-            image.sprite = GetIcon(effects[i]);
-            image.color = GetIconColor(grid, index, effects[i]);
+            if (i < shown) slot.SetIcon(i, GetIcon(effects[i]), GetIconColor(grid, index, effects[i]));
+            else slot.HideIcon(i);
         }
 
-        int overflow = effects.Count - IconSlotNames.Length;
-        SetText(cell, "AmountText", overflow > 0 ? $"{overflow}+" : "");
-        SetText(cell, "AmountText_Underlay", overflow > 0 ? $"{overflow}+" : "");
+        slot.SetOverflow(effects.Count - shown);
+        slot.SetSelected(index == selectedIndex);
 
-        SetSelected(cell, index == selectedIndex);
-
-        var button = cell.GetComponent<Button>();
-        if (button != null)
-        {
-            int captured = index;
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => SelectCell(captured));
-        }
+        int captured = index;
+        slot.SetClick(() => SelectCell(captured));
     }
 
     private void SelectCell(int index)
@@ -170,15 +223,9 @@ public class GridPopup : MonoBehaviour
         selectedIndex = index;
 
         for (int i = 0; i < cells.Count; i++)
-            if (cells[i] != null) SetSelected(cells[i], i == index);
+            if (cells[i] != null) cells[i].SetSelected(i == index);
 
         ShowDetail(index);
-    }
-
-    private static void SetSelected(GameObject cell, bool on)
-    {
-        Transform frame = FindDeep(cell.transform, "SelectedFrame");
-        if (frame != null) frame.gameObject.SetActive(on);
     }
 
     // ── 상세 ──────────────────────────────────────────────────────────────────
@@ -210,16 +257,15 @@ public class GridPopup : MonoBehaviour
         GameObject row = Instantiate(detailRowPrefab, detailContent);
         row.SetActive(true);
 
-        Transform imageT = FindDeep(row.transform, "GridDetailImage");
-        var image = imageT != null ? imageT.GetComponent<Image>() : null;
-        if (image != null)
+        var detail = row.GetComponent<GridDetailRow>();
+        if (detail == null)
         {
-            image.sprite = icon;
-            image.color = color;
-            image.enabled = icon != null;
+            Debug.LogWarning("[GridPopup] Detail Row Prefab에 GridDetailRow가 없습니다. " +
+                             "Tools/Grid/Setup Grid Prefabs 로 붙일 수 있습니다.");
+            return;
         }
 
-        SetText(row, "GridDetailText", text);
+        detail.Setup(icon, text, color);
     }
 
     // ── 효과 판정 (정보 앱과 같은 규칙) ───────────────────────────────────────
@@ -283,29 +329,6 @@ public class GridPopup : MonoBehaviour
     }
 
     // ── 헬퍼 ──────────────────────────────────────────────────────────────────
-
-    private static void SetText(GameObject root, string childName, string value)
-    {
-        Transform t = FindDeep(root.transform, childName);
-        var text = t != null ? t.GetComponent<TMP_Text>() : null;
-        if (text == null) return;
-
-        text.text = value;
-        text.gameObject.SetActive(!string.IsNullOrEmpty(value));
-    }
-
-    private static Transform FindDeep(Transform root, string childName)
-    {
-        if (root.name == childName) return root;
-
-        for (int i = 0; i < root.childCount; i++)
-        {
-            Transform found = FindDeep(root.GetChild(i), childName);
-            if (found != null) return found;
-        }
-
-        return null;
-    }
 
     /// <summary>에디터에서 넣어 둔 예시 행도 함께 비운다.</summary>
     private static void Clear(Transform content)

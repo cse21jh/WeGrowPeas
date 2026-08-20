@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: 7609751865620397929}
   - component: {fileID: 7959903896824435406}
   - component: {fileID: 7710839280095915646}
+  - component: {fileID: 7336240942122303372}
   m_Layer: 0
   m_Name: GridPrefab
   m_TagString: Untagged
@@ -203,6 +204,26 @@ MonoBehaviour:
   easeType: 4
   onMouseIcon: {fileID: 0}
   cursorType: 1
+--- !u!114 &7336240942122303372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952796213897134049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a9be2eaf151e034e97d2cdff168f627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridCellSlot
+  icons:
+  - {fileID: 6530623898372578446}
+  - {fileID: 7246422933176353049}
+  - {fileID: 384383905992340461}
+  amountText: {fileID: 5554146558646901840}
+  amountUnderlayText: {fileID: 7555352439114514258}
+  selectedFrame: {fileID: 1499661838008028670}
+  button: {fileID: 7959903896824435406}
 --- !u!1 &1499661838008028670
 GameObject:
   m_ObjectHideFlags: 0
