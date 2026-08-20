@@ -1323,8 +1323,54 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       insertIndex: 1
       addedObject: {fileID: 8687423598505086256}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6844903052432961187, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9191363997068732227}
   m_SourcePrefab: {fileID: 100100000, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+--- !u!1 &5110150449269677933 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4662681355481128400, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+  m_PrefabInstance: {fileID: 459311359156257469}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6386726801645726750 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6844903052432961187, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+  m_PrefabInstance: {fileID: 459311359156257469}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9191363997068732227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6386726801645726750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f1fc9a8d273df940bc32f4cb457e29e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeatherWidget
+  uniFrame: {fileID: 2308803381752187385}
+  uniWaveImage: {fileID: 4825007149776668205}
+  uniWaveNameText: {fileID: 1917861267605960117}
+  dualFrame: {fileID: 1104984424516236085}
+  dualWaveImage1: {fileID: 8502071189060281667}
+  dualWaveNameText1: {fileID: 8552621254507830235}
+  dualWaveImage2: {fileID: 6516464347425465018}
+  dualWaveNameText2: {fileID: 2233283934924260748}
+  waveIcons:
+  - {fileID: 21300000, guid: 199b38371470b8143827d8a8b3d728b7, type: 3}
+  - {fileID: 21300000, guid: b6d4ffb5f9399ac41b9b49f1ad7afd30, type: 3}
+  - {fileID: 21300000, guid: 1fcf3413f0206de47a103a3e0a3b40e0, type: 3}
+  - {fileID: 21300000, guid: 9ada4d1daab936a4cad3b2dc84145f90, type: 3}
+  - {fileID: 21300000, guid: df378693f7e304a4fb8e82d545a9f647, type: 3}
+  - {fileID: 21300000, guid: 234fda82e19f6d5458b8956f6f72f8a6, type: 3}
+  - {fileID: 21300000, guid: 4d9e6031c7fd986409b0f5b064ff8f22, type: 3}
+  - {fileID: 21300000, guid: 709356db8c7c08c40a34d76987e2aadd, type: 3}
+  waveColors: []
+  uniFrameBackground: {fileID: 0}
+  alarmDot: {fileID: 5110150449269677933}
+  raiseAppAlarm: 1
 --- !u!224 &6404890924907491381 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}

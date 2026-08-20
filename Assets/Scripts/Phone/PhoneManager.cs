@@ -492,6 +492,13 @@ public class PhoneManager : Singleton<PhoneManager>
         topBar.SetTitle(title);
     }
     */
+    /// <summary>앱 알람 상태가 바뀔 때. 앱 아이콘 말고 다른 곳(홈 위젯 등)에서도 같은 표시를 하려고 둔다.</summary>
+    public static event System.Action<AppKey, AlarmState> OnAppAlarmChanged;
+
+    /// <summary>앱의 현재 알람 상태. 기록이 없으면 None.</summary>
+    public AlarmState GetAppAlarmState(AppKey appKey)
+        => appAlarmStates.TryGetValue(appKey, out var state) ? state : AlarmState.None;
+
     // pauseIfMandatory: 이 알람이 Mandatory일 때 게임을 멈출지(기본 true). 세금 같은 "빨간 알림이지만 멈추지 않는" 용도로 false.
     public void UpdateAppAlarmState(AppKey appKey, AlarmState newState, bool pauseIfMandatory = true)
     {
@@ -499,6 +506,8 @@ public class PhoneManager : Singleton<PhoneManager>
         appAlarmPausing[appKey] = pauseIfMandatory;
         RefreshTotalAlarmState();
         UpdateAppIconUI(appKey, newState);
+
+        OnAppAlarmChanged?.Invoke(appKey, newState);
     }
 
     private void RefreshTotalAlarmState()
@@ -579,19 +588,24 @@ public class PhoneManager : Singleton<PhoneManager>
             || i < 0 || i >= mandatoryAppAlarm.Count || i >= nonMandatoryAppAlarm.Count)
             return; // 해당 앱의 아이콘 알람 UI 미등록(예: Tax 앱 아이콘 미배선) — 크래시 방지
 
+        // 리스트에 자리는 있어도 칸이 비어 있을 수 있다(예: 날씨 앱은 하단 메뉴 아이콘이 없음).
+        // 그런 앱도 알람 상태 자체는 유효하므로, 여기서는 조용히 건너뛴다.
+        GameObject mandatory = mandatoryAppAlarm[i];
+        GameObject nonMandatory = nonMandatoryAppAlarm[i];
+
         switch (state)
         {
             case AlarmState.Mandatory:
-                nonMandatoryAppAlarm[(int)key].SetActive(false);
-                mandatoryAppAlarm[(int)key].SetActive(true);
+                if (nonMandatory != null) nonMandatory.SetActive(false);
+                if (mandatory != null) mandatory.SetActive(true);
                 break;
             case AlarmState.NonMandatory:
-                nonMandatoryAppAlarm[(int)key].SetActive(true);
-                mandatoryAppAlarm[(int)key].SetActive(false);
+                if (nonMandatory != null) nonMandatory.SetActive(true);
+                if (mandatory != null) mandatory.SetActive(false);
                 break;
             case AlarmState.None:
-                nonMandatoryAppAlarm[(int)key].SetActive(false);
-                mandatoryAppAlarm[(int)key].SetActive(false);
+                if (nonMandatory != null) nonMandatory.SetActive(false);
+                if (mandatory != null) mandatory.SetActive(false);
                 break;
         }
     }
@@ -677,18 +691,18 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public void SetWeatherForecastPanel()
     {
-        if (!GameManager.Instance.grid.GetHasWeatherForecast())
-        {
-            weatherApp_Default.SetActive(true);
-            weatherApp_Tomorrow.SetActive(false);
-            GameManager.Instance.enemyController.SetWeatherApp(weatherApp_Default.GetComponent<WeatherApp>());
-        }
-        else
-        {
-            weatherApp_Default.SetActive(false);
-            weatherApp_Tomorrow.SetActive(true);
-            GameManager.Instance.enemyController.SetWeatherApp(weatherApp_Tomorrow.GetComponent<WeatherApp>());
-        }
+        // 날씨 앱을 홈 위젯+팝업으로 대체하면 이 패널들이 아예 없을 수 있다.
+        // 일기예보 특성 자체는 위젯이 grid.GetHasWeatherForecast()로 직접 보므로 여기서 빠져도 된다.
+        if (weatherApp_Default == null && weatherApp_Tomorrow == null) return;
+
+        bool hasForecast = GameManager.Instance.grid.GetHasWeatherForecast();
+
+        if (weatherApp_Default != null) weatherApp_Default.SetActive(!hasForecast);
+        if (weatherApp_Tomorrow != null) weatherApp_Tomorrow.SetActive(hasForecast);
+
+        GameObject active = hasForecast ? weatherApp_Tomorrow : weatherApp_Default;
+        if (active != null)
+            GameManager.Instance.enemyController.SetWeatherApp(active.GetComponent<WeatherApp>());
     }
 
     public void SetEMPEffect(bool isOn)

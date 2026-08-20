@@ -22,13 +22,15 @@ public class WidgetController : MonoBehaviour
 
     public void ShowPopup()
     {
-        if (popupRect != null)
-        {
-            popupRect.DOSizeDelta(originalSize, animationDuration).SetEase(animationEase).OnStart(() =>
-            {
-                popupRect.gameObject.SetActive(true); // 애니메이션 시작 시 활성화
-            });
-        }
+        if (popupRect == null) return;
+
+        // 닫기/열기 트윈이 남아 있으면 방금 연 팝업을 도로 닫거나 크기가 어긋난다.
+        popupRect.DOKill();
+
+        popupRect.gameObject.SetActive(true);
+        popupRect.sizeDelta = Vector2.zero; // 항상 0에서 펼쳐지도록
+
+        popupRect.DOSizeDelta(originalSize, animationDuration).SetEase(animationEase);
     }
 
 

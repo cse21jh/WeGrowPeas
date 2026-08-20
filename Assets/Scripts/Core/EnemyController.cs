@@ -122,7 +122,9 @@ public class EnemyController : MonoBehaviour
         else
             nextSecondWave = null;
 
-        weatherApp.InitApp(1, currentWave, nextWave, grid.CountNoTraitPlant(currentWave.WaveType));
+        // 날씨 앱은 홈 위젯+팝업으로 대체될 수 있어 없을 수도 있다(다른 호출부와 같은 규칙).
+        if (weatherApp != null)
+            weatherApp.InitApp(1, currentWave, nextWave, grid.CountNoTraitPlant(currentWave.WaveType));
 
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
@@ -268,6 +270,8 @@ public class EnemyController : MonoBehaviour
             nextSecondWave = PickSecondWave(nextWave.WaveType);
         else
             nextSecondWave = null;
+
+        GameEvents.RaiseWaveScheduleChanged(); // 예보 UI(홈 위젯 등) 즉시 갱신
     }
 
     public void UpdateSecondWaveIfNull()

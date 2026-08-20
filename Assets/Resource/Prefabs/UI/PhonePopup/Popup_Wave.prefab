@@ -688,6 +688,7 @@ GameObject:
   - component: {fileID: 5798314224520675096}
   - component: {fileID: 4015674484092014647}
   - component: {fileID: 1285755687802231657}
+  - component: {fileID: 975480321016535344}
   m_Layer: 0
   m_Name: Popup_Wave
   m_TagString: Untagged
@@ -768,6 +769,31 @@ MonoBehaviour:
   self: {fileID: 7033639784223673758}
   easeDuration: 0.5
   ease: 4
+--- !u!114 &975480321016535344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8868334242518645616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7dacc1d721f4f42aad5c65a1cacb4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveHistoryPopup
+  content: {fileID: 4142311277637967625}
+  bannerPrefab: {fileID: 5511435495703247163, guid: 951a8b174cbb06c458426ecfa8673515, type: 3}
+  titleText: {fileID: 0}
+  emptyText: {fileID: 0}
+  waveIcons:
+  - {fileID: 21300000, guid: 06751c12020882e4abfcd310e25b9765, type: 3}
+  - {fileID: 21300000, guid: 89d816c1d1c7e6e4897919b7e5aeacea, type: 3}
+  - {fileID: 21300000, guid: 8907b93e1136c99409a1d5d89857efdb, type: 3}
+  - {fileID: 21300000, guid: 47a287e3b4ae7194c8b182021c4fb1bb, type: 3}
+  - {fileID: 21300000, guid: f60c8c0536bd0e846809b5fa79020f8b, type: 3}
+  - {fileID: 21300000, guid: adcf84f7faa9b29439785379c7d97149, type: 3}
+  - {fileID: 21300000, guid: 082aae3f41fb6894fab0e61c64896fbc, type: 3}
+  - {fileID: 21300000, guid: 30af2fa2ccbcc81449a92efc48eebb85, type: 3}
 --- !u!1001 &3737073466022559691
 PrefabInstance:
   m_ObjectHideFlags: 0

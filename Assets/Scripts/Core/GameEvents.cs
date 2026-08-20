@@ -30,6 +30,22 @@ public static class GameEvents
     public static event Action OnQuestDayPassed;
     public static void RaiseQuestDayPassed() => OnQuestDayPassed?.Invoke();
 
+    /// <summary>
+    /// 웨이브 예정표가 새로 정해졌을 때 (EnemyController.SetNextWave).
+    /// 하루가 지났다는 알림(OnQuestDayPassed)은 폰이 닫힌 뒤에 오므로,
+    /// 예보를 보여주는 UI는 이쪽을 들어야 폰이 열려 있는 동안 최신값이 뜬다.
+    /// </summary>
+    public static event Action OnWaveScheduleChanged;
+    public static void RaiseWaveScheduleChanged() => OnWaveScheduleChanged?.Invoke();
+
+    /// <summary>
+    /// 새 일차가 시작됐을 때 (GameManager.StageUpdate). 부를 때 stage는 이미 새 값이다.
+    /// OnQuestDayPassed는 stage가 오르기 <b>전</b>에 오므로,
+    /// "며칠째" · "N일 전"처럼 일차를 기준으로 계산하는 UI는 이쪽을 들어야 한다.
+    /// </summary>
+    public static event Action OnDayStarted;
+    public static void RaiseDayStarted() => OnDayStarted?.Invoke();
+
     public static event Action<Plant> OnPeaSold;
     public static void RaisePeaSold(Plant p) => OnPeaSold?.Invoke(p);
 

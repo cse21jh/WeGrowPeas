@@ -1234,6 +1234,10 @@ PrefabInstance:
       propertyPath: 'additionalTargetGraphics.Array.data[15]'
       value: 
       objectReference: {fileID: 2382718243175803794}
+    - target: {fileID: 2946570059451643857, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1244,27 +1248,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 163
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 63
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1318,7 +1322,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Widget_Tax
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3989072469123509323, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
@@ -1337,7 +1342,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6844903052432961187, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2244509039006165155}
+    - targetCorrespondingSourceObject: {fileID: 6844903052432961187, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7350769788042910410}
   m_SourcePrefab: {fileID: 100100000, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+--- !u!1 &1086108530148817102 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4662681355481128400, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
+  m_PrefabInstance: {fileID: 5739708021387339038}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1232571685840148374 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6826739483362488968, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}
@@ -1362,6 +1375,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PhoneWidgetMenuButton
   button: {fileID: 7441032706519601871}
   menuIndex: 1
+--- !u!114 &7350769788042910410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250436119061875645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b78f75f53339e64695d77159d37875f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TaxWidget
+  ddayText: {fileID: 7500212626215038296}
+  payableText: {fileID: 196631292938094365}
+  progressSlider: {fileID: 7622869334414396901}
+  sliderFill: {fileID: 7909909165165358937}
+  alarmDot: {fileID: 1086108530148817102}
+  fillColors:
+  - {r: 0.85, g: 0.3, b: 0.25, a: 1}
+  - {r: 0.9, g: 0.55, b: 0.2, a: 1}
+  - {r: 0.85, g: 0.78, b: 0.25, a: 1}
+  - {r: 0.45, g: 0.75, b: 0.3, a: 1}
 --- !u!114 &7441032706519601871 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2946570059451643857, guid: c89c8089f0a10e64a9e6f8e81d45a71e, type: 3}

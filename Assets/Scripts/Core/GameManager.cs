@@ -168,6 +168,8 @@ public class GameManager : Singleton<GameManager>
         {
             shopCanvases[0].DailyReroll();
         }
+
+        GameEvents.RaiseDayStarted(); // 일차를 기준으로 표시하는 UI 갱신 (D-day, "N일 전" 등)
     }
 
     IEnumerator StartStage()
