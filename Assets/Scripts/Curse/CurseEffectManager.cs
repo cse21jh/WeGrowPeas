@@ -88,7 +88,6 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
             thief.PlayLineAnimation();
     }
 
-    /// <summary>104 기상 이변.</summary>
     public void SetWaveBlind(bool on)
     {
         for (int i = 0; i < volumes.Length; i++)
@@ -96,20 +95,20 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
             if (volumes[i] == null) continue;
 
             VolumeProfile profile = volumes[i].profile;
-            originalValues[i] = profile.TryGet<ColorAdjustments>(out var colorAdjustments) ? colorAdjustments.saturation.value : 0f;
-
-            if (colorAdjustments == null) continue;
+            if (!profile.TryGet<ColorAdjustments>(out var colorAdjustments)) continue;
 
             if (on)
             {
-                originalValues[i] = colorAdjustments.saturation.value;
+                // on일 때만 현재 값을 원래 값으로 저장 (이미 목표값 근처라면 덮어쓰지 않음)
+                if (Mathf.Abs(colorAdjustments.saturation.value - targetValue) > 1f)
+                    originalValues[i] = colorAdjustments.saturation.value;
+
                 DOTween.To(
                     () => colorAdjustments.saturation.value,
                     value => colorAdjustments.saturation.value = value,
                     targetValue,
                     duration
-                )
-                .SetEase(ease);
+                ).SetEase(ease);
             }
             else
             {
@@ -118,11 +117,9 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
                     value => colorAdjustments.saturation.value = value,
                     originalValues[i],
                     duration
-                )
-                .SetEase(ease);
+                ).SetEase(ease);
             }
         }
-
     }
 
     /// <summary>105 버섯 발생.</summary>

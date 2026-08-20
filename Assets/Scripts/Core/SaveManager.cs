@@ -163,7 +163,7 @@ public class SaveManager : MonoBehaviour
         var allItems = Resources.LoadAll<ItemData>("");
         foreach (var item in allItems)
         {
-            if (item.requiresUnlock && !string.IsNullOrEmpty(item.UnlockId))
+            if (!string.IsNullOrEmpty(item.UnlockId))
             {
                 UnlockManager.Unlock(item.UnlockId);
             }
@@ -173,7 +173,7 @@ public class SaveManager : MonoBehaviour
         var allSpecialItems = Resources.LoadAll<SpecialItemData>("");
         foreach (var spec in allSpecialItems)
         {
-            if (spec.plantSpecific && !string.IsNullOrEmpty(spec.UnlockId))
+            if (!string.IsNullOrEmpty(spec.UnlockId))
             {
                 UnlockManager.Unlock(spec.UnlockId);
             }
