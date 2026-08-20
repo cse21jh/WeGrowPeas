@@ -28,6 +28,12 @@ public class AbilityManager : MonoBehaviour
     // 프로필 데이터로 저장 필요한 값들. 추후 불러오기 시 Initialize다음에 불러와야 함
     private Dictionary<PlayablePlantType, bool> isPlantUnlocked = new();
 
+    /// <summary>식물 특성 1개의 최대 레벨.</summary>
+    public const int MaxPlantAbilityLevel = 5;
+
+    /// <summary>일반 특성을 끼울 수 있는 최대 칸 수.</summary>
+    public const int MaxGeneralAbilitySlots = 3;
+
     private Dictionary<PlayablePlantType, int> plantAbilityPoint = new();
 
     private Dictionary<string, bool> isGeneralAbilityDataUnlocked = new(); // 일반 특성 이름, 해당 특성의 해금 여부
@@ -206,7 +212,7 @@ public class AbilityManager : MonoBehaviour
 
     public bool AddGeneralAbilityPoint()
     {
-        if(generalAbilityPoint >= 3)
+        if(generalAbilityPoint >= MaxGeneralAbilitySlots)
             return false;
 
         if (UseGenetics(generalAbilityPoint * 500))

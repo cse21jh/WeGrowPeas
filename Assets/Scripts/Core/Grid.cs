@@ -2309,6 +2309,7 @@ public class Grid : MonoBehaviour
         if (!absorbFertilizerTiles.Contains(index))
         {
             absorbFertilizerTiles.Add(index);
+            OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
             // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
             Debug.Log($"Absorb Fertilizer Added at {index}");
         }
@@ -2777,6 +2778,7 @@ public class Grid : MonoBehaviour
         }
 
         goldSoilTiles.Add(idx);
+        OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
 
         // 시각화 (황금색 마커)
         if (goldSoilMarkerPrefab != null)
@@ -2821,6 +2823,7 @@ public class Grid : MonoBehaviour
             }
 
             petBottleTiles.Add(idx);
+            OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
             // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
             int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
             petBottleBlockCount[idx] = baseBlockCount;
@@ -2922,6 +2925,7 @@ public class Grid : MonoBehaviour
         int col = GetCol(idx);
 
         fertilizerColumns.Add(col, wave);
+        OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
 
         Transform soilColT = transform.GetChild(col);
         var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);

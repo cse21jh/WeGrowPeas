@@ -867,6 +867,7 @@ GameObject:
   - component: {fileID: 2169030350847889102}
   - component: {fileID: 8489086212810638126}
   - component: {fileID: 1134515401028846228}
+  - component: {fileID: 3356240950064956390}
   m_Layer: 0
   m_Name: Popup_Info
   m_TagString: Untagged
@@ -947,6 +948,27 @@ MonoBehaviour:
   self: {fileID: 2519903954538489863}
   easeDuration: 0.5
   ease: 4
+--- !u!114 &3356240950064956390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2911482220542856084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ccacc8d3591e040a2cc4d126ede0ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InfoPopup
+  plantImage: {fileID: 17877612485783509}
+  plantNameText: {fileID: 2446043483663421286}
+  plantDescriptionText: {fileID: 0}
+  plantTraitContent: {fileID: 8346767120394165357}
+  plantTraitPrefab: {fileID: 838068195527459633, guid: 6ac8692e6663e914eb0cd22cd70a25a9, type: 3}
+  commonTraitContent: {fileID: 3961271285084407821}
+  commonTraitPrefab: {fileID: 5005652430506863775, guid: c76d524964a8c5c4b91ba3ea83cee90b, type: 3}
+  maxPlantAbilityLevel: 5
+  generalTraitSlots: 3
 --- !u!1 &3773809984695819130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,7 +1091,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 8674965716755586775}
   m_Direction: 2
   m_Value: 1.0000014
-  m_Size: 0.70866144
+  m_Size: 0.7086614
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

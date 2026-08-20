@@ -470,6 +470,7 @@ GameObject:
   - component: {fileID: 7145409416099441976}
   - component: {fileID: 1688017843328089689}
   - component: {fileID: 1229973259943377709}
+  - component: {fileID: 3324117346843318796}
   m_Layer: 0
   m_Name: Popup_Grid
   m_TagString: Untagged
@@ -550,6 +551,34 @@ MonoBehaviour:
   self: {fileID: 6507763737905207362}
   easeDuration: 0.5
   ease: 4
+--- !u!114 &3324117346843318796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4326205170118763582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8697da314eb0d44c8a91787fb283ba0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridPopup
+  gridContent: {fileID: 962327448862675346}
+  gridLinePrefab: {fileID: 3202787074049900253, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
+  gridCellPrefab: {fileID: 952796213897134049, guid: a493875d56588f84ca599b37b10f5e47, type: 3}
+  detailContent: {fileID: 1267030699388633888}
+  detailRowPrefab: {fileID: 7563841664720674180, guid: 255c8070def3ad543bd9cc3fe7d07ab8, type: 3}
+  detailEmptyText: {fileID: 0}
+  effectIcons:
+  - {fileID: 21300000, guid: acee6c31f498fdb4c8576a04d54932c2, type: 3}
+  - {fileID: 21300000, guid: d5a2faf885583dd419edb8158e0c091b, type: 3}
+  - {fileID: 21300000, guid: c78c7d5a3d6521949a030de38a731658, type: 3}
+  - {fileID: 21300000, guid: a12607954efe63a41b6d0ad78671551d, type: 3}
+  - {fileID: 21300000, guid: e395daaf198e45d458b500c4ece5cc65, type: 3}
+  - {fileID: 21300000, guid: d8ed2da17bb0453408e9fa232fd9796a, type: 3}
+  - {fileID: 21300000, guid: f2f432e195626f1449a9dfa6a5c0f30a, type: 3}
+  - {fileID: 21300000, guid: a7845a800f18d22489e429ecda60c53a, type: 3}
+  - {fileID: 21300000, guid: 8421fefd65873a84bb6ba4dc042f5975, type: 3}
 --- !u!1 &4397153947623152678
 GameObject:
   m_ObjectHideFlags: 0
@@ -994,7 +1023,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3575470418671981866}
   m_HandleRect: {fileID: 1458622664121430627}
   m_Direction: 0
-  m_Value: -0.0000025431316
+  m_Value: -0.0000003633045
   m_Size: 0.8695652
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1886,6 +1915,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2621457304145026255, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3163206242277457999, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2703,6 +2736,18 @@ PrefabInstance:
     - target: {fileID: 4018297617476941794, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4539157359715591132, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.94932365
+      objectReference: {fileID: 0}
+    - target: {fileID: 4539157359715591132, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 15.13276
+      objectReference: {fileID: 0}
+    - target: {fileID: 4539157359715591132, guid: a218b1c44a5f04145b8ced20974e65ab, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.26639494
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

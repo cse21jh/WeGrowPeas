@@ -161,7 +161,7 @@ public class AbilityUIController : MonoBehaviour
         }
         // 리스트 안에 들어있는 경우
 
-        if (selectedPlantAbilities[idx].level == 5) // 이미 최고랩
+        if (selectedPlantAbilities[idx].level == AbilityManager.MaxPlantAbilityLevel) // 이미 최고랩
             return false;
 
         selectedPlantAbilities[idx].level++; // 들어 있고, 최고랩이 아닌 경우

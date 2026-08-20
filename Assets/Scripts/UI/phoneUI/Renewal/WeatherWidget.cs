@@ -26,11 +26,11 @@ public class WeatherWidget : MonoBehaviour
     [SerializeField] private Image dualWaveImage2;
     [SerializeField] private TMP_Text dualWaveNameText2;
 
-    [Header("웨이브별 리소스 (WaveType 순서 — 날씨 앱과 같게)")]
+    [Header("웨이브 아이콘 (WaveType 순서)")]
+    [Tooltip("규격이 화면마다 달라 아이콘만 여기서 지정한다. 색은 WavePalette를 따른다.")]
     [SerializeField] private Sprite[] waveIcons;
-    [Tooltip("프레임 배경색. 비워두면 색을 건드리지 않는다.")]
-    [SerializeField] private Color[] waveColors;
-    [Tooltip("색을 칠할 프레임 배경. 없으면 생략.")]
+
+    [Tooltip("웨이브 색을 칠할 프레임 배경. 없으면 색은 건드리지 않는다.")]
     [SerializeField] private Image uniFrameBackground;
 
     [Header("알람")]
@@ -121,8 +121,8 @@ public class WeatherWidget : MonoBehaviour
         {
             SetWave(uniWaveImage, uniWaveNameText, tomorrow);
 
-            if (uniFrameBackground != null && waveColors != null && waveColors.Length > 0)
-                uniFrameBackground.color = waveColors[IconIndex(tomorrow)];
+            if (uniFrameBackground != null && tomorrow != null)
+                uniFrameBackground.color = WavePalette.GetColor(tomorrow.WaveType);
         }
 
         // 알람은 내일 실제로 맞을 웨이브만 센다. 모레 예보는 참고용이라 제외.

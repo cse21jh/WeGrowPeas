@@ -59,21 +59,8 @@ public class GraphBuilder : MonoBehaviour
     /// <summary>그릴 대상 기록. null이면 Start에서 이번 런(<see cref="PlayerRecordForGraph"/>)을 담는다.</summary>
     private GraphSave data;
 
-    private static readonly string[] WaveNames =
-    {
-        "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위"
-    };
-
-    private Color[] colors = {
-        ColorUtility.TryParseHtmlString("#fccf4e", out var c0) ? c0 : Color.white, //자연사
-        ColorUtility.TryParseHtmlString("#b6b53a", out var c1) ? c1 : Color.white, //해충
-        ColorUtility.TryParseHtmlString("#d6e6eb", out var c2) ? c2 : Color.white, //바람
-        ColorUtility.TryParseHtmlString("#469696", out var c3) ? c3 : Color.white, //홍수
-        ColorUtility.TryParseHtmlString("#746d80", out var c4) ? c4 : Color.white, //폭우
-        ColorUtility.TryParseHtmlString("#629ab7", out var c5) ? c5 : Color.white, //추위
-        ColorUtility.TryParseHtmlString("#be9978", out var c6) ? c6 : Color.white, //가뭄
-        ColorUtility.TryParseHtmlString("#ff6037", out var c7) ? c7 : Color.white, //더위
-    };
+    // 웨이브 이름·색은 WavePalette 한 곳에서 가져온다.
+    // (예전에는 여기 하드코딩돼 있어서 정보 앱·위젯의 색과 서로 달랐다)
 
     void Start()
     {
@@ -247,7 +234,7 @@ public class GraphBuilder : MonoBehaviour
             s.symbol.show = true;
             s.symbol.size = 3;
             s.symbol.type = SymbolType.Circle;
-            s.itemStyle.color = colors[w];
+            s.itemStyle.color = WavePalette.GetColor((WaveType)w);
 
             for (int day = bottom; day < top; day++)
             {
@@ -269,7 +256,7 @@ public class GraphBuilder : MonoBehaviour
             s.symbol.show = true;
             s.symbol.size = 3;
             s.symbol.type = SymbolType.Circle;
-            s.itemStyle.color = colors[w];
+            s.itemStyle.color = WavePalette.GetColor((WaveType)w);
 
             s.AddXYData(day + 1, w);
         }

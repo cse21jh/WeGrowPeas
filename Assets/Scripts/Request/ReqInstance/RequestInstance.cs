@@ -81,27 +81,42 @@ public abstract class RequestInstance
                     }
                 );
         //완료 알람(앱 아이콘)
-        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+        PhoneManager.Instance?.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
         RaiseChanged();
     }
 
     protected void RaiseChanged() => OnChanged?.Invoke(this);
 
+    /// <summary>이것 말고도 아직 수령하지 않은 보상이 남아 있는가.</summary>
+    private bool HasOtherClaimableReward()
+    {
+        var manager = RequestManager.Instance;
+        if (manager == null || manager.ActiveReq == null) return false;
+
+        foreach (var request in manager.ActiveReq)
+            if (request != null && request != this && request.CanAcceptReward)
+                return true;
+
+        return false;
+    }
+
     public virtual void GrantRewardOnce()
     {
         if (!IsCompleted)
         {
-            SoundManager.Instance.PlayEffect("WrongSelect");
+            SoundManager.Instance?.PlayEffect("WrongSelect");
             return;
         }
         if (rewardGranted) return;
 
+        // 아래 매니저들은 씬 구성에 따라 없을 수 있다(농장 씬만 열고 테스트하는 경우 등).
+        // 하나가 없다고 보상 지급 자체가 중간에 끊기면 안 되므로 전부 널 검사한다.
         foreach (var r in Data.rewards)
         {
             switch (r.type)
             {
                 case RewardType.Gold:
-                    GameManager.Instance.economyManager.AddGold(r.amount);
+                    GameManager.Instance?.economyManager?.AddGold(r.amount);
                     break;
                 case RewardType.Gene:
                     //추가
@@ -114,10 +129,10 @@ public abstract class RequestInstance
             case RequestDifficulty.Easy:
                 break;
             case RequestDifficulty.Normal:
-                AbilityManager.Instance.AddGeneStorage(5);
+                AbilityManager.Instance?.AddGeneStorage(5);
                 break;
             case RequestDifficulty.Hard:
-                AbilityManager.Instance.AddGeneStorage(10);
+                AbilityManager.Instance?.AddGeneStorage(10);
                 break;
         }
 
@@ -127,11 +142,15 @@ public abstract class RequestInstance
 
         RaiseChanged();
 
-        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Quest, AlarmState.None);
+        // 아직 받지 않은 보상이 남아 있으면 알람을 끄지 않는다.
+        // (예전에는 하나만 받아도 꺼져서, 남은 보상이 있는데도 알림이 사라졌다)
+        PhoneManager.Instance?.UpdateAppAlarmState(
+            AppKey.Quest,
+            HasOtherClaimableReward() ? AlarmState.NonMandatory : AlarmState.None);
 
-        SoundManager.Instance.PlayEffect("QuestSuccess");
+        SoundManager.Instance?.PlayEffect("QuestSuccess");
 
-        RequestManager.Instance.AddCompleteRequestCount();
+        RequestManager.Instance?.AddCompleteRequestCount();
 
         Debug.Log("보상 획득 완료");
     }

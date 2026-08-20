@@ -18,21 +18,11 @@ public static class RecallLookup
         public string description;
     }
 
-    /// <summary><see cref="WaveType"/> 순서와 일치해야 한다.</summary>
-    private static readonly string[] WaveNames =
-    {
-        "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위", "없음"
-    };
-
     private static Dictionary<string, Entry> _plants;
     private static Dictionary<string, Entry> _items;
     private static Dictionary<string, Entry> _curses;
 
-    public static string WaveName(WaveType type)
-    {
-        int i = (int)type;
-        return (i >= 0 && i < WaveNames.Length) ? WaveNames[i] : type.ToString();
-    }
+    public static string WaveName(WaveType type) => WavePalette.GetName(type);
 
     /// <summary>
     /// 식물 종(Plant.speciesname)으로 표시 정보를 찾는다.

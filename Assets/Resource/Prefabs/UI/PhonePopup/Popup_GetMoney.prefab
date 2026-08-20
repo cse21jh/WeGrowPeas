@@ -749,6 +749,7 @@ GameObject:
   - component: {fileID: 673066885694660421}
   - component: {fileID: 7776205922764948912}
   - component: {fileID: 4495111112289525456}
+  - component: {fileID: 8608782005751675555}
   m_Layer: 0
   m_Name: Popup_GetMoney
   m_TagString: Untagged
@@ -829,6 +830,21 @@ MonoBehaviour:
   self: {fileID: 3158546688313219182}
   easeDuration: 0.5
   ease: 4
+--- !u!114 &8608782005751675555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5939839848143994259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50d82a6c643fd0b47802f432372e72a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RewardClaimPopup
+  summaryText: {fileID: 726449923205349449}
+  dimButtonWhenEmpty: 1
+  getButton: {fileID: 7179436752918619884}
 --- !u!1 &7964207335695829865
 GameObject:
   m_ObjectHideFlags: 0
