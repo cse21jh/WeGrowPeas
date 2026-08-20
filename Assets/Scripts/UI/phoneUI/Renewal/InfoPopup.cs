@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// 이번 런에서 고른 식물과 그 식물의 특성 레벨, 일반 특성을 보여준다.
 ///
 /// 값은 <see cref="AbilityManager"/>에서 읽으며 표시 규칙은 정보 앱(<see cref="InfoApp"/>)과 같다.
-/// 행은 PlantTraitPrefab / CommonTraitPrefab을 쓰고, 자식 이름으로 찾아 채운다.
+/// 행은 PlantTraitRow / CommonTraitRow가 채운다. (프리팹에 붙여 인스펙터에서 연결)
 /// 특성 설명은 마우스를 올리면 <see cref="HoverTooltip"/>으로 뜬다.
 /// </summary>
 public class InfoPopup : MonoBehaviour
@@ -99,9 +99,15 @@ public class InfoPopup : MonoBehaviour
 
             GameObject row = Spawn(plantTraitPrefab, plantTraitContent);
 
-            SetImage(row, "TraitImage", data.icon);
-            SetText(row, "TraitName", data.abilityName);
-            SetSlider(row, level, AbilityManager.MaxPlantAbilityLevel);
+            var view = row.GetComponent<PlantTraitRow>();
+            if (view == null)
+            {
+                Debug.LogWarning("[InfoPopup] Plant Trait Prefab에 PlantTraitRow가 없습니다. " +
+                                 "프리팹에 컴포넌트를 붙이고 인스펙터에서 연결하세요.");
+                continue;
+            }
+
+            view.Setup(data.icon, data.abilityName, level, AbilityManager.MaxPlantAbilityLevel);
             SetTooltip(row, data.abilityName, data.description, level);
         }
     }
@@ -120,23 +126,28 @@ public class InfoPopup : MonoBehaviour
         {
             GameObject row = Spawn(commonTraitPrefab, commonTraitContent);
 
+            var view = row.GetComponent<CommonTraitRow>();
+            if (view == null)
+            {
+                Debug.LogWarning("[InfoPopup] Common Trait Prefab에 CommonTraitRow가 없습니다. " +
+                                 "프리팹에 컴포넌트를 붙이고 인스펙터에서 연결하세요.");
+                continue;
+            }
+
             bool hasAbility = owned != null && i < owned.Count && owned[i] != null;
             bool locked = i >= unlockedSlots;
 
             if (hasAbility)
             {
                 var data = owned[i];
-                SetImage(row, "TraitImage", data.icon);
-                SetText(row, "TraitName", data.abilityName);
-                SetText(row, "TraitAmount", "");
+                view.Setup(data.icon, data.abilityName);
                 SetTooltip(row, data.abilityName, data.description, 0);
             }
             else
             {
-                SetImage(row, "TraitImage", null);
-                SetText(row, "TraitName", locked ? "잠김" : "빈 슬롯");
-                SetText(row, "TraitAmount", "");
-                SetTooltip(row, locked ? "잠김" : "빈 슬롯",
+                string label = locked ? "잠김" : "빈 슬롯";
+                view.Setup(null, label);
+                SetTooltip(row, label,
                     locked ? "유전자를 모아 특성 칸을 열 수 있습니다." : "아직 특성을 고르지 않았습니다.", 0);
             }
         }
@@ -152,34 +163,6 @@ public class InfoPopup : MonoBehaviour
         return row;
     }
 
-    private static void SetText(GameObject row, string childName, string value)
-    {
-        Transform t = FindDeep(row.transform, childName);
-        var text = t != null ? t.GetComponent<TMP_Text>() : null;
-        if (text == null) return;
-
-        text.text = value;
-        text.gameObject.SetActive(!string.IsNullOrEmpty(value));
-    }
-
-    private static void SetImage(GameObject row, string childName, Sprite sprite)
-    {
-        Transform t = FindDeep(row.transform, childName);
-        var image = t != null ? t.GetComponent<Image>() : null;
-        if (image == null) return;
-
-        image.sprite = sprite;
-        image.enabled = sprite != null;
-    }
-
-    private static void SetSlider(GameObject row, int level, int max)
-    {
-        var slider = row.GetComponentInChildren<Slider>(true);
-        if (slider == null || max <= 0) return;
-
-        slider.value = Mathf.Lerp(slider.minValue, slider.maxValue, Mathf.Clamp01((float)level / max));
-    }
-
     private static void SetTooltip(GameObject row, string name, string description, int level)
     {
         var hover = row.GetComponent<UIHoverHandler>();
@@ -189,20 +172,6 @@ public class InfoPopup : MonoBehaviour
         string content = string.IsNullOrEmpty(description) ? header : $"{header}\n{description}";
 
         hover.Setup(() => HoverTooltip.ShowFor(content), HoverTooltip.HideCurrent);
-    }
-
-    /// <summary>이름으로 자손을 뒤진다. 행 프리팹의 계층이 바뀌어도 찾을 수 있게.</summary>
-    private static Transform FindDeep(Transform root, string childName)
-    {
-        if (root.name == childName) return root;
-
-        for (int i = 0; i < root.childCount; i++)
-        {
-            Transform found = FindDeep(root.GetChild(i), childName);
-            if (found != null) return found;
-        }
-
-        return null;
     }
 
     /// <summary>에디터에서 넣어 둔 예시 행도 함께 비운다.</summary>

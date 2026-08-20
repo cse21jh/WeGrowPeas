@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4993151571952687829}
   - component: {fileID: 1136489509466633975}
+  - component: {fileID: 1897357817760865195}
   m_Layer: 0
   m_Name: CommonTraitPrefab
   m_TagString: Untagged
@@ -122,6 +123,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5005652430506863775}
   m_CullTransparentMesh: 1
+--- !u!114 &1897357817760865195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005652430506863775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64e709f723bdacc4fa2f2b9d13b7918b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CommonTraitRow
+  icon: {fileID: 554668631182299040}
+  nameText: {fileID: 5833694668986433897}
+  amountText: {fileID: 5189462197482948241}
 --- !u!1 &5225744542763989816
 GameObject:
   m_ObjectHideFlags: 0

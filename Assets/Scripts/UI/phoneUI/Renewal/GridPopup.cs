@@ -22,7 +22,7 @@ public enum TileEffect
 /// 효과 판정과 설명 문구는 정보 앱(<see cref="InfoAppGridSlot"/>)과 같다.
 ///
 /// 칸과 상세 줄은 각각 <see cref="GridCellSlot"/> / <see cref="GridDetailRow"/>가 채운다.
-/// (Tools/Grid/Setup Grid Prefabs 로 붙이고 연결할 수 있다)
+/// (프리팹에 붙여 인스펙터에서 연결한다)
 /// </summary>
 public class GridPopup : MonoBehaviour
 {
@@ -190,7 +190,7 @@ public class GridPopup : MonoBehaviour
         var slot = cell.GetComponent<GridCellSlot>();
         if (slot == null)
             Debug.LogWarning("[GridPopup] Cell Prefab에 GridCellSlot이 없습니다. " +
-                             "Tools/Grid/Setup Grid Prefabs 로 붙일 수 있습니다.");
+                             "프리팹에 컴포넌트를 붙이고 인스펙터에서 연결하세요.");
 
         return slot;
     }
@@ -261,7 +261,7 @@ public class GridPopup : MonoBehaviour
         if (detail == null)
         {
             Debug.LogWarning("[GridPopup] Detail Row Prefab에 GridDetailRow가 없습니다. " +
-                             "Tools/Grid/Setup Grid Prefabs 로 붙일 수 있습니다.");
+                             "프리팹에 컴포넌트를 붙이고 인스펙터에서 연결하세요.");
             return;
         }
 

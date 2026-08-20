@@ -5,9 +5,9 @@ using UnityEngine;
 /// <summary>
 /// 회상 상세 화면. 목록에서 사진을 고르면 그 런의 결과 화면(편지 + 그래프)을 그대로 다시 보여준다.
 ///
-/// 결과 화면 UI를 새로 만들지 않고 GameOverScene에서 뽑아낸 프리팹을 그대로 쓴다
-/// (Tools/Recall/Extract Ending UI Prefab). 값만 과거 기록으로 갈아끼우므로
-/// 엔딩 화면을 손보면 회상도 같이 따라간다.
+/// 결과 화면 UI를 새로 만들지 않고 GameOverScene에서 뽑아낸 프리팹을 그대로 쓴다.
+/// GameOverScene의 Envelope가 이 프리팹의 인스턴스라, 프리팹을 고치면 양쪽이 함께 바뀐다.
+/// 값만 과거 기록으로 갈아끼우므로 엔딩 화면을 손보면 회상도 같이 따라간다.
 /// </summary>
 public class RecallDetailUI : MonoBehaviour
 {
@@ -107,7 +107,7 @@ public class RecallDetailUI : MonoBehaviour
         if (prefab == null)
         {
             Debug.LogWarning("[Recall] 결과 화면 프리팹이 없습니다. " +
-                             "GameOverScene을 열고 Tools/Recall/Extract Ending UI Prefab을 실행하세요.");
+                             "Resources/Prefabs/Recall/RecallEndingContent 를 확인하세요.");
             return;
         }
 

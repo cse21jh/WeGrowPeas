@@ -90,13 +90,13 @@ public class UIClickEvent : MonoBehaviour
         SceneLoader.Instance?.LoadGardenScene();
     }
 
-    /// <summary>회상 화면 열기. 회상 UI는 씬에 항상 켜진 루트로 들어 있다(Tools/Recall 메뉴로 생성).</summary>
+    /// <summary>회상 화면 열기. 회상 UI는 씬에 항상 켜진 루트로 들어 있다.</summary>
     public void OnClick_OpenRecall()
     {
         var recall = FindAnyObjectByType<RecallUIController>();
         if (recall == null)
         {
-            Debug.LogWarning("[Recall] 씬에 회상 UI가 없습니다. Tools/Recall/Add Recall UI To Scene으로 생성하세요.");
+            Debug.LogWarning("[Recall] 씬에 회상 UI(RecallUIController)가 없습니다.");
             return;
         }
 

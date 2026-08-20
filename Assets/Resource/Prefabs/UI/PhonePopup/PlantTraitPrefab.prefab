@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6975703486527144081}
   - component: {fileID: 4148659497008858886}
+  - component: {fileID: 6926784938794737516}
   m_Layer: 0
   m_Name: PlantTraitPrefab
   m_TagString: Untagged
@@ -47,6 +48,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 838068195527459633}
   m_CullTransparentMesh: 1
+--- !u!114 &6926784938794737516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838068195527459633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd5f96ec63b4c409296cade430291a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlantTraitRow
+  icon: {fileID: 4306037809359481309}
+  nameText: {fileID: 6452215259312149924}
+  levelSlider: {fileID: 343096984757258058}
 --- !u!1 &4728842926733472590
 GameObject:
   m_ObjectHideFlags: 0

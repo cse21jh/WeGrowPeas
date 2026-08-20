@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// 날씨 팝업(Popup_Wave). 날씨 위젯에서 열어 지난 며칠에 무엇이 지나갔고
@@ -10,8 +9,8 @@ using UnityEngine.UI;
 /// 기록은 <see cref="EnemyController.StageWaveRecord"/> / <see cref="EnemyController.StageKillRecord"/>가
 /// 일차를 인덱스로 들고 있다. 여기서는 읽기만 한다.
 ///
-/// 행은 WaveBanner 프리팹을 쓴다. 자식 이름으로 찾아 채우는 방식은
-/// 날씨 앱(<see cref="WeatherApp"/>)의 지난 기록 처리와 같다.
+/// 행은 WaveBanner 프리팹(WaveBannerRow)이 채운다.
+/// (프리팹에 붙여 인스펙터에서 연결한다)
 /// </summary>
 public class WeatherPopup : MonoBehaviour
 {
@@ -19,7 +18,7 @@ public class WeatherPopup : MonoBehaviour
     [Tooltip("Scroll View > Viewport > Content — 행이 쌓이는 곳")]
     [SerializeField] private Transform content;
 
-    [Tooltip("WaveBanner 프리팹 (DayText / WaveImage / DieText)")]
+    [Tooltip("WaveBanner 프리팹 — WaveBannerRow가 붙어 있어야 한다")]
     [SerializeField] private GameObject bannerPrefab;
 
     [Tooltip("Top > Text (TMP) — 비워두면 제목을 건드리지 않는다")]
@@ -116,27 +115,28 @@ public class WeatherPopup : MonoBehaviour
         row.SetActive(true);
         spawned.Add(row);
 
-        var dayText = FindText(row, "DayText");
-        if (dayText != null)
+        var banner = row.GetComponent<WaveBannerRow>();
+        if (banner == null)
         {
-            int ago = today - day;
-            dayText.text = ago <= 0 ? "오늘" : $"{ago}일 전";
+            Debug.LogWarning("[WeatherPopup] Banner Prefab에 WaveBannerRow가 없습니다. " +
+                             "프리팹에 컴포넌트를 붙이고 인스펙터에서 연결하세요.");
+            return;
         }
 
-        var image = FindImage(row, "WaveImage");
-        if (image != null && waveIcons != null && waveIcons.Length > 0)
+        int ago = today - day;
+        string dayLabel = ago <= 0 ? "오늘" : $"{ago}일 전";
+
+        Sprite icon = null;
+        if (waveIcons != null && waveIcons.Length > 0)
         {
             int idx = waveType == WaveType.None ? 0 : Mathf.Clamp((int)waveType, 0, waveIcons.Length - 1);
-            image.sprite = waveIcons[idx];
-            image.enabled = image.sprite != null;
+            icon = waveIcons[idx];
         }
 
-        var dieText = FindText(row, "DieText");
-        if (dieText != null)
-        {
-            string plant = GameManager.Instance != null ? GameManager.Instance.currentPlant : "식물";
-            dieText.text = diedCount > 0 ? $"{plant} {diedCount}개 죽음" : "피해 없음";
-        }
+        string plant = GameManager.Instance != null ? GameManager.Instance.currentPlant : "식물";
+        string dieLabel = diedCount > 0 ? $"{plant} {diedCount}개 죽음" : "피해 없음";
+
+        banner.Setup(dayLabel, icon, dieLabel);
     }
 
     /// <summary>
@@ -156,17 +156,5 @@ public class WeatherPopup : MonoBehaviour
             child.SetParent(null, false);
             Destroy(child.gameObject);
         }
-    }
-
-    private static TMP_Text FindText(GameObject row, string childName)
-    {
-        Transform t = row.transform.Find(childName);
-        return t != null ? t.GetComponent<TMP_Text>() : null;
-    }
-
-    private static Image FindImage(GameObject row, string childName)
-    {
-        Transform t = row.transform.Find(childName);
-        return t != null ? t.GetComponent<Image>() : null;
     }
 }

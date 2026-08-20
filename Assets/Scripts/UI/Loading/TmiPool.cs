@@ -50,7 +50,7 @@ public static class TmiPool
             _tips = new List<string>(DefaultTips);
             if (cfg == null)
                 Debug.LogWarning($"[Tmi] Resources/{ResourcePath} 에셋이 없어 기본 문구를 사용합니다. " +
-                                 "Tools > Loading > Create Tmi Config 로 생성하세요.");
+                                 "TmiConfig 에셋을 만들어 그 경로에 두세요.");
         }
     }
 

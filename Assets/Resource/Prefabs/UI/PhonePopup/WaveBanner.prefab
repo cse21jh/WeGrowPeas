@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 7939437763525333535}
   - component: {fileID: 4491458884420634742}
   - component: {fileID: 7053817648939992280}
+  - component: {fileID: 7750223221627518214}
   m_Layer: 0
   m_Name: WaveBanner
   m_TagString: Untagged
@@ -264,6 +265,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
   m_ShowMaskGraphic: 0
+--- !u!114 &7750223221627518214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5511435495703247163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f991a5ece437a740801b3f100c1cce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveBannerRow
+  dayText: {fileID: 2808217789749832847}
+  waveImage: {fileID: 8262433271488583398}
+  dieText: {fileID: 6905073467888552767}
 --- !u!1 &6240231395041705641
 GameObject:
   m_ObjectHideFlags: 0
