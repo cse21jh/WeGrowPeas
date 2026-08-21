@@ -921,6 +921,12 @@ public class MessengerApp : MonoBehaviour
         }
 
         // 설정이 켜진 경우: 이미 프로필에서 읽었더라도 슬롯 기준 아직 안 읽었다면 새로 온 판정(Unread)으로 처리
+        // 만약 슬롯의 진행도가 프로필보다 높다면(프로필 데이터 유실 등), 영구적인 알람(소프트락) 방지를 위해 프로필을 동기화합니다.
+        if (slotSeenIndex > profileSeenIndex)
+        {
+            MessengerSaveSystem.MarkAsRead(partnerName, slotSeenIndex);
+        }
+
         return slotSeenIndex;
     }
 
