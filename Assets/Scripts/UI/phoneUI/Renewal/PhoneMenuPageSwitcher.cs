@@ -31,6 +31,8 @@ public sealed class PhoneMenuPageSwitcher : MonoBehaviour
 
     private bool _initialized;
 
+    public bool IsInitialized => _initialized;
+
     /// <summary>
     /// UnityEvent&lt;int&gt;에 연결할 페이지 전환 함수.
     /// </summary>

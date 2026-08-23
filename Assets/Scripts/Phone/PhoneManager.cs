@@ -193,7 +193,9 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public void OpenAppByIndex(int index)
     {
-        PhoneTouchEffect();
+        bool isInitialPageSetup = pageSwitcher != null && !pageSwitcher.IsInitialized;
+        if (!isInitialPageSetup)
+            PhoneTouchEffect();
 
         if (pageSwitcher != null)
         {
