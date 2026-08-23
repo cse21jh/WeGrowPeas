@@ -176,8 +176,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 _lastClickedObject = null;
                 break;
             case 7: // 이제 실전으로 끝
-                //yield return new WaitForSeconds(1f);
-                PhoneManager.Instance.isTutorialEnd = true;
+                //yield return new WaitForSeconds(1f);                
                 gcController.ToggleGlow(false);
                 waveManager.StartCoroutine(waveManager.StopNightCoroutine());
                 if (gameStartUI != null)

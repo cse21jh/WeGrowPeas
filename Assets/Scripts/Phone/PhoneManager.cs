@@ -88,8 +88,6 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private TimerUI phoneTimerUI;
     [SerializeField] TextMeshProUGUI phoneTimerText;
     [SerializeField] public bool isTutorial = false;
-    [SerializeField] public bool isTutorialEnd = false;
-
 
     [SerializeField] public GameObject weatherApp_Default;
     [SerializeField] public GameObject weatherApp_Tomorrow;
@@ -171,8 +169,6 @@ public class PhoneManager : Singleton<PhoneManager>
     public void SetOpen(bool open)
     {
         PhoneTouchEffect();
-        if (isTutorial && isTutorialEnd)
-            return;
         _isOpen = open;
         if (phoneRoot != null) phoneRoot.SetActive(open);
         phoneBtn.SetActive(!open);
@@ -217,8 +213,6 @@ public class PhoneManager : Singleton<PhoneManager>
                 if (taxCanvas != null) taxCanvas.Refresh(); // Renewal 국세청 UI
                 break;
             case 2: // 홈
-                if (isTutorial && isTutorialEnd)
-                    return;
                 messengerApp.CheckCoroutineByTab(false);
                 mappedKey = null;
                 if (messengerApp != null) messengerApp.CheckCoroutineByTab(false);
