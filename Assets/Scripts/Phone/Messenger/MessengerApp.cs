@@ -120,7 +120,10 @@ public class MessengerApp : MonoBehaviour
                 if (lastIndexOfTriggerZero > -1)
                 {
                     progress.conversationSeenIndices[partnerName] = lastIndexOfTriggerZero;
-                    MessengerSaveSystem.MarkAsRead(partnerName, lastIndexOfTriggerZero);
+                    if (!chat.useSaveSlotReadStateOnly)
+                    {
+                        MessengerSaveSystem.MarkAsRead(partnerName, lastIndexOfTriggerZero);
+                    }
 
                     if (!progress.daySeparators.ContainsKey(partnerName))
                     {
@@ -385,7 +388,9 @@ public class MessengerApp : MonoBehaviour
             // 4. 안 읽은 메시지들 중에 진짜 안 읽은 '필수' 메시지가 있는지 확인
             var unreadMessages = arrivedMessages.Skip(lastSeenPositionInArrivedList + 1);
             string partnerName = chat.chatPartner.chatPartnerName;
-            int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
+            int mandatorySeenIndex = chat.useSaveSlotReadStateOnly
+                ? lastSeenIndex
+                : MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
 
             bool hasTrulyUnreadMandatory = false;
             foreach (var msg in unreadMessages)
@@ -393,7 +398,7 @@ public class MessengerApp : MonoBehaviour
                 if (msg.isMandatory)
                 {
                     int msgIndex = chat.messages.IndexOf(msg);
-                    if (msgIndex > profileSeenIndex)
+                    if (msgIndex > mandatorySeenIndex)
                     {
                         hasTrulyUnreadMandatory = true;
                         break;
@@ -808,6 +813,7 @@ public class MessengerApp : MonoBehaviour
     private bool HasReadMandatoryMessagesInChat(Chat chat)
     {
         if (chat == null || chat.messages == null) return false;
+        if (chat.useSaveSlotReadStateOnly) return false;
 
         List<ChatMessage> arrivedMessages = new List<ChatMessage>();
         foreach (string triggerId in progress.activatedTriggersOrdered)
@@ -861,28 +867,30 @@ public class MessengerApp : MonoBehaviour
             arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
         }
 
-        // 2. 프로필 전체의 읽음 인덱스 확인 (진짜 안 읽은 필수 메시지 감지용)
+        // 2. 이 채팅에서 알람 판정에 사용할 읽음 인덱스 확인
         string partnerName = chat.chatPartner.chatPartnerName;
-        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-        if (profileSeenIndex == -1) // 한 번도 안 봤다면
+        int seenIndex = chat.useSaveSlotReadStateOnly
+            ? GetSlotSeenIndex(chat)
+            : MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
+        if (seenIndex == -1) // 한 번도 안 봤다면
         {
             // 도착한 메시지 중에 필수 메시지가 있는지 확인
             return arrivedMessages.Any(msg => msg.isMandatory);
         }
 
-        if (profileSeenIndex >= chat.messages.Count)
+        if (seenIndex >= chat.messages.Count)
         {
             return false;
         }
 
-        ChatMessage profileSeenMessage = chat.messages[profileSeenIndex];
-        int positionInArrivedList = arrivedMessages.IndexOf(profileSeenMessage);
+        ChatMessage seenMessage = chat.messages[seenIndex];
+        int positionInArrivedList = arrivedMessages.IndexOf(seenMessage);
 
         if (positionInArrivedList == -1)
         {
             for (int i = arrivedMessages.Count - 1; i >= 0; i--)
             {
-                if (chat.messages.IndexOf(arrivedMessages[i]) <= profileSeenIndex)
+                if (chat.messages.IndexOf(arrivedMessages[i]) <= seenIndex)
                 {
                     positionInArrivedList = i;
                     break;
@@ -901,13 +909,13 @@ public class MessengerApp : MonoBehaviour
         if (chat == null || chat.chatPartner == null) return -1;
 
         string partnerName = chat.chatPartner.chatPartnerName;
-        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-
-        int slotSeenIndex = -1;
-        if (progress.conversationSeenIndices.TryGetValue(partnerName, out int index))
+        int slotSeenIndex = GetSlotSeenIndex(chat);
+        if (chat.useSaveSlotReadStateOnly)
         {
-            slotSeenIndex = index;
+            return slotSeenIndex;
         }
+
+        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
 
         // 설정이 꺼진 경우: 이미 읽은 경우 메신저 자체에서도 읽은 판정
         if (!MessengerSaveSystem.PlayAlarmForSeenMessages)
@@ -934,7 +942,20 @@ public class MessengerApp : MonoBehaviour
     {
         string partnerName = chat.chatPartner.chatPartnerName;
         progress.conversationSeenIndices[partnerName] = index;
-        MessengerSaveSystem.MarkAsRead(partnerName, index);
+        if (!chat.useSaveSlotReadStateOnly)
+        {
+            MessengerSaveSystem.MarkAsRead(partnerName, index);
+        }
+    }
+
+    private int GetSlotSeenIndex(Chat chat)
+    {
+        if (chat == null || chat.chatPartner == null) return -1;
+
+        string partnerName = chat.chatPartner.chatPartnerName;
+        return progress.conversationSeenIndices.TryGetValue(partnerName, out int index)
+            ? index
+            : -1;
     }
 
     public MessengerProgress GetProgress()

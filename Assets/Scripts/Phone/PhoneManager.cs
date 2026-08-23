@@ -117,7 +117,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(toggleKey) && !isTutorial)
+        if (Input.GetKeyDown(toggleKey))
             Toggle();
 
         UpdateEmpNoise(); // 통신장애 시간이 끝나면 노이즈가 자동으로 꺼지도록

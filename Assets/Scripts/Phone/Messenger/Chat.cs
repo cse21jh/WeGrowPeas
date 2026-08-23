@@ -6,4 +6,6 @@ public class Chat : ScriptableObject
 {
     public ChatPartner chatPartner;
     public List<ChatMessage> messages;
+
+    public bool useSaveSlotReadStateOnly;
 }
