@@ -65,13 +65,11 @@ public class SettingUI : MonoBehaviour
 
         if (showBreedPopupToggle != null && UIManager.Instance != null)
         {
-            Debug.Log("1234");
             showBreedPopupToggle.isOn = UIManager.Instance.ShowBreedPopupSetting;
         }
 
         if (playAlarmForSeenMessagesToggle != null)
         {
-            Debug.Log("5678");
             playAlarmForSeenMessagesToggle.isOn = MessengerSaveSystem.PlayAlarmForSeenMessages;
         }
 

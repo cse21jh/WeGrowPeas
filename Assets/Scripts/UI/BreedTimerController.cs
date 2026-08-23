@@ -51,7 +51,11 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
         // 마우스가 버튼 위에 올려졌을 때
         if (!isLocked)
         {
-            if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
+            if (PhoneManager.Instance != null && PhoneManager.Instance.IsPhonePhase)
+            {
+                PhoneManager.Instance.ShowPhonePhaseText();
+            }
+            else if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
             {
                 GameManager.Instance.enemyController.ShowNextWaveText();
             }

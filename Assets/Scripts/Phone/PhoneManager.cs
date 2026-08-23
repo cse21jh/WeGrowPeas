@@ -21,6 +21,7 @@ public enum AppKey
     Tax,   // 국세청 앱 (5일마다 세금 납부). 맨 끝에 추가 — 기존 패널 인덱스 보존
 }
 
+[RequireComponent(typeof(PhoneAlarmEffectController))]
 public class PhoneManager : Singleton<PhoneManager>
 {
 
@@ -45,7 +46,18 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private List<GameObject> mandatoryAppAlarm;
     [SerializeField] private List<GameObject> nonMandatoryAppAlarm;
 
-    PhoneAlarmEffectController alarm;
+    private PhoneAlarmEffectController alarm;
+
+    private PhoneAlarmEffectController AlarmController
+    {
+        get
+        {
+            if (alarm == null)
+                alarm = GetComponent<PhoneAlarmEffectController>();
+
+            return alarm;
+        }
+    }
 
     [Serializable]
     public class AppEntry
@@ -175,7 +187,7 @@ public class PhoneManager : Singleton<PhoneManager>
         messengerApp.CheckCoroutineByTab(open);
         if (open)
         {
-            alarm.DisableAlarm();
+            AlarmController?.DisableAlarm();
         }
         else
         {
@@ -184,7 +196,7 @@ public class PhoneManager : Singleton<PhoneManager>
             // 핸드폰을 닫을 때 알람 UI 닫기
             mandatoryAlarm.SetActive(false);
             nonMandatoryAlarm.SetActive(false);
-            alarm.EnableAlarm();
+            AlarmController?.EnableAlarm();
         }
         //FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
         //if (open) RefreshTopBar();
@@ -374,7 +386,13 @@ public class PhoneManager : Singleton<PhoneManager>
     public void SetPhoneTimer()
     {
         breedTimerManager.SetPhoneTimer();
-        phoneTimerText.text = "자기 전에\n핸드폰 봐야지...";
+        ShowPhonePhaseText();
+    }
+
+    public void ShowPhonePhaseText()
+    {
+        if (phoneTimerText != null)
+            phoneTimerText.text = "자기 전에\n핸드폰 봐야지...";
     }
 
     // 세금 압류 유예 타이머(GameManager.TaxCollectionRoutine에서 사용)
@@ -533,13 +551,15 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void ApplyPhoneAlarmUI()
     {
+        PhoneAlarmEffectController alarmController = AlarmController;
+
         // 폰 외부 버튼이나 전체 루트 UI에 알람 수위 적용
         switch (TotalPhoneAlarmState)
         {
             case AlarmState.Mandatory:
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
-                alarm.AlarmPermanent();
+                alarmController?.AlarmPermanent();
                 if (GameManager.Instance != null)
                 {
                     if (anyPausingMandatory) // 멈춤을 요청한 mandatory만 게임 정지
@@ -557,7 +577,7 @@ public class PhoneManager : Singleton<PhoneManager>
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
-                alarm.AlarmImpermanent();
+                alarmController?.AlarmImpermanent();
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.ResumeGame();
@@ -567,7 +587,7 @@ public class PhoneManager : Singleton<PhoneManager>
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
-                alarm.StopAlarm();
+                alarmController?.StopAlarm();
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.ResumeGame();
