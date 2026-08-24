@@ -64,7 +64,7 @@ public class Grid : MonoBehaviour
 
     public bool isDraggingShovel = false;
 
-    private Plant breedButtonPlant = null;
+    protected Plant breedButtonPlant = null;
     private int hoveredSoilIndex = -1;
 
     //저장 필요
@@ -244,7 +244,7 @@ public class Grid : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (breedButtonPlant != null)
         {
