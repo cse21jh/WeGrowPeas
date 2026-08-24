@@ -72,27 +72,58 @@ public class TutorialManager : Singleton<TutorialManager>
 
     private IEnumerator PlayTutorialSequence()
     {
-        while (currentStep <= maxStep)
+        PhoneManager.Instance.messengerApp.ActivateTrigger("0");
+
+        while (currentStep < maxStep)
         {
-            // 1. 해당 단계의 메신저 트리거 발송 (0, 1, 2...)
-            PhoneManager.Instance.messengerApp.ActivateTrigger(currentStep.ToString());
+            MandatoryMessageHandle blockedHandle = default;
+            string triggerId = currentStep.ToString();
+            yield return new WaitUntil(() =>
+                PhoneManager.Instance.messengerApp.TryGetAwaitingMandatoryAdvance(
+                    triggerId,
+                    out blockedHandle));
 
-
-            yield return new WaitUntil(() => PhoneManager.Instance.messengerApp.IsTriggerFullySeen(currentStep.ToString()));
-
-            // 3. 메시지 종료 후, 해당 단계에서 해야 할 "가이드/액션" 실행 (스위치문)
-            ExecuteStepAction(currentStep);
-
-            // 4. 플레이어가 목표 행동을 완료할 때까지 대기 (스위치문)
-            yield return WaitForTrigger(currentStep);
-
+            yield return RunStepActionAndWait(currentStep);
             ExecuteAfterStepAction(currentStep);
-
             currentStep++;
+
+            PhoneManager.Instance.messengerApp.ActivateTrigger(currentStep.ToString());
+            PhoneManager.Instance.messengerApp.UnlockMandatoryAdvance(blockedHandle);
         }
 
-        Debug.Log("모든 튜토리얼이 완료되었습니다.");
+        yield return new WaitUntil(() =>
+            PhoneManager.Instance.messengerApp.IsTriggerFullySeen(maxStep.ToString())
+            && !PhoneManager.Instance.messengerApp.IsMandatoryPopupOpen);
 
+        gcController.ToggleGlow(false);
+        yield return StartCoroutine(waveManager.StopNightCoroutine());
+        if (gameStartUI != null)
+            gameStartUI.SetActive(true);
+
+        Debug.Log("모든 튜토리얼이 완료되었습니다.");
+    }
+
+    private IEnumerator RunStepActionAndWait(int index)
+    {
+        if (index == 3)
+        {
+            yield return StartCoroutine(enemyController.TutorialWaveCoroutine());
+            tStage = 2;
+            UpdateStageUI();
+            enemyController.ShowNextWaveText();
+            yield break;
+        }
+
+        if (index == 4)
+        {
+            gcController.ToggleGlow(true);
+            yield return StartCoroutine(waveManager.StartNightCoroutine());
+            PhoneManager.Instance.TutorialPhonePhase();
+            yield break;
+        }
+
+        ExecuteStepAction(index);
+        yield return WaitForTrigger(index);
     }
 
     private void ExecuteStepAction(int index)
@@ -110,13 +141,8 @@ public class TutorialManager : Singleton<TutorialManager>
             case 2: // 교배                
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f, 0f), new Vector2(75f, 150f));
                 break;
-            case 3: // 웨이브 지나감
-                ActivateWave();
-                break;
-            case 4: // 자유시간
-                gcController.ToggleGlow(true);
-                waveManager.StartCoroutine(waveManager.StartNightCoroutine());
-                PhoneManager.Instance.TutorialPhonePhase();
+            case 3: // 웨이브 지나감 (RunStepActionAndWait에서 완료까지 대기)
+            case 4: // 자유시간 전환 (RunStepActionAndWait에서 완료까지 대기)
                 break;
             case 5: // 삽 클릭
                 shovel.SetActive(true);
@@ -175,14 +201,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 );
                 _lastClickedObject = null;
                 break;
-            case 7: // 이제 실전으로 끝
-                //yield return new WaitForSeconds(1f);                
-                gcController.ToggleGlow(false);
-                waveManager.StartCoroutine(waveManager.StopNightCoroutine());
-                if (gameStartUI != null)
-                {
-                    gameStartUI.SetActive(true);
-                }
+            case 7: // 최종 확인 이후 PlayTutorialSequence에서 종료 연출
                 break;
         }
     }
@@ -206,7 +225,6 @@ public class TutorialManager : Singleton<TutorialManager>
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;
             case 4: // 자유시간
-                PhoneManager.Instance.TutorialPhonePhase();
                 spawnedCircle.FlushSpawnedCircleCanvas();
                 break;
             case 5: // 삽 클릭

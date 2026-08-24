@@ -86,12 +86,11 @@ public class PhoneAlarmEffectController : MonoBehaviour
     public void EnableAlarm()
     {
         isAlarmAble = true;
-        if (PhoneManager.Instance.TotalPhoneAlarmState != AlarmState.None)
+        if (PhoneManager.Instance != null
+            && PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.Mandatory
+            && PhoneManager.Instance.ShouldResumePermanentAlarm)
         {
-            if (PhoneManager.Instance.TotalPhoneAlarmState == AlarmState.Mandatory)
-            {
-                AlarmPermanent();
-            }
+            AlarmPermanent();
         }
 
     }

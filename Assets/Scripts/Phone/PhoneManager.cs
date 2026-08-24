@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,8 +28,13 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private Dictionary<AppKey, AlarmState> appAlarmStates = new Dictionary<AppKey, AlarmState>();
     private Dictionary<AppKey, bool> appAlarmPausing = new Dictionary<AppKey, bool>(); // 앱별: mandatory 알람이 게임을 멈출지 (기본 true)
+    private Dictionary<AppKey, bool> appAlarmEffects = new Dictionary<AppKey, bool>();
+    private Dictionary<AppKey, bool> appAlarmUIVisible = new Dictionary<AppKey, bool>();
     private bool anyPausingMandatory = false;
     public AlarmState TotalPhoneAlarmState { get; private set; } = AlarmState.None;
+    public bool ShouldResumePermanentAlarm => appAlarmStates.Any(pair =>
+        pair.Value == AlarmState.Mandatory
+        && (!appAlarmEffects.TryGetValue(pair.Key, out bool enabled) || enabled));
 
     [SerializeField] private GameObject mandatoryAlarm;
     [SerializeField] private GameObject nonMandatoryAlarm;
@@ -514,39 +520,57 @@ public class PhoneManager : Singleton<PhoneManager>
         => appAlarmStates.TryGetValue(appKey, out var state) ? state : AlarmState.None;
 
     // pauseIfMandatory: 이 알람이 Mandatory일 때 게임을 멈출지(기본 true). 세금 같은 "빨간 알림이지만 멈추지 않는" 용도로 false.
-    public void UpdateAppAlarmState(AppKey appKey, AlarmState newState, bool pauseIfMandatory = true)
+    public void UpdateAppAlarmState(
+        AppKey appKey,
+        AlarmState newState,
+        bool pauseIfMandatory = true,
+        bool playAlarmEffect = true,
+        bool showAlarmUI = true)
     {
+        AlarmState previousAppState = GetAppAlarmState(appKey);
         appAlarmStates[appKey] = newState;
         appAlarmPausing[appKey] = pauseIfMandatory;
+        appAlarmEffects[appKey] = playAlarmEffect;
+        appAlarmUIVisible[appKey] = showAlarmUI;
         RefreshTotalAlarmState();
-        UpdateAppIconUI(appKey, newState);
+        UpdateAppIconUI(appKey, showAlarmUI ? newState : AlarmState.None);
+
+        if (showAlarmUI && playAlarmEffect && previousAppState != newState && newState == TotalPhoneAlarmState)
+            PlayAlarmEffect(newState);
 
         OnAppAlarmChanged?.Invoke(appKey, newState);
     }
 
     private void RefreshTotalAlarmState()
     {
-        AlarmState highestState = AlarmState.None;
         bool pausing = false;
 
         foreach (var kv in appAlarmStates)
         {
             if (kv.Value == AlarmState.Mandatory)
             {
-                highestState = AlarmState.Mandatory;
                 // 멈춤을 요청한 mandatory가 하나라도 있으면 폰 전체가 멈춤(기본 true)
                 if (!appAlarmPausing.TryGetValue(kv.Key, out bool p) || p)
                     pausing = true;
             }
-            else if (kv.Value == AlarmState.NonMandatory && highestState != AlarmState.Mandatory)
-            {
-                highestState = AlarmState.NonMandatory;
-            }
         }
 
         anyPausingMandatory = pausing;
-        TotalPhoneAlarmState = highestState;
+        TotalPhoneAlarmState = GetHighestVisibleAlarmState();
         ApplyPhoneAlarmUI();
+    }
+
+    private void PlayAlarmEffect(AlarmState state)
+    {
+        switch (state)
+        {
+            case AlarmState.Mandatory:
+                AlarmController?.AlarmPermanent();
+                break;
+            case AlarmState.NonMandatory:
+                AlarmController?.AlarmImpermanent();
+                break;
+        }
     }
 
     private void ApplyPhoneAlarmUI()
@@ -559,42 +583,54 @@ public class PhoneManager : Singleton<PhoneManager>
             case AlarmState.Mandatory:
                 mandatoryAlarm.SetActive(true);
                 nonMandatoryAlarm.SetActive(false);
-                alarmController?.AlarmPermanent();
-                if (GameManager.Instance != null)
-                {
-                    if (anyPausingMandatory) // 멈춤을 요청한 mandatory만 게임 정지
-                    {
-                        GameManager.Instance.StopGame();
-                        GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText();
-                    }
-                    else
-                    {
-                        GameManager.Instance.ResumeGame();
-                        GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
-                    }
-                }
                 break;
             case AlarmState.NonMandatory:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(true);
-                alarmController?.AlarmImpermanent();
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.ResumeGame();
-                    GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
-                }
                 break;
             case AlarmState.None:
                 mandatoryAlarm.SetActive(false);
                 nonMandatoryAlarm.SetActive(false);
                 alarmController?.StopAlarm();
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.ResumeGame();
-                    GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
-                }
                 break;
         }
+
+        if (GameManager.Instance == null)
+            return;
+
+        if (anyPausingMandatory)
+        {
+            GameManager.Instance.StopGame();
+            bool isMessengerMandatory = appAlarmStates.TryGetValue(
+                AppKey.Messenger,
+                out AlarmState messengerState)
+                && messengerState == AlarmState.Mandatory;
+            GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText(isMessengerMandatory);
+        }
+        else
+        {
+            GameManager.Instance.ResumeGame();
+            GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
+        }
+    }
+
+    private AlarmState GetHighestVisibleAlarmState()
+    {
+        AlarmState highestState = AlarmState.None;
+
+        foreach (KeyValuePair<AppKey, AlarmState> pair in appAlarmStates)
+        {
+            if (appAlarmUIVisible.TryGetValue(pair.Key, out bool visible) && !visible)
+                continue;
+
+            if (pair.Value == AlarmState.Mandatory)
+                return AlarmState.Mandatory;
+
+            if (pair.Value == AlarmState.NonMandatory)
+                highestState = AlarmState.NonMandatory;
+        }
+
+        return highestState;
     }
 
     private void UpdateAppIconUI(AppKey key, AlarmState state)
@@ -656,36 +692,95 @@ public class PhoneManager : Singleton<PhoneManager>
 
         save.activatedTriggers.Clear();
         save.activatedTriggers.AddRange(progress.activatedTriggersOrdered);
+
+        save.messageStates ??= new List<ChatMessageStateData>();
+        save.messageStates.Clear();
+        var statePartners = new HashSet<string>(progress.revealedMessageIndices.Keys);
+        statePartners.UnionWith(progress.readMessageIndices.Keys);
+        foreach (string partnerName in statePartners.OrderBy(name => name))
+        {
+            var state = new ChatMessageStateData { partnerName = partnerName };
+            if (progress.revealedMessageIndices.TryGetValue(partnerName, out HashSet<int> revealed))
+                state.revealedIndices.AddRange(revealed.OrderBy(index => index));
+            if (progress.readMessageIndices.TryGetValue(partnerName, out HashSet<int> read))
+                state.readIndices.AddRange(read.OrderBy(index => index));
+            save.messageStates.Add(state);
+        }
     }
 
     public void LoadPhoneManager(PhoneSave saveData)
     {
         MessengerProgress progress = new MessengerProgress();
 
-        for (int i = 0; i < saveData.chatPartners.Count; i++)
+        if (saveData == null)
         {
-            progress.conversationSeenIndices.Add(saveData.chatPartners[i], saveData.conversationSeenIndices[i]);
+            messengerApp.SetProgress(progress);
+            return;
         }
-        for (int i = 0; i < saveData.dayChatPartners.Count; i++)
+
+        int legacyCount = Mathf.Min(
+            saveData.chatPartners?.Count ?? 0,
+            saveData.conversationSeenIndices?.Count ?? 0);
+        for (int i = 0; i < legacyCount; i++)
+        {
+            string partnerName = saveData.chatPartners[i];
+            int lastSeen = saveData.conversationSeenIndices[i];
+            progress.conversationSeenIndices[partnerName] = lastSeen;
+        }
+
+        if (saveData.messageStates != null && saveData.messageStates.Count > 0)
+        {
+            foreach (ChatMessageStateData state in saveData.messageStates)
+            {
+                if (state == null || string.IsNullOrEmpty(state.partnerName)) continue;
+                var revealed = new HashSet<int>(state.revealedIndices ?? new List<int>());
+                var read = new HashSet<int>(state.readIndices ?? new List<int>());
+                revealed.UnionWith(read);
+                progress.revealedMessageIndices[state.partnerName] = revealed;
+                progress.readMessageIndices[state.partnerName] = read;
+            }
+        }
+        else
+        {
+            foreach (KeyValuePair<string, int> legacy in progress.conversationSeenIndices)
+            {
+                var revealed = new HashSet<int>();
+                var read = new HashSet<int>();
+                for (int index = 0; index <= legacy.Value; index++)
+                {
+                    revealed.Add(index);
+                    read.Add(index);
+                }
+                progress.revealedMessageIndices[legacy.Key] = revealed;
+                progress.readMessageIndices[legacy.Key] = read;
+            }
+        }
+
+        int dayPartnerCount = Mathf.Min(
+            saveData.dayChatPartners?.Count ?? 0,
+            saveData.dayByChatPartners?.Count ?? 0);
+        for (int i = 0; i < dayPartnerCount; i++)
         {
             string partnerName = saveData.dayChatPartners[i];
 
             ChatDayData chatDayData = saveData.dayByChatPartners[i];
-
-
             Dictionary<int, int> separatorsForPartner = new Dictionary<int, int>();
-            for (int j = 0; j < chatDayData.index.Count; j++)
+            int separatorCount = chatDayData == null
+                ? 0
+                : Mathf.Min(chatDayData.index?.Count ?? 0, chatDayData.day?.Count ?? 0);
+            for (int j = 0; j < separatorCount; j++)
             {
                 int messageIndex = chatDayData.index[j];
                 int day = chatDayData.day[j];
-
-                separatorsForPartner.Add(messageIndex, day);
+                separatorsForPartner[messageIndex] = day;
             }
-            progress.daySeparators.Add(partnerName, separatorsForPartner);
+            progress.daySeparators[partnerName] = separatorsForPartner;
         }
-        foreach (var r in saveData.activatedTriggers)
+
+        foreach (string trigger in saveData.activatedTriggers ?? new List<string>())
         {
-            progress.activatedTriggersOrdered.Add(r);
+            if (!string.IsNullOrEmpty(trigger) && !progress.activatedTriggersOrdered.Contains(trigger))
+                progress.activatedTriggersOrdered.Add(trigger);
         }
         messengerApp.SetProgress(progress);
     }

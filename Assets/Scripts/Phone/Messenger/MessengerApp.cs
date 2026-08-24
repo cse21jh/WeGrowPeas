@@ -2,20 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using DG.Tweening;
 
 public class MessengerProgress
 {
-    // Key: Chat의 이름, Value: 마지막으로 본 메시지의 인덱스
     public Dictionary<string, int> conversationSeenIndices = new Dictionary<string, int>();
-
-    // 활성화된 모든 트리거 ID들을 저장 (중복 없이)
+    public Dictionary<string, HashSet<int>> revealedMessageIndices = new Dictionary<string, HashSet<int>>();
+    public Dictionary<string, HashSet<int>> readMessageIndices = new Dictionary<string, HashSet<int>>();
     public List<string> activatedTriggersOrdered = new List<string>();
-
     public Dictionary<string, Dictionary<int, int>> daySeparators = new Dictionary<string, Dictionary<int, int>>();
 }
 
@@ -25,1006 +22,799 @@ public struct UnreadInfo
     public bool hasMandatory;
 }
 
+public readonly struct MandatoryMessageHandle : IEquatable<MandatoryMessageHandle>
+{
+    public string PartnerName { get; }
+    public int MessageIndex { get; }
+    public string TriggerId { get; }
+
+    public MandatoryMessageHandle(string partnerName, int messageIndex, string triggerId)
+    {
+        PartnerName = partnerName;
+        MessageIndex = messageIndex;
+        TriggerId = triggerId;
+    }
+
+    public bool Equals(MandatoryMessageHandle other)
+    {
+        return PartnerName == other.PartnerName
+            && MessageIndex == other.MessageIndex
+            && TriggerId == other.TriggerId;
+    }
+
+    public override bool Equals(object obj) => obj is MandatoryMessageHandle other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(PartnerName, MessageIndex, TriggerId);
+}
 
 public class MessengerApp : MonoBehaviour
 {
+    private sealed class MessageReference
+    {
+        public Chat chat;
+        public int index;
+        public ChatMessage message;
+
+        public MandatoryMessageHandle Handle => new MandatoryMessageHandle(
+            chat.chatPartner.chatPartnerName,
+            index,
+            message.triggerId);
+    }
+
+    private sealed class MandatoryEntry
+    {
+        public MessageReference reference;
+        public bool revealedByPopup;
+        public bool advanceUnlocked;
+        public bool waitEventRaised;
+    }
+
     [Header("Data")]
     [SerializeField] private List<Chat> allChats;
 
     [Header("UI Panels")]
     [SerializeField] private GameObject chatPartnerListPanel;
     [SerializeField] private GameObject chatRoomPanel;
+    [SerializeField] private MandatoryMessagePopupController mandatoryMessagePopup;
 
     [Header("UI Components")]
     [SerializeField] private Transform chatPartnerListContent;
     [SerializeField] private Button backTochatPartnersButton;
-
     [SerializeField] private TMP_Text chatRoomHeaderName;
     [SerializeField] private Image chatRoomHeaderImage;
     [SerializeField] private ChatMessageList chatMessageList;
     [SerializeField] private ScrollRect scrollRect;
-
-
     [SerializeField] private GameObject chatPartnerListItemPrefab;
 
     [Header("Open/Close Animation Settings")]
     [SerializeField] private RectTransform Panel_OpenRect;
     [SerializeField] private RectTransform Panel_CloseRect;
-
     [SerializeField] private RectTransform PeoplePanel;
     [SerializeField] private RectTransform ChatPanel;
-
     [SerializeField] private float OpenCloseDuration = 0.5f;
     [SerializeField] private Ease OpenCloseEase = Ease.InOutSine;
+
+    private readonly List<MandatoryEntry> mandatoryEntries = new List<MandatoryEntry>();
+    private readonly List<MessageReference> heldOptionalMessages = new List<MessageReference>();
+    private readonly HashSet<int> renderedIndicesForCurrentChat = new HashSet<int>();
 
     private MessengerProgress progress;
     private Chat currentChat;
     private Coroutine messageDisplayCoroutine;
+    private Tween currentPanelTween;
+    private int mandatoryPopupIndex;
+    private bool mandatoryPopupOpen;
+    private bool messageRefreshPending;
+    private bool closedByTabShowingChat;
+    private bool alreadyOpenChatRoom;
+    private bool doubleClose;
+    private bool skipTyping;
 
-    private bool closedByTabShowingChat = false;
-    private bool alreadyOpenChatRoom = false;
-    public bool IsDisplayingMessages { get; private set; } = false;
+    public bool IsDisplayingMessages { get; private set; }
+    public bool IsMandatoryPopupOpen => mandatoryPopupOpen;
+    public event Action<MandatoryMessageHandle> OnMandatoryAdvanceBlocked;
 
-    // 타이핑 스킵 플래그 (클릭 시 현재 "..." 대기를 즉시 건너뜀)
-    private bool _skipTyping = false;
-
-
-
-    void Awake()
+    private void Awake()
     {
         progress = new MessengerProgress();
+        mandatoryMessagePopup?.Initialize(
+            ShowPreviousMandatoryMessage,
+            ShowNextMandatoryMessage,
+            ConfirmMandatoryMessages);
 
-        //Trigger 0인 애들은 이미 와있던 메세지로 취급하고 삽입해줌. (New Game인 경우)
-        if (progress.conversationSeenIndices.Count == 0 && progress.activatedTriggersOrdered.Count == 0) // 더 확실한 새 게임 확인
-        {
+        if (progress.activatedTriggersOrdered.Count == 0)
             InitializeForNewGame();
+    }
+
+    private void Start()
+    {
+        if (backTochatPartnersButton == null) return;
+        backTochatPartnersButton.onClick.AddListener(OpenchatPartnerList);
+        backTochatPartnersButton.onClick.AddListener(() => PhoneManager.Instance?.PhoneTouchEffect());
+    }
+
+    private void Update()
+    {
+        if (IsDisplayingMessages && chatRoomPanel != null && chatRoomPanel.activeInHierarchy
+            && Input.GetMouseButtonDown(0))
+        {
+            skipTyping = true;
         }
     }
 
     private void InitializeForNewGame()
     {
         if (allChats == null) return;
-
-        // Trigger "Default"을 가장 먼저 활성화된 것으로 기록
         progress.activatedTriggersOrdered.Add("Default");
 
-
-        foreach (var chat in allChats)
+        foreach (MessageReference reference in GetReferencesForTrigger("Default"))
         {
-            if (chat != null && chat.chatPartner != null)
-            {
-                string partnerName = chat.chatPartner.chatPartnerName;
-
-                // 딕셔너리에 대화 상대 추가
-                if (!progress.conversationSeenIndices.ContainsKey(partnerName))
-                {
-                    progress.conversationSeenIndices.Add(partnerName, -1);
-                }
-
-                int lastIndexOfTriggerZero = -1;
-                int firstIndexOfTriggerZero = -1;
-
-                for (int i = 0; i < chat.messages.Count; i++)
-                {
-                    if (chat.messages[i].triggerId == "Default")
-                    {
-                        if (firstIndexOfTriggerZero == -1)
-                        {
-                            firstIndexOfTriggerZero = i;
-                        }
-                        lastIndexOfTriggerZero = i;
-                    }
-                }
-
-                // Trigger "0" 메시지가 있다면, "이미 읽음" 처리
-                if (lastIndexOfTriggerZero > -1)
-                {
-                    progress.conversationSeenIndices[partnerName] = lastIndexOfTriggerZero;
-                    if (!chat.useSaveSlotReadStateOnly)
-                    {
-                        MessengerSaveSystem.MarkAsRead(partnerName, lastIndexOfTriggerZero);
-                    }
-
-                    if (!progress.daySeparators.ContainsKey(partnerName))
-                    {
-                        progress.daySeparators[partnerName] = new Dictionary<int, int>();
-                    }
-
-                    for (int i = firstIndexOfTriggerZero; i <= lastIndexOfTriggerZero; i++)
-                    {
-                        if (chat.messages[i].triggerId == "Default")
-                        {
-                            progress.daySeparators[partnerName][i] = 1;
-                        }
-                    }
-                }
-            }
+            SetMessageDay(reference, 1);
+            RevealMessage(reference);
+            MarkMessageRead(reference.chat, reference.index);
         }
+
         RefreshchatPartnerList();
-    }
-
-    void Start()
-    {
-        if (backTochatPartnersButton != null)
-        {
-            backTochatPartnersButton.onClick.AddListener(OpenchatPartnerList);
-            backTochatPartnersButton.onClick.AddListener(PhoneManager.Instance.PhoneTouchEffect);
-        }
-    }
-
-    void Update()
-    {
-        // 채팅방에서 메시지 표시 중 클릭하면 현재 타이핑 대기를 스킵
-        if (IsDisplayingMessages && chatRoomPanel.activeSelf && Input.GetMouseButtonDown(0))
-        {
-            _skipTyping = true;
-        }
-    }
-
-    public void UpdateMessenger()
-    {
-        if (chatRoomPanel.activeSelf && currentChat != null)
-        {
-            // 화면을 다 지우지 않고, 현재 진행 중인 코루틴이 없다면 새 메시지만 체크해서 시작
-            if (!IsDisplayingMessages)
-            {
-                if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-                messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(false)); // false: 초기화 안함
-            }
-        }
-        else
-        {
-            RefreshchatPartnerList();
-        }
-        ReportAlarmState();
     }
 
     public void ActivateTrigger(string triggerId)
     {
-        if (!DoesAnyMessageUseTrigger(triggerId)) return;
+        if (string.IsNullOrEmpty(triggerId) || !DoesAnyMessageUseTrigger(triggerId)) return;
+        if (progress.activatedTriggersOrdered.Contains(triggerId)) return;
 
-        // 중복 추가 방지
-        if (!progress.activatedTriggersOrdered.Contains(triggerId))
+        progress.activatedTriggersOrdered.Add(triggerId);
+        List<MessageReference> references = GetReferencesForTrigger(triggerId);
+        int currentDay = GameManager.Instance != null ? GameManager.Instance.stage : 1;
+        foreach (MessageReference reference in references)
+            SetMessageDay(reference, currentDay);
+
+        List<MessageReference> required = references
+            .Where(reference => RequiresMandatoryPopup(reference.chat, reference.index))
+            .ToList();
+
+        if (required.Count == 0)
         {
-            progress.activatedTriggersOrdered.Add(triggerId);
-
-            int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
-
-            foreach (var chat in allChats)
-            {
-                if (chat == null || chat.messages == null) continue;
-                string partnerName = chat.chatPartner.chatPartnerName;
-                for (int i = 0; i < chat.messages.Count; i++)
-                {
-                    if (chat.messages[i].triggerId == triggerId)
-                    {
-                        if (!progress.daySeparators.ContainsKey(partnerName))
-                            progress.daySeparators[partnerName] = new Dictionary<int, int>();
-                        if (!progress.daySeparators[partnerName].ContainsKey(i))
-                            progress.daySeparators[partnerName][i] = currentDay;
-                    }
-                }
-            }
-            // TODO: 세이브
+            foreach (MessageReference reference in references)
+                RevealMessage(reference);
+            UpdateMessenger();
+            return;
         }
 
-        if (chatPartnerListPanel.activeInHierarchy || chatRoomPanel.activeInHierarchy)
+        if (mandatoryMessagePopup == null)
         {
+            Debug.LogError("[Messenger] MandatoryMessagePopupController가 연결되지 않아 필수 메시지를 자동 처리합니다.", this);
+            foreach (MessageReference reference in references)
+            {
+                RevealMessage(reference);
+                if (reference.message.isMandatory)
+                    MarkMessageRead(reference.chat, reference.index);
+            }
             UpdateMessenger();
+            return;
+        }
+
+        bool startsNewSession = !mandatoryPopupOpen;
+        if (startsNewSession)
+        {
+            mandatoryEntries.Clear();
+            heldOptionalMessages.Clear();
+            mandatoryPopupIndex = 0;
+            mandatoryPopupOpen = true;
+        }
+
+        foreach (MessageReference reference in references)
+        {
+            if (required.Contains(reference))
+                mandatoryEntries.Add(new MandatoryEntry { reference = reference });
+            else if (!IsMessageRevealed(reference.chat, reference.index))
+                heldOptionalMessages.Add(reference);
+        }
+
+        if (startsNewSession)
+            ShowCurrentMandatoryMessage();
+        else
+            RefreshMandatoryNavigation();
+
+        ReportAlarmState();
+    }
+
+    public bool TryGetAwaitingMandatoryAdvance(string triggerId, out MandatoryMessageHandle handle)
+    {
+        foreach (MandatoryEntry entry in mandatoryEntries)
+        {
+            if (entry.waitEventRaised && !entry.advanceUnlocked
+                && entry.reference.message.waitForAdvanceSignal
+                && entry.reference.message.triggerId == triggerId)
+            {
+                handle = entry.reference.Handle;
+                return true;
+            }
+        }
+
+        handle = default;
+        return false;
+    }
+
+    public void UnlockMandatoryAdvance(MandatoryMessageHandle handle)
+    {
+        MandatoryEntry entry = mandatoryEntries.FirstOrDefault(item => item.reference.Handle.Equals(handle));
+        if (entry == null) return;
+        entry.advanceUnlocked = true;
+        RefreshMandatoryNavigation();
+    }
+
+    private void ShowPreviousMandatoryMessage()
+    {
+        if (!mandatoryPopupOpen || mandatoryPopupIndex <= 0) return;
+        mandatoryPopupIndex--;
+        ShowCurrentMandatoryMessage();
+    }
+
+    private void ShowNextMandatoryMessage()
+    {
+        if (!mandatoryPopupOpen || mandatoryEntries.Count == 0) return;
+        MandatoryEntry current = mandatoryEntries[mandatoryPopupIndex];
+        if (current.reference.message.waitForAdvanceSignal && !current.advanceUnlocked) return;
+        if (mandatoryPopupIndex >= mandatoryEntries.Count - 1) return;
+
+        mandatoryPopupIndex++;
+        ShowCurrentMandatoryMessage();
+    }
+
+    private void ConfirmMandatoryMessages()
+    {
+        if (!mandatoryPopupOpen || mandatoryEntries.Count == 0) return;
+        if (mandatoryPopupIndex != mandatoryEntries.Count - 1) return;
+        MandatoryEntry current = mandatoryEntries[mandatoryPopupIndex];
+        if (current.reference.message.waitForAdvanceSignal && !current.advanceUnlocked) return;
+
+        foreach (MessageReference reference in heldOptionalMessages)
+            RevealMessage(reference);
+
+        mandatoryPopupOpen = false;
+        mandatoryMessagePopup.Hide();
+        mandatoryEntries.Clear();
+        heldOptionalMessages.Clear();
+        mandatoryPopupIndex = 0;
+        UpdateMessenger();
+    }
+
+    private void ShowCurrentMandatoryMessage()
+    {
+        if (!mandatoryPopupOpen || mandatoryEntries.Count == 0) return;
+        mandatoryPopupIndex = Mathf.Clamp(mandatoryPopupIndex, 0, mandatoryEntries.Count - 1);
+
+        MandatoryEntry entry = mandatoryEntries[mandatoryPopupIndex];
+        MessageReference reference = entry.reference;
+        mandatoryMessagePopup.Show(reference.chat.chatPartner, reference.message.messageText);
+
+        if (!entry.revealedByPopup)
+        {
+            entry.revealedByPopup = true;
+            RevealMessage(reference);
+            MarkMessageRead(reference.chat, reference.index);
+            UpdateMessenger();
+        }
+
+        if (reference.message.waitForAdvanceSignal && !entry.waitEventRaised)
+        {
+            entry.waitEventRaised = true;
+            OnMandatoryAdvanceBlocked?.Invoke(reference.Handle);
+        }
+
+        RefreshMandatoryNavigation();
+    }
+
+    private void RefreshMandatoryNavigation()
+    {
+        if (!mandatoryPopupOpen || mandatoryEntries.Count == 0 || mandatoryMessagePopup == null) return;
+        MandatoryEntry entry = mandatoryEntries[mandatoryPopupIndex];
+        mandatoryMessagePopup.SetNavigation(
+            mandatoryPopupIndex == 0,
+            mandatoryPopupIndex == mandatoryEntries.Count - 1,
+            entry.reference.message.waitForAdvanceSignal,
+            entry.advanceUnlocked);
+    }
+
+    public void UpdateMessenger()
+    {
+        if (chatRoomPanel != null && chatRoomPanel.activeInHierarchy && currentChat != null)
+        {
+            if (IsDisplayingMessages)
+                messageRefreshPending = true;
+            else
+                StartMessageDisplay(false);
         }
         else
         {
             RefreshchatPartnerList();
         }
+
         ReportAlarmState();
     }
 
-    // 해당 트리거 ID를 사용하는 메시지가 있으면 true, 없으면 false를 반환
     private bool DoesAnyMessageUseTrigger(string triggerId)
     {
-        if (string.IsNullOrEmpty(triggerId)) return false;
-
-        foreach (var chat in allChats)
-        {
-            if (chat != null && chat.messages != null)
-            {
-                if (chat.messages.Any(message => message.triggerId == triggerId))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return allChats != null && allChats.Any(chat => chat != null && chat.messages != null
+            && chat.messages.Any(message => message.triggerId == triggerId));
     }
-
-
-    private Tween currentPanelTween;
 
     public void OpenchatPartnerList()
     {
-        if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-        IsDisplayingMessages = false;
-
-        chatPartnerListPanel.SetActive(true); // 이동 시작 전에 미리 켜서 갱신이 동작하도록 함
+        StopMessageDisplay();
+        chatPartnerListPanel.SetActive(true);
         PeoplePanel.gameObject.SetActive(true);
 
-        if (currentPanelTween != null) currentPanelTween.Kill();
+        currentPanelTween?.Kill();
         currentPanelTween = ChatPanel.DOAnchorPosX(Panel_CloseRect.anchoredPosition.x, OpenCloseDuration)
             .SetEase(OpenCloseEase)
-            .OnComplete(() =>
-            {
-                chatRoomPanel.SetActive(false); // 이동 완료 후 가림
-            });
+            .OnComplete(() => chatRoomPanel.SetActive(false));
 
         alreadyOpenChatRoom = false;
         currentChat = null;
+        renderedIndicesForCurrentChat.Clear();
         RefreshchatPartnerList();
     }
 
-
     public void OpenChatRoom(Chat conversation)
     {
+        if (conversation == null) return;
+        StopMessageDisplay();
         currentChat = conversation;
+        renderedIndicesForCurrentChat.Clear();
 
         chatRoomHeaderName.text = conversation.chatPartner.chatPartnerName;
         chatRoomHeaderImage.sprite = conversation.chatPartner.chatPartnerImage;
         chatMessageList.SetSender(conversation.chatPartner.chatPartnerName, conversation.chatPartner.chatPartnerImage);
 
-        chatRoomPanel.SetActive(true); // 이동 시작 전에 미리 켜서 코루틴(Scroll View 등)이 동작하도록 함
+        chatRoomPanel.SetActive(true);
         ChatPanel.gameObject.SetActive(true);
-
-        if (currentPanelTween != null) currentPanelTween.Kill();
+        currentPanelTween?.Kill();
         currentPanelTween = ChatPanel.DOAnchorPosX(Panel_OpenRect.anchoredPosition.x, OpenCloseDuration)
             .SetEase(OpenCloseEase)
-            .OnComplete(() =>
-            {
-                chatPartnerListPanel.SetActive(false); // 이동 완료 후 가림
-            });
+            .OnComplete(() => chatPartnerListPanel.SetActive(false));
 
         alreadyOpenChatRoom = true;
-        DisplayChatMessages();
+        StartMessageDisplay(true);
         scrollRect.verticalNormalizedPosition = 0f;
     }
 
-
-
     public void RefreshchatPartnerList()
     {
-        foreach (Transform child in chatPartnerListContent) Destroy(child.gameObject);
+        if (chatPartnerListContent == null || allChats == null) return;
+        foreach (Transform child in chatPartnerListContent)
+            Destroy(child.gameObject);
 
         List<Chat> chatsToShow = allChats
-            .Where(chat => chat != null && chat.messages != null && HasAnyArrivedMessages(chat))
+            .Where(chat => chat != null && chat.messages != null && GetArrivedMessages(chat).Count > 0)
+            .OrderByDescending(chat =>
+            {
+                MessageReference last = GetArrivedMessages(chat).LastOrDefault();
+                return last == null ? -1 : GetMessageDay(
+                    chat.chatPartner.chatPartnerName,
+                    last.index,
+                    last.message.triggerId);
+            })
             .ToList();
 
-        List<Chat> sortedChats = chatsToShow.OrderByDescending(chat =>
-        {
-            List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-            foreach (string triggerId in progress.activatedTriggersOrdered)
-            {
-                arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-            }
-
-            if (arrivedMessages.Count == 0)
-            {
-                return -1;
-            }
-
-            ChatMessage lastMessage = arrivedMessages.Last();
-            int originalIndex = chat.messages.IndexOf(lastMessage);
-            return GetMessageDay(chat.chatPartner.chatPartnerName, originalIndex, lastMessage.triggerId);
-
-        }).ToList();
-
-
-        foreach (var chat in sortedChats)
+        foreach (Chat chat in chatsToShow)
         {
             UnreadInfo unreadInfo = GetUnreadInfo(chat);
-            int cnt = 0;
-            string previewMessage = GetPreviewMessageText(chat, unreadInfo.hasUnread, out cnt);
-
-            GameObject itemGO = Instantiate(chatPartnerListItemPrefab, chatPartnerListContent);
-            ChatPartnerUI uiComponent = itemGO.GetComponent<ChatPartnerUI>();
-            if (uiComponent != null)
-            {
-                uiComponent.Setup(chat, previewMessage, unreadInfo, this, cnt);
-            }
+            string preview = GetPreviewMessageText(chat, unreadInfo.hasUnread, out int count);
+            GameObject item = Instantiate(chatPartnerListItemPrefab, chatPartnerListContent);
+            ChatPartnerUI ui = item.GetComponent<ChatPartnerUI>();
+            if (ui != null)
+                ui.Setup(chat, preview, unreadInfo, this, count);
             else
-            {
                 Debug.LogError($"Prefab '{chatPartnerListItemPrefab.name}' is missing ChatPartnerUI component.");
-            }
         }
     }
 
     private UnreadInfo GetUnreadInfo(Chat chat)
     {
-        UnreadInfo info = new UnreadInfo { hasUnread = false, hasMandatory = false };
-        if (chat == null || chat.messages == null) return info;
+        List<MessageReference> unread = GetArrivedMessages(chat)
+            .Where(reference => !IsMessageRead(chat, reference.index))
+            .ToList();
 
-        // --- 여기가 수정된 로직 ---
-        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
+        return new UnreadInfo
         {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        if (arrivedMessages.Count == 0) return info;
-
-        // 2. 마지막으로 본 메시지가 도착한 메시지 리스트에서 몇 번째인지 확인
-        int lastSeenIndex = GetLastSeenIndex(chat);
-        int lastSeenPositionInArrivedList = -1; // -1은 한 번도 안 봤다는 의미
-
-        if (lastSeenIndex > -1)
-        {
-            // lastSeenIndex가 유효한지 확인
-            if (lastSeenIndex >= chat.messages.Count)
-            {
-                return info; // 오류 상황에서는 안 읽은 메시지 없다고 처리
-            }
-            ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
-            lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
-
-            if (lastSeenPositionInArrivedList == -1)
-            {
-                for (int i = arrivedMessages.Count - 1; i >= 0; i--)
-                {
-                    if (chat.messages.IndexOf(arrivedMessages[i]) <= lastSeenIndex)
-                    {
-                        lastSeenPositionInArrivedList = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 3. 아직 안 본 메시지가 있는지 확인
-        if (arrivedMessages.Count > lastSeenPositionInArrivedList + 1)
-        {
-            info.hasUnread = true;
-
-            // 4. 안 읽은 메시지들 중에 진짜 안 읽은 '필수' 메시지가 있는지 확인
-            var unreadMessages = arrivedMessages.Skip(lastSeenPositionInArrivedList + 1);
-            string partnerName = chat.chatPartner.chatPartnerName;
-            int mandatorySeenIndex = chat.useSaveSlotReadStateOnly
-                ? lastSeenIndex
-                : MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-
-            bool hasTrulyUnreadMandatory = false;
-            foreach (var msg in unreadMessages)
-            {
-                if (msg.isMandatory)
-                {
-                    int msgIndex = chat.messages.IndexOf(msg);
-                    if (msgIndex > mandatorySeenIndex)
-                    {
-                        hasTrulyUnreadMandatory = true;
-                        break;
-                    }
-                }
-            }
-
-            if (hasTrulyUnreadMandatory)
-            {
-                info.hasMandatory = true;
-            }
-        }
-        // --- 수정된 로직 끝 ---
-
-        return info;
+            hasUnread = unread.Count > 0,
+            hasMandatory = unread.Any(reference => RequiresMandatoryPopup(chat, reference.index))
+        };
     }
 
-    private string GetPreviewMessageText(Chat chat, bool hasUnread, out int cnt)
+    private string GetPreviewMessageText(Chat chat, bool hasUnread, out int count)
     {
-        cnt = 0;
-        if (chat == null || chat.messages == null || chat.messages.Count == 0) return "새로운 대화";
-
-        // 도착한 모든 메시지를 도착 순서대로 정렬
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
+        List<MessageReference> arrived = GetArrivedMessages(chat);
+        if (arrived.Count == 0)
         {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-        if (arrivedMessages.Count == 0) return "새로운 대화";
-
-        // --- 안 읽은 메시지가 없는 경우 (가장 간단한 케이스) ---
-        if (!hasUnread)
-        {
-            // 4. 가장 마지막으로 '도착한' 메시지를 반환
-            return arrivedMessages.Last().messageText;
+            count = 0;
+            return "새로운 대화";
         }
 
-        // --- 안 읽은 메시지가 있는 경우 ---
-        int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
-
-        // 마지막으로 본 메시지의 위치 확인
-        int lastSeenIndex = GetLastSeenIndex(chat);
-        int lastSeenPositionInArrivedList = -1;
-        if (lastSeenIndex > -1)
-        {
-            lastSeenPositionInArrivedList = arrivedMessages.IndexOf(chat.messages[lastSeenIndex]);
-        }
-
-        // 안 읽은 메시지 목록 생성
-        List<ChatMessage> unreadMessages = arrivedMessages.Skip(lastSeenPositionInArrivedList + 1).ToList();
-        string partnerName = chat.chatPartner.chatPartnerName;
-
-        // 2. 도착한 날짜가 '오늘'인 안 읽은 메시지 확인
-        var todayMessages = unreadMessages.Where(msg =>
-        {
-            int originalIndex = chat.messages.IndexOf(msg);
-            int arrivalDay = GetMessageDay(partnerName, originalIndex, msg.triggerId);
-            return arrivalDay == currentDay;
-        }).ToList();
-
-        if (todayMessages.Any())
-        {
-            // 오늘 날짜 메시지가 있다면, 그중 가장 첫 번째 메시지를 보여주고 카운트는 1
-            cnt = 1;
-            return todayMessages.First().messageText;
-        }
-
-        // 1. 도착한 날짜가 '과거'인 안 읽은 메시지 확인
-        var pastDayMessages = unreadMessages.Where(msg =>
-        {
-            int originalIndex = chat.messages.IndexOf(msg);
-            int arrivalDay = GetMessageDay(partnerName, originalIndex, msg.triggerId);
-            return arrivalDay < currentDay;
-        }).ToList();
-
-        if (pastDayMessages.Any())
-        {
-            // 과거 날짜 메시지가 있다면, 그중 가장 마지막 메시지를 보여주고 카운트는 전체 누적 개수
-            cnt = unreadMessages.Count;
-            return pastDayMessages.Last().messageText;
-        }
-
-        // 안전장치로, 안 읽은 메시지 중 가장 첫 번째 것을 반환
-        if (unreadMessages.Any())
-        {
-            cnt = 1; // 기본적으로 당일 도착으로 간주
-            return unreadMessages.First().messageText;
-        }
-
-        // 정말 아무것도 해당하지 않는 예외적인 경우
-        return arrivedMessages.Last().messageText;
+        List<MessageReference> unread = arrived
+            .Where(reference => !IsMessageRead(chat, reference.index))
+            .ToList();
+        count = unread.Count;
+        return hasUnread && unread.Count > 0
+            ? unread[0].message.messageText
+            : arrived[arrived.Count - 1].message.messageText;
     }
 
-
-    private void DisplayChatMessages()
+    private void StartMessageDisplay(bool freshEntry)
     {
-        chatMessageList.ClearMessages();
-        if (currentChat == null) return;
-
-        if (messageDisplayCoroutine != null) StopCoroutine(messageDisplayCoroutine);
-        messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine()); // isFreshEntry 파라미터 제거
+        if (messageDisplayCoroutine != null)
+            StopCoroutine(messageDisplayCoroutine);
+        messageDisplayCoroutine = StartCoroutine(ShowMessagesInOrderCoroutine(freshEntry));
     }
 
+    private void StopMessageDisplay()
+    {
+        if (messageDisplayCoroutine != null)
+            StopCoroutine(messageDisplayCoroutine);
+        messageDisplayCoroutine = null;
+        IsDisplayingMessages = false;
+        messageRefreshPending = false;
+        chatMessageList?.HideTypingMessage();
+    }
 
-
-    private IEnumerator ShowMessagesInOrderCoroutine(bool isFreshEntry = true) // 기본값을 true로 설정
+    private IEnumerator ShowMessagesInOrderCoroutine(bool freshEntry)
     {
         IsDisplayingMessages = true;
-        if (currentChat == null) { IsDisplayingMessages = false; yield break; }
-
-        string partnerName = currentChat.chatPartner.chatPartnerName;
-
-        // 1. 보여줘야 할 모든 메시지를 '도착한 순서대로' 정렬
-        List<ChatMessage> messagesToShow = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
+        Chat displayingChat = currentChat;
+        if (displayingChat == null)
         {
-            messagesToShow.AddRange(currentChat.messages.Where(msg => msg.triggerId == triggerId));
+            IsDisplayingMessages = false;
+            messageDisplayCoroutine = null;
+            yield break;
         }
 
-        // 2. "몇 개까지 봤는지" 계산
-        int seenMessageCount = 0;
-        int lastSeenIndex = GetLastSeenIndex(currentChat);
-        if (lastSeenIndex > -1)
+        if (freshEntry)
         {
-            if (lastSeenIndex < currentChat.messages.Count) // 방어 코드
-            {
-                ChatMessage lastSeenMessage = currentChat.messages[lastSeenIndex];
-                int positionInShowList = messagesToShow.IndexOf(lastSeenMessage);
-                if (positionInShowList > -1)
-                {
-                    seenMessageCount = positionInShowList + 1;
-                }
-                else
-                {
-                    int fallbackPos = -1;
-                    for (int i = messagesToShow.Count - 1; i >= 0; i--)
-                    {
-                        if (currentChat.messages.IndexOf(messagesToShow[i]) <= lastSeenIndex)
-                        {
-                            fallbackPos = i;
-                            break;
-                        }
-                    }
-                    if (fallbackPos > -1) seenMessageCount = fallbackPos + 1;
-                }
-            }
-            else
-            {
-                seenMessageCount = messagesToShow.Count;
-            }
-        }
-
-        // 3. 이미 본 메시지들을 즉시 표시 (채팅방에 처음 들어왔을 때만)
-        if (isFreshEntry)
-        {
-            // 화면을 깨끗이 비운다
             chatMessageList.ClearMessages();
-
-            int lastDisplayedDay = -1;
-            for (int i = 0; i < seenMessageCount; i++)
-            {
-                int originalIndex = currentChat.messages.IndexOf(messagesToShow[i]);
-                int day = GetMessageDay(partnerName, originalIndex, messagesToShow[i].triggerId);
-
-                if (!progress.daySeparators.ContainsKey(partnerName))
-                    progress.daySeparators[partnerName] = new Dictionary<int, int>();
-                progress.daySeparators[partnerName][originalIndex] = day;
-
-                if (day != -1 && lastDisplayedDay != day && !PhoneManager.Instance.isTutorial)
-                {
-                    lastDisplayedDay = day;
-                }
-                CreateMessageBubble(day, messagesToShow[i].messageText, messagesToShow[i].triggerId);
-            }
+            renderedIndicesForCurrentChat.Clear();
         }
 
-        // 4. 아직 안 본 메시지들을 이어서 표시
-        bool isFirstUnreadInThisSession = isFreshEntry;
-        bool afterPast = false;
-        bool skippedFirstToday = false;
-
-        int lastDay = -1;
-        if (seenMessageCount > 0)
+        bool firstUnreadSkipped = false;
+        bool separatorAdded = false;
+        List<MessageReference> messages = GetArrivedMessages(displayingChat);
+        foreach (MessageReference reference in messages)
         {
-            ChatMessage lastSeenMsg = messagesToShow[seenMessageCount - 1];
-            int lastSeenOrigIndex = currentChat.messages.IndexOf(lastSeenMsg);
-            lastDay = GetMessageDay(partnerName, lastSeenOrigIndex, lastSeenMsg.triggerId);
-        }
+            if (currentChat != displayingChat) break;
+            if (renderedIndicesForCurrentChat.Contains(reference.index)) continue;
 
-        for (int i = seenMessageCount; i < messagesToShow.Count; i++)
-        {
-            ChatMessage message = messagesToShow[i];
-            int originalIndex = currentChat.messages.IndexOf(message);
-            int currentDay = GetMessageDay(partnerName, originalIndex, message.triggerId);
-
-            // --- 날짜 변경 감지 및 저장/표시 로직 ---
-            if (lastDay != currentDay && !PhoneManager.Instance.isTutorial)
+            bool wasRead = IsMessageRead(displayingChat, reference.index);
+            bool isPastDay = IsPastDayMessage(
+                displayingChat.chatPartner.chatPartnerName,
+                reference.index,
+                reference.message.triggerId);
+            bool animate = !isPastDay && (!freshEntry || !wasRead);
+            if (!wasRead && !separatorAdded)
             {
-                if (!progress.daySeparators.ContainsKey(partnerName))
-                    progress.daySeparators[partnerName] = new Dictionary<int, int>();
-                progress.daySeparators[partnerName][originalIndex] = currentDay;
-                // TODO: 세이브
-                lastDay = currentDay;
-            }
-            bool isPast = IsPastDayMessage(partnerName, originalIndex, message.triggerId);
-
-            if (isFirstUnreadInThisSession && isPast)
-            {
-                // 과거, 처음 읽음
-                if (isFreshEntry)
-                    chatMessageList.AddNewChatSeparator();
-                isFirstUnreadInThisSession = false;
-                afterPast = true;
-            }
-            else if (isFirstUnreadInThisSession)
-            {
-                // 세션의 첫 안읽은 메시지이지만, '오늘' 날짜라면 분리선만 표시
-                if (isFreshEntry)
-                    chatMessageList.AddNewChatSeparator();
-                isFirstUnreadInThisSession = false;
-            }
-            else if (!isFirstUnreadInThisSession && afterPast && !isPast)
-            {
-                afterPast = false;
+                chatMessageList.AddNewChatSeparator();
+                separatorAdded = true;
             }
 
-            if (!isPast)
+            if (animate)
             {
-                if (!skippedFirstToday)
-                {
-                    // 당일 도착 메시지 중 첫 번째(미리보기로 본 메시지)는 타이핑 연출 없이 즉시 출력
-                    skippedFirstToday = true;
-                }
-                else
-                {
-                    float time = (message.messageText.Length / 10f);
-                    float preDelay = time / 3f;
-                    float typingDelay = time - preDelay;
-
-                    // 메시지 전 짧은 대기 (클릭 시 스킵)
-                    _skipTyping = false;
-                    float elapsed = 0f;
-                    while (elapsed < preDelay && !_skipTyping)
-                    {
-                        elapsed += Time.deltaTime;
-                        yield return null;
-                    }
-
-                    // "..." 버블 표시 후 대기 (클릭 시 즉시 제거)
-                    if (!_skipTyping)
-                    {
-                        chatMessageList.ShowTypingMessage();
-                        elapsed = 0f;
-                        while (elapsed < typingDelay && !_skipTyping)
-                        {
-                            elapsed += Time.deltaTime;
-                            yield return null;
-                        }
-                    }
-
-                    // 스킵되거나 시간이 끝나면 "..." 버블 제거
-                    chatMessageList.HideTypingMessage();
-                    _skipTyping = false;
-                }
+                bool skipFirstToday = freshEntry && !firstUnreadSkipped
+                    && !isPastDay;
+                firstUnreadSkipped = true;
+                if (!skipFirstToday)
+                    yield return PlayTypingDelay(reference.message);
             }
 
-            if (currentChat == null) break;
+            if (currentChat != displayingChat) break;
+            int day = GetMessageDay(
+                displayingChat.chatPartner.chatPartnerName,
+                reference.index,
+                reference.message.triggerId);
+            CreateMessageBubble(day, reference.message.messageText, reference.message.triggerId);
+            renderedIndicesForCurrentChat.Add(reference.index);
 
-            CreateMessageBubble(currentDay, message.messageText, message.triggerId);
-            SetLastSeenIndex(currentChat, originalIndex);
+            if (!wasRead)
+                MarkMessageRead(displayingChat, reference.index);
 
             ReportAlarmState();
             yield return null;
-            scrollRect.verticalNormalizedPosition = 0f;
+            if (scrollRect != null)
+                scrollRect.verticalNormalizedPosition = 0f;
         }
 
         IsDisplayingMessages = false;
         messageDisplayCoroutine = null;
+
+        if (messageRefreshPending && currentChat == displayingChat
+            && chatRoomPanel != null && chatRoomPanel.activeInHierarchy)
+        {
+            messageRefreshPending = false;
+            StartMessageDisplay(false);
+        }
     }
 
-    private int GetLastDisplayedDayForChat(string partnerName)
+    private IEnumerator PlayTypingDelay(ChatMessage message)
     {
-        // 2. 런타임 기록이 없다면 (예: 채팅방에 처음 들어왔을 때),
-        //    저장된 progress 데이터에서 복원 시도
-        if (progress != null && progress.daySeparators.TryGetValue(partnerName, out var separators) && separators.Count > 0)
-        {
-            // daySeparators에는 {메시지 인덱스, 날짜} 쌍이 저장되어 있음.
-            // 이 중 가장 큰 메시지 인덱스(가장 최근)에 해당하는 날짜를 찾아서 반환.
-            int latestDay = separators.OrderByDescending(kvp => kvp.Key).First().Value;
+        float total = Mathf.Max(message.delayAfterPrevious, message.messageText.Length / 10f);
+        float preDelay = total / 3f;
+        float typingDelay = total - preDelay;
+        skipTyping = false;
 
-            return latestDay;
+        float elapsed = 0f;
+        while (elapsed < preDelay && !skipTyping)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
         }
 
-        // 런타임 기록도, 저장된 기록도 없으면 -1 반환
-        return -1;
+        if (!skipTyping)
+        {
+            chatMessageList.ShowTypingMessage();
+            elapsed = 0f;
+            while (elapsed < typingDelay && !skipTyping)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        chatMessageList.HideTypingMessage();
+        skipTyping = false;
     }
+
+    private List<MessageReference> GetReferencesForTrigger(string triggerId)
+    {
+        List<MessageReference> result = new List<MessageReference>();
+        if (allChats == null) return result;
+
+        foreach (Chat chat in allChats)
+        {
+            if (chat == null || chat.chatPartner == null || chat.messages == null) continue;
+            for (int i = 0; i < chat.messages.Count; i++)
+            {
+                if (chat.messages[i].triggerId != triggerId) continue;
+                result.Add(new MessageReference { chat = chat, index = i, message = chat.messages[i] });
+            }
+        }
+        return result;
+    }
+
+    private List<MessageReference> GetArrivedMessages(Chat chat)
+    {
+        List<MessageReference> result = new List<MessageReference>();
+        if (chat == null || chat.messages == null) return result;
+
+        foreach (string triggerId in progress.activatedTriggersOrdered)
+        {
+            for (int i = 0; i < chat.messages.Count; i++)
+            {
+                ChatMessage message = chat.messages[i];
+                if (message.triggerId == triggerId && IsMessageRevealed(chat, i))
+                    result.Add(new MessageReference { chat = chat, index = i, message = message });
+            }
+        }
+        return result;
+    }
+
+    private void EnsureMessageState(string partnerName)
+    {
+        if (!progress.revealedMessageIndices.ContainsKey(partnerName))
+            progress.revealedMessageIndices[partnerName] = new HashSet<int>();
+        if (!progress.readMessageIndices.ContainsKey(partnerName))
+            progress.readMessageIndices[partnerName] = new HashSet<int>();
+        if (!progress.conversationSeenIndices.ContainsKey(partnerName))
+            progress.conversationSeenIndices[partnerName] = -1;
+    }
+
+    private bool RevealMessage(MessageReference reference)
+    {
+        string partnerName = reference.chat.chatPartner.chatPartnerName;
+        EnsureMessageState(partnerName);
+        return progress.revealedMessageIndices[partnerName].Add(reference.index);
+    }
+
+    private bool IsMessageRevealed(Chat chat, int index)
+    {
+        if (chat == null || chat.chatPartner == null) return false;
+        string partnerName = chat.chatPartner.chatPartnerName;
+        return progress.revealedMessageIndices.TryGetValue(partnerName, out HashSet<int> indices)
+            && indices.Contains(index);
+    }
+
+    private bool IsSlotMessageRead(Chat chat, int index)
+    {
+        if (chat == null || chat.chatPartner == null) return false;
+        string partnerName = chat.chatPartner.chatPartnerName;
+        return progress.readMessageIndices.TryGetValue(partnerName, out HashSet<int> indices)
+            && indices.Contains(index);
+    }
+
+    private bool IsMessageRead(Chat chat, int index)
+    {
+        if (IsSlotMessageRead(chat, index)) return true;
+        if (chat == null || chat.chatPartner == null || chat.useSaveSlotReadStateOnly) return false;
+        return !MessengerSaveSystem.PlayAlarmForSeenMessages
+            && MessengerSaveSystem.IsRead(chat.chatPartner.chatPartnerName, index);
+    }
+
+    private bool RequiresMandatoryPopup(Chat chat, int index)
+    {
+        if (chat == null || chat.messages == null || index < 0 || index >= chat.messages.Count) return false;
+        if (!chat.messages[index].isMandatory || IsSlotMessageRead(chat, index)) return false;
+        if (chat.useSaveSlotReadStateOnly) return true;
+        return !MessengerSaveSystem.IsRead(chat.chatPartner.chatPartnerName, index);
+    }
+
+    private void MarkMessageRead(Chat chat, int index)
+    {
+        if (chat == null || chat.chatPartner == null || index < 0) return;
+        string partnerName = chat.chatPartner.chatPartnerName;
+        EnsureMessageState(partnerName);
+        progress.readMessageIndices[partnerName].Add(index);
+
+        if (!chat.useSaveSlotReadStateOnly)
+            MessengerSaveSystem.MarkMessageAsRead(partnerName, index);
+
+        UpdateContiguousSeenIndex(partnerName);
+    }
+
+    private void UpdateContiguousSeenIndex(string partnerName)
+    {
+        EnsureMessageState(partnerName);
+        int contiguous = -1;
+        while (progress.readMessageIndices[partnerName].Contains(contiguous + 1))
+            contiguous++;
+        progress.conversationSeenIndices[partnerName] = contiguous;
+    }
+
+    private void SetMessageDay(MessageReference reference, int day)
+    {
+        string partnerName = reference.chat.chatPartner.chatPartnerName;
+        if (!progress.daySeparators.ContainsKey(partnerName))
+            progress.daySeparators[partnerName] = new Dictionary<int, int>();
+        if (!progress.daySeparators[partnerName].ContainsKey(reference.index))
+            progress.daySeparators[partnerName][reference.index] = day;
+    }
+
+    private bool HasUnreadMessages(Chat chat)
+    {
+        return GetArrivedMessages(chat).Any(reference => !IsMessageRead(chat, reference.index));
+    }
+
+    private bool HasUnreadMessagesForAllChats()
+    {
+        return allChats != null && allChats.Any(HasUnreadMessages);
+    }
+
+    public void ReportAlarmState()
+    {
+        AlarmState state = mandatoryPopupOpen
+            ? AlarmState.Mandatory
+            : HasUnreadMessagesForAllChats() ? AlarmState.NonMandatory : AlarmState.None;
+        PhoneManager.Instance?.UpdateAppAlarmState(
+            AppKey.Messenger,
+            state,
+            playAlarmEffect: state != AlarmState.Mandatory,
+            showAlarmUI: state != AlarmState.Mandatory);
+    }
+
     private bool IsPastDayMessage(string partnerName, int originalIndex, string triggerId)
     {
-        int arrivalDay = GetMessageDay(partnerName, originalIndex, triggerId);
-        int currentDay = (GameManager.Instance != null) ? GameManager.Instance.stage : 1;
-        return arrivalDay < currentDay;
+        int currentDay = GameManager.Instance != null ? GameManager.Instance.stage : 1;
+        return GetMessageDay(partnerName, originalIndex, triggerId) < currentDay;
     }
 
     private int GetMessageDay(string partnerName, int originalIndex, string triggerId)
     {
-        if (progress.daySeparators.ContainsKey(partnerName) && progress.daySeparators[partnerName].TryGetValue(originalIndex, out int savedDay))
+        if (progress.daySeparators.TryGetValue(partnerName, out Dictionary<int, int> separators)
+            && separators.TryGetValue(originalIndex, out int savedDay))
         {
             return savedDay;
         }
 
         if (int.TryParse(triggerId, out int day) && day != 0)
-        {
-            return day; // 숫자로 변환 성공 시 해당 날짜 반환
-        }
-
-        // "Default" 또는 "Item_Acquired" 등 숫자가 아닌 트리거는 현재 날짜로 취급
-        if (GameManager.Instance != null)
-        {
-            return GameManager.Instance.stage;
-        }
-        return 1; // GameManager가 없을 경우 기본값
+            return day;
+        return GameManager.Instance != null ? GameManager.Instance.stage : 1;
     }
 
-    private void CreateMessageBubble(int stage, string text, string triggerId = null)
+    private void CreateMessageBubble(int stage, string text, string triggerId)
     {
         int stageToPass = stage;
         if (PhoneManager.Instance != null && PhoneManager.Instance.isTutorial && !string.IsNullOrEmpty(triggerId))
-        {
             stageToPass = triggerId.GetHashCode();
-        }
         chatMessageList.AddMessage(stageToPass, text);
     }
 
+    public MessengerProgress GetProgress() => progress;
 
-    private bool HasAnyArrivedMessages(Chat chat)
+    public void SetProgress(MessengerProgress loadedProgress)
     {
-        if (chat == null || chat.messages == null) return false;
-        // 도착한 트리거 중 이 채팅에 해당하는 메시지가 하나라도 있는지 확인
-        return progress.activatedTriggersOrdered.Any(triggerId => chat.messages.Any(msg => msg.triggerId == triggerId));
-    }
+        progress = loadedProgress ?? new MessengerProgress();
+        progress.conversationSeenIndices ??= new Dictionary<string, int>();
+        progress.revealedMessageIndices ??= new Dictionary<string, HashSet<int>>();
+        progress.readMessageIndices ??= new Dictionary<string, HashSet<int>>();
+        progress.activatedTriggersOrdered ??= new List<string>();
+        progress.daySeparators ??= new Dictionary<string, Dictionary<int, int>>();
 
-    private bool HasUnreadMessages(Chat chat)
-    {
-        if (chat == null || chat.messages == null) return false;
+        foreach (string partnerName in progress.readMessageIndices.Keys.ToList())
+            UpdateContiguousSeenIndex(partnerName);
 
-        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
-        {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        // 2. 마지막으로 본 메시지가 도착한 메시지 리스트의 몇 번째인지 확인
-        int lastSeenIndex = GetLastSeenIndex(chat);
-        if (lastSeenIndex == -1) // 한 번도 안 봤다면
-        {
-            return arrivedMessages.Count > 0; // 도착한 메시지가 있으면 안 읽은 것임
-        }
-
-        if (lastSeenIndex >= chat.messages.Count)
-        {
-            return false;
-        }
-
-        ChatMessage lastSeenMessage = chat.messages[lastSeenIndex];
-        int lastSeenPositionInArrivedList = arrivedMessages.IndexOf(lastSeenMessage);
-
-        if (lastSeenPositionInArrivedList == -1)
-        {
-            for (int i = arrivedMessages.Count - 1; i >= 0; i--)
-            {
-                if (chat.messages.IndexOf(arrivedMessages[i]) <= lastSeenIndex)
-                {
-                    lastSeenPositionInArrivedList = i;
-                    break;
-                }
-            }
-        }
-
-        // 3. 도착한 메시지 수와 마지막으로 본 메시지의 위치를 비교
-        return arrivedMessages.Count > lastSeenPositionInArrivedList + 1;
-    }
-    public void ReportAlarmState()
-    {
-        AlarmState currentState = AlarmState.None;
-
-        if (HasUnreadMandatoryMessages())
-        {
-            currentState = AlarmState.Mandatory;
-        }
-        else if (MessengerSaveSystem.PlayAlarmForSeenMessages && HasReadMandatoryMessages())
-        {
-            currentState = AlarmState.NonMandatory;
-        }
-        else if (HasUnreadMessagesForAllChats()) // 모든 채팅방 중 하나라도 안 읽은 게 있다면
-        {
-            currentState = AlarmState.NonMandatory;
-        }
-        PhoneManager.Instance.UpdateAppAlarmState(AppKey.Messenger, currentState);
-    }
-
-    private bool HasReadMandatoryMessages()
-    {
-        foreach (var chat in allChats)
-        {
-            if (HasReadMandatoryMessagesInChat(chat))
-                return true;
-        }
-        return false;
-    }
-
-    private bool HasReadMandatoryMessagesInChat(Chat chat)
-    {
-        if (chat == null || chat.messages == null) return false;
-        if (chat.useSaveSlotReadStateOnly) return false;
-
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
-        {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        string partnerName = chat.chatPartner.chatPartnerName;
-        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-
-        int slotSeenIndex = -1;
-        if (progress.conversationSeenIndices.TryGetValue(partnerName, out int index))
-        {
-            slotSeenIndex = index;
-        }
-
-        foreach (var msg in arrivedMessages)
-        {
-            int originalIndex = chat.messages.IndexOf(msg);
-            if (originalIndex > slotSeenIndex && originalIndex <= profileSeenIndex && msg.isMandatory)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private bool HasUnreadMessagesForAllChats()
-    {
-        return allChats.Any(chat => HasUnreadMessages(chat));
-    }
-
-    private bool HasUnreadMandatoryMessages()
-    {
-        foreach (var chat in allChats)
-        {
-            if (HasUnreadMandatoryMessagesInChat(chat))
-                return true;
-        }
-        return false;
-    }
-
-    private bool HasUnreadMandatoryMessagesInChat(Chat chat)
-    {
-        if (chat == null || chat.messages == null) return false;
-
-        // 1. 이 채팅방에서 도착한 모든 메시지를 도착 순서대로 정렬
-        List<ChatMessage> arrivedMessages = new List<ChatMessage>();
-        foreach (string triggerId in progress.activatedTriggersOrdered)
-        {
-            arrivedMessages.AddRange(chat.messages.Where(msg => msg.triggerId == triggerId));
-        }
-
-        // 2. 이 채팅에서 알람 판정에 사용할 읽음 인덱스 확인
-        string partnerName = chat.chatPartner.chatPartnerName;
-        int seenIndex = chat.useSaveSlotReadStateOnly
-            ? GetSlotSeenIndex(chat)
-            : MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-        if (seenIndex == -1) // 한 번도 안 봤다면
-        {
-            // 도착한 메시지 중에 필수 메시지가 있는지 확인
-            return arrivedMessages.Any(msg => msg.isMandatory);
-        }
-
-        if (seenIndex >= chat.messages.Count)
-        {
-            return false;
-        }
-
-        ChatMessage seenMessage = chat.messages[seenIndex];
-        int positionInArrivedList = arrivedMessages.IndexOf(seenMessage);
-
-        if (positionInArrivedList == -1)
-        {
-            for (int i = arrivedMessages.Count - 1; i >= 0; i--)
-            {
-                if (chat.messages.IndexOf(arrivedMessages[i]) <= seenIndex)
-                {
-                    positionInArrivedList = i;
-                    break;
-                }
-            }
-        }
-
-        // 3. 아직 프로필 기준으로도 안 본 메시지들 중에 필수 메시지가 있는지 확인
-        return arrivedMessages
-            .Skip(positionInArrivedList + 1)
-            .Any(msg => msg.isMandatory);
-    }
-
-    private int GetLastSeenIndex(Chat chat)
-    {
-        if (chat == null || chat.chatPartner == null) return -1;
-
-        string partnerName = chat.chatPartner.chatPartnerName;
-        int slotSeenIndex = GetSlotSeenIndex(chat);
-        if (chat.useSaveSlotReadStateOnly)
-        {
-            return slotSeenIndex;
-        }
-
-        int profileSeenIndex = MessengerSaveSystem.GetLastSeenIndex(partnerName, chat.messages.Count);
-
-        // 설정이 꺼진 경우: 이미 읽은 경우 메신저 자체에서도 읽은 판정
-        if (!MessengerSaveSystem.PlayAlarmForSeenMessages)
-        {
-            if (slotSeenIndex > profileSeenIndex)
-            {
-                MessengerSaveSystem.MarkAsRead(partnerName, slotSeenIndex);
-                return slotSeenIndex;
-            }
-            return profileSeenIndex;
-        }
-
-        // 설정이 켜진 경우: 이미 프로필에서 읽었더라도 슬롯 기준 아직 안 읽었다면 새로 온 판정(Unread)으로 처리
-        // 만약 슬롯의 진행도가 프로필보다 높다면(프로필 데이터 유실 등), 영구적인 알람(소프트락) 방지를 위해 프로필을 동기화합니다.
-        if (slotSeenIndex > profileSeenIndex)
-        {
-            MessengerSaveSystem.MarkAsRead(partnerName, slotSeenIndex);
-        }
-
-        return slotSeenIndex;
-    }
-
-    private void SetLastSeenIndex(Chat chat, int index)
-    {
-        string partnerName = chat.chatPartner.chatPartnerName;
-        progress.conversationSeenIndices[partnerName] = index;
-        if (!chat.useSaveSlotReadStateOnly)
-        {
-            MessengerSaveSystem.MarkAsRead(partnerName, index);
-        }
-    }
-
-    private int GetSlotSeenIndex(Chat chat)
-    {
-        if (chat == null || chat.chatPartner == null) return -1;
-
-        string partnerName = chat.chatPartner.chatPartnerName;
-        return progress.conversationSeenIndices.TryGetValue(partnerName, out int index)
-            ? index
-            : -1;
-    }
-
-    public MessengerProgress GetProgress()
-    {
-        return progress;
-    }
-
-    public void SetProgress(MessengerProgress pro)
-    {
-        progress = pro;
+        RestorePendingMandatoryMessages();
         UpdateMessenger();
     }
 
+    private void RestorePendingMandatoryMessages()
+    {
+        mandatoryEntries.Clear();
+        heldOptionalMessages.Clear();
+        mandatoryPopupOpen = false;
+        mandatoryMessagePopup?.Hide();
+
+        foreach (string triggerId in progress.activatedTriggersOrdered.ToList())
+        {
+            List<MessageReference> references = GetReferencesForTrigger(triggerId);
+            List<MessageReference> pendingRequired = references
+                .Where(reference => RequiresMandatoryPopup(reference.chat, reference.index))
+                .ToList();
+
+            if (pendingRequired.Count == 0)
+            {
+                foreach (MessageReference reference in references)
+                {
+                    if (!IsMessageRevealed(reference.chat, reference.index))
+                        RevealMessage(reference);
+                }
+                continue;
+            }
+
+            foreach (MessageReference reference in references)
+            {
+                if (pendingRequired.Contains(reference))
+                    mandatoryEntries.Add(new MandatoryEntry { reference = reference });
+                else if (!IsMessageRevealed(reference.chat, reference.index))
+                    heldOptionalMessages.Add(reference);
+            }
+        }
+
+        if (mandatoryEntries.Count == 0) return;
+        if (mandatoryMessagePopup == null)
+        {
+            Debug.LogError("[Messenger] 저장 복원 중 필수 메시지 팝업 참조를 찾지 못했습니다.", this);
+            return;
+        }
+
+        mandatoryPopupOpen = true;
+        mandatoryPopupIndex = 0;
+        ShowCurrentMandatoryMessage();
+    }
 
     public bool IsTriggerFullySeen(string triggerId)
     {
-        foreach (var chat in allChats)
+        foreach (MessageReference reference in GetReferencesForTrigger(triggerId))
         {
-            // 1. 이 채팅방에서 해당 트리거 아이디를 사용하는 '가장 마지막 메시지'의 인덱스를 찾습니다.
-            int lastTargetIndex = -1;
-            for (int i = 0; i < chat.messages.Count; i++)
-            {
-                if (chat.messages[i].triggerId == triggerId)
-                {
-                    lastTargetIndex = i;
-                }
-            }
-
-            // 해당 채팅방에 이 트리거가 없다면 다음 채팅방으로
-            if (lastTargetIndex == -1) continue;
-
-            // 2. 현재 저장된 진행도(LastSeenIndex)와 비교합니다.
-            int currentSeenIndex = GetLastSeenIndex(chat);
-
-            // 마지막 메시지 인덱스보다 현재 본 인덱스가 작다면 아직 다 안 본 것임
-            if (currentSeenIndex < lastTargetIndex)
+            if (!IsMessageRevealed(reference.chat, reference.index)
+                || !IsMessageRead(reference.chat, reference.index))
             {
                 return false;
             }
         }
-
-        // 모든 채팅방을 검사했는데 미진행된 트리거 메시지가 없다면 완료된 것임
         return true;
     }
 
-    private bool doubleClose = false;
     public void CheckCoroutineByTab(bool open)
     {
-        if (!open && alreadyOpenChatRoom == true)
+        if (!open && alreadyOpenChatRoom)
         {
             if (!closedByTabShowingChat)
                 doubleClose = true;
-
-            if (messageDisplayCoroutine != null)
-            {
-                StopCoroutine(messageDisplayCoroutine);
-                IsDisplayingMessages = false;
-            }
+            StopMessageDisplay();
             closedByTabShowingChat = true;
         }
-        if (closedByTabShowingChat && open && alreadyOpenChatRoom == true)
-        {
-            if (doubleClose == true)
-            {
-                doubleClose = false;
-                scrollRect.verticalNormalizedPosition = 1f;
-                OpenChatRoom(currentChat);
-                return;
-            }
+
+        if (!closedByTabShowingChat || !open || !alreadyOpenChatRoom) return;
+        if (doubleClose)
+            doubleClose = false;
+        if (scrollRect != null)
             scrollRect.verticalNormalizedPosition = 1f;
-            OpenChatRoom(currentChat);
-            closedByTabShowingChat = false;
-        }
+        OpenChatRoom(currentChat);
+        closedByTabShowingChat = false;
     }
 }

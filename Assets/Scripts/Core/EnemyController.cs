@@ -365,6 +365,9 @@ public class EnemyController : MonoBehaviour
 
     public void WaveSkip()
     {
+        if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
+            return;
+
         if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave != noneWave)
         {
             currentWave = noneWave;
@@ -602,6 +605,11 @@ public class EnemyController : MonoBehaviour
         StartCoroutine(TEnemyWaveCoroutine());
     }
 
+    public IEnumerator TutorialWaveCoroutine()
+    {
+        yield return TEnemyWaveCoroutine();
+    }
+
     private IEnumerator TEnemyWaveCoroutine()
     {
         //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
@@ -658,6 +666,9 @@ public class EnemyController : MonoBehaviour
 
     public void SkipWaveEffect()
     {
+        if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
+            return;
+
         isWaveSkipped = true;
         waveManager.SkipWaveEffect();
     }

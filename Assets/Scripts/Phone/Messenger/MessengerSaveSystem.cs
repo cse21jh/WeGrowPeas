@@ -16,6 +16,12 @@ public static class MessengerSaveSystem
         }
     }
 
+    public static void MarkMessageAsRead(string partnerName, int index)
+    {
+        if (string.IsNullOrEmpty(partnerName) || index < 0) return;
+        _readKeys.Add($"{partnerName}_{index}");
+    }
+
     public static bool IsRead(string partnerName, int index)
     {
         if (string.IsNullOrEmpty(partnerName)) return false;

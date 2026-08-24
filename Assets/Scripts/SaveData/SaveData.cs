@@ -232,6 +232,17 @@ public class PhoneSave
     // dayChatPartners[i]의 날짜 구분선이 dayByChatPartners[i] (인덱스 매칭)
     public List<string> dayChatPartners = new();
     public List<ChatDayData> dayByChatPartners = new();
+
+    // 메시지 단위 공개/읽음 상태. 비어 있으면 conversationSeenIndices 기반의 이전 저장으로 간주한다.
+    public List<ChatMessageStateData> messageStates = new();
+}
+
+[Serializable]
+public class ChatMessageStateData
+{
+    public string partnerName;
+    public List<int> revealedIndices = new();
+    public List<int> readIndices = new();
 }
 
 /// <summary>보유 능력 / 유전자 저장고 (AbilityManager).</summary>

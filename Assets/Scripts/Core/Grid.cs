@@ -1470,6 +1470,9 @@ public class Grid : MonoBehaviour
 
     private void SpawnRandomBug(bool ignoreStageGate = false)
     {
+        if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
+            return;
+
         int stage = GameManager.Instance.stage;
         if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;

@@ -210,13 +210,20 @@ public class TimerUI : MonoBehaviour
         }
     }
 
-    public void ShowPhoneAlarmText()
+    public void ShowPhoneAlarmText(bool isMessengerMandatory = false)
     {
         if (!breedTimerController.isLocked)
         {
             waveText = GameManager.Instance.enemyController.GetNextWaveText();
-            GameManager.Instance.enemyController.SetNextWaveText("<color=#FF4F4F>폰 알람</color> 확인!");
             breedTimerController.LockText();
+        }
+
+        if (waveText != null)
+        {
+            string alarmText = isMessengerMandatory
+                ? "<color=#FF4F4F>좌측 메세지</color> 확인!"
+                : "<color=#FF4F4F>폰 알람</color> 확인!";
+            GameManager.Instance.enemyController.SetNextWaveText(alarmText);
         }
     }
 
