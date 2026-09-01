@@ -42,7 +42,17 @@ public class BreedCountItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
+        bool counterWasActive = ctx.Grid.GetIsBreeding();
+        int previousRemainingCount = ctx.Grid.GetEffectiveRemainingBreedCount();
         ctx.Grid.AddMaxBreedCount(1);
+        int currentRemainingCount = ctx.Grid.GetEffectiveRemainingBreedCount();
+
+        GameEvents.RaiseBreedCountFeedback(
+            new BreedCountFeedbackData(
+                1,
+                previousRemainingCount,
+                currentRemainingCount,
+                counterWasActive));
 
         UpdatePrice(ctx);
     }

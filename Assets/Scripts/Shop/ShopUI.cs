@@ -391,7 +391,7 @@ public class ShopUI : MonoBehaviour
         // 무료 횟수가 없으면 골드 지불
         if (economy != null && economy.HasGold(rerollPrice))
         {
-            economy.SpendGold(rerollPrice);
+            economy.SpendGold(rerollPrice, GoldFeedbackReason.ShopReroll);
             SoundManager.Instance.PlayEffect("Button");
             shopManager.IncrementRerollCount(); // 리롤 횟수 증가 (다른 시드 사용)
             session.ClearThisShop(); // 세션 초기화 (구매 이력 리셋)

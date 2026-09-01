@@ -229,7 +229,7 @@ public class ShopController
 
         if (economy != null && economy.HasGold(RerollPrice))
         {
-            economy.SpendGold(RerollPrice);
+            economy.SpendGold(RerollPrice, GoldFeedbackReason.ShopReroll);
             SoundManager.Instance?.PlayEffect("Button");
             shopManager.IncrementRerollCount();
             session.ClearThisShop();

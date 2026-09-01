@@ -43,7 +43,6 @@ public abstract class MovablePlant : Plant
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);
         if(GameManager.Instance)
             CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
-        TryRootByDawn(); // 새벽: 등장 시 확률로 뿌리
     }
 
     protected void Update()
@@ -160,9 +159,11 @@ public abstract class MovablePlant : Plant
         transform.position = worldPos;
     }
 
-    public void SetMovable(bool value)
+    public void SetMovable(bool value, PlantValueChangeReason reason = PlantValueChangeReason.None)
     {
+        int previousSellingPrice = GetSellingPrice();
         isReallyMovable = value;
+        RefreshSellingPriceAndNotify(previousSellingPrice, reason);
     }
 
     // 새벽: 등장/이동 시 확률로 뿌리를 내려 이동 불가가 됨
@@ -173,13 +174,19 @@ public abstract class MovablePlant : Plant
         if (chance <= 0f) return;
         if (UnityEngine.Random.Range(0f, 100f) < chance)
         {
-            SetMovable(false); // TODO: 뿌리 시각효과
+            SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
 
             // 특수(임시땅콩C): 뿌리를 내리면 모든 저항력 40%p 증가
             if (SpecialItemSystem.Has("peanut_special_12"))
                 for (int i = 0; i < Wave.NumberOfWave; i++)
                     ChangeResistance(i, 0.4f);
         }
+    }
+
+    /// <summary>새 식물이 실제 흙 위치에 놓인 뒤 등장 시 뿌리 판정을 수행한다.</summary>
+    public void TryRootAfterPlacement()
+    {
+        TryRootByDawn();
     }
 
     public void CheckResistanceScouterImage(WaveType wave)

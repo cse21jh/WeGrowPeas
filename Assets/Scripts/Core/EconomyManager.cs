@@ -24,6 +24,11 @@ public class EconomyManager : MonoBehaviour
     /// <summary>오늘 번 골드. <see cref="PushEarnedGold"/>로 그래프에 밀어넣으면 0으로 초기화된다.</summary>
     public int EarnedGoldToday => earnedGoldToday;
 
+    private void Awake()
+    {
+        EconomyFeedbackController.EnsureExists(CoinUI);
+    }
+
     private void Start()
     {
         UpdateCoinUI(gold);
@@ -40,11 +45,16 @@ public class EconomyManager : MonoBehaviour
 
     public bool HasGold(int amount) => gold >= amount;
 
-    public void SpendGold(int amount)
+    public void SpendGold(int amount, GoldFeedbackReason reason = GoldFeedbackReason.Other)
     {
         gold -= amount;
         consumeGold += amount;
         UpdateCoinUI(gold);
+        if (amount > 0)
+        {
+            GameEvents.RaiseGoldFeedback(
+                GoldFeedbackData.HudOnly(-amount, gold, reason));
+        }
         Debug.Log($"골드 {amount} 사용 → 남은 {gold}");
     }
 
@@ -57,7 +67,7 @@ public class EconomyManager : MonoBehaviour
         Debug.Log($"골드 {amount} 획득 → 합계 {gold}");
     }
 
-    public string ToAbbreviatedString(int number)
+    public static string ToAbbreviatedString(int number)
     {
         float value = number;
 

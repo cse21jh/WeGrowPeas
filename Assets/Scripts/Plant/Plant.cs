@@ -688,6 +688,7 @@ public abstract class Plant : MonoBehaviour
     {
         if (isFrozen) return;
 
+        int previousSellingPrice = GetSellingPrice();
         resistWaveCount++;
 
         // 특수(세계여행): 낮 동안 이동한 맨해튼 거리(최초↔최종 위치) 한 칸마다 판매 골드 배수 +0.1
@@ -757,7 +758,7 @@ public abstract class Plant : MonoBehaviour
         {
             FenceUIManager.Instance.SetFenceElements(plantID, this);
         }
-        priceSign.SetPrice(GetSellingPrice());
+        RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.WaveSurvived);
     }
 
     public bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
@@ -852,11 +853,42 @@ public abstract class Plant : MonoBehaviour
         return price;
     }
 
+    protected void RefreshSellingPriceAndNotify(int previousPrice, PlantValueChangeReason reason)
+    {
+        int currentSellingPrice = GetSellingPrice();
+        if (priceSign != null)
+            priceSign.SetPrice(currentSellingPrice);
+
+        if (reason == PlantValueChangeReason.None || currentSellingPrice <= previousPrice)
+            return;
+
+        GameEvents.RaisePlantValueFeedback(new PlantValueFeedbackData(
+            GetInstanceID(),
+            previousPrice,
+            currentSellingPrice,
+            reason,
+            transform.position));
+    }
+
+    /// <summary>외부 가격 배율 변경 뒤 가격표를 갱신하고, 실제 상승분이 있으면 연출을 요청한다.</summary>
+    public void RefreshSellingPriceAndNotifyExternal(int previousPrice, PlantValueChangeReason reason)
+    {
+        RefreshSellingPriceAndNotify(previousPrice, reason);
+    }
+
+    /// <summary>저장 데이터 복원처럼 연출이 필요 없는 경우 가격표만 현재 값으로 맞춘다.</summary>
+    public void RefreshSellingPriceDisplay()
+    {
+        if (priceSign != null)
+            priceSign.SetPrice(GetSellingPrice());
+    }
+
     /// <summary>완두커피: 자유시간이 지날 때마다 호출되어 판매 골드 배수를 누적한다. (Grid.Breeding 종료 시)</summary>
     public void OnFreeTimePassed()
     {
+        int previousSellingPrice = GetSellingPrice();
         freeTimePassedCount++;
-        priceSign.SetPrice(GetSellingPrice());
+        RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.FreeTimePassed);
     }
 
     public int GetFreeTimePassedCount() => freeTimePassedCount;
@@ -883,10 +915,11 @@ public abstract class Plant : MonoBehaviour
         priceSign.SetPrice(GetSellingPrice());
     }
 
-    public void AddBonusGoldMultiplier(int amount)
+    public void AddBonusGoldMultiplier(int amount, PlantValueChangeReason reason = PlantValueChangeReason.None)
     {
+        int previousSellingPrice = GetSellingPrice();
         bonusGoldMultiplierCount += amount;
-        priceSign.SetPrice(GetSellingPrice());
+        RefreshSellingPriceAndNotify(previousSellingPrice, reason);
     }
 
     public int GetBonusGoldMultiplierCount()

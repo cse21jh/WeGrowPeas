@@ -124,13 +124,31 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
             Plant target = plant;
             if (plant != null && !plant.isDying)
             {
+                // Die()가 그리드에서 식물을 제거하고 사망 보너스를 지급하므로,
+                // 판매 연출에 필요한 값은 호출 전에 스냅샷으로 보관한다.
+                int sellingPrice = plant.GetSellingPrice();
+                int goldBeforeSale = economyManager.GetGold();
+                Vector3 feedbackWorldOrigin = plant.transform.position;
+
                 SoundManager.Instance.PlayEffect("Shovel");
                 if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
                     economyManager.AddSellCount(plant.speciesname);
-                    economyManager.AddGold(plant.GetSellingPrice());
-                    grid.TryUpdateMostExpensivePlant(plant.GetSellingPrice());
+                    economyManager.AddGold(sellingPrice);
+                    grid.TryUpdateMostExpensivePlant(sellingPrice);
                     grid.HealNeighborsBySell(plant.gridIndex); // 특수(순환): 주변 저항 회복
+
+                    // Die() 내부의 사망 보너스까지 포함해 실제 잔액 변화량과 연출 금액을 일치시킨다.
+                    int totalEarned = economyManager.GetGold() - goldBeforeSale;
+                    if (totalEarned > 0)
+                    {
+                        GameEvents.RaiseGoldFeedback(new GoldFeedbackData(
+                            totalEarned,
+                            economyManager.GetGold(),
+                            GoldFeedbackReason.PlantSale,
+                            feedbackWorldOrigin));
+                    }
+
                     GameEvents.RaisePeaSold(target);
                 }
                 return;

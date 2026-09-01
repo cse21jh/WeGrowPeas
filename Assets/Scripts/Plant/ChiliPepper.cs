@@ -16,8 +16,12 @@ public class ChiliPepper : Plant
 
     public override void ResistWave(WaveType waveType)
     {
+        int previousSellingPrice = GetSellingPrice();
+
         // 특수(채식주의자): 웨이브를 버틸 때마다 가치 증가
         if (SpecialItemSystem.Has("vegetarian")) resistWaveCount++;
+
+        RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.WaveSurvived);
         return;
     }
     public override int GetSellingPrice()

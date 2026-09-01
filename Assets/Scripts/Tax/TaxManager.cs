@@ -82,7 +82,7 @@ public class TaxManager : Singleton<TaxManager>
         if (Economy == null || !Economy.HasGold(amount))
             return false;
 
-        Economy.SpendGold(amount);
+        Economy.SpendGold(amount, GoldFeedbackReason.Tax);
         lastPaidTaxStage = taxStage;
         Debug.Log($"[Tax] {taxStage}일차 세금 {amount} 납부 완료. 다음 세금일 {DueTaxStage} ({DueAmount})");
         return true;

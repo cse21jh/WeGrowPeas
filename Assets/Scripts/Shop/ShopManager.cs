@@ -259,7 +259,7 @@ public class ShopManager : Singleton<ShopManager>
         }
 
         // 결제
-        ctx.Economy.SpendGold(price);
+        ctx.Economy.SpendGold(price, GoldFeedbackReason.ShopPurchase);
         GameEvents.RaiseShopBought(data);
 
         // 신용카드 정산용 일일 집계

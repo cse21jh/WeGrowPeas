@@ -53,6 +53,64 @@ public static class GameEvents
     public static event Action<int> OnGoldChanged;
     public static void RaiseGoldChanged(int gold) => OnGoldChanged?.Invoke(gold);
 
+    /// <summary>골드 증감에 대한 시각 피드백을 요청한다.</summary>
+    public static event Action<GoldFeedbackData> OnGoldFeedbackRequested;
+    public static void RaiseGoldFeedback(GoldFeedbackData data)
+    {
+        try
+        {
+            OnGoldFeedbackRequested?.Invoke(data);
+        }
+        catch (Exception exception)
+        {
+            // 장식용 피드백 실패가 결제·보상 같은 게임 로직을 중단시키지 않게 격리한다.
+            Debug.LogException(exception);
+        }
+    }
+
+    /// <summary>식물 가치 상승에 대한 시각 피드백을 요청한다.</summary>
+    public static event Action<PlantValueFeedbackData> OnPlantValueFeedbackRequested;
+    public static void RaisePlantValueFeedback(PlantValueFeedbackData data)
+    {
+        try
+        {
+            OnPlantValueFeedbackRequested?.Invoke(data);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+    }
+
+    /// <summary>화면에 표시되는 남은 교배 횟수가 바뀔 때 호출한다.</summary>
+    public static event Action<int> OnBreedCountChanged;
+    public static void RaiseBreedCountChanged(int count)
+    {
+        try
+        {
+            OnBreedCountChanged?.Invoke(count);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+    }
+
+    /// <summary>교배 횟수 증가에 대한 HUD 피드백을 요청한다.</summary>
+    public static event Action<BreedCountFeedbackData> OnBreedCountFeedbackRequested;
+    public static void RaiseBreedCountFeedback(BreedCountFeedbackData data)
+    {
+        try
+        {
+            OnBreedCountFeedbackRequested?.Invoke(data);
+        }
+        catch (Exception exception)
+        {
+            // 장식용 피드백 실패가 아이템 구매 결과를 되돌리지 않게 격리한다.
+            Debug.LogException(exception);
+        }
+    }
+
     public static event Action OnPlantMoved;
     public static void RaisePlantMoved() => OnPlantMoved?.Invoke();
 
@@ -85,5 +143,9 @@ public static class GameEvents
         OnDayEndedWithRemainingBreeds = null;
         OnPeaDiedByBug = null;
         OnGoldChanged = null;
+        OnGoldFeedbackRequested = null;
+        OnPlantValueFeedbackRequested = null;
+        OnBreedCountChanged = null;
+        OnBreedCountFeedbackRequested = null;
     }
 }

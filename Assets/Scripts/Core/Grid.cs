@@ -241,6 +241,7 @@ public class Grid : MonoBehaviour
         plantGrid.Clear();
         breedButton.SetActive(false);
         breedButtonPlant = null;
+        EconomyFeedbackController.BindBreedCountUi(breedCountUI);
     }
 
     // Update is called once per frame
@@ -698,10 +699,16 @@ public class Grid : MonoBehaviour
     private void PlantPlant(Plant plant)
     {
         plantGrid[plant.gridIndex] = plant;
-        UpdateGoldScouterImageInGrid();
-        enemyController.UpdateCurrentWaveAlarm();
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
+
+        // 저장 복원 중에는 기존 뿌리 상태를 아래에서 그대로 불러온다.
+        // 새 식물은 실제 흙 위치로 옮긴 뒤 판정해야 가격 상승 팝업도 올바른 곳에서 시작한다.
+        if (!isLoadingGrid && plant is MovablePlant movablePlant)
+            movablePlant.TryRootAfterPlacement();
+
+        UpdateGoldScouterImageInGrid();
+        enemyController.UpdateCurrentWaveAlarm();
 
         // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
         if (!isLoadingGrid)
@@ -787,9 +794,11 @@ public class Grid : MonoBehaviour
     /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
     public void AddLandRichColumn()
     {
+        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         int col = Random.Range(0, maxCol);
         if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
         columnGoldMulBonus[col] += 0.5f;
+        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
         Debug.Log($"[SpecialItem] 땅부자: {col + 1}번째 세로줄에 고속 숙성 효과 (+0.5, 누적 {columnGoldMulBonus[col]})");
     }
 
@@ -1009,9 +1018,17 @@ public class Grid : MonoBehaviour
             // breedCount는 이미 사용한 횟수이므로 변경하지 않음
             // maxBreedCount가 증가하면 자동으로 남은 횟수가 증가함
             // UI 업데이트
-            int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)));
-            UpdateBreedCountUI(effectiveMaxBreedCount - breedCount);
+            UpdateBreedCountUI(GetEffectiveRemainingBreedCount());
         }
+    }
+
+    public int GetEffectiveRemainingBreedCount()
+    {
+        int effectiveMaxBreedCount = Mathf.Max(
+            1,
+            Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1))
+                + GetKingReturnBreedDelta());
+        return Mathf.Max(0, effectiveMaxBreedCount - breedCount);
     }
 
     public int GetMaxCol()
@@ -1432,6 +1449,7 @@ public class Grid : MonoBehaviour
     protected void UpdateBreedCountUI(int count)
     {
         breedCountUI.text = $"{count}회";
+        GameEvents.RaiseBreedCountChanged(count);
     }
 
     /// <summary>디버그 전용: 벌레(또는 확률에 따라 무당벌레) 1마리를 즉시 소환한다. 등장 스테이지 제한 무시.</summary>
@@ -1528,7 +1546,7 @@ public class Grid : MonoBehaviour
             }
             // 대상 칸에 식물이 있는 경우: 서로 위치 교환
             Plant targetPlant = plantGrid[toIndex];
-
+            Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
 
             // 서로 gridIndex 바꾸기
             plant.SetGridIndex(toIndex);
@@ -1555,12 +1573,13 @@ public class Grid : MonoBehaviour
             }
 
             OnGridStateChanged?.Invoke();
+            RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.Moved);
             if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;
         }
         else
         {
-
+            Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
             // 빈 칸이면 원래대로 심기
             plantGrid.Remove(fromIndex); // 원래 위치에서 제거
             plant.SetGridIndex(toIndex);
@@ -1572,6 +1591,7 @@ public class Grid : MonoBehaviour
                 p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
             }
             OnGridStateChanged?.Invoke();
+            RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.Moved);
             if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;
         }
@@ -1798,7 +1818,7 @@ public class Grid : MonoBehaviour
             plant.SetFreeTimePassedCount(item.freeTimePassedCount); // 완두커피 복원
             plant.SetHasTriedBreed(item.hasTriedBreed); // 활성형 껍질 복원
 
-            // 뿌리 상태 복원. Init()의 TryRootByDawn이 로드 중 새로 뿌리를 내릴 수 있으므로 반드시 그 뒤에 덮어쓴다.
+            // 뿌리 상태 복원. 로드 중에는 새 뿌리 판정을 하지 않고 저장값을 그대로 사용한다.
             if (plant is MovablePlant movablePlant)
                 movablePlant.SetMovable(!item.isRooted);
 
@@ -1920,6 +1940,7 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < saveData.fertilizerColumns.Count; i++)
             TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
 
+        RefreshAllPlantSellingPriceDisplays();
         mostExpensivePlant = saveData.mostExpensivePlant;
     }
 
@@ -2564,9 +2585,51 @@ public class Grid : MonoBehaviour
         return additionalBugGold;
     }
 
+    private Dictionary<Plant, int> CapturePlantSellingPrices()
+    {
+        var previousPrices = new Dictionary<Plant, int>();
+        foreach (Plant plant in plantGrid.Values)
+        {
+            if (plant == null || plant.isDying)
+                continue;
+
+            previousPrices[plant] = plant.GetSellingPrice();
+        }
+
+        return previousPrices;
+    }
+
+    private void RefreshPlantSellingPricesAndNotify(
+        Dictionary<Plant, int> previousPrices,
+        PlantValueChangeReason reason)
+    {
+        if (previousPrices == null)
+            return;
+
+        foreach (KeyValuePair<Plant, int> entry in previousPrices)
+        {
+            Plant plant = entry.Key;
+            if (plant == null || plant.isDying)
+                continue;
+
+            plant.RefreshSellingPriceAndNotifyExternal(entry.Value, reason);
+        }
+    }
+
+    public void RefreshAllPlantSellingPriceDisplays()
+    {
+        foreach (Plant plant in plantGrid.Values)
+        {
+            if (plant != null && !plant.isDying)
+                plant.RefreshSellingPriceDisplay();
+        }
+    }
+
     public void AddAdditionalPlantGold(int value)
     {
+        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         additionalPlantGold += value;
+        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
 
     public int GetAdditionalPlantGold()
@@ -2576,7 +2639,9 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalPlantGoldMultiplier(float value)
     {
+        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         additionalPlantGoldMultiplier += value;
+        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
 
     public float GetAdditionalPlantGoldMultiplier()
@@ -2616,7 +2681,9 @@ public class Grid : MonoBehaviour
     /// <summary>완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수 증가.</summary>
     public void AddPeaCoffeeMultiplier(float value)
     {
+        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         peaCoffeeMultiplier += value;
+        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
 
     public float GetPeaCoffeeMultiplier()
@@ -2656,7 +2723,9 @@ public class Grid : MonoBehaviour
     /// <summary>땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매.</summary>
     public void AddLandAndBeanLevel(int value)
     {
+        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         landAndBeanLevel += value;
+        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
 
     /// <summary>땅과 콩: 웨이브가 지나간 후 식물이 뿌리를 내릴 확률(0~1). 구매 1회당 +10%p.</summary>
@@ -2685,7 +2754,7 @@ public class Grid : MonoBehaviour
             if (p is MovablePlant mp && mp.IsMovable && !mp.isDying)
             {
                 if (Random.value < chance)
-                    mp.SetMovable(false); // TODO: 뿌리 시각효과
+                    mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
             }
         }
     }

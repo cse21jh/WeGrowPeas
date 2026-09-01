@@ -335,7 +335,7 @@ public class GameManager : Singleton<GameManager>
 
         if (owed <= 0) yield break;
 
-        economyManager.SpendGold(owed); // 강제 차감(부족하면 음수)
+        economyManager.SpendGold(owed, GoldFeedbackReason.Tax); // 강제 차감(부족하면 음수)
 
         if (economyManager.GetGold() >= 0)
         {
@@ -511,6 +511,8 @@ public class GameManager : Singleton<GameManager>
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
         }
+        // 특수 아이템까지 복원된 최종 판매가를 표시한다. 로드 자체는 가치 상승 연출 대상이 아니다.
+        grid.RefreshAllPlantSellingPriceDisplays();
         PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
         RecallRecorder.LoadFromSave(saveData.recall);
 
