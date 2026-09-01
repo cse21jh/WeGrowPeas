@@ -21,6 +21,11 @@ public class LoadingScreen : MonoBehaviour
     [SerializeField] private TMP_Text percentText;     // "42%"
     [SerializeField] private TMP_Text tmiText;         // TMI 문구
 
+    [Header("Spinner")]
+    [SerializeField] private Image spinnerImage;
+    [Tooltip("로딩창을 열 때 이 배열의 스프라이트 중 하나를 무작위로 표시합니다.")]
+    [SerializeField] private Sprite[] spinnerSprites;
+
     [Header("Fade")]
     [SerializeField] private float fadeDuration = 0.25f;
 
@@ -102,11 +107,44 @@ public class LoadingScreen : MonoBehaviour
         tmiTimer = 0f;
 
         if (root != null) root.SetActive(true);
+        ApplyRandomSpinnerSprite();
         if (tmiText != null) tmiText.text = TmiPool.GetRandom();
         ApplyBar(0f);
 
         StopAllCoroutines();
         StartCoroutine(Fade(1f));
+    }
+
+    private void ApplyRandomSpinnerSprite()
+    {
+        if (spinnerImage == null || spinnerSprites == null || spinnerSprites.Length == 0)
+            return;
+
+        int validSpriteCount = 0;
+        for (int i = 0; i < spinnerSprites.Length; i++)
+        {
+            if (spinnerSprites[i] != null)
+                validSpriteCount++;
+        }
+
+        if (validSpriteCount == 0)
+            return;
+
+        int selectedIndex = Random.Range(0, validSpriteCount);
+        for (int i = 0; i < spinnerSprites.Length; i++)
+        {
+            Sprite sprite = spinnerSprites[i];
+            if (sprite == null)
+                continue;
+
+            if (selectedIndex == 0)
+            {
+                spinnerImage.sprite = sprite;
+                return;
+            }
+
+            selectedIndex--;
+        }
     }
 
     /// <summary>진행도 갱신(0~1).</summary>
