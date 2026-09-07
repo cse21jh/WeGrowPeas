@@ -27,6 +27,36 @@ public class CodexUIController : MonoBehaviour
     [Header("Footer")]
     [SerializeField] private TMP_Text pageText; // (현재) / (전체)
 
+    /// <summary>
+    /// 도감은 DontDestroyCanvas 아래에 있어 씬이 바뀌어도 살아남는다.
+    /// 게임 씬의 설정창처럼 다른 씬/프리팹의 버튼이 참조할 수 있도록 진입점을 열어 둔다.
+    /// (중복 정리는 부모의 TransitionController가 담당하므로 여기선 참조만 잡는다.)
+    /// </summary>
+    public static CodexUIController Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindAnyObjectByType<CodexUIController>(FindObjectsInactive.Include);
+            return _instance;
+        }
+    }
+    private static CodexUIController _instance;
+
+    private void Awake()
+    {
+        if (_instance == null) _instance = this;
+    }
+
+    private int _escapeFrame = -1;
+
+    /// <summary>
+    /// 이번 프레임에 ESC로 닫혔는가.
+    /// 설정창 위에 도감이 떠 있을 때 같은 ESC 입력을 설정창이 또 먹지 않게 하려는 것이다.
+    /// (Update 실행 순서가 보장되지 않아 IsOpen만으론 부족하다.)
+    /// </summary>
+    public bool ConsumedEscapeThisFrame => _escapeFrame == Time.frameCount;
+
     private CodexProgress.Category _cat = CodexProgress.Category.Item;
     private List<CodexEntry> _entries = new List<CodexEntry>();
     private readonly List<CodexListSlot> _slots = new List<CodexListSlot>();
@@ -40,7 +70,11 @@ public class CodexUIController : MonoBehaviour
     {
         // F8은 디버그용 단축키(정식 진입은 버튼). 디버그 패널이 꺼져 있으면 동작하지 않는다.
         if (DebugPanels.Enabled && Input.GetKeyDown(KeyCode.F8)) Toggle();
-        else if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseCodex();
+        else if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
+        {
+            _escapeFrame = Time.frameCount;
+            CloseCodex();
+        }
     }
 
     public void Toggle()

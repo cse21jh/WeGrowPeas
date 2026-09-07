@@ -38,6 +38,11 @@ public class SettingUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            // 도감이 설정창 위에 떠 있으면 ESC는 도감이 처리한다.
+            // 도감을 닫으면 설정창이 그대로 남아 있어야 하므로 여기선 아무것도 하지 않는다.
+            var codex = CodexUIController.Instance;
+            if (codex != null && (codex.IsOpen || codex.ConsumedEscapeThisFrame)) return;
+
             // 설정창이 열려 있으면 닫기 (기존 동작)
             if (SettingPanel != null && SettingPanel.activeSelf)
             {
@@ -99,6 +104,28 @@ public class SettingUI : MonoBehaviour
             ShowSettingPanel();
         return;
     }
+
+    /// <summary>
+    /// 설정창의 도감 버튼. 도감은 DontDestroyCanvas에 있어 씬을 넘어 유지되므로
+    /// 게임 씬에서도 같은 인스턴스를 연다.
+    ///
+    /// 설정창은 닫지 않고 그 위에 띄운다. 설정창이 열려 있는 동안은 timeScale이 0이라
+    /// 도감을 보는 동안 게임이 진행되지 않는다.
+    /// </summary>
+    public void OpenCodex()
+    {
+        var codex = CodexUIController.Instance;
+        if (codex == null)
+        {
+            // StartScene을 거치지 않고 게임 씬에서 바로 플레이하면 도감이 없다.
+            Debug.LogWarning("[SettingUI] 도감(CodexUIController)을 찾지 못했습니다. " +
+                             "StartScene에서 시작했는지 확인하세요.");
+            return;
+        }
+
+        codex.OpenCodex();
+    }
+
     public void PlayButtonClickSound()
     {
         SoundManager.Instance.PlayEffect("Button");
