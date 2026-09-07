@@ -216,6 +216,11 @@ public abstract class ItemData : ScriptableObject
 
     public virtual int GetDisplayPrice()
     {
+        // int.MaxValue는 "더 이상 구매 불가"를 뜻하는 신호값이다.
+        // 배수를 곱하면 float로 넘어가며 자릿수가 넘쳐 int.MinValue로 뒤집히고,
+        // 그러면 가격표를 떼는 조건(price == int.MaxValue)이 전부 깨진다. 그대로 돌려준다.
+        if (Price == int.MaxValue) return int.MaxValue;
+
         // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
         float mul = DawnSystem.Current.shopPriceMultiplier;
         float price = Price * (mul > 0f ? mul : 1f);
@@ -253,6 +258,13 @@ public abstract class ItemData : ScriptableObject
         if (MaxPurchaseCount < 0) return true; // -1 = ������
         return GetTotalPurchaseCount() < MaxPurchaseCount;
     }
+
+    /// <summary>
+    /// 배지·재고 문구에 쓸 실제 구매 한도. -1이면 무제한.
+    /// 기본은 <see cref="MaxPurchaseCount"/>지만, 자체 한도를 쓰는 아이템은 override 한다.
+    /// 구매 차단은 각 아이템의 CanPurchase가 담당하므로 이 값은 표시 전용이다.
+    /// </summary>
+    public virtual int EffectivePurchaseLimit => MaxPurchaseCount;
 
     // === 공통 헬퍼 메서드 ===
 

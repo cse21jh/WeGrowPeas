@@ -85,8 +85,10 @@ public class ItemController : MonoBehaviour
         if (buyButtonText != null)
             buyButtonText.text = needsSelection ? "선택하기" : "구매하기";
 
-        // 더 이상 살 수 없는 아이템(가격 숨김)은 비활성화
-        buyButton.interactable = item.GetDisplayPrice() != int.MaxValue;
+        // 더 이상 살 수 없으면 비활성화. 상세 패널의 구매 버튼과 같은 규칙을 쓴다.
+        bool soldOut = item.GetDisplayPrice() == int.MaxValue;   // 구매 한도 소진 → 가격표를 뗀 상태
+        bool boughtThisShop = owner != null && owner.WasBoughtThisShop(item);
+        buyButton.interactable = !soldOut && !boughtThisShop;
 
         buyButton.onClick.RemoveAllListeners();
         buyButton.onClick.AddListener(() =>
@@ -150,10 +152,11 @@ public class ItemController : MonoBehaviour
     }
     #endregion
 
-    /// <summary>남은 구매 가능 횟수. MaxPurchaseCount가 -1(무제한)이면 0을 반환(표시 안 함).</summary>
+    /// <summary>남은 구매 가능 횟수. 한도가 -1(무제한)이면 0을 반환(표시 안 함).</summary>
     private static int GetRemainingPurchaseCount(ItemData item)
     {
-        if (item.MaxPurchaseCount < 0) return 0;
-        return Mathf.Max(0, item.MaxPurchaseCount - item.GetTotalPurchaseCount());
+        int limit = item.EffectivePurchaseLimit;
+        if (limit < 0) return 0;
+        return Mathf.Max(0, limit - item.GetTotalPurchaseCount());
     }
 }

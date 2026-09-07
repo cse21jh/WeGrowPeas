@@ -25,7 +25,7 @@ public static class ShopBadge
         if (gradeText != null) gradeText.text = $"{GetGrade(item)}등급";
 
         // 품목 제한: 전체 구매 제한이 있는 아이템만 표시
-        bool hasLimit = item.MaxPurchaseCount >= 0;
+        bool hasLimit = item.EffectivePurchaseLimit >= 0;
         if (limitObj != null) limitObj.SetActive(hasLimit);
         if (limitText != null && hasLimit) limitText.text = "품목 제한";
     }
@@ -34,9 +34,10 @@ public static class ShopBadge
     public static string GetStockText(ItemData item)
     {
         if (item == null) return "";
-        if (item.MaxPurchaseCount < 0) return "재고 제한 없음";
+        int limit = item.EffectivePurchaseLimit;
+        if (limit < 0) return "재고 제한 없음";
 
-        int remain = Mathf.Max(0, item.MaxPurchaseCount - item.GetTotalPurchaseCount());
+        int remain = Mathf.Max(0, limit - item.GetTotalPurchaseCount());
         return $"남은 수량 {remain}";
     }
 

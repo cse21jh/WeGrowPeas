@@ -41,10 +41,10 @@ public class ShopPopupController : MonoBehaviour
             string description = itemData.Description;
             
             // 구매 횟수 정보 추가
-            if (itemData.MaxPurchaseCount >= 0)
+            if (itemData.EffectivePurchaseLimit >= 0)
             {
                 int currentCount = itemData.GetTotalPurchaseCount();
-                int maxCount = itemData.MaxPurchaseCount;
+                int maxCount = itemData.EffectivePurchaseLimit;
                 description += $"\n\n구매 횟수: {currentCount}/{maxCount}";
             }
             

@@ -86,9 +86,11 @@ public class ShopCanvasController : MonoBehaviour
 
     private void OnEnable()
     {
-        // 상점을 열 때마다 목록을 최신 상태로 (다른 UI/시스템이 리롤했을 수 있음)
-        shop.InvalidateInventory();
-        ShowAll();
+        // 목록 캐시는 일부러 버리지 않는다.
+        // 여기서 InvalidateInventory를 부르면 GenerateInventory가 목록을 처음부터 다시 만드는데,
+        // 그 과정엔 이번 상점의 구매 이력(session)이 반영되지 않아 이미 산 품목이 되살아난다.
+        // 리롤/일일 리롤은 각자 캐시를 비우고 스테이지 변경은 GetInventory가 감지하므로 갱신은 정상 동작한다.
+        ShowAll();            // 가격·재고 문구는 슬롯을 다시 그리면서 갱신된다
         UpdateRerollButton();
     }
 
@@ -255,6 +257,9 @@ public class ShopCanvasController : MonoBehaviour
         data.SetSelectedOption(0); // 기본 선택 반영
         optionDropdown.onValueChanged.AddListener(idx => data.SetSelectedOption(idx));
     }
+
+    /// <summary>이번 상점에서 이미 구매해 더 살 수 없는 아이템인가. (슬롯 구매 버튼 잠금용)</summary>
+    public bool WasBoughtThisShop(ItemData data) => shop.WasBoughtThisShop(data);
 
     /// <summary>현재 인벤토리에서 고정 상품인지 판별.</summary>
     private bool IsFixedItem(ItemData data)

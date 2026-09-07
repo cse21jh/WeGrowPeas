@@ -23,6 +23,9 @@ public class AddSoilItemData : ItemData
     // 특수(땅부자): 추가 구매 가능 횟수 +8 (구매마다 무작위 세로줄 고속 숙성)
     private int EffectiveMaxPurchase => maxPurchase + (SpecialItemSystem.Has("land_rich") ? 8 : 0);
 
+    // MaxPurchaseCount는 -1(무제한)이라 목록에서 제거되지 않는다. 표시만 실제 한도를 따르게 한다.
+    public override int EffectivePurchaseLimit => EffectiveMaxPurchase;
+
     private void UpdatePrice(ShopContext ctx)
     {
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용

@@ -143,12 +143,11 @@ public class ShopManager : Singleton<ShopManager>
 
         // 상단: 고정
         foreach (var it in fixedItems)
-        { 
-            if (it)
-            {
-                inv.Fixed.Add(it);
-                it.InitializePrice(ctx);
-            }
+        {
+            if (!it) continue;
+            if (!it.CanPurchaseByLimit()) continue;              // 구매 제한 도달 시 제외 (로테이션과 동일 규칙)
+            inv.Fixed.Add(it);
+            it.InitializePrice(ctx);
         }
 
         // 하단: 로테이션 (ItemData가 해금/가중치 제공)
