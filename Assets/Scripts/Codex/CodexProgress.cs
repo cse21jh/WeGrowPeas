@@ -24,7 +24,7 @@ public static class CodexProgress
     private static Dictionary<string, int> _stats; // "sold_pea" -> 123
     private static bool _saveBlocked;              // 파일을 읽지 못했을 때 덮어쓰기 방지
 
-    private static string FilePath => Path.Combine(Application.persistentDataPath, "codex.json");
+    private static string FilePath => ProfileStore.PathOf("codex.json");
 
     [Serializable]
     private class CodexSaveData
@@ -120,6 +120,14 @@ public static class CodexProgress
     /// <summary>완두콩/땅콩 판매 수 누적.</summary>
     public static void AddSold(bool isPea, int count = 1)
         => AddStat(isPea ? StatSoldPea : StatSoldPeanut, count);
+
+    /// <summary>메모리의 도감을 버린다. 다음 접근 때 현재 프로필 파일에서 다시 읽는다. (프로필 전환용)</summary>
+    public static void Invalidate()
+    {
+        _discovered = null;
+        _stats = null;
+        _saveBlocked = false;
+    }
 
     // ── 테스트/리셋용 ─────────────────────────────────────────────────────────
     public static void ResetAll()

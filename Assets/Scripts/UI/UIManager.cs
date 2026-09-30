@@ -6,11 +6,8 @@ using UnityEngine.SceneManagement;
 public class UIManager : Singleton<UIManager>
 {
     public PopupSystem Popup { get; private set; }
-    private bool showBreedPopupSetting = false;
-
-
-    //프로필 데이터 저장    
-    public bool ShowBreedPopupSetting => showBreedPopupSetting;
+    // 기기 설정(프로필과 무관)
+    public bool ShowBreedPopupSetting => DeviceSettings.Data.showBreedPopup;
 
 
     [Header("Popup Settings")]
@@ -48,14 +45,9 @@ public class UIManager : Singleton<UIManager>
         Popup?.CleanupOnSceneChange();
     }
 
-    public void LoadUIManager(ProfileData profileData)
-    {
-        showBreedPopupSetting = profileData.showBreedPopupSetting;
-    }
-
     public void SetBreedPopupSetting(bool val)
     {
-        showBreedPopupSetting = val;
+        DeviceSettings.Data.showBreedPopup = val;
         if (!val && Popup != null)
         {
             Popup.CloseBreedPopup();

@@ -40,7 +40,8 @@ public class AbilityManager : MonoBehaviour
 
     private int generalAbilityPoint = 0;
 
-    private int genetics = 10000;
+    private const int DefaultGenetics = 10000;
+    private int genetics = DefaultGenetics;
 
     private int storage = 0; //퀘스트, 등 게임 중간에 저장해 뒀다가 일정 기간을 두고 추가
     public int Storage => storage;
@@ -71,17 +72,16 @@ public class AbilityManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        InitializeData();
+        ResetProfileToDefaults();
     }
 
-    private void InitializeData()
+    /// <summary>프로필 값(유전자·해금·포인트)을 새 프로필 상태로 되돌린다.</summary>
+    public void ResetProfileToDefaults()
     {
-        if (generalAbilityPoint != 0) // Load가 먼저 된 경우
-            return;
-
-        // 기본값으로 초기화
+        genetics = DefaultGenetics;
         isPlantUnlocked = new Dictionary<PlayablePlantType, bool>();
         plantAbilityPoint = new Dictionary<PlayablePlantType, int>();
+        isGeneralAbilityDataUnlocked = new Dictionary<string, bool>();
         generalAbilityPoint = 1;
 
         for (int i = 0; i < Enum.GetValues(typeof(PlayablePlantType)).Length; i++)
@@ -279,6 +279,7 @@ public class AbilityManager : MonoBehaviour
     public void ChangeGenetics(int val)
     {
         genetics = val;
+        SaveManager.RequestProfileSave(); // 해금·포인트 구매도 여기를 지난다
         if(GameObject.Find("AbilityPanel") is var a)
         {
             a.GetComponent<AbilityUIController>().UpdateGenetics();
@@ -292,23 +293,48 @@ public class AbilityManager : MonoBehaviour
         return genetics;
     }
 
-    public void LoadAbilityManager(ProfileData data)
+    /// <summary>프로필에 담는다. <see cref="LoadProfile"/>과 짝.</summary>
+    public void SaveProfile(AbilityProfile profile)
     {
-        genetics = data.genetics;
+        profile.genetics = genetics;
+        profile.generalAbilityPoint = generalAbilityPoint;
 
-        isPlantUnlocked.Clear();
-        for (int i = 0; i < data.unlockPlantType.Count; i++)
-            isPlantUnlocked.Add(data.unlockPlantType[i], data.isPlantUnlocked[i]);
+        profile.plants.Clear();
+        foreach (var kv in isPlantUnlocked)
+        {
+            plantAbilityPoint.TryGetValue(kv.Key, out int point);
+            profile.plants.Add(new PlantProgress { type = kv.Key, unlocked = kv.Value, abilityPoint = point });
+        }
 
-        plantAbilityPoint.Clear();
-        for (int i = 0; i < data.plantTypeOfAbilityPoint.Count; i++)
-            plantAbilityPoint.Add(data.plantTypeOfAbilityPoint[i], data.plantAbilityPoint[i]);
+        profile.generalAbilities.Clear();
+        foreach (var kv in isGeneralAbilityDataUnlocked)
+            profile.generalAbilities.Add(new NamedFlag { name = kv.Key, value = kv.Value });
+    }
 
-        isGeneralAbilityDataUnlocked.Clear();
-        for (int i = 0; i < data.generalAbilityDataName.Count; i++)
-            isGeneralAbilityDataUnlocked.Add(data.generalAbilityDataName[i], data.isGeneralAbilityDataUnlocked[i]);
+    /// <summary>
+    /// 기본값 위에 저장된 값을 덮어쓴다. 저장 이후 새로 추가된 식물·특성도 기본값으로 들어 있게 된다.
+    /// </summary>
+    public void LoadProfile(AbilityProfile profile)
+    {
+        ResetProfileToDefaults();
+        if (profile == null) return;
 
-        generalAbilityPoint = data.generalAbilityPoint;
+        genetics = profile.genetics;
+        generalAbilityPoint = profile.generalAbilityPoint;
+
+        foreach (var p in profile.plants)
+        {
+            if (p == null) continue;
+            isPlantUnlocked[p.type] = p.unlocked;
+            plantAbilityPoint[p.type] = p.abilityPoint;
+        }
+
+        foreach (var a in profile.generalAbilities)
+        {
+            // 에셋에서 빠진 특성은 버린다(목록에 없는 키가 UI에 남지 않도록).
+            if (a != null && isGeneralAbilityDataUnlocked.ContainsKey(a.name))
+                isGeneralAbilityDataUnlocked[a.name] = a.value;
+        }
     }
 
     public void AddGeneStorage(int num)
@@ -321,5 +347,6 @@ public class AbilityManager : MonoBehaviour
         genetics += storage;
         GameRecordHolder.SaveGenetics(storage);
         storage = 0;
+        SaveManager.RequestProfileSave();
     }
 }

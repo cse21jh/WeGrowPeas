@@ -1,40 +1,30 @@
 using UnityEngine;
-using System.Collections.Generic;
 
-public class ProfileData
-{
-    //AbilityManager
-    public int genetics;
-
-    public List<PlayablePlantType> unlockPlantType = new();
-    public List<bool> isPlantUnlocked = new();
-
-    public List<PlayablePlantType> plantTypeOfAbilityPoint = new();
-    public List<int> plantAbilityPoint = new();
-
-    public List<string> generalAbilityDataName = new();
-    public List<bool> isGeneralAbilityDataUnlocked = new();
-
-    public int generalAbilityPoint;
-
-    //SoundManager
-    public float BGMVolume;
-    public float EffectVolume;
-
-    public bool showBreedPopupSetting = false;
-
-    //PhoneManager & Messenger
-    public List<string> readMessengerKeys = new List<string>();
-    public List<string> unlockedItems = new List<string>();
-    public bool playAlarmForSeenMessages = true;
-}
-
+/// <summary>
+/// 계정(프로필) 진행을 파일(<see cref="ProfileData"/>)과 주고받는다.
+/// 무엇을 저장하는지는 각 시스템의 SaveTo/LoadFrom이 알고, 여기서는 순서와 파일 입출력만 맡는다.
+///
+/// 저장 시점: 각 시스템이 값을 바꾸면 <see cref="RequestProfileSave"/>를 부르고,
+/// 그 프레임 끝(LateUpdate)에 한 번 모아서 쓴다. 종료 시 저장은 보조일 뿐이다.
+/// </summary>
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
 
+    /// <summary>
+    /// 프로필 저장 형식 버전. 구조가 바뀌면 올리고 <see cref="MigrateProfile"/>에 보정을 추가한다.
+    /// 필드가 늘어나는 정도는 JsonUtility가 기본값으로 채우므로 올릴 필요 없다.
+    /// </summary>
+    public const int ProfileVersion = 1;
+
     // 로드가 끝나기 전에 저장하면 기본값으로 기존 프로필을 덮어쓴다. 그걸 막는 표시.
     private bool isProfileLoaded;
+
+    // 저장 요청 표시. 매니저가 아직 없을 때 요청돼도 로드 후 첫 LateUpdate에 반영된다.
+    private static bool saveRequested;
+
+    /// <summary>프로필 값이 바뀌었음을 알린다. 이번 프레임 끝에 한 번 저장된다.</summary>
+    public static void RequestProfileSave() => saveRequested = true;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -47,19 +37,28 @@ public class SaveManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        LegacySaveMigration.RunIfNeeded();
+        ProfileStore.SelectLastProfile();
         LoadProfileData();
     }
+
+    private void LateUpdate()
+    {
+        if (saveRequested && isProfileLoaded) SaveProfileData();
+    }
+
     void OnApplicationQuit()
     {
         SaveProfileData();
+        DeviceSettings.Save();
     }
 
     private void LoadProfileData()
     {
-        string path = GetSavePath();
+        string path = ProfileStore.CurrentProfileFile;
         if (!SaveIO.Exists(path))
         {
-            isProfileLoaded = true; // 첫 실행: 지금 상태가 곧 프로필
+            isProfileLoaded = true; // 새 프로필: 지금 상태(기본값)가 곧 프로필
             return;
         }
 
@@ -70,70 +69,50 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
-        SoundManager.Instance.LoadSoundManager(profileData);
-        AbilityManager.Instance.LoadAbilityManager(profileData);
+        if (profileData.version > ProfileVersion)
+        {
+            Debug.LogError($"[SaveManager] 더 새로운 빌드의 프로필입니다 (v{profileData.version} > v{ProfileVersion}). 저장하지 않습니다: {path}");
+            return;
+        }
+        MigrateProfile(profileData);
 
-        UIManager.Instance.LoadUIManager(profileData);
-
-        // 로드하기
-        MessengerSaveSystem.PlayAlarmForSeenMessages = profileData.playAlarmForSeenMessages;
-        UnlockManager.SetUnlockedList(profileData.unlockedItems);
-        MessengerSaveSystem.SetReadKeys(profileData.readMessengerKeys);
+        // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadFrom이 안다.
+        AbilityManager.Instance.LoadProfile(profileData.ability);
+        UnlockManager.LoadFrom(profileData.unlock);
+        DawnSystem.LoadFrom(profileData.dawn);
+        MessengerSaveSystem.LoadFrom(profileData.messenger);
 
         isProfileLoaded = true;
     }
 
     public void SaveProfileData()
     {
+        saveRequested = false;
         if (!isProfileLoaded) return;
-        if (AbilityManager.Instance == null || SoundManager.Instance == null || UIManager.Instance == null)
+        if (AbilityManager.Instance == null)
         {
             // 일부만 채운 프로필로 덮어쓰지 않는다.
             Debug.LogWarning("[SaveManager] 매니저가 준비되지 않아 프로필 저장을 건너뜁니다.");
             return;
         }
 
-        var profileData = new ProfileData();
+        var profileData = new ProfileData { version = ProfileVersion };
+        profileData.meta.lastSavedUnix = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        //AbilityManager
-        profileData.genetics = AbilityManager.Instance.Genetics;
+        // 시스템별 저장. LoadProfileData와 같은 순서로 두어 짝을 눈으로 확인할 수 있게 한다.
+        AbilityManager.Instance.SaveProfile(profileData.ability);
+        UnlockManager.SaveTo(profileData.unlock);
+        DawnSystem.SaveTo(profileData.dawn);
+        MessengerSaveSystem.SaveTo(profileData.messenger);
 
-        foreach (KeyValuePair<PlayablePlantType, bool> val in AbilityManager.Instance.IsPlantUnlocked)
-        {
-            profileData.unlockPlantType.Add(val.Key);
-            profileData.isPlantUnlocked.Add(val.Value);
-        }
-
-        foreach (KeyValuePair<PlayablePlantType, int> val in AbilityManager.Instance.PlantAbilityPoint)
-        {
-            profileData.plantTypeOfAbilityPoint.Add(val.Key);
-            profileData.plantAbilityPoint.Add(val.Value);
-        }
-
-        foreach (KeyValuePair<string, bool> val in AbilityManager.Instance.IsGeneralAbilityDataUnlocked)
-        {
-            profileData.generalAbilityDataName.Add(val.Key);
-            profileData.isGeneralAbilityDataUnlocked.Add(val.Value);
-        }
-
-        profileData.generalAbilityPoint = AbilityManager.Instance.GeneralAbilityPoint;
-
-        //SoundManager
-        profileData.BGMVolume = SoundManager.Instance.BGMVolume;
-        profileData.EffectVolume = SoundManager.Instance.EffectVolume;
-
-        profileData.showBreedPopupSetting = UIManager.Instance.ShowBreedPopupSetting;
-
-        //PhoneManager & Messenger
-        profileData.playAlarmForSeenMessages = MessengerSaveSystem.PlayAlarmForSeenMessages;
-        profileData.readMessengerKeys = MessengerSaveSystem.GetReadKeys();
-        profileData.unlockedItems = UnlockManager.GetUnlockedList();
-
-        SaveIO.Write(GetSavePath(), profileData);
+        SaveIO.Write(ProfileStore.CurrentProfileFile, profileData);
     }
-    private string GetSavePath()
+
+    /// <summary>옛 버전 프로필을 현재 형식으로 맞춘다. 버전을 올릴 때마다 단계를 추가한다.</summary>
+    private static void MigrateProfile(ProfileData data)
     {
-        return Application.dataPath + "/ProfileData.json";
+        // v0 → v1: 없음(v1이 첫 구조화 버전. 그 이전 형식은 LegacySaveMigration이 변환한다).
+        if (data.version < 1) data.version = 1;
     }
 
     [ContextMenu("Debug: Unlock All Elements")]
@@ -205,20 +184,22 @@ public class SaveManager : MonoBehaviour
     [ContextMenu("Debug: Reset All Data")]
     public void DebugResetAllData()
     {
-        // 1. ProfileData.json (아이템 해금, 특성, 재화 등) 파일 삭제
-        string path = GetSavePath();
+        // 아래 초기화가 저장 요청을 보내도 다시 쓰지 않도록 먼저 막는다.
+        isProfileLoaded = false;
+
+        // 1. 현재 프로필 파일(아이템 해금, 특성, 유전자, 새벽 진행 등) 삭제
+        string path = ProfileStore.CurrentProfileFile;
         if (SaveIO.Exists(path))
         {
             SaveIO.Delete(path);
             Debug.Log($"[SaveManager] 프로필 데이터를 삭제했습니다: {path}");
         }
-        isProfileLoaded = false; // 아래에서 파괴되기 전 OnApplicationQuit 등으로 다시 쓰지 않도록
 
-        // 2. 메모리 상의 아이템 해금 목록 초기화
+        // 2. 메모리 상의 해금 목록·새벽 진행 초기화
         UnlockManager.ResetAll();
-
-        // 3. PlayerPrefs에 저장된 새벽 단계 진행도 및 기타 세이브 초기화
         DawnSystem.ResetAllPlantProgress();
+
+        // 3. PlayerPrefs(디버그 패널 등) 초기화
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
 

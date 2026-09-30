@@ -37,22 +37,16 @@ public static class UnlockManager
 
     private static HashSet<string> _unlocked;
 
-    public static List<string> GetUnlockedList()
+    /// <summary>프로필에 담는다. <see cref="LoadFrom"/>과 짝.</summary>
+    public static void SaveTo(UnlockProfile profile)
     {
         EnsureLoaded();
-        return new List<string>(_unlocked);
+        profile.ids = new List<string>(_unlocked);
     }
 
-    public static void SetUnlockedList(List<string> list)
+    public static void LoadFrom(UnlockProfile profile)
     {
-        if (list == null)
-        {
-            _unlocked = new HashSet<string>();
-        }
-        else
-        {
-            _unlocked = new HashSet<string>(list);
-        }
+        _unlocked = profile?.ids != null ? new HashSet<string>(profile.ids) : new HashSet<string>();
     }
 
     private static void EnsureLoaded()
@@ -63,7 +57,8 @@ public static class UnlockManager
 
     private static void Save()
     {
-        // 글로벌 프로필 저장은 게임 종료 시(SaveManager)에 일괄 수행됩니다.
+        // 해금은 즉시 프로필에 기록한다(같은 프레임의 여러 해금은 한 번에 저장된다).
+        SaveManager.RequestProfileSave();
     }
 
     // ── 조회 ──────────────────────────────────────────────────────────────────

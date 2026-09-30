@@ -4,13 +4,12 @@ using UnityEngine;
 /// <summary>
 /// 새벽 모드(승천) 런타임 접근자. 단계별 데이터/누적 제약/해금·선택 상태를 제공.
 /// - 설정: Resources의 <see cref="DawnStageConfig"/> 에셋.
-/// - 해금(MaxUnlockedDawnStage): 메타 진행 → PlayerPrefs 영구 저장.
+/// - 해금(MaxUnlockedDawnStage): 메타 진행 → 프로필(<see cref="DawnProfile"/>)에 저장.
 /// - 선택(SelectedDawnStage): 이번 런에 고른 단계(게임 시작 시 UI가 설정).
 /// </summary>
 public static class DawnSystem
 {
     public const string ResourcePath = "Data/DawnStageConfig";
-    private const string PrefKeyMaxUnlocked = "Dawn_MaxUnlockedStage";
 
     private static DawnStageConfig _config;
     private static DawnStageConfig Config
@@ -54,21 +53,20 @@ public static class DawnSystem
     }
 
     // ── 해금(메타) ────────────────────────────────────────────────────────────
-    // 새벽 진행도는 식물별로 따로 저장된다. ("Dawn_MaxUnlockedStage_완두콩" 등)
-    private static string PrefKeyFor(string plant) => PrefKeyMaxUnlocked + "_" + plant;
+    // 새벽 진행도는 식물별로 따로 프로필에 저장된다. (SaveManager가 LoadFrom/SaveTo 호출)
+    private static readonly Dictionary<string, int> _maxUnlocked = new();
 
     /// <summary>지정한 식물의 해금된 최대 새벽 단계. 0 = 그 식물로는 새벽 모드 미해금.</summary>
     public static int GetMaxUnlockedStage(string plant)
     {
-        MigrateLegacyProgressIfNeeded();
-        return PlayerPrefs.GetInt(PrefKeyFor(plant), 0);
+        return plant != null && _maxUnlocked.TryGetValue(plant, out int stage) ? stage : 0;
     }
 
     public static void SetMaxUnlockedStage(string plant, int stage)
     {
-        MigrateLegacyProgressIfNeeded();
-        PlayerPrefs.SetInt(PrefKeyFor(plant), Mathf.Max(0, stage));
-        PlayerPrefs.Save();
+        if (string.IsNullOrEmpty(plant)) return;
+        _maxUnlocked[plant] = Mathf.Max(0, stage);
+        SaveManager.RequestProfileSave();
     }
 
     /// <summary>현재 식물 기준 해금된 최대 새벽 단계.</summary>
@@ -113,36 +111,49 @@ public static class DawnSystem
         Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
     }
 
-    // ── 레거시 마이그레이션 ───────────────────────────────────────────────────
-    // 식물 구분이 없던 시절의 단일 키를 각 식물로 1회 이관한다(진행도 손실 방지).
-    private const string PrefKeyMigrated = "Dawn_MaxUnlockedStage_Migrated";
-    private static bool _migrationChecked;
-
-    private static void MigrateLegacyProgressIfNeeded()
-    {
-        if (_migrationChecked) return;
-        _migrationChecked = true;
-
-        if (PlayerPrefs.GetInt(PrefKeyMigrated, 0) == 1) return;
-        PlayerPrefs.SetInt(PrefKeyMigrated, 1);
-
-        int legacy = PlayerPrefs.GetInt(PrefKeyMaxUnlocked, 0);
-        if (legacy > 0)
-        {
-            foreach (var p in Plants)
-                if (PlayerPrefs.GetInt(PrefKeyFor(p), 0) < legacy)
-                    PlayerPrefs.SetInt(PrefKeyFor(p), legacy);
-            Debug.Log($"[Dawn] 기존 새벽 진행도({legacy}단계)를 식물별로 이관했습니다.");
-        }
-        PlayerPrefs.Save();
-    }
-
     /// <summary>테스트용: 모든 식물의 새벽 진행도 초기화.</summary>
     public static void ResetAllPlantProgress()
     {
-        MigrateLegacyProgressIfNeeded();
-        foreach (var p in Plants) PlayerPrefs.SetInt(PrefKeyFor(p), 0);
-        PlayerPrefs.Save();
+        _maxUnlocked.Clear();
+        SaveManager.RequestProfileSave();
+    }
+
+    // ── 프로필 저장 ───────────────────────────────────────────────────────────
+
+    /// <summary>프로필에 담는다. <see cref="LoadFrom"/>과 짝.</summary>
+    public static void SaveTo(DawnProfile profile)
+    {
+        profile.maxUnlockedStage.Clear();
+        foreach (var kv in _maxUnlocked)
+            profile.maxUnlockedStage.Add(new NamedInt { name = kv.Key, value = kv.Value });
+    }
+
+    public static void LoadFrom(DawnProfile profile)
+    {
+        _maxUnlocked.Clear();
+        if (profile?.maxUnlockedStage == null) return;
+        foreach (var e in profile.maxUnlockedStage)
+            if (e != null && !string.IsNullOrEmpty(e.name)) _maxUnlocked[e.name] = Mathf.Max(0, e.value);
+    }
+
+    // ── 레거시(PlayerPrefs) ───────────────────────────────────────────────────
+    // 프로필 도입 전에는 PlayerPrefs에 식물별 키("Dawn_MaxUnlockedStage_완두콩")로 저장했고,
+    // 그보다 전에는 식물 구분 없는 단일 키였다. 프로필로 옮길 때 한 번만 읽는다.
+    private const string LegacyPrefKey = "Dawn_MaxUnlockedStage";
+
+    /// <summary>옛 PlayerPrefs 진행도를 읽는다. 없으면 빈 목록.</summary>
+    public static DawnProfile ReadLegacyPlayerPrefs()
+    {
+        var profile = new DawnProfile();
+        // 단일 키는 식물별 키로 이관되기 전(_Migrated 표시 없음)에만 유효하다.
+        bool splitDone = PlayerPrefs.GetInt(LegacyPrefKey + "_Migrated", 0) == 1;
+        int singleKey = splitDone ? 0 : PlayerPrefs.GetInt(LegacyPrefKey, 0);
+        foreach (var p in Plants)
+        {
+            int stage = Mathf.Max(PlayerPrefs.GetInt(LegacyPrefKey + "_" + p, 0), singleKey);
+            if (stage > 0) profile.maxUnlockedStage.Add(new NamedInt { name = p, value = stage });
+        }
+        return profile;
     }
 
     // ── 선택(이번 런) ─────────────────────────────────────────────────────────

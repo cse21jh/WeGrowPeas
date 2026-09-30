@@ -91,6 +91,9 @@ public class SettingUI : MonoBehaviour
         SettingPanel.SetActive(false);
         Time.timeScale = 1;
         ClickRouter.Instance.IsBlockedByUI = false;
+
+        // 볼륨·토글 변경을 바로 기록한다(종료 시에만 저장하면 크래시 때 날아간다).
+        DeviceSettings.Save();
         return;
     }
 

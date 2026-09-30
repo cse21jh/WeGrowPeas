@@ -33,8 +33,11 @@ public static class RecallStore
 
     private const string IndexFileName = "recall_index.json";
 
-    /// <summary>회상 파일이 모이는 폴더. 경로를 바꾸려면 여기만 고치면 된다.</summary>
-    public static string RootPath =>
+    /// <summary>회상 파일이 모이는 폴더(프로필별). 경로를 바꾸려면 여기만 고치면 된다.</summary>
+    public static string RootPath => ProfileStore.PathOf("Recall");
+
+    /// <summary>프로필 도입 전 회상 폴더. 옮길 때만 쓴다.</summary>
+    public static string LegacyRootPath =>
         Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Recall"));
 
     public static string RunJsonPath(string id) => Path.Combine(RootPath, $"run_{id}.json");

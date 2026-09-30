@@ -46,8 +46,9 @@ public class SoundManager : Singleton<SoundManager>
             EffectSoundDictionary.Add(audioclip.name, audioclip);
         }
 
-        BGMVolume = 0.05f;
-        EffectVolume = 0.3f;
+        // 볼륨은 기기 설정에서 읽는다(프로필과 무관).
+        BGMVolume = DeviceSettings.Data.bgmVolume;
+        EffectVolume = DeviceSettings.Data.effectVolume;
         
 
         EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/Effect/SelectPlant"));
@@ -147,6 +148,7 @@ public class SoundManager : Singleton<SoundManager>
     {
         BGMVolume = val;
         BgmPlayer.volume = val;
+        DeviceSettings.Data.bgmVolume = val;
     }
 
     public void ChangeEffectVolume(float val)
@@ -154,11 +156,6 @@ public class SoundManager : Singleton<SoundManager>
         EffectVolume = val;
         EffectPlayer.volume = val;
         FlexibleEffectPlayer.volume = val;
-    }
-
-    public void LoadSoundManager(ProfileData data)
-    {
-        ChangeBGMVolume(data.BGMVolume);
-        ChangeEffectVolume(data.EffectVolume);        
+        DeviceSettings.Data.effectVolume = val;
     }
 }
