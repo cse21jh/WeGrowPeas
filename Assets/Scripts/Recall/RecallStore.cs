@@ -150,7 +150,7 @@ public static class RecallStore
             string id = NewId();
             var run = BuildRunFile(id);
 
-            File.WriteAllText(RunJsonPath(id), JsonUtility.ToJson(run, true));
+            if (!SaveIO.Write(RunJsonPath(id), run)) return null;
 
             if (screenshotPng != null && screenshotPng.Length > 0)
                 File.WriteAllBytes(RunImagePath(id), screenshotPng);
@@ -326,7 +326,7 @@ public static class RecallStore
     {
         index.version = FormatVersion; // 쓰는 순간 지금 형식이 된다
         Directory.CreateDirectory(RootPath);
-        File.WriteAllText(IndexPath, JsonUtility.ToJson(index, true));
+        SaveIO.Write(IndexPath, index);
     }
 
     /// <summary>상한을 넘으면 오래된 것부터 지운다(엔딩/게임오버 구분 없이 시간순).</summary>

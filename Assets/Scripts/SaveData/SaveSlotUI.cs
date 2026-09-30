@@ -1,9 +1,4 @@
-using DG.Tweening.Plugins.Core.PathCore;
-using System;
-using System.Collections;
-using System.IO;
 using TMPro;
-using Unity.Collections;
 using UnityEngine;
 
 public class SaveSlotUI : MonoBehaviour
@@ -30,24 +25,13 @@ public class SaveSlotUI : MonoBehaviour
 
             int slotIndex = i;
 
-            string path = SaveContext.Instance.GetSavePath(slotIndex);
+            string path = SaveContext.GetSavePath(slotIndex);
 
-            if (!File.Exists(path)) tmp.text = $"저장소 {slotIndex}\n비어 있음";
-            else
-            {
-                string json = File.ReadAllText(path);
-                SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-
-                tmp.text = $"저장소 {slotIndex}\nDay {saveData.progress.stage}";
-            }
+            if (!RunSave.Exists(path)) tmp.text = $"저장소 {slotIndex}\n비어 있음";
+            else if (RunSave.TryLoad(path, out SaveData saveData)) tmp.text = $"저장소 {slotIndex}\nDay {saveData.progress.stage}";
+            else tmp.text = $"저장소 {slotIndex}\n읽을 수 없음";
         }
 
-    }
-
-    private IEnumerator DelayAction(float delay, Action action)
-    {
-        yield return new WaitForSecondsRealtime(delay);
-        action?.Invoke();
     }
 
     public void OnClickSlot(int slotIndex)
@@ -56,7 +40,7 @@ public class SaveSlotUI : MonoBehaviour
 
         path = SaveContext.Instance.CurrentSaveFilePath;
 
-        if (path != null && File.Exists(path)) //continue
+        if (RunSave.Exists(path)) //continue
         {
             ShowSavePopup();
         }
@@ -69,7 +53,7 @@ public class SaveSlotUI : MonoBehaviour
 
     public void OnClickNewGame()
     {
-        File.Delete(path);
+        RunSave.Delete(path);
         ActivateBlocker();
         // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
         GameStartContext.SetStartType(GameStartType.NewGame);
@@ -78,20 +62,14 @@ public class SaveSlotUI : MonoBehaviour
 
     public void OnClickContinueGame()
     {
-        string json = File.ReadAllText(path);
-        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-
-        // 안전장치: 파일에 잘못 기록된 새 게임/게임오버 상태를 이어하기 상태로 보정
-        GameStartType startType = saveData.progress.gst;
-        if (startType == GameStartType.NewGame || startType == GameStartType.GameOver || startType == GameStartType.None)
+        if (!RunSave.TryLoad(path, out SaveData saveData))
         {
-            startType = GameStartType.ContinueGame;
+            Debug.LogError($"[SaveSlotUI] 세이브를 읽지 못했습니다: {path}");
+            return;
         }
-        GameStartContext.SetStartType(startType);
+        GameStartContext.SetStartType(RunSave.ResolveContinueStartType(saveData));
 
         ActivateBlocker();
-
-        //GameStartContext.SetStartType(GameStartType.ContinueGame);
         SceneLoader.Instance?.LoadGardenScene();
     }
 

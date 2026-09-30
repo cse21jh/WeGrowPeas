@@ -19,6 +19,9 @@ using System.Collections.Generic;
 [Serializable]
 public class SaveData
 {
+    /// <summary>저장 형식 버전. 이 필드가 생기기 전 파일은 0으로 읽힌다. (<see cref="RunSave.CurrentVersion"/>)</summary>
+    public int version;
+
     public ProgressSave progress = new();
     public GridSave grid = new();
     public WaveSave wave = new();

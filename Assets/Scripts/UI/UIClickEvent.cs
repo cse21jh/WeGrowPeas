@@ -1,8 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,12 +28,6 @@ public class UIClickEvent : MonoBehaviour
     [SerializeField] private GameObject buttonPanel;
     [SerializeField] private GameObject saveSlotPanel;
 
-    private IEnumerator DelayAction(float delay, Action action)
-    {
-        yield return new WaitForSecondsRealtime(delay);
-        action?.Invoke();
-    }
-
     // 씬 전환 연출(덮기/열기)은 SceneLoader가 담당한다. 여기서 Transition_Out을 직접 부르지 않는다.
     public void OnClick_StartNewGame(int slotIndex)
     {
@@ -52,41 +41,19 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_ContinueGame()
     {
-        /*string path = Application.dataPath + "/UserData.json";
-
-        GetGameStartTypeFromSave();
-
-        if (File.Exists(path) && GameStartContext.StartType != GameStartType.GameOver)
-        {
-            TransitionController.instance.Transition_Out();
-            StartCoroutine(DelayAction(1.1f, () =>
-            {
-                //GameStartContext.SetStartType(GameStartType.ContinueGame);
-                SceneLoader.Instance?.LoadGardenScene();
-            }));
-        }
-
-        return;*/
-
         OnClickShowSaveSlotPanel();
     }
 
     public void OnClick_ContinueGameAfterEnding()
     {
         string path = SaveContext.Instance.CurrentSaveFilePath;
-
-        string json = File.ReadAllText(path);
-        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-
-        // 안전장치: 파일에 잘못 기록된 새 게임/게임오버 상태를 이어하기 상태로 보정
-        GameStartType startType = saveData.progress.gst;
-        if (startType == GameStartType.NewGame || startType == GameStartType.GameOver || startType == GameStartType.None)
+        if (!RunSave.TryLoad(path, out SaveData saveData))
         {
-            startType = GameStartType.ContinueGame;
+            Debug.LogError($"[UIClickEvent] 세이브를 읽지 못했습니다: {path}");
+            return;
         }
-        GameStartContext.SetStartType(startType);
+        GameStartContext.SetStartType(RunSave.ResolveContinueStartType(saveData));
 
-        //GameStartContext.SetStartType(GameStartType.ContinueGame);
         SceneLoader.Instance?.LoadGardenScene();
     }
 
@@ -149,13 +116,6 @@ public class UIClickEvent : MonoBehaviour
         restartPopup.SetActive(false);
     }
 
-    private void GetGameStartTypeFromSave()
-    {
-        string json = File.ReadAllText(Application.dataPath + "/UserData.json");
-        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
-
-        GameStartContext.SetStartType(saveData.progress.gst);
-    }
     public void PlayButtonClickSound()
     {
         SoundManager.Instance.PlayEffect("Button");

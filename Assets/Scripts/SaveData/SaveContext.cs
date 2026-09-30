@@ -20,7 +20,10 @@ public class SaveContext : MonoBehaviour
         }
     }
 
-    public string GetSavePath(int slotIndex)
+    /// <summary>슬롯을 고르지 않고 정원 씬을 바로 실행했을 때(에디터 테스트) 쓰는 슬롯.</summary>
+    public const int EditorFallbackSlot = 2;
+
+    public static string GetSavePath(int slotIndex)
     {
         return Application.dataPath + $"/UserData_{slotIndex}.json";
     }

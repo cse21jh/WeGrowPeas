@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -438,7 +437,7 @@ public class GameManager : Singleton<GameManager>
 
         // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
         SceneLoader.Instance.LoadGameOverScene();
-        File.Delete(GetSavePath());
+        RunSave.Delete(GetSavePath());
         //Time.timeScale = 0.0f;
         Debug.Log("GameOver");
     }
@@ -482,12 +481,18 @@ public class GameManager : Singleton<GameManager>
         byte[] png = null;
         yield return StartCoroutine(RecallScreenshot.CaptureRoutine(bytes => png = bytes));
         RecallStore.Commit(png);
+
+        // 지급한 유전자가 종료 전 크래시로 날아가지 않도록 바로 기록한다.
+        SaveManager.Instance?.SaveProfileData();
     }
 
     private void LoadGame()
     {
-        string json = File.ReadAllText(GetSavePath());
-        SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+        if (!RunSave.TryLoad(GetSavePath(), out SaveData saveData))
+        {
+            Debug.LogError($"[GameManager] 세이브를 불러오지 못했습니다: {GetSavePath()}");
+            return;
+        }
 
         // 진행 상황
         stage = saveData.progress.stage;
@@ -549,19 +554,21 @@ public class GameManager : Singleton<GameManager>
         PlayerRecordForGraph.SaveTo(saveData.graph);
         RecallRecorder.SaveTo(saveData.recall);
 
-        File.WriteAllText(GetSavePath(), JsonUtility.ToJson(saveData, true));
+        RunSave.Save(GetSavePath(), saveData);
         GameStartContext.SetStartType(GameStartType.ContinueGame);
+
+        // 계정 진행(유전자·해금 등)도 같은 시점에 기록한다. 종료 시에만 저장하면 크래시 때 날아간다.
+        SaveManager.Instance?.SaveProfileData();
 
         Debug.Log("저장됨");
     }
 
     private string GetSavePath()
     {
-        string defaultPath = Application.dataPath + "/UserData_2.json";
-
-        if (SaveContext.Instance == null) return defaultPath;
-
-        return SaveContext.Instance.CurrentSaveFilePath;
+        // 시작 화면을 거치지 않고 정원 씬을 바로 실행했을 때(에디터 테스트)는 슬롯이 정해져 있지 않다.
+        if (SaveContext.Instance != null && SaveContext.Instance.CurrentSaveFilePath != null)
+            return SaveContext.Instance.CurrentSaveFilePath;
+        return SaveContext.GetSavePath(SaveContext.EditorFallbackSlot);
     }
 
     private void PassRecordToGameRecordHolder()

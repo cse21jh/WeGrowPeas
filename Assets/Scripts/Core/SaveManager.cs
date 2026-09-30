@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.IO;
-using NUnit.Framework;
 using System.Collections.Generic;
 
 public class ProfileData
@@ -23,9 +21,6 @@ public class ProfileData
     public float BGMVolume;
     public float EffectVolume;
 
-    //TutorialManager
-    public bool hasSeenTutorial;
-
     public bool showBreedPopupSetting = false;
 
     //PhoneManager & Messenger
@@ -37,6 +32,9 @@ public class ProfileData
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
+
+    // 로드가 끝나기 전에 저장하면 기본값으로 기존 프로필을 덮어쓴다. 그걸 막는 표시.
+    private bool isProfileLoaded;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -59,10 +57,18 @@ public class SaveManager : MonoBehaviour
     private void LoadProfileData()
     {
         string path = GetSavePath();
-        if (!File.Exists(path)) return;
+        if (!SaveIO.Exists(path))
+        {
+            isProfileLoaded = true; // 첫 실행: 지금 상태가 곧 프로필
+            return;
+        }
 
-        string json = File.ReadAllText(path);
-        ProfileData profileData = JsonUtility.FromJson<ProfileData>(json);
+        if (!SaveIO.TryRead(path, out ProfileData profileData))
+        {
+            // 파일은 있는데 못 읽었다. 여기서 저장을 허용하면 기존 진행이 기본값으로 덮인다.
+            Debug.LogError($"[SaveManager] 프로필을 읽지 못해 이번 실행에서는 프로필을 저장하지 않습니다: {path}");
+            return;
+        }
 
         SoundManager.Instance.LoadSoundManager(profileData);
         AbilityManager.Instance.LoadAbilityManager(profileData);
@@ -73,10 +79,20 @@ public class SaveManager : MonoBehaviour
         MessengerSaveSystem.PlayAlarmForSeenMessages = profileData.playAlarmForSeenMessages;
         UnlockManager.SetUnlockedList(profileData.unlockedItems);
         MessengerSaveSystem.SetReadKeys(profileData.readMessengerKeys);
+
+        isProfileLoaded = true;
     }
 
     public void SaveProfileData()
     {
+        if (!isProfileLoaded) return;
+        if (AbilityManager.Instance == null || SoundManager.Instance == null || UIManager.Instance == null)
+        {
+            // 일부만 채운 프로필로 덮어쓰지 않는다.
+            Debug.LogWarning("[SaveManager] 매니저가 준비되지 않아 프로필 저장을 건너뜁니다.");
+            return;
+        }
+
         var profileData = new ProfileData();
 
         //AbilityManager
@@ -113,11 +129,7 @@ public class SaveManager : MonoBehaviour
         profileData.readMessengerKeys = MessengerSaveSystem.GetReadKeys();
         profileData.unlockedItems = UnlockManager.GetUnlockedList();
 
-        //TutorialManager
-
-
-        string json = JsonUtility.ToJson(profileData, true);
-        File.WriteAllText(GetSavePath(), json);
+        SaveIO.Write(GetSavePath(), profileData);
     }
     private string GetSavePath()
     {
@@ -195,11 +207,12 @@ public class SaveManager : MonoBehaviour
     {
         // 1. ProfileData.json (아이템 해금, 특성, 재화 등) 파일 삭제
         string path = GetSavePath();
-        if (System.IO.File.Exists(path))
+        if (SaveIO.Exists(path))
         {
-            System.IO.File.Delete(path);
+            SaveIO.Delete(path);
             Debug.Log($"[SaveManager] 프로필 데이터를 삭제했습니다: {path}");
         }
+        isProfileLoaded = false; // 아래에서 파괴되기 전 OnApplicationQuit 등으로 다시 쓰지 않도록
 
         // 2. 메모리 상의 아이템 해금 목록 초기화
         UnlockManager.ResetAll();

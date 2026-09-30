@@ -22,6 +22,7 @@ public static class CodexProgress
 
     private static HashSet<string> _discovered;   // "Item:id", "Bug:DefaultBug" ...
     private static Dictionary<string, int> _stats; // "sold_pea" -> 123
+    private static bool _saveBlocked;              // 파일을 읽지 못했을 때 덮어쓰기 방지
 
     private static string FilePath => Path.Combine(Application.persistentDataPath, "codex.json");
 
@@ -38,43 +39,34 @@ public static class CodexProgress
         if (_discovered != null) return;
         _discovered = new HashSet<string>();
         _stats = new Dictionary<string, int>();
-        try
+        if (!SaveIO.Exists(FilePath)) return;
+
+        if (!SaveIO.TryRead(FilePath, out CodexSaveData data))
         {
-            if (File.Exists(FilePath))
-            {
-                var data = JsonUtility.FromJson<CodexSaveData>(File.ReadAllText(FilePath));
-                if (data != null)
-                {
-                    if (data.discovered != null)
-                        foreach (var id in data.discovered) _discovered.Add(id);
-                    if (data.statKeys != null && data.statValues != null)
-                        for (int i = 0; i < data.statKeys.Count && i < data.statValues.Count; i++)
-                            _stats[data.statKeys[i]] = data.statValues[i];
-                }
-            }
+            // 빈 도감으로 저장해 기존 기록을 덮지 않도록 이번 실행에서는 저장을 막는다.
+            _saveBlocked = true;
+            Debug.LogError($"[Codex] 도감을 읽지 못해 이번 실행에서는 저장하지 않습니다: {FilePath}");
+            return;
         }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[Codex] 로드 실패: {e.Message}");
-        }
+
+        if (data.discovered != null)
+            foreach (var id in data.discovered) _discovered.Add(id);
+        if (data.statKeys != null && data.statValues != null)
+            for (int i = 0; i < data.statKeys.Count && i < data.statValues.Count; i++)
+                _stats[data.statKeys[i]] = data.statValues[i];
     }
 
     private static void Save()
     {
-        try
+        if (_saveBlocked) return;
+
+        var data = new CodexSaveData { discovered = new List<string>(_discovered) };
+        foreach (var kv in _stats)
         {
-            var data = new CodexSaveData { discovered = new List<string>(_discovered) };
-            foreach (var kv in _stats)
-            {
-                data.statKeys.Add(kv.Key);
-                data.statValues.Add(kv.Value);
-            }
-            File.WriteAllText(FilePath, JsonUtility.ToJson(data));
+            data.statKeys.Add(kv.Key);
+            data.statValues.Add(kv.Value);
         }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[Codex] 저장 실패: {e.Message}");
-        }
+        SaveIO.Write(FilePath, data, pretty: false);
     }
 
     private static string Key(Category cat, string id) => $"{cat}:{id}";
@@ -134,6 +126,7 @@ public static class CodexProgress
     {
         _discovered = new HashSet<string>();
         _stats = new Dictionary<string, int>();
+        _saveBlocked = false; // 명시적 초기화는 덮어쓰기가 의도다
         Save();
     }
 }
