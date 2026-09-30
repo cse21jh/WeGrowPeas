@@ -34,7 +34,9 @@ public class ShopController
     public ShopContext Context { get { InitializeIfNeeded(); return ctx; } }
 
     /// <summary>이번 상점(세션)에서 이미 구매한 아이템인가. (비스택 1회 제한 표시용)</summary>
-    public bool WasBoughtThisShop(ItemData data) => data != null && session.WasBought(data);
+    // Buy()의 1회 제한 조건과 같아야 한다. OnePerShopIfNotStackable이 꺼진 아이템(땅문서 등)은 여러 번 살 수 있다.
+    public bool WasBoughtThisShop(ItemData data) =>
+        data != null && data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data);
 
     // ── 인벤토리 ──────────────────────────────────────────────────────────────
     // 이번 상점 방문의 목록을 캐시한다. 탭 전환/구매 갱신마다 GenerateInventory를 다시 부르면
