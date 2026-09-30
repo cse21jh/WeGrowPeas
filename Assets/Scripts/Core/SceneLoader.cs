@@ -48,12 +48,12 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadStartScene()
     {
-        StartCoroutine(LoadSceneRoutine("StartScene", useLoadingScreen: false, bgm: "StartScene"));
+        StartCoroutine(LoadSceneRoutine("StartScene", useLoadingScreen: true, bgm: "StartScene"));
     }
 
     public void LoadIntroScene()
     {
-        StartCoroutine(LoadSceneRoutine("IntroScene", useLoadingScreen: false, bgm: "IntroScene"));
+        StartCoroutine(LoadSceneRoutine("IntroScene", useLoadingScreen: true, bgm: "IntroScene"));
     }
 
     public void LoadTutorialScene()
@@ -72,7 +72,7 @@ public class SceneLoader : MonoBehaviour
 
     private bool isLoading;
 
-    /// <summary>로딩창을 띄우고 씬을 비동기로 불러온다. (무거운 씬 전용)</summary>
+    /// <summary>로딩창을 띄우고 씬을 비동기로 불러온다.</summary>
     public void LoadWithLoadingScreen(string sceneName)
     {
         StartCoroutine(LoadSceneRoutine(sceneName, useLoadingScreen: true));
@@ -96,7 +96,7 @@ public class SceneLoader : MonoBehaviour
             while (!task.IsCompleted) yield return null;
         }
 
-        // 2) 로딩창 (무거운 씬만)
+        // 2) 로딩창
         var loading = useLoadingScreen ? LoadingScreen.Instance : null;
         if (loading != null) loading.Show();
 
@@ -149,7 +149,7 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadGameOverScene()
     {
-        StartCoroutine(LoadSceneRoutine("GameOverScene", useLoadingScreen: false));
+        StartCoroutine(LoadSceneRoutine("GameOverScene", useLoadingScreen: true));
     }
 
 

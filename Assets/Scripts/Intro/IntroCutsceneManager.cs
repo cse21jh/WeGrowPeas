@@ -226,7 +226,12 @@ public class IntroCutsceneManager : MonoBehaviour
     private void LoadNextScene()
     {
         if (string.IsNullOrEmpty(nextSceneName)) return;
-        SceneManager.LoadScene(nextSceneName);
+
+        // 다른 씬 전환과 같은 로딩창을 거치도록 SceneLoader에 맡긴다.
+        if (SceneLoader.Instance != null)
+            SceneLoader.Instance.LoadWithLoadingScreen(nextSceneName);
+        else
+            SceneManager.LoadScene(nextSceneName);
     }
 
     private void OnDisable()
