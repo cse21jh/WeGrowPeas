@@ -94,7 +94,8 @@ public class GameManager : Singleton<GameManager>
     // Update is called once per frame
     void Update()
     {
-
+        // 프로필 플레이 시간: 런을 하는 동안의 실제 시간(일시정지 포함, 창 비활성 제외)
+        if (SaveManager.Instance != null) SaveManager.Instance.AddPlayTime(Time.unscaledDeltaTime);
     }
 
     private void OnEnable()

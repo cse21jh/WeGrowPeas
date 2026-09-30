@@ -32,6 +32,9 @@ public class ProfileMeta
 {
     /// <summary>마지막으로 저장한 시각(UTC, 유닉스 초).</summary>
     public long lastSavedUnix;
+
+    /// <summary>누적 플레이 시간(초). 런을 하는 동안만 센다. (SaveManager.AddPlayTime)</summary>
+    public double playTimeSeconds;
 }
 
 /// <summary>특성 화면의 해금·포인트와 유전자 (AbilityManager).</summary>

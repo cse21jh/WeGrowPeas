@@ -45,6 +45,9 @@ public class GameDebugPanel : MonoBehaviour
 
         scroll = GUILayout.BeginScrollView(scroll);
 
+        // ── 프로필 ──
+        DrawProfileSection();
+
         // ── 특수 아이템 ──
         GUILayout.Label("[특수 아이템]");
         GUILayout.Label($"미수령 선물: {SpecialItemSystem.PendingGifts}개");
@@ -167,6 +170,32 @@ public class GameDebugPanel : MonoBehaviour
 
         GUILayout.EndScrollView();
         GUILayout.EndArea();
+    }
+
+    private void DrawProfileSection()
+    {
+        GUILayout.Label("[프로필]");
+        var sm = SaveManager.Instance;
+        if (sm == null)
+        {
+            GUILayout.Label("SaveManager 없음 (시작 화면을 거치지 않음)", wrapLabel);
+            return;
+        }
+
+        GUILayout.Label($"현재: 프로필 {ProfileStore.CurrentIndex + 1}"
+            + (SaveManager.CanSwitchProfile ? "" : " (게임 중 — 전환 불가)"), wrapLabel);
+
+        for (int i = 0; i < ProfileStore.ProfileCount; i++)
+        {
+            var s = ProfileStore.GetSummary(i);
+            GUILayout.BeginHorizontal();
+            string label = s.exists ? $"{i + 1}: {s.PlayTimeText} · {s.LastSavedLocal:MM/dd HH:mm}" : $"{i + 1}: 비어있음";
+            if (i == ProfileStore.CurrentIndex) label = "▶ " + label;
+            GUILayout.Label(label, GUILayout.Width(170));
+            if (GUILayout.Button("전환")) sm.SwitchProfile(i);
+            if (GUILayout.Button("삭제")) sm.DeleteProfile(i);
+            GUILayout.EndHorizontal();
+        }
     }
 #endif
 }

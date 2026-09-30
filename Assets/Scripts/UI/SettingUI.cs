@@ -43,6 +43,9 @@ public class SettingUI : MonoBehaviour
             var codex = CodexUIController.Instance;
             if (codex != null && (codex.IsOpen || codex.ConsumedEscapeThisFrame)) return;
 
+            // 프로필 선택 창도 ESC를 먼저 처리한다(시작 화면).
+            if (ProfileSelectUI.BlocksEscape) return;
+
             // 설정창이 열려 있으면 닫기 (기존 동작)
             if (SettingPanel != null && SettingPanel.activeSelf)
             {

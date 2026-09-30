@@ -39,4 +39,10 @@ public class SaveContext : MonoBehaviour
     {
         CurrentSlotIndex = slotIndex;
     }
+
+    /// <summary>선택한 슬롯을 비운다. (프로필 전환 시)</summary>
+    public void ClearSlot()
+    {
+        CurrentSlotIndex = -1;
+    }
 }

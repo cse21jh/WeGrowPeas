@@ -13,8 +13,19 @@ public class SaveSlotUI : MonoBehaviour
 
     private void Start()
     {
-        SetSlots();
         clickBlocker.SetActive(false);
+    }
+
+    // 슬롯은 현재 프로필 폴더에 있으므로 프로필이 바뀌면 다시 그린다.
+    private void OnEnable()
+    {
+        SaveManager.OnProfileChanged += SetSlots;
+        SetSlots();
+    }
+
+    private void OnDisable()
+    {
+        SaveManager.OnProfileChanged -= SetSlots;
     }
 
     public void SetSlots()

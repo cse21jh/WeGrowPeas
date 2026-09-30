@@ -26,6 +26,21 @@ public class SaveManager : MonoBehaviour
     /// <summary>프로필 값이 바뀌었음을 알린다. 이번 프레임 끝에 한 번 저장된다.</summary>
     public static void RequestProfileSave() => saveRequested = true;
 
+    // 현재 프로필의 누적 플레이 시간(초). 매 프레임 바뀌므로 저장 요청 없이
+    // 다른 저장(하루 종료·런 종료·게임 종료)에 실려 기록된다.
+    private double playTimeSeconds;
+
+    /// <summary>현재 프로필의 누적 플레이 시간(초). 아직 파일에 쓰지 않은 시간도 포함.</summary>
+    public double PlayTimeSeconds => playTimeSeconds;
+
+    /// <summary>플레이 시간을 더한다. 런 중에 GameManager가 매 프레임 부른다.</summary>
+    public void AddPlayTime(float seconds)
+    {
+        if (!isProfileLoaded || seconds <= 0f) return;
+        if (!Application.isFocused) return; // 창을 내려둔 시간은 세지 않는다
+        playTimeSeconds += seconds;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -76,6 +91,8 @@ public class SaveManager : MonoBehaviour
         }
         MigrateProfile(profileData);
 
+        playTimeSeconds = profileData.meta.playTimeSeconds;
+
         // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadFrom이 안다.
         AbilityManager.Instance.LoadProfile(profileData.ability);
         UnlockManager.LoadFrom(profileData.unlock);
@@ -98,6 +115,7 @@ public class SaveManager : MonoBehaviour
 
         var profileData = new ProfileData { version = ProfileVersion };
         profileData.meta.lastSavedUnix = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        profileData.meta.playTimeSeconds = playTimeSeconds;
 
         // 시스템별 저장. LoadProfileData와 같은 순서로 두어 짝을 눈으로 확인할 수 있게 한다.
         AbilityManager.Instance.SaveProfile(profileData.ability);
@@ -106,6 +124,85 @@ public class SaveManager : MonoBehaviour
         MessengerSaveSystem.SaveTo(profileData.messenger);
 
         SaveIO.Write(ProfileStore.CurrentProfileFile, profileData);
+    }
+
+    // ── 프로필 전환 ───────────────────────────────────────────────────────────
+
+    /// <summary>현재 프로필의 내용이 바뀌었다(다른 프로필로 전환 / 현재 프로필 삭제). UI 갱신용.</summary>
+    public static event System.Action OnProfileChanged;
+
+    /// <summary>프로필은 시작 화면에서만 바꿀 수 있다. 런 도중엔 세이브 경로가 바뀌면 안 된다.</summary>
+    public static bool CanSwitchProfile => GameManager.Instance == null;
+
+    /// <summary>
+    /// 다른 프로필로 전환한다. 현재 프로필을 저장한 뒤 메모리 상태를 비우고 새 프로필을 읽는다.
+    /// 비어 있는 프로필이면 새 프로필(기본값)로 시작한다.
+    /// </summary>
+    public bool SwitchProfile(int index)
+    {
+        if (!ProfileStore.IsValidIndex(index)) return false;
+        if (!CanSwitchProfile)
+        {
+            Debug.LogWarning("[SaveManager] 게임 진행 중에는 프로필을 바꿀 수 없습니다.");
+            return false;
+        }
+        if (index == ProfileStore.CurrentIndex) return true;
+
+        SaveProfileData(); // 떠나는 프로필 마무리
+        ProfileStore.SetCurrent(index);
+        ReloadCurrentProfile();
+
+        Debug.Log($"[SaveManager] 프로필 {index + 1}(으)로 전환했습니다.");
+        return true;
+    }
+
+    /// <summary>
+    /// 프로필을 지운다(진행·도감·회상·런 세이브 전부). 현재 프로필이면 빈 상태로 다시 시작한다.
+    /// </summary>
+    public bool DeleteProfile(int index)
+    {
+        if (!ProfileStore.IsValidIndex(index)) return false;
+        if (!CanSwitchProfile)
+        {
+            Debug.LogWarning("[SaveManager] 게임 진행 중에는 프로필을 지울 수 없습니다.");
+            return false;
+        }
+
+        bool isCurrent = index == ProfileStore.CurrentIndex;
+        if (isCurrent) isProfileLoaded = false; // 지우는 사이 대기 중인 저장이 파일을 되살리지 않도록
+
+        bool ok = ProfileStore.DeleteFiles(index);
+        if (isCurrent) ReloadCurrentProfile();
+
+        Debug.Log($"[SaveManager] 프로필 {index + 1} 삭제 {(ok ? "완료" : "실패")}");
+        return ok;
+    }
+
+    private void ReloadCurrentProfile()
+    {
+        isProfileLoaded = false;
+        saveRequested = false;
+        playTimeSeconds = 0;
+
+        ResetProfileState();
+        LoadProfileData();
+
+        OnProfileChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// 프로필에 속한 메모리 상태를 새 프로필 상태로 되돌린다.
+    /// 새 프로필 단위 상태를 추가하면 여기에도 초기화를 넣는다.
+    /// </summary>
+    private static void ResetProfileState()
+    {
+        if (AbilityManager.Instance != null) AbilityManager.Instance.ResetProfileToDefaults();
+        UnlockManager.LoadFrom(null);
+        DawnSystem.LoadFrom(null);
+        DawnSystem.SetSelectedStage(0);
+        MessengerSaveSystem.LoadFrom(null);
+        CodexProgress.Invalidate();                                   // 다음 접근 때 새 프로필의 codex.json을 읽는다
+        if (SaveContext.Instance != null) SaveContext.Instance.ClearSlot(); // 이전 프로필 슬롯을 가리키지 않도록
     }
 
     /// <summary>옛 버전 프로필을 현재 형식으로 맞춘다. 버전을 올릴 때마다 단계를 추가한다.</summary>
