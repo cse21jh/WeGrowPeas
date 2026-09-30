@@ -54,7 +54,9 @@ public class SaveManager : MonoBehaviour
 
         LegacySaveMigration.RunIfNeeded();
         ProfileStore.SelectLastProfile();
+        CodexProgress.Invalidate(); // 프로필이 정해지기 전에 누가 읽었다면 Profile_0 것일 수 있다
         LoadProfileData();
+        if (isProfileLoaded) AchievementSystem.OnProfileLoaded();
     }
 
     private void LateUpdate()
@@ -98,6 +100,7 @@ public class SaveManager : MonoBehaviour
         UnlockManager.LoadFrom(profileData.unlock);
         DawnSystem.LoadFrom(profileData.dawn);
         MessengerSaveSystem.LoadFrom(profileData.messenger);
+        AchievementSystem.LoadFrom(profileData.achievement);
 
         isProfileLoaded = true;
     }
@@ -122,6 +125,7 @@ public class SaveManager : MonoBehaviour
         UnlockManager.SaveTo(profileData.unlock);
         DawnSystem.SaveTo(profileData.dawn);
         MessengerSaveSystem.SaveTo(profileData.messenger);
+        AchievementSystem.SaveTo(profileData.achievement);
 
         SaveIO.Write(ProfileStore.CurrentProfileFile, profileData);
     }
@@ -186,6 +190,7 @@ public class SaveManager : MonoBehaviour
 
         ResetProfileState();
         LoadProfileData();
+        if (isProfileLoaded) AchievementSystem.OnProfileLoaded();
 
         OnProfileChanged?.Invoke();
     }
@@ -201,6 +206,7 @@ public class SaveManager : MonoBehaviour
         DawnSystem.LoadFrom(null);
         DawnSystem.SetSelectedStage(0);
         MessengerSaveSystem.LoadFrom(null);
+        AchievementSystem.LoadFrom(null);
         CodexProgress.Invalidate();                                   // 다음 접근 때 새 프로필의 codex.json을 읽는다
         if (SaveContext.Instance != null) SaveContext.Instance.ClearSlot(); // 이전 프로필 슬롯을 가리키지 않도록
     }

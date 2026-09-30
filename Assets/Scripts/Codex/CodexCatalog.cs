@@ -17,7 +17,7 @@ public class CodexEntry
 }
 
 /// <summary>
-/// 4카테고리(아이템/식물/저주/벌레)를 Resources에서 로드해 <see cref="CodexEntry"/> 목록으로 통합 제공.
+/// 카테고리(아이템/식물/저주/벌레/업적)를 Resources에서 로드해 <see cref="CodexEntry"/> 목록으로 통합 제공.
 /// 발견 여부(<see cref="CodexProgress"/>)와 누적 통계를 함께 채운다. 씬 의존 없음(시작화면에서도 사용 가능).
 /// </summary>
 public static class CodexCatalog
@@ -30,6 +30,7 @@ public static class CodexCatalog
             case CodexProgress.Category.Plant: return GetPlants();
             case CodexProgress.Category.Curse: return GetCurses();
             case CodexProgress.Category.Bug: return GetBugs();
+            case CodexProgress.Category.Achievement: return GetAchievements();
         }
         return new List<CodexEntry>();
     }
@@ -137,6 +138,39 @@ public static class CodexCatalog
                 displayName = b.displayName,
                 icon = b.icon,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Bug, b.bugId),
+                detail = sb.ToString().TrimEnd()
+            });
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// 업적. 달성했거나 숨김이 아니면 이름을 보여주고, 숨김 업적은 달성 전까지 ??? 로 둔다.
+    /// </summary>
+    public static List<CodexEntry> GetAchievements()
+    {
+        var list = new List<CodexEntry>();
+        foreach (var a in AchievementSystem.All)
+        {
+            if (a == null || string.IsNullOrEmpty(a.id)) continue;
+            bool done = AchievementSystem.IsUnlocked(a.id);
+
+            var sb = new StringBuilder();
+            if (!string.IsNullOrEmpty(a.description)) sb.AppendLine(a.description);
+            if (done && AchievementSystem.TryGetUnlockedAt(a.id, out var at))
+                sb.AppendLine($"달성: {at.Year}년 {at.Month}월 {at.Day}일");
+            else if (a.condition == AchievementCondition.LifetimeStat)
+                sb.AppendLine($"진행도: {AchievementSystem.GetProgress(a)} / {a.target}");
+            else
+                sb.AppendLine("미달성");
+
+            list.Add(new CodexEntry
+            {
+                category = CodexProgress.Category.Achievement,
+                id = a.id,
+                displayName = done ? a.title : $"{a.title} (미달성)",
+                icon = a.icon,
+                discovered = done || !a.hidden,
                 detail = sb.ToString().TrimEnd()
             });
         }

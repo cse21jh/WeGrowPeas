@@ -12,7 +12,11 @@ using UnityEngine;
 /// </summary>
 public static class CodexProgress
 {
-    public enum Category { Item, Plant, Curse, Bug }
+    // 순서가 도감 카테고리 버튼 순서다(CodexUIController.categoryButtons). 끝에만 추가한다.
+    public enum Category { Item, Plant, Curse, Bug, Achievement }
+
+    /// <summary>통계가 바뀌었다(키, 바뀐 뒤 값). 업적 판정용.</summary>
+    public static event Action<string, int> OnStatChanged;
 
     // 통계 키 헬퍼
     public const string StatSoldPea = "sold_pea";
@@ -98,6 +102,7 @@ public static class CodexProgress
         _stats.TryGetValue(key, out int cur);
         _stats[key] = cur + amount;
         Save();
+        OnStatChanged?.Invoke(key, cur + amount);
     }
 
     public static int GetStat(string key)

@@ -12,7 +12,7 @@ public class CodexUIController : MonoBehaviour
     [Header("Root")]
     [SerializeField] private GameObject codexPanel;
 
-    [Header("Category Buttons (Item, Plant, Curse, Bug 순서)")]
+    [Header("Category Buttons (Item, Plant, Curse, Bug, Achievement 순서)")]
     [SerializeField] private Button[] categoryButtons;
 
     [Header("List")]

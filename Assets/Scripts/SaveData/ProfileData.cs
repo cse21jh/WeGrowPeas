@@ -24,6 +24,7 @@ public class ProfileData
     public UnlockProfile unlock = new();
     public DawnProfile dawn = new();
     public MessengerProfile messenger = new();
+    public AchievementProfile achievement = new();
 }
 
 /// <summary>프로필 선택 화면에 보여줄 정보.</summary>
@@ -81,6 +82,14 @@ public class UnlockProfile
 public class DawnProfile
 {
     public List<NamedInt> maxUnlockedStage = new();
+}
+
+/// <summary>달성한 업적과 달성 시각 (AchievementSystem). 진행도는 통계에서 계산하므로 저장하지 않는다.</summary>
+[Serializable]
+public class AchievementProfile
+{
+    public List<string> unlocked = new();
+    public List<long> unlockedAtUnix = new();
 }
 
 /// <summary>읽은 메신저 메시지 (MessengerSaveSystem).</summary>
