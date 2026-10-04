@@ -36,6 +36,9 @@ public class GrassChunkController : MonoBehaviour
     [Header("Material")]
     [SerializeField] private Material grassMaterial;
 
+    [Tooltip("풀/꽃 텍스처에 곱할 색상. 흰색이면 원래 색을 유지하고, Alpha로 투명도를 조절합니다.")]
+    [SerializeField] private Color tintColor = Color.white;
+
     [Header("Grass Density")]
     [Tooltip("Area 1당 생성할 풀/꽃 개수. 예: Area Size 10x2에서 Density 25면 목표 500개 생성")]
     [SerializeField] private float grassDensity = 25f;
@@ -100,6 +103,21 @@ public class GrassChunkController : MonoBehaviour
 
     private readonly List<Vector2> debugSpawnPoints = new();
     private Mesh generatedMesh;
+    private MeshRenderer cachedRenderer;
+    private MaterialPropertyBlock propertyBlock;
+
+    // GrassChunkSwayEffect uses _White as its tint in all rendering passes.
+    private static readonly int TintColorId = Shader.PropertyToID("_White");
+
+    public Color TintColor
+    {
+        get => tintColor;
+        set
+        {
+            tintColor = value;
+            ApplyTint();
+        }
+    }
 
     private void Awake()
     {
@@ -143,6 +161,18 @@ public class GrassChunkController : MonoBehaviour
         debugSpawnPointRadius = Mathf.Max(0.001f, debugSpawnPointRadius);
 
         calculatedTargetCount = CalculateTargetCount();
+
+        // OnValidate can run while loading; update the renderer on the editor thread.
+        UnityEditor.EditorApplication.delayCall -= ApplyTintInEditor;
+        UnityEditor.EditorApplication.delayCall += ApplyTintInEditor;
+    }
+
+    private void ApplyTintInEditor()
+    {
+        if (this == null) return;
+
+        ApplyTint();
+        UnityEditor.SceneView.RepaintAll();
     }
 #endif
 
@@ -464,6 +494,27 @@ public class GrassChunkController : MonoBehaviour
 
         meshRenderer.sortingLayerName = sortingLayerName;
         meshRenderer.sortingOrder = sortingOrder;
+        ApplyTint();
+    }
+
+    private void ApplyTint()
+    {
+        if (cachedRenderer == null)
+        {
+            cachedRenderer = GetComponent<MeshRenderer>();
+        }
+
+        if (cachedRenderer == null) return;
+
+        if (propertyBlock == null)
+        {
+            propertyBlock = new MaterialPropertyBlock();
+        }
+
+        // Preserve other per-renderer effects without changing the shared material.
+        cachedRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetColor(TintColorId, tintColor);
+        cachedRenderer.SetPropertyBlock(propertyBlock);
     }
 
     private void DestroyGeneratedMesh()
