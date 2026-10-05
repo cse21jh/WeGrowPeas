@@ -3,8 +3,10 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(100)] // Read the final squash transforms before resolving face visibility.
 public class BGVisualController : MonoBehaviour
 {
     [Header("Circles (center to outside)")]
@@ -29,9 +31,10 @@ public class BGVisualController : MonoBehaviour
 
     [Header("Start peas")]
     [SerializeField] private Rigidbody2D startPeaPrefab;
+    [Tooltip("전체 생성 수. 0이면 생성하지 않습니다. 특성 종류 수보다 적으면 각 특성을 1개씩 생성할 만큼 늘립니다.")]
     [SerializeField, Min(0)] private int peaCount = 40;
     [Tooltip("완두콩을 하나씩 생성하는 간격 (초)")]
-    [SerializeField, Min(0.01f)] private float peaSpawnInterval = 0.1f;
+    [SerializeField, Min(0.001f)] private float peaSpawnInterval = 0.1f;
     [Tooltip("BG 위치 기준 생성 영역의 중심 오프셋 (월드 단위)")]
     [SerializeField] private Vector2 peaSpawnOffset = new Vector2(0f, 0.1f);
     [Tooltip("생성 영역의 가로/세로 크기 (월드 단위). 바닥과 벽 안쪽으로 설정하세요.")]
@@ -44,12 +47,51 @@ public class BGVisualController : MonoBehaviour
     [SerializeField, Range(0f, 3f)] private float peaSideBias = 0.65f;
     [Tooltip("프리팹 원래 크기에 곱할 무작위 배율의 최솟값/최댓값. 가로/세로 비율은 유지합니다.")]
     [SerializeField] private Vector2 peaScaleRange = new Vector2(0.75f, 1.3f);
-    [Tooltip("켜면 생성 시 표시 순서를 무작위로 정하고 유지합니다. 끄면 낮은 Y 위치일수록 앞에 표시합니다.")]
+    [Tooltip("켜면 표시 순서를 완전 랜덤으로 정합니다. 끄면 낮은 Y 위치일수록 앞에 표시하고 Depth Order Jitter로 일부 순서를 섞습니다.")]
     [SerializeField] private bool randomizePeaSortingOrder = true;
     [Tooltip("무작위 Order in Layer의 최솟값/최댓값. 표시 순서 기준값이 추가됩니다.")]
     [SerializeField] private Vector2Int peaSortingOrderRange = new Vector2Int(0, 100);
     [Tooltip("완두콩 전체의 표시 순서에 더하는 기준값")]
     [SerializeField] private int peaSortingOrderOffset = 0;
+    [Tooltip("높이 기준 정렬에 더하는 랜덤 편차의 최대 크기(±). 0이면 높이만 따릅니다. 개체별 랜덤값은 생성 시 고정됩니다.")]
+    [SerializeField, Min(0)] private int peaDepthOrderJitter = 0;
+
+    [Header("Pea appearances")]
+    [Tooltip("앞쪽 완두콩이 얼굴 영역을 가리면 뒤쪽 완두콩의 표정 전체를 숨깁니다.")]
+    [SerializeField] private bool hideOccludedPeaFaces = true;
+    [Tooltip("특성 완두콩을 같은 줄에서 앞으로 올릴 최대 오더 보정값. 아래 줄을 넘어오지 않습니다.")]
+    [SerializeField, Min(0)] private int peaTraitSortingBoost = 12;
+    [Tooltip("화면 각 구역의 대표 완두콩을 주변보다 앞으로 올려 표정이 골고루 보이게 합니다.")]
+    [SerializeField] private bool spreadPeaFaces = true;
+    [Tooltip("표정을 분산할 화면 구역 수 (가로, 세로)")]
+    [SerializeField] private Vector2Int peaFaceGrid = new Vector2Int(6, 3);
+    [Tooltip("대표 표정 사이 최소 거리 (월드 단위). 특성 완두콩 주변은 비워 둡니다.")]
+    [SerializeField, Min(0f)] private float peaFaceSpacing = 0.5f;
+    [Tooltip("일반 대표 표정을 같은 줄에서 앞으로 올릴 최대 오더 보정값")]
+    [SerializeField, Min(0)] private int peaFaceSortingBoost = 10;
+    [Tooltip("같은 줄로 취급할 중심 높이 차이 (월드 단위). 이보다 아래인 완두콩은 앞에 유지합니다.")]
+    [SerializeField, Min(0f)] private float peaFaceRowHeight = 0.15f;
+
+    [Header("Pea depth scale")]
+    [Tooltip("아래에 쌓일수록 몸체, 장식, 얼굴을 함께 크게 표시합니다.")]
+    [SerializeField] private bool scalePeasByHeight = false;
+    [Tooltip("크기와 밝기를 보간할 월드 Y 범위. X는 하단(가까움), Y는 상단(멀어짐)입니다.")]
+    [SerializeField] private Vector2 peaDepthYRange = new Vector2(-0.9f, 0.4f);
+    [Tooltip("하단에서 기존 랜덤 크기에 추가로 곱할 배율")]
+    [SerializeField, Min(0.01f)] private float peaBottomScale = 1.4f;
+    [Tooltip("상단에서 기존 랜덤 크기에 추가로 곱할 배율")]
+    [SerializeField, Min(0.01f)] private float peaTopScale = 0.85f;
+
+    [Header("Pea depth additive")]
+    [Tooltip("위쪽 완두콩일수록 지정한 색을 더해 밝게 합니다. Pea Depth Y Range를 크기 조절과 공유합니다.")]
+    [FormerlySerializedAs("tintPeasByHeight")]
+    [SerializeField] private bool brightenPeasByHeight = false;
+    [Tooltip("상단 완두콩의 원래 픽셀 색에 더할 색상. 검정이면 효과가 없으며 흰색은 전체 밝기를 높입니다.")]
+    [FormerlySerializedAs("peaDepthTintColor")]
+    [SerializeField, ColorUsage(false)] private Color peaDepthAdditiveColor = new Color(0.55f, 0.7f, 0.85f, 1f);
+    [Tooltip("상단에서의 최대 밝기 추가량. 0이면 원래 색이며 하단에서는 항상 추가량이 0입니다.")]
+    [FormerlySerializedAs("peaDepthTintStrength")]
+    [SerializeField, Range(0f, 1f)] private float peaDepthAdditiveStrength = 0.2f;
 
     [Header("Pea popup sequence")]
     [Tooltip("기본~바람 프리팹 아래의 Animator들. 한 번에 하나씩 재생하고, 모두 재생한 뒤 순서를 다시 섞습니다.")]
@@ -73,14 +115,30 @@ public class BGVisualController : MonoBehaviour
     private Sequence revealSequence;
     private Transform spawnedPeasRoot;
     private readonly List<SortingGroup> spawnedPeaGroups = new();
+    private readonly Dictionary<SortingGroup, float> spawnedPeaDepthNoise = new();
+    private readonly List<StartPeaAppearanceController> spawnedPeaVisuals = new();
+    private readonly Dictionary<SortingGroup, int> faceSortingOverrides = new();
+    private readonly List<StartPeaAppearanceController> faceRepresentatives = new();
+    private readonly HashSet<StartPeaAppearanceController> previousFaceRepresentatives = new();
+    private readonly Dictionary<StartPeaAppearanceController, Vector3> peaFaceViewports = new();
+    private Camera peaViewCamera;
     private readonly Collider2D[] peaSpawnOverlaps = new Collider2D[1];
     private ContactFilter2D peaSpawnFilter;
     private Vector3[] peaSpawnPositions;
     private Vector3 peaSpawnCenter;
     private int targetPeaCount;
+    private readonly List<int> remainingPeaTraits = new();
     private int spawnedPeaCount;
     private float peaSpawnTimer;
     private float peaPrefabRadius;
+    private StartPeaAppearanceController draggedPea;
+
+    public IReadOnlyList<StartPeaAppearanceController> SpawnedPeas => spawnedPeaVisuals;
+
+    public void SetDraggedPea(StartPeaAppearanceController pea)
+    {
+        draggedPea = pea != null && spawnedPeaVisuals.Contains(pea) ? pea : null;
+    }
 
     private void Awake()
     {
@@ -244,16 +302,186 @@ public class BGVisualController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (randomizePeaSortingOrder) return;
-
-        foreach (SortingGroup group in spawnedPeaGroups)
+        RestoreFaceSorting();
+        if (!randomizePeaSortingOrder)
         {
-            if (group != null) UpdatePeaSorting(group);
+            foreach (SortingGroup group in spawnedPeaGroups)
+            {
+                if (group != null) UpdatePeaSorting(group);
+            }
         }
+
+        foreach (StartPeaAppearanceController pea in spawnedPeaVisuals)
+        {
+            if (pea != null) UpdatePeaDepthAppearance(pea);
+        }
+
+        // Finish all depth changes before comparing the rendered silhouettes.
+        foreach (StartPeaAppearanceController pea in spawnedPeaVisuals)
+        {
+            if (pea != null) pea.PrepareFaceOcclusion();
+        }
+        ArrangePeaFaces();
+        BringDraggedPeaForward();
+        foreach (StartPeaAppearanceController pea in spawnedPeaVisuals)
+        {
+            if (pea == null) continue;
+            if (pea == draggedPea) pea.SetFaceVisible(true);
+            else if (hideOccludedPeaFaces)
+                pea.UpdateFaceVisibility(spawnedPeaVisuals, spreadPeaFaces && faceRepresentatives.Contains(pea));
+            else pea.SetFaceVisible(true);
+        }
+    }
+
+    private void RestoreFaceSorting()
+    {
+        // Rebuild from the height/random order each frame; boosts must never accumulate.
+        foreach (KeyValuePair<SortingGroup, int> item in faceSortingOverrides)
+        {
+            if (item.Key != null) item.Key.sortingOrder = item.Value;
+        }
+        faceSortingOverrides.Clear();
+    }
+
+    private void BringDraggedPeaForward()
+    {
+        if (draggedPea == null || draggedPea.SortingGroup == null) return;
+        SortingGroup group = draggedPea.SortingGroup;
+        int frontOrder = group.sortingOrder;
+        foreach (SortingGroup other in spawnedPeaGroups)
+        {
+            if (other != null && other != group && other.sortingLayerID == group.sortingLayerID)
+                frontOrder = Mathf.Max(frontOrder, other.sortingOrder);
+        }
+        if (!faceSortingOverrides.ContainsKey(group)) faceSortingOverrides[group] = group.sortingOrder;
+        group.sortingOrder = Mathf.Min(short.MaxValue, frontOrder + 1);
+    }
+
+    private void ArrangePeaFaces()
+    {
+        previousFaceRepresentatives.Clear();
+        foreach (StartPeaAppearanceController pea in faceRepresentatives)
+        {
+            if (pea != null) previousFaceRepresentatives.Add(pea);
+        }
+        faceRepresentatives.Clear();
+        peaFaceViewports.Clear();
+        if (peaViewCamera == null) peaViewCamera = Camera.main;
+
+        if (spreadPeaFaces && peaViewCamera != null)
+        {
+            foreach (StartPeaAppearanceController pea in spawnedPeaVisuals)
+            {
+                if (pea == null || pea == draggedPea || !pea.isActiveAndEnabled) continue;
+                Vector3 point = peaViewCamera.WorldToViewportPoint(pea.FaceCenter);
+                if (point.z <= 0f || point.x < 0.03f || point.x > 0.97f ||
+                    point.y < 0.04f || point.y > 0.96f) continue;
+                peaFaceViewports[pea] = point;
+                if (pea.HasTrait) faceRepresentatives.Add(pea);
+            }
+
+            int columns = Mathf.Clamp(peaFaceGrid.x, 1, 12);
+            int rows = Mathf.Clamp(peaFaceGrid.y, 1, 8);
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    StartPeaAppearanceController best = null;
+                    float bestScore = float.MaxValue;
+                    bool hasTrait = false;
+                    foreach (KeyValuePair<StartPeaAppearanceController, Vector3> item in peaFaceViewports)
+                    {
+                        Vector3 point = item.Value;
+                        if (Mathf.FloorToInt(point.x * columns) != column ||
+                            Mathf.FloorToInt(point.y * rows) != row) continue;
+                        StartPeaAppearanceController candidate = item.Key;
+                        if (candidate.HasTrait) { hasTrait = true; break; }
+                        if (IsNearFaceRepresentative(candidate)) continue;
+                        int visibleSamples = candidate.CountVisibleFaceSamples(spawnedPeaVisuals);
+                        if (visibleSamples < 5) continue;
+                        float dx = point.x * columns - column - 0.5f;
+                        float dy = point.y * rows - row - 0.5f;
+                        // Prefer the current representative to prevent swaps from tiny motion.
+                        float score = dx * dx + dy * dy -
+                            (previousFaceRepresentatives.Contains(candidate) ? 0.15f : 0f) - visibleSamples * 0.02f;
+                        if (score >= bestScore) continue;
+                        bestScore = score;
+                        best = candidate;
+                    }
+                    if (!hasTrait && best != null) faceRepresentatives.Add(best);
+                }
+            }
+
+            foreach (StartPeaAppearanceController pea in faceRepresentatives)
+            {
+                if (!pea.HasTrait) BringFaceForward(pea, peaFaceSortingBoost, false);
+            }
+        }
+
+        // Traits get a small preference within their row, while lower rows still cover them.
+        foreach (StartPeaAppearanceController pea in spawnedPeaVisuals)
+        {
+            if (pea != null && pea != draggedPea && pea.HasTrait) BringFaceForward(pea, peaTraitSortingBoost, true);
+        }
+    }
+
+    private bool IsNearFaceRepresentative(StartPeaAppearanceController candidate)
+    {
+        float spacingSquared = peaFaceSpacing * peaFaceSpacing;
+        foreach (StartPeaAppearanceController pea in faceRepresentatives)
+        {
+            if ((pea.FaceCenter - candidate.FaceCenter).sqrMagnitude < spacingSquared) return true;
+        }
+        return false;
+    }
+
+    private void BringFaceForward(StartPeaAppearanceController pea, int boost, bool trait)
+    {
+        SortingGroup group = pea.SortingGroup;
+        if (group == null) return;
+        int originalOrder = group.sortingOrder;
+        long limit = (long)originalOrder + Mathf.Max(0, boost);
+        long targetOrder = trait ? limit : originalOrder;
+        foreach (StartPeaAppearanceController other in spawnedPeaVisuals)
+        {
+            if (other == null || other == pea || other.SortingGroup == null ||
+                other.SortingGroup.sortingLayerID != group.sortingLayerID) continue;
+            int otherOrder = other.SortingGroup.sortingOrder;
+            if (faceSortingOverrides.TryGetValue(other.SortingGroup, out int baseOrder))
+                otherOrder = baseOrder;
+            float heightDifference = pea.transform.position.y - other.transform.position.y;
+            if (heightDifference > peaFaceRowHeight && otherOrder > originalOrder)
+                limit = System.Math.Min(limit, (long)otherOrder - 1);
+            if (!other.HasTrait && Mathf.Abs(heightDifference) <= peaFaceRowHeight && other.CoversFaceOf(pea))
+                targetOrder = System.Math.Max(targetOrder, (long)otherOrder + 1);
+        }
+        targetOrder = System.Math.Max(originalOrder, System.Math.Min(targetOrder, limit));
+        int order = (int)System.Math.Clamp(targetOrder, short.MinValue, short.MaxValue);
+        if (order == originalOrder) return;
+        faceSortingOverrides[group] = originalOrder;
+        group.sortingOrder = order;
+    }
+
+    private float GetPeaNearAmount(float worldY)
+    {
+        float bottomY = Mathf.Min(peaDepthYRange.x, peaDepthYRange.y);
+        float topY = Mathf.Max(bottomY + 0.01f, Mathf.Max(peaDepthYRange.x, peaDepthYRange.y));
+        return 1f - Mathf.InverseLerp(bottomY, topY, worldY);
+    }
+
+    private void UpdatePeaDepthAppearance(StartPeaAppearanceController pea)
+    {
+        float nearAmount = GetPeaNearAmount(pea.transform.position.y);
+        float topScale = Mathf.Max(0.01f, peaTopScale);
+        float bottomScale = Mathf.Max(topScale, peaBottomScale);
+        pea.SetDepthScale(scalePeasByHeight ? Mathf.Lerp(topScale, bottomScale, nearAmount) : 1f);
+        pea.SetDepthAdditive(peaDepthAdditiveColor,
+            brightenPeasByHeight ? (1f - nearAmount) * Mathf.Clamp01(peaDepthAdditiveStrength) : 0f);
     }
 
     private void OnDisable()
     {
+        RestoreFaceSorting();
         KillSequence();
         RestoreScales();
         RestoreGrassPositions();
@@ -402,9 +630,19 @@ public class BGVisualController : MonoBehaviour
 
         peaSpawnFilter = new ContactFilter2D { useTriggers = false };
         peaSpawnFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(startPeaPrefab.gameObject.layer));
-        targetPeaCount = peaCount;
+        StartPeaAppearanceController prefabAppearance = startPeaPrefab.GetComponent<StartPeaAppearanceController>();
+        int traitCount = prefabAppearance != null ? prefabAppearance.TraitCount : 0;
+        targetPeaCount = Mathf.Max(peaCount, traitCount);
+        remainingPeaTraits.Clear();
+        for (int i = 1; i <= traitCount; i++) remainingPeaTraits.Add(i);
         spawnedPeaCount = 0;
         spawnedPeaGroups.Clear();
+        spawnedPeaDepthNoise.Clear();
+        spawnedPeaVisuals.Clear();
+        faceRepresentatives.Clear();
+        previousFaceRepresentatives.Clear();
+        peaFaceViewports.Clear();
+        faceSortingOverrides.Clear();
         peaSpawnTimer = 0f;
     }
 
@@ -439,16 +677,35 @@ public class BGVisualController : MonoBehaviour
         spawnedPeaCount++;
         pea.name = $"StartPea_{spawnedPeaCount:00}";
 
-        // Keep each pea's outline, fill and SpriteMask together when peas overlap.
+        StartPeaAppearanceController appearance = pea.GetComponent<StartPeaAppearanceController>();
+        if (appearance != null)
+        {
+            // Randomize both the spawn slots and the traits, consuming each trait exactly once.
+            int remainingPeas = targetPeaCount - spawnedPeaCount + 1;
+            int appearanceIndex = 0;
+            if (remainingPeaTraits.Count > 0 && Random.Range(0, remainingPeas) < remainingPeaTraits.Count)
+            {
+                int traitSlot = Random.Range(0, remainingPeaTraits.Count);
+                appearanceIndex = remainingPeaTraits[traitSlot];
+                remainingPeaTraits.RemoveAt(traitSlot);
+            }
+            appearance.SetAppearance(appearanceIndex);
+            spawnedPeaVisuals.Add(appearance);
+            UpdatePeaDepthAppearance(appearance);
+        }
+
+        // Keep each pea's body, accessories and face together when peas overlap.
         SortingGroup group = pea.GetComponent<SortingGroup>();
         if (group == null) group = pea.gameObject.AddComponent<SortingGroup>();
         SpriteRenderer sprite = pea.GetComponent<SpriteRenderer>();
+        if (sprite == null) sprite = pea.GetComponentInChildren<SpriteRenderer>();
         if (sprite != null)
         {
             group.sortingLayerID = sprite.sortingLayerID;
         }
 
         spawnedPeaGroups.Add(group);
+        spawnedPeaDepthNoise[group] = Random.Range(-1f, 1f);
         if (randomizePeaSortingOrder)
         {
             int minimum = Mathf.Clamp(Mathf.Min(peaSortingOrderRange.x, peaSortingOrderRange.y), short.MinValue, short.MaxValue);
@@ -464,9 +721,11 @@ public class BGVisualController : MonoBehaviour
 
     private void UpdatePeaSorting(SortingGroup group)
     {
-        // Larger sorting orders render in front; lower peas therefore get larger values.
-        group.sortingOrder = Mathf.Clamp(
-            peaSortingOrderOffset - Mathf.RoundToInt(group.transform.position.y * 100f),
+        // Keep depth dominant while nearby peas can overlap in a less uniform order.
+        spawnedPeaDepthNoise.TryGetValue(group, out float noise);
+        int jitter = Mathf.RoundToInt(noise * Mathf.Clamp(peaDepthOrderJitter, 0, short.MaxValue));
+        group.sortingOrder = (int)System.Math.Clamp(
+            (long)peaSortingOrderOffset - Mathf.RoundToInt(group.transform.position.y * 100f) + jitter,
             short.MinValue, short.MaxValue);
     }
 
