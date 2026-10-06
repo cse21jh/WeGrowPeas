@@ -11,6 +11,9 @@ namespace WeGrowPeas.RecallBook
     {
         [Tooltip("Only the two paper pages and their contents. Keep cover, rings and navigation outside.")]
         [SerializeField] private RectTransform pageRoot;
+        [Tooltip("The actual paper Image RectTransforms. Size and position are read on every turn.")]
+        [SerializeField] private RectTransform leftPage;
+        [SerializeField] private RectTransform rightPage;
         [SerializeField] private BookPageSnapshot snapshot;
         [SerializeField] private RawImage stationaryPage;
         [SerializeField] private BookPageCurlGraphic turningPage;
@@ -21,7 +24,9 @@ namespace WeGrowPeas.RecallBook
         [SerializeField] private bool reduceMotion;
         [SerializeField] private UnityEvent onTurnStarted = new UnityEvent();
         [SerializeField] private UnityEvent onTurnCompleted = new UnityEvent();
-        private RenderTexture before, after;
+        private RenderTexture frontSnapshot, backSnapshot, stationarySnapshot;
+        private Rect shadowSourceRect, shadowDestinationRect;
+        private readonly Vector3[] pageCorners = new Vector3[4];
         private Coroutine animation;
         private bool previousInteractable;
         private bool locked;
@@ -32,7 +37,8 @@ namespace WeGrowPeas.RecallBook
         public bool TryTurn(bool forward, Action redrawDestination)
         {
             if (IsTurning || !isActiveAndEnabled || redrawDestination == null) return false;
-            if (reduceMotion || pageRoot == null || snapshot == null || turningPage == null ||
+            ResolvePages();
+            if (reduceMotion || pageRoot == null || leftPage == null || rightPage == null || snapshot == null || turningPage == null ||
                 stationaryPage == null || pageMaterial == null)
             {
                 redrawDestination();
@@ -40,9 +46,20 @@ namespace WeGrowPeas.RecallBook
                 return true;
             }
             IsTurning = true;
+            var sourcePage = forward ? rightPage : leftPage;
+            var destinationPage = forward ? leftPage : rightPage;
+            Rect sourceBounds;
             try
             {
-                snapshot.Capture(pageRoot, ref before);
+                Canvas.ForceUpdateCanvases();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(pageRoot);
+                sourceBounds = PageBounds(sourcePage, turningPage.rectTransform.parent);
+                // Capture pages separately: the paper may extend outside Pages, overlap at
+                // the spine, or have transparent corners. Never crop it to a fixed half-spread.
+                snapshot.Capture(destinationPage, ref stationarySnapshot);
+                snapshot.Capture(sourcePage, ref frontSnapshot);
+                FitRect(stationaryPage.rectTransform, PageBounds(destinationPage, stationaryPage.rectTransform.parent));
+                if (castShadow != null) shadowSourceRect = PageBounds(sourcePage, castShadow.rectTransform.parent);
             }
             catch (Exception exception)
             {
@@ -55,16 +72,22 @@ namespace WeGrowPeas.RecallBook
             try
             {
                 redrawDestination();
-                snapshot.Capture(pageRoot, ref after);
-                stationaryPage.texture = before;
-                stationaryPage.uvRect = new Rect(forward ? 0 : 0.5f, 0, 0.5f, 1);
-                var rect = stationaryPage.rectTransform;
-                rect.anchorMin = new Vector2(forward ? 0 : 0.5f, 0);
-                rect.anchorMax = new Vector2(forward ? 0.5f : 1, 1);
-                rect.offsetMin = rect.offsetMax = Vector2.zero;
+                snapshot.Capture(destinationPage, ref backSnapshot);
+                var destinationBounds = PageBounds(destinationPage, turningPage.rectTransform.parent);
+                var union = Rect.MinMaxRect(Mathf.Min(sourceBounds.xMin, destinationBounds.xMin),
+                    Mathf.Min(sourceBounds.yMin, destinationBounds.yMin), Mathf.Max(sourceBounds.xMax, destinationBounds.xMax),
+                    Mathf.Max(sourceBounds.yMax, destinationBounds.yMax));
+                var sheetRect = turningPage.rectTransform;
+                FitRect(sheetRect, union);
+                // FitRect uses a centered pivot and identity rotation/scale in this plane.
+                var localSource = new Rect(sourceBounds.position - union.center, sourceBounds.size);
+                var localDestination = new Rect(destinationBounds.position - union.center, destinationBounds.size);
+                if (castShadow != null) shadowDestinationRect = PageBounds(destinationPage, castShadow.rectTransform.parent);
+                stationaryPage.texture = stationarySnapshot;
+                stationaryPage.uvRect = new Rect(0, 0, 1, 1);
                 stationaryPage.gameObject.SetActive(true);
                 turningPage.gameObject.SetActive(true);
-                turningPage.SetSheet(before, after, forward, pageMaterial);
+                turningPage.SetSheet(frontSnapshot, backSnapshot, forward, pageMaterial, localSource, localDestination);
                 turningPage.SetProgress(0);
                 if (pageInteraction != null)
                 {
@@ -98,16 +121,50 @@ namespace WeGrowPeas.RecallBook
                 {
                     float strength = Mathf.Sin(t * Mathf.PI);
                     castShadow.color = new Color(0.34f, 0.20f, 0.12f, strength * 0.13f);
-                    var rect = castShadow.rectTransform;
-                    float edge = 0.5f + Mathf.Cos(t * Mathf.PI) * (forward ? 0.5f : -0.5f);
-                    rect.anchorMin = new Vector2(Mathf.Max(0, edge - 0.045f * strength), 0);
-                    rect.anchorMax = new Vector2(Mathf.Min(1, edge + 0.045f * strength), 1);
-                    rect.offsetMin = rect.offsetMax = Vector2.zero;
+                    float width = Mathf.Lerp(shadowSourceRect.width, shadowDestinationRect.width, t);
+                    float height = Mathf.Lerp(shadowSourceRect.height, shadowDestinationRect.height, t);
+                    float spine = Mathf.Lerp(forward ? shadowSourceRect.xMin : shadowSourceRect.xMax,
+                        forward ? shadowDestinationRect.xMax : shadowDestinationRect.xMin, t);
+                    float edge = spine + Mathf.Cos(t * Mathf.PI) * width * (forward ? 1 : -1);
+                    float shadowWidth = width * 0.18f * strength;
+                    float centerY = Mathf.Lerp(shadowSourceRect.center.y, shadowDestinationRect.center.y, t);
+                    FitRect(castShadow.rectTransform, new Rect(edge - shadowWidth * 0.5f, centerY - height * 0.5f, shadowWidth, height));
                 }
                 yield return null;
             }
             animation = null;
             Finish();
+        }
+
+        private void ResolvePages()
+        {
+            // Existing prefab instances created before these fields were added still work.
+            if (pageRoot == null) return;
+            if (leftPage == null) leftPage = pageRoot.Find("LeftPage") as RectTransform;
+            if (rightPage == null) rightPage = pageRoot.Find("RightPage") as RectTransform;
+        }
+
+        private Rect PageBounds(RectTransform page, Transform relativeTo)
+        {
+            page.GetWorldCorners(pageCorners);
+            Vector2 min = relativeTo.InverseTransformPoint(pageCorners[0]);
+            Vector2 max = min;
+            for (int i = 1; i < pageCorners.Length; i++)
+            {
+                Vector2 point = relativeTo.InverseTransformPoint(pageCorners[i]);
+                min = Vector2.Min(min, point);
+                max = Vector2.Max(max, point);
+            }
+            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        }
+
+        private static void FitRect(RectTransform target, Rect bounds)
+        {
+            target.anchorMin = target.anchorMax = target.pivot = new Vector2(0.5f, 0.5f);
+            target.localRotation = Quaternion.identity;
+            target.localScale = Vector3.one;
+            target.sizeDelta = bounds.size;
+            target.localPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
         }
 
         private void Finish()
@@ -128,8 +185,9 @@ namespace WeGrowPeas.RecallBook
             animation = null;
             Finish();
             if (stationaryPage != null) stationaryPage.texture = null;
-            BookPageSnapshot.Release(ref before);
-            BookPageSnapshot.Release(ref after);
+            BookPageSnapshot.Release(ref frontSnapshot);
+            BookPageSnapshot.Release(ref backSnapshot);
+            BookPageSnapshot.Release(ref stationarySnapshot);
         }
     }
 }

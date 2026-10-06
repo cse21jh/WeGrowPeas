@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 namespace WeGrowPeas.RecallBook
 {
-    /// <summary>Captures an entire live spread, including TMP and UI masks, only when turning.</summary>
+    /// <summary>Captures a live UI page (or a supplied preview root), including TMP and UI masks.</summary>
     [AddComponentMenu("UI/Recall Book/Page Snapshot")]
     public sealed class BookPageSnapshot : MonoBehaviour
     {
-        [SerializeField, Range(512, 4096)] private int textureWidth = 2048;
+        [Tooltip("Capture width per page, not the entire open book.")]
+        [SerializeField, Range(512, 4096)] private int textureWidth = 1024;
         [SerializeField, Range(0, 31)] private int captureLayer = 5;
         private GameObject stage;
         private RectTransform stageRect;
@@ -33,7 +34,7 @@ namespace WeGrowPeas.RecallBook
                 Release(ref destination);
                 destination = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
                 {
-                    name = "Recall Book Spread", antiAliasing = 1, filterMode = FilterMode.Bilinear,
+                    name = "Recall Book Snapshot", antiAliasing = 1, filterMode = FilterMode.Bilinear,
                     wrapMode = TextureWrapMode.Clamp, hideFlags = HideFlags.HideAndDontSave
                 };
                 destination.Create();

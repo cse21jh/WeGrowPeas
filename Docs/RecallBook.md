@@ -29,23 +29,37 @@ Blender 모델, 뼈대 애니메이션, 3D 조명이 필요 없다. 페이지에
 
 권장 레이어는 표지/종이 더미, 왼쪽 종이, 오른쪽 종이, 중앙 링, 책갈피·닫기 버튼이다.
 사진과 설명은 종이 위의 일반 UI로 만든다. 중앙 링, 표지, 화살표, 닫기 버튼은 종이 밖에 둔다.
+기존 임시 종이 더미(PageStack/PaperEdge)와 철심(Ring/RingShadow)은 제거했다.
+종이 두께는 하드커버 그림에 함께 그려 `Cover`의 Image > Source Image에 적용한다.
+철심은 투명 PNG로 준비하고, 빈 `PageTurnOverlay/Binding` 아래에 UI Image를 추가해서 넣는다.
+PNG의 Texture Type은 Sprite (2D and UI)로 설정하고, Cover의 Image Color는 흰색으로 바꾸면 원본 색이 유지된다.
 
 ```text
 RecallBookExample
-  Cover / PageStack         고정된 2D 그림
-  Pages                    캡처 대상: 두 종이와 그 위 내용만
+  Cover                    하드커버와 종이 두께를 합친 2D 그림
+  Pages                    LeftPage / RightPage를 각각 캡처
     LeftPage               사진 4개 + 기록 설명
     RightPage              사진 4개 + 기록 설명
-  PageTurnOverlay          Pages와 같은 위치·크기, 그보다 나중에 그려짐
+  PageTurnOverlay          Pages보다 나중에 그려지는 효과·철심 컨테이너
     StationaryPage         넘기지 않는 기존 반쪽
+    Binding                사용자 철심 이미지를 넣을 빈 컨테이너; 이동 종이가 덮는 부분만 가려짐
     TurningShadow
     TurningSheet           BookPageCurlGraphic
-  Ring ...                 넘기는 종이보다 나중에 그려짐
   Previous / Next          캡처 대상 밖
 ```
 
-`Pages`와 `PageTurnOverlay`의 RectTransform 크기·피벗·위치를 일치시킨다.
-각 페이지는 전체 펼침면의 정확히 절반이며 가운데를 경첩으로 사용한다.
+종이 이미지는 `Pages/LeftPage`, `Pages/RightPage`의 Image > Source Image에 각각 넣는다.
+이 두 오브젝트의 RectTransform으로 종이 크기와 위치를 조절한다.
+`BookPageTurner`의 Left Page / Right Page에 이 두 RectTransform을 연결한다.
+기존 프리팹 인스턴스에서 참조가 비어 있으면 Pages 아래의 같은 이름으로 자동 연결한다.
+넘길 때마다 실제 종이의 크기·위치·스케일을 읽으므로 TurningSheet나 PageTurnOverlay의 크기는
+별도로 맞출 필요가 없다. 효과가 맞춰지는 동안 표지와 Binding의 배치는 그대로 유지된다.
+Canvas는 Hierarchy의 뒤쪽 형제를 나중에 그리므로, Binding을 StationaryPage 뒤,
+TurningSheet 앞에 둔다. 철심 자체를 끄지 않아도 넘기는 종이가 철심 위를 덮는다.
+Binding에 별도 Canvas의 Override Sorting을 지정하면 이 순서를 벗어날 수 있으므로 사용하지 않는다.
+각 페이지는 Pages 영역 밖으로 조금 커지거나 중앙에서 겹쳐도 된다. 좌우 종이 크기가 달라도
+출발 종이의 안쪽 끝에서 도착 종이의 안쪽 끝으로 넘기며 시작·종료 크기를 각각 맞춘다.
+종이는 책과 같은 평면에서 회전 없이 배치한다.
 종이 배경은 가급적 불투명하게 만든다. 종이가 화면 밖으로 살짝 부풀 공간도 남긴다.
 넘기는 종이를 잘라버릴 수 있으므로 `PageTurnOverlay`에 페이지 크기의 RectMask2D를 씌우지 않는다.
 
@@ -106,7 +120,7 @@ if (targetSpread >= 0 && targetSpread < spreadCount)
 | Material / Shadow Strength | 0.24 | 사진·글자에 덮이는 음영 강도 |
 | Material / Warm Shadow Tint | 갈색 | 검정보다 따뜻한 종이 그림자 |
 | Material / Paper Edge Width | 0.0025 | 종이 테두리 두께, 0이면 끔 |
-| Snapshot / Texture Width | 2048 | 펼침면 전체 캡처 너비. 글자가 작으면 3072, 성능 우선이면 1024 |
+| Snapshot / Texture Width | 1024 | 종이 한 장의 캡처 너비. 더 선명하게 하려면 2048, 성능 우선이면 512 |
 
 `Reduce Motion`을 켜면 애니메이션 없이 바로 바뀐다.
 프리팹의 카드 Button은 잠금 중 색이 어두워지지 않게 Disabled Color를 Normal Color와 같게 설정했다.
@@ -118,9 +132,9 @@ if (targetSpread >= 0 && targetSpread < spreadCount)
 ## 렌더링과 비용
 
 - Unity 6000.3.6f1, URP 17.3의 프로젝트 2D Renderer에서 확인했다.
-- 정지 중에는 별도 캡처 카메라가 실행되지 않는다. 넘길 때만 펼침면 두 장을 캡처한다.
+- 정지 중에는 별도 캡처 카메라가 실행되지 않는다. 넘길 때만 이동 종이 앞·뒷면과 반대편 기존 종이를 각각 캡처한다.
 - 기본 이동 종이는 48×8 스트립 셀, 삼각형 768개다.
-- 펼침면당 2048×1290 정도의 RGBA8와 깊이 버퍼가 필요하다. 전환용 두 장을 재사용하고 닫을 때 해제한다.
+- 현재 종이 비율에서 장당 약 1024×1285의 RGBA8와 깊이 버퍼가 필요하다. 전환용 세 장을 재사용하고 닫을 때 해제한다.
 - ReadPixels는 검증용 PNG 저장에서만 사용한다. 실제 넘김에는 GPU→CPU 이미지 읽기가 없다.
 - 캡처는 UI를 먼 위치의 임시 Canvas로 동기적으로 옮겼다가 같은 호출 안에서 부모·레이어·Transform을 복구한다.
   루트 Canvas도 캡처 레이어에 두어야 2D Renderer에서 출력된다.
@@ -139,7 +153,8 @@ Play Mode에서 `Tools > Recall Book > Validate In Play Mode`를 실행한다.
 기존 씬을 열거나 저장하지 않는다.
 
 검사 범위: 앞/뒤 넘김, 첫/마지막 페이지, 빠른 연속 요청, timeScale=0, Reduce Motion,
-도중에 닫기·다시 열기, UI 부모와 위치 복구, 불투명 캡처와 실제 이동 메시 생성.
+도중에 닫기·다시 열기, UI 부모와 위치 복구, 불투명 캡처와 실제 이동 메시 생성,
+양방향 넘김의 시작·종료 크기와 위치, 좌우 크기·스케일·피벗 변경 후 정렬, 철심 배치 유지.
 `Temp/RecallBookValidation/01-open.png`부터 `05-reverse-back.png`까지는 눈으로 확인할 이미지다.
 
 추가 코드와 셰이더 컴파일 오류 없음. 실제 렌더에서 사진·글자의 앞면과 뒷면 방향을 확인했다.

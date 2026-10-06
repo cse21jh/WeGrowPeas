@@ -58,6 +58,15 @@ public static class RecallBookValidation
         var capture = book.GetComponent<BookPageSnapshot>();
         var sheet = book.GetComponentInChildren<BookPageCurlGraphic>(true);
         var pages = (RectTransform)book.transform.Find("Pages");
+        var leftPage = (RectTransform)pages.Find("LeftPage");
+        var rightPage = (RectTransform)pages.Find("RightPage");
+        var leftSize = leftPage.sizeDelta;
+        var rightSize = rightPage.sizeDelta;
+        var leftPosition = leftPage.anchoredPosition;
+        var rightPosition = rightPage.anchoredPosition;
+        var binding = (RectTransform)book.transform.Find("PageTurnOverlay/Binding");
+        var bindingPosition = binding.anchoredPosition;
+        var bindingSize = binding.rect.size;
         var pageGroup = pages.GetComponent<CanvasGroup>();
         var pagePosition = pages.anchoredPosition;
         originalTimeScale = Time.timeScale;
@@ -77,6 +86,14 @@ public static class RecallBookValidation
             Assert.IsNotNull(sheet.GetComponent<CanvasRenderer>(), "A custom Graphic needs a CanvasRenderer.");
             Assert.AreEqual(book.transform, pages.parent);
             Assert.AreEqual(pagePosition, pages.anchoredPosition);
+            Assert.AreEqual(leftSize, leftPage.sizeDelta);
+            Assert.AreEqual(rightSize, rightPage.sizeDelta);
+            Assert.AreEqual(leftPosition, leftPage.anchoredPosition);
+            Assert.AreEqual(rightPosition, rightPage.anchoredPosition);
+            AssertSheetMatches(sheet, rightPage, 0);
+            AssertSheetMatches(sheet, leftPage, 1);
+            Assert.AreEqual(bindingPosition, binding.anchoredPosition);
+            Assert.AreEqual(bindingSize, binding.rect.size);
             example.Next();
             Assert.AreEqual(1, example.SpreadIndex, "Repeated input must be ignored during a turn.");
             sheet.SetProgress(0.35f);
@@ -100,6 +117,8 @@ public static class RecallBookValidation
             example.Previous();
             Assert.IsTrue(turner.IsTurning);
             Assert.AreEqual(0, example.SpreadIndex);
+            AssertSheetMatches(sheet, leftPage, 0);
+            AssertSheetMatches(sheet, rightPage, 1);
             sheet.SetProgress(0.72f);
             Export(capture, frame, "05-reverse-back.png");
             ready = true;
@@ -113,6 +132,23 @@ public static class RecallBookValidation
             Assert.IsFalse(turner.IsTurning);
             example.Previous();
             Assert.IsFalse(turner.IsTurning, "First spread must not turn backwards.");
+            // Reproduce art/layout edits between turns on this disposable instance only.
+            // Include unequal sizes, offsets, scale and pivot, while the overlay stays stale.
+            leftPage.sizeDelta += new Vector2(42, 18);
+            leftPage.anchoredPosition += new Vector2(-6, 9);
+            leftPage.localScale = new Vector3(0.93f, 1.04f, 1);
+            leftPage.pivot = new Vector2(0.6f, 0.45f);
+            rightPage.sizeDelta += new Vector2(18, 44);
+            rightPage.anchoredPosition += new Vector2(8, -5);
+            rightPage.localScale = new Vector3(1.06f, 0.98f, 1);
+            example.Next();
+            Assert.IsTrue(turner.IsTurning);
+            AssertSheetMatches(sheet, rightPage, 0);
+            AssertSheetMatches(sheet, leftPage, 1);
+            Assert.AreEqual(bindingPosition, binding.anchoredPosition);
+            Assert.AreEqual(bindingSize, binding.rect.size);
+            book.SetActive(false);
+            book.SetActive(true);
             turner.ReduceMotion = true;
             example.Next();
             Assert.AreEqual(1, example.SpreadIndex);
@@ -131,10 +167,27 @@ public static class RecallBookValidation
             example.Next();
             Assert.IsTrue(turner.IsTurning, "Reopening must reacquire released render textures.");
             book.SetActive(false);
-            Result = "PASS: forward/back, opaque snapshots, sheet mesh, bounds, repeated input, timeScale=0, reduced motion, close/reopen and hierarchy restoration. PNGs for visual review: " + Output;
+            Result = "PASS: forward/back endpoint size and position, page resize/scale/pivot edits, unchanged binding and page layout, opaque snapshots, sheet mesh, bounds, repeated input, timeScale=0, reduced motion, close/reopen and hierarchy restoration. PNGs for visual review: " + Output;
             Debug.Log("[Recall Book] " + Result);
         }
         catch (Exception e) { Fail(e); }
+    }
+
+    private static void AssertSheetMatches(BookPageCurlGraphic sheet, RectTransform page, float progress)
+    {
+        sheet.SetProgress(progress);
+        Canvas.ForceUpdateCanvases();
+        var vertices = sheet.canvasRenderer.GetMesh().vertices;
+        Assert.IsTrue(vertices.Length > 0);
+        var actual = new Bounds(sheet.transform.TransformPoint(vertices[0]), Vector3.zero);
+        foreach (var vertex in vertices) actual.Encapsulate(sheet.transform.TransformPoint(vertex));
+        var corners = new Vector3[4];
+        page.GetWorldCorners(corners);
+        var expected = new Bounds(corners[0], Vector3.zero);
+        foreach (var corner in corners) expected.Encapsulate(corner);
+        Assert.IsTrue(Vector3.Distance(actual.min, expected.min) < 0.02f &&
+            Vector3.Distance(actual.max, expected.max) < 0.02f,
+            $"Turn endpoint {progress} must match {page.name}. Actual {actual}, expected {expected}");
     }
 
     private static void Export(BookPageSnapshot capture, RectTransform root, string filename)

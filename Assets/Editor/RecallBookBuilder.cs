@@ -92,9 +92,7 @@ public static class RecallBookBuilder
             var snapshot = root.gameObject.AddComponent<BookPageSnapshot>();
             Panel("DropShadow", root, new Vector2(0, -12), new Vector2(1152, 760), new Color(0.1f, 0.07f, 0.04f, 0.3f));
             Panel("Cover", root, Vector2.zero, new Vector2(1140, 748), new Color(0.77f, 0.43f, 0.25f));
-            Panel("PageStack", root, new Vector2(0, 3), new Vector2(1110, 722), new Color(0.93f, 0.70f, 0.49f));
-            for (int i = 0; i < 3; i++)
-                Panel("PaperEdge", root, new Vector2(0, -353 + i * 5), new Vector2(1095, 1), new Color(0.81f, 0.48f, 0.28f));
+            // Paper thickness is part of the user's cover artwork.
             var spread = Rect("Pages", root);
             spread.sizeDelta = new Vector2(1080, 680);
             spread.anchoredPosition = new Vector2(0, 14);
@@ -148,6 +146,10 @@ public static class RecallBookBuilder
             var stationary = Rect("StationaryPage", effects).gameObject.AddComponent<RawImage>();
             stationary.raycastTarget = false;
             stationary.gameObject.SetActive(false);
+            // Keep the binding above the resting page, but below the moving sheet so only
+            // the part physically covered by that sheet is hidden.
+            var binding = Rect("Binding", effects);
+            Stretch(binding);
             var shadow = Rect("TurningShadow", effects).gameObject.AddComponent<Image>();
             shadow.raycastTarget = false;
             shadow.gameObject.SetActive(false);
@@ -157,17 +159,12 @@ public static class RecallBookBuilder
             sheet.raycastTarget = false;
             sheet.material = material;
             sheet.gameObject.SetActive(false);
-            // Rings are drawn over the moving paper, and are deliberately outside its capture.
-            for (int i = 0; i < 15; i++)
-            {
-                float y = 317 - i * 44;
-                Panel("RingShadow", root, new Vector2(0, y - 2), new Vector2(38, 13), new Color(0.68f, 0.43f, 0.29f, 0.55f));
-                Panel("Ring", root, new Vector2(0, y), new Vector2(38, 10), new Color(1, 0.99f, 0.95f));
-            }
+            // Leave Binding empty for the user's artwork, beneath the moving paper.
             var previous = Navigation(root, "Previous", "<", new Vector2(-485, -324));
             var next = Navigation(root, "Next", ">", new Vector2(485, -324));
             Assign(turner, ("pageRoot", spread), ("snapshot", snapshot), ("stationaryPage", stationary),
-                ("turningPage", sheet), ("castShadow", shadow), ("pageInteraction", group), ("pageMaterial", material));
+                ("turningPage", sheet), ("castShadow", shadow), ("pageInteraction", group), ("pageMaterial", material),
+                ("leftPage", spread.Find("LeftPage")), ("rightPage", spread.Find("RightPage")));
             Assign(example, ("turner", turner), ("leftNumber", leftNumber), ("rightNumber", rightNumber),
                 ("previous", previous), ("next", next), ("demoPhoto", photo));
             AssignArray(example, "titles", titles);

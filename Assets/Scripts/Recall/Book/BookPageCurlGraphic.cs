@@ -17,22 +17,27 @@ namespace WeGrowPeas.RecallBook
         private Material instance;
         private float progress;
         private bool forward = true;
+        private Rect sourceRect;
+        private Rect destinationRect;
 
         public override Texture mainTexture => front != null ? front : Texture2D.whiteTexture;
 
-        public void SetSheet(Texture frontSpread, Texture backSpread, bool turnForward, Material template)
+        public void SetSheet(Texture frontPage, Texture backPage, bool turnForward, Material template,
+            Rect sourcePageRect, Rect destinationPageRect)
         {
-            front = frontSpread;
-            back = backSpread;
+            front = frontPage;
+            back = backPage;
             forward = turnForward;
+            sourceRect = sourcePageRect;
+            destinationRect = destinationPageRect;
             if (instance == null)
             {
                 instance = new Material(template) { name = "Book Curl (Instance)", hideFlags = HideFlags.HideAndDontSave };
                 material = instance;
             }
             instance.SetTexture("_BackTex", back);
-            instance.SetVector("_FrontRect", forward ? new Vector4(0.5f, 0, 0.5f, 1) : new Vector4(0, 0, 0.5f, 1));
-            instance.SetVector("_BackRect", forward ? new Vector4(0, 0, 0.5f, 1) : new Vector4(0.5f, 0, 0.5f, 1));
+            instance.SetVector("_FrontRect", new Vector4(0, 0, 1, 1));
+            instance.SetVector("_BackRect", new Vector4(0, 0, 1, 1));
             if (canvas != null) canvas.additionalShaderChannels |= AdditionalCanvasShaderChannels.TexCoord1;
             SetAllDirty();
         }
@@ -60,8 +65,14 @@ namespace WeGrowPeas.RecallBook
         protected override void OnPopulateMesh(VertexHelper vh)
         {
             vh.Clear();
-            var rect = GetPixelAdjustedRect();
-            float width = rect.width * 0.5f;
+            // Each endpoint comes from the actual page, including its size, scale and offset.
+            // A slightly overlapping spine or unequal page widths must not shift at handoff.
+            float width = Mathf.Lerp(sourceRect.width, destinationRect.width, progress);
+            float height = Mathf.Lerp(sourceRect.height, destinationRect.height, progress);
+            float spine = Mathf.Lerp(forward ? sourceRect.xMin : sourceRect.xMax,
+                forward ? destinationRect.xMax : destinationRect.xMin, progress);
+            float centerY = Mathf.Lerp(sourceRect.center.y, destinationRect.center.y, progress);
+            var rect = new Rect(spine - width * 0.5f, centerY - height * 0.5f, width, height);
             if (width <= 0 || rect.height <= 0) return;
             int nx = Mathf.Clamp(columns, 16, 96);
             int ny = Mathf.Clamp(rows, 2, 24);
