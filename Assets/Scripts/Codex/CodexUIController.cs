@@ -90,6 +90,13 @@ public class CodexUIController : MonoBehaviour
         SelectCategory((int)_cat);
     }
 
+    /// <summary>도감을 특정 카테고리 탭으로 연다. 버튼 onClick에서 int 인자로 호출한다.</summary>
+    public void OpenCategory(int catIndex)
+    {
+        _cat = (CodexProgress.Category)catIndex;
+        OpenCodex();
+    }
+
     public void CloseCodex()
     {
         if (codexPanel != null) codexPanel.SetActive(false);
