@@ -63,13 +63,135 @@ Binding에 별도 Canvas의 Override Sorting을 지정하면 이 순서를 벗�
 종이 배경은 가급적 불투명하게 만든다. 종이가 화면 밖으로 살짝 부풀 공간도 남긴다.
 넘기는 종이를 잘라버릴 수 있으므로 `PageTurnOverlay`에 페이지 크기의 RectMask2D를 씌우지 않는다.
 
+## 회상 이외의 UI에 재사용
+
+공용 프리팹: `Assets/Resource/Sprites/UI/Book/BookUIBase.prefab`.
+현재 디자인의 종이·표지·철심·넘김 효과를 복사하고, 회상 예제 콘텐츠와 `RecallBookExample`을 제외했다.
+원본 `Assets/Resource/Sprites/UI/Book/BookUI.prefab` 및 회상 프리팹은 변경하지 않는다.
+`Tools > Book UI > Create Reusable Prefab`은 공용 프리팹이 없을 때만 만든다.
+
+1. 공용 프리팹을 복제하거나 Prefab Variant로 만들어 Canvas 아래에 놓는다.
+2. `BookContent/Pages/LeftPage/Layout0`, `BookContent/Pages/RightPage/Layout0` 안에 해당 화면의 UI를 배치한다.
+   슬롯 수나 컴포넌트 이름은 자유다. TMP, Image, Button, Slider, ScrollRect 등을 쓸 수 있다.
+   `Layout0`은 여백을 둔 컨테이너이므로 여백도 RectTransform에서 조절할 수 있다.
+3. 책 한 개에 여러 화면을 넣을 때는 Layout1 안에 다른 UI를 만든다.
+   최상위 `Book Layout Controller`의 `Layouts` 각 항목은 좌·우 콘텐츠 한 쌍이다.
+   예: 0번은 인벤토리 격자 + 설명, 1번은 도감 그림 + 수치, 2번은 설정 옵션 + 슬라이더.
+4. Inspector의 `Add Empty Layout`을 누르면 새 좌우 컨테이너와 배열 연결이 함께 생긴다.
+   `Preview 0`, `Preview 1` 버튼으로 편집할 화면을 고른다. Preview는 데이터 이벤트를 실행하지 않는다.
+   시작 화면은 별도의 `Initial Layout`(0부터 시작) 값으로 정한다.
+5. 버튼 On Click에는 `BookLayoutController.Show(int)`와 화면 번호를 지정한다.
+   기본 화살표는 Layouts 순서로 이동한다. 필요 없으면 Previous / Next 연결을 비우고 버튼을 숨긴다.
+   한 화면만 쓸 때는 Layouts를 한 항목으로 줄이고 안 쓰는 Layout1 오브젝트도 삭제한다.
+
+책 전체 크기는 **최상위 BookUIBase의 RectTransform > Width / Height**로 조절한다.
+`Book Root Scaler`가 `BookContent` 아래의 표지·종이·철심·버튼·내용·넘김 효과를 함께 축소한다.
+예: 기준 1180×800에서 590×400으로 변경하면 전체가 절반 크기가 된다. 편집·Prefab Mode에서도 바로 적용된다.
+기본 `Preserve Aspect`가 켜져 있으면 주어진 영역 안에 비율을 유지해 맞추므로 한쪽에 여백이 남을 수 있다.
+가로·세로를 각각 늘이려면 이 옵션을 끈다. Reference Size는 원본 디자인 크기 1180×800을 유지한다.
+기존 최상위 Scale도 함께 적용된다. 전체와 같이 커지거나 작아질 새 요소는 `BookContent` 아래에 추가한다.
+`BookContent` 자체의 크기·스케일은 자동 계산된다. 개별 종이와 콘텐츠는 그 아래에서 계속 편집한다.
+
+공용 컨트롤러는 내용의 글자나 사진을 덮어쓰지 않는다. 고정 문구는 Inspector에서 그대로 편집한다.
+게임 데이터는 각 UI 전용 스크립트가 채운다. 각 Layout의 `On Show`에 데이터 갱신 함수를 연결하면
+활성화 직후, 넘김용 캡처 전에 실행된다. 초기 열기와 다시 열기에도 호출된다.
+비동기 사진·데이터 로딩은 전환 전에 끝내고, On Show에서는 UI에 즉시 반영한다.
+On Show 안에서 다른 페이지 이동이나 책 닫기를 호출하지 않는다.
+
+```csharp
+using WeGrowPeas.UI.Book;
+
+// BookLayoutController bookLayouts;
+bookLayouts.Show(1);               // 1번 레이아웃으로 넘김; 버튼에도 연결 가능
+bookLayouts.ShowImmediate(0);      // 애니메이션 없이 변경
+bool accepted = bookLayouts.TryShow(2); // 범위 밖 / 넘김 중 / 같은 화면이면 false
+```
+
+전환은 콘텐츠 루트만 켜고 끈다. 기존 컨트롤의 값은 각 컨트롤러가 초기화하지 않는 한 유지되며,
+책을 닫았다 열어도 마지막 레이아웃을 유지한다. 넘기는 동안 클릭은 잠기고 연속 요청은 무시한다.
+레이아웃 루트는 해당 종이의 자식이어야 하며, 종이 자체를 지정하거나 다른 레이아웃 루트와
+공유·중첩하면 안 된다. 왼쪽 또는 오른쪽 참조를 비우면 그쪽은 빈 종이를 표시한다.
+레이아웃 배열에서 항목을 제거할 때는 해당 콘텐츠 오브젝트도 삭제하거나 비활성화한다.
+
+인벤토리의 다음 아이템 페이지처럼 **레이아웃은 같고 데이터만 바뀌는 경우**에는 해당 화면의
+스크립트에서 `BookPageTurner.TryTurn(forward, () => RefreshItems())`를 호출한다.
+`BookLayoutController`는 화면 종류 전환만 담당한다. 이 경우 기본 화살표의 Previous / Next
+연결을 비우고, 전용 데이터 페이징 함수에 버튼을 연결한다.
+실제 `RecallRoot`의 목록은 `RecallUIController`가 담당한다. 데모 전용인 `RecallBookExample`을
+같은 책에 함께 붙이지 않는다.
+
+넘김 효과의 기존 `WeGrowPeas.RecallBook` 네임스페이스는 직렬화 호환성을 위해 유지하지만,
+`BookPageTurner`, `BookPageSnapshot`, `BookPageCurlGraphic`은 회상 데이터에 의존하지 않는다.
+일반 uGUI 콘텐츠를 지원하며 페이지 밖의 별도 Canvas나 3D 오브젝트는 캡처 대상에 포함되지 않는다.
+
+## 모서리 닫기 버튼
+
+공용 책의 `BookContent/CloseButton`은 `BookCloseButton`을 사용한다. 일반 상태는
+`xBtn0`·`rightPage`·`bookBase`, 마우스 하이라이트·누름·키보드 선택 상태는
+`xBtn1`·`rightPage1`·`bookBase1`을 함께 표시한다. 비활성화하거나 책을 닫으면 일반 상태로 복구한다.
+`Book Base Image`는 `BookContent/Cover`에 연결한다. 배경까지 함께 바꿔야 접힌 모서리 뒤로
+기존 종이 면이 드러나지 않는다.
+
+버튼의 두 그림은 각자 RectTransform을 사용한다. `CloseButton`의 Image가 작은 그림이고,
+자식 `xBtn1`의 Image가 큰 그림이다. 큰 그림은 오른쪽 위를 고정하고 왼쪽·아래로 펼쳐진다.
+Sprite Swap은 사용하지 않으므로 큰 그림이 작은 버튼 사각형 안에 압축되지 않는다.
+두 그림의 크기와 위치는 원본 PNG의 슬라이스 좌표를 종이 크기에 맞춰 배치했다.
+책 전체 크기는 기존처럼 `BookRootScaler`로 조절한다.
+
+`RecallRoot` 인스턴스의 On Click에는 `RecallUIController.CloseRecall()`이 연결되어 있다.
+다른 화면에 공용 책을 사용할 때는 `BookCloseButton`의 On Click에 그 화면의 닫기 함수를 연결한다.
+페이지 콘텐츠나 목록 페이징과는 별도로 동작한다.
+
+## 책 열기·닫기와 페이드
+
+`RecallRoot > RecallPanel > BookUIBase`의 `Book Close Motion`에서 열기·닫기 동작을 조절한다.
+기존 X 버튼의 CloseRecall 연결을 유지하며, 위로 올라갔다가 화면 아래로 빠져나간 뒤 패널을 닫는다.
+회상 버튼의 OpenRecall은 같은 경로를 역재생해 화면 아래에서 올라온 뒤 살짝 내려앉는다.
+
+- Rise Height: 위로 튀는 높이. 기본 50 UI 단위.
+- Rise Duration / Rise Curve: 닫을 때 상승 시간(기본 0.14초)과 이동 곡선. 열 때 마지막 안착 구간에 역으로 적용된다.
+- Drop Duration / Drop Curve: 닫을 때 하강 시간(기본 0.34초)과 이동 곡선. 열 때 처음 올라오는 구간에 역으로 적용된다.
+- Offscreen Padding: 책이 화면 아래로 완전히 내려간 뒤의 추가 여백. 기본 40.
+- Tint Fade Curve: RecallPanel의 어두운 배경 이미지 페이드 곡선.
+- Title Fade Curve: 왼쪽 Title의 글자와 기록 개수 페이드 곡선.
+
+이동 커브의 X는 각 구간의 시간 0~1, Y는 이동 거리 0~1이다. 시작은 (0,0), 끝은 (1,1)로 둔다.
+페이드 커브의 X는 전체 열기·닫기 시간 0~1, Y는 페이드 진행도 0~1이다.
+배경과 Title은 Graphic.DOFade로 색상의 알파만 변경한다. 열 때는 0에서 각 요소의 원래 알파까지,
+닫을 때는 원래 알파에서 0까지 재생하며 RGB와 원래의 반투명 디자인을 유지한다.
+
+화면 크기에 맞춰 하강 거리를 자동 계산한다. 이동과 페이드는 하나의 DOTween Sequence에 묶이며,
+SetUpdate(true)로 게임이 일시 정지되어도 재생한다. 재생 중 중복 입력은 무시한다.
+완료·비활성화·트윈 취소 시 원래 위치, 색상과 입력 상태를 복구한다.
+씬 전환처럼 즉시 정리해야 할 때는 RecallUIController.CloseRecallImmediately()를 사용할 수 있다.
+
 ## 기존 회상 목록과 연결
 
-가장 쉬운 방법은 프리팹의 `RecallBookExample > Use Saved Records`를 켜는 것이다.
-현재 프로필의 RecallStore 기록을 최신순으로, 한 펼침면당 8개씩 불러온다.
-`Detail UI`에 기존 `RecallDetailUI`를 연결하면 기록 클릭으로 기존 상세 화면을 연다.
-또는 `Entry Selected(string)` 이벤트에 별도 화면 전환 함수를 연결할 수 있다.
-다른 프로필로 바꾼 뒤에는 책을 닫았다 열어 목록을 갱신한다.
+`Assets/Resource/Sprites/UI/Book/RecallRoot.prefab`은 `RecallUIController`에서
+`BookUIBase`의 **레이아웃 1(회상_목록)**에 현재 프로필의 기록을 최신순으로 표시한다.
+기존 `ListScroll`은 비활성화되어 있으며, 왼쪽 4개·오른쪽 4개의 `RecallButton`을 재사용한다.
+화살표는 레이아웃 번호를 바꾸지 않고 다음/이전 기록 8개로 책장을 넘긴다.
+양쪽 하단 숫자는 같은 펼침면 번호/전체 펼침면 수이며, 기록이 없으면 `0/0`이다.
+책을 다시 열면 목록을 다시 읽고 첫 펼침면부터 표시한다.
+
+`RecallUIController`의 `Book Layouts`, `Left/Right Page Slots`, `Previous/Next Page`,
+양쪽 빈 목록 문구와 페이지 번호가 프리팹에 연결되어 있다.
+이 `RecallRoot` 안의 `BookLayoutController`는 기본 Previous/Next 참조를 비워
+목록 넘김과 레이아웃 넘김이 동시에 실행되지 않게 했다. 공용 `BookUIBase`의 기본 동작은 유지한다.
+카드를 추가하거나 순서를 바꿀 때는 `Left/Right Page Slots` 배열도 화면 순서에 맞춘다.
+
+카드의 사진은 런타임 PNG를 표시하는 `RawImage`로 연결했다. 사진이 없으면 `사진 없음`을 표시한다.
+`RecallListSlot`이 기록 번호, 날짜·시간, 일수·식물·승천 단계를 채우며 카드의 모양과 배치는
+`RecallButton.prefab`에서 편집한다. `RecallRoot` 밖의 기존 씬은 종전 목록 방식도 계속 지원한다.
+
+카드를 누르면 저장된 기록을 읽어 **레이아웃 2**를 연다. `BookRecallDetail`의
+`RecallTimelineUI`가 마지막 일자의 텃밭, 아이템, 저주, 웨이브, 골드와 변화량을 채운다.
+레이아웃 1의 On Show는 `RestoreBookList`, 레이아웃 2의 On Show는 `RenderBookDetail`에
+연결되어 있다. 화면을 채우는 시점은 원래 페이지 캡처 이후다.
+`목록으로` 또는 ESC로 돌아오면 선택 전의 목록 펼침면을 유지한다.
+
+별도 데모 `RecallBookExample`에도 `Use Saved Records` 옵션이 있지만 실제 `RecallRoot`에서는
+사용하지 않는다.
 
 직접 만든 목록 컨트롤러에서는, 페이지 내용 변경을 아래 콜백 안에서 한 번 실행한다.
 
@@ -94,17 +216,24 @@ if (targetSpread >= 0 && targetSpread < spreadCount)
 목적지 데이터는 넘김 시작 시 확정된다. 창을 도중에 닫으면 그 목적지 상태를 유지한다.
 `Time.unscaledDeltaTime`을 사용하므로 게임의 timeScale이 0이어도 넘김은 끝난다.
 
-기존 `RecallUIController.BuildList()`는 모든 기록을 한 Grid에 놓는 구조다.
-새 디자인으로 전환할 때는 위 프리팹의 목록 표시 부분으로 대체하거나, 한 펼침면의 8개만
-양쪽 컨테이너에 배치하도록 목록 그리기 함수를 분리한다. 기존 사진 로딩과 상세 UI는 재사용한다.
+`RecallUIController.BuildBookList()`와 `RenderSpread()`가 책 목록을 채운다.
+`BuildList()`는 책 참조가 없는 이전 씬의 Grid 목록을 위한 호환 경로다.
 
 ## 상세·타임라인 화면
 
 세 번째 줄 시안처럼 왼쪽에는 밭, 오른쪽에는 수치·아이콘을 넣고 같은 `Pages` 구조를 사용한다.
-타임라인 슬라이더는 캡처 대상 밖에 둔다. 연속 드래그 중에는 기존 방식대로 즉시 갱신하고,
-목록↔상세 전환이나 이전/다음 페이지 버튼에만 넘김 효과를 적용하는 편이 조작하기 쉽다.
-자주 바뀌는 그래프나 애니메이션도 넘기는 0.65초 동안에는 캡처 당시 모습으로 고정된다.
-최종 상세·타임라인 레이아웃 이식은 포함하지 않았다.
+왼쪽 날짜 슬라이더는 즉시 날짜를 바꾸며, 책 하단 화살표는 이전/다음 일자로 넘긴다.
+양쪽 페이지 번호는 일자 스냅샷의 순번/전체 개수다. 넘김 중에는 날짜 입력을 받지 않는다.
+
+기존 GardenPlant 32개를 재사용한다. 실제 저장 순서대로 세로 4칸을 먼저 채우며,
+빈 땅은 아이콘과 그림자를 숨기고 아직 확장하지 않은 땅은 DisabledBlocker를 표시한다.
+사용자가 만든 가로 스크롤과 칸 크기를 유지하며 Content 폭을 8열에 맞춘다.
+아이템과 저주는 기존 RecallIconSlot.prefab을 생성한다. 항목이 많으면 패널 안에 들어가도록
+칸 크기를 조절한다. 수량, 새로 획득한 항목 강조, 마우스 설명을 유지한다.
+
+`결과 보기`는 기존 결과 요약과 그래프를 열고, `책으로`로 상세 페이지에 복귀한다.
+일자별 기록이 없는 파일도 안내를 표시하고 결과 화면을 열 수 있다.
+기존 전체 화면 타임라인은 결과 화면의 타임라인 버튼에서 계속 사용할 수 있다.
 
 ## 캐주얼한 셀 느낌 조절
 
@@ -147,6 +276,11 @@ URP 렌더 요청은 [Unity 공식 문서](https://docs.unity3d.com/kr/current/M
 `UniversalRenderPipeline.SingleCameraRequest` 방식을 사용한다.
 
 ## 검증
+
+공용 레이아웃 전환은 Play Mode에서 `Tools > Book UI > Validate In Play Mode`로 검증한다.
+격자·설명 화면과 그림·슬라이더 화면을 임시 인스턴스에 만들고, 전환·입력 잠금·값 유지·재열기,
+최상위 Width / Height / Scale 변경에 따른 전체 크기와 축소 상태의 넘김 정렬을 검사한다.
+검증용 UI는 공용 프리팹에 저장하지 않는다. 확인용 이미지는 `Temp/BookLayoutValidation`에 생성한다.
 
 Play Mode에서 `Tools > Recall Book > Validate In Play Mode`를 실행한다.
 테스트가 임시 Canvas를 만들었다가 제거하며, timeScale을 원래 값으로 복구한다.

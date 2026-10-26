@@ -14,9 +14,11 @@ public class RecallListSlot : MonoBehaviour
     [SerializeField] private GameObject noPhotoMark;
     [SerializeField] private TMP_Text dateLabel;
     [SerializeField] private TMP_Text infoLabel;
+    [SerializeField] private TMP_Text titleLabel;
+    [SerializeField] private string dateFormat = "yyyy.MM.dd HH:mm";
 
     /// <param name="texture">농장 사진. 없으면 null (사진 없이 기록만 남은 경우).</param>
-    public void Setup(RecallIndexEntry entry, Texture2D texture, Action<string> onClick)
+    public void Setup(RecallIndexEntry entry, Texture2D texture, Action<string> onClick, int recordNumber = 0)
     {
         if (entry == null) return;
 
@@ -29,7 +31,9 @@ public class RecallListSlot : MonoBehaviour
 
         if (dateLabel != null)
             dateLabel.text = DateTimeOffset.FromUnixTimeSeconds(entry.savedAtUnix)
-                .ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+                .ToLocalTime().ToString(dateFormat);
+
+        if (titleLabel != null) titleLabel.text = $"{recordNumber}번째 기록";
 
         if (infoLabel != null)
         {
@@ -45,5 +49,12 @@ public class RecallListSlot : MonoBehaviour
             string id = entry.id;
             button.onClick.AddListener(() => onClick?.Invoke(id));
         }
+    }
+
+    /// <summary>Release references before the owning list disposes its loaded pictures.</summary>
+    public void Clear()
+    {
+        if (photo != null) { photo.texture = null; photo.enabled = false; }
+        if (button != null) button.onClick.RemoveAllListeners();
     }
 }

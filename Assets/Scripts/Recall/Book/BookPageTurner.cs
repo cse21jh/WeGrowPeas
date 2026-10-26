@@ -32,6 +32,8 @@ namespace WeGrowPeas.RecallBook
         private bool locked;
         public bool IsTurning { get; private set; }
         public bool ReduceMotion { get => reduceMotion; set => reduceMotion = value; }
+        public RectTransform LeftPage { get { ResolvePages(); return leftPage; } }
+        public RectTransform RightPage { get { ResolvePages(); return rightPage; } }
 
         /// <summary>Redraw synchronously, once. Destination data is committed even if capture is unavailable.</summary>
         public bool TryTurn(bool forward, Action redrawDestination)

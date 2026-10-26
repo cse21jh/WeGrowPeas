@@ -13,6 +13,8 @@ public class RecallIconSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private Image background;
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text countText;
+    [SerializeField] private GameObject lockedOverlay;
+    [SerializeField] private bool tintBackground = true;
 
     private string _description;
     private Action<string> _onHover;
@@ -22,11 +24,13 @@ public class RecallIconSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void Setup(RecallLookup.Entry entry, int count, Action<string> onHover, Action onHoverExit)
     {
         bool hasIcon = entry.icon != null;
+        if (lockedOverlay != null) lockedOverlay.SetActive(false);
 
         if (icon != null)
         {
             icon.sprite = entry.icon;
             icon.enabled = hasIcon;
+            icon.gameObject.SetActive(hasIcon); // Hide the icon's authored shadow together with empty soil.
         }
 
         if (countText != null)
@@ -51,7 +55,8 @@ public class RecallIconSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     /// <summary>빈 밭 칸처럼 아이콘 없이 자리만 잡는 경우.</summary>
     public void SetupEmpty(string description, Action<string> onHover, Action onHoverExit)
     {
-        if (icon != null) icon.enabled = false;
+        if (lockedOverlay != null) lockedOverlay.SetActive(false);
+        if (icon != null) { icon.enabled = false; icon.gameObject.SetActive(false); }
         if (countText != null) countText.gameObject.SetActive(false);
 
         _description = description;
@@ -65,6 +70,7 @@ public class RecallIconSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void SetupLocked(string description, Action<string> onHover, Action onHoverExit)
     {
         SetupEmpty(description, onHover, onHoverExit);
+        if (lockedOverlay != null) lockedOverlay.SetActive(true);
         SetBackground(LockedColor);
     }
 
@@ -77,7 +83,7 @@ public class RecallIconSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void SetBackground(Color c)
     {
-        if (background != null) background.color = c;
+        if (tintBackground && background != null) background.color = c;
     }
 
     public void OnPointerEnter(PointerEventData eventData) => _onHover?.Invoke(_description);

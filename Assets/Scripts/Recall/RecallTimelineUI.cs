@@ -14,6 +14,10 @@ public class RecallTimelineUI : MonoBehaviour
 {
     [Header("Root")]
     [SerializeField] private GameObject timelinePanel;
+    [SerializeField] private GameObject secondaryPanel;
+    [SerializeField] private TMP_Text[] recordLabels = System.Array.Empty<TMP_Text>();
+    [SerializeField] private TMP_Text noTimelineText;
+    [SerializeField] private WeGrowPeas.RecallBook.BookPageTurner pageTurner;
 
     [Header("Slider")]
     [SerializeField] private Slider daySlider;
@@ -22,6 +26,8 @@ public class RecallTimelineUI : MonoBehaviour
     [Header("밭")]
     [SerializeField] private Transform gridContainer;
     [SerializeField] private GridLayoutGroup gridLayout;
+    [SerializeField] private RecallIconSlot[] farmSlots = System.Array.Empty<RecallIconSlot>();
+    [SerializeField] private ScrollRect farmScroll;
 
     [Header("아이템 / 저주")]
     [SerializeField] private Transform itemContainer;
@@ -30,6 +36,8 @@ public class RecallTimelineUI : MonoBehaviour
 
     [Header("아이콘 슬롯")]
     [SerializeField] private RecallIconSlot iconSlotPrefab;
+    [SerializeField] private bool fitCollections;
+    [SerializeField] private float collectionMaxCellSize = 44f;
 
     [Header("수치")]
     [SerializeField] private TMP_Text waveText;
@@ -47,6 +55,11 @@ public class RecallTimelineUI : MonoBehaviour
 
     private RecallRunFile _run;
     private readonly List<RecallIconSlot> _spawned = new List<RecallIconSlot>();
+    private bool updatingSlider;
+
+    public int DayIndex { get; private set; } = -1;
+    public int DayCount => _run?.recall?.days?.Count ?? 0;
+    public event System.Action DayChanged;
 
     public bool IsOpen => timelinePanel != null && timelinePanel.activeSelf;
 
@@ -55,61 +68,101 @@ public class RecallTimelineUI : MonoBehaviour
         if (daySlider != null)
         {
             daySlider.wholeNumbers = true;
-            daySlider.onValueChanged.AddListener(v => SetDayIndex(Mathf.RoundToInt(v)));
+            daySlider.onValueChanged.AddListener(OnSliderChanged);
         }
+    }
+
+    private void OnSliderChanged(float value)
+    {
+        if (updatingSlider) return;
+        if (pageTurner != null && pageTurner.IsTurning)
+        {
+            daySlider.SetValueWithoutNotify(Mathf.Max(0, DayIndex));
+            return;
+        }
+        SetDayIndex(Mathf.RoundToInt(value));
+    }
+
+    private void OnDestroy()
+    {
+        if (daySlider != null) daySlider.onValueChanged.RemoveListener(OnSliderChanged);
+        ClearSpawned();
     }
 
     /// <summary>기록 하나의 타임라인을 연다. 마지막 날부터 보여준다.</summary>
     public void Show(RecallRunFile run)
     {
-        if (run == null || run.recall == null || run.recall.days.Count == 0)
-        {
-            Debug.LogWarning("[Recall] 일자별 기록이 없어 타임라인을 열 수 없습니다.");
-            return;
-        }
+        if (run == null) return;
 
         _run = run;
 
         if (timelinePanel != null) timelinePanel.SetActive(true);
+        if (secondaryPanel != null) secondaryPanel.SetActive(true);
         ClearDescription();
+        string header = run.header == null ? "기록" : $"{run.header.day}일 · {run.header.plantName}" +
+            (run.header.dawnStage > 0 ? $" · 승천 {run.header.dawnStage}" : " · 일반 모드");
+        foreach (var label in recordLabels) if (label != null) label.text = header;
 
         // 방금 켠 패널의 크기가 확정돼야 셀 크기를 맞출 수 있다.
         Canvas.ForceUpdateCanvases();
 
-        int last = _run.recall.days.Count - 1;
+        int last = Mathf.Max(0, DayCount - 1);
         if (daySlider != null)
         {
+            updatingSlider = true;
             daySlider.minValue = 0;
             daySlider.maxValue = last;
-            // 값이 그대로면 onValueChanged가 안 불리므로 직접 갱신한다.
-            if (Mathf.RoundToInt(daySlider.value) == last) SetDayIndex(last);
-            else daySlider.value = last;
+            daySlider.SetValueWithoutNotify(last);
+            daySlider.interactable = DayCount > 1;
+            updatingSlider = false;
         }
+        if (noTimelineText != null) noTimelineText.gameObject.SetActive(DayCount == 0);
+        if (gridContainer != null) gridContainer.gameObject.SetActive(DayCount > 0);
+        if (farmScroll != null)
+        {
+            farmScroll.gameObject.SetActive(DayCount > 0);
+            farmScroll.horizontalNormalizedPosition = 0;
+        }
+        if (DayCount > 0) SetDayIndex(last);
         else
         {
-            SetDayIndex(last);
+            ClearSpawned();
+            DayIndex = -1;
+            if (dayLabel != null) dayLabel.text = "일자별 기록 없음";
+            if (waveText != null) waveText.text = "일자별 기록이 없습니다.";
+            if (goldText != null) goldText.text = "—";
+            if (summaryText != null) summaryText.text = "결과 보기에서 요약을 확인할 수 있습니다.";
+            if (curseEmptyText != null) { curseEmptyText.text = "기록 없음"; curseEmptyText.gameObject.SetActive(true); }
+            DayChanged?.Invoke();
         }
     }
 
     public void Close()
     {
         if (timelinePanel != null) timelinePanel.SetActive(false);
+        if (secondaryPanel != null) secondaryPanel.SetActive(false);
+        ClearDescription();
         ClearSpawned();
+        _run = null;
+        DayIndex = -1;
     }
 
     // ── 하루 그리기 ───────────────────────────────────────────────────────────
 
-    private void SetDayIndex(int index)
+    public void SetDayIndex(int index)
     {
-        if (_run == null) return;
+        if (DayCount == 0) return;
 
         var days = _run.recall.days;
         index = Mathf.Clamp(index, 0, days.Count - 1);
+        DayIndex = index;
+        if (daySlider != null) daySlider.SetValueWithoutNotify(index);
 
         DaySnapshot today = days[index];
         DaySnapshot prev = index > 0 ? days[index - 1] : null;
 
         ClearSpawned();
+        ClearDescription();
 
         if (dayLabel != null)
             dayLabel.text = today.isFinalPartial ? $"{today.day}일차 (마지막 날)" : $"{today.day}일차";
@@ -118,11 +171,13 @@ public class RecallTimelineUI : MonoBehaviour
         BuildItems(today, prev);
         BuildCurses(today);
         BuildTexts(today, prev);
+        Canvas.ForceUpdateCanvases();
+        DayChanged?.Invoke();
     }
 
     private void BuildGrid(DaySnapshot day)
     {
-        if (gridContainer == null || iconSlotPrefab == null) return;
+        if (gridContainer == null || (farmSlots.Length == 0 && iconSlotPrefab == null)) return;
 
         // 밭 인덱스는 열 우선이다 (Grid: col = idx / 4, row = idx % 4).
         // 세로로 먼저 채워야 실제 밭과 같은 모양으로 보인다.
@@ -133,7 +188,15 @@ public class RecallTimelineUI : MonoBehaviour
             gridLayout.constraintCount = FarmRows;
 
             // 칸 수는 항상 최대 크기 기준. 밭이 넓어져도 격자가 흔들리지 않는다.
-            FitCellSize(gridLayout, MaxFarmCols, FarmRows);
+            if (farmSlots.Length > 0 && farmScroll != null && farmScroll.horizontal)
+            {
+                // Keep the authored farm cell size and expose all eight columns to the scrollbar.
+                float width = gridLayout.padding.horizontal + MaxFarmCols * gridLayout.cellSize.x +
+                              (MaxFarmCols - 1) * gridLayout.spacing.x;
+                ((RectTransform)gridContainer).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(width, farmScroll.viewport.rect.width));
+            }
+            else FitCellSize(gridLayout, MaxFarmCols, FarmRows);
         }
 
         // 그날 쓰던 만큼만 실제 칸이고, 나머지는 아직 넓히지 않은 자리로 어둡게 깐다.
@@ -141,30 +204,32 @@ public class RecallTimelineUI : MonoBehaviour
 
         for (int i = 0; i < MaxFarmCols * FarmRows; i++)
         {
-            var slot = Instantiate(iconSlotPrefab, gridContainer);
+            var slot = farmSlots.Length > 0 ? (i < farmSlots.Length ? farmSlots[i] : null) : Instantiate(iconSlotPrefab, gridContainer);
+            if (slot == null) continue;
 
             if (i >= usable)
             {
-                slot.SetupLocked($"{i / FarmRows + 1}번째 줄 — 아직 넓히지 않은 땅", ShowDescription, ClearDescription);
+                slot.SetupLocked($"{i / FarmRows + 1}번째 줄: 아직 넓히지 않은 땅", ShowDescription, ClearDescription);
             }
             else
             {
                 string species = day.cellSpecies[i];
 
                 if (string.IsNullOrEmpty(species))
-                    slot.SetupEmpty($"{i + 1}번째 땅 — 비어 있음", ShowDescription, ClearDescription);
+                    slot.SetupEmpty($"{i + 1}번째 땅: 비어 있음", ShowDescription, ClearDescription);
                 else
                     slot.Setup(RecallLookup.Plant(species), 0, ShowDescription, ClearDescription);
             }
 
             slot.gameObject.SetActive(true);
-            _spawned.Add(slot);
+            if (farmSlots.Length == 0) _spawned.Add(slot);
         }
     }
 
     private void BuildItems(DaySnapshot day, DaySnapshot prev)
     {
         if (itemContainer == null || iconSlotPrefab == null) return;
+        FitCollection(itemContainer, day.itemNames.Length + day.specialItemIds.Length);
 
         for (int i = 0; i < day.itemNames.Length; i++)
         {
@@ -190,8 +255,9 @@ public class RecallTimelineUI : MonoBehaviour
 
     private void BuildCurses(DaySnapshot day)
     {
-        if (curseEmptyText != null) curseEmptyText.gameObject.SetActive(day.curseIds.Length == 0);
+        if (curseEmptyText != null) { curseEmptyText.text = "없음"; curseEmptyText.gameObject.SetActive(day.curseIds.Length == 0); }
         if (curseContainer == null || iconSlotPrefab == null) return;
+        FitCollection(curseContainer, day.curseIds.Length);
 
         foreach (var id in day.curseIds)
         {
@@ -227,6 +293,27 @@ public class RecallTimelineUI : MonoBehaviour
     }
 
     // ── 헬퍼 ──────────────────────────────────────────────────────────────────
+
+    private void FitCollection(Transform container, int count)
+    {
+        var grid = container.GetComponent<GridLayoutGroup>();
+        if (!fitCollections || grid == null || count == 0) return;
+        var rect = (RectTransform)container;
+        float width = rect.rect.width - grid.padding.horizontal;
+        float height = rect.rect.height - grid.padding.vertical;
+        float best = 0;
+        int columns = 1;
+        for (int c = 1; c <= count; c++)
+        {
+            int rows = Mathf.CeilToInt(count / (float)c);
+            float size = Mathf.Min(collectionMaxCellSize, (width - (c - 1) * grid.spacing.x) / c,
+                (height - (rows - 1) * grid.spacing.y) / rows);
+            if (size >= best) { best = size; columns = c; }
+        }
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = columns;
+        grid.cellSize = Vector2.one * Mathf.Max(1, Mathf.Floor(best));
+    }
 
     /// <summary>
     /// 지정한 칸 수가 패널에 들어가도록 <see cref="GridLayoutGroup.cellSize"/>를 맞춘다.
@@ -266,13 +353,18 @@ public class RecallTimelineUI : MonoBehaviour
     private void ClearSpawned()
     {
         foreach (var slot in _spawned)
-            if (slot != null) Destroy(slot.gameObject);
+            if (slot != null)
+            {
+                slot.gameObject.SetActive(false);
+                if (Application.isPlaying) Destroy(slot.gameObject);
+                else DestroyImmediate(slot.gameObject);
+            }
         _spawned.Clear();
     }
 
     private void ShowDescription(string text)
     {
-        if (tooltip != null) tooltip.Show(text);
+        if (tooltip != null && (pageTurner == null || !pageTurner.IsTurning)) tooltip.Show(text);
     }
 
     private void ClearDescription()
