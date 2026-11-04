@@ -49,4 +49,7 @@ public class SettingsData
 
     /// <summary>이미 읽은 메시지도 알림음 재생.</summary>
     public bool playAlarmForSeenMessages = true;
+
+    /// <summary>표시 언어 코드(<see cref="Loc"/>). 비어 있으면 원문 언어를 쓴다.</summary>
+    public string language = "";
 }
