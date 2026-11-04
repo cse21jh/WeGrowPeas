@@ -31,7 +31,10 @@ public class SettingUI : MonoBehaviour
         }
 
         if (SettingPanel != null)
+        {
+            LanguageSelector.AddTo(SettingPanel.transform);
             SettingPanel.SetActive(false);
+        }
     }
 
     void Update()

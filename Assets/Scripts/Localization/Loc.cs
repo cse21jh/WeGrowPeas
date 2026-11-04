@@ -17,6 +17,7 @@ using UnityEngine;
 public static class Loc
 {
     private const string ResourcePath = "Localization";
+    private const string LanguageNameKey = "language.name";
 
     private static LocDatabase _database;
     private static string _language;
@@ -41,6 +42,13 @@ public static class Loc
             EnsureLoaded();
             return _database.Languages;
         }
+    }
+
+    /// <summary>언어 이름을 그 언어로 돌려준다. (표의 language.name 행, 없으면 언어 코드)</summary>
+    public static string GetLanguageName(string language)
+    {
+        EnsureLoaded();
+        return _database.TryGet(LanguageNameKey, language, out string name) ? name : language;
     }
 
     public static bool Has(string key)
