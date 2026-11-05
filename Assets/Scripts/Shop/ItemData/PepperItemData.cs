@@ -37,7 +37,7 @@ public class ChiliPepperItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid 객체가 없습니다 (ShopContext.Grid 필요)";
+            reason = Loc.T("shop.error.no_game_state");
             return false;
         }
         if (!ctx.Grid.HasEmptyGrid())
@@ -59,7 +59,7 @@ public class ChiliPepperItemData : ItemData
         reason = null;
         if (ctx == null || ctx.Grid == null)
         {
-            reason = "Grid 객체가 없습니다";
+            reason = Loc.T("shop.error.no_game_state");
             return false;
         }
 
@@ -85,7 +85,7 @@ public class ChiliPepperItemData : ItemData
     {
         if (ctx == null || ctx.Grid == null)
         {
-            ctx?.ShowError?.Invoke("Grid 객체가 없습니다");
+            ctx?.ShowError?.Invoke(Loc.T("shop.error.no_game_state"));
             return;
         }
         if (!pendingIndex.HasValue)

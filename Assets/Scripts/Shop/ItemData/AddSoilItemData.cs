@@ -47,7 +47,7 @@ public class AddSoilItemData : ItemData
 
         if (ctx?.Grid == null)
         {
-            reason = "그리드가 없습니다.";
+            reason = Loc.T("shop.error.no_game_state");
             return false;
         }
 

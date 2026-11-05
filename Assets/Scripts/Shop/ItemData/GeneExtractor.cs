@@ -33,13 +33,13 @@ public class GeneExtractorItemData : ItemData
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid 객체가 없습니다"; return false; }
+        if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
 
         int maxSlots = g.maxCol * 4;
         int empty = maxSlots - g.plantGrid.Count;
-        if (empty <= 0) { reason = "빈 칸이 없습니다"; return false; }
+        if (empty <= 0) { reason = Loc.T("shop.error.no_empty_cell"); return false; }
 
-        if (g.plantGrid.Count <= 0) { reason = "선택할 수 있는 식물이 없습니다"; return false; }
+        if (g.plantGrid.Count <= 0) { reason = Loc.T("shop.error.no_selectable_plant"); return false; }
 
         return true;
     }
@@ -51,7 +51,7 @@ public class GeneExtractorItemData : ItemData
 
     public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
     {
-        if (target == null) { reason = "식물을 선택해주세요"; return false; }
+        if (target == null) { reason = Loc.T("shop.error.select_plant"); return false; }
         reason = null;
         return true;
     }
@@ -65,7 +65,7 @@ public class GeneExtractorItemData : ItemData
     {
         if (!selected)
         {
-            ctx.ShowError?.Invoke("선택한 식물이 없습니다");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.no_plant_selected"));
             return;
         }
 
@@ -90,9 +90,9 @@ public class GeneExtractorItemData : ItemData
         }
 
         if (spawned > 0)
-            ctx.ShowInfo?.Invoke($"{LocalizedName}: {spawned}개 생성 완료");
+            ctx.ShowInfo?.Invoke(Loc.T("shop.info.gene_extracted", ("name", LocalizedName), ("count", spawned)));
         else
-            ctx.ShowError?.Invoke("빈 칸이 부족하여 생성할 수 없습니다");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.not_enough_empty"));
 
         selected = null;
     }

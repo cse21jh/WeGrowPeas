@@ -32,7 +32,7 @@ public class BugFanItemData : ItemData
     {
         if (ctx == null)
         {
-            reason = "컨텍스트 없음";
+            reason = Loc.T("shop.error.no_game_state");
             return false;
         }
 

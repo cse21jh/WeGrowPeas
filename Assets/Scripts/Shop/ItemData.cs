@@ -297,7 +297,7 @@ public abstract class ItemData : ScriptableObject
         errorReason = null;
         if (ctx?.Grid == null)
         {
-            errorReason = "Grid 객체가 없습니다";
+            errorReason = Loc.T("shop.error.no_game_state");
             ctx?.ShowError?.Invoke(errorReason);
             return false;
         }

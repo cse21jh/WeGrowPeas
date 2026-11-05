@@ -47,7 +47,7 @@ public class PlantHealingItemData : ItemData
     {
         if (!pendingWave.HasValue)
         {
-            onError?.Invoke("웨이브를 선택해주세요");
+            onError?.Invoke(Loc.T("shop.error.select_wave"));
             return;
         }
         onReady?.Invoke();
@@ -96,7 +96,7 @@ public class PlantHealingItemData : ItemData
             }
         }
 
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {targetWave} 웨이브에 대한 {healedCount}개 식물 치료 완료");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.healed", ("name", LocalizedName), ("wave", WavePalette.GetName(targetWave)), ("count", healedCount)));
         pendingWave = null;
     }
 

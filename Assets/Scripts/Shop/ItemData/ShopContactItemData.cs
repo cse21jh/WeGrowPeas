@@ -32,7 +32,7 @@ public class ShopContactItemData : ItemData
     {
         if (ctx?.Shop == null)
         {
-            ctx?.ShowError?.Invoke("ShopManager 객체가 없습니다");
+            ctx?.ShowError?.Invoke(Loc.T("shop.error.no_game_state"));
             return;
         }
 

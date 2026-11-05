@@ -79,7 +79,7 @@ public class DNAExtractionItemData : ItemData
     {
         reason = null;
         var g = ctx.Grid;
-        if (!g) { reason = "Grid 객체가 없습니다"; return false; }
+        if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
 
         int? idx = g.GetGridIndexFromPosition(worldPos);
         if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
