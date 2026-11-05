@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -137,7 +138,7 @@ public class RecallDetailUI : MonoBehaviour
             for (int i = 0; i < run.plantAbilityNames.Count; i++)
             {
                 if (i > 0) sb.Append(", ");
-                sb.Append(run.plantAbilityNames[i]);
+                sb.Append(RecallLookup.Ability(run.plantAbilityNames[i]).name);
 
                 int level = i < run.plantAbilityLevels.Count ? run.plantAbilityLevels[i] : 0;
                 if (level > 0) sb.Append($" Lv{level}");
@@ -145,7 +146,7 @@ public class RecallDetailUI : MonoBehaviour
         }
 
         if (run.generalAbilityNames.Count > 0)
-            sb.Append(Loc.T("game.recall.general_traits", ("names", string.Join(", ", run.generalAbilityNames))));
+            sb.Append(Loc.T("game.recall.general_traits", ("names", string.Join(", ", run.generalAbilityNames.Select(id => RecallLookup.Ability(id).name)))));
 
         return sb.ToString();
     }

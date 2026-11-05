@@ -21,6 +21,7 @@ public static class RecallLookup
     private static Dictionary<string, Entry> _plants;
     private static Dictionary<string, Entry> _items;
     private static Dictionary<string, Entry> _curses;
+    private static Dictionary<string, Entry> _abilities;
     private static string _language;
 
     // 조회 결과에 표시 이름이 들어 있어 언어가 바뀌면 다시 만들어야 한다.
@@ -31,9 +32,14 @@ public static class RecallLookup
         _plants = null;
         _items = null;
         _curses = null;
+        _abilities = null;
     }
 
     public static string WaveName(WaveType type) => WavePalette.GetName(type);
+
+    /// <summary>기록에 저장된 웨이브 값의 표시 이름. 알 수 없는 값은 저장된 그대로 보여 준다.</summary>
+    public static string SavedWaveName(string saved)
+        => WavePalette.TryParseSaved(saved, out var type) ? WaveName(type) : saved;
 
     /// <summary>
     /// 식물 종(Plant.speciesname)으로 표시 정보를 찾는다.
@@ -163,6 +169,38 @@ public static class RecallLookup
         }
 
         return _curses.TryGetValue(id, out var e) ? e : NotFound(id);
+    }
+
+    /// <summary>
+    /// 특성의 에셋 이름으로 정보를 찾는다.
+    /// 예전 기록은 abilityName을 저장했으므로 그 값도 함께 등록해 둔다.
+    /// </summary>
+    public static Entry Ability(string id)
+    {
+        EnsureLanguage();
+        if (string.IsNullOrEmpty(id)) return default;
+
+        if (_abilities == null)
+        {
+            _abilities = new Dictionary<string, Entry>();
+
+            foreach (var a in Resources.LoadAll<PlantAbilityData>("Data/AbilityData/PlantAbilityData"))
+                if (a != null) AddAbility(a.name, a.abilityName, a.icon, a.LocalizedName, a.LocalizedDescription);
+
+            foreach (var a in Resources.LoadAll<GeneralAbilityData>("Data/AbilityData/GeneralAbilityData"))
+                if (a != null) AddAbility(a.name, a.abilityName, a.icon, a.LocalizedName, a.LocalizedDescription);
+        }
+
+        return _abilities.TryGetValue(id, out var e) ? e : NotFound(id);
+    }
+
+    private static void AddAbility(string id, string legacyName, Sprite icon, string name, string description)
+    {
+        var entry = new Entry { found = true, icon = icon, name = name, description = description };
+
+        _abilities[id] = entry;
+        if (!string.IsNullOrEmpty(legacyName) && !_abilities.ContainsKey(legacyName))
+            _abilities[legacyName] = entry;
     }
 
     /// <summary>데이터를 못 찾아도 이름은 남긴다 — 삭제된 아이템의 옛 기록도 읽히도록.</summary>

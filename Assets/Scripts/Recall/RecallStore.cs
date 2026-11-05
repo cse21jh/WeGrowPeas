@@ -212,21 +212,21 @@ public static class RecallStore
         PlayerRecordForGraph.SaveTo(run.graph);
         RecallRecorder.SaveTo(run.recall);
 
-        // 선택한 특성. 파일이 단독으로 읽혀야 하므로 에셋 참조 대신 이름/레벨로 남긴다.
+        // 선택한 특성. 파일이 단독으로 읽혀야 하므로 에셋 참조 대신 에셋 이름/레벨로 남긴다.
         var am = AbilityManager.Instance;
         if (am != null)
         {
             foreach (var ability in am.CurrentPlantAbility)
             {
                 if (ability == null) continue;
-                run.plantAbilityNames.Add(ability.abilityName);
+                run.plantAbilityNames.Add(ability.name);
                 run.plantAbilityLevels.Add(ability.level);
             }
 
             foreach (var ability in am.CurrentGeneralAbility)
             {
                 if (ability == null) continue;
-                run.generalAbilityNames.Add(ability.abilityName);
+                run.generalAbilityNames.Add(ability.name);
             }
         }
 

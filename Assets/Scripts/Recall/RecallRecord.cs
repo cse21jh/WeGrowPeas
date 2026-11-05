@@ -52,6 +52,7 @@ public class RecallRunFile
     public RecallSave recall = new();
 
     // 선택한 특성 (plantAbilityNames[i]의 레벨이 plantAbilityLevels[i] — 인덱스 매칭)
+    // 값은 특성의 에셋 이름이다. 예전 기록에는 abilityName이 들어 있고, 둘 다 RecallLookup.Ability로 읽는다.
     public List<string> plantAbilityNames = new();
     public List<int> plantAbilityLevels = new();
     public List<string> generalAbilityNames = new();

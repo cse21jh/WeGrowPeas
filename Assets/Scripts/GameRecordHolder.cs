@@ -20,7 +20,13 @@ public class RunSummary
     public int totalBugsKilled;
     public int totalGoldEarned;
     public int totalGoldSpend;
+
+    /// <summary>
+    /// 피해가 가장 컸던 웨이브의 <see cref="WaveType"/> 이름. 표시는 <see cref="RecallLookup.SavedWaveName"/>로 한다.
+    /// 예전 기록에는 저장 당시의 표시 이름이 들어 있다.
+    /// </summary>
     public string mostKilledWave;
+
     public string popularItemName;
     public string mostSellPlantName;
     public int totalGenetics;
@@ -46,7 +52,6 @@ public static class GameRecordHolder
     public static int TotalBugsKilled => Current.totalBugsKilled;
     public static int totalGoldEarned => Current.totalGoldEarned;
     public static int totalGoldSpend => Current.totalGoldSpend;
-    public static string MostKilledWave => Current.mostKilledWave;
     public static string PopularItemName => Current.popularItemName;
     public static string MostSellPlantName => Current.mostSellPlantName;
     public static int totalGenetics => Current.totalGenetics;
@@ -56,7 +61,7 @@ public static class GameRecordHolder
     //기타 로그들
     public static int PlayerRank => Current.playerRank;
 
-    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, string wName, string iName, int mPlant, int rCount)
+    public static void SaveRecord(int stage, int peas, int peanuts, int speas, int speanuts, int bugs, int egold, int sgold, WaveType mostKilledWave, string iName, int mPlant, int rCount)
     {
         Current = new RunSummary();
 
@@ -68,7 +73,7 @@ public static class GameRecordHolder
         Current.totalBugsKilled = bugs;
         Current.totalGoldEarned = egold;
         Current.totalGoldSpend = sgold;
-        Current.mostKilledWave = wName;
+        Current.mostKilledWave = mostKilledWave.ToString();
         Current.popularItemName = iName;
         Current.mostExpensivePlant = mPlant;
         Current.completeRequestCount = rCount;

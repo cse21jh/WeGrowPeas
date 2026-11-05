@@ -655,13 +655,10 @@ public class EnemyController : MonoBehaviour
         yield return null;
     }
 
-    public string GetMostKillWaveName()
+    public WaveType GetMostKillWaveType()
     {
         int maxKills = waveKillCount.Max();
-        int waveIndex = waveKillCount.ToList().IndexOf(maxKills);
-
-        WaveType mostKillWaveType = (WaveType)waveIndex;
-        return waves[mostKillWaveType].WaveName;
+        return (WaveType)waveKillCount.ToList().IndexOf(maxKills);
     }
 
     public void SkipWaveEffect()

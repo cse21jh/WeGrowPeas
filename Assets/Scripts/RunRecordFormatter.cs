@@ -46,7 +46,7 @@ public static class RunRecordFormatter
 
     public static string BuildFarmNoteLine(RunSummary s)
     {
-        string wave = s.mostKilledWave;
+        string wave = RecallLookup.SavedWaveName(s.mostKilledWave);
         string plant = RecallLookup.Plant(s.mostSellPlantName).name;
 
         return string.IsNullOrEmpty(s.popularItemName)

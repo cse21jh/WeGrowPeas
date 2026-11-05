@@ -574,7 +574,7 @@ public class GameManager : Singleton<GameManager>
 
     private void PassRecordToGameRecordHolder()
     {
-        string mostKillWaveName = enemyController.GetMostKillWaveName();
+        WaveType mostKillWave = enemyController.GetMostKillWaveType();
         string itemName = shopManager.ReturnMostPurchasedItem();
 
         GameRecordHolder.SaveRecord(stage,
@@ -585,7 +585,7 @@ public class GameManager : Singleton<GameManager>
             grid.killBugCount,
             economyManager.TotalGold,
             economyManager.ConsumeGold,
-            mostKillWaveName,
+            mostKillWave,
             itemName,
             grid.MostExpensivePlant,
             requestManager.CompleteRequestCount

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -56,6 +57,24 @@ public static class WavePalette
 
     /// <summary>형질의 표시 이름. TraitType의 앞쪽 값은 WaveType과 순서가 같다.</summary>
     public static string GetName(TraitType type) => GetName((WaveType)(int)type);
+
+    /// <summary>
+    /// 저장된 값을 웨이브로 되돌린다. 지금은 <see cref="WaveType"/> 이름을 저장하지만,
+    /// 예전 기록에는 원문 또는 그때 언어의 표시 이름이 들어 있다.
+    /// </summary>
+    public static bool TryParseSaved(string saved, out WaveType type)
+    {
+        foreach (WaveType candidate in Enum.GetValues(typeof(WaveType)))
+        {
+            if (saved != candidate.ToString() && saved != GetDefaultName(candidate) && saved != GetName(candidate)) continue;
+
+            type = candidate;
+            return true;
+        }
+
+        type = default;
+        return false;
+    }
 
     private static string GetDefaultName(WaveType type)
     {
