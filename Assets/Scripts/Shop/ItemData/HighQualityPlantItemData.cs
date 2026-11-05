@@ -112,7 +112,7 @@ public class HighQualityPlantItemData : ItemData
         // 완두콩 추가 (자동으로 가장 빠른 빈 칸에 설치)
         ctx.Grid.AddMovablePlant(traits);
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: {targetWave} 웨이브에 강한 완두콩 추가");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {targetWave} 웨이브에 강한 완두콩 추가");
         pendingWave = null;
     }
 

@@ -39,7 +39,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
         if (nameText)
         {
-            nameText.text = eff.DisplayName;
+            nameText.text = eff.LocalizedName;
         }
 
         stock = eff.IsStackable ? Mathf.Max(1, eff.InitialStock) : 1;

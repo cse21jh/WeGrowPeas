@@ -96,7 +96,7 @@ public class PlantHealingItemData : ItemData
             }
         }
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: {targetWave} 웨이브에 대한 {healedCount}개 식물 치료 완료");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {targetWave} 웨이브에 대한 {healedCount}개 식물 치료 완료");
         pendingWave = null;
     }
 

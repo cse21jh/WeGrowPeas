@@ -47,6 +47,7 @@ public class LocalizationWindow : EditorWindow
         EditorGUILayout.Space(6);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("표 검사", GUILayout.Height(30))) Validate();
+        if (GUILayout.Button("SO 텍스트 추출", GUILayout.Height(30))) ExtractFromAssets();
         if (GUILayout.Button("내보내기", GUILayout.Height(30))) Export();
         if (GUILayout.Button("변경 내역 확인", GUILayout.Height(30))) PreviewImport();
         EditorGUILayout.EndHorizontal();
@@ -156,6 +157,15 @@ public class LocalizationWindow : EditorWindow
             sb.Append($"\n{language}: {filled}/{database.Count}");
         }
         status = sb.ToString();
+    }
+
+    // ── SO 텍스트 추출 ───────────────────────────────────────────────────────
+    private void ExtractFromAssets()
+    {
+        pending = null;
+        var report = LocExtractor.Run();
+        issues = report.Issues;
+        status = $"추출 완료: 표 {report.TablesChanged}개에 {report.Added}행 추가";
     }
 
     // ── 내보내기 ─────────────────────────────────────────────────────────────

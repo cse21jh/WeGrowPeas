@@ -73,7 +73,7 @@ public class FertilizerItemData : ItemData
             ctx.ShowError?.Invoke("이미 비료가 있어 뿌릴 수 없습니다!");
             return;
         }
-        ctx.ShowInfo?.Invoke($"{DisplayName} 배치 완료 (idx={selectedIdx.Value})");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료 (idx={selectedIdx.Value})");
         selectedIdx = null;
         pendingWave = null;
     }

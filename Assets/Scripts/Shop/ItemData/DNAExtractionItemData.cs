@@ -68,7 +68,7 @@ public class DNAExtractionItemData : ItemData
             g.AddMovablePlant(trait);
         }
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 선택한 식물의 유전자를 가진 식물을 3개 추가했습니다");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: 선택한 식물의 유전자를 가진 식물을 3개 추가했습니다");
     }
 
     public override void Cancel(ShopContext ctx)

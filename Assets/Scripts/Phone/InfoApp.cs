@@ -267,7 +267,7 @@ public class InfoApp : BasePhoneApp
                 if (itemLookup.TryGetValue(itemName, out ItemData itemData))
                 {
                     var slot = Instantiate(purchaseSlotPrefab, purchasesContainer);
-                    slot.Setup(itemData.Icon, itemData.DisplayName, count, itemData.Description, UpdateDescription, ClearDescription);
+                    slot.Setup(itemData.Icon, itemData.LocalizedName, count, itemData.LocalizedDescription, UpdateDescription, ClearDescription);
                     slot.gameObject.SetActive(true);
                 }
                 else

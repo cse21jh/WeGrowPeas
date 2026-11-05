@@ -192,8 +192,8 @@ public class ShopCanvasController : MonoBehaviour
             detailImage.sprite = data.Icon;
             detailImage.enabled = data.Icon != null;
         }
-        if (detailName != null) detailName.text = data.DisplayName;
-        if (detailDescription != null) detailDescription.text = data.Description;
+        if (detailName != null) detailName.text = data.LocalizedName;
+        if (detailDescription != null) detailDescription.text = data.LocalizedDescription;
 
         int price = data.GetDisplayPrice();
         bool priceHidden = price == int.MaxValue;

@@ -30,7 +30,7 @@ public class ShopPopupController : MonoBehaviour
         Debug.Log("Setting popup for item: " + itemData.DisplayName + " " + itemData.Description);
         if (itemName != null)
         {
-            itemName.text = itemData.DisplayName;
+            itemName.text = itemData.LocalizedName;
         }
         if (iconImage != null)
         {
@@ -38,7 +38,7 @@ public class ShopPopupController : MonoBehaviour
         }
         if (itemDescription != null)
         {
-            string description = itemData.Description;
+            string description = itemData.LocalizedDescription;
             
             // 구매 횟수 정보 추가
             if (itemData.EffectivePurchaseLimit >= 0)

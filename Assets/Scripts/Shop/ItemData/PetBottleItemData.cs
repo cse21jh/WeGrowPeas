@@ -148,7 +148,7 @@ public class PetBottleItemData : ItemData
             }
 
             ctx.Grid.PlacePetBottle(idx);
-            ctx.ShowInfo?.Invoke($"{DisplayName} 배치 완료");
+            ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료");
         }
         catch (System.Exception e)
         {

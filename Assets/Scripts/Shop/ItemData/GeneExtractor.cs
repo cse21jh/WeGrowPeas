@@ -90,7 +90,7 @@ public class GeneExtractorItemData : ItemData
         }
 
         if (spawned > 0)
-            ctx.ShowInfo?.Invoke($"{DisplayName}: {spawned}개 생성 완료");
+            ctx.ShowInfo?.Invoke($"{LocalizedName}: {spawned}개 생성 완료");
         else
             ctx.ShowError?.Invoke("빈 칸이 부족하여 생성할 수 없습니다");
 

@@ -211,8 +211,8 @@ public class DawnUIController : MonoBehaviour
             if (norm == null) continue;
             itemsToShow.Add(new UnlockItemInfo
             {
-                displayName = norm.DisplayName,
-                description = norm.Description,
+                displayName = norm.LocalizedName,
+                description = norm.LocalizedDescription,
                 icon = norm.Icon,
                 isSpecial = false
             });

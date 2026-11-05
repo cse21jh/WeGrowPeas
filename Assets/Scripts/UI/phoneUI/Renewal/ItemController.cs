@@ -50,7 +50,7 @@ public class ItemController : MonoBehaviour
 
         SetItemDetail(
             item.Icon,
-            item.DisplayName,
+            item.LocalizedName,
             item.GetDisplayPrice(),
             GetRemainingPurchaseCount(item),
             ShopBadge.GetTags(item));

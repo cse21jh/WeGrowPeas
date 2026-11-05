@@ -41,6 +41,6 @@ public class CoolingShieldItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
         ctx.Grid.ActivateCoolingShield();
-        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: 이번 게임동안 식물이 1개 이하가 될 경우 1회 보호됩니다.");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: 이번 게임동안 식물이 1개 이하가 될 경우 1회 보호됩니다.");
     }
 }

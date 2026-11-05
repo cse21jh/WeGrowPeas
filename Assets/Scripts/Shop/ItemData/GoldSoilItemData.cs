@@ -75,7 +75,7 @@ public class GoldSoilItemData : ItemData
             return;
         }
 
-        ctx.ShowInfo?.Invoke($"{DisplayName} 배치 완료");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료");
         pendingIndex = null;
     }
 

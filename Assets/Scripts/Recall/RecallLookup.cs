@@ -97,8 +97,8 @@ public static class RecallLookup
                 {
                     found = true,
                     icon = it.Icon,
-                    name = string.IsNullOrEmpty(it.DisplayName) ? it.name : it.DisplayName,
-                    description = it.Description
+                    name = string.IsNullOrEmpty(it.DisplayName) ? it.name : it.LocalizedName,
+                    description = it.LocalizedDescription
                 };
 
                 if (!_items.ContainsKey(it.name)) _items[it.name] = entry;

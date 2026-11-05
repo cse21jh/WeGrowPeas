@@ -72,7 +72,7 @@ public class SignPostItemData : ItemData
             durationDays,                   // 다음 5일간
             $"SignPost_{pendingWave.Value}"        // 모드 소스 태그
         );
-        ctx.ShowInfo?.Invoke($"{DisplayName} 적용: {pendingWave.Value} {durationDays}일간 {(int)(reducePercent * 100)}% 감소");
+        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {pendingWave.Value} {durationDays}일간 {(int)(reducePercent * 100)}% 감소");
         pendingWave = null;
     }
 

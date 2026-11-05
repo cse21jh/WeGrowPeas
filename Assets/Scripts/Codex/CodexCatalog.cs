@@ -45,7 +45,7 @@ public static class CodexCatalog
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(it.GradeTagText)) sb.AppendLine($"[{it.GradeTagText}] {it.Rarity}");
             sb.AppendLine($"가격: {it.Price}골드");
-            if (!string.IsNullOrEmpty(it.Description)) sb.AppendLine(it.Description);
+            if (!string.IsNullOrEmpty(it.Description)) sb.AppendLine(it.LocalizedDescription);
 
             bool locked = !it.IsMetaUnlocked();
 
@@ -53,7 +53,7 @@ public static class CodexCatalog
             {
                 category = CodexProgress.Category.Item,
                 id = id,
-                displayName = it.DisplayName,
+                displayName = it.LocalizedName,
                 icon = it.Icon,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Item, id),
                 detail = sb.ToString().TrimEnd(),
