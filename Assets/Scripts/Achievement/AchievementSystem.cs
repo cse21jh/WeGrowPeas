@@ -142,7 +142,7 @@ public static class AchievementSystem
         _unlocked[a.id] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         SaveManager.RequestProfileSave();
         Platform?.SetAchievement(a.id);
-        Debug.Log($"[Achievement] 달성: {a.id} ({a.title})");
+        Debug.Log($"[Achievement] 달성: {a.id} ({a.name})");
 
         if (notify && UIManager.Instance != null && UIManager.Instance.Popup != null)
             UIManager.Instance.Popup.ShowToastPopup(Loc.T("game.achievement.unlocked"), a.LocalizedTitle, a.icon, 3f);

@@ -37,7 +37,7 @@ public class AbilityManager : MonoBehaviour
     private Dictionary<PlayablePlantType, int> plantAbilityPoint = new();
 
     // 처음부터 해금된 일반 특성의 에셋 이름.
-    private const string DefaultUnlockedGeneralAbility = "AddGoldAbility";
+    public const string DefaultUnlockedGeneralAbility = "AddGoldAbility";
 
     private Dictionary<string, bool> isGeneralAbilityDataUnlocked = new(); // 일반 특성 에셋 이름, 해당 특성의 해금 여부
 

@@ -10,30 +10,19 @@ public enum CurseType { Temporal, Seasonal }
 /// </summary>
 [CreateAssetMenu(menuName = "Curse/CurseItem")]
 [BalanceGroup("Curse", "Curses")]
-[LocGroup(LocPrefix)]
-public class CurseScriptable : ScriptableObject, ILocListSource
+[LocGroup(LocPrefix, "title", "description")]
+public class CurseScriptable : ScriptableObject
 {
     private const string LocPrefix = "curse";
 
     /// <summary>화면에 보여줄 이름.</summary>
-    public string LocalizedTitle => Loc.Or(LocKey.For(LocPrefix, name, "title"), title);
+    public string LocalizedTitle => Loc.T(LocKey.For(LocPrefix, name, "title"));
 
     /// <summary>화면에 보여줄 설명.</summary>
-    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), "");
 
     /// <summary>화면에 보여줄 단계별 설명. index는 0부터.</summary>
-    public string GetLevelNote(int index) => Loc.Or(LocKey.For(LocPrefix, name, LevelId(index)), levels[index].note);
-
-    public IEnumerable<LocListText> GetLocTexts()
-    {
-        for (int i = 0; i < levels.Count; i++)
-        {
-            if (levels[i] != null) yield return new LocListText(LevelId(i), levels[i].note);
-        }
-    }
-
-    // 단계 번호가 곧 고정 id다.
-    public bool EnsureLocIds() => false;
+    public string GetLevelNote(int index) => Loc.Or(LocKey.For(LocPrefix, name, LevelId(index)), "");
 
     private static string LevelId(int index) => $"level{index + 1}";
 
@@ -41,11 +30,7 @@ public class CurseScriptable : ScriptableObject, ILocListSource
 
     public CurseType curseType;
 
-    [LocText("title")] public string title;
-
     public Sprite icon;
-
-    [TextArea, LocText("description")] public string description;
 
     [Balance("해금 스테이지")]
     [Tooltip("해금 스테이지 (이 스테이지 이상부터 등장)")]
@@ -77,8 +62,4 @@ public class CurseLevel
     [Balance("수치A")] public float valueA;
     [Balance("수치B")] public float valueB;
     [Balance("일수")] public int days;
-
-    [TextArea]
-    [Tooltip("인스펙터 메모용. 로직에 영향 없음.")]
-    public string note;
 }

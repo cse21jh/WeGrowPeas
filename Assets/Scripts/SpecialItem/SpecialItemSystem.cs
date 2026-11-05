@@ -150,7 +150,7 @@ public static class SpecialItemSystem
         _owned.Add(item.id);
         PendingGifts = Mathf.Max(0, PendingGifts - 1);
         ResetSlotRerolls(); // 다음 선물을 위해 칸별 리롤 횟수 회복
-        Debug.Log($"[SpecialItem] 획득: {item.displayName} ({item.id})");
+        Debug.Log($"[SpecialItem] 획득: {item.name} ({item.id})");
     }
 
     // ── 저장/로드 (per-run) ────────────────────────────────────────────────────

@@ -106,7 +106,7 @@ public class CurseManager : Singleton<CurseManager>
             currentSeasonCurse.Activate();
             UpdateCurseUI();
         }
-        Debug.Log($"[Curse][강제] {data.title} 적용 (레벨 {debugForceLevel})");
+        Debug.Log($"[Curse][강제] {data.name} 적용 (레벨 {debugForceLevel})");
     }
 
     /// <summary>[디버그] 현재 적용 중인 저주 모두 해제.</summary>
@@ -208,10 +208,10 @@ public class CurseManager : Singleton<CurseManager>
         sb.AppendLine("<b>── 저주 상태 (F9) ──</b>");
         sb.AppendLine($"저주 레벨: {DawnSystem.Current.curseLevel}");
         sb.AppendLine(currentSeasonCurse != null
-            ? $"지속형: <color=#FF6E6E>{currentSeasonCurse.Data.title}</color>  ({remainingCurseDay}일 남음)"
+            ? $"지속형: <color=#FF6E6E>{currentSeasonCurse.Data.LocalizedTitle}</color>  ({remainingCurseDay}일 남음)"
             : "지속형: 없음");
         sb.AppendLine(currentTempCurse != null
-            ? $"단발형: <color=#6EC1FF>{currentTempCurse.Data.title}</color>"
+            ? $"단발형: <color=#6EC1FF>{currentTempCurse.Data.LocalizedTitle}</color>"
             : "단발형: 없음");
 
         sb.AppendLine("<b>[활성 수정자]</b>");
@@ -259,11 +259,11 @@ public class CurseManager : Singleton<CurseManager>
 
         GUILayout.Label("[단발형]");
         foreach (var c in temporalCursePool)
-            if (c != null && GUILayout.Button($"{c.curseId}  {c.title}")) DebugForceCurse(c);
+            if (c != null && GUILayout.Button($"{c.curseId}  {c.LocalizedTitle}")) DebugForceCurse(c);
 
         GUILayout.Label("[지속형]");
         foreach (var c in seasonalCursePool)
-            if (c != null && GUILayout.Button($"{c.curseId}  {c.title}")) DebugForceCurse(c);
+            if (c != null && GUILayout.Button($"{c.curseId}  {c.LocalizedTitle}")) DebugForceCurse(c);
 
         GUILayout.EndScrollView();
         GUILayout.EndArea();
@@ -327,7 +327,7 @@ public class CurseManager : Singleton<CurseManager>
         currentSeasonCurse = CreateInstanceById(data, GetCurseLevel());
         remainingCurseDay = seasonInterval;
 
-        Debug.Log($"[Curse] 다음 계절 지속형 저주 예고: {currentSeasonCurse?.Data.title}");
+        Debug.Log($"[Curse] 다음 계절 지속형 저주 예고: {currentSeasonCurse?.Data.LocalizedTitle}");
         //TODO: 다음 지속형 저주에 대한 경고 UI(안전재난경보) 표시
     }
 
@@ -359,7 +359,7 @@ public class CurseManager : Singleton<CurseManager>
         if (currentSeasonCurse == null) return;
 
         remainingCurseDay--;
-        Debug.Log($"[Curse] {currentSeasonCurse.Data.title} 저주 {remainingCurseDay}일 남음");
+        Debug.Log($"[Curse] {currentSeasonCurse.Data.LocalizedTitle} 저주 {remainingCurseDay}일 남음");
 
         if (remainingCurseDay <= 0)
         {

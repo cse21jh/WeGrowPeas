@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[LocGroup(LocPrefix)]
+[LocGroup(LocPrefix, "name", "description")]
 public abstract class GeneralAbilityData : ScriptableObject
 {
     private const string LocPrefix = "ability";
@@ -9,15 +9,12 @@ public abstract class GeneralAbilityData : ScriptableObject
     public string UnlockKey => name;
 
     /// <summary>화면에 보여줄 이름. 저장 키가 필요하면 <see cref="UnlockKey"/>를 쓴다.</summary>
-    public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, name, "name"), abilityName);
+    public string LocalizedName => Loc.T(LocKey.For(LocPrefix, name, "name"));
 
     /// <summary>화면에 보여줄 설명.</summary>
-    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), "");
 
     [Header("기본 정보")]
-    [LocText("name")] public string abilityName;
-    [TextArea(3, 5), LocText("description")]
-    public string description;
     public Sprite icon;
     public int price;
     public abstract void ApplyEffect(GameManager gameManager);

@@ -514,7 +514,7 @@ public class MessengerApp : MonoBehaviour
                     && !isPastDay;
                 firstUnreadSkipped = true;
                 if (!skipFirstToday)
-                    yield return PlayTypingDelay(reference.message);
+                    yield return PlayTypingDelay(reference.message, displayingChat.GetText(reference.message));
             }
 
             if (currentChat != displayingChat) break;
@@ -545,9 +545,9 @@ public class MessengerApp : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayTypingDelay(ChatMessage message)
+    private IEnumerator PlayTypingDelay(ChatMessage message, string text)
     {
-        float total = Mathf.Max(message.delayAfterPrevious, message.messageText.Length / 10f);
+        float total = Mathf.Max(message.delayAfterPrevious, text.Length / 10f);
         float preDelay = total / 3f;
         float typingDelay = total - preDelay;
         skipTyping = false;

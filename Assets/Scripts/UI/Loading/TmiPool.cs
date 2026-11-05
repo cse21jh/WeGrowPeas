@@ -43,9 +43,10 @@ public static class TmiPool
         _language = Loc.Language;
 
         var cfg = Resources.Load<TmiConfig>(ResourcePath);
-        if (cfg != null && cfg.tips != null && cfg.tips.Count > 0)
+        var tips = cfg != null ? cfg.GetLocalizedTips() : null;
+        if (tips != null && tips.Count > 0)
         {
-            _tips = cfg.GetLocalizedTips();
+            _tips = tips;
         }
         else
         {

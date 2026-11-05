@@ -111,12 +111,13 @@ public static class RecallStore
         if (run.graph == null) run.graph = new GraphSave();
         if (run.recall == null) run.recall = new RecallSave();
 
-        // v1 → v2: 구매 이력과 일반 특성 키를 표시 이름에서 에셋 이름으로.
+        // v1 → v2: 구매 이력과 특성 키를 표시 이름에서 에셋 이름으로.
         if (run.version < 2)
         {
             run.summary.popularItemName = LegacySaveKeys.Item(run.summary.popularItemName);
             LegacySaveKeys.ConvertItems(run.recall.days);
             LegacySaveKeys.ConvertGeneralAbilities(run.generalAbilityNames);
+            LegacySaveKeys.ConvertPlantAbilities(run.plantAbilityNames, run.header?.plantName);
             run.version = 2;
         }
     }

@@ -45,7 +45,7 @@ public static class CodexCatalog
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(it.GradeTagText)) sb.AppendLine($"[{it.GradeTagText}] {it.Rarity}");
             sb.AppendLine(Loc.T("game.codex.price", ("price", it.Price)));
-            if (!string.IsNullOrEmpty(it.Description)) sb.AppendLine(it.LocalizedDescription);
+            if (!string.IsNullOrEmpty(it.LocalizedDescription)) sb.AppendLine(it.LocalizedDescription);
 
             bool locked = !it.IsMetaUnlocked();
 
@@ -71,9 +71,9 @@ public static class CodexCatalog
         {
             if (p == null) continue;
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(p.description)) sb.AppendLine(p.LocalizedDescription);
-            if (!string.IsNullOrEmpty(p.traitInfo)) sb.AppendLine(Loc.T("game.codex.trait", ("trait", p.LocalizedTraitInfo)));
-            if (!string.IsNullOrEmpty(p.resistanceNote)) sb.AppendLine(p.LocalizedResistanceNote);
+            if (!string.IsNullOrEmpty(p.LocalizedDescription)) sb.AppendLine(p.LocalizedDescription);
+            if (!string.IsNullOrEmpty(p.LocalizedTraitInfo)) sb.AppendLine(Loc.T("game.codex.trait", ("trait", p.LocalizedTraitInfo)));
+            if (!string.IsNullOrEmpty(p.LocalizedResistanceNote)) sb.AppendLine(p.LocalizedResistanceNote);
             // 판매 수를 세는 것은 완두콩·땅콩뿐이다. 나머지는 "판매한 수: 0"이 늘 붙어 헷갈리므로 뺀다.
             if (p.plantId == PlantIds.Pea)
                 sb.AppendLine(Loc.T("game.codex.sold", ("count", CodexProgress.GetStat(CodexProgress.StatSoldPea))));
@@ -101,10 +101,10 @@ public static class CodexCatalog
             if (c == null) continue;
             var sb = new StringBuilder();
             sb.AppendLine(Loc.T(c.curseType == CurseType.Seasonal ? "game.codex.curse_seasonal" : "game.codex.curse_temporal"));
-            if (!string.IsNullOrEmpty(c.description)) sb.AppendLine(c.LocalizedDescription);
+            if (!string.IsNullOrEmpty(c.LocalizedDescription)) sb.AppendLine(c.LocalizedDescription);
             if (c.levels != null)
                 for (int i = 0; i < c.levels.Count; i++)
-                    if (c.levels[i] != null && !string.IsNullOrEmpty(c.levels[i].note))
+                    if (c.levels[i] != null && !string.IsNullOrEmpty(c.GetLevelNote(i)))
                         sb.AppendLine(Loc.T("game.codex.curse_level", ("level", i + 1), ("note", c.GetLevelNote(i))));
 
             list.Add(new CodexEntry
@@ -128,7 +128,7 @@ public static class CodexCatalog
         {
             if (b == null) continue;
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(b.description)) sb.AppendLine(b.LocalizedDescription);
+            if (!string.IsNullOrEmpty(b.LocalizedDescription)) sb.AppendLine(b.LocalizedDescription);
             sb.AppendLine(Loc.T("game.codex.bug_kills", ("count", CodexProgress.GetStat(CodexProgress.StatBugKill(b.bugId)))));
 
             list.Add(new CodexEntry
@@ -156,7 +156,7 @@ public static class CodexCatalog
             bool done = AchievementSystem.IsUnlocked(a.id);
 
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(a.description)) sb.AppendLine(a.LocalizedDescription);
+            if (!string.IsNullOrEmpty(a.LocalizedDescription)) sb.AppendLine(a.LocalizedDescription);
             if (done && AchievementSystem.TryGetUnlockedAt(a.id, out var at))
                 sb.AppendLine(Loc.T("game.codex.achieved", ("year", at.Year), ("month", at.Month), ("day", at.Day)));
             else if (a.condition == AchievementCondition.LifetimeStat)

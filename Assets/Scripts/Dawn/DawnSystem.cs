@@ -183,7 +183,7 @@ public static class DawnSystem
         foreach (var d in Config.stages)
         {
             if (d == null || d.stage < 1 || d.stage > stage) continue;
-            if (string.IsNullOrWhiteSpace(d.constraintDescription)) continue;
+            if (string.IsNullOrWhiteSpace(d.LocalizedConstraint)) continue;
             sb.AppendLine($"• [{d.stage}] {d.LocalizedConstraint}");
         }
         return sb.ToString();

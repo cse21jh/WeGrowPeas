@@ -103,7 +103,7 @@ public class InfoPopup : MonoBehaviour
         {
             if (data == null || data.type != plantType) continue;
 
-            var owned = learned != null ? learned.Find(a => a != null && a.abilityName == data.abilityName) : null;
+            var owned = learned != null ? learned.Find(a => a != null && a.name == data.name) : null;
             int level = owned != null ? owned.level : 0;
 
             GameObject row = Spawn(plantTraitPrefab, plantTraitContent);

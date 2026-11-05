@@ -55,8 +55,6 @@ public static class CodexDataCreator
             if (AssetDatabase.LoadAssetAtPath<BugCodexData>(path) != null) continue;
             var so = ScriptableObject.CreateInstance<BugCodexData>();
             so.bugId = b.id;
-            so.displayName = b.name;
-            so.description = b.desc;
             AssetDatabase.CreateAsset(so, path);
             created++;
         }
@@ -67,16 +65,13 @@ public static class CodexDataCreator
             if (AssetDatabase.LoadAssetAtPath<PlantCodexData>(path) != null) continue;
             var so = ScriptableObject.CreateInstance<PlantCodexData>();
             so.plantId = p.id;
-            so.displayName = p.name;
-            so.description = p.desc;
-            so.traitInfo = p.trait;
             AssetDatabase.CreateAsset(so, path);
             created++;
         }
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log($"[Codex] 스타터 데이터 에셋 {created}개 생성 (아이콘/설명은 인스펙터에서 보완)");
+        Debug.Log($"[Codex] 스타터 데이터 에셋 {created}개 생성 (아이콘은 인스펙터에서, 문구는 번역 표에서 보완)");
     }
 
     private static void EnsureFolder(string path)

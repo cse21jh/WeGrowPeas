@@ -10,9 +10,9 @@ public class ShopInventory
 public class ShopManager : Singleton<ShopManager>
 {
     // 코드가 직접 찾는 아이템의 구매 이력 키. ItemData.PurchaseKey와 같은 값(에셋 이름)이다.
-    private const string ShopContactKey = "ShopContactItemData";
-    private const string LandDeedKey = "AddSoilItem";
-    private const string BreedingKitKey = "BreedCountItemData";
+    public const string ShopContactKey = "ShopContactItemData";
+    public const string LandDeedKey = "AddSoilItem";
+    public const string BreedingKitKey = "BreedCountItemData";
 
     [Header("Inventory (Serialized here)")]
     [SerializeField] private ItemData[] fixedItems = new ItemData[4];  // 상단 고정 4종

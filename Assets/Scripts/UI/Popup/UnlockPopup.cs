@@ -227,7 +227,7 @@ public class UnlockItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (ownerPopup != null && itemData != null && !string.IsNullOrEmpty(itemData.Description))
+        if (ownerPopup != null && itemData != null && !string.IsNullOrEmpty(itemData.LocalizedDescription))
         {
             ownerPopup.ShowTooltip(itemData.LocalizedDescription, transform.position);
         }

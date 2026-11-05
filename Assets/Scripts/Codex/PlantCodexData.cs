@@ -6,22 +6,22 @@ using UnityEngine;
 /// 유전자별 최대 저항력 표는 UI에서 코드/이 데이터로 구성.
 /// </summary>
 [CreateAssetMenu(menuName = "Codex/Plant Codex Data")]
-[LocGroup(LocPrefix)]
+[LocGroup(LocPrefix, "name", "description")]
 public class PlantCodexData : ScriptableObject, ILocKeyed
 {
     private const string LocPrefix = "plant";
 
     /// <summary>화면에 보여줄 이름.</summary>
-    public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, LocId, "name"), displayName);
+    public string LocalizedName => Loc.T(LocKey.For(LocPrefix, LocId, "name"));
 
     /// <summary>화면에 보여줄 설명.</summary>
-    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, LocId, "description"), description);
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, LocId, "description"), "");
 
     /// <summary>화면에 보여줄 특성 설명.</summary>
-    public string LocalizedTraitInfo => Loc.Or(LocKey.For(LocPrefix, LocId, "trait"), traitInfo);
+    public string LocalizedTraitInfo => Loc.Or(LocKey.For(LocPrefix, LocId, "trait"), "");
 
     /// <summary>화면에 보여줄 저항력 설명.</summary>
-    public string LocalizedResistanceNote => Loc.Or(LocKey.For(LocPrefix, LocId, "resistance"), resistanceNote);
+    public string LocalizedResistanceNote => Loc.Or(LocKey.For(LocPrefix, LocId, "resistance"), "");
 
     /// <inheritdoc/>
     public string LocId => string.IsNullOrEmpty(locId) ? name : locId;
@@ -32,18 +32,5 @@ public class PlantCodexData : ScriptableObject, ILocKeyed
     [Tooltip("Plant.speciesname과 일치 (예: 완두콩, 땅콩, 피스타치오)")]
     public string plantId;
 
-    [LocText("name")] public string displayName;
     public Sprite icon;
-
-    [TextArea]
-    [Tooltip("특징 설명 및 tmi (예: 자가번식 가능, 칼로리 높음)")]
-    [LocText("description")] public string description;
-
-    [TextArea]
-    [Tooltip("특성/특이사항 설명 (예: 네펜데스는 벌레 면역)")]
-    [LocText("trait")] public string traitInfo;
-
-    [TextArea]
-    [Tooltip("유전자별 최대 저항력 등 추가 설명(선택). 비우면 UI에서 코드값으로 표시 시도.")]
-    [LocText("resistance")] public string resistanceNote;
 }

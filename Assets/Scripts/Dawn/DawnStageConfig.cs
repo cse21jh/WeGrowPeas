@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
 /// 새벽 모드(승천) 단계별 데이터. 단계가 올라갈수록 제약이 "누적"된다.
-/// 수치/텍스트는 인스펙터에서 수정 가능(SO). 저주는 별도(여기선 curseLevel만 참고값).
+/// 수치는 인스펙터에서, 제약 문구는 번역 표에서 수정한다. 저주는 별도(여기선 curseLevel만 참고값).
 /// 런타임 접근은 <see cref="DawnSystem"/>을 통해서 한다.
 /// </summary>
 [BalanceGroup("Dawn", "DawnStages")]
 [CreateAssetMenu(menuName = "Dawn/Dawn Stage Config", fileName = "DawnStageConfig")]
 [LocGroup(LocPrefix)]
-public class DawnStageConfig : ScriptableObject, ILocKeyed, ILocListSource
+public class DawnStageConfig : ScriptableObject, ILocKeyed
 {
     public const string LocPrefix = "dawn";
     public const string LocGroupId = "stages";
@@ -21,12 +20,6 @@ public class DawnStageConfig : ScriptableObject, ILocKeyed, ILocListSource
 
     /// <inheritdoc/>
     public string LocId => LocGroupId;
-
-    public IEnumerable<LocListText> GetLocTexts()
-        => stages.Where(s => s != null).Select(s => new LocListText(s.LocId, s.constraintDescription));
-
-    // 단계 번호가 곧 고정 id다.
-    public bool EnsureLocIds() => false;
 
     public DawnStageData Get(int stage) => stages.Find(s => s != null && s.stage == stage);
 }
@@ -39,21 +32,14 @@ public class DawnStageData
 
     /// <summary>화면에 보여줄 제약 설명.</summary>
     public string LocalizedConstraint
-        => Loc.Or(LocKey.For(DawnStageConfig.LocPrefix, DawnStageConfig.LocGroupId, LocId), constraintDescription);
+        => Loc.Or(LocKey.For(DawnStageConfig.LocPrefix, DawnStageConfig.LocGroupId, LocId), "");
 
     [Tooltip("새벽 단계 번호 (1..N)")]
     public int stage;
 
-    [TextArea]
-    [Tooltip("이 단계에서 '추가'되는 제약(누적됨). UI에 표시됨")]
-    public string constraintDescription;
-
     [Balance("유전자 배율")]
     [Tooltip("유전자 배율(절대값). 표 기준 1.5~2.6")]
     public float geneticsMultiplier = 1f;
-
-    [Tooltip("이 단계 클리어 시 해금되는 아이템(표시용, 없으면 빈칸)")]
-    public string unlockItemName;
 
     [Tooltip("이 단계 클리어 시 해금되는 아이템 리스트")]
     public List<ItemData> unlockItems = new List<ItemData>();

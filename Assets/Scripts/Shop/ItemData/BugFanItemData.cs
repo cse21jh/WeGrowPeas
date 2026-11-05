@@ -60,7 +60,7 @@ public class BugFanItemData : ItemData
         if (GameManager.Instance?.grid != null)
         {
             GameManager.Instance.grid.AddBugSpeedDcreasement(reducePercent);
-            Debug.Log($"{DisplayName} 구매: 벌레 이동속도 {reducePercent * 100f}% 영구 감소 적용");
+            Debug.Log($"{name} 구매: 벌레 이동속도 {reducePercent * 100f}% 영구 감소 적용");
         }
         else
         {

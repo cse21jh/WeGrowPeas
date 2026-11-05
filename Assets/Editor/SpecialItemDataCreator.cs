@@ -60,8 +60,6 @@ public static class SpecialItemDataCreator
 
         var so = ScriptableObject.CreateInstance<SpecialItemData>();
         so.id = id;
-        so.displayName = name;
-        so.description = desc;
         so.plantSpecific = plantSpecific;
         so.plantName = plant;
         so.unlockDawnStage = dawn;

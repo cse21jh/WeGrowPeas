@@ -83,15 +83,13 @@ public static class ItemTagExtensions
 }
 
 [BalanceGroup("Shop", "Items")] // 서브클래스 전부 Shop/Items.csv 한 파일로
-[LocGroup(LocPrefix)]
+[LocGroup(LocPrefix, "name", "description")]
 public abstract class ItemData : ScriptableObject
 {
     private const string LocPrefix = "item";
 
     [Header("Meta")]
-    [LocText("name")] public string DisplayName;
     public Sprite Icon;
-    [TextArea, LocText("description")] public string Description;
     [Balance("가격")] public int Price;
 
     [Header("Rarity")]
@@ -122,10 +120,10 @@ public abstract class ItemData : ScriptableObject
     public string PurchaseKey => name;
 
     /// <summary>화면에 보여줄 이름. 저장 키가 필요하면 <see cref="PurchaseKey"/>를 쓴다.</summary>
-    public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, name, "name"), DisplayName);
+    public string LocalizedName => Loc.T(LocKey.For(LocPrefix, name, "name"));
 
     /// <summary>화면에 보여줄 설명.</summary>
-    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), Description);
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), "");
 
     /// <summary>
     /// 설치형 아이템 구매 후, 위치/식물을 고를 때까지 계속 표시할 안내 문구.

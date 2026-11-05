@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-/// <summary>추출할 문구 하나. Source는 문제가 생겼을 때 보여줄 에셋 이름이다.</summary>
+/// <summary>표에 넣을 문구 하나. Text가 없으면 빈 행을 만든다. Source는 문제가 생겼을 때 보여줄 에셋 이름이다.</summary>
 public sealed class LocEntry
 {
     public string Key;
@@ -12,7 +12,7 @@ public sealed class LocEntry
 }
 
 /// <summary>
-/// 추출한 문구를 번역 표 CSV에 합친다. 표에 없는 키만 맨 뒤에 추가하고 기존 행은 건드리지 않는다.
+/// 문구를 번역 표 CSV에 합친다. 표에 없는 키만 맨 뒤에 추가하고 기존 행은 건드리지 않는다.
 /// 표에서 고친 문구와 번역을 지키기 위해서다.
 /// </summary>
 public static class LocExtract
@@ -63,7 +63,7 @@ public static class LocExtract
             if (rows.TryGetValue(entry.Key, out LocRow row))
             {
                 // 표를 고친 경우가 정상이므로 알리기만 한다. 게임은 표의 문구를 쓴다.
-                if (Normalize(row.Get(LocTable.SourceLanguage)) != Normalize(entry.Text))
+                if (entry.Text != null && Normalize(row.Get(LocTable.SourceLanguage)) != Normalize(entry.Text))
                     result.Issues.Add(Warning(tableName, $"'{entry.Key}': 표의 원문이 {entry.Source}와 다릅니다. 표의 문구를 씁니다."));
                 continue;
             }
@@ -89,7 +89,7 @@ public static class LocExtract
     {
         if (column == "key") return entry.Key;
         if (column == LocTable.NoteColumn) return entry.Note ?? "";
-        return column == LocTable.SourceLanguage ? entry.Text : "";
+        return column == LocTable.SourceLanguage ? entry.Text ?? "" : "";
     }
 
     private static string Normalize(string text) => (text ?? "").Replace("\r\n", "\n");

@@ -19,6 +19,27 @@ public static class LegacySaveKeys
         ["일기예보"] = "WeatherForecastAbility",
     };
 
+    private static readonly Dictionary<string, string> PlantAbilities = new()
+    {
+        ["버틴 웨이브 저항력 증가"] = "ResistanceAdaptation",
+        ["감소하는 저항력 감소"] = "ResistanceDecayReduction",
+        ["땅콩 복제 확률 증가"] = "AdditionalPeanutCopyProbability",
+        ["죽어서 돈을 남긴다"] = "BonusRatioWhenDie",
+    };
+
+    // 완두콩과 땅콩이 같은 표시 이름을 쓰던 특성. 저장된 식물로 구분한다.
+    private static readonly Dictionary<string, string> PeaAbilities = new()
+    {
+        ["식물 기본 가격 증가"] = "PeaAdditionalPlantGold",
+        ["기본 저항력 증가"] = "PeaResistanceBonus",
+    };
+
+    private static readonly Dictionary<string, string> PeanutAbilities = new()
+    {
+        ["식물 기본 가격 증가"] = "PeanutAdditionalPlantGold",
+        ["기본 저항력 증가"] = "PeanutResistanceBonus",
+    };
+
     private static readonly Dictionary<string, string> Items = new()
     {
         ["저항력 흡수 비료"] = "AbsorbFertilizerItemData",
@@ -96,12 +117,29 @@ public static class LegacySaveKeys
             keys[i] = GeneralAbility(keys[i]);
     }
 
+    /// <summary>식물 특성 키 목록을 그 자리에서 바꾼다. plant는 그 기록의 식물 ID다.</summary>
+    public static void ConvertPlantAbilities(IList<string> keys, string plant)
+    {
+        if (keys == null) return;
+        var shared = plant == PlantIds.Peanut ? PeanutAbilities : PeaAbilities;
+        for (int i = 0; i < keys.Count; i++)
+            keys[i] = Convert(shared, Convert(PlantAbilities, keys[i]));
+    }
+
     /// <summary>회상 스냅샷의 구매 이력 키를 그 자리에서 바꾼다.</summary>
     public static void ConvertItems(IEnumerable<DaySnapshot> days)
     {
         if (days == null) return;
         foreach (var day in days)
             if (day != null) ConvertItems(day.itemNames);
+    }
+
+    /// <summary>이 표가 가리키는 에셋 이름 전체. 에셋 문구 검사가 파일 존재를 확인한다.</summary>
+    public static IEnumerable<string> AllAssetNames()
+    {
+        foreach (var table in new[] { GeneralAbilities, PlantAbilities, PeaAbilities, PeanutAbilities, Items })
+            foreach (string name in table.Values)
+                yield return name;
     }
 
     private static string Convert(Dictionary<string, string> table, string saved)

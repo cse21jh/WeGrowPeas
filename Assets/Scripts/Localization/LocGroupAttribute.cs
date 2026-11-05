@@ -2,32 +2,21 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 이 ScriptableObject의 텍스트가 들어갈 번역 표를 지정한다. 서브클래스도 같은 표를 쓴다.
-/// 예: [LocGroup("item")] → Resources/Localization/item.csv, 키는 item.{에셋 이름}.{필드}
+/// 이 ScriptableObject의 문구가 있는 번역 표를 지정한다. 서브클래스도 같은 표를 쓴다.
+/// 문구는 에셋에 두지 않고 표에만 둔다. 키는 {표}.{에셋 이름}.{항목}이다.
+/// 예: [LocGroup("item", "name", "description")] → Resources/Localization/item.csv의 item.Pepper.name
 /// </summary>
+/// <remarks>Required는 에셋마다 반드시 있어야 하는 항목이다. 에셋 문구 검사가 표에 있는지 확인한다.</remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]
 public class LocGroupAttribute : Attribute
 {
     public string Prefix { get; }
+    public string[] Required { get; }
 
-    public LocGroupAttribute(string prefix)
+    public LocGroupAttribute(string prefix, params string[] required)
     {
         Prefix = prefix;
-    }
-}
-
-/// <summary>
-/// 번역 표로 추출할 문자열 필드. Localization 창의 'SO 텍스트 추출'이 이 필드의 값을 표에 추가한다.
-/// 코드에서는 필드를 직접 읽지 말고 <see cref="Loc.Or(string, string)"/>를 거치는 속성으로 읽는다.
-/// </summary>
-[AttributeUsage(AttributeTargets.Field)]
-public class LocTextAttribute : Attribute
-{
-    public string Suffix { get; }
-
-    public LocTextAttribute(string suffix)
-    {
-        Suffix = suffix;
+        Required = required;
     }
 }
 
@@ -39,32 +28,19 @@ public interface ILocKeyed
     string LocId { get; }
 }
 
-/// <summary>목록 안의 문구 하나. Id는 그 에셋 안에서 유일하고 바뀌지 않아야 한다.</summary>
-public readonly struct LocListText
-{
-    public readonly string Id;
-    public readonly string Text;
-
-    public LocListText(string id, string text)
-    {
-        Id = id;
-        Text = text;
-    }
-}
-
 /// <summary>
-/// 목록 안에 문구가 있는 ScriptableObject. 키는 {표}.{에셋}.{Id}이다.
+/// 목록 안에 항목별 문구가 있는 ScriptableObject. 키는 {표}.{에셋}.{Id}이다.
 /// 순서가 바뀌어도 키가 밀리지 않도록 Id는 순번이 아니라 항목에 붙은 값을 쓴다.
 /// </summary>
 public interface ILocListSource
 {
-    IEnumerable<LocListText> GetLocTexts();
+    IEnumerable<string> GetLocIds();
 
     /// <summary>Id가 없는 항목에 Id를 준다. 값이 바뀌었으면 true.</summary>
     bool EnsureLocIds();
 }
 
-/// <summary>SO 텍스트의 번역 키 규칙. 추출 도구와 런타임이 같은 키를 쓰도록 한 곳에 둔다.</summary>
+/// <summary>SO 문구의 번역 키 규칙. 검사 도구와 런타임이 같은 키를 쓰도록 한 곳에 둔다.</summary>
 public static class LocKey
 {
     public static string For(string prefix, string assetName, string suffix) => $"{prefix}.{assetName}.{suffix}";

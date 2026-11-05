@@ -78,7 +78,7 @@ public class IntroCutsceneManager : MonoBehaviour
             advanceIcon.SetActive(false);
 
         bool hasImage = entry.image != null;
-        bool hasText = !string.IsNullOrEmpty(entry.text);
+        bool hasText = !string.IsNullOrEmpty(data.GetText(entry));
 
         if (topImage != null)
         {

@@ -47,7 +47,8 @@ public class LocalizationWindow : EditorWindow
         EditorGUILayout.Space(6);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("표 검사", GUILayout.Height(30))) Validate();
-        if (GUILayout.Button("SO 텍스트 추출", GUILayout.Height(30))) ExtractFromAssets();
+        if (GUILayout.Button("에셋 문구 검사", GUILayout.Height(30))) CheckAssets(addMissing: false);
+        if (GUILayout.Button("빠진 행 추가", GUILayout.Height(30))) CheckAssets(addMissing: true);
         if (GUILayout.Button("UI 문구 연결", GUILayout.Height(30))) LinkUiText();
         if (GUILayout.Button("코드 키 검사", GUILayout.Height(30))) CheckCodeKeys();
         if (GUILayout.Button("내보내기", GUILayout.Height(30))) Export();
@@ -161,13 +162,15 @@ public class LocalizationWindow : EditorWindow
         status = sb.ToString();
     }
 
-    // ── SO 텍스트 추출 ───────────────────────────────────────────────────────
-    private void ExtractFromAssets()
+    // ── 에셋 문구 검사 ───────────────────────────────────────────────────────
+    private void CheckAssets(bool addMissing)
     {
         pending = null;
-        var report = LocExtractor.Run();
+        var report = LocAssetChecker.Run(addMissing);
         issues = report.Issues;
-        status = $"추출 완료: 표 {report.TablesChanged}개에 {report.Added}행 추가";
+        status = addMissing
+            ? $"검사 완료: 키 {report.Checked}개, 표 {report.TablesChanged}개에 빈 행 {report.Added}개 추가"
+            : $"검사 완료: 키 {report.Checked}개, 문제 {report.Issues.Count}건";
     }
 
     // ── UI 문구 연결 ─────────────────────────────────────────────────────────

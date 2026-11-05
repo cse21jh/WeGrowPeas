@@ -36,7 +36,7 @@ public static class CurseConfigCreator
     }
 
     private static CurseLevel L(float a, float b, int days, string note)
-        => new CurseLevel { valueA = a, valueB = b, days = days, note = note };
+        => new CurseLevel { valueA = a, valueB = b, days = days };
 
     private static List<CurseLevel> Lvls(CurseLevel l1, CurseLevel l2, CurseLevel l3)
         => new List<CurseLevel> { l1, l2, l3 };

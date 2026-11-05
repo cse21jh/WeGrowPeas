@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public static class ItemTagApplier
 {
-    // 아이템 이름(ItemData.DisplayName) → 태그. 태그가 없는 아이템은 빈 배열.
+    // 아이템 한글 이름(LegacySaveKeys로 에셋 이름을 찾는다) → 태그. 태그가 없는 아이템은 빈 배열.
     private static readonly Dictionary<string, ItemTag[]> Table = new Dictionary<string, ItemTag[]>
     {
         // ── 고정 물품 ─────────────────────────────────────────────────────
@@ -91,6 +91,7 @@ public static class ItemTagApplier
     public static void Apply()
     {
         var items = Resources.LoadAll<ItemData>("Data/Item Data");
+        var tagsByAsset = Table.ToDictionary(kv => LegacySaveKeys.Item(kv.Key), kv => kv.Value);
         var matched = new HashSet<string>();
 
         int changed = 0;
@@ -100,15 +101,13 @@ public static class ItemTagApplier
         {
             if (item == null) continue;
 
-            string key = string.IsNullOrEmpty(item.DisplayName) ? item.name : item.DisplayName;
-
-            if (!Table.TryGetValue(key, out var tags))
+            if (!tagsByAsset.TryGetValue(item.name, out var tags))
             {
-                unmatchedAssets.Add($"{item.name} (\"{key}\")");
+                unmatchedAssets.Add(item.name);
                 continue;
             }
 
-            matched.Add(key);
+            matched.Add(item.name);
 
             var next = tags.ToList();
             if (item.Tags != null && item.Tags.SequenceEqual(next)) continue;
@@ -126,7 +125,7 @@ public static class ItemTagApplier
         if (unmatchedAssets.Count > 0)
             Debug.LogWarning("[Shop] 표에 없는 아이템 에셋 (태그 미적용):\n  " + string.Join("\n  ", unmatchedAssets));
 
-        var missingInProject = Table.Keys.Where(k => !matched.Contains(k)).ToList();
+        var missingInProject = tagsByAsset.Keys.Where(k => !matched.Contains(k)).ToList();
         if (missingInProject.Count > 0)
             Debug.LogWarning("[Shop] 표에는 있는데 에셋이 없는 아이템:\n  " + string.Join("\n  ", missingInProject));
     }

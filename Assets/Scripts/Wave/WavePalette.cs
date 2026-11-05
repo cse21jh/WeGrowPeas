@@ -11,8 +11,8 @@ public static class WavePalette
 {
     public const string ResourcePath = "Data/Wave/WaveDisplay";
 
-    /// <summary>에셋이 없을 때 쓰는 이름. <see cref="WaveType"/> 순서.</summary>
-    private static readonly string[] FallbackNames =
+    /// <summary>옛 기록에 저장된 원문 이름. 표시에는 쓰지 않는다. <see cref="WaveType"/> 순서.</summary>
+    private static readonly string[] LegacyNames =
     {
         "자연사", "해충", "바람", "홍수", "폭우", "추위", "가뭄", "더위", "없음"
     };
@@ -52,8 +52,8 @@ public static class WavePalette
         }
     }
 
-    /// <summary>웨이브 표시 이름. 번역 표의 wave.{WaveType}을 먼저 쓰고, 없으면 에셋·기본값을 쓴다.</summary>
-    public static string GetName(WaveType type) => Loc.Or($"wave.{type}", GetDefaultName(type));
+    /// <summary>웨이브 표시 이름. 번역 표의 wave.{WaveType} 행이다.</summary>
+    public static string GetName(WaveType type) => Loc.T($"wave.{type}");
 
     /// <summary>형질의 표시 이름. TraitType의 앞쪽 값은 WaveType과 순서가 같다.</summary>
     public static string GetName(TraitType type) => GetName((WaveType)(int)type);
@@ -66,7 +66,7 @@ public static class WavePalette
     {
         foreach (WaveType candidate in Enum.GetValues(typeof(WaveType)))
         {
-            if (saved != candidate.ToString() && saved != GetDefaultName(candidate) && saved != GetName(candidate)) continue;
+            if (saved != candidate.ToString() && saved != LegacyName(candidate) && saved != GetName(candidate)) continue;
 
             type = candidate;
             return true;
@@ -76,13 +76,10 @@ public static class WavePalette
         return false;
     }
 
-    private static string GetDefaultName(WaveType type)
+    private static string LegacyName(WaveType type)
     {
-        var entry = Data != null ? Data.Find(type) : null;
-        if (entry != null && !string.IsNullOrEmpty(entry.displayName)) return entry.displayName;
-
         int i = (int)type;
-        return (i >= 0 && i < FallbackNames.Length) ? FallbackNames[i] : type.ToString();
+        return (i >= 0 && i < LegacyNames.Length) ? LegacyNames[i] : type.ToString();
     }
 
     public static Color GetColor(WaveType type)

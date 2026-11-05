@@ -24,9 +24,6 @@ public class WaveDisplayData : ScriptableObject
     {
         public WaveType type;
 
-        [Tooltip("화면에 찍히는 이름 (예: 자연사)")]
-        public string displayName;
-
         [Tooltip("그래프·비료 등 이 웨이브를 색으로 나타낼 때 쓰는 색")]
         public Color color = Color.white;
     }

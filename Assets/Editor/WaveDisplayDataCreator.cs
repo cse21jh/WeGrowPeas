@@ -50,7 +50,6 @@ public static class WaveDisplayDataCreator
             data.entries.Add(new WaveDisplayData.Entry
             {
                 type = type,
-                displayName = name,
                 color = ColorUtility.TryParseHtmlString(hex, out var color) ? color : Color.white
             });
             added++;
