@@ -1919,6 +1919,7 @@ GameObject:
   - component: {fileID: 2897532757194119138}
   - component: {fileID: 6784312070777570001}
   - component: {fileID: 2912982307532688657}
+  - component: {fileID: 828995465358801946}
   m_Layer: 5
   m_Name: TitleText
   m_TagString: Untagged
@@ -2045,6 +2046,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &828995465358801946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433295084233670918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0029
+  sourceText: "\uAD50\uBC30 \uACB0\uACFC.pdf"
 --- !u!1 &3656306108600331523
 GameObject:
   m_ObjectHideFlags: 0
@@ -2343,6 +2358,7 @@ GameObject:
   - component: {fileID: 5279346142847158872}
   - component: {fileID: 4022929614126188210}
   - component: {fileID: 559436910078359373}
+  - component: {fileID: 4386633340737040870}
   m_Layer: 5
   m_Name: TitleText
   m_TagString: Untagged
@@ -2469,6 +2485,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4386633340737040870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4184399810296504539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0029
+  sourceText: "\uAD50\uBC30 \uACB0\uACFC.pdf"
 --- !u!1 &4224528334825707592
 GameObject:
   m_ObjectHideFlags: 0
@@ -4327,6 +4357,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 671262d5cf6b99043871119492c3e05a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  self: {fileID: 0}
+  easeDuration: 0
+  ease: 0
 --- !u!1 &8781585559648244210
 GameObject:
   m_ObjectHideFlags: 0

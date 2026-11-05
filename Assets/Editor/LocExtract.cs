@@ -8,6 +8,7 @@ public sealed class LocEntry
     public string Key;
     public string Text;
     public string Source;
+    public string Note;
 }
 
 /// <summary>
@@ -87,6 +88,7 @@ public static class LocExtract
     private static string CellFor(string column, LocEntry entry)
     {
         if (column == "key") return entry.Key;
+        if (column == LocTable.NoteColumn) return entry.Note ?? "";
         return column == LocTable.SourceLanguage ? entry.Text : "";
     }
 
