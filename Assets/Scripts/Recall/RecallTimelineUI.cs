@@ -99,8 +99,8 @@ public class RecallTimelineUI : MonoBehaviour
         if (timelinePanel != null) timelinePanel.SetActive(true);
         if (secondaryPanel != null) secondaryPanel.SetActive(true);
         ClearDescription();
-        string header = run.header == null ? "기록" : $"{run.header.day}일 · {run.header.plantName}" +
-            (run.header.dawnStage > 0 ? $" · 승천 {run.header.dawnStage}" : " · 일반 모드");
+        string header = run.header == null ? Loc.T("game.recall.record") : Loc.T("game.recall.day", ("day", run.header.day)) + $" · {RecallLookup.Plant(run.header.plantName).name}" +
+            (run.header.dawnStage > 0 ? Loc.T("game.recall.ascended", ("stage", run.header.dawnStage)) : Loc.T("game.recall.normal_mode"));
         foreach (var label in recordLabels) if (label != null) label.text = header;
 
         // 방금 켠 패널의 크기가 확정돼야 셀 크기를 맞출 수 있다.
@@ -128,11 +128,11 @@ public class RecallTimelineUI : MonoBehaviour
         {
             ClearSpawned();
             DayIndex = -1;
-            if (dayLabel != null) dayLabel.text = "일자별 기록 없음";
-            if (waveText != null) waveText.text = "일자별 기록이 없습니다.";
+            if (dayLabel != null) dayLabel.text = Loc.T("game.recall.no_daily_label");
+            if (waveText != null) waveText.text = Loc.T("game.recall.no_daily");
             if (goldText != null) goldText.text = "—";
-            if (summaryText != null) summaryText.text = "결과 보기에서 요약을 확인할 수 있습니다.";
-            if (curseEmptyText != null) { curseEmptyText.text = "기록 없음"; curseEmptyText.gameObject.SetActive(true); }
+            if (summaryText != null) summaryText.text = Loc.T("game.recall.see_result");
+            if (curseEmptyText != null) { curseEmptyText.text = Loc.T("game.recall.no_record"); curseEmptyText.gameObject.SetActive(true); }
             DayChanged?.Invoke();
         }
     }
@@ -165,7 +165,7 @@ public class RecallTimelineUI : MonoBehaviour
         ClearDescription();
 
         if (dayLabel != null)
-            dayLabel.text = today.isFinalPartial ? $"{today.day}일차 (마지막 날)" : $"{today.day}일차";
+            dayLabel.text = Loc.T(today.isFinalPartial ? "game.recall.last_day" : "game.recall.day_number", ("day", today.day));
 
         BuildGrid(today);
         BuildItems(today, prev);
@@ -209,14 +209,14 @@ public class RecallTimelineUI : MonoBehaviour
 
             if (i >= usable)
             {
-                slot.SetupLocked($"{i / FarmRows + 1}번째 줄: 아직 넓히지 않은 땅", ShowDescription, ClearDescription);
+                slot.SetupLocked(Loc.T("game.recall.locked_row", ("row", i / FarmRows + 1)), ShowDescription, ClearDescription);
             }
             else
             {
                 string species = day.cellSpecies[i];
 
                 if (string.IsNullOrEmpty(species))
-                    slot.SetupEmpty($"{i + 1}번째 땅: 비어 있음", ShowDescription, ClearDescription);
+                    slot.SetupEmpty(Loc.T("game.recall.empty_cell", ("cell", i + 1)), ShowDescription, ClearDescription);
                 else
                     slot.Setup(RecallLookup.Plant(species), 0, ShowDescription, ClearDescription);
             }
@@ -255,7 +255,7 @@ public class RecallTimelineUI : MonoBehaviour
 
     private void BuildCurses(DaySnapshot day)
     {
-        if (curseEmptyText != null) { curseEmptyText.text = "없음"; curseEmptyText.gameObject.SetActive(day.curseIds.Length == 0); }
+        if (curseEmptyText != null) { curseEmptyText.text = Loc.T("game.recall.none"); curseEmptyText.gameObject.SetActive(day.curseIds.Length == 0); }
         if (curseContainer == null || iconSlotPrefab == null) return;
         FitCollection(curseContainer, day.curseIds.Length);
 
@@ -271,7 +271,7 @@ public class RecallTimelineUI : MonoBehaviour
     private void BuildTexts(DaySnapshot day, DaySnapshot prev)
     {
         if (waveText != null)
-            waveText.text = $"{RecallLookup.WaveName(day.waveType)} · 식물 {day.diedCount}개 사망";
+            waveText.text = Loc.T("game.recall.wave_summary", ("wave", RecallLookup.WaveName(day.waveType)), ("died", day.diedCount));
 
         if (goldText != null)
         {
@@ -287,8 +287,7 @@ public class RecallTimelineUI : MonoBehaviour
             int bought = TotalItemCount(day) - (prev != null ? TotalItemCount(prev) : 0);
 
             summaryText.text =
-                $"추가 {added}개 · 판매 {sold}개 · 사망 {day.diedCount}개\n" +
-                $"번 골드 {day.earnedGold} · 구매 {bought}개";
+                Loc.T("game.recall.day_summary", ("added", added), ("sold", sold), ("died", day.diedCount), ("gold", day.earnedGold), ("bought", bought));
         }
     }
 

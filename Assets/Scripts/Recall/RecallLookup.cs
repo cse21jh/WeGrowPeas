@@ -21,6 +21,17 @@ public static class RecallLookup
     private static Dictionary<string, Entry> _plants;
     private static Dictionary<string, Entry> _items;
     private static Dictionary<string, Entry> _curses;
+    private static string _language;
+
+    // 조회 결과에 표시 이름이 들어 있어 언어가 바뀌면 다시 만들어야 한다.
+    private static void EnsureLanguage()
+    {
+        if (_language == Loc.Language) return;
+        _language = Loc.Language;
+        _plants = null;
+        _items = null;
+        _curses = null;
+    }
 
     public static string WaveName(WaveType type) => WavePalette.GetName(type);
 
@@ -32,6 +43,7 @@ public static class RecallLookup
     /// </summary>
     public static Entry Plant(string speciesName)
     {
+        EnsureLanguage();
         if (string.IsNullOrEmpty(speciesName)) return default;
 
         if (_plants == null)
@@ -84,6 +96,7 @@ public static class RecallLookup
     /// </summary>
     public static Entry Item(string itemKey)
     {
+        EnsureLanguage();
         if (string.IsNullOrEmpty(itemKey)) return default;
 
         if (_items == null)
@@ -130,6 +143,7 @@ public static class RecallLookup
     /// <summary>저주 id로 정보를 찾는다.</summary>
     public static Entry Curse(string id)
     {
+        EnsureLanguage();
         if (string.IsNullOrEmpty(id)) return default;
 
         if (_curses == null)

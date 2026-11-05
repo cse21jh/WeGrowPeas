@@ -133,7 +133,7 @@ public class WeatherPopup : MonoBehaviour
             icon = waveIcons[idx];
         }
 
-        string plant = GameManager.Instance != null ? GameManager.Instance.currentPlant : Loc.T("game.weather.plant");
+        string plant = GameManager.Instance != null ? RecallLookup.Plant(GameManager.Instance.currentPlant).name : Loc.T("game.weather.plant");
         string dieLabel = diedCount > 0 ? Loc.T("game.weather.died", ("plant", plant), ("count", diedCount)) : Loc.T("game.weather.no_damage");
 
         banner.Setup(dayLabel, icon, dieLabel);

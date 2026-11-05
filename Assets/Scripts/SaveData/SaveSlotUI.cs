@@ -38,9 +38,9 @@ public class SaveSlotUI : MonoBehaviour
 
             string path = SaveContext.GetSavePath(slotIndex);
 
-            if (!RunSave.Exists(path)) tmp.text = $"저장소 {slotIndex}\n비어 있음";
-            else if (RunSave.TryLoad(path, out SaveData saveData)) tmp.text = $"저장소 {slotIndex}\nDay {saveData.progress.stage}";
-            else tmp.text = $"저장소 {slotIndex}\n읽을 수 없음";
+            if (!RunSave.Exists(path)) tmp.text = Loc.T("game.slot.empty", ("slot", slotIndex));
+            else if (RunSave.TryLoad(path, out SaveData saveData)) tmp.text = Loc.T("game.slot.day", ("slot", slotIndex), ("day", saveData.progress.stage));
+            else tmp.text = Loc.T("game.slot.broken", ("slot", slotIndex));
         }
 
     }

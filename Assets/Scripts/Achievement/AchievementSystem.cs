@@ -145,7 +145,7 @@ public static class AchievementSystem
         Debug.Log($"[Achievement] 달성: {a.id} ({a.title})");
 
         if (notify && UIManager.Instance != null && UIManager.Instance.Popup != null)
-            UIManager.Instance.Popup.ShowToastPopup("업적 달성", a.LocalizedTitle, a.icon, 3f);
+            UIManager.Instance.Popup.ShowToastPopup(Loc.T("game.achievement.unlocked"), a.LocalizedTitle, a.icon, 3f);
 
         OnUnlocked?.Invoke(a);
     }

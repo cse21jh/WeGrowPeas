@@ -5,7 +5,7 @@ using UnityEngine;
 public class DroughtWave : Wave
 {
     public override WaveType WaveType => WaveType.Drought;
-    public override string WaveDescription => "땅이 메마르기\n시작합니다......";
+    public override string WaveDescription => Loc.T("game.wave.Drought.description");
     public override string WaveSoundString => "Drought";
     public const int UnlockStage = 21;
 }

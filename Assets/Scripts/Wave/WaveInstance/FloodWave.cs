@@ -5,7 +5,7 @@ using UnityEngine;
 public class FloodWave : Wave
 {
     public override WaveType WaveType => WaveType.Flood;
-    public override string WaveDescription => "홍수가\n덮쳐옵니다......";
+    public override string WaveDescription => Loc.T("game.wave.Flood.description");
     public override string WaveSoundString => "Flood";
     public const int UnlockStage = 16;
 }

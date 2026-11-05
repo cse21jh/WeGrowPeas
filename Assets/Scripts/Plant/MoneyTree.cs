@@ -86,8 +86,8 @@ public class MoneyTree : Plant
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "돈나무 수확 완료!",
-                        message = $"{REWARD_GOLD}골드를 획득했습니다.",
+                        title = Loc.T("game.money_tree.title"),
+                        message = Loc.T("game.money_tree.message", ("gold", REWARD_GOLD)),
                         duration = 3f
                     }
                 );

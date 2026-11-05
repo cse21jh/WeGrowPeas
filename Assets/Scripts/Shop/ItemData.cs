@@ -181,7 +181,7 @@ public abstract class ItemData : ScriptableObject
         {
             return string.IsNullOrEmpty(metaRequiredDawnPlant)
                 ? Loc.T("shop.unlock.dawn", ("stage", metaRequiredDawnStage))
-                : Loc.T("shop.unlock.dawn_plant", ("plant", metaRequiredDawnPlant), ("stage", metaRequiredDawnStage));
+                : Loc.T("shop.unlock.dawn_plant", ("plant", RecallLookup.Plant(metaRequiredDawnPlant).name), ("stage", metaRequiredDawnStage));
         }
 
         return "";

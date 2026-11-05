@@ -200,22 +200,22 @@ public static class DawnSystem
         var prev = GetCumulative(Mathf.Max(0, stage - 1));
         var sb = new System.Text.StringBuilder();
 
-        AddLine(sb, cur.curseLevel > 0, $"저주 {cur.curseLevel}단계",
+        AddLine(sb, cur.curseLevel > 0, Loc.T("game.dawn.line.curse", ("level", cur.curseLevel)),
             cur.curseLevel != prev.curseLevel, changeColorHex);
-        AddLine(sb, cur.mutationChanceAddPercent > 0f, $"교배 시 변종 발생 확률 +{cur.mutationChanceAddPercent:0.#}%p",
+        AddLine(sb, cur.mutationChanceAddPercent > 0f, Loc.T("game.dawn.line.mutation", ("value", cur.mutationChanceAddPercent.ToString("0.#"))),
             cur.mutationChanceAddPercent != prev.mutationChanceAddPercent, changeColorHex);
         AddLine(sb, cur.bugPriceReduction > 0 || cur.bugDelayReduction > 0f,
-            $"벌레 기본 가격 -{cur.bugPriceReduction}, 등장 딜레이 -{cur.bugDelayReduction:0.#}초",
+            Loc.T("game.dawn.line.bug", ("price", cur.bugPriceReduction), ("delay", cur.bugDelayReduction.ToString("0.#"))),
             cur.bugPriceReduction != prev.bugPriceReduction || cur.bugDelayReduction != prev.bugDelayReduction, changeColorHex);
-        AddLine(sb, cur.shopPriceMultiplier > 1f, $"상점 아이템 가격 x{cur.shopPriceMultiplier:0.##}",
+        AddLine(sb, cur.shopPriceMultiplier > 1f, Loc.T("game.dawn.line.shop", ("value", cur.shopPriceMultiplier.ToString("0.##"))),
             cur.shopPriceMultiplier != prev.shopPriceMultiplier, changeColorHex);
-        AddLine(sb, cur.dailyResistanceDecayAddPercent > 0f, $"매일 모든 저항력 -{cur.dailyResistanceDecayAddPercent:0.#}%p",
+        AddLine(sb, cur.dailyResistanceDecayAddPercent > 0f, Loc.T("game.dawn.line.decay", ("value", cur.dailyResistanceDecayAddPercent.ToString("0.#"))),
             cur.dailyResistanceDecayAddPercent != prev.dailyResistanceDecayAddPercent, changeColorHex);
-        AddLine(sb, cur.taxMultiplier > 1f, $"세금 x{cur.taxMultiplier:0.##}",
+        AddLine(sb, cur.taxMultiplier > 1f, Loc.T("game.dawn.line.tax", ("value", cur.taxMultiplier.ToString("0.##"))),
             cur.taxMultiplier != prev.taxMultiplier, changeColorHex);
-        AddLine(sb, cur.resistanceCapReductionPercent > 0f, $"저항력 상한 -{cur.resistanceCapReductionPercent:0.#}%p",
+        AddLine(sb, cur.resistanceCapReductionPercent > 0f, Loc.T("game.dawn.line.cap", ("value", cur.resistanceCapReductionPercent.ToString("0.#"))),
             cur.resistanceCapReductionPercent != prev.resistanceCapReductionPercent, changeColorHex);
-        AddLine(sb, cur.rootChancePercent > 0f, $"식물 등장·이동 시 {cur.rootChancePercent:0.#}% 확률로 뿌리(이동 불가)",
+        AddLine(sb, cur.rootChancePercent > 0f, Loc.T("game.dawn.line.root", ("value", cur.rootChancePercent.ToString("0.#"))),
             cur.rootChancePercent != prev.rootChancePercent, changeColorHex);
 
         return sb.ToString();

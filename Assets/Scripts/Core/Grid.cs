@@ -362,7 +362,7 @@ public class Grid : MonoBehaviour
                     // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
                     PlayMutationEffectIfAny(
                         AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
-                    UIManager.Instance.Popup.ShowFloatingPopup("쌍둥이가 태어났습니다!", 1);
+                    UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.twins"), 1);
                     totalBreedCount++;
                     if (GameManager.Instance.currentPlant == "완두콩")
                         totalPeaBreedcount++;
@@ -392,26 +392,26 @@ public class Grid : MonoBehaviour
             }
             else if (breedCount >= currentEffectiveMaxBreedCount)
             {
-                UIManager.Instance.Popup.ShowFloatingPopup("교배 횟수를 모두 소진했습니다.", 1);
+                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.no_attempts"), 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
             else if (isEqualPlant)
             {
-                UIManager.Instance.Popup.ShowFloatingPopup("두 종이 일치하지 않습니다.", 1);
+                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.species_mismatch"), 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
             else
             {
-                UIManager.Instance.Popup.ShowFloatingPopup("키울 공간이 부족합니다.", 1);
+                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.no_space"), 1);
                 SoundManager.Instance.PlayEffect("WrongSelect");
                 isBreedButtonPressed = false;
             }
         }
         else
         {
-            UIManager.Instance.Popup.ShowFloatingPopup("아직 두 식물을 선택하지 않았습니다.", 1);
+            UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.select_two"), 1);
             isBreedButtonPressed = false;
         }
     }
@@ -451,7 +451,7 @@ public class Grid : MonoBehaviour
             if (refund > 0)
             {
                 GameManager.Instance.economyManager.AddGold(refund);
-                UIManager.Instance.Popup.ShowFloatingPopup($"신용카드 환급: {refund}골드", 1);
+                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.card_refund", ("gold", refund)), 1);
             }
         }
 
@@ -485,8 +485,8 @@ public class Grid : MonoBehaviour
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "웨이브가 얼마 남지 않았습니다",
-                        message = "조심하세요.",
+                        title = Loc.T("game.wave.soon_title"),
+                        message = Loc.T("game.wave.soon_message"),
                         duration = 5f
                     }
                 );
@@ -1448,7 +1448,7 @@ public class Grid : MonoBehaviour
 
     protected void UpdateBreedCountUI(int count)
     {
-        breedCountUI.text = $"{count}회";
+        breedCountUI.text = Loc.T("game.common.times", ("count", count));
         GameEvents.RaiseBreedCountChanged(count);
     }
 

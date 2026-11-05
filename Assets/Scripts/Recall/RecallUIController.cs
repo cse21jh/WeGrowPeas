@@ -210,7 +210,7 @@ public class RecallUIController : MonoBehaviour
         if (emptyText != null) emptyText.gameObject.SetActive(_entries.Count == 0);
         if (rightEmptyText != null)
         {
-            rightEmptyText.text = _entries.Count == 0 ? "아직 남은 기록이 없습니다." : "마지막 기록입니다.";
+            rightEmptyText.text = _entries.Count == 0 ? Loc.T("game.recall.empty") : Loc.T("game.recall.last");
             rightEmptyText.gameObject.SetActive(first + leftPageSlots.Length >= _entries.Count);
         }
         RefreshBookPageNumbers();

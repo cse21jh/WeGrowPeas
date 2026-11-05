@@ -33,13 +33,13 @@ public class RecallListSlot : MonoBehaviour
             dateLabel.text = DateTimeOffset.FromUnixTimeSeconds(entry.savedAtUnix)
                 .ToLocalTime().ToString(dateFormat);
 
-        if (titleLabel != null) titleLabel.text = $"{recordNumber}번째 기록";
+        if (titleLabel != null) titleLabel.text = Loc.T("game.recall.record_number", ("number", recordNumber));
 
         if (infoLabel != null)
         {
-            string info = $"{entry.day}일";
-            if (!string.IsNullOrEmpty(entry.plantName)) info += $" · {entry.plantName}";
-            if (entry.dawnStage > 0) info += $" · 승천 {entry.dawnStage}";
+            string info = Loc.T("game.recall.day", ("day", entry.day));
+            if (!string.IsNullOrEmpty(entry.plantName)) info += $" · {RecallLookup.Plant(entry.plantName).name}";
+            if (entry.dawnStage > 0) info += Loc.T("game.recall.ascended", ("stage", entry.dawnStage));
             infoLabel.text = info;
         }
 

@@ -218,8 +218,8 @@ public class GameManager : Singleton<GameManager>
             SpecialItemSystem.AddGift();
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
-                title = "완두콩의 선물이 도착했습니다!",
-                message = "선물 버튼을 눌러 특수 아이템을 수령하세요.",
+                title = Loc.T("game.gift.title"),
+                message = Loc.T("game.gift.message"),
                 duration = 5f
             });
         }

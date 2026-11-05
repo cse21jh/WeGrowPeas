@@ -127,13 +127,13 @@ public class RecallDetailUI : MonoBehaviour
         var sb = new StringBuilder();
 
         var header = run.header;
-        sb.Append($"{header.day}일");
-        if (!string.IsNullOrEmpty(header.plantName)) sb.Append($" · {header.plantName}");
-        sb.Append(header.dawnStage > 0 ? $" · 승천 {header.dawnStage}단계" : " · 일반 모드");
+        sb.Append(Loc.T("game.recall.day", ("day", header.day)));
+        if (!string.IsNullOrEmpty(header.plantName)) sb.Append($" · {RecallLookup.Plant(header.plantName).name}");
+        sb.Append(header.dawnStage > 0 ? Loc.T("game.recall.ascended_stage", ("stage", header.dawnStage)) : Loc.T("game.recall.normal_mode"));
 
         if (run.plantAbilityNames.Count > 0)
         {
-            sb.Append("\n특성: ");
+            sb.Append(Loc.T("game.recall.traits"));
             for (int i = 0; i < run.plantAbilityNames.Count; i++)
             {
                 if (i > 0) sb.Append(", ");
@@ -145,7 +145,7 @@ public class RecallDetailUI : MonoBehaviour
         }
 
         if (run.generalAbilityNames.Count > 0)
-            sb.Append($"\n일반 특성: {string.Join(", ", run.generalAbilityNames)}");
+            sb.Append(Loc.T("game.recall.general_traits", ("names", string.Join(", ", run.generalAbilityNames))));
 
         return sb.ToString();
     }

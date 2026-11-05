@@ -345,16 +345,16 @@ public class EnemyController : MonoBehaviour
         switch (season)
         {
             case Season.Spring:
-                tempSeasonText.text = "봄";
+                tempSeasonText.text = Loc.T("game.season.spring");
                 break;
             case Season.Summer:
-                tempSeasonText.text = "여름";
+                tempSeasonText.text = Loc.T("game.season.summer");
                 break;
             case Season.Fall:
-                tempSeasonText.text = "가을";
+                tempSeasonText.text = Loc.T("game.season.fall");
                 break;
             case Season.Winter:
-                tempSeasonText.text = "겨울";
+                tempSeasonText.text = Loc.T("game.season.winter");
                 UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
                 break;
         }
@@ -425,7 +425,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = "추가 스킵 " + waveSkipCount.ToString() + "회";
+        waveSkipCountText.text = Loc.T("game.hud.extra_skips", ("count", waveSkipCount));
         return;
     }
 
