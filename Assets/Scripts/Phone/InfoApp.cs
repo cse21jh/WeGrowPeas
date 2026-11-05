@@ -287,7 +287,7 @@ public class InfoApp : BasePhoneApp
             {
                 if (sp == null) continue;
                 var slot = Instantiate(purchaseSlotPrefab, purchasesContainer);
-                slot.Setup(sp.icon, sp.displayName, 0, sp.description, UpdateDescription, ClearDescription);
+                slot.Setup(sp.icon, sp.LocalizedName, 0, sp.LocalizedDescription, UpdateDescription, ClearDescription);
                 slot.gameObject.SetActive(true);
             }
         }

@@ -122,8 +122,8 @@ public static class RecallLookup
         {
             found = true,
             icon = data.icon,
-            name = data.displayName,
-            description = data.description
+            name = data.LocalizedName,
+            description = data.LocalizedDescription
         };
     }
 
@@ -142,8 +142,8 @@ public static class RecallLookup
                 {
                     found = true,
                     icon = c.icon,
-                    name = string.IsNullOrEmpty(c.title) ? c.curseId : c.title,
-                    description = c.description
+                    name = string.IsNullOrEmpty(c.title) ? c.curseId : c.LocalizedTitle,
+                    description = c.LocalizedDescription
                 };
             }
         }

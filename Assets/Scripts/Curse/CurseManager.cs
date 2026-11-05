@@ -461,8 +461,8 @@ public class CurseManager : Singleton<CurseManager>
         if (currentSeasonCurse != null && currentSeasonCurse.Data != null)
         {
             Sprite icon = currentSeasonCurse.Data.icon;
-            string title = currentSeasonCurse.Data.title;
-            string description = currentSeasonCurse.Data.description;
+            string title = currentSeasonCurse.Data.LocalizedTitle;
+            string description = currentSeasonCurse.Data.LocalizedDescription;
 
             string tooltipDesc = $"<b>{title}</b>\n{description}";
 
@@ -499,8 +499,8 @@ public class CurseManager : Singleton<CurseManager>
         if (currentTempCurse != null && currentTempCurse.Data != null)
         {
             Sprite icon = currentTempCurse.Data.icon;
-            string title = currentTempCurse.Data.title;
-            string description = currentTempCurse.Data.description;
+            string title = currentTempCurse.Data.LocalizedTitle;
+            string description = currentTempCurse.Data.LocalizedDescription;
 
             string tooltipDesc = $"<b>{title}</b>\n{description}";
 

@@ -14,13 +14,22 @@ public enum AchievementCondition
 /// 업적 정의 1개. Resources/Data/Achievements 아래에 두면 자동으로 읽힌다.
 /// </summary>
 [CreateAssetMenu(menuName = "Achievement/Achievement Data", fileName = "NEW_ACHIEVEMENT")]
+[LocGroup(LocPrefix)]
 public class AchievementData : ScriptableObject
 {
+    private const string LocPrefix = "achievement";
+
+    /// <summary>화면에 보여줄 이름.</summary>
+    public string LocalizedTitle => Loc.Or(LocKey.For(LocPrefix, name, "title"), title);
+
+    /// <summary>화면에 보여줄 설명.</summary>
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+
     [Tooltip("영구 키이자 Steam 업적 API 이름. 영문 대문자·숫자·_ 만. 바꾸면 기존 달성 기록과 연결이 끊긴다.")]
     public string id;
 
-    public string title;
-    [TextArea] public string description;
+    [LocText("title")] public string title;
+    [TextArea, LocText("description")] public string description;
     public Sprite icon;
 
     [Tooltip("달성 전에는 도감에 ??? 로 표시")]

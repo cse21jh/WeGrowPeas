@@ -197,8 +197,8 @@ public class DawnUIController : MonoBehaviour
             if (spec == null) continue;
             itemsToShow.Add(new UnlockItemInfo
             {
-                displayName = spec.displayName,
-                description = spec.description,
+                displayName = spec.LocalizedName,
+                description = spec.LocalizedDescription,
                 icon = spec.icon,
                 isSpecial = true
             });

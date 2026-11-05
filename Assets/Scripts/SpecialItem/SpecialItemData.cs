@@ -6,15 +6,24 @@ using UnityEngine;
 /// </summary>
 [CreateAssetMenu(menuName = "SpecialItem/Special Item Data")]
 [BalanceGroup("SpecialItem", "SpecialItems")]
+[LocGroup(LocPrefix)]
 public class SpecialItemData : ScriptableObject
 {
+    private const string LocPrefix = "special";
+
+    /// <summary>화면에 보여줄 이름.</summary>
+    public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, name, "name"), displayName);
+
+    /// <summary>화면에 보여줄 설명.</summary>
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+
     [Tooltip("고유 id (효과 코드에서 SpecialItemState.Has(id)로 조회)")]
     public string id;
 
-    public string displayName;
+    [LocText("name")] public string displayName;
     public Sprite icon;
 
-    [TextArea] public string description;
+    [TextArea, LocText("description")] public string description;
 
     [Header("등장 조건")]
     [Tooltip("false = 공용(항상 후보), true = 식물별(해당 식물 + 언락 필요)")]

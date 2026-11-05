@@ -36,8 +36,8 @@ public class SpecialItemCard : MonoBehaviour
         gameObject.SetActive(hasItem);
         if (!hasItem) return;
 
-        if (nameText != null) nameText.text = item.displayName;
-        if (descText != null) descText.text = item.description;
+        if (nameText != null) nameText.text = item.LocalizedName;
+        if (descText != null) descText.text = item.LocalizedDescription;
         if (icon != null)
         {
             icon.enabled = item.icon != null;

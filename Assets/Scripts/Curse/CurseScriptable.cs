@@ -10,17 +10,26 @@ public enum CurseType { Temporal, Seasonal }
 /// </summary>
 [CreateAssetMenu(menuName = "Curse/CurseItem")]
 [BalanceGroup("Curse", "Curses")]
+[LocGroup(LocPrefix)]
 public class CurseScriptable : ScriptableObject
 {
+    private const string LocPrefix = "curse";
+
+    /// <summary>화면에 보여줄 이름.</summary>
+    public string LocalizedTitle => Loc.Or(LocKey.For(LocPrefix, name, "title"), title);
+
+    /// <summary>화면에 보여줄 설명.</summary>
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+
     public string curseId;
 
     public CurseType curseType;
 
-    public string title;
+    [LocText("title")] public string title;
 
     public Sprite icon;
 
-    [TextArea] public string description;
+    [TextArea, LocText("description")] public string description;
 
     [Balance("해금 스테이지")]
     [Tooltip("해금 스테이지 (이 스테이지 이상부터 등장)")]

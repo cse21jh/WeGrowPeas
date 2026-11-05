@@ -101,7 +101,7 @@ public static class CodexCatalog
             if (c == null) continue;
             var sb = new StringBuilder();
             sb.AppendLine(c.curseType == CurseType.Seasonal ? "지속형 저주" : "단발형 저주");
-            if (!string.IsNullOrEmpty(c.description)) sb.AppendLine(c.description);
+            if (!string.IsNullOrEmpty(c.description)) sb.AppendLine(c.LocalizedDescription);
             if (c.levels != null)
                 for (int i = 0; i < c.levels.Count; i++)
                     if (c.levels[i] != null && !string.IsNullOrEmpty(c.levels[i].note))
@@ -111,7 +111,7 @@ public static class CodexCatalog
             {
                 category = CodexProgress.Category.Curse,
                 id = c.curseId,
-                displayName = c.title,
+                displayName = c.LocalizedTitle,
                 icon = null,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Curse, c.curseId),
                 detail = sb.ToString().TrimEnd()
@@ -128,14 +128,14 @@ public static class CodexCatalog
         {
             if (b == null) continue;
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(b.description)) sb.AppendLine(b.description);
+            if (!string.IsNullOrEmpty(b.description)) sb.AppendLine(b.LocalizedDescription);
             sb.AppendLine($"잡은 횟수: {CodexProgress.GetStat(CodexProgress.StatBugKill(b.bugId))}");
 
             list.Add(new CodexEntry
             {
                 category = CodexProgress.Category.Bug,
                 id = b.bugId,
-                displayName = b.displayName,
+                displayName = b.LocalizedName,
                 icon = b.icon,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Bug, b.bugId),
                 detail = sb.ToString().TrimEnd()
@@ -156,7 +156,7 @@ public static class CodexCatalog
             bool done = AchievementSystem.IsUnlocked(a.id);
 
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(a.description)) sb.AppendLine(a.description);
+            if (!string.IsNullOrEmpty(a.description)) sb.AppendLine(a.LocalizedDescription);
             if (done && AchievementSystem.TryGetUnlockedAt(a.id, out var at))
                 sb.AppendLine($"달성: {at.Year}년 {at.Month}월 {at.Day}일");
             else if (a.condition == AchievementCondition.LifetimeStat)
@@ -168,7 +168,7 @@ public static class CodexCatalog
             {
                 category = CodexProgress.Category.Achievement,
                 id = a.id,
-                displayName = done ? a.title : $"{a.title} (미달성)",
+                displayName = done ? a.LocalizedTitle : $"{a.LocalizedTitle} (미달성)",
                 icon = a.icon,
                 discovered = done || !a.hidden,
                 detail = sb.ToString().TrimEnd()
