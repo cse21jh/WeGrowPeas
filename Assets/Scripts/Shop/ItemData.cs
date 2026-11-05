@@ -40,12 +40,12 @@ public static class ItemTagExtensions
     {
         switch (tag)
         {
-            case ItemTag.Install: return "설치";
-            case ItemTag.Select: return "선택";
-            case ItemTag.Trigger: return "발동형";
-            case ItemTag.Timed: return "기간제";
-            case ItemTag.Profit: return "수익성";
-            case ItemTag.Upgrade: return "강화";
+            case ItemTag.Install: return Loc.T("shop.tag.Install.name");
+            case ItemTag.Select: return Loc.T("shop.tag.Select.name");
+            case ItemTag.Trigger: return Loc.T("shop.tag.Trigger.name");
+            case ItemTag.Timed: return Loc.T("shop.tag.Timed.name");
+            case ItemTag.Profit: return Loc.T("shop.tag.Profit.name");
+            case ItemTag.Upgrade: return Loc.T("shop.tag.Upgrade.name");
             default: return tag.ToString();
         }
     }
@@ -55,12 +55,12 @@ public static class ItemTagExtensions
     {
         switch (tag)
         {
-            case ItemTag.Install: return "토양을 클릭해 새로운 오브젝트를 배치합니다.";
-            case ItemTag.Select: return "이미 있는 식물을 선택해야 합니다.";
-            case ItemTag.Trigger: return "효과가 발동하면 사라집니다.";
-            case ItemTag.Timed: return "일정 기간 동안만 지속됩니다.";
-            case ItemTag.Profit: return "골드와 직접적인 연관이 있습니다.";
-            case ItemTag.Upgrade: return "이미 있는 아이템의 성능을 향상시킵니다.";
+            case ItemTag.Install: return Loc.T("shop.tag.Install.description");
+            case ItemTag.Select: return Loc.T("shop.tag.Select.description");
+            case ItemTag.Trigger: return Loc.T("shop.tag.Trigger.description");
+            case ItemTag.Timed: return Loc.T("shop.tag.Timed.description");
+            case ItemTag.Profit: return Loc.T("shop.tag.Profit.description");
+            case ItemTag.Upgrade: return Loc.T("shop.tag.Upgrade.description");
             default: return "";
         }
     }
@@ -133,8 +133,8 @@ public abstract class ItemData : ScriptableObject
     {
         switch (FlowType)
         {
-            case ShopFlowType.PlaceOnTile: return "토양을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
-            case ShopFlowType.SelectExistingPlant: return "식물을 선택해주세요 (좌클릭=확정, 우클릭/ESC=취소)";
+            case ShopFlowType.PlaceOnTile: return Loc.T("shop.guide.place");
+            case ShopFlowType.SelectExistingPlant: return Loc.T("shop.guide.select");
             default: return null;
         }
     }
@@ -179,8 +179,9 @@ public abstract class ItemData : ScriptableObject
         // 새벽 단계 해금
         if (metaRequiredDawnStage > 0)
         {
-            string p = string.IsNullOrEmpty(metaRequiredDawnPlant) ? "" : metaRequiredDawnPlant + "(으)로 ";
-            return $"{p}새벽 {metaRequiredDawnStage}단계 클리어 시 해금됩니다.";
+            return string.IsNullOrEmpty(metaRequiredDawnPlant)
+                ? Loc.T("shop.unlock.dawn", ("stage", metaRequiredDawnStage))
+                : Loc.T("shop.unlock.dawn_plant", ("plant", metaRequiredDawnPlant), ("stage", metaRequiredDawnStage));
         }
 
         return "";
@@ -308,7 +309,7 @@ public abstract class ItemData : ScriptableObject
     {
         if (!CanPurchaseByLimit())
         {
-            reason = "최대 구매 횟수를 초과했습니다.";
+            reason = Loc.T("shop.error.max_purchase_exceeded");
             return false;
         }
         reason = null;
@@ -326,7 +327,7 @@ public abstract class ItemData : ScriptableObject
 
         if (!ctx.Grid.HasEmptyGrid())
         {
-            reason = "배치할 수 있는 공간이 없습니다";
+            reason = Loc.T("shop.error.no_space");
             return false;
         }
         return true;
@@ -362,7 +363,7 @@ public abstract class ItemData : ScriptableObject
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
-            errorReason = "유효한 위치가 아닙니다";
+            errorReason = Loc.T("shop.error.invalid_position");
             return false;
         }
 
@@ -378,7 +379,7 @@ public abstract class ItemData : ScriptableObject
         errorReason = null;
         if (!pendingIndex.HasValue)
         {
-            errorReason = "위치 선택이 유효하지 않습니다";
+            errorReason = Loc.T("shop.error.invalid_selection");
             ctx?.ShowError?.Invoke(errorReason);
             return false;
         }

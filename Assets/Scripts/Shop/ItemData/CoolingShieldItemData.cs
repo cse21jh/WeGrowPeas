@@ -24,7 +24,7 @@ public class CoolingShieldItemData : ItemData
         // 이미 구매했는지 확인
         if (ctx.Grid.HasCoolingShield)
         {
-            reason = "이미 냉각 방패를 구매했습니다. (이번 게임동안 1회만 구매 가능)";
+            reason = Loc.T("shop.error.cooling_owned");
             return false;
         }
 
@@ -41,6 +41,6 @@ public class CoolingShieldItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
         ctx.Grid.ActivateCoolingShield();
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: 이번 게임동안 식물이 1개 이하가 될 경우 1회 보호됩니다.");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.cooling", ("name", LocalizedName)));
     }
 }

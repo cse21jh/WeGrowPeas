@@ -42,7 +42,7 @@ public class ChiliPepperItemData : ItemData
         }
         if (!ctx.Grid.HasEmptyGrid())
         {
-            reason = "배치할 수 있는 빈 칸이 없습니다";
+            reason = Loc.T("shop.error.no_empty_cell");
             return false;
         }
         reason = null;
@@ -66,13 +66,13 @@ public class ChiliPepperItemData : ItemData
         int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
         if (!idx.HasValue)
         {
-            reason = "유효한 위치가 아닙니다";
+            reason = Loc.T("shop.error.invalid_position");
             return false;
         }
 
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "이미 식물이 있는 칸입니다";
+            reason = Loc.T("shop.error.occupied");
             return false;
         }
 
@@ -90,7 +90,7 @@ public class ChiliPepperItemData : ItemData
         }
         if (!pendingIndex.HasValue)
         {
-            ctx.ShowError?.Invoke("위치 선택이 유효하지 않습니다");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.invalid_selection"));
             return;
         }
 

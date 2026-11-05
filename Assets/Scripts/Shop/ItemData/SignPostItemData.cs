@@ -51,7 +51,7 @@ public class SignPostItemData : ItemData
     {
         if (!pendingWave.HasValue)
         {
-            onError?.Invoke("웨이브를 선택해주세요");
+            onError?.Invoke(Loc.T("shop.error.select_wave"));
             return;
         }
         onReady?.Invoke();
@@ -72,7 +72,7 @@ public class SignPostItemData : ItemData
             durationDays,                   // 다음 5일간
             $"SignPost_{pendingWave.Value}"        // 모드 소스 태그
         );
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {pendingWave.Value} {durationDays}일간 {(int)(reducePercent * 100)}% 감소");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.signpost", ("name", LocalizedName), ("wave", WavePalette.GetName(pendingWave.Value)), ("days", durationDays), ("percent", (int)(reducePercent * 100))));
         pendingWave = null;
     }
 

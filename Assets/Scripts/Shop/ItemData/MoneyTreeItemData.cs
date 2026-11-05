@@ -43,7 +43,7 @@ public class MoneyTreeItemData : ItemData
         // 빈 칸인지 확인
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "이미 식물이 있는 칸입니다";
+            reason = Loc.T("shop.error.occupied");
             return false;
         }
 

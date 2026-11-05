@@ -40,7 +40,7 @@ public class NepenthesPheromoneItemData : ItemData
         // 이미 페로몬이 활성화되어 있으면 구매 불가
         if (ctx?.Grid != null && ctx.Grid.HasNepenthesPheromone)
         {
-            reason = "이미 페로몬이 활성화되어 있습니다.";
+            reason = Loc.T("shop.error.pheromone_active");
             return false;
         }
 

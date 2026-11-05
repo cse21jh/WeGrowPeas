@@ -18,7 +18,7 @@ public class ProbabilityEventItemData : ItemData
         // 하지만 사용자 경험상 막는 게 좋을 수도 있음.
         if (ShopManager.Instance.isProbabilityEqualized)
         {
-            reason = "이미 확률 증가 이벤트가 적용 중입니다.";
+            reason = Loc.T("shop.error.event_active");
             return false;
         }
         

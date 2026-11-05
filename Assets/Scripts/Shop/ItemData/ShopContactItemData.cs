@@ -40,6 +40,6 @@ public class ShopContactItemData : ItemData
         // 매일 초기화 시 ResetDailyRerollCount()에서 구매 횟수만큼 무료 리롤이 추가됩니다.
         // 구매 직후에도 즉시 적용하기 위해 현재 무료 리롤 횟수에 추가합니다.
         ctx.Shop.AddDailyRerollCount(rerollBonus);
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: 매일 무료 리롤 횟수 {rerollBonus}회 추가");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.contact", ("name", LocalizedName), ("count", rerollBonus)));
     }
 }

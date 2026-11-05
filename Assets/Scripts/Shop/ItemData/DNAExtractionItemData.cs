@@ -68,7 +68,7 @@ public class DNAExtractionItemData : ItemData
             g.AddMovablePlant(trait);
         }
 
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: 선택한 식물의 유전자를 가진 식물을 3개 추가했습니다");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.dna", ("name", LocalizedName)));
     }
 
     public override void Cancel(ShopContext ctx)
@@ -83,9 +83,9 @@ public class DNAExtractionItemData : ItemData
         if (!g) { reason = "Grid 객체가 없습니다"; return false; }
 
         int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = "유효한 위치가 아닙니다"; return false; }
+        if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
 
-        if (!g.HasBreedablePlantAt(idx.Value)) { reason = "교배 가능한 식물이 없습니다"; return false; }
+        if (!g.HasBreedablePlantAt(idx.Value)) { reason = Loc.T("shop.error.no_breedable"); return false; }
 
         return true;
     }

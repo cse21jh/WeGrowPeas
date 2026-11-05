@@ -44,14 +44,14 @@ public class HighQualityPlantItemData : ItemData
         // 현재 등장하는 웨이브가 있는지 확인
         if (GameManager.Instance == null || GameManager.Instance.enemyController == null)
         {
-            reason = "게임 상태를 확인할 수 없습니다";
+            reason = Loc.T("shop.error.no_game_state");
             return false;
         }
         
         var currentWave = GameManager.Instance.enemyController.CurrentWave;
         if (currentWave == null || currentWave.WaveType == WaveType.None)
         {
-            reason = "등장하는 웨이브가 없습니다";
+            reason = Loc.T("shop.error.no_wave");
             return false;
         }
         
@@ -83,7 +83,7 @@ public class HighQualityPlantItemData : ItemData
     {
         if (!pendingWave.HasValue)
         {
-            onError?.Invoke("등장하는 웨이브가 없습니다");
+            onError?.Invoke(Loc.T("shop.error.no_wave"));
             return;
         }
         onReady?.Invoke();
@@ -112,7 +112,7 @@ public class HighQualityPlantItemData : ItemData
         // 완두콩 추가 (자동으로 가장 빠른 빈 칸에 설치)
         ctx.Grid.AddMovablePlant(traits);
 
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {targetWave} 웨이브에 강한 완두콩 추가");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.high_quality", ("name", LocalizedName), ("wave", WavePalette.GetName(targetWave))));
         pendingWave = null;
     }
 

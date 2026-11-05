@@ -90,20 +90,20 @@ public class ShopController
         // 상점 세션 1회 제한
         if (data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data))
         {
-            showError("구매 불가");
+            showError(Loc.T("shop.error.cannot_buy"));
             return;
         }
 
         // 구매 가능 체크(중복 상태/해금 등)
         if (!data.CanPurchase(ctx, out string why))
         {
-            showError(why ?? "구매 불가");
+            showError(why ?? Loc.T("shop.error.cannot_buy"));
             return;
         }
 
         if (data.GetDisplayPrice() > (economy != null ? economy.GetGold() : 0))
         {
-            showError("구매 불가");
+            showError(Loc.T("shop.error.cannot_buy"));
             return;
         }
 
@@ -139,7 +139,7 @@ public class ShopController
                         if (placement == null)
                         {
                             Debug.LogError("[ShopController] PlacementController is null!");
-                            showError("배치 컨트롤러를 찾을 수 없습니다");
+                            showError(Loc.T("shop.error.no_placement"));
                             return;
                         }
                         try
@@ -167,7 +167,7 @@ public class ShopController
                                     catch (Exception e)
                                     {
                                         Debug.LogError($"[ShopController] onConfirm error: {e.Message}\n{e.StackTrace}");
-                                        showError($"구매 처리 중 오류가 발생했습니다: {e.Message}");
+                                        showError(Loc.T("shop.error.buy_failed", ("error", e.Message)));
                                     }
                                 },
                                 onCancel: () =>
@@ -181,12 +181,12 @@ public class ShopController
                         {
                             UIManager.Instance?.Popup?.HideGuide();
                             Debug.LogError($"[ShopController] BeginPlantSelection error: {e.Message}\n{e.StackTrace}");
-                            showError($"식물 선택 모드 시작 중 오류가 발생했습니다: {e.Message}");
+                            showError(Loc.T("shop.error.select_failed", ("error", e.Message)));
                         }
                         break;
                 }
             },
-            onError: err => showError(err ?? "구매 불가"));
+            onError: err => showError(err ?? Loc.T("shop.error.cannot_buy")));
     }
 
     private void TryChargeAndCommit(ItemData data, Action onPurchased)
@@ -210,7 +210,7 @@ public class ShopController
     {
         InitializeIfNeeded();
         int free = shopManager != null ? shopManager.DailyRerollCount : 0;
-        return free > 0 ? $"무료 {free}회" : $"{RerollPrice} G";
+        return free > 0 ? Loc.T("shop.reroll.free", ("count", free)) : $"{RerollPrice} G";
     }
 
     /// <summary>사용자가 리롤 요청. 성공 시 true(호출 측에서 목록 다시 그림).</summary>
@@ -239,7 +239,7 @@ public class ShopController
             return true;
         }
 
-        showError("골드가 부족합니다.");
+        showError(Loc.T("shop.error.not_enough_gold"));
         return false;
     }
 

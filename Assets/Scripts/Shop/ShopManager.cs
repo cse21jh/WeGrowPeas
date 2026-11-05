@@ -244,7 +244,7 @@ public class ShopManager : Singleton<ShopManager>
 
         if (data == null)
         {
-            error = "아이템 없음";
+            error = Loc.T("shop.error.no_item");
             return false;
         }
 
@@ -253,7 +253,7 @@ public class ShopManager : Singleton<ShopManager>
         // 골드 체크
         if (!ctx?.Economy?.HasGold(price) ?? true)
         {
-            error = "골드 부족";
+            error = Loc.T("shop.error.low_gold");
             return false;
         }
 

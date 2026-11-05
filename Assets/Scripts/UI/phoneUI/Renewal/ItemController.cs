@@ -83,7 +83,7 @@ public class ItemController : MonoBehaviour
         bool needsSelection = options != null && options.Length > 0;
 
         if (buyButtonText != null)
-            buyButtonText.text = needsSelection ? "선택하기" : "구매하기";
+            buyButtonText.text = needsSelection ? Loc.T("shop.button.select") : Loc.T("shop.button.buy");
 
         // 더 이상 살 수 없으면 비활성화. 상세 패널의 구매 버튼과 같은 규칙을 쓴다.
         bool soldOut = item.GetDisplayPrice() == int.MaxValue;   // 구매 한도 소진 → 가격표를 뗀 상태

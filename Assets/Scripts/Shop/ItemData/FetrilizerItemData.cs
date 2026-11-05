@@ -44,7 +44,7 @@ public class FertilizerItemData : ItemData
     {
         if (!pendingWave.HasValue)
         {
-            onError?.Invoke("웨이브를 선택해주세요");
+            onError?.Invoke(Loc.T("shop.error.select_wave"));
             return;
         }
         onReady?.Invoke(); // 이후 위치(토양) 선택으로 진행
@@ -70,10 +70,10 @@ public class FertilizerItemData : ItemData
         }
         if (!g.TryPlaceFertilizer(selectedIdx.Value, pendingWave.Value))
         {
-            ctx.ShowError?.Invoke("이미 비료가 있어 뿌릴 수 없습니다!");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.fertilizer_exists"));
             return;
         }
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료 (idx={selectedIdx.Value})");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
         selectedIdx = null;
         pendingWave = null;
     }
@@ -92,9 +92,9 @@ public class FertilizerItemData : ItemData
         if (!g) { reason = "Grid 없음"; return false; }
 
         int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = "유효한 위치가 아닙니다"; return false; }
+        if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
 
-        if (g.HasFertilizerAt(idx.Value)) { reason = "이미 비료가 있어 뿌릴 수 없습니다!"; return false; }
+        if (g.HasFertilizerAt(idx.Value)) { reason = Loc.T("shop.error.fertilizer_exists"); return false; }
 
         return true;
     }

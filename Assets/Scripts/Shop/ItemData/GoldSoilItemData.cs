@@ -42,14 +42,14 @@ public class GoldSoilItemData : ItemData
         // 이미 황금 비료가 있는 칸인지 확인
         if (ctx.Grid.HasGoldSoil(idx.Value))
         {
-            reason = "이미 황금 비료가 있는 칸입니다";
+            reason = Loc.T("shop.error.gold_soil_exists");
             return false;
         }
 
         // 식물이 있는 칸인지 확인
         if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
         {
-            reason = "식물이 있는 칸에는 황금 비료를 뿌릴 수 없습니다";
+            reason = Loc.T("shop.error.gold_soil_occupied");
             return false;
         }
 
@@ -71,11 +71,11 @@ public class GoldSoilItemData : ItemData
 
         if (!ctx.Grid.TryPlaceGoldSoil(pendingIndex.Value))
         {
-            ctx.ShowError?.Invoke("황금 비료를 뿌릴 수 없습니다");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.gold_soil_failed"));
             return;
         }
 
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
         pendingIndex = null;
     }
 

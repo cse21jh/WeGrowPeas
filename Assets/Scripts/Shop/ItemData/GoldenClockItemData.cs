@@ -31,7 +31,7 @@ public class GoldenClockItemData : ItemData
 
         if (bought >= MaxPurchaseCount)
         {
-            reason = "구매 한도 도달";
+            reason = Loc.T("shop.error.limit_reached");
             return false;
         }
 

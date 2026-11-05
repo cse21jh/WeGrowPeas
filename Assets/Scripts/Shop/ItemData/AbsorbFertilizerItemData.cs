@@ -43,7 +43,7 @@ public class AbsorbFertilizerItemData : ItemData
         // 하지만 사용자 경험상 이미 뿌려진 곳은 막는 게 좋을 수 있음.
         if (ctx.Grid.HasAbsorbFertilizer(idx.Value))
         {
-             reason = "이미 저항력 흡수 비료가 뿌려져 있습니다.";
+             reason = Loc.T("shop.error.absorb_exists");
              return false;
         }
 

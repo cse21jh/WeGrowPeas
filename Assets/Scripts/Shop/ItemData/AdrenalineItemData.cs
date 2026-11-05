@@ -50,7 +50,8 @@ public class AdrenalineItemData : ItemData
         ExtendOrAddMod("Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
         ExtendOrAddMod("Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
 
-        ctx.ShowInfo?.Invoke($"{LocalizedName} 적용: {days}일간 벌레{(1f / spawnIntervalMul):0.#}배, 교배시간{breedingDurationMul:0.#}배, 교배횟수{breedingAttemptsMul:0.#}배");
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.adrenaline", ("name", LocalizedName), ("days", days),
+            ("spawn", (1f / spawnIntervalMul).ToString("0.#")), ("duration", breedingDurationMul.ToString("0.#")), ("attempts", breedingAttemptsMul.ToString("0.#"))));
     }
 
     private void ExtendOrAddMod(string sourceTag, StatId stat, float multiplier, int days)

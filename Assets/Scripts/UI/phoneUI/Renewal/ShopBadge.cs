@@ -18,16 +18,16 @@ public static class ShopBadge
 
         // 고정 상품 / 로테이션 상품
         if (typeObj != null) typeObj.SetActive(true);
-        if (typeText != null) typeText.text = isFixed ? "고정" : "로테이션";
+        if (typeText != null) typeText.text = isFixed ? Loc.T("shop.badge.fixed") : Loc.T("shop.badge.rotation");
 
         // 등급 (GradeTagText가 있으면 우선, 없으면 Rarity로 S/A/B/C)
         if (gradeObj != null) gradeObj.SetActive(true);
-        if (gradeText != null) gradeText.text = $"{GetGrade(item)}등급";
+        if (gradeText != null) gradeText.text = Loc.T("shop.badge.grade", ("grade", GetGrade(item)));
 
         // 품목 제한: 전체 구매 제한이 있는 아이템만 표시
         bool hasLimit = item.EffectivePurchaseLimit >= 0;
         if (limitObj != null) limitObj.SetActive(hasLimit);
-        if (limitText != null && hasLimit) limitText.text = "품목 제한";
+        if (limitText != null && hasLimit) limitText.text = Loc.T("shop.badge.limited");
     }
 
     /// <summary>남은 구매 횟수 문구. 무제한이면 "재고 제한 없음".</summary>
@@ -35,10 +35,10 @@ public static class ShopBadge
     {
         if (item == null) return "";
         int limit = item.EffectivePurchaseLimit;
-        if (limit < 0) return "재고 제한 없음";
+        if (limit < 0) return Loc.T("shop.badge.no_limit");
 
         int remain = Mathf.Max(0, limit - item.GetTotalPurchaseCount());
-        return $"남은 수량 {remain}";
+        return Loc.T("shop.badge.remaining", ("count", remain));
     }
 
     /// <summary>슬롯 하단에 표시할 태그 목록. (등급 배지와 별개)</summary>

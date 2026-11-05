@@ -55,7 +55,7 @@ public class AddSoilItemData : ItemData
         // maxCol이 이미 최대치인지 확인 — 땅부자 보유 시엔 확장 없이도 구매 가능(고속 숙성 부여)
         if (ctx.Grid.maxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
         {
-            reason = "최대 확장 횟수에 도달했습니다.";
+            reason = Loc.T("shop.error.max_expand");
             return false;
         }
 
@@ -66,7 +66,7 @@ public class AddSoilItemData : ItemData
 
         if (ctx.Shop.PurchaseHistory[key] >= EffectiveMaxPurchase)
         {
-            reason = "최대 구매 횟수에 도달했습니다.";
+            reason = Loc.T("shop.error.max_purchase_reached");
             return false;
         }
 

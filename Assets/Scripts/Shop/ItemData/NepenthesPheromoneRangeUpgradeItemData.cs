@@ -38,7 +38,7 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
         // 페로몬 생성이 활성화되어 있어야 함 (선행 조건)
         if (ctx?.Grid == null || !ctx.Grid.HasNepenthesPheromone)
         {
-            reason = "먼저 네펜데스 페로몬 생성을 구매해야 합니다.";
+            reason = Loc.T("shop.error.pheromone_required");
             return false;
         }
 

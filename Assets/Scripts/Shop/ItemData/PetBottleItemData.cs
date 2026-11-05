@@ -85,7 +85,7 @@ public class PetBottleItemData : ItemData
         
         if (target == null)
         {
-            reason = "선택된 식물이 없습니다";
+            reason = Loc.T("shop.error.no_plant_selected");
             return false;
         }
         
@@ -94,13 +94,13 @@ public class PetBottleItemData : ItemData
         // 이미 페트병이 위치한 칸 불가
         if (ctx.Grid.HasPetBottle(idx))
         {
-            reason = "이미 페트병이 위치한 칸입니다";
+            reason = Loc.T("shop.error.bottle_exists");
             return false;
         }
 
         if (!target.IsMovable)
         {
-            reason = "유효한 식물이 아닙니다";
+            reason = Loc.T("shop.error.invalid_plant");
             return false;
         }
 
@@ -142,18 +142,18 @@ public class PetBottleItemData : ItemData
             if (idx < 0 || idx >= maxIdx)
             {
                 Debug.LogError($"[PetBottle] Commit: Invalid idx={idx}, maxIdx={maxIdx}");
-                ctx.ShowError?.Invoke($"유효하지 않은 위치입니다 (idx={idx})");
+                ctx.ShowError?.Invoke(Loc.T("shop.error.invalid_position"));
                 pendingIndex = null;
                 return;
             }
 
             ctx.Grid.PlacePetBottle(idx);
-            ctx.ShowInfo?.Invoke($"{LocalizedName} 배치 완료");
+            ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[PetBottle] Commit error: {e.Message}\n{e.StackTrace}");
-            ctx.ShowError?.Invoke($"페트병 배치 중 오류가 발생했습니다: {e.Message}");
+            ctx.ShowError?.Invoke(Loc.T("shop.error.placement_failed", ("error", e.Message)));
         }
         finally
         {

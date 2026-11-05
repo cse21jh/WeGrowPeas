@@ -30,7 +30,7 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
         // 최대 레벨(2) 체크
         if (ctx.Grid.ChiliPepperRangeLevel >= 2)
         {
-            reason = "이미 최대 범위 레벨에 도달했습니다.";
+            reason = Loc.T("shop.error.max_range");
             return false;
         }
 
