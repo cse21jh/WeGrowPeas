@@ -34,12 +34,12 @@ public class SellHighResistancePlantRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        return Data.requestTitle.Replace("(웨이브 중 하나)", WaveLabel);
+        return Data.GetTitle(("wave", WaveLabel));
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Wave}", WaveLabel + LocFormat.ChooseJosa(WaveLabel, "이/가"));
+        return Data.GetDescription(("wave", WaveLabel));
     }
 
     private void SelectRandomTrait()

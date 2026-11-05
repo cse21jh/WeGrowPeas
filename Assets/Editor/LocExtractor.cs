@@ -11,6 +11,7 @@ using UnityEngine;
 public static class LocExtractor
 {
     private const string TableFolder = "Assets/Resources/Localization";
+    private const string ExcludedFolder = "/Legacy/"; // 게임에서 쓰지 않는 구버전 데이터
     private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
     public sealed class Report
@@ -54,6 +55,8 @@ public static class LocExtractor
 
         foreach (string path in paths)
         {
+            if (path.Contains(ExcludedFolder)) continue;
+
             // 폰트처럼 큰 에셋을 읽지 않도록 타입부터 본다.
             Type type = AssetDatabase.GetMainAssetTypeAtPath(path);
             var group = type?.GetCustomAttribute<LocGroupAttribute>(true);

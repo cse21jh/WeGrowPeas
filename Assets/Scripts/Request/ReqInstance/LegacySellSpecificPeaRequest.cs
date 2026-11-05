@@ -37,12 +37,12 @@ public class LegacySellSpecificPeaRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        return Data.requestTitle.Replace("{Trait}", WaveLabel);
+        return Data.GetTitle(("wave", WaveLabel));
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Wave}", WaveLabel + LocFormat.ChooseJosa(WaveLabel, "이/가"));
+        return Data.GetDescription(("wave", WaveLabel));
     }
 
     private void HandleCheckType(Plant p)

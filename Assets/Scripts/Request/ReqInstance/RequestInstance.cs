@@ -39,12 +39,12 @@ public abstract class RequestInstance
 
     public virtual string GetTitleText()
     {
-        return Data.requestTitle;
+        return Data.GetTitle();
     }
 
     public virtual string GetDescriptionText()
     {
-        return Data.requestDescription;
+        return Data.GetDescription();
     }
 
     public string GetRewardText()

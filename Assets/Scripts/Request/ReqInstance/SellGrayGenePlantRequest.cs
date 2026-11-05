@@ -35,12 +35,12 @@ public class SellGrayGenePlantRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        return Data.requestTitle.Replace("(특정 형질)", WaveLabel);
+        return Data.GetTitle(("wave", WaveLabel));
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Trait}", WaveLabel);
+        return Data.GetDescription(("wave", WaveLabel));
     }
 
     private void SelectRandomTrait()
