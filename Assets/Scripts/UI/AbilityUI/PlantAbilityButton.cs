@@ -21,8 +21,8 @@ public class PlantAbilityButton : MonoBehaviour
         abilityUIController = controller;
         abilityData = ability;
         icon.sprite = ability.icon;
-        name.text = ability.abilityName;
-        description.text = ability.description;
+        name.text = ability.LocalizedName;
+        description.text = ability.LocalizedDescription;
         level.text = "0";
 
         levelUpButton.onClick.AddListener(() =>

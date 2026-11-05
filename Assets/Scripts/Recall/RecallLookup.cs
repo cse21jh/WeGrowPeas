@@ -45,8 +45,8 @@ public static class RecallLookup
                 {
                     found = true,
                     icon = p.icon,
-                    name = string.IsNullOrEmpty(p.displayName) ? p.plantId : p.displayName,
-                    description = p.description
+                    name = string.IsNullOrEmpty(p.displayName) ? p.plantId : p.LocalizedName,
+                    description = p.LocalizedDescription
                 };
             }
 
@@ -68,8 +68,8 @@ public static class RecallLookup
                     {
                         found = true,
                         icon = info.icon,
-                        name = info.plantName,
-                        description = info.description
+                        name = info.LocalizedName,
+                        description = info.LocalizedDescription
                     };
                 }
             }

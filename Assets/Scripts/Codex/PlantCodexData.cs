@@ -6,23 +6,44 @@ using UnityEngine;
 /// 유전자별 최대 저항력 표는 UI에서 코드/이 데이터로 구성.
 /// </summary>
 [CreateAssetMenu(menuName = "Codex/Plant Codex Data")]
-public class PlantCodexData : ScriptableObject
+[LocGroup(LocPrefix)]
+public class PlantCodexData : ScriptableObject, ILocKeyed
 {
+    private const string LocPrefix = "plant";
+
+    /// <summary>화면에 보여줄 이름.</summary>
+    public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, LocId, "name"), displayName);
+
+    /// <summary>화면에 보여줄 설명.</summary>
+    public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, LocId, "description"), description);
+
+    /// <summary>화면에 보여줄 특성 설명.</summary>
+    public string LocalizedTraitInfo => Loc.Or(LocKey.For(LocPrefix, LocId, "trait"), traitInfo);
+
+    /// <summary>화면에 보여줄 저항력 설명.</summary>
+    public string LocalizedResistanceNote => Loc.Or(LocKey.For(LocPrefix, LocId, "resistance"), resistanceNote);
+
+    /// <inheritdoc/>
+    public string LocId => string.IsNullOrEmpty(locId) ? name : locId;
+
+    [Tooltip("번역 키에 쓰는 영문 id. 파일 이름이 한글이라 따로 둔다.")]
+    [SerializeField] private string locId;
+
     [Tooltip("Plant.speciesname과 일치 (예: 완두콩, 땅콩, 피스타치오)")]
     public string plantId;
 
-    public string displayName;
+    [LocText("name")] public string displayName;
     public Sprite icon;
 
     [TextArea]
     [Tooltip("특징 설명 및 tmi (예: 자가번식 가능, 칼로리 높음)")]
-    public string description;
+    [LocText("description")] public string description;
 
     [TextArea]
     [Tooltip("특성/특이사항 설명 (예: 네펜데스는 벌레 면역)")]
-    public string traitInfo;
+    [LocText("trait")] public string traitInfo;
 
     [TextArea]
     [Tooltip("유전자별 최대 저항력 등 추가 설명(선택). 비우면 UI에서 코드값으로 표시 시도.")]
-    public string resistanceNote;
+    [LocText("resistance")] public string resistanceNote;
 }

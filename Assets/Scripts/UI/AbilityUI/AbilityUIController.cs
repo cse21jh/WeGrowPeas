@@ -113,7 +113,7 @@ public class AbilityUIController : MonoBehaviour
         addPlantAbilityButton.GetComponent<Button>().onClick.RemoveAllListeners();
         addPlantAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).plantName + "의 특성 포인트 +1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
+            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).LocalizedName + "의 특성 포인트 +1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
         });
         UpdatePlantAbilityList(plant);
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
@@ -315,8 +315,8 @@ public class AbilityUIController : MonoBehaviour
         Color c = generalAbilityIcon.color;
         c.a = 1f;
         generalAbilityIcon.color = c;
-        generalAbilityName.text = ability.abilityName;
-        generalAbilityDescription.text = ability.description;
+        generalAbilityName.text = ability.LocalizedName;
+        generalAbilityDescription.text = ability.LocalizedDescription;
     }
 
     public void ClearGeneralAbilityDescription()

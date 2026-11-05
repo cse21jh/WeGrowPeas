@@ -66,13 +66,16 @@ public static class LocExtractor
             if (!tables.TryGetValue(group.Prefix, out var entries))
                 tables[group.Prefix] = entries = new List<LocEntry>();
 
+            string id = (asset as ILocKeyed)?.LocId;
+            if (string.IsNullOrEmpty(id)) id = asset.name;
+
             foreach (var field in GetFields(type))
             {
                 string text = field.GetValue(asset) as string;
                 if (string.IsNullOrEmpty(text)) continue;
 
                 string suffix = field.GetCustomAttribute<LocTextAttribute>().Suffix;
-                entries.Add(new LocEntry { Key = LocKey.For(group.Prefix, asset.name, suffix), Text = text, Source = path });
+                entries.Add(new LocEntry { Key = LocKey.For(group.Prefix, id, suffix), Text = text, Source = path });
             }
         }
         return tables;

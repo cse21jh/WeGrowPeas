@@ -145,7 +145,7 @@ public class InfoApp : BasePhoneApp
             {
                 // info가 유효하면 그 이름 사용, 아니면 기존 CurrentPlantName 사용 (Fallback)
                 if (!string.IsNullOrEmpty(info.plantName))
-                    currentPlantName.text = info.plantName;
+                    currentPlantName.text = info.LocalizedName;
                 else
                     currentPlantName.text = AbilityManager.Instance.CurrentPlantName;
             }
@@ -163,7 +163,7 @@ public class InfoApp : BasePhoneApp
                         hoverHandler = currentPlantIcon.gameObject.AddComponent<UIHoverHandler>();
 
                     hoverHandler.Setup(
-                        () => UpdateDescription(info.description),
+                        () => UpdateDescription(info.LocalizedDescription),
                         () => ClearDescription()
                     );
                 }
@@ -195,10 +195,10 @@ public class InfoApp : BasePhoneApp
                 var learnedAbility = currentPlantAbilities.Find(a => a.abilityName == ability.abilityName);
                 
                 int level = (learnedAbility != null) ? learnedAbility.level : 0;
-                string desc = ability.description; // Use base description
+                string desc = ability.LocalizedDescription; // Use base description
 
                 var slot = Instantiate(plantAbilitySlotPrefab, plantAbilityContainer);
-                slot.Setup(ability.icon, ability.abilityName, level, desc, UpdateDescription, ClearDescription);
+                slot.Setup(ability.icon, ability.LocalizedName, level, desc, UpdateDescription, ClearDescription);
                 
                 // Use Level Bar visualization
                 // Assuming max level is 5 for now
@@ -232,7 +232,7 @@ public class InfoApp : BasePhoneApp
                     // If AbilityManager manages slots, we check that. 
                     // Let's assume CurrentGeneralAbility has the equipped ones.
 
-                    slot.Setup(ability.icon, ability.abilityName, 0, ability.description, UpdateDescription, ClearDescription, isLocked);
+                    slot.Setup(ability.icon, ability.LocalizedName, 0, ability.LocalizedDescription, UpdateDescription, ClearDescription, isLocked);
                 }
                 else
                 {

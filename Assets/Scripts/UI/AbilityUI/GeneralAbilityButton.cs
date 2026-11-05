@@ -23,7 +23,7 @@ public class GeneralAbilityButton : MonoBehaviour
         abilityUIController = controller;
         abilityData = ability;
         icon.sprite = ability.icon;
-        name.text = ability.abilityName;
+        name.text = ability.LocalizedName;
         price = ability.price;
 
         if(isUnlocked)

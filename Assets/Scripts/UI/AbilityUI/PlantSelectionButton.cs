@@ -34,8 +34,8 @@ public class PlantSelectionButton : MonoBehaviour
         // info가 default값일 수 있으므로(리스트에 없을 때), 체크 필요할 수 있음
         
         if (icon != null) icon.sprite = info.icon;
-        if (name != null) name.text = info.plantName;
-        if (description != null) description.text = info.description;
+        if (name != null) name.text = info.LocalizedName;
+        if (description != null) description.text = info.LocalizedDescription;
         if (description != null) price = info.price;
 
         if (isUnlocked)

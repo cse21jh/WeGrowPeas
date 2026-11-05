@@ -66,7 +66,7 @@ public class InfoPopup : MonoBehaviour
         {
             // info가 없으면 AbilityManager가 들고 있는 이름으로 대체 (정보 앱과 같은 규칙)
             plantNameText.text = (info != null && !string.IsNullOrEmpty(info.plantName))
-                ? info.plantName
+                ? info.LocalizedName
                 : ability.CurrentPlantName;
         }
 
@@ -78,7 +78,7 @@ public class InfoPopup : MonoBehaviour
         }
 
         if (plantDescriptionText != null)
-            plantDescriptionText.text = info != null ? info.description : "";
+            plantDescriptionText.text = info != null ? info.LocalizedDescription : "";
     }
 
     // ── 식물 특성 ─────────────────────────────────────────────────────────────
@@ -107,8 +107,8 @@ public class InfoPopup : MonoBehaviour
                 continue;
             }
 
-            view.Setup(data.icon, data.abilityName, level, AbilityManager.MaxPlantAbilityLevel);
-            SetTooltip(row, data.abilityName, data.description, level);
+            view.Setup(data.icon, data.LocalizedName, level, AbilityManager.MaxPlantAbilityLevel);
+            SetTooltip(row, data.LocalizedName, data.LocalizedDescription, level);
         }
     }
 
@@ -140,8 +140,8 @@ public class InfoPopup : MonoBehaviour
             if (hasAbility)
             {
                 var data = owned[i];
-                view.Setup(data.icon, data.abilityName);
-                SetTooltip(row, data.abilityName, data.description, 0);
+                view.Setup(data.icon, data.LocalizedName);
+                SetTooltip(row, data.LocalizedName, data.LocalizedDescription, 0);
             }
             else
             {
