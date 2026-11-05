@@ -12,15 +12,10 @@ public class HighQualityPlantItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고품질 식물";
-        if (string.IsNullOrEmpty(Description)) Description = "선택한 웨이브에 강한 식물을 1개 추가합니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.Instant;
     }
 

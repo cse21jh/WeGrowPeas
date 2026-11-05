@@ -5,15 +5,10 @@ public class BadGuyMoreRiceItemData : ItemData
 {
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "미운 놈 떡 하나 더 준다";
-        if (string.IsNullOrEmpty(Description)) Description = "식물이 보유한 자연사/해충/바람/홍수 관련 우성 유전자(1등급 이하) 1개당 판매 가격이 증가합니다.";
         if (Price <= 0) Price = 500;
-        Rarity = ItemRarity.Common; 
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 3; 
         FlowType = ShopFlowType.Instant;
     }
 

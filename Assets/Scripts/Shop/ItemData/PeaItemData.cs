@@ -11,12 +11,9 @@ public class PeaItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "식물 모종";
         if (Price <= 0) Price = 500;
-        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
         FlowType = ShopFlowType.Instant;  // 위치 선택 없이 즉시 설치
     }

@@ -8,8 +8,7 @@ public class LegacySellSpecificPeaRequest : RequestInstance
     private int requiredCount;
     private int currentCount;
     private int conditionType;
-    private string[] traitName = { "자연사", "해충", "바람", "홍수", "폭우", "가뭄", "추위", "더위" };
-    private string[] waveName = { "자연사가", "해충이", "바람이", "홍수가", "폭우가", "가뭄이", "추위가", "더위가" };
+    private string WaveLabel => WavePalette.GetName((TraitType)conditionType);
 
     public LegacySellSpecificPeaRequest(RequestScriptable data) : base(data)
     {
@@ -38,12 +37,12 @@ public class LegacySellSpecificPeaRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        return Data.requestTitle.Replace("{Trait}", traitName[conditionType]);
+        return Data.requestTitle.Replace("{Trait}", WaveLabel);
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Wave}", waveName[conditionType]);
+        return Data.requestDescription.Replace("{Wave}", WaveLabel + LocFormat.ChooseJosa(WaveLabel, "이/가"));
     }
 
     private void HandleCheckType(Plant p)

@@ -12,15 +12,10 @@ public class PetBottleMaterialUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 재질 강화";
-        if (string.IsNullOrEmpty(Description)) Description = "페트병을 강하게 만들어 웨이브를 1회 더 막을 수 있게 해줍니다.";
         if (Price <= 0) Price = 3000;
-        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 9;
     }

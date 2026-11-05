@@ -10,14 +10,10 @@ public class SprinklerItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "스프링클러";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1; // 일일 구매 제한 1회
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음 (여러 번 구매 가능)
         FlowType = ShopFlowType.PlaceOnTile;
         metaRequiredDawnStage = 5;
     }

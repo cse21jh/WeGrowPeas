@@ -13,15 +13,10 @@ public class PetBottleSupplyIncreaseItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 납품량 증가";
-        if (string.IsNullOrEmpty(Description)) Description = "페트병의 일일 최대 구매 횟수가 1 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음 (X)
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 9;
     }

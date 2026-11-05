@@ -12,15 +12,10 @@ public class HealingCapsaicinItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "치료형 캡사이신";
-        if (string.IsNullOrEmpty(Description)) Description = "웨이브가 끝날 때 고추의 영향 범위에 있는 식물이 모든 저항력을 소폭 회복합니다.";
         if (Price <= 0) Price = 3000;
-        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 3; // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
     }
 

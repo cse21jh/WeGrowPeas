@@ -10,15 +10,10 @@ public class TwinsItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "쌍둥이";
-        if (string.IsNullOrEmpty(Description)) Description = "식물 교배 시 식물 2개가 생성될 확률이 증가합니다.";
         if (Price <= 0) Price = 2500;
-        Rarity = ItemRarity.Special;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4;            // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 11;
     }

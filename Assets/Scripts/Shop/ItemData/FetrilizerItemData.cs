@@ -15,15 +15,8 @@ public class FertilizerItemData : ItemData
     {
         FlowType = ShopFlowType.PlaceOnTile;
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
-        Rarity = ItemRarity.Common; // 일반 등급
 
-        if (string.IsNullOrEmpty(DisplayName))
-            DisplayName = "전용 비료";
-        if (string.IsNullOrEmpty(Description))
-            Description = "세로 한 줄의 토양에 비료를 뿌려 선택한 웨이브에서 잘 살아남을 수 있게 하고, 그 웨이브에 대한 저항력이 감소하지 않게 합니다.";
         if (Price <= 0) Price = 1000;
     }
 

@@ -11,15 +11,10 @@ public class GoldSoilItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 비료";
-        if (string.IsNullOrEmpty(Description)) Description = "원하는 토양 1칸에 황금 비료를 추가합니다. 황금 비료에 심은 식물은 옮길 수 없지만, 특별한 일이 발생합니다.";
         if (Price <= 0) Price = 5000;
-        Rarity = ItemRarity.Legendary; // 전설 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
         metaRequiredEventId = UnlockManager.Ids.GoldenPlantCreated;
     }

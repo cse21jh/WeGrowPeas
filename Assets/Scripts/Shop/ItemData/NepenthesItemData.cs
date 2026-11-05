@@ -11,14 +11,10 @@ public class NepenthesItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음 (X)
         FlowType = ShopFlowType.PlaceOnTile;
     }
 

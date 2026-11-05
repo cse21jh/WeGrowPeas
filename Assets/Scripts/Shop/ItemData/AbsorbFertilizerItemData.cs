@@ -10,14 +10,10 @@ public class AbsorbFertilizerItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "저항력 흡수 비료";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Rare;
 
         IsStackable = false;
-        InitialStock = 1; // 일일 구매 제한 1회
         OnePerShopIfNotStackable = false; // 소모품
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
         metaRequiredEventId = UnlockManager.Ids.FertilizerFourColumns;
     }

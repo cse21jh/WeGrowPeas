@@ -11,15 +11,10 @@ public class LadybugLureDeviceItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "무당벌레 유도장치";
-        if (string.IsNullOrEmpty(Description)) Description = "식물을 해치지 않는 무당벌레가 나올 확률이 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 1;
         

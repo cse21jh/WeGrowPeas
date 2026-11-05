@@ -11,15 +11,10 @@ public class BugProcessingUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 가공 기계";
-        if (string.IsNullOrEmpty(Description)) Description = "벌레의 기본 가격이 50골드 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4; // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 3;
         

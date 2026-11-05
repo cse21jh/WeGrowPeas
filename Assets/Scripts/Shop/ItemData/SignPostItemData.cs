@@ -19,15 +19,8 @@ public class SignPostItemData : ItemData
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
-        Rarity = ItemRarity.Common; // 일반 등급
 
-        if (string.IsNullOrEmpty(DisplayName))
-            DisplayName = "팻말";
-        if (string.IsNullOrEmpty(Description))
-            Description = "다음 5일간 선택한 웨이브가 나타날 확률을 크게 감소시킵니다.";
         if (Price <= 0) Price = 500;
     }
 

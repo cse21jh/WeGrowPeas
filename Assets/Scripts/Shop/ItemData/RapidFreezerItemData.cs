@@ -10,14 +10,10 @@ public class RapidFreezerItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "급속 냉각기";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1; // 일일 구매 제한 1회
         OnePerShopIfNotStackable = false; // 소모품이므로 상점에 여러 번 뜰 수 있음 (일일 제한은 별도)
-        MaxPurchaseCount = -1; // 최대 구매 제한 없음
         FlowType = ShopFlowType.PlaceOnTile;
         metaRequiredEventId = UnlockManager.Ids.WinterReached;
     }

@@ -8,15 +8,10 @@ public class SprinklerRangeUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "스프링클러 성능 향상";
-        if (string.IsNullOrEmpty(Description)) Description = "매 웨이브마다 스프링클러 효과가 발동하는 작동 범위를 1칸 추가합니다.";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Rare; 
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 3; 
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 5;
     }

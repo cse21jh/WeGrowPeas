@@ -10,15 +10,10 @@ public class ActiveShellItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "활성형 껍질";
-        if (string.IsNullOrEmpty(Description)) Description = "한 번도 교배를 시도하지 않은 식물의 자가번식 확률이 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5;            // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 2;
         metaRequiredDawnPlant = "땅콩";

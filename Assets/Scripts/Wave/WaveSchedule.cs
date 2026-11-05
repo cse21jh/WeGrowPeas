@@ -145,22 +145,8 @@ public static class WaveSchedule
         return (index >= 0 && index < waves.Count) ? waves[index] : (WaveType?)null;
     }
 
-    /// <summary>웨이브 한국어 표시명.</summary>
-    public static string GetWaveDisplayName(WaveType waveType)
-    {
-        switch (waveType)
-        {
-            case WaveType.Aging: return "자연사";
-            case WaveType.Pest: return "해충";
-            case WaveType.Wind: return "바람";
-            case WaveType.Flood: return "홍수";
-            case WaveType.HeavyRain: return "폭우";
-            case WaveType.Cold: return "추위";
-            case WaveType.Drought: return "가뭄";
-            case WaveType.Heat: return "더위";
-            default: return waveType.ToString();
-        }
-    }
+    /// <summary>웨이브 표시명.</summary>
+    public static string GetWaveDisplayName(WaveType waveType) => WavePalette.GetName(waveType);
 
     public static Season GetSeasonByStage(int stage)
     {

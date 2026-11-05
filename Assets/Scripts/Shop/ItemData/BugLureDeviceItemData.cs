@@ -11,15 +11,10 @@ public class BugLureDeviceItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "벌레 유도장치";
-        if (string.IsNullOrEmpty(Description)) Description = "벌레가 더 자주 등장합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 3;
         

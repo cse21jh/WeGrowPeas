@@ -12,15 +12,10 @@ public class NepenthesDigestionUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 소화액 개량";
-        if (string.IsNullOrEmpty(Description)) Description = "네펜데스가 벌레를 먹을 때 80골드를 더 획득합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정

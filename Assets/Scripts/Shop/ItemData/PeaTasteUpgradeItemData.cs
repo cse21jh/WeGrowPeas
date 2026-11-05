@@ -8,15 +8,10 @@ public class PeaTasteUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "풍미 증진";
-        if (string.IsNullOrEmpty(Description)) Description = "완두콩의 기본 가격이 40골드 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 3; // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
     }
 

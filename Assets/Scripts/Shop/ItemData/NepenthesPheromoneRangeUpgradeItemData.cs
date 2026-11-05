@@ -12,15 +12,10 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 페로몬 강화";
-        if (string.IsNullOrEmpty(Description)) Description = "네펜데스의 페로몬 범위가 증가합니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 3; // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정

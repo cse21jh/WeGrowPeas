@@ -5,7 +5,7 @@ public class SellHighResistancePlantRequest : RequestInstance
     private int requiredCount;
     private int currentCount;
     private int conditionType;
-    private string[] waveName = { "자연사가", "해충이", "바람이", "홍수가", "폭우가", "가뭄이", "추위가", "더위가" };
+    private string WaveLabel => WavePalette.GetName((TraitType)conditionType);
 
     public SellHighResistancePlantRequest(RequestScriptable data) : base(data)
     {
@@ -34,14 +34,12 @@ public class SellHighResistancePlantRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        string rawWaveName = waveName[conditionType];
-        string baseWaveName = rawWaveName.Substring(0, rawWaveName.Length - 1); // "폭우가" -> "폭우"
-        return Data.requestTitle.Replace("(웨이브 중 하나)", baseWaveName);
+        return Data.requestTitle.Replace("(웨이브 중 하나)", WaveLabel);
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Wave}", waveName[conditionType]);
+        return Data.requestDescription.Replace("{Wave}", WaveLabel + LocFormat.ChooseJosa(WaveLabel, "이/가"));
     }
 
     private void SelectRandomTrait()

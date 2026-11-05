@@ -12,15 +12,10 @@ public class LadybugCollectionBoxItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "무당벌레 채집통";
-        if (string.IsNullOrEmpty(Description)) Description = "농장에 존재할 수 있는 무당벌레의 수가 1마리 증가합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4; // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 1;
         

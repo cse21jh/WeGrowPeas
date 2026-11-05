@@ -6,7 +6,7 @@ public class SellGrayGenePlantRequest : RequestInstance
     private int requiredCount;
     private int currentCount;
     private int conditionType;
-    private string[] traitName = { "자연사", "해충", "바람", "홍수", "폭우", "가뭄", "추위", "더위" };
+    private string WaveLabel => WavePalette.GetName((TraitType)conditionType);
 
     public SellGrayGenePlantRequest(RequestScriptable data) : base(data)
     {
@@ -35,12 +35,12 @@ public class SellGrayGenePlantRequest : RequestInstance
 
     public override string GetTitleText()
     {
-        return Data.requestTitle.Replace("(특정 형질)", traitName[conditionType]);
+        return Data.requestTitle.Replace("(특정 형질)", WaveLabel);
     }
 
     public override string GetDescriptionText()
     {
-        return Data.requestDescription.Replace("{Trait}", traitName[conditionType]);
+        return Data.requestDescription.Replace("{Trait}", WaveLabel);
     }
 
     private void SelectRandomTrait()

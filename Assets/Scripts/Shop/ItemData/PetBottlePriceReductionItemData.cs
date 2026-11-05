@@ -12,15 +12,10 @@ public class PetBottlePriceReductionItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병 원가 감소";
-        if (string.IsNullOrEmpty(Description)) Description = "페트병의 가격이 100골드 감소합니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 3; // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 9;
     }

@@ -12,15 +12,10 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "매운 고추";
-        if (string.IsNullOrEmpty(Description)) Description = "고추의 영향 범위를 증가시킵니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
     }
 

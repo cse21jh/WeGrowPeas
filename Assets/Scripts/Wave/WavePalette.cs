@@ -51,7 +51,13 @@ public static class WavePalette
         }
     }
 
-    public static string GetName(WaveType type)
+    /// <summary>웨이브 표시 이름. 번역 표의 wave.{WaveType}을 먼저 쓰고, 없으면 에셋·기본값을 쓴다.</summary>
+    public static string GetName(WaveType type) => Loc.Or($"wave.{type}", GetDefaultName(type));
+
+    /// <summary>형질의 표시 이름. TraitType의 앞쪽 값은 WaveType과 순서가 같다.</summary>
+    public static string GetName(TraitType type) => GetName((WaveType)(int)type);
+
+    private static string GetDefaultName(WaveType type)
     {
         var entry = Data != null ? Data.Find(type) : null;
         if (entry != null && !string.IsNullOrEmpty(entry.displayName)) return entry.displayName;

@@ -5,15 +5,10 @@ public class CoolingShieldItemData : ItemData
 {
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "냉각 방패";
-        if (string.IsNullOrEmpty(Description)) Description = "웨이브로 식물이 모두 죽을 경우 1회에 한해 적어도 1개의 식물은 살아남습니다.\n(이번 게임동안 1회만 구매할 수 있습니다!)";
         if (Price <= 0) Price = 5000;
-        Rarity = ItemRarity.Legendary; // 전설 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 1; // 이번 게임동안 단 1회만 구매 가능
         FlowType = ShopFlowType.Instant;
         metaRequiredEventId = UnlockManager.Ids.WinterReached;
     }

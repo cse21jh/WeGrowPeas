@@ -10,15 +10,10 @@ public class SuperMutationItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "슈퍼 변종";
-        if (string.IsNullOrEmpty(Description)) Description = "양성 변종이 더 잘 발생하게 됩니다. 추가로 변종 발생 확률이 증가합니다.";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Special;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4;            // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 10;
         metaRequiredDawnPlant = "완두콩";

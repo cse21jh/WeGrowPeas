@@ -10,15 +10,10 @@ public class GoldenGeneticsItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 유전자";
-        if (string.IsNullOrEmpty(Description)) Description = "교배 시 금색 유전자가 나올 확률이 증가합니다.";
         if (Price <= 0) Price = 3000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
     }
 

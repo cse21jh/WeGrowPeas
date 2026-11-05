@@ -5,15 +5,10 @@ public class TimeIsGoldItemData : ItemData
 {
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "시간은 금이다";
-        if (string.IsNullOrEmpty(Description)) Description = "웨이브 스킵 시 (남은 시간 * 10골드)를 획득합니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Rare; 
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 5; 
         FlowType = ShopFlowType.Instant;
     }
 

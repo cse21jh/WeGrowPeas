@@ -10,15 +10,10 @@ public class PeaCoffeeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "완두커피";
-        if (string.IsNullOrEmpty(Description)) Description = "식물이 자유시간이 지난 후에도 조금씩 비싸집니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Rare;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 3;            // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 6;
         metaRequiredDawnPlant = "완두콩";

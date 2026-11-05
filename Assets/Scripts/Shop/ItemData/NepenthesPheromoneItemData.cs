@@ -11,15 +11,10 @@ public class NepenthesPheromoneItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "네펜데스 페로몬 생성";
-        if (string.IsNullOrEmpty(Description)) Description = "네펜데스에게 페로몬 효과를 추가합니다.";
         if (Price <= 0) Price = 3000;
-        Rarity = ItemRarity.Special; // 특수 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 1; // 최대 구매 제한 1회
         FlowType = ShopFlowType.Instant;
         
         // 벌레 등장 스테이지에 맞춰 해금 스테이지 자동 설정

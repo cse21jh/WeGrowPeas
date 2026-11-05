@@ -10,15 +10,10 @@ public class CreditCardItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "신용카드";
-        if (string.IsNullOrEmpty(Description)) Description = "하루에 물품을 3개 이상 구매하면 자유시간에 소모 비용의 일부를 돌려받습니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Rare;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 3;            // 최대 구매 제한 3회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 7;
     }

@@ -12,15 +12,10 @@ public class HealthyLadybugItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "건강한 무당벌레";
-        if (string.IsNullOrEmpty(Description)) Description = "무당벌레가 많을수록 모든 식물이 더 잘 살아남습니다.";
         if (Price <= 0) Price = 3000;
-        Rarity = ItemRarity.Special; // 특수 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 1;
         

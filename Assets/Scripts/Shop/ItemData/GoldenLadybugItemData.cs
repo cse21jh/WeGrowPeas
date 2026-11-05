@@ -12,15 +12,10 @@ public class GoldenLadybugItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 무당벌레";
-        if (string.IsNullOrEmpty(Description)) Description = "웨이브가 끝날 때 무당벌레의 수만큼 100골드를 추가로 획득합니다.";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4; // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 1;
         

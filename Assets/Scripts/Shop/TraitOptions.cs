@@ -17,23 +17,28 @@ public static class TraitOptions
         public Option(string name, params TraitType[] traits) { this.name = name; this.traits = traits; }
     }
 
+    private static Option Single(TraitType trait) => new Option(WavePalette.GetName(trait), trait);
+
+    private static Option Pair(TraitType a, TraitType b)
+        => new Option($"{WavePalette.GetName(a)}/{WavePalette.GetName(b)}", a, b);
+
     private static List<Option> Build(int currentStage)
     {
         var list = new List<Option>();
 
         // 자연사는 항상 해금
-        list.Add(new Option("자연사", TraitType.NaturalDeath));
+        list.Add(Single(TraitType.NaturalDeath));
 
-        if (IsUnlocked(TraitType.Pest, currentStage)) list.Add(new Option("해충", TraitType.Pest));
-        if (IsUnlocked(TraitType.Wind, currentStage)) list.Add(new Option("바람", TraitType.Wind));
-        if (IsUnlocked(TraitType.Flood, currentStage)) list.Add(new Option("홍수", TraitType.Flood));
+        if (IsUnlocked(TraitType.Pest, currentStage)) list.Add(Single(TraitType.Pest));
+        if (IsUnlocked(TraitType.Wind, currentStage)) list.Add(Single(TraitType.Wind));
+        if (IsUnlocked(TraitType.Flood, currentStage)) list.Add(Single(TraitType.Flood));
 
         // 쌍 형질: 둘 중 하나라도 해금되면 함께 제공 (기존 UI와 동일)
         if (IsUnlocked(TraitType.HeavyRain, currentStage) || IsUnlocked(TraitType.Drought, currentStage))
-            list.Add(new Option("폭우/가뭄", TraitType.HeavyRain, TraitType.Drought));
+            list.Add(Pair(TraitType.HeavyRain, TraitType.Drought));
 
         if (IsUnlocked(TraitType.Cold, currentStage) || IsUnlocked(TraitType.Heat, currentStage))
-            list.Add(new Option("추위/더위", TraitType.Cold, TraitType.Heat));
+            list.Add(Pair(TraitType.Cold, TraitType.Heat));
 
         return list;
     }

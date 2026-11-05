@@ -8,15 +8,10 @@ public class PeaMaturationUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고속 숙성";
-        if (string.IsNullOrEmpty(Description)) Description = "완두콩이 웨이브를 버틸 때마다 더 빠르게 비싸집니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
         
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 2;
         metaRequiredDawnPlant = "완두콩";

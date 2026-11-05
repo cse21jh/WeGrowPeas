@@ -8,15 +8,10 @@ public class ShopContactItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "상점 연락처";
-        if (string.IsNullOrEmpty(Description)) Description = "매일 상점의 물품을 무료로 갱신할 수 있는 기회를 추가로 얻습니다.";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Special; // 특수 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 2; // 최대 구매 제한 2회
         FlowType = ShopFlowType.Instant;
     }
 

@@ -11,13 +11,10 @@ public class PetBottleItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "페트병";
         if (Price <= 0) Price = 500;
-        Rarity = ItemRarity.Common; // 일반 등급
 
         // 기본 재고 3회
         IsStackable = true;
-        InitialStock = 3;
 
         OnePerShopIfNotStackable = false;
         FlowType = ShopFlowType.SelectExistingPlant;

@@ -6,15 +6,10 @@ public class LandAndBeanItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "땅과 콩";
-        if (string.IsNullOrEmpty(Description)) Description = "식물이 웨이브가 지나간 후 뿌리를 내릴 확률이 증가하고, 뿌리를 내린 식물의 가격이 증가합니다.";
         if (Price <= 0) Price = 2500;
-        Rarity = ItemRarity.Special;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 4;            // 최대 구매 제한 4회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 10;
         metaRequiredDawnPlant = "땅콩";

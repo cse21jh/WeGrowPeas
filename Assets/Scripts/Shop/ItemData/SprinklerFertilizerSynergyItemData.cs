@@ -8,15 +8,10 @@ public class SprinklerFertilizerSynergyItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "스프링클러 전용비료 시너지";
-        if (string.IsNullOrEmpty(Description)) Description = "스프링클러의 범위 내에 있는 전용비료 칸이 상승시키는 저항력을 1%p 증가시킵니다.";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Common; 
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
-        MaxPurchaseCount = 5; 
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 5;
     }

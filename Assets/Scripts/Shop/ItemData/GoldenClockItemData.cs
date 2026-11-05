@@ -9,18 +9,11 @@ public class GoldenClockItemData : ItemData
     [Header("Pricing")]
     [SerializeField] private int basePrice = 500;
 
-    [Header("Limit")]
-    [SerializeField] private int maxTotalPurchase = 2; // 전체 게임 내 최대 구매 가능 횟수
-
     private void OnEnable()
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
-        InitialStock = 1;
-        MaxPurchaseCount = maxTotalPurchase;
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "황금 시계";
-        if (string.IsNullOrEmpty(Description)) Description = "구매 시 교배 시간이 10초 증가";
         if (Price <= 0) Price = basePrice;
     }
 
@@ -36,7 +29,7 @@ public class GoldenClockItemData : ItemData
         if (!ctx.Shop.PurchaseHistory.TryGetValue(purchaseKey, out int bought))
             bought = 0;
 
-        if (bought >= maxTotalPurchase)
+        if (bought >= MaxPurchaseCount)
         {
             reason = "구매 한도 도달";
             return false;

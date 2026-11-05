@@ -5,14 +5,10 @@ public class ProbabilityEventItemData : ItemData
 {
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "확률 증가 이벤트";
         if (Price <= 0) Price = 2000;
-        Rarity = ItemRarity.Rare; // 희귀 등급
 
         IsStackable = false;
-        InitialStock = 1; // 일일 구매 제한 1회
         OnePerShopIfNotStackable = true; // 상점에 하나만 등장
-        MaxPurchaseCount = 1; // 최대 구매 제한 1회 (이벤트는 한 번만 적용되면 됨)
         FlowType = ShopFlowType.Instant; // 즉시 사용
     }
 

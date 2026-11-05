@@ -10,15 +10,10 @@ public class StrongGeneticsResistanceUpgradeItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "강자생존";
-        if (string.IsNullOrEmpty(Description)) Description = "강한 웨이브에 대한 완두콩의 저항력을 소폭 증가시킵니다.";
         if (Price <= 0) Price = 1000;
-        Rarity = ItemRarity.Common; // 일반 등급
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
-        MaxPurchaseCount = 5; // 최대 구매 제한 5회
         FlowType = ShopFlowType.Instant;
     }
 

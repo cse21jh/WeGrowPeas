@@ -10,12 +10,9 @@ public class ChiliPepperItemData : ItemData
 
     private void OnEnable()
     {
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "고추";
         if (Price <= 0) Price = 1500;
-        Rarity = ItemRarity.Common;
 
         IsStackable = false;
-        InitialStock = 1;
         OnePerShopIfNotStackable = true;
         FlowType = ShopFlowType.PlaceOnTile;
     }
