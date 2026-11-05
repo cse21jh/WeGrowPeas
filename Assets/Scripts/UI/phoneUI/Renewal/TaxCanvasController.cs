@@ -33,6 +33,7 @@ public class TaxCanvasController : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         // 골드가 바뀌면(식물 판매 등) 즉시 반영
         GameEvents.OnGoldChanged += OnGoldChanged;
         Refresh();
@@ -40,6 +41,7 @@ public class TaxCanvasController : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         GameEvents.OnGoldChanged -= OnGoldChanged;
     }
 

@@ -68,6 +68,7 @@ public class GridPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         // 저주 만료·빙결 해제처럼 밭 밖에서 바뀌는 것들.
         GameEvents.OnDayStarted += Refresh;
 
@@ -76,6 +77,7 @@ public class GridPopup : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         Unsubscribe();
         GameEvents.OnDayStarted -= Refresh;
     }

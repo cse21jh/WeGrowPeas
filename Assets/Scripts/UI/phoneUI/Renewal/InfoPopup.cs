@@ -38,7 +38,16 @@ public class InfoPopup : MonoBehaviour
 
     public void Close() => gameObject.SetActive(false);
 
-    private void OnEnable() => Refresh();
+    private void OnEnable()
+    {
+        Loc.LanguageChanged += Refresh;
+        Refresh();
+    }
+
+    private void OnDisable()
+    {
+        Loc.LanguageChanged -= Refresh;
+    }
 
     /// <summary>팝업 내용을 다시 만든다.</summary>
     public void Refresh()

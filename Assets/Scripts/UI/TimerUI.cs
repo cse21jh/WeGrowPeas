@@ -9,8 +9,26 @@ public class TimerUI : MonoBehaviour
     private int maxBreedingTime;
     private Coroutine countdownRoutine;
     private string waveText = null;
+    private bool alarmIsMandatory;
 
     [SerializeField] private BreedTimerController breedTimerController;
+
+    private void OnEnable() => Loc.LanguageChanged += RefreshAlarmText;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshAlarmText;
+
+    // 알람이 떠 있으면 알람과, 알람이 꺼질 때 되돌릴 웨이브 문구를 함께 바꾼다.
+    private void RefreshAlarmText()
+    {
+        if (waveText == null || GameManager.Instance == null) return;
+
+        var enemy = GameManager.Instance.enemyController;
+        waveText = enemy.NextWaveDescription;
+        enemy.SetNextWaveText(GetAlarmText());
+    }
+
+    private string GetAlarmText()
+        => alarmIsMandatory ? Loc.T("game.hud.check_message") : Loc.T("game.hud.check_phone");
 
     // Start is called before the first frame update
     void Start()
@@ -220,10 +238,8 @@ public class TimerUI : MonoBehaviour
 
         if (waveText != null)
         {
-            string alarmText = isMessengerMandatory
-                ? Loc.T("game.hud.check_message")
-                : Loc.T("game.hud.check_phone");
-            GameManager.Instance.enemyController.SetNextWaveText(alarmText);
+            alarmIsMandatory = isMessengerMandatory;
+            GameManager.Instance.enemyController.SetNextWaveText(GetAlarmText());
         }
     }
 

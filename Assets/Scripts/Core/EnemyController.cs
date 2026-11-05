@@ -74,6 +74,7 @@ public class EnemyController : MonoBehaviour
     private Wave nextSecondWave;
     private int waveSkipCount = 0;
     private int[] waveKillCount;
+    private string shownWaveText;
 
     private List<WaveType> stageWaveRecord = new List<WaveType>(); // 세이브데이터의 웨이브, 좀 더 확인 >> 엔딩조건 체크하기 위해 필요
     private List<int> stageKillRecord = new List<int>();
@@ -91,6 +92,18 @@ public class EnemyController : MonoBehaviour
     public List<WaveType> StageWaveRecord => stageWaveRecord;
     public List<int> StageKillRecord => stageKillRecord;
     public List<int> StageNoTraitRecord => stageNoTraitRecord;
+
+    private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
+
+    // 폰 알람처럼 다른 문구가 떠 있으면 웨이브 문구로 덮지 않는다. 알람은 TimerUI가 다시 그린다.
+    private void RefreshLocalizedTexts()
+    {
+        ApplySeasonText(currentSeason);
+        SetWaveSkipCountText();
+        if (nextWaveText != null && nextWaveText.text == shownWaveText) ShowNextWaveText();
+    }
 
     private void Awake()
     {
@@ -321,25 +334,25 @@ public class EnemyController : MonoBehaviour
         return currentSeason;
     }
 
+    private void ApplySeasonText(Season season)
+    {
+        if (tempSeasonText == null) return;
+
+        tempSeasonText.text = season switch
+        {
+            Season.Summer => Loc.T("game.season.summer"),
+            Season.Fall => Loc.T("game.season.fall"),
+            Season.Winter => Loc.T("game.season.winter"),
+            _ => Loc.T("game.season.spring"),
+        };
+    }
+
     public void SetSeason(Season season)
     {
         // 계절이 변경되었을 때, 계절에 맞는 텍스트를 해당 위치에 변경
-        switch (season)
-        {
-            case Season.Spring:
-                tempSeasonText.text = Loc.T("game.season.spring");
-                break;
-            case Season.Summer:
-                tempSeasonText.text = Loc.T("game.season.summer");
-                break;
-            case Season.Fall:
-                tempSeasonText.text = Loc.T("game.season.fall");
-                break;
-            case Season.Winter:
-                tempSeasonText.text = Loc.T("game.season.winter");
-                UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
-                break;
-        }
+        ApplySeasonText(season);
+        if (season == Season.Winter)
+            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.WinterReached); // 급속 냉각기·냉각 방패 해금
         currentSeason = season;
 
         seasonManager.ChangeToSeason(season);
@@ -371,10 +384,13 @@ public class EnemyController : MonoBehaviour
             return false;
     }
 
+    public string NextWaveDescription => CurseState.WaveBlind ? "???" : currentWave.WaveDescription;
+
     public void ShowNextWaveText()
     {
         // 저주(기상이변): 웨이브 유형 확인 불가
-        nextWaveText.text = CurseState.WaveBlind ? "???" : currentWave.WaveDescription;
+        shownWaveText = NextWaveDescription;
+        nextWaveText.text = shownWaveText;
     }
 
     public void SetNextWaveText(string text)

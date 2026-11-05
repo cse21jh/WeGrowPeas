@@ -66,6 +66,15 @@ public class CodexUIController : MonoBehaviour
     public bool IsOpen => codexPanel != null && codexPanel.activeSelf;
 
     // 컨트롤러는 항상 켜진 루트에 있어야 함(패널만 토글). 그래야 닫힌 상태에서도 F8이 동작.
+    private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
+
+    private void RefreshLocalizedTexts()
+    {
+        if (IsOpen) SelectCategory((int)_cat);
+    }
+
     private void Update()
     {
         // F8은 디버그용 단축키(정식 진입은 버튼). 디버그 패널이 꺼져 있으면 동작하지 않는다.

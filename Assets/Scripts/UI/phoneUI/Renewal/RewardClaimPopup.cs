@@ -24,6 +24,7 @@ public class RewardClaimPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         var manager = RequestManager.Instance;
         if (manager != null)
         {
@@ -42,6 +43,7 @@ public class RewardClaimPopup : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         var manager = RequestManager.Instance;
         if (manager != null)
         {

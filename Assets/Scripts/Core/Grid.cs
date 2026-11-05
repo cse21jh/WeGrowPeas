@@ -129,6 +129,7 @@ public class Grid : MonoBehaviour
     protected float maxBreedTimer = 50.0f;
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
+    private int? shownBreedCount;
 
     protected bool hasCoolingShield = false; // 냉각 방패 보유 여부
     protected bool isCoolingShieldActivated = false; // 냉각 방패 활성화 여부 (1회 사용)
@@ -1447,9 +1448,20 @@ public class Grid : MonoBehaviour
 
     protected void UpdateBreedCountUI(int count)
     {
-        breedCountUI.text = Loc.T("game.common.times", ("count", count));
+        shownBreedCount = count;
+        ApplyBreedCountText();
         GameEvents.RaiseBreedCountChanged(count);
     }
+
+    private void ApplyBreedCountText()
+    {
+        if (shownBreedCount.HasValue)
+            breedCountUI.text = Loc.T("game.common.times", ("count", shownBreedCount.Value));
+    }
+
+    private void OnEnable() => Loc.LanguageChanged += ApplyBreedCountText;
+
+    private void OnDisable() => Loc.LanguageChanged -= ApplyBreedCountText;
 
     /// <summary>디버그 전용: 벌레(또는 확률에 따라 무당벌레) 1마리를 즉시 소환한다. 등장 스테이지 제한 무시.</summary>
     public void DebugSpawnBug()

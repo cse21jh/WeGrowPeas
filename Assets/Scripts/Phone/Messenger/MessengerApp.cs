@@ -113,6 +113,20 @@ public class MessengerApp : MonoBehaviour
     public bool IsMandatoryPopupOpen => mandatoryPopupOpen;
     public event Action<MandatoryMessageHandle> OnMandatoryAdvanceBlocked;
 
+    private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
+
+    // 대화방에 이미 그려진 말풍선은 대화방에 다시 들어올 때 새 언어로 만들어진다.
+    private void RefreshLocalizedTexts()
+    {
+        RefreshchatPartnerList();
+
+        if (currentChat == null) return;
+        if (chatRoomHeaderName != null) chatRoomHeaderName.text = currentChat.chatPartner.LocalizedName;
+        chatMessageList?.SetSender(currentChat.chatPartner.LocalizedName, currentChat.chatPartner.chatPartnerImage);
+    }
+
     private void Awake()
     {
         progress = new MessengerProgress();

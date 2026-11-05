@@ -18,6 +18,7 @@ public class RequestUI : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         if (RequestManager.Instance != null)
         {
             RequestManager.Instance.OnBoardUpdated += Refresh;
@@ -29,6 +30,7 @@ public class RequestUI : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         if (RequestManager.Instance != null)
         {
             RequestManager.Instance.OnBoardUpdated -= Refresh;

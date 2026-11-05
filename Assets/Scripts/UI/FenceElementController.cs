@@ -35,10 +35,40 @@ public class FenceElementController : MonoBehaviour
     [SerializeField] private Sprite[] dnaSprites;
     [SerializeField] private Image star;
 
+    private bool nameIsPeanut;
+    private int nameIndex = -1;
 
-    private string PeaName(int index) => Loc.Or($"game.fence.pea{index}", peaNames[index]);
+    private void ShowPeaName(int index)
+    {
+        nameIsPeanut = false;
+        nameIndex = index;
+        RefreshName();
+    }
 
-    private string PeanutName(int index) => Loc.Or($"game.fence.peanut{index}", peanutNames[index]);
+    private void ShowPeanutName(int index)
+    {
+        nameIsPeanut = true;
+        nameIndex = index;
+        RefreshName();
+    }
+
+    private void RefreshName()
+    {
+        if (nameIndex < 0) return;
+
+        elementName.text = nameIsPeanut
+            ? Loc.Or($"game.fence.peanut{nameIndex}", peanutNames[nameIndex])
+            : Loc.Or($"game.fence.pea{nameIndex}", peaNames[nameIndex]);
+    }
+
+    private void OnEnable()
+    {
+        Loc.LanguageChanged += RefreshName;
+        RefreshName();
+    }
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshName;
+
     private void Start()
     {
         star.gameObject.SetActive(false);
@@ -146,7 +176,7 @@ public class FenceElementController : MonoBehaviour
             {
                 case TraitType.NaturalDeath:
                     peas[1].SetActive(true);
-                    elementName.text = PeaName(1);
+                    ShowPeaName(1);
                     if (currentWaveType == WaveType.Aging)
                     {
                         isWaveResistance = true;
@@ -154,7 +184,7 @@ public class FenceElementController : MonoBehaviour
                     break;
                 case TraitType.Wind:
                     peas[2].SetActive(true);
-                    elementName.text = PeaName(2);
+                    ShowPeaName(2);
                     if (currentWaveType == WaveType.Wind)
                     {
                         isWaveResistance = true;
@@ -162,7 +192,7 @@ public class FenceElementController : MonoBehaviour
                     break;
                 case TraitType.Flood:
                     peas[3].SetActive(true);
-                    elementName.text = PeaName(3);
+                    ShowPeaName(3);
                     if (currentWaveType == WaveType.Flood)
                     {
                         isWaveResistance = true;
@@ -170,7 +200,7 @@ public class FenceElementController : MonoBehaviour
                     break;
                 case TraitType.Pest:
                     peas[4].SetActive(true);
-                    elementName.text = PeaName(4);
+                    ShowPeaName(4);
                     if (currentWaveType == WaveType.Pest)
                     {
                         isWaveResistance = true;
@@ -183,7 +213,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 0개
                         // heat
                         peas[8].SetActive(true);
-                        elementName.text = PeaName(8);
+                        ShowPeaName(8);
                         if (currentWaveType == WaveType.Heat)
                         {
                             isWaveResistance = true;
@@ -194,7 +224,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 1개
                         // 반반
                         peas[10].SetActive(true);
-                        elementName.text = PeaName(10);
+                        ShowPeaName(10);
                         if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
                         {
                             isWaveResistance = true;
@@ -205,7 +235,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 2개
                         // cold
                         peas[5].SetActive(true);
-                        elementName.text = PeaName(5);
+                        ShowPeaName(5);
                         if (currentWaveType == WaveType.Cold)
                         {
                             isWaveResistance = true;
@@ -219,7 +249,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 0개
                         // drought
                         peas[7].SetActive(true);
-                        elementName.text = PeaName(7);
+                        ShowPeaName(7);
                         if (currentWaveType == WaveType.Drought)
                         {
                             isWaveResistance = true;
@@ -230,7 +260,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 1개
                         // 반반
                         peas[9].SetActive(true);
-                        elementName.text = PeaName(9);
+                        ShowPeaName(9);
                         if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.HeavyRain)
                         {
                             isWaveResistance = true;
@@ -241,7 +271,7 @@ public class FenceElementController : MonoBehaviour
                         // 유전자 2개
                         // heavyRain
                         peas[6].SetActive(true);
-                        elementName.text = PeaName(6);
+                        ShowPeaName(6);
                         if (currentWaveType == WaveType.HeavyRain)
                         {
                             isWaveResistance = true;
@@ -255,7 +285,7 @@ public class FenceElementController : MonoBehaviour
                 /*
             case TraitType.Drought:
                 peas[7].SetActive(true);
-                elementName.text = PeaName(7);
+                ShowPeaName(7);
                 if (currentWaveType == WaveType.Drought)
                 {
                     isWaveResistance = true;
@@ -263,7 +293,7 @@ public class FenceElementController : MonoBehaviour
                 break;
             case TraitType.Heat:
                 peas[8].SetActive(true);
-                elementName.text = PeaName(8);
+                ShowPeaName(8);
                 if (currentWaveType == WaveType.Heat)
                 {
                     isWaveResistance = true;
@@ -271,7 +301,7 @@ public class FenceElementController : MonoBehaviour
                 break;
             case TraitType.FD:
                 peas[9].SetActive(true);
-                elementName.text = PeaName(9);
+                ShowPeaName(9);
                 if (currentWaveType == WaveType.Drought || currentWaveType == WaveType.Flood)
                 {
                     isWaveResistance = true;
@@ -279,7 +309,7 @@ public class FenceElementController : MonoBehaviour
                 break;
             case TraitType.CH:
                 peas[10].SetActive(true);
-                elementName.text = PeaName(10);
+                ShowPeaName(10);
                 if (currentWaveType == WaveType.Cold || currentWaveType == WaveType.Heat)
                 {
                     isWaveResistance = true;
@@ -288,7 +318,7 @@ public class FenceElementController : MonoBehaviour
                 */
                 default:
                     peas[0].SetActive(true); // 기본 완두콩
-                    elementName.text = PeaName(0);
+                    ShowPeaName(0);
                     isWaveResistance = false; // 현재 표시 중인 완두콩이 웨이브 저항이 없다면(기본 완두콩이라면) false로 설정
                     break;
             }
@@ -299,31 +329,31 @@ public class FenceElementController : MonoBehaviour
             {
                 case TraitType.NaturalDeath:
                     peanuts[1].SetActive(true);
-                    elementName.text = PeanutName(1);
+                    ShowPeanutName(1);
                     break;
                 case TraitType.Wind:
                     peanuts[2].SetActive(true);
-                    elementName.text = PeanutName(2);
+                    ShowPeanutName(2);
                     break;
                 case TraitType.Flood:
                     peanuts[3].SetActive(true);
-                    elementName.text = PeanutName(3);
+                    ShowPeanutName(3);
                     break;
                 case TraitType.Pest:
                     peanuts[4].SetActive(true);
-                    elementName.text = PeanutName(4);
+                    ShowPeanutName(4);
                     break;
                 case TraitType.Cold:
                     peanuts[5].SetActive(true);
-                    elementName.text = PeanutName(5);
+                    ShowPeanutName(5);
                     break;
                 case TraitType.HeavyRain:
                     peanuts[6].SetActive(true);
-                    elementName.text = PeanutName(6);
+                    ShowPeanutName(6);
                     break;
                 default:
                     peanuts[0].SetActive(true); // 기본 땅콩
-                    elementName.text = PeanutName(0);
+                    ShowPeanutName(0);
                     isWaveResistance = false; // 현재 표시 중인 땅콩이 웨이브 저항이 없다면(기본 땅콩이라면) false로 설정
                     break;
             }

@@ -40,6 +40,7 @@ public class TaxWidget : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         // 골드가 바뀌면 납부 가능 비율이, 날이 바뀌면 기한(D-n)이 달라진다.
         // OnQuestDayPassed는 stage가 오르기 전에 와서 D-day가 하루 밀리므로 OnDayStarted를 쓴다.
         GameEvents.OnGoldChanged += OnGoldChanged;
@@ -51,6 +52,7 @@ public class TaxWidget : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         GameEvents.OnGoldChanged -= OnGoldChanged;
         GameEvents.OnDayStarted -= Refresh;
         PhoneManager.OnAppAlarmChanged -= OnAppAlarmChanged;

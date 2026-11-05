@@ -106,6 +106,16 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private TimerUI phoneTimerUI;
     [SerializeField] TextMeshProUGUI phoneTimerText;
     [SerializeField] public bool isTutorial = false;
+    private string phasePhoneText;
+
+    private void OnEnable() => Loc.LanguageChanged += RefreshPhonePhaseText;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshPhonePhaseText;
+
+    private void RefreshPhonePhaseText()
+    {
+        if (phoneTimerText != null && phoneTimerText.text == phasePhoneText) ShowPhonePhaseText();
+    }
 
     private void Awake()
     {
@@ -395,7 +405,10 @@ public class PhoneManager : Singleton<PhoneManager>
     public void ShowPhonePhaseText()
     {
         if (phoneTimerText != null)
-            phoneTimerText.text = Loc.T("game.phone.before_sleep");
+        {
+            phasePhoneText = Loc.T("game.phone.before_sleep");
+            phoneTimerText.text = phasePhoneText;
+        }
     }
 
     // 세금 압류 유예 타이머(GameManager.TaxCollectionRoutine에서 사용)

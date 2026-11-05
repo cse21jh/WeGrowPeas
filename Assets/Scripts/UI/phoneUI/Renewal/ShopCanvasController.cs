@@ -86,6 +86,8 @@ public class ShopCanvasController : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += RefreshLocalizedTexts;
+
         // 목록 캐시는 일부러 버리지 않는다.
         // 여기서 InvalidateInventory를 부르면 GenerateInventory가 목록을 처음부터 다시 만드는데,
         // 그 과정엔 이번 상점의 구매 이력(session)이 반영되지 않아 이미 산 품목이 되살아난다.
@@ -94,6 +96,24 @@ public class ShopCanvasController : MonoBehaviour
         UpdateRerollButton();
     }
 
+
+    private void OnDisable()
+    {
+        Loc.LanguageChanged -= RefreshLocalizedTexts;
+    }
+
+    // 목록과 열려 있는 상세 패널을 새 언어로 다시 채운다.
+    private void RefreshLocalizedTexts()
+    {
+        ItemData selected = descriptionLayer.gameObject.activeSelf && selectedSlot != null ? selectedSlot.Data : null;
+
+        RefreshCurrentTab();
+        UpdateRerollButton();
+
+        if (selected == null) return;
+        ItemController slot = slots.Find(s => s != null && s.Data == selected);
+        if (slot != null) OnClickItem(slot);
+    }
 
     /// <summary>
     /// 로테이션 아이템들을 리롤한다. 무료 횟수가 있으면 무료, 없으면 골드를 소모한다.

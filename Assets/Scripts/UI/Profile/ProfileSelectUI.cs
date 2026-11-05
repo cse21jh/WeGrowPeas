@@ -44,11 +44,13 @@ public class ProfileSelectUI : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         SaveManager.OnProfileChanged += Refresh;
     }
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         SaveManager.OnProfileChanged -= Refresh;
         if (openInstance == this) openInstance = null;
     }

@@ -48,6 +48,7 @@ public class WeatherPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         // 열려 있는 동안 웨이브가 넘어가면 목록도 바로 따라간다.
         // (하루 경과 알림은 폰이 닫힌 뒤에 오므로 웨이브 확정 시점을 듣는다)
         GameEvents.OnWaveScheduleChanged += Refresh;
@@ -61,6 +62,7 @@ public class WeatherPopup : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         GameEvents.OnWaveScheduleChanged -= Refresh;
         GameEvents.OnDayStarted -= Refresh;
     }

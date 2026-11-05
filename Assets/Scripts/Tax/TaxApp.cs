@@ -15,12 +15,14 @@ public class TaxApp : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         GameEvents.OnGoldChanged += OnGoldChanged;
         Refresh();
     }
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         GameEvents.OnGoldChanged -= OnGoldChanged;
     }
 

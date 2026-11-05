@@ -56,6 +56,18 @@ public class DawnUIController : MonoBehaviour
         }
     }
 
+    private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
+
+    private void RefreshLocalizedTexts()
+    {
+        if (dawnPanel == null || !dawnPanel.activeSelf) return;
+
+        BuildStageList();
+        if (selectedStage >= 0) SelectStage(selectedStage);
+    }
+
     public void OpenDawnPanel()
     {
         if (dawnPanel != null) dawnPanel.SetActive(true);

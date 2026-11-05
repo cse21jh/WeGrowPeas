@@ -45,11 +45,13 @@ public class RequestManager : Singleton<RequestManager>
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += UpdateRequestAppTitle;
         GameEvents.OnQuestDayPassed += HandleDayPassed;
     }
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= UpdateRequestAppTitle;
         GameEvents.OnQuestDayPassed -= HandleDayPassed;
         ClearActive();
     }
@@ -262,7 +264,7 @@ public class RequestManager : Singleton<RequestManager>
 
     public void UpdateRequestAppTitle()
     {
-        if (cycleEndRound < 0) return;
+        if (cycleEndRound < 0 || appTitle == null) return;
 
         appTitle.text = Loc.T("game.quest.weekly_title", ("days", cycle - dayPassed));
     }

@@ -48,6 +48,7 @@ public class WeatherWidget : MonoBehaviour
 
     private void OnEnable()
     {
+        Loc.LanguageChanged += Refresh;
         // 웨이브가 새로 정해지는 순간(SetNextWave)에 맞춰 갱신한다.
         // OnQuestDayPassed는 폰이 닫힌 뒤에 와서 위젯이 열려 있는 동안 반영되지 않는다.
         GameEvents.OnWaveScheduleChanged += OnWaveScheduleChanged;
@@ -60,6 +61,7 @@ public class WeatherWidget : MonoBehaviour
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= Refresh;
         GameEvents.OnWaveScheduleChanged -= OnWaveScheduleChanged;
         GameEvents.OnDayStarted -= Refresh;
         PhoneManager.OnAppAlarmChanged -= OnAppAlarmChanged;
