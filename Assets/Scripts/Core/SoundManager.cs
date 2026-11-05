@@ -79,7 +79,7 @@ public class SoundManager : Singleton<SoundManager>
         EffectSoundDictionary.Add("IntroScene", Resources.Load<AudioClip>("Audio/BGM/IntroSceneBGM"));
 
 
-        if (SceneManager.GetActiveScene().name == "StartScene")
+        if (SceneManager.GetActiveScene().name == SceneLoader.StartSceneName)
             PlayBgm("StartScene");
     }
 

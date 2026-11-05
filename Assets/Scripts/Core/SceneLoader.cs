@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    /// <summary>시작 화면 씬 이름. 빌드 목록의 첫 씬과 같아야 한다.</summary>
+    public const string StartSceneName = "StartScene 3";
+
     public static SceneLoader Instance;
 
     // Start is called before the first frame update
@@ -48,7 +51,7 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadStartScene()
     {
-        StartCoroutine(LoadSceneRoutine("StartScene", useLoadingScreen: true, bgm: "StartScene"));
+        StartCoroutine(LoadSceneRoutine(StartSceneName, useLoadingScreen: true, bgm: "StartScene"));
     }
 
     public void LoadIntroScene()

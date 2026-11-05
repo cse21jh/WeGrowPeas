@@ -23,7 +23,7 @@ public class IntroCutsceneManager : MonoBehaviour
     [SerializeField] private float emptyTextAutoAdvanceDelay = 1f;
 
     [Header("Completion")]
-    [SerializeField] private string nextSceneName = "StartScene";
+    [SerializeField] private string nextSceneName = SceneLoader.StartSceneName;
 
     private int _index;
     private bool _isTyping;

@@ -13241,6 +13241,7 @@ GameObject:
   - component: {fileID: 146872442}
   - component: {fileID: 146872444}
   - component: {fileID: 146872443}
+  - component: {fileID: 146872445}
   m_Layer: 5
   m_Name: desc
   m_TagString: Untagged
@@ -13373,6 +13374,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 146872441}
   m_CullTransparentMesh: 1
+--- !u!114 &146872445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 146872441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0081
+  sourceText: "\uCD95\uD558\uD569\uB2C8\uB2E4!\n\uD669\uAE08 \uC644\uB450\uCF69\uC744
+    \uB9CC\uB4E4\uC5B4\uB0C8\uC2B5\uB2C8\uB2E4.\n\n\uD669\uAE08 \uC644\uB450\uCF69\uC740
+    \uBAA8\uB4E0 \uD615\uC9C8\uC774 \uC644\uBCBD\uD55C \uC644\uB450\uCF69\uC744 \uB73B\uD569\uB2C8\uB2E4.\n\uD558\uC9C0\uB9CC
+    \uC6E8\uC774\uBE0C\uB97C \uBC84\uD2F0\uB2E4 \uBCF4\uBA74 \uBA74\uC5ED\uB825\uC774
+    \uC870\uAE08\uC529 \uB5A8\uC5B4\uC838 \uB098\uAC00 \uD669\uAE08\uC0C9\uC774 \uBC97\uACA8\uC9C8
+    \uC218\uB3C4 \uC788\uC2B5\uB2C8\uB2E4...!\n\n\uB9C8\uC9C0\uB9C9\uAE4C\uC9C0 \uD669\uAE08
+    \uC644\uB450\uCF69\uC744 \uC9C0\uCF1C\uB0B4\uBCF4\uC138\uC694."
 --- !u!1 &150351696
 GameObject:
   m_ObjectHideFlags: 0
@@ -19697,6 +19718,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -44336,6 +44358,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 7}
   placementMode: 1
@@ -50142,6 +50165,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -51617,6 +51641,7 @@ GameObject:
   - component: {fileID: 595459665}
   - component: {fileID: 595459667}
   - component: {fileID: 595459666}
+  - component: {fileID: 595459668}
   m_Layer: 5
   m_Name: Txt_StageTitle
   m_TagString: Untagged
@@ -51743,6 +51768,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 595459664}
   m_CullTransparentMesh: 1
+--- !u!114 &595459668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595459664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0002
+  sourceText: "\uC2A4\uD14C\uC774\uC9C0"
 --- !u!1 &598517445
 GameObject:
   m_ObjectHideFlags: 0
@@ -52595,6 +52634,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -53561,6 +53601,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -80445,6 +80486,7 @@ GameObject:
   - component: {fileID: 930698048}
   - component: {fileID: 930698050}
   - component: {fileID: 930698049}
+  - component: {fileID: 930698051}
   m_Layer: 5
   m_Name: text
   m_TagString: Untagged
@@ -80571,6 +80613,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 930698047}
   m_CullTransparentMesh: 1
+--- !u!114 &930698051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930698047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0082
+  sourceText: "\uD669\uAE08 \uC644\uB450\uCF69.png"
 --- !u!1001 &933268868
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94182,6 +94238,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -109986,6 +110043,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -110705,6 +110763,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -121236,6 +121295,7 @@ GameObject:
   - component: {fileID: 1474702724}
   - component: {fileID: 1474702726}
   - component: {fileID: 1474702725}
+  - component: {fileID: 1474702727}
   m_Layer: 5
   m_Name: text
   m_TagString: Untagged
@@ -121362,6 +121422,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1474702723}
   m_CullTransparentMesh: 1
+--- !u!114 &1474702727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474702723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0082
+  sourceText: "\uD669\uAE08 \uC644\uB450\uCF69.png"
 --- !u!1 &1476123922
 GameObject:
   m_ObjectHideFlags: 0
@@ -125088,6 +125162,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -125971,6 +126046,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -126674,6 +126750,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 10}
   placementMode: 1
@@ -128325,6 +128402,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -128766,6 +128844,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 10}
   placementMode: 1
@@ -130959,6 +131038,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -137168,6 +137248,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -143317,6 +143398,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -149990,6 +150072,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 7}
   placementMode: 1

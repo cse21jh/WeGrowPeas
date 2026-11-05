@@ -22,7 +22,7 @@ using UnityEngine.UI;
 /// </summary>
 public static class ProfileSelectUIBuilder
 {
-    private const string StartScenePath = "Assets/Scenes/StartScene.unity";
+    private const string StartScenePath = "Assets/Scenes/StartScene 3.unity";
     private const string FolderPath = "Assets/Resources/Prefabs/Profile";
     private const string PrefabPath = FolderPath + "/ProfileSelectRoot.prefab";
     private const string MarkerSpritePath = FolderPath + "/ProfileCurrentMarker.png";

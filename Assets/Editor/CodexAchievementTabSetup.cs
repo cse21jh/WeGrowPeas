@@ -21,7 +21,7 @@ using UnityEngine.UI;
 /// </summary>
 public static class CodexAchievementTabSetup
 {
-    private const string StartScenePath = "Assets/Scenes/StartScene.unity";
+    private const string StartScenePath = "Assets/Scenes/StartScene 3.unity";
     private const string StartScene3Path = "Assets/Scenes/StartScene 3.unity";
     private const string ButtonName = "Btn_업적";
     private const string ButtonLabel = "업적";

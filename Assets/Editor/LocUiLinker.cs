@@ -6,10 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 프리팹의 고정 한글 텍스트에 <see cref="LocalizedText"/>를 붙이고 문구를 ui.csv에 추가한다.
+/// 프리팹과 씬의 고정 한글 텍스트에 <see cref="LocalizedText"/>를 붙이고 문구를 ui.csv에 추가한다.
 /// 같은 문구는 같은 키를 쓴다. 이미 연결된 텍스트는 건너뛰므로 다시 실행해도 된다.
 ///
 /// 코드 필드가 참조하는 텍스트는 코드가 채우는 값이므로 대상에서 뺀다.
@@ -20,10 +22,8 @@ public static class LocUiLinker
     private const string TablePath = "Assets/Resources/Localization/ui.csv";
     private const string Table = "ui";
 
-    // 씬은 다루지 않는다. 시작 씬은 프리팹 수집의 출발점으로만 쓴다.
     private static readonly string[] Scenes =
     {
-        "Assets/Scenes/StartScene.unity",
         "Assets/Scenes/StartScene 3.unity",
         "Assets/Scenes/GameOverScene.unity",
         "Assets/Scenes/Garden_GrassUpdate.unity",
@@ -66,6 +66,7 @@ public static class LocUiLinker
         public readonly List<Item> Skipped = new List<Item>();
         public readonly List<LocIssue> Issues = new List<LocIssue>();
         public int PrefabsChanged;
+        public int ScenesChanged;
         public int RowsAdded;
     }
 
@@ -77,12 +78,14 @@ public static class LocUiLinker
         var keys = ReadKeys(existing);
         var entries = new List<LocEntry>();
 
+        if (apply && !CanModifyScenes(report)) return report;
+
         foreach (string path in CollectPrefabs())
         {
             var root = PrefabUtility.LoadPrefabContents(path);
             try
             {
-                bool changed = Process(path, root, keys, entries, report, apply);
+                bool changed = Process(path, new[] { root }, keys, entries, report, apply);
                 if (apply && changed)
                 {
                     PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -94,6 +97,9 @@ public static class LocUiLinker
                 PrefabUtility.UnloadPrefabContents(root);
             }
         }
+
+        foreach (string path in Scenes.Where(File.Exists))
+            ProcessScene(path, keys, entries, report, apply);
 
         if (apply && entries.Count > 0)
         {
@@ -123,13 +129,50 @@ public static class LocUiLinker
             .OrderBy(p => p, StringComparer.Ordinal);
     }
 
-    private static bool Process(string path, GameObject root, Dictionary<string, string> keys,
+    private static bool CanModifyScenes(Report report)
+    {
+        if (!Application.isPlaying) return true;
+
+        report.Issues.Add(new LocIssue { Level = LocIssueLevel.Error, Table = Table, Message = "플레이 중에는 실행할 수 없습니다." });
+        return false;
+    }
+
+    private static void ProcessScene(string path, Dictionary<string, string> keys, List<LocEntry> entries, Report report, bool apply)
+    {
+        var scene = SceneManager.GetSceneByPath(path);
+
+        // 저장하면 사용자의 저장 안 된 작업까지 함께 저장되므로 건너뛴다.
+        if (scene.isLoaded && scene.isDirty)
+        {
+            report.Issues.Add(new LocIssue { Level = LocIssueLevel.Warning, Table = Table, Message = $"저장하지 않은 씬이라 건너뜁니다: {path}" });
+            return;
+        }
+
+        bool opened = !scene.isLoaded;
+        if (opened) scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+
+        try
+        {
+            if (Process(path, scene.GetRootGameObjects(), keys, entries, report, apply))
+            {
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+                report.ScenesChanged++;
+            }
+        }
+        finally
+        {
+            if (opened) EditorSceneManager.CloseScene(scene, true);
+        }
+    }
+
+    private static bool Process(string path, GameObject[] roots, Dictionary<string, string> keys,
         List<LocEntry> entries, Report report, bool apply)
     {
-        var referenced = FindReferencedTexts(root);
+        var referenced = FindReferencedTexts(roots);
         bool changed = false;
 
-        foreach (var text in root.GetComponentsInChildren<TMP_Text>(true))
+        foreach (var text in roots.SelectMany(r => r.GetComponentsInChildren<TMP_Text>(true)))
         {
             string value = text.text;
             if (string.IsNullOrEmpty(value) || !Hangul.IsMatch(value)) continue;
@@ -142,7 +185,7 @@ public static class LocUiLinker
             var item = new Item
             {
                 Prefab = Path.GetFileName(path),
-                Path = HierarchyPath(text.transform, root.transform),
+                Path = HierarchyPath(text.transform),
                 Text = value,
                 ReferencedByCode = referenced.Contains(text),
             };
@@ -171,11 +214,11 @@ public static class LocUiLinker
     }
 
     /// <summary>스크립트 필드가 가리키는 TMP 텍스트. 코드가 값을 넣는 대상이다.</summary>
-    private static HashSet<TMP_Text> FindReferencedTexts(GameObject root)
+    private static HashSet<TMP_Text> FindReferencedTexts(GameObject[] roots)
     {
         var result = new HashSet<TMP_Text>();
 
-        foreach (var behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
+        foreach (var behaviour in roots.SelectMany(r => r.GetComponentsInChildren<MonoBehaviour>(true)))
         {
             if (behaviour == null || behaviour is TMP_Text || behaviour is UnityEngine.UI.Selectable) continue;
             if (behaviour.GetType().Namespace?.StartsWith("UnityEngine") == true) continue;
@@ -200,10 +243,10 @@ public static class LocUiLinker
         return keys;
     }
 
-    private static string HierarchyPath(Transform transform, Transform root)
+    private static string HierarchyPath(Transform transform)
     {
         var names = new List<string>();
-        for (var t = transform; t != null && t != root; t = t.parent) names.Add(t.name);
+        for (var t = transform; t != null; t = t.parent) names.Add(t.name);
         names.Reverse();
         return string.Join("/", names);
     }

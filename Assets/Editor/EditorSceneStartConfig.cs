@@ -5,7 +5,7 @@ using UnityEngine;
 public class EditorSceneStartConfig
 {
     private const string MENU_PATH = "Tools/Always Start From StartScene";
-    private const string START_SCENE_PATH = "Assets/Scenes/StartScene.unity";
+    private const string START_SCENE_PATH = "Assets/Scenes/StartScene 3.unity";
 
     [MenuItem(MENU_PATH)]
     private static void ToggleStartScene()

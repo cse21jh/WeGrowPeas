@@ -1555,6 +1555,7 @@ GameObject:
   - component: {fileID: 36571767}
   - component: {fileID: 36571769}
   - component: {fileID: 36571768}
+  - component: {fileID: 36571770}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1682,6 +1683,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 36571766}
   m_CullTransparentMesh: 1
+--- !u!114 &36571770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36571766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0011
+  sourceText: "\uBA54\uC778\uBA54\uB274"
 --- !u!1 &36797648
 GameObject:
   m_ObjectHideFlags: 0
@@ -3191,6 +3206,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 7}
   placementMode: 1
@@ -9961,6 +9977,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -10328,6 +10345,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -11783,6 +11801,7 @@ GameObject:
   - component: {fileID: 165768188}
   - component: {fileID: 165768190}
   - component: {fileID: 165768189}
+  - component: {fileID: 165768191}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -11910,6 +11929,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 165768187}
   m_CullTransparentMesh: 1
+--- !u!114 &165768191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165768187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0011
+  sourceText: "\uBA54\uC778\uBA54\uB274"
 --- !u!1 &168584591
 GameObject:
   m_ObjectHideFlags: 0
@@ -12051,6 +12084,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -18697,6 +18731,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 531948699066747830, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 531948699066747830, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 531948699066747830, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 531948699066747830, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 604706118957384658, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -19073,6 +19123,22 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2889857581587717678, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889857581587717678, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889857581587717678, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2889857581587717678, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2946438960258210002, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -19083,6 +19149,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2946438960258210002, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3167345736019712342, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3236694943293469492, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
@@ -19170,6 +19240,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3973164554301078980, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009230564581739799, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009230564581739799, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009230564581739799, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009230564581739799, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -19318,6 +19404,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4674700774658128025, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4734526915103831621, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4734526915103831621, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4734526915103831621, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4734526915103831621, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -19889,6 +19991,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7308854351828373388, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7308854351828373388, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7308854351828373388, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7398470525370609044, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -19896,6 +20010,22 @@ PrefabInstance:
     - target: {fileID: 7398470525370609044, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -0.0008973734
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420460426929512018, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420460426929512018, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420460426929512018, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420460426929512018, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7447330740577086554, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchorMax.y
@@ -20089,6 +20219,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7987208076856249654, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7990321313492114445, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -20098,6 +20232,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7990321313492114445, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994536542578975427, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994536542578975427, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994536542578975427, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994536542578975427, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -21103,6 +21253,7 @@ GameObject:
   - component: {fileID: 249968222}
   - component: {fileID: 249968224}
   - component: {fileID: 249968223}
+  - component: {fileID: 249968225}
   m_Layer: 5
   m_Name: Txt_StageTitle
   m_TagString: Untagged
@@ -21229,6 +21380,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 249968221}
   m_CullTransparentMesh: 1
+--- !u!114 &249968225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249968221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0002
+  sourceText: "\uC2A4\uD14C\uC774\uC9C0"
 --- !u!1 &255424887
 GameObject:
   m_ObjectHideFlags: 0
@@ -24625,6 +24790,7 @@ GameObject:
   - component: {fileID: 339466656}
   - component: {fileID: 339466658}
   - component: {fileID: 339466657}
+  - component: {fileID: 339466659}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -24752,6 +24918,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339466655}
   m_CullTransparentMesh: 1
+--- !u!114 &339466659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339466655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0012
+  sourceText: "\uD6A8\uACFC\uC74C \uBCFC\uB968"
 --- !u!1 &342611646
 GameObject:
   m_ObjectHideFlags: 0
@@ -26646,6 +26826,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -27031,6 +27212,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -27789,6 +27971,7 @@ GameObject:
   - component: {fileID: 447376186}
   - component: {fileID: 447376188}
   - component: {fileID: 447376187}
+  - component: {fileID: 447376189}
   m_Layer: 5
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
@@ -27915,6 +28098,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 447376185}
   m_CullTransparentMesh: 1
+--- !u!114 &447376189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447376185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0004
+  sourceText: "\uAD50\uBC30\nSpace"
 --- !u!1 &447724676
 GameObject:
   m_ObjectHideFlags: 0
@@ -28990,6 +29187,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 10}
   placementMode: 1
@@ -31610,6 +31808,7 @@ GameObject:
   - component: {fileID: 553848547}
   - component: {fileID: 553848549}
   - component: {fileID: 553848548}
+  - component: {fileID: 553848550}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -31736,6 +31935,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 553848546}
   m_CullTransparentMesh: 1
+--- !u!114 &553848550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553848546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0006
+  sourceText: "\uC2A4\uD0B5\nS"
 --- !u!1 &554059830
 GameObject:
   m_ObjectHideFlags: 0
@@ -57577,6 +57790,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 7}
   placementMode: 1
@@ -67092,6 +67306,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 10}
   placementMode: 1
@@ -68206,6 +68421,7 @@ GameObject:
   - component: {fileID: 961493039}
   - component: {fileID: 961493041}
   - component: {fileID: 961493040}
+  - component: {fileID: 961493042}
   m_Layer: 5
   m_Name: SkipText
   m_TagString: Untagged
@@ -68332,6 +68548,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961493038}
   m_CullTransparentMesh: 1
+--- !u!114 &961493042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961493038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0083
+  sourceText: "\uD29C\uD1A0\uB9AC\uC5BC\uC744 \uC2A4\uD0B5\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -69207,6 +69437,7 @@ GameObject:
   - component: {fileID: 987247624}
   - component: {fileID: 987247626}
   - component: {fileID: 987247625}
+  - component: {fileID: 987247627}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -69333,6 +69564,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 987247623}
   m_CullTransparentMesh: 1
+--- !u!114 &987247627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987247623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0007
+  sourceText: "\uC774\uD399\uD2B8 \uC2A4\uD0B5\nS"
 --- !u!1 &988820930
 GameObject:
   m_ObjectHideFlags: 0
@@ -71265,6 +71510,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: e17c6353d0a2ce242b11ac785489ad2e, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -79528,6 +79774,7 @@ GameObject:
   - component: {fileID: 1126421774}
   - component: {fileID: 1126421776}
   - component: {fileID: 1126421775}
+  - component: {fileID: 1126421777}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -79654,6 +79901,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126421773}
   m_CullTransparentMesh: 1
+--- !u!114 &1126421777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126421773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0086
+  sourceText: "\uBA54\uC778 \uBA54\uB274"
 --- !u!1 &1129427486
 GameObject:
   m_ObjectHideFlags: 0
@@ -86387,6 +86648,7 @@ GameObject:
   - component: {fileID: 1221775772}
   - component: {fileID: 1221775774}
   - component: {fileID: 1221775773}
+  - component: {fileID: 1221775775}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -86513,6 +86775,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1221775771}
   m_CullTransparentMesh: 1
+--- !u!114 &1221775775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221775771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0005
+  sourceText: "\uC124\uC815\nESC"
 --- !u!1 &1222931455
 GameObject:
   m_ObjectHideFlags: 0
@@ -93279,6 +93555,7 @@ MonoBehaviour:
   textureVariantCount: 3
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: f0ade5b620278ab43bfee7168040e95a, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 0.4
   areaSize: {x: 45, y: 5}
   placementMode: 1
@@ -98557,6 +98834,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -98690,6 +98968,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -99647,6 +99926,7 @@ GameObject:
   - component: {fileID: 1348812233}
   - component: {fileID: 1348812235}
   - component: {fileID: 1348812234}
+  - component: {fileID: 1348812236}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -99774,6 +100054,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1348812232}
   m_CullTransparentMesh: 1
+--- !u!114 &1348812236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1348812232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0013
+  sourceText: "\uBC30\uACBD\uC74C\uC545 \uBCFC\uB968"
 --- !u!1 &1349760265
 GameObject:
   m_ObjectHideFlags: 0
@@ -99861,6 +100155,7 @@ GameObject:
   - component: {fileID: 1354248426}
   - component: {fileID: 1354248428}
   - component: {fileID: 1354248427}
+  - component: {fileID: 1354248429}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -99988,6 +100283,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1354248425}
   m_CullTransparentMesh: 1
+--- !u!114 &1354248429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354248425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0012
+  sourceText: "\uD6A8\uACFC\uC74C \uBCFC\uB968"
 --- !u!1 &1355799483
 GameObject:
   m_ObjectHideFlags: 0
@@ -115893,6 +116202,7 @@ GameObject:
   - component: {fileID: 1603399073}
   - component: {fileID: 1603399075}
   - component: {fileID: 1603399074}
+  - component: {fileID: 1603399076}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -116019,6 +116329,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603399072}
   m_CullTransparentMesh: 1
+--- !u!114 &1603399076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603399072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0008
+  sourceText: "\uD3F0 \uC2A4\uD0B5\nS"
 --- !u!1 &1606627692
 GameObject:
   m_ObjectHideFlags: 0
@@ -119911,6 +120235,7 @@ GameObject:
   - component: {fileID: 1745312285}
   - component: {fileID: 1745312287}
   - component: {fileID: 1745312286}
+  - component: {fileID: 1745312288}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -120037,6 +120362,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1745312284}
   m_CullTransparentMesh: 1
+--- !u!114 &1745312288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745312284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0085
+  sourceText: "\u25B6 \uC644\uB450\uCF69 \uD0A4\uC6B0\uB7EC \uAC08\uB798!"
 --- !u!1 &1748000412
 GameObject:
   m_ObjectHideFlags: 0
@@ -125594,6 +125933,7 @@ GameObject:
   - component: {fileID: 1793390688}
   - component: {fileID: 1793390690}
   - component: {fileID: 1793390689}
+  - component: {fileID: 1793390691}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -125721,6 +126061,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1793390687}
   m_CullTransparentMesh: 1
+--- !u!114 &1793390691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793390687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0013
+  sourceText: "\uBC30\uACBD\uC74C\uC545 \uBCFC\uB968"
 --- !u!1 &1797212649
 GameObject:
   m_ObjectHideFlags: 0
@@ -126439,6 +126793,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -126907,6 +127262,7 @@ GameObject:
   - component: {fileID: 1844304653}
   - component: {fileID: 1844304655}
   - component: {fileID: 1844304654}
+  - component: {fileID: 1844304656}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -127033,6 +127389,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1844304652}
   m_CullTransparentMesh: 1
+--- !u!114 &1844304656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844304652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0003
+  sourceText: "\uC0BD A"
 --- !u!1 &1845706963
 GameObject:
   m_ObjectHideFlags: 0
@@ -128459,6 +128829,7 @@ GameObject:
   - component: {fileID: 1886666204}
   - component: {fileID: 1886666206}
   - component: {fileID: 1886666205}
+  - component: {fileID: 1886666207}
   m_Layer: 5
   m_Name: EndText
   m_TagString: Untagged
@@ -128585,6 +128956,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886666203}
   m_CullTransparentMesh: 1
+--- !u!114 &1886666207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886666203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0084
+  sourceText: "\uD29C\uD1A0\uB9AC\uC5BC\uC774 \uC885\uB8CC\uB429\uB2C8\uB2E4."
 --- !u!1 &1887304952
 GameObject:
   m_ObjectHideFlags: 0
@@ -128793,6 +129178,7 @@ GameObject:
   - component: {fileID: 1894737839}
   - component: {fileID: 1894737841}
   - component: {fileID: 1894737840}
+  - component: {fileID: 1894737842}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -128920,6 +129306,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1894737838}
   m_CullTransparentMesh: 1
+--- !u!114 &1894737842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894737838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0010
+  sourceText: "\uC124\uC815"
 --- !u!1 &1903293120
 GameObject:
   m_ObjectHideFlags: 0
@@ -140497,6 +140897,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -146544,6 +146945,7 @@ GameObject:
   - component: {fileID: 2014959730}
   - component: {fileID: 2014959732}
   - component: {fileID: 2014959731}
+  - component: {fileID: 2014959733}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -146670,6 +147072,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2014959729}
   m_CullTransparentMesh: 1
+--- !u!114 &2014959733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014959729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.t0007
+  sourceText: "\uC774\uD399\uD2B8 \uC2A4\uD0B5\nS"
 --- !u!1 &2015399143
 GameObject:
   m_ObjectHideFlags: 0
@@ -152135,6 +152551,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1
@@ -158238,6 +158655,7 @@ MonoBehaviour:
   textureVariantCount: 1
   atlasUvPadding: 0.001
   grassMaterial: {fileID: 2100000, guid: c0d279cbe01d4cd45b459495ba2e26f9, type: 2}
+  tintColor: {r: 1, g: 1, b: 1, a: 1}
   grassDensity: 4
   areaSize: {x: 40, y: 2}
   placementMode: 1

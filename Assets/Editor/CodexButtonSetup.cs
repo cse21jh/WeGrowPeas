@@ -22,7 +22,7 @@ using UnityEngine.UI;
 public static class CodexButtonSetup
 {
     private const string CanvasPrefabPath = "Assets/Resource/Prefabs/Canvas.prefab";
-    private const string StartScenePath = "Assets/Scenes/StartScene.unity";
+    private const string StartScenePath = "Assets/Scenes/StartScene 3.unity";
 
     private const string ButtonName = "CodexButton";
     private const string ButtonLabel = "도감";
