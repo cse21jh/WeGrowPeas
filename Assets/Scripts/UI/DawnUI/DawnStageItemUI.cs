@@ -84,7 +84,7 @@ public class DawnStageItemUI : MonoBehaviour
             if (isUnlocked)
             {
                 constraintDescriptionText.text = string.IsNullOrWhiteSpace(constraintDescription)
-                    ? "추가 제약 없음"
+                    ? Loc.T("game.dawn.no_constraint")
                     : constraintDescription;
             }
             else

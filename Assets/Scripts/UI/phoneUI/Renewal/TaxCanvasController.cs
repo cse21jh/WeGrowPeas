@@ -58,17 +58,17 @@ public class TaxCanvasController : MonoBehaviour
         bool isStage40 = tax.DueTaxStage == 40;
 
         // ── 마감 기한 ──
-        if (deadlineText != null) deadlineText.text = $"{tax.DueTaxStage}일차 밤";
+        if (deadlineText != null) deadlineText.text = Loc.T("game.tax.due_night", ("day", tax.DueTaxStage));
         if (leftDayText != null)
         {
             int left = tax.DaysLeft(stage);
-            leftDayText.text = left > 0 ? $"{left}일 남음"
-                             : left == 0 ? "오늘 마감"
-                             : "연체";
+            leftDayText.text = left > 0 ? Loc.T("game.tax.days_left", ("days", left))
+                             : left == 0 ? Loc.T("game.tax.due_today")
+                             : Loc.T("game.tax.overdue");
         }
 
         // ── 납부할 금액 / 진행도 ──
-        if (amountText != null) amountText.text = isStage40 ? "세금 X" : $"{due} G";
+        if (amountText != null) amountText.text = isStage40 ? Loc.T("game.tax.none") : $"{due} G";
 
         float progress = tax.PayProgress;
         if (amountSlider != null) amountSlider.value = progress; // 0~1 (Slider Min0/Max1 기준)
@@ -79,7 +79,7 @@ public class TaxCanvasController : MonoBehaviour
         if (nextAmountText != null) 
         {
             if (tax.DueTaxStage == 35)
-                nextAmountText.text = "세금 X";
+                nextAmountText.text = Loc.T("game.tax.none");
             else
                 nextAmountText.text = $"{tax.NextAmount} G";
         }
@@ -111,7 +111,7 @@ public class TaxCanvasController : MonoBehaviour
 
         if (currentGoldTexts != null)
             foreach (var t in currentGoldTexts)
-                if (t != null) t.text = $"현재 보유액 {gold:N0} G";
+                if (t != null) t.text = Loc.T("game.tax.current_gold", ("gold", gold.ToString("N0")));
     }
 
     /// <summary>납부 진행도(0~1)에 따라 표정 아이콘 교체. 0~25 / 25~50 / 50~75 / 75~100.</summary>
@@ -143,8 +143,8 @@ public class TaxCanvasController : MonoBehaviour
 
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
-                title = "국세청",
-                message = "세금 납부가 완료되었습니다.",
+                title = Loc.T("game.tax.office"),
+                message = Loc.T("game.tax.paid_message"),
                 duration = 3f
             });
 
@@ -154,8 +154,8 @@ public class TaxCanvasController : MonoBehaviour
         {
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
-                title = "국세청",
-                message = "골드가 부족합니다. 식물을 팔아 마련하세요.",
+                title = Loc.T("game.tax.office"),
+                message = Loc.T("game.tax.not_enough_gold"),
                 duration = 3.5f
             });
         }

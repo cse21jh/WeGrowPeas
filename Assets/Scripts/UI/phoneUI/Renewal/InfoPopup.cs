@@ -145,10 +145,10 @@ public class InfoPopup : MonoBehaviour
             }
             else
             {
-                string label = locked ? "잠김" : "빈 슬롯";
+                string label = locked ? Loc.T("game.common.locked") : Loc.T("game.ability.empty_slot");
                 view.Setup(null, label);
                 SetTooltip(row, label,
-                    locked ? "유전자를 모아 특성 칸을 열 수 있습니다." : "아직 특성을 고르지 않았습니다.", 0);
+                    locked ? Loc.T("game.ability.locked_hint") : Loc.T("game.ability.empty_hint"), 0);
             }
         }
     }

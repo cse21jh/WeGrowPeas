@@ -234,8 +234,8 @@ public class RequestManager : Singleton<RequestManager>
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "새 퀘스트 도착!",
-                        message = "퀘스트 앱에서 확인해 주세요.",
+                        title = Loc.T("game.quest.new_title"),
+                        message = Loc.T("game.quest.new_message"),
                         duration = 5f
                     }
                 );
@@ -264,7 +264,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         if (cycleEndRound < 0) return;
 
-        appTitle.text = "금주의 퀘스트 - " + (cycle - dayPassed) + "일 남음";
+        appTitle.text = Loc.T("game.quest.weekly_title", ("days", cycle - dayPassed));
     }
 
     public void AddCompleteRequestCount()

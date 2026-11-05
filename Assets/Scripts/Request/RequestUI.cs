@@ -138,8 +138,8 @@ public class RequestUI : MonoBehaviour
             PhoneNotificationBus.OnShow?.Invoke(
                 new PhoneNotificationData
                 {
-                    title = "알림",
-                    message = "아직 퀘스트가 완료되지 않았습니다.",
+                    title = Loc.T("game.common.notice"),
+                    message = Loc.T("game.quest.not_complete"),
                     duration = 2f
                 }
             );

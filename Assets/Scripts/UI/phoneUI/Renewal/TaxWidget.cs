@@ -77,16 +77,16 @@ public class TaxWidget : MonoBehaviour
         if (ddayText != null)
         {
             int left = tax.DaysLeft(stage);
-            ddayText.text = noTax ? "세금 납부 없음"
-                          : left > 0 ? $"세금 납부 기한 D - {left}"
-                          : left == 0 ? "세금 납부 기한 D - DAY"
-                          : "세금 연체";
+            ddayText.text = noTax ? Loc.T("game.tax.no_tax")
+                          : left > 0 ? Loc.T("game.tax.dday", ("days", left))
+                          : left == 0 ? Loc.T("game.tax.dday_today")
+                          : Loc.T("game.tax.widget_overdue");
         }
 
         float progress = noTax ? 0f : tax.PayProgress; // 0~1
 
         if (payableText != null)
-            payableText.text = $"현재 납부 가능 {Mathf.RoundToInt(progress * 100f)}%";
+            payableText.text = Loc.T("game.tax.payable", ("percent", Mathf.RoundToInt(progress * 100f)));
 
         // 슬라이더 min/max가 0~1이든 0~100이든 맞게 들어가도록 환산한다.
         if (progressSlider != null)

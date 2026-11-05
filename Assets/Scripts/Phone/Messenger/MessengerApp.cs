@@ -428,7 +428,7 @@ public class MessengerApp : MonoBehaviour
         if (arrived.Count == 0)
         {
             count = 0;
-            return "새로운 대화";
+            return Loc.T("game.phone.new_chat");
         }
 
         List<MessageReference> unread = arrived

@@ -32,7 +32,7 @@ public class DawnUnlockItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         if (controller != null)
         {
-            string suffix = info.isSpecial ? " (특수 아이템)" : " (상점 아이템)";
+            string suffix = info.isSpecial ? Loc.T("game.dawn.special_suffix") : Loc.T("game.dawn.shop_suffix");
             string nameLine = $"<size=120%>{info.displayName}</size>{suffix}";
             controller.ShowTooltip(nameLine, info.description, transform.position);
         }

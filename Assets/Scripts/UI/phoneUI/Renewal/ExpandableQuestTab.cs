@@ -139,7 +139,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
         }
 
         if (descriptionText != null)
-            descriptionText.text = request.GetDescriptionText() + "\n보상 : " + request.GetRewardText();
+            descriptionText.text = Loc.T("game.quest.detail", ("description", request.GetDescriptionText()), ("reward", request.GetRewardText()));
 
         if (canvasGroup == null)
         {
@@ -178,28 +178,28 @@ public sealed class ExpandableQuestTab : MonoBehaviour
             case RequestState.InProgress:
                 if (complete_panel != null) complete_panel.SetActive(false);
                 if (failed_panel != null) failed_panel.SetActive(false);
-                stateText.text = "진행 중";
+                stateText.text = Loc.T("game.quest.in_progress");
                 stateText.color = Color.black;
                 if (canvasGroup != null) canvasGroup.alpha = 1f;
                 break;
             case RequestState.Complete:
                 if (complete_panel != null) complete_panel.SetActive(false);
                 if (failed_panel != null) failed_panel.SetActive(false);
-                stateText.text = "보상 받기";
+                stateText.text = Loc.T("game.quest.claim");
                 stateText.color = Color.black;
                 if (canvasGroup != null) canvasGroup.alpha = 1f;
                 break;
             case RequestState.Granted:
                 if (complete_panel != null) complete_panel.SetActive(true);
                 if (failed_panel != null) failed_panel.SetActive(false);
-                stateText.text = "수령 완료";
+                stateText.text = Loc.T("game.quest.claimed");
                 stateText.color = Color.black;
                 if (canvasGroup != null) canvasGroup.alpha = 0.5f;
                 break;
             case RequestState.Fail:
                 if (complete_panel != null) complete_panel.SetActive(false);
                 if (failed_panel != null) failed_panel.SetActive(true);
-                stateText.text = "실패";
+                stateText.text = Loc.T("game.quest.failed");
                 stateText.color = Color.red;
                 if (canvasGroup != null) canvasGroup.alpha = 0.5f;
                 break;
@@ -222,8 +222,8 @@ public sealed class ExpandableQuestTab : MonoBehaviour
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "알림",
-                        message = "아직 퀘스트가 완료되지 않았습니다.",
+                        title = Loc.T("game.common.notice"),
+                        message = Loc.T("game.quest.not_complete"),
                         duration = 2f
                     }
                 );
@@ -415,7 +415,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
                 _animationSequence = null;
             });
 
-        descriptionBtn.text = expanded ? "닫기" : "상세 설명";
+        descriptionBtn.text = expanded ? Loc.T("game.common.close") : Loc.T("game.quest.details");
     }
 
     /// <summary>

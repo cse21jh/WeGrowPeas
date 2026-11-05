@@ -366,8 +366,8 @@ public class PhoneManager : Singleton<PhoneManager>
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "내일이 얼마 남지 않았습니다",
-                        message = "또 힘내봅시다.",
+                        title = Loc.T("game.phone.night_title"),
+                        message = Loc.T("game.phone.night_message"),
                         duration = 5f
                     });
             }
@@ -398,7 +398,7 @@ public class PhoneManager : Singleton<PhoneManager>
     public void ShowPhonePhaseText()
     {
         if (phoneTimerText != null)
-            phoneTimerText.text = "자기 전에\n핸드폰 봐야지...";
+            phoneTimerText.text = Loc.T("game.phone.before_sleep");
     }
 
     // 세금 압류 유예 타이머(GameManager.TaxCollectionRoutine에서 사용)

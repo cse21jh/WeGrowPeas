@@ -1942,7 +1942,7 @@ public sealed class EconomyFeedbackController : MonoBehaviour
 
     private static string FormatBreedCount(int value)
     {
-        return $"{Mathf.Max(0, value)}회";
+        return Loc.T("game.common.times", ("count", Mathf.Max(0, value)));
     }
 
     private sealed class CoinFx

@@ -33,7 +33,7 @@ public class TaxApp : MonoBehaviour
         if (tax == null) return;
 
         if (amountText != null) amountText.text = tax.DueAmount.ToString();
-        if (dueText != null) dueText.text = $"{tax.DueTaxStage}일차 마감";
+        if (dueText != null) dueText.text = Loc.T("game.tax.due_day", ("day", tax.DueTaxStage));
         if (payButton != null) payButton.interactable = tax.CanPayNow();
         if (statusText != null) statusText.text = "";
     }
@@ -46,7 +46,7 @@ public class TaxApp : MonoBehaviour
 
         if (tax.TryPay())
         {
-            if (statusText != null) statusText.text = "납부 완료!";
+            if (statusText != null) statusText.text = Loc.T("game.tax.paid");
             if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
 
             // 국세청 앱 red dot 해제
@@ -55,7 +55,7 @@ public class TaxApp : MonoBehaviour
         }
         else
         {
-            if (statusText != null) statusText.text = "골드가 부족합니다. 식물을 팔아 마련하세요.";
+            if (statusText != null) statusText.text = Loc.T("game.tax.not_enough_gold");
         }
 
         Refresh();

@@ -59,7 +59,7 @@ public abstract class RequestInstance
                     rewardStrings.Add(r.amount.ToString() + "G");
                     break;
                 case RewardType.Gene:
-                    rewardStrings.Add(r.amount.ToString() + "유전자");
+                    rewardStrings.Add(Loc.T("game.quest.reward_gene", ("amount", r.amount)));
                     break;
             }
         }
@@ -75,8 +75,8 @@ public abstract class RequestInstance
         PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData
                     {
-                        title = "완료된 퀘스트가 있습니다",
-                        message = "수령 버튼을 눌러 보상을 획득해 주세요.",
+                        title = Loc.T("game.quest.complete_title"),
+                        message = Loc.T("game.quest.complete_message"),
                         duration = 3f
                     }
                 );

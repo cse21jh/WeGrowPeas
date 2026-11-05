@@ -66,7 +66,7 @@ public class CurseTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
             if (daysLeft > 0)
             {
                 durationText.gameObject.SetActive(true);
-                durationText.text = $"{daysLeft}일";
+                durationText.text = Loc.T("game.curse.days", ("days", daysLeft));
             }
             else
             {

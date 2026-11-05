@@ -14,7 +14,7 @@ public class CodexListSlot : MonoBehaviour
     {
         // 잠김(해금 안 됨) → "잠김", 해금됐지만 미발견 → "???", 발견 → 이름
         if (label != null)
-            label.text = entry.locked ? "잠김" : (entry.discovered ? entry.displayName : "???");
+            label.text = entry.locked ? Loc.T("game.common.locked") : (entry.discovered ? entry.displayName : "???");
 
         if (icon != null)
         {

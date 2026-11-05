@@ -113,7 +113,7 @@ public class AbilityUIController : MonoBehaviour
         addPlantAbilityButton.GetComponent<Button>().onClick.RemoveAllListeners();
         addPlantAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            OpenUnlockUI(AbilityManager.Instance.GetPlantInfo(plant).LocalizedName + "의 특성 포인트 +1", AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
+            OpenUnlockUI(Loc.T("game.ability.plant_point", ("plant", AbilityManager.Instance.GetPlantInfo(plant).LocalizedName)), AbilityManager.Instance.PlantAbilityPoint[plant] * 300, () => TryAddPlantAbilityPoint(plant));            
         });
         UpdatePlantAbilityList(plant);
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint);
@@ -142,7 +142,7 @@ public class AbilityUIController : MonoBehaviour
     private void UpdateRemainPlantAbilityPoint(int point) // 특성 포인트 사용, 반환, 최대량 증가 시 remain에 적용 및 UI에 적용
     {
         remainPlantAbilityPoint = point;
-        plantAbilityPointText.text = "남은 포인트 : " + remainPlantAbilityPoint.ToString();
+        plantAbilityPointText.text = Loc.T("game.ability.points_left", ("count", remainPlantAbilityPoint));
         //UI에 적용 필요
     }
 
@@ -233,7 +233,7 @@ public class AbilityUIController : MonoBehaviour
 
         addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-            OpenUnlockUI("일반 특성 포인트 +1", AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
+            OpenUnlockUI(Loc.T("game.ability.general_point"), AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
         });
 
         remainGeneralAbilityPoint = abilityManager.GetGeneralAbilityPoint();
@@ -243,7 +243,7 @@ public class AbilityUIController : MonoBehaviour
     public void UpdateRemainGeneralAbilityPoint(int point)
     {
         remainGeneralAbilityPoint = point;
-        generalAbilityPointText.text = "남은 포인트 : " + remainGeneralAbilityPoint.ToString();
+        generalAbilityPointText.text = Loc.T("game.ability.points_left", ("count", remainGeneralAbilityPoint));
         //UI 업데이트 필요
     }
     public bool SelectGeneralAbility(GeneralAbilityData ability) // 특정 특성 레벨 + 1
@@ -354,7 +354,7 @@ public class AbilityUIController : MonoBehaviour
     public void OpenUnlockUI(string name, int price, Action unlockAction)
     {
         unlockUI.gameObject.SetActive(true);
-        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "\"" + name + "\" 해금에\n" + price.ToString() + "개의 유전자가 필요합니다.\n해금하시겠습니까?";
+        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = Loc.T("game.ability.unlock_confirm", ("name", name), ("price", price));
         Button b = unlockUI.transform.Find("ConfirmButton").GetComponent<Button>();
         b.onClick.RemoveAllListeners();
         b.onClick.AddListener(() =>
@@ -367,7 +367,7 @@ public class AbilityUIController : MonoBehaviour
     public void FailUnlcok()
     {
         SoundManager.Instance.PlayEffect("WrongSelect");
-        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "<color=#FF4F4F>유전자가 부족하거나 이미 최대치입니다</color>";
+        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = Loc.T("game.ability.cannot_unlock");
     }
 
     public void CloseUnlockUI()

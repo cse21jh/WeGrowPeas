@@ -27,7 +27,7 @@ public class ProfileCardUI : MonoBehaviour
 
     public void Bind(ProfileSummary summary, bool isCurrent, Action onSelect, Action onDelete)
     {
-        if (titleText != null) titleText.text = $"세이브 프로필 {summary.index + 1}";
+        if (titleText != null) titleText.text = Loc.T("game.profile.title", ("index", summary.index + 1));
 
         if (filledGroup != null) filledGroup.SetActive(summary.exists);
         if (emptyGroup != null) emptyGroup.SetActive(!summary.exists);
@@ -58,8 +58,8 @@ public class ProfileCardUI : MonoBehaviour
     /// <summary>"2026년 9월 29일 오후 4:04"</summary>
     private static string FormatDate(DateTime t)
     {
-        string ampm = t.Hour < 12 ? "오전" : "오후";
+        string ampm = Loc.T(t.Hour < 12 ? "game.profile.am" : "game.profile.pm");
         int hour12 = t.Hour % 12 == 0 ? 12 : t.Hour % 12;
-        return $"{t.Year}년 {t.Month}월 {t.Day}일 {ampm} {hour12}:{t.Minute:00}";
+        return Loc.T("game.profile.saved_at", ("year", t.Year), ("month", t.Month), ("day", t.Day), ("ampm", ampm), ("hour", hour12), ("minute", t.Minute.ToString("00")));
     }
 }

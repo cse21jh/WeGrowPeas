@@ -68,8 +68,8 @@ public class RewardClaimPopup : MonoBehaviour
 
         if (summaryText != null)
             summaryText.text = claimable.Count > 0
-                ? $"수령 가능한 보상 {claimable.Count}개 / {gold}G"
-                : "수령 가능한 보상이 없습니다";
+                ? Loc.T("game.reward.available", ("count", claimable.Count), ("gold", gold))
+                : Loc.T("game.reward.none");
 
         if (getButton != null)
         {
@@ -94,8 +94,8 @@ public class RewardClaimPopup : MonoBehaviour
             SoundManager.Instance?.PlayEffect("WrongSelect");
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
-                title = "알림",
-                message = "지금 받을 수 있는 보상이 없습니다.",
+                title = Loc.T("game.common.notice"),
+                message = Loc.T("game.reward.none_now"),
                 duration = 2f
             });
             return;
@@ -109,8 +109,8 @@ public class RewardClaimPopup : MonoBehaviour
         PhoneManager.Instance?.PhoneTouchEffect();
         PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
         {
-            title = "보상 수령",
-            message = $"보상 {claimable.Count}개를 받았습니다. (+{gold}G)",
+            title = Loc.T("game.reward.title"),
+            message = Loc.T("game.reward.received", ("count", claimable.Count), ("gold", gold)),
             duration = 2f
         });
 

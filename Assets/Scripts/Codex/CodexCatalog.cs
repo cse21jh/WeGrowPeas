@@ -44,7 +44,7 @@ public static class CodexCatalog
             string id = it.UnlockId;
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(it.GradeTagText)) sb.AppendLine($"[{it.GradeTagText}] {it.Rarity}");
-            sb.AppendLine($"가격: {it.Price}골드");
+            sb.AppendLine(Loc.T("game.codex.price", ("price", it.Price)));
             if (!string.IsNullOrEmpty(it.Description)) sb.AppendLine(it.LocalizedDescription);
 
             bool locked = !it.IsMetaUnlocked();
@@ -72,13 +72,13 @@ public static class CodexCatalog
             if (p == null) continue;
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(p.description)) sb.AppendLine(p.LocalizedDescription);
-            if (!string.IsNullOrEmpty(p.traitInfo)) sb.AppendLine($"특성: {p.LocalizedTraitInfo}");
+            if (!string.IsNullOrEmpty(p.traitInfo)) sb.AppendLine(Loc.T("game.codex.trait", ("trait", p.LocalizedTraitInfo)));
             if (!string.IsNullOrEmpty(p.resistanceNote)) sb.AppendLine(p.LocalizedResistanceNote);
             // 판매 수를 세는 것은 완두콩·땅콩뿐이다. 나머지는 "판매한 수: 0"이 늘 붙어 헷갈리므로 뺀다.
             if (p.plantId == "완두콩")
-                sb.AppendLine($"판매한 수: {CodexProgress.GetStat(CodexProgress.StatSoldPea)}");
+                sb.AppendLine(Loc.T("game.codex.sold", ("count", CodexProgress.GetStat(CodexProgress.StatSoldPea))));
             else if (p.plantId == "땅콩")
-                sb.AppendLine($"판매한 수: {CodexProgress.GetStat(CodexProgress.StatSoldPeanut)}");
+                sb.AppendLine(Loc.T("game.codex.sold", ("count", CodexProgress.GetStat(CodexProgress.StatSoldPeanut))));
 
             list.Add(new CodexEntry
             {
@@ -100,12 +100,12 @@ public static class CodexCatalog
         {
             if (c == null) continue;
             var sb = new StringBuilder();
-            sb.AppendLine(c.curseType == CurseType.Seasonal ? "지속형 저주" : "단발형 저주");
+            sb.AppendLine(Loc.T(c.curseType == CurseType.Seasonal ? "game.codex.curse_seasonal" : "game.codex.curse_temporal"));
             if (!string.IsNullOrEmpty(c.description)) sb.AppendLine(c.LocalizedDescription);
             if (c.levels != null)
                 for (int i = 0; i < c.levels.Count; i++)
                     if (c.levels[i] != null && !string.IsNullOrEmpty(c.levels[i].note))
-                        sb.AppendLine($"{i + 1}단계: {c.GetLevelNote(i)}");
+                        sb.AppendLine(Loc.T("game.codex.curse_level", ("level", i + 1), ("note", c.GetLevelNote(i))));
 
             list.Add(new CodexEntry
             {
@@ -129,7 +129,7 @@ public static class CodexCatalog
             if (b == null) continue;
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(b.description)) sb.AppendLine(b.LocalizedDescription);
-            sb.AppendLine($"잡은 횟수: {CodexProgress.GetStat(CodexProgress.StatBugKill(b.bugId))}");
+            sb.AppendLine(Loc.T("game.codex.bug_kills", ("count", CodexProgress.GetStat(CodexProgress.StatBugKill(b.bugId)))));
 
             list.Add(new CodexEntry
             {
@@ -158,17 +158,17 @@ public static class CodexCatalog
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(a.description)) sb.AppendLine(a.LocalizedDescription);
             if (done && AchievementSystem.TryGetUnlockedAt(a.id, out var at))
-                sb.AppendLine($"달성: {at.Year}년 {at.Month}월 {at.Day}일");
+                sb.AppendLine(Loc.T("game.codex.achieved", ("year", at.Year), ("month", at.Month), ("day", at.Day)));
             else if (a.condition == AchievementCondition.LifetimeStat)
-                sb.AppendLine($"진행도: {AchievementSystem.GetProgress(a)} / {a.target}");
+                sb.AppendLine(Loc.T("game.codex.progress", ("current", AchievementSystem.GetProgress(a)), ("target", a.target)));
             else
-                sb.AppendLine("미달성");
+                sb.AppendLine(Loc.T("game.codex.not_achieved"));
 
             list.Add(new CodexEntry
             {
                 category = CodexProgress.Category.Achievement,
                 id = a.id,
-                displayName = done ? a.LocalizedTitle : $"{a.LocalizedTitle} (미달성)",
+                displayName = done ? a.LocalizedTitle : Loc.T("game.codex.title_not_achieved", ("title", a.LocalizedTitle)),
                 icon = a.icon,
                 discovered = done || !a.hidden,
                 detail = sb.ToString().TrimEnd()

@@ -221,8 +221,8 @@ public class TimerUI : MonoBehaviour
         if (waveText != null)
         {
             string alarmText = isMessengerMandatory
-                ? "<color=#FF4F4F>좌측 메세지</color> 확인!"
-                : "<color=#FF4F4F>폰 알람</color> 확인!";
+                ? Loc.T("game.hud.check_message")
+                : Loc.T("game.hud.check_phone");
             GameManager.Instance.enemyController.SetNextWaveText(alarmText);
         }
     }

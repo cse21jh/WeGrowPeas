@@ -244,7 +244,7 @@ public class GridPopup : MonoBehaviour
 
         if (effects.Count == 0)
         {
-            AddDetailRow(null, $"{index + 1}번째 땅 — 효과 없음 (일반 토양)", Color.white);
+            AddDetailRow(null, Loc.T("game.tile.no_effect", ("index", index + 1)), Color.white);
             return;
         }
 
@@ -297,18 +297,18 @@ public class GridPopup : MonoBehaviour
     {
         switch (effect)
         {
-            case TileEffect.GoldSoil: return "황금 흙: 모든 저항력 90% 고정, 이동 불가";
+            case TileEffect.GoldSoil: return Loc.T("game.tile.gold_soil");
             case TileEffect.Fertilizer:
                 return grid.TryGetFertilizerType(index, out var type)
-                    ? $"비료: {type} 저항력 +5%"
-                    : "비료";
-            case TileEffect.PetBottle: return "페트병: 사망 1회 방지, 이동 불가";
-            case TileEffect.ChiliPepper: return "매운 맛: 우성 형질 저항력 +20%";
-            case TileEffect.Freezer: return "급속 냉각기: 식물 빙결 상태 (피해 면역)";
-            case TileEffect.Sprinkler: return "스프링클러: 수분 공급 (비료 시너지 효과 포함)";
-            case TileEffect.AbsorbFertilizer: return "저항력 흡수 비료: 주변 식물의 저항력을 지속 흡수";
-            case TileEffect.Fog: return "안개: 이 땅 식물의 저항력을 확인할 수 없음";
-            case TileEffect.Mushroom: return "버섯: 이번 웨이브에 이 땅의 식물이 피해를 입음";
+                    ? Loc.T("game.tile.fertilizer_type", ("wave", WavePalette.GetName(type)))
+                    : Loc.T("game.tile.fertilizer");
+            case TileEffect.PetBottle: return Loc.T("game.tile.pet_bottle");
+            case TileEffect.ChiliPepper: return Loc.T("game.tile.chili");
+            case TileEffect.Freezer: return Loc.T("game.tile.freezer");
+            case TileEffect.Sprinkler: return Loc.T("game.tile.sprinkler");
+            case TileEffect.AbsorbFertilizer: return Loc.T("game.tile.absorb");
+            case TileEffect.Fog: return Loc.T("game.tile.fog");
+            case TileEffect.Mushroom: return Loc.T("game.tile.mushroom");
             default: return effect.ToString();
         }
     }

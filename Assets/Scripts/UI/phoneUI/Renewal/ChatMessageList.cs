@@ -64,12 +64,12 @@ public sealed class ChatMessageList : MonoBehaviour
             var btnCtrl = dateObj.GetComponent<MessageBoxBtnController>();
             if (btnCtrl != null)
             {
-                btnCtrl.SetText($"{stageId} 일차");
+                btnCtrl.SetText(Loc.T("game.common.day", ("day", stageId)));
             }
             else
             {
                 var tmp = dateObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                if (tmp != null) tmp.text = $"{stageId} 일차";
+                if (tmp != null) tmp.text = Loc.T("game.common.day", ("day", stageId));
             }
         }
 

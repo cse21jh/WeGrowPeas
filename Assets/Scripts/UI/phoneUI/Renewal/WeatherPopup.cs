@@ -90,7 +90,7 @@ public class WeatherPopup : MonoBehaviour
         List<int> kills = enemy.StageKillRecord;
         if (waves == null) return;
 
-        if (titleText != null) titleText.text = "지난 웨이브";
+        if (titleText != null) titleText.text = Loc.T("game.weather.past_waves");
 
         // 인덱스 0은 초기화용 더미라 1일차부터 본다. 오늘 지나간 웨이브까지 포함.
         int today = gm.stage;
@@ -124,7 +124,7 @@ public class WeatherPopup : MonoBehaviour
         }
 
         int ago = today - day;
-        string dayLabel = ago <= 0 ? "오늘" : $"{ago}일 전";
+        string dayLabel = ago <= 0 ? Loc.T("game.weather.today") : Loc.T("game.weather.days_ago", ("days", ago));
 
         Sprite icon = null;
         if (waveIcons != null && waveIcons.Length > 0)
@@ -133,8 +133,8 @@ public class WeatherPopup : MonoBehaviour
             icon = waveIcons[idx];
         }
 
-        string plant = GameManager.Instance != null ? GameManager.Instance.currentPlant : "식물";
-        string dieLabel = diedCount > 0 ? $"{plant} {diedCount}개 죽음" : "피해 없음";
+        string plant = GameManager.Instance != null ? GameManager.Instance.currentPlant : Loc.T("game.weather.plant");
+        string dieLabel = diedCount > 0 ? Loc.T("game.weather.died", ("plant", plant), ("count", diedCount)) : Loc.T("game.weather.no_damage");
 
         banner.Setup(dayLabel, icon, dieLabel);
     }

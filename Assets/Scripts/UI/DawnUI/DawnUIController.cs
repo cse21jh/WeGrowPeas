@@ -148,7 +148,7 @@ public class DawnUIController : MonoBehaviour
 
         if (UIManager.Instance != null && UIManager.Instance.Popup != null)
         {
-            UIManager.Instance.Popup.ShowFloatingPopup("아직 해금되지 않은 단계입니다.", 2.0f);
+            UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.dawn.locked_stage"), 2.0f);
         }
     }
 
@@ -169,11 +169,11 @@ public class DawnUIController : MonoBehaviour
         selectedStage = stage;
         HideTooltip();
 
-        if (currentStageText != null) currentStageText.text = $"{stage} 단계";
+        if (currentStageText != null) currentStageText.text = Loc.T("game.dawn.stage", ("stage", stage));
         if (constraintText != null)
             constraintText.text = DawnSystem.GetConstraintSummaryRich(stage); // 병합 + 변경분 색 강조
         if (geneticsMultText != null)
-            geneticsMultText.text = $"유전자 배율 x{DawnSystem.GetGeneticsMultiplier(stage):0.##}";
+            geneticsMultText.text = Loc.T("game.dawn.gene_multiplier", ("value", DawnSystem.GetGeneticsMultiplier(stage).ToString("0.##")));
 
         var stageData = DawnSystem.GetStage(stage);
 

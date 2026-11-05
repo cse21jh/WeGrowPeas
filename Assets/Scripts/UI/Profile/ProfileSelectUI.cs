@@ -111,8 +111,7 @@ public class ProfileSelectUI : MonoBehaviour
     {
         pendingDeleteIndex = index;
         if (confirmText != null)
-            confirmText.text = $"세이브 프로필 {index + 1}을(를) 삭제할까요?\n" +
-                               "진행·도감·회상·이어하기가 모두 지워지며 되돌릴 수 없습니다.";
+            confirmText.text = Loc.T("game.profile.delete_confirm", ("index", index + 1));
         if (confirmPopup != null) confirmPopup.SetActive(true);
     }
 

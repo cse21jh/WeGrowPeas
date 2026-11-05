@@ -156,17 +156,17 @@ public class CodexUIController : MonoBehaviour
         if (e.locked)
         {
             // 잠김: 이름 대신 "잠김", 상세엔 무엇을 해야 해금되는지 안내
-            if (detailName) detailName.text = "잠김";
+            if (detailName) detailName.text = Loc.T("game.common.locked");
             if (detailText)
                 detailText.text = string.IsNullOrEmpty(e.unlockHint)
-                    ? "특정 조건을 만족하면 해금됩니다."
+                    ? Loc.T("shop.unlock.default")
                     : e.unlockHint;
             if (detailIcon) detailIcon.enabled = false;
         }
         else
         {
             if (detailName) detailName.text = e.discovered ? e.displayName : "???";
-            if (detailText) detailText.text = e.discovered ? e.detail : "아직 발견하지 못했습니다.";
+            if (detailText) detailText.text = e.discovered ? e.detail : Loc.T("game.codex.undiscovered");
             if (detailIcon)
             {
                 bool show = e.discovered && e.icon != null;

@@ -151,7 +151,7 @@ public class WeatherWidget : MonoBehaviour
         }
 
         if (nameText != null)
-            nameText.text = wave.WaveType == WaveType.None ? "맑음" : wave.WaveName;
+            nameText.text = wave.WaveType == WaveType.None ? Loc.T("game.weather.clear") : wave.WaveName;
     }
 
     /// <summary>None은 날씨 앱과 마찬가지로 0번 아이콘을 쓴다.</summary>
