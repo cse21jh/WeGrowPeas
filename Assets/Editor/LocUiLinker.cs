@@ -50,6 +50,14 @@ public static class LocUiLinker
         "스테이지 1", "4개", "4회", "여름", "B 등급", "자연사 저항", "정부", "추가 스킵 0회\nD", "홍수가 덮쳐옵니다.....",
     };
 
+    // MultiTargetButton처럼 색만 바꾸려고 텍스트를 참조하는 경우다. 값은 코드가 바꾸지 않는다.
+    private static readonly string[] ForcedTexts =
+    {
+        "회상", "프로필", "도감", "업적", "치트메뉴", "모든 요소 잠그기", "모든 요소 해금하기",
+        "고정 상품", "로테이션 품목", "고정 품목", "전체", "현재는 등록된 퀘스트가 없습니다.", "완두콩의 선물.pdf",
+        "메인 메뉴.pdf",
+    };
+
     private static readonly Regex Hangul = new Regex("[가-힣]");
 
     public sealed class Item
@@ -178,9 +186,12 @@ public static class LocUiLinker
             if (string.IsNullOrEmpty(value) || !Hangul.IsMatch(value)) continue;
             if (ExcludedTexts.Contains(value)) continue;
 
-            // 중첩 프리팹의 텍스트는 그 프리팹을 처리할 때 다룬다.
-            if (PrefabUtility.IsPartOfPrefabInstance(text)) continue;
-            if (text.GetComponent<LocalizedText>() != null) continue;
+            // 중첩 프리팹의 텍스트는 그 프리팹을 처리할 때 다룬다. 문구를 덮어쓴 인스턴스만 여기서 연결한다.
+            if (PrefabUtility.IsPartOfPrefabInstance(text) && !HasTextOverride(text)) continue;
+
+            // 인스턴스가 문구를 덮어쓰면 물려받은 원문과 달라져 번역되지 않으므로 그 문구로 다시 연결한다.
+            var localized = text.GetComponent<LocalizedText>();
+            if (localized != null && localized.SourceText == value) continue;
 
             var item = new Item
             {
@@ -190,7 +201,7 @@ public static class LocUiLinker
                 ReferencedByCode = referenced.Contains(text),
             };
 
-            if (item.ReferencedByCode)
+            if (item.ReferencedByCode && !ForcedTexts.Contains(value))
             {
                 report.Skipped.Add(item);
                 continue;
@@ -199,18 +210,26 @@ public static class LocUiLinker
             report.Linked.Add(item);
             if (!keys.TryGetValue(value, out string key))
             {
-                key = $"{Table}.t{keys.Count + 1:0000}";
+                key = NextKey(keys);
                 keys[value] = key;
                 entries.Add(new LocEntry { Key = key, Text = value, Source = path, Note = $"{item.Prefab}: {item.Path}" });
             }
 
             if (apply)
             {
-                text.gameObject.AddComponent<LocalizedText>().Link(key, value);
+                if (localized == null) localized = text.gameObject.AddComponent<LocalizedText>();
+                localized.Link(key, value);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(localized);
                 changed = true;
             }
         }
         return changed;
+    }
+
+    private static bool HasTextOverride(TMP_Text text)
+    {
+        var source = PrefabUtility.GetCorrespondingObjectFromSource(text);
+        return source != null && source.text != text.text;
     }
 
     /// <summary>스크립트 필드가 가리키는 TMP 텍스트. 코드가 값을 넣는 대상이다.</summary>
@@ -238,9 +257,19 @@ public static class LocUiLinker
         var keys = new Dictionary<string, string>();
         if (string.IsNullOrEmpty(csv)) return keys;
 
+        // 자리에 맞춰 줄인 전용 키(ui.menu.*)는 같은 원문이 있어도 다른 곳에 재사용하지 않는다.
         foreach (var row in LocTable.Parse(Table, csv).Rows)
-            keys[row.Get(LocTable.SourceLanguage)] = row.Key;
+            if (row.Key.StartsWith($"{Table}.t")) keys[row.Get(LocTable.SourceLanguage)] = row.Key;
         return keys;
+    }
+
+    private static string NextKey(Dictionary<string, string> keys)
+    {
+        int number = keys.Count + 1;
+        string key;
+        do key = $"{Table}.t{number++:0000}";
+        while (keys.ContainsValue(key));
+        return key;
     }
 
     private static string HierarchyPath(Transform transform)

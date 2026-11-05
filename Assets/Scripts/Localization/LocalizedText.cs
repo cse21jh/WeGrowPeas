@@ -10,22 +10,30 @@ using UnityEngine;
 /// 값을 직접 지정할 때는 <see cref="SetKey"/>를 쓴다.
 ///
 /// 번역문은 원문보다 긴 경우가 많아 원문 언어가 아닐 때만 글자를 칸에 맞게 줄인다.
+/// 원문부터 칸을 넘치게 쓰는 레이아웃은 줄이면 글자만 작아지므로 그대로 둔다.
 /// </summary>
 [DisallowMultipleComponent]
 public class LocalizedText : MonoBehaviour
 {
-    private const float MinFontScale = 0.6f;
-
     [SerializeField] private string key;
 
     [Tooltip("연결할 때의 원문. 화면 값과 비교해 코드가 넣은 값을 구분한다.")]
     [SerializeField] private string sourceText;
 
+    [Tooltip("번역문이 길 때 원래 글자 크기의 몇 배까지 줄일지. 칸이 아주 좁은 제목은 더 낮춘다.")]
+    [Range(0.2f, 1f)]
+    [SerializeField] private float minFontScale = 0.6f;
+
     private TMP_Text text;
     private string applied;
     private bool originalAutoSizing;
     private float originalFontSize;
+    private bool? sourceFits;
+    private TextWrappingModes originalWrapping;
     private (string name, object value)[] args;
+
+    /// <summary>연결할 때의 원문.</summary>
+    public string SourceText => sourceText;
 
     /// <summary>에디터 도구가 키와 원문을 연결할 때 쓴다.</summary>
     public void Link(string newKey, string source)
@@ -47,6 +55,7 @@ public class LocalizedText : MonoBehaviour
 
         originalAutoSizing = text.enableAutoSizing;
         originalFontSize = text.fontSize;
+        originalWrapping = text.textWrappingMode;
     }
 
     private void OnEnable()
@@ -89,17 +98,34 @@ public class LocalizedText : MonoBehaviour
     {
         if (originalAutoSizing) return;
 
-        bool shrink = Loc.Language != LocTable.SourceLanguage;
+        bool shrink = Loc.Language != LocTable.SourceLanguage && SourceFits();
         text.enableAutoSizing = shrink;
+
+        // 한 단어는 줄바꿈하면 중간에서 끊기므로 줄바꿈 없이 줄인다.
+        bool singleWord = applied.IndexOf(' ') < 0 && applied.IndexOf('\n') < 0;
+        text.textWrappingMode = shrink && singleWord ? TextWrappingModes.NoWrap : originalWrapping;
 
         if (shrink)
         {
-            text.fontSizeMin = originalFontSize * MinFontScale;
+            text.fontSizeMin = originalFontSize * minFontScale;
             text.fontSizeMax = originalFontSize;
         }
         else
         {
             text.fontSize = originalFontSize;
         }
+    }
+
+    private bool SourceFits()
+    {
+        if (sourceFits.HasValue) return sourceFits.Value;
+
+        Rect rect = text.rectTransform.rect;
+        if (rect.width < 1f || rect.height < 1f) return true; // 레이아웃이 아직 안 잡혔다
+
+        Vector2 size = text.GetPreferredValues(sourceText, rect.width, 0f);
+        bool wraps = text.textWrappingMode != TextWrappingModes.NoWrap;
+        sourceFits = wraps ? size.y <= rect.height + 1f : size.x <= rect.width + 1f;
+        return sourceFits.Value;
     }
 }

@@ -27,7 +27,7 @@ public static class ShopBadge
         // 품목 제한: 전체 구매 제한이 있는 아이템만 표시
         bool hasLimit = item.EffectivePurchaseLimit >= 0;
         if (limitObj != null) limitObj.SetActive(hasLimit);
-        if (limitText != null && hasLimit) limitText.text = Loc.T("shop.badge.limited");
+        if (limitText != null) limitText.text = Loc.T(hasLimit ? "shop.badge.limited" : "shop.badge.no_limit");
     }
 
     /// <summary>남은 구매 횟수 문구. 무제한이면 "재고 제한 없음".</summary>

@@ -14,6 +14,7 @@ public class LanguageSelector : MonoBehaviour
     private const float RowSpacing = 30f;
     private const float ArrowSize = 30f;
     private const float ArrowInset = 45f; // 슬라이더 구간 안쪽에 맞춰 왼쪽 라벨과 떨어뜨린다
+    private const float LabelInset = 12f; // 같은 줄의 설정창 제목과 겹치지 않게 민다
 
     private TMP_Text label;
     private TMP_Text value;
@@ -50,6 +51,7 @@ public class LanguageSelector : MonoBehaviour
     private void Build(TMP_Text template)
     {
         label = Instantiate(template, transform, false);
+        label.rectTransform.anchoredPosition += Vector2.right * LabelInset;
         value = CreateText(template, Vector2.zero, Vector2.one, Vector2.zero);
 
         CreateArrow(template, "<", 0f, -1);

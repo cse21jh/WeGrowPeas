@@ -19,6 +19,7 @@ public class TutorialGrid : Grid
     {
         base.Start();
         curBreedCount = TMaxBreedCount;
+        UpdateBreedCountUI(curBreedCount);
     }
 
     protected override void Update()

@@ -104,9 +104,24 @@ public class GraphBuilder : MonoBehaviour
 
     private void LoadChart()
     {
+        ApplyTitles();
         BuildPlants();
         BuildGold();
         BuildWaves();
+    }
+
+    // 차트 제목은 씬에 값으로 저장돼 있어 언어에 맞춰 여기서 넣는다.
+    private void ApplyTitles()
+    {
+        SetTitle(plantChart, "game.graph.plants");
+        SetTitle(goldChart, "game.graph.gold");
+        SetTitle(waveChart, "game.graph.waves");
+    }
+
+    private static void SetTitle(LineChart chart, string key)
+    {
+        var title = chart != null ? chart.GetChartComponent<Title>() : null;
+        if (title != null) title.text = Loc.T(key);
     }
 
     private void BuildPlants()

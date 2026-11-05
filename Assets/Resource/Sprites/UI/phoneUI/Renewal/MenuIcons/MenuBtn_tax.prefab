@@ -94,7 +94,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7628908199116614838, guid: 37bb83a3dafec15409748b085ae603d9, type: 3}
       propertyPath: m_Name
-      value: MenuBtn_tax Variant
+      value: MenuBtn_tax
       objectReference: {fileID: 0}
     - target: {fileID: 8866585796491603491, guid: 37bb83a3dafec15409748b085ae603d9, type: 3}
       propertyPath: m_Sprite
@@ -103,5 +103,27 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 703476249001804076, guid: 37bb83a3dafec15409748b085ae603d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6466542412941482628}
   m_SourcePrefab: {fileID: 100100000, guid: 37bb83a3dafec15409748b085ae603d9, type: 3}
+--- !u!1 &2753405559528128552 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 703476249001804076, guid: 37bb83a3dafec15409748b085ae603d9, type: 3}
+  m_PrefabInstance: {fileID: 3455721269443412228}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6466542412941482628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2753405559528128552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05873d31af60c964e9fca2c55ad7a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  key: ui.menu.tax
+  sourceText: "\uAD6D\uC138\uCCAD"
