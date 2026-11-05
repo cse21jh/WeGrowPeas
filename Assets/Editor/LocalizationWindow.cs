@@ -48,6 +48,8 @@ public class LocalizationWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("표 검사", GUILayout.Height(30))) Validate();
         if (GUILayout.Button("SO 텍스트 추출", GUILayout.Height(30))) ExtractFromAssets();
+        if (GUILayout.Button("UI 문구 연결", GUILayout.Height(30))) LinkUiText();
+        if (GUILayout.Button("코드 키 검사", GUILayout.Height(30))) CheckCodeKeys();
         if (GUILayout.Button("내보내기", GUILayout.Height(30))) Export();
         if (GUILayout.Button("변경 내역 확인", GUILayout.Height(30))) PreviewImport();
         EditorGUILayout.EndHorizontal();
@@ -166,6 +168,30 @@ public class LocalizationWindow : EditorWindow
         var report = LocExtractor.Run();
         issues = report.Issues;
         status = $"추출 완료: 표 {report.TablesChanged}개에 {report.Added}행 추가";
+    }
+
+    // ── UI 문구 연결 ─────────────────────────────────────────────────────────
+    private void LinkUiText()
+    {
+        if (!EditorUtility.DisplayDialog("UI 문구 연결",
+                "프리팹과 씬의 고정 문구에 LocalizedText를 붙이고 저장합니다.\n저장하지 않은 씬은 건너뜁니다.", "진행", "취소"))
+        {
+            return;
+        }
+
+        pending = null;
+        var report = LocUiLinker.Run(apply: true);
+        issues = report.Issues;
+        status = $"연결 완료: 텍스트 {report.Linked.Count}개, 표 {report.RowsAdded}행, 프리팹 {report.PrefabsChanged}개, 씬 {report.ScenesChanged}개";
+    }
+
+    // ── 코드 키 검사 ─────────────────────────────────────────────────────────
+    private void CheckCodeKeys()
+    {
+        pending = null;
+        var result = LocKeyChecker.Run(LoadTables(TableFolder).Values);
+        issues = result.Issues;
+        status = $"코드 키 {result.Checked}개 검사, 문제 {result.Issues.Count}건";
     }
 
     // ── 내보내기 ─────────────────────────────────────────────────────────────

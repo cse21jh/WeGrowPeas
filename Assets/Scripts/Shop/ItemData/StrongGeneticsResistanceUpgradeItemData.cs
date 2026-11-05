@@ -6,7 +6,6 @@ public class StrongGeneticsResistanceUpgradeItemData : ItemData
     [Header("Effect")]
     [SerializeField] private float resistanceBonus = 0.01f; // 1% 증가
 
-    private string purchaseKey = "강자생존";
 
     private void OnEnable()
     {

@@ -12,11 +12,11 @@ public class LandAndBeanItemData : ItemData
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 10;
-        metaRequiredDawnPlant = "땅콩";
+        metaRequiredDawnPlant = PlantIds.Peanut;
     }
 
     // 땅콩 전용 아이템 (새벽 10단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant("땅콩");
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Peanut);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Special;
 

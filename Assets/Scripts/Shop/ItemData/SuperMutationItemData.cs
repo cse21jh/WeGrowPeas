@@ -16,11 +16,11 @@ public class SuperMutationItemData : ItemData
         OnePerShopIfNotStackable = true; // 일일 구매 제한 1회
         FlowType = ShopFlowType.Instant;
         metaRequiredDawnStage = 10;
-        metaRequiredDawnPlant = "완두콩";
+        metaRequiredDawnPlant = PlantIds.Pea;
     }
 
     // 완두콩 전용 아이템 (새벽 10단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant("완두콩");
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Pea);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Special;
 

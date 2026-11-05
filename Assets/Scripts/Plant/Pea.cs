@@ -11,7 +11,7 @@ public class Pea : MovablePlant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "완두콩";
+        speciesname = PlantIds.Pea;
         base.Init(gridIndex, grid);
         plantID = 0;
     }

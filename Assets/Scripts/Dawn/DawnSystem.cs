@@ -34,7 +34,7 @@ public static class DawnSystem
 
     // ── 식물 ──────────────────────────────────────────────────────────────────
     /// <summary>새벽 진행도를 따로 관리하는 식물 목록.</summary>
-    public static readonly string[] Plants = { "완두콩", "땅콩" };
+    public static readonly string[] Plants = { PlantIds.Pea, PlantIds.Peanut };
 
     /// <summary>
     /// 진행도를 조회·기록할 기준 식물.

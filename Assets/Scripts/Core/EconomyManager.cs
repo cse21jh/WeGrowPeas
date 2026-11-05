@@ -121,14 +121,14 @@ public class EconomyManager : MonoBehaviour
 
     public void AddSellCount(string plantName)
     {
-        if(plantName == "완두콩")
+        if(plantName == PlantIds.Pea)
         {
             peaSellCount++;
             CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
             CodexProgress.AddSold(true);
             return;
         }
-        else if(plantName == "땅콩")
+        else if(plantName == PlantIds.Peanut)
         {
             peanutSellCount++;
             CodexProgress.Discover(CodexProgress.Category.Plant, plantName);

@@ -103,7 +103,7 @@ public class InfoApp : BasePhoneApp
             // PurchaseHistory uses item.name (or DisplayName?) -> ShopManager says: 
             // var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
             // So we need to match that logic.
-            string key = string.IsNullOrEmpty(item.DisplayName) ? item.name : item.DisplayName;
+            string key = item.PurchaseKey;
             if (!itemLookup.ContainsKey(key))
             {
                 itemLookup.Add(key, item);

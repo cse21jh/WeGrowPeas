@@ -24,7 +24,7 @@ public class HighQualityPlantItemData : ItemData
     /// </summary>
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        if (!IsCurrentPlant("완두콩")) return false;
+        if (!IsCurrentPlant(PlantIds.Pea)) return false;
 
         // 현재 웨이브가 None이 아니면 등장하는 웨이브가 있음
         if (GameManager.Instance == null || GameManager.Instance.enemyController == null)

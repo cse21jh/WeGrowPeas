@@ -119,7 +119,10 @@ public abstract class ItemData : ScriptableObject
     [Header("Flow")]
     public ShopFlowType FlowType;
 
-    /// <summary>화면에 보여줄 이름. 저장 키가 필요하면 <see cref="DisplayName"/>을 쓴다.</summary>
+    /// <summary>구매 이력의 저장 키. 세이브에 저장되므로 번역하지 않는다.</summary>
+    public string PurchaseKey => string.IsNullOrEmpty(DisplayName) ? name : DisplayName;
+
+    /// <summary>화면에 보여줄 이름. 저장 키가 필요하면 <see cref="PurchaseKey"/>를 쓴다.</summary>
     public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, name, "name"), DisplayName);
 
     /// <summary>화면에 보여줄 설명.</summary>

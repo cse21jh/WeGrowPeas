@@ -5,7 +5,7 @@ public class ChiliPepper : Plant
 {
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "고추";
+        speciesname = PlantIds.ChiliPepper;
         base.Init(gridIndex, grid);
         plantID = 3;
     }

@@ -108,6 +108,6 @@ public static class GameRecordHolder
 
     private static void CalculateMSP()
     {
-        Current.mostSellPlantName = (soldPeas >= soldPeanuts) ? "완두콩" : "땅콩";
+        Current.mostSellPlantName = (soldPeas >= soldPeanuts) ? PlantIds.Pea : PlantIds.Peanut;
     }
 }

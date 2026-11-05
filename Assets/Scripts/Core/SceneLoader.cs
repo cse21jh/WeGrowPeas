@@ -9,6 +9,11 @@ public class SceneLoader : MonoBehaviour
     /// <summary>시작 화면 씬 이름. 빌드 목록의 첫 씬과 같아야 한다.</summary>
     public const string StartSceneName = "StartScene 3";
 
+    private const string IntroSceneName = "IntroScene";
+    private const string TutorialSceneName = "Tutorial";
+    private const string GameSceneName = "Garden_GrassUpdate";
+    private const string GameOverSceneName = "GameOverScene";
+
     public static SceneLoader Instance;
 
     // Start is called before the first frame update
@@ -56,17 +61,17 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadIntroScene()
     {
-        StartCoroutine(LoadSceneRoutine("IntroScene", useLoadingScreen: true, bgm: "IntroScene"));
+        StartCoroutine(LoadSceneRoutine(IntroSceneName, useLoadingScreen: true, bgm: "IntroScene"));
     }
 
     public void LoadTutorialScene()
     {
-        StartCoroutine(LoadSceneRoutine("Tutorial", useLoadingScreen: true));
+        StartCoroutine(LoadSceneRoutine(TutorialSceneName, useLoadingScreen: true));
     }
 
     public void LoadGardenScene()
     {
-        StartCoroutine(LoadSceneRoutine("Garden_GrassUpdate", useLoadingScreen: true));
+        StartCoroutine(LoadSceneRoutine(GameSceneName, useLoadingScreen: true));
     }
 
     [Header("Loading")]
@@ -152,7 +157,7 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadGameOverScene()
     {
-        StartCoroutine(LoadSceneRoutine("GameOverScene", useLoadingScreen: true));
+        StartCoroutine(LoadSceneRoutine(GameOverSceneName, useLoadingScreen: true));
     }
 
 

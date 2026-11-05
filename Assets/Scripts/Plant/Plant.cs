@@ -514,7 +514,7 @@ public abstract class Plant : MonoBehaviour
 
         switch (GameManager.Instance.currentPlant)
         {
-            case "완두콩":
+            case PlantIds.Pea:
                 if ((int)traitType >= (int)TraitType.HeavyRain)
                 {
                     switch (genetics)
@@ -534,7 +534,7 @@ public abstract class Plant : MonoBehaviour
                     }
                 }
                 break;
-            case "땅콩":
+            case PlantIds.Peanut:
                 if ((int)traitType >= (int)TraitType.HeavyRain)
                 {
                     switch (genetics)

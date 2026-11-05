@@ -4,7 +4,6 @@ using System;
 [CreateAssetMenu(menuName = "Shop/Items/Bug Fan (벌레 방해용 선풍기)", fileName = "BugFanItemData")]
 public class BugFanItemData : ItemData
 {
-    private string purchaseKey = "벌레 방해용 선풍기";
 
     [Header("Effect")]
     [Range(0f, 1f)] public float reducePercent = 0.1f; // 10%
@@ -37,7 +36,7 @@ public class BugFanItemData : ItemData
             return false;
         }
 
-        if (!ctx.Shop.PurchaseHistory.TryGetValue(purchaseKey, out int bought))
+        if (!ctx.Shop.PurchaseHistory.TryGetValue(PurchaseKey, out int bought))
             bought = 0;
 
         if (bought >= MaxPurchaseCount)

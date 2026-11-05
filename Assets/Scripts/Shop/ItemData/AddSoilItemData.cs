@@ -5,7 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Shop/Items/Add Soil (땅문서)", fileName = "AddSoilItemData")]
 public class AddSoilItemData : ItemData
 {
-    private string purchaseKey = "땅문서";
 
     [Header("Pricing")]
     [SerializeField] private int basePrice = 1000;
@@ -29,7 +28,7 @@ public class AddSoilItemData : ItemData
     private void UpdatePrice(ShopContext ctx)
     {
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용
-        var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
+        var key = PurchaseKey;
 
         if (!ctx.Shop.PurchaseHistory.ContainsKey(key))
             ctx.Shop.PurchaseHistory[key] = 0;
@@ -60,7 +59,7 @@ public class AddSoilItemData : ItemData
         }
 
         // 구매 이력 확인 (TryPurchase에서 DisplayName을 키로 사용)
-        var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
+        var key = PurchaseKey;
         if (!ctx.Shop.PurchaseHistory.ContainsKey(key))
             ctx.Shop.PurchaseHistory[key] = 0;
 
@@ -105,7 +104,7 @@ public class AddSoilItemData : ItemData
         }
 
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용
-        var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
+        var key = PurchaseKey;
         
         int purchaseCount = 0;
         if (!ctx.Shop.PurchaseHistory.TryGetValue(key, out purchaseCount))

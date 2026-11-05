@@ -75,9 +75,9 @@ public static class CodexCatalog
             if (!string.IsNullOrEmpty(p.traitInfo)) sb.AppendLine(Loc.T("game.codex.trait", ("trait", p.LocalizedTraitInfo)));
             if (!string.IsNullOrEmpty(p.resistanceNote)) sb.AppendLine(p.LocalizedResistanceNote);
             // 판매 수를 세는 것은 완두콩·땅콩뿐이다. 나머지는 "판매한 수: 0"이 늘 붙어 헷갈리므로 뺀다.
-            if (p.plantId == "완두콩")
+            if (p.plantId == PlantIds.Pea)
                 sb.AppendLine(Loc.T("game.codex.sold", ("count", CodexProgress.GetStat(CodexProgress.StatSoldPea))));
-            else if (p.plantId == "땅콩")
+            else if (p.plantId == PlantIds.Peanut)
                 sb.AppendLine(Loc.T("game.codex.sold", ("count", CodexProgress.GetStat(CodexProgress.StatSoldPeanut))));
 
             list.Add(new CodexEntry

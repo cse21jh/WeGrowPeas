@@ -12,7 +12,7 @@ public class GameManager : Singleton<GameManager>
 {
     public int stage = 0;
     [HideInInspector] public bool seenFirstGold = false;
-    public string currentPlant = "땅콩";
+    public string currentPlant = PlantIds.Peanut;
 
     //위는 저장 필요
 

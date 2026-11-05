@@ -7,7 +7,7 @@ public class Sprinkler : Plant
     public ParticleSystem waterParticle;
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "스프링클러";
+        speciesname = PlantIds.Sprinkler;
         base.Init(gridIndex, grid);
         plantID = 4; // 식물 ID 4
         anim = GetComponentInChildren<Animator>();

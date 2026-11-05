@@ -364,9 +364,9 @@ public class Grid : MonoBehaviour
                         AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
                     UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.twins"), 1);
                     totalBreedCount++;
-                    if (GameManager.Instance.currentPlant == "완두콩")
+                    if (GameManager.Instance.currentPlant == PlantIds.Pea)
                         totalPeaBreedcount++;
-                    else if (GameManager.Instance.currentPlant == "땅콩")
+                    else if (GameManager.Instance.currentPlant == PlantIds.Peanut)
                         totalPeanutBreedCount++;
                 }
 
@@ -377,9 +377,9 @@ public class Grid : MonoBehaviour
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
                 SoundManager.Instance.PlayEffect("Breed");
                 totalBreedCount++;
-                if (GameManager.Instance.currentPlant == "완두콩")
+                if (GameManager.Instance.currentPlant == PlantIds.Pea)
                     totalPeaBreedcount++;
-                else if (GameManager.Instance.currentPlant == "땅콩")
+                else if (GameManager.Instance.currentPlant == PlantIds.Peanut)
                     totalPeanutBreedCount++;
                 UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
                 Plant p1 = breedObj1.GetComponent<Plant>();
@@ -848,12 +848,12 @@ public class Grid : MonoBehaviour
     {
         switch (plantName)
         {
-            case "완두콩": return Instantiate(peaPrefab);
-            case "땅콩": return Instantiate(peanutPrefab);
-            case "네펜데스": return Instantiate(nepenthesPrefab);
-            case "고추": return Instantiate(chiliPepperPrefab);
-            case "스프링클러": return Instantiate(sprinklerPrefab);
-            case "돈나무": return Instantiate(moneyTreePrefab);
+            case PlantIds.Pea: return Instantiate(peaPrefab);
+            case PlantIds.Peanut: return Instantiate(peanutPrefab);
+            case PlantIds.Nepenthes: return Instantiate(nepenthesPrefab);
+            case PlantIds.ChiliPepper: return Instantiate(chiliPepperPrefab);
+            case PlantIds.Sprinkler: return Instantiate(sprinklerPrefab);
+            case PlantIds.MoneyTree: return Instantiate(moneyTreePrefab);
             default: return Instantiate(peaPrefab);
         }
     }

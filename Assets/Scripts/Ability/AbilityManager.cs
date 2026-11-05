@@ -8,7 +8,7 @@ public class AbilityManager : MonoBehaviour
 {
     public static AbilityManager Instance { get; private set; }
 
-    private string currentPlant = "완두콩";
+    private string currentPlant = PlantIds.Pea;
 
     [SerializeField] private List<PlantAbilityData> allPlantAbilities;
     [SerializeField] private List<GeneralAbilityData> allGeneralAbilities;

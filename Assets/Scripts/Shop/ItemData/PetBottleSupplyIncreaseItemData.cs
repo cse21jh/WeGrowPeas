@@ -9,7 +9,6 @@ public class PetBottleSupplyIncreaseItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 8;
 
-    private string purchaseKey = "페트병 납품량 증가";
 
     private void OnEnable()
     {

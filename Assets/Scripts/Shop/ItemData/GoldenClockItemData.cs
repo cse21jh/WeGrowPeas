@@ -4,7 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Shop/Items/Golden Clock (황금 시계)", fileName = "GoldenClockItemData")]
 public class GoldenClockItemData : ItemData
 {
-    private const string purchaseKey = "황금 시계";
 
     [Header("Pricing")]
     [SerializeField] private int basePrice = 500;
@@ -26,7 +25,7 @@ public class GoldenClockItemData : ItemData
             return false;
         }
 
-        if (!ctx.Shop.PurchaseHistory.TryGetValue(purchaseKey, out int bought))
+        if (!ctx.Shop.PurchaseHistory.TryGetValue(PurchaseKey, out int bought))
             bought = 0;
 
         if (bought >= MaxPurchaseCount)

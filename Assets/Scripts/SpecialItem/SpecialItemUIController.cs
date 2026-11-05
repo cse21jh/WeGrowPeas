@@ -107,5 +107,5 @@ public class SpecialItemUIController : MonoBehaviour
     }
 
     private static string CurrentPlant =>
-        GameManager.Instance != null ? GameManager.Instance.currentPlant : "완두콩";
+        GameManager.Instance != null ? GameManager.Instance.currentPlant : PlantIds.Pea;
 }

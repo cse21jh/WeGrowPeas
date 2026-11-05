@@ -13,7 +13,7 @@ public class Peanut : MovablePlant
     private float peanutCopyProbability = 0.25f;
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "땅콩";
+        speciesname = PlantIds.Peanut;
         base.Init(gridIndex, grid);
         plantID = 1;
     }

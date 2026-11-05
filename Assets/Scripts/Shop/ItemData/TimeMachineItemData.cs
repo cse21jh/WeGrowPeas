@@ -17,7 +17,6 @@ public class TimeMachineItemData : ItemData
         IsStackable = true;
         OnePerShopIfNotStackable = false;
         Rarity = ItemRarity.Rare; // 희귀 등급
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "타임 머신";
         if (Price <= 0) Price = 2000;
     }
 

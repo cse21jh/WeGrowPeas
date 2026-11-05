@@ -8,7 +8,7 @@ public class MoneyTree : Plant
 
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "돈나무";
+        speciesname = PlantIds.MoneyTree;
         base.Init(gridIndex, grid);
         plantID = 5; 
         

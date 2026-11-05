@@ -5,7 +5,6 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "Shop/Items/Breed Count Increase (교배 횟수 증가)", fileName = "BreedCountItemData")]
 public class BreedCountItemData : ItemData
 {
-    private string purchaseKey = "교배 키트";
 
     [Header("Pricing (exponential)")]
     [SerializeField] private int basePrice = 1000;
@@ -19,7 +18,7 @@ public class BreedCountItemData : ItemData
     private void UpdatePrice(ShopContext ctx)
     {
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용
-        var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
+        var key = PurchaseKey;
         int i;
         if (!ctx.Shop.PurchaseHistory.TryGetValue(key, out i))
             i = 0;
@@ -60,7 +59,7 @@ public class BreedCountItemData : ItemData
     public override void InitializePrice(ShopContext ctx)
     {
         // TryPurchase에서 DisplayName을 키로 사용하므로 DisplayName 사용
-        var key = string.IsNullOrEmpty(DisplayName) ? purchaseKey : DisplayName;
+        var key = PurchaseKey;
         int i;
         if (!ctx.Shop.PurchaseHistory.TryGetValue(key, out i))
             i = 0;

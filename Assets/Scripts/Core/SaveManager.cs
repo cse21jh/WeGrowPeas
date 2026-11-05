@@ -315,7 +315,7 @@ public class SaveManager : MonoBehaviour
         if (GameManager.Instance != null) Destroy(GameManager.Instance.gameObject);
 
         // 첫 번째 씬(타이틀 화면)으로 리로드
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(SceneLoader.StartSceneName);
 
         // SaveManager 자신도 파괴 (씬 리로드 시 새로 생성되도록)
         Destroy(gameObject);

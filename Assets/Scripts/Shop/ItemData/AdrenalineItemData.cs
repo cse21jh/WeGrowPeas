@@ -25,7 +25,6 @@ public class AdrenalineItemData : ItemData
         OnePerShopIfNotStackable = true;
         Rarity = ItemRarity.Legendary;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "아드레날린";
         if (Price <= 0) Price = 10000;
     }
 

@@ -21,7 +21,6 @@ public class DNAExtractionItemData : ItemData
         OnePerShopIfNotStackable = true;
         Rarity = ItemRarity.Common;
 
-        if (string.IsNullOrEmpty(DisplayName)) DisplayName = "유전자 추출기";
         if (Price <= 0) Price = 1000;
     }
 

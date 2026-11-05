@@ -9,7 +9,7 @@ public class Nepenthes : Plant
     [SerializeField] private float pheromoneSize = 4f;
     public override void Init(int gridIndex, Grid grid)
     {
-        speciesname = "네펜데스";
+        speciesname = PlantIds.Nepenthes;
         base.Init(gridIndex, grid);
         plantID = 2;
         UpdatePheromone();

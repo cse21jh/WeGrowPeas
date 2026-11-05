@@ -9,6 +9,11 @@ public class ShopInventory
 }
 public class ShopManager : Singleton<ShopManager>
 {
+    // 코드가 직접 찾는 아이템의 구매 이력 키. ItemData.PurchaseKey와 같은 값이다.
+    private const string ShopContactKey = "상점 연락처";
+    private const string LandDeedKey = "땅문서";
+    private const string BreedingKitKey = "교배 키트";
+
     [Header("Inventory (Serialized here)")]
     [SerializeField] private ItemData[] fixedItems = new ItemData[4];  // 상단 고정 4종
     [SerializeField] private List<ItemData> rotationPool = new(); // 하단 로테이션 풀 (자동으로 Rotation 폴더에서 로드됨)
@@ -89,10 +94,9 @@ public class ShopManager : Singleton<ShopManager>
         dailyRerollCount = 0;
         
         // 상점 연락처 구매 횟수 확인 및 무료 리롤 추가
-        const string shopContactKey = "상점 연락처";
-        if (purchaseHistory.ContainsKey(shopContactKey))
+        if (purchaseHistory.ContainsKey(ShopContactKey))
         {
-            int purchaseCount = purchaseHistory[shopContactKey];
+            int purchaseCount = purchaseHistory[ShopContactKey];
             if (purchaseCount > 0)
             {
                 // 상점 연락처는 구매 1회당 매일 무료 리롤 1회 추가
@@ -266,7 +270,7 @@ public class ShopManager : Singleton<ShopManager>
         dailySpentGold += price;
 
         // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
-        var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
+        var key = data.PurchaseKey;
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
 
@@ -283,7 +287,7 @@ public class ShopManager : Singleton<ShopManager>
         if (purchaseHistory.Count == 0) return null;
 
         var mostSold = purchaseHistory
-        .Where(item => item.Key != "농장 확장" && item.Key != "교배 키트")
+        .Where(item => item.Key != LandDeedKey && item.Key != BreedingKitKey)
         .OrderByDescending(item => item.Value)
         .FirstOrDefault();
 
@@ -354,7 +358,7 @@ public class ShopManager : Singleton<ShopManager>
         if (data == null) return 0;
 
         // TryPurchase와 동일한 키 생성 방식 사용
-        var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
+        var key = data.PurchaseKey;
         return purchaseHistory.ContainsKey(key) ? purchaseHistory[key] : 0;
     }
 
