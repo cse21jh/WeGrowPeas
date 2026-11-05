@@ -8,10 +8,14 @@ using UnityEngine;
 /// 화면의 글자가 원문도, 이 컴포넌트가 넣은 번역도 아니면 코드가 넣은 값으로 보고 건드리지 않는다.
 /// 그래서 코드가 채우는 텍스트에 붙어 있어도 값을 덮어쓰지 않는다.
 /// 값을 직접 지정할 때는 <see cref="SetKey"/>를 쓴다.
+///
+/// 번역문은 원문보다 긴 경우가 많아 원문 언어가 아닐 때만 글자를 칸에 맞게 줄인다.
 /// </summary>
 [DisallowMultipleComponent]
 public class LocalizedText : MonoBehaviour
 {
+    private const float MinFontScale = 0.6f;
+
     [SerializeField] private string key;
 
     [Tooltip("연결할 때의 원문. 화면 값과 비교해 코드가 넣은 값을 구분한다.")]
@@ -19,6 +23,8 @@ public class LocalizedText : MonoBehaviour
 
     private TMP_Text text;
     private string applied;
+    private bool originalAutoSizing;
+    private float originalFontSize;
     private (string name, object value)[] args;
 
     /// <summary>에디터 도구가 키와 원문을 연결할 때 쓴다.</summary>
@@ -38,6 +44,9 @@ public class LocalizedText : MonoBehaviour
         }
 
         if (string.IsNullOrEmpty(sourceText)) sourceText = text.text;
+
+        originalAutoSizing = text.enableAutoSizing;
+        originalFontSize = text.fontSize;
     }
 
     private void OnEnable()
@@ -73,5 +82,24 @@ public class LocalizedText : MonoBehaviour
 
         applied = Loc.Or(key, sourceText, args);
         text.text = applied;
+        ApplyFit();
+    }
+
+    private void ApplyFit()
+    {
+        if (originalAutoSizing) return;
+
+        bool shrink = Loc.Language != LocTable.SourceLanguage;
+        text.enableAutoSizing = shrink;
+
+        if (shrink)
+        {
+            text.fontSizeMin = originalFontSize * MinFontScale;
+            text.fontSizeMax = originalFontSize;
+        }
+        else
+        {
+            text.fontSize = originalFontSize;
+        }
     }
 }
