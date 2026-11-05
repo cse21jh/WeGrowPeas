@@ -4,6 +4,9 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ChatMessage
 {
+    [HideInInspector, Tooltip("번역 키에 쓰는 고정 id. 추출 도구가 채운다.")]
+    public string locId;
+
     [Tooltip("메시지 도착을 유발하는 트리거 ID. 예: '3', 'GoldPlant'")]
     public string triggerId;
 

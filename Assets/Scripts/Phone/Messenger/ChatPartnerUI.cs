@@ -25,7 +25,7 @@ public class ChatPartnerUI : MonoBehaviour
         this.messengerApp = appController;
 
         chatPartnerImage.sprite = chat.chatPartner.chatPartnerImage;
-        chatPartnerNameText.text = chat.chatPartner.chatPartnerName;
+        chatPartnerNameText.text = chat.chatPartner.LocalizedName;
         lastMessageText.text = previewMessage; // 미리보기 메시지로 텍스트 설정
 
 

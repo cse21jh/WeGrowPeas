@@ -285,7 +285,7 @@ public class MessengerApp : MonoBehaviour
 
         MandatoryEntry entry = mandatoryEntries[mandatoryPopupIndex];
         MessageReference reference = entry.reference;
-        mandatoryMessagePopup.Show(reference.chat.chatPartner, reference.message.messageText);
+        mandatoryMessagePopup.Show(reference.chat.chatPartner, reference.chat.GetText(reference.message));
 
         if (!entry.revealedByPopup)
         {
@@ -362,9 +362,9 @@ public class MessengerApp : MonoBehaviour
         currentChat = conversation;
         renderedIndicesForCurrentChat.Clear();
 
-        chatRoomHeaderName.text = conversation.chatPartner.chatPartnerName;
+        chatRoomHeaderName.text = conversation.chatPartner.LocalizedName;
         chatRoomHeaderImage.sprite = conversation.chatPartner.chatPartnerImage;
-        chatMessageList.SetSender(conversation.chatPartner.chatPartnerName, conversation.chatPartner.chatPartnerImage);
+        chatMessageList.SetSender(conversation.chatPartner.LocalizedName, conversation.chatPartner.chatPartnerImage);
 
         chatRoomPanel.SetActive(true);
         ChatPanel.gameObject.SetActive(true);
@@ -436,8 +436,8 @@ public class MessengerApp : MonoBehaviour
             .ToList();
         count = unread.Count;
         return hasUnread && unread.Count > 0
-            ? unread[0].message.messageText
-            : arrived[arrived.Count - 1].message.messageText;
+            ? chat.GetText(unread[0].message)
+            : chat.GetText(arrived[arrived.Count - 1].message);
     }
 
     private void StartMessageDisplay(bool freshEntry)
@@ -508,7 +508,7 @@ public class MessengerApp : MonoBehaviour
                 displayingChat.chatPartner.chatPartnerName,
                 reference.index,
                 reference.message.triggerId);
-            CreateMessageBubble(day, reference.message.messageText, reference.message.triggerId);
+            CreateMessageBubble(day, displayingChat.GetText(reference.message), reference.message.triggerId);
             renderedIndicesForCurrentChat.Add(reference.index);
 
             if (!wasRead)

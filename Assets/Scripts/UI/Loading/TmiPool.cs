@@ -32,18 +32,20 @@ public static class TmiPool
     };
 
     private static bool _loaded;
+    private static string _language;
     private static List<string> _tips;
     private static int _lastIndex = -1;
 
     private static void EnsureLoaded()
     {
-        if (_loaded) return;
+        if (_loaded && _language == Loc.Language) return;
         _loaded = true;
+        _language = Loc.Language;
 
         var cfg = Resources.Load<TmiConfig>(ResourcePath);
         if (cfg != null && cfg.tips != null && cfg.tips.Count > 0)
         {
-            _tips = new List<string>(cfg.tips);
+            _tips = cfg.GetLocalizedTips();
         }
         else
         {

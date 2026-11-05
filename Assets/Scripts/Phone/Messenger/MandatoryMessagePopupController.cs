@@ -66,7 +66,7 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour
         }
 
         if (partnerNameText != null)
-            partnerNameText.text = partner != null ? partner.chatPartnerName : string.Empty;
+            partnerNameText.text = partner != null ? partner.LocalizedName : string.Empty;
 
         if (messageText != null)
             messageText.text = body ?? string.Empty;

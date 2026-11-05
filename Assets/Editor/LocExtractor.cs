@@ -77,6 +77,21 @@ public static class LocExtractor
                 string suffix = field.GetCustomAttribute<LocTextAttribute>().Suffix;
                 entries.Add(new LocEntry { Key = LocKey.For(group.Prefix, id, suffix), Text = text, Source = path });
             }
+
+            if (asset is ILocListSource list)
+            {
+                if (list.EnsureLocIds())
+                {
+                    EditorUtility.SetDirty(asset);
+                    AssetDatabase.SaveAssetIfDirty(asset);
+                }
+
+                foreach (var item in list.GetLocTexts())
+                {
+                    if (string.IsNullOrEmpty(item.Text)) continue;
+                    entries.Add(new LocEntry { Key = LocKey.For(group.Prefix, id, item.Id), Text = item.Text, Source = path });
+                }
+            }
         }
         return tables;
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -9,10 +10,23 @@ using UnityEngine;
 /// </summary>
 [BalanceGroup("Dawn", "DawnStages")]
 [CreateAssetMenu(menuName = "Dawn/Dawn Stage Config", fileName = "DawnStageConfig")]
-public class DawnStageConfig : ScriptableObject
+[LocGroup(LocPrefix)]
+public class DawnStageConfig : ScriptableObject, ILocKeyed, ILocListSource
 {
+    public const string LocPrefix = "dawn";
+    public const string LocGroupId = "stages";
+
     [BalanceRows("stage")] // 단계별 한 행으로 표에 펼침
     public List<DawnStageData> stages = new List<DawnStageData>();
+
+    /// <inheritdoc/>
+    public string LocId => LocGroupId;
+
+    public IEnumerable<LocListText> GetLocTexts()
+        => stages.Where(s => s != null).Select(s => new LocListText(s.LocId, s.constraintDescription));
+
+    // 단계 번호가 곧 고정 id다.
+    public bool EnsureLocIds() => false;
 
     public DawnStageData Get(int stage) => stages.Find(s => s != null && s.stage == stage);
 }
@@ -20,6 +34,13 @@ public class DawnStageConfig : ScriptableObject
 [Serializable]
 public class DawnStageData
 {
+    /// <summary>번역 키에 쓰는 id.</summary>
+    public string LocId => $"stage{stage}";
+
+    /// <summary>화면에 보여줄 제약 설명.</summary>
+    public string LocalizedConstraint
+        => Loc.Or(LocKey.For(DawnStageConfig.LocPrefix, DawnStageConfig.LocGroupId, LocId), constraintDescription);
+
     [Tooltip("새벽 단계 번호 (1..N)")]
     public int stage;
 

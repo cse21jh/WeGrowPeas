@@ -124,7 +124,7 @@ public class DawnUIController : MonoBehaviour
 
             bool isUnlocked = DawnSystem.IsStageUnlocked(data.stage);
             int stageNum = data.stage;
-            string constraintDesc = data.constraintDescription;
+            string constraintDesc = data.LocalizedConstraint;
 
             item.Setup(
                 stage: stageNum,

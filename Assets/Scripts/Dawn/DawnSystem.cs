@@ -184,7 +184,7 @@ public static class DawnSystem
         {
             if (d == null || d.stage < 1 || d.stage > stage) continue;
             if (string.IsNullOrWhiteSpace(d.constraintDescription)) continue;
-            sb.AppendLine($"• [{d.stage}] {d.constraintDescription}");
+            sb.AppendLine($"• [{d.stage}] {d.LocalizedConstraint}");
         }
         return sb.ToString();
     }

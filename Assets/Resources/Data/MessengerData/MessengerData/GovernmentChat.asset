@@ -14,99 +14,136 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chatPartner: {fileID: 11400000, guid: e357b105dbca2de4e8a1dcf249bb1896, type: 2}
   messages:
-  - triggerId: Default
+  - locId: m001
+    triggerId: Default
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uAE30\uD6C4 \uBCC0\uD654\uB85C \uC778\uD574 \uBE44\uCD95\uD574\uB454
       \uC2DD\uB7C9\uC774 \uACE0\uAC08\uB418\uACE0 \uC788\uC2B5\uB2C8\uB2E4. "
     delayAfterPrevious: 0
-  - triggerId: Default
+  - locId: m002
+    triggerId: Default
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB048\uC9C8\uAE34 \uC0DD\uC874\uB825\uACFC \uD48D\uBD80\uD55C
       \uC601\uC591\uC18C\uB97C \uC9C0\uB2CC \uC2DD\uBB3C\uC744 \uAC00\uC838\uC624\uB294
       \uC0AC\uB78C\uC5D0\uAC8C \uD3EC\uC0C1\uAE08\uC744 \uC9C0\uAE09\uD558\uB824
       \uD569\uB2C8\uB2E4."
     delayAfterPrevious: 0
-  - triggerId: Default
+  - locId: m003
+    triggerId: Default
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uADC0\uD558\uAED8\uC11C \uC2DD\uBB3C\uACFC \uC18C\uD1B5\uC774
       \uAC00\uB2A5\uD55C \uB2A5\uB825\uC744 \uAC00\uC9C0\uACE0 \uC788\uB2E4\uACE0
       \uB4E4\uC5C8\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 0
-  - triggerId: Default
+  - locId: m004
+    triggerId: Default
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uBD80\uB514 \uADF8 \uB2A5\uB825\uC744 \uBC14\uD0D5\uC73C\uB85C
       \uD6CC\uB96D\uD55C \uC2DD\uBB3C\uC744 \uD0A4\uC6CC \uC8FC\uC2DC\uAE30 \uBC14\uB78D\uB2C8\uB2E4."
     delayAfterPrevious: 0
-  - triggerId: PestUnlock
+  - locId: m005
+    triggerId: PestUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uAE30\uD6C4 \uBCC0\uD654\uB85C \uC778\uD574 \uBA54\uB69C\uAE30
       \uB5BC\uAC00 \uAE30\uC2B9\uC744 \uBD80\uB9AC\uACE0 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: PestUnlock
+  - locId: m006
+    triggerId: PestUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB0B4\uC77C\uBD80\uD130 \uD574\uCDA9 \uC6E8\uC774\uBE0C\uAC00
       \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: WindUnlock
+  - locId: m007
+    triggerId: WindUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uC800\uAE30\uC555\uC758 \uC601\uD5A5\uC73C\uB85C \uAC15\uD48D\uC774
       \uC2EC\uD574\uC9C0\uACE0 \uC788\uC2B5\uB2C8\uB2E4. "
     delayAfterPrevious: 2
-  - triggerId: WindUnlock
+  - locId: m008
+    triggerId: WindUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB0B4\uC77C\uBD80\uD130 \uBC14\uB78C \uC6E8\uC774\uBE0C\uAC00
       \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: FloodUnlock
+  - locId: m009
+    triggerId: FloodUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uAC15\uC218\uB7C9\uC774 \uC9C0\uC18D\uC801\uC73C\uB85C \uC0C1\uC2B9\uD558\uBA70
       \uD64D\uC218\uAC00 \uC7A6\uC544\uC9C0\uACE0 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: FloodUnlock
+  - locId: m010
+    triggerId: FloodUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB0B4\uC77C\uBD80\uD130 \uD64D\uC218 \uC6E8\uC774\uBE0C\uAC00
       \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: HeavyRainUnlock
+  - locId: m011
+    triggerId: HeavyRainUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uC5EC\uB984\uCCA0 \uB192\uC740 \uC2B5\uB3C4\uAC00 \uC7A5\uAE30\uAC04
       \uC9C0\uC18D\uB418\uBA70 \uAC11\uC791\uC2A4\uB7EC\uC6B4 \uD3ED\uC6B0\uAC00
       \uC788\uC744 \uAC83\uC73C\uB85C \uC608\uC0C1\uB429\uB2C8\uB2E4. "
     delayAfterPrevious: 2
-  - triggerId: HeavyRainUnlock
+  - locId: m012
+    triggerId: HeavyRainUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB0B4\uC77C\uBD80\uD130 \uD3ED\uC6B0 \uC6E8\uC774\uBE0C\uAC00
       \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: ColdUnlock
+  - locId: m013
+    triggerId: ColdUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uAC00\uC744\uC774 \uB418\uBA70 \uC77C\uAD50\uCC28\uAC00 \uC2EC\uD574\uC838
       \uAE30\uC628\uC774 \uC601\uD558\uAE4C\uC9C0 \uB5A8\uC5B4\uC9C0\uB294 \uC0C1\uD669\uC774
       \uBC1C\uC0DD\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: ColdUnlock
+  - locId: m014
+    triggerId: ColdUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uB0B4\uC77C\uBD80\uD130 \uCD94\uC704 \uC6E8\uC774\uBE0C\uAC00
       \uB4F1\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: DroughtUnlock
+  - locId: m015
+    triggerId: DroughtUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uACA8\uC6B8\uCCA0 \uC2B5\uB3C4\uAC00 \uAE09\uACA9\uD788 \uB0AE\uC544\uC9C0\uBA70
       \uAC00\uBB44\uC774 \uC2EC\uD654\uB420 \uAC83\uC73C\uB85C \uC608\uC0C1\uB429\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: DroughtUnlock
+  - locId: m016
+    triggerId: DroughtUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uACA8\uC6B8\uC774 \uB418\uC5B4 \uD3ED\uC6B0 \uC6E8\uC774\uBE0C
       \uB300\uC2E0 \uAC00\uBB44 \uC6E8\uC774\uBE0C\uAC00 \uB4F1\uC7A5\uD569\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: HeatUnlock
+  - locId: m017
+    triggerId: HeatUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uBD04\uC774 \uB418\uBA70 \uAE30\uC628\uC774 \uAE09\uC0C1\uC2B9\uD574
       \uC774\uB978 \uC2DC\uC810\uBD80\uD130 \uB354\uC6B4 \uB0A0\uC528\uAC00 \uC9C0\uC18D\uB418\uACE0
       \uC788\uC2B5\uB2C8\uB2E4."
     delayAfterPrevious: 2
-  - triggerId: HeatUnlock
+  - locId: m018
+    triggerId: HeatUnlock
     isMandatory: 0
+    waitForAdvanceSignal: 0
     messageText: "\uBD04\uC774 \uB418\uC5B4 \uCD94\uC704 \uC6E8\uC774\uBE0C \uB300\uC2E0
       \uB354\uC704 \uC6E8\uC774\uBE0C\uAC00 \uB4F1\uC7A5\uD569\uB2C8\uB2E4."
     delayAfterPrevious: 2
+  useSaveSlotReadStateOnly: 0

@@ -105,7 +105,7 @@ public static class CodexCatalog
             if (c.levels != null)
                 for (int i = 0; i < c.levels.Count; i++)
                     if (c.levels[i] != null && !string.IsNullOrEmpty(c.levels[i].note))
-                        sb.AppendLine($"{i + 1}단계: {c.levels[i].note}");
+                        sb.AppendLine($"{i + 1}단계: {c.GetLevelNote(i)}");
 
             list.Add(new CodexEntry
             {

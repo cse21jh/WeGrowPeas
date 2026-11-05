@@ -11,7 +11,7 @@ public enum CurseType { Temporal, Seasonal }
 [CreateAssetMenu(menuName = "Curse/CurseItem")]
 [BalanceGroup("Curse", "Curses")]
 [LocGroup(LocPrefix)]
-public class CurseScriptable : ScriptableObject
+public class CurseScriptable : ScriptableObject, ILocListSource
 {
     private const string LocPrefix = "curse";
 
@@ -20,6 +20,22 @@ public class CurseScriptable : ScriptableObject
 
     /// <summary>화면에 보여줄 설명.</summary>
     public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
+
+    /// <summary>화면에 보여줄 단계별 설명. index는 0부터.</summary>
+    public string GetLevelNote(int index) => Loc.Or(LocKey.For(LocPrefix, name, LevelId(index)), levels[index].note);
+
+    public IEnumerable<LocListText> GetLocTexts()
+    {
+        for (int i = 0; i < levels.Count; i++)
+        {
+            if (levels[i] != null) yield return new LocListText(LevelId(i), levels[i].note);
+        }
+    }
+
+    // 단계 번호가 곧 고정 id다.
+    public bool EnsureLocIds() => false;
+
+    private static string LevelId(int index) => $"level{index + 1}";
 
     public string curseId;
 

@@ -107,7 +107,7 @@ public class IntroCutsceneManager : MonoBehaviour
         if (hasText)
         {
             _isTyping = true;
-            _typingCoroutine = StartCoroutine(TypeText(ToDisplayText(entry.text)));
+            _typingCoroutine = StartCoroutine(TypeText(ToDisplayText(data.GetText(entry))));
         }
         else
         {
@@ -170,7 +170,7 @@ public class IntroCutsceneManager : MonoBehaviour
 
         var entry = data.Get(_index);
         if (entry != null && bottomText != null)
-            bottomText.text = ToDisplayText(entry.text);
+            bottomText.text = ToDisplayText(data.GetText(entry));
 
         _waitingAdvance = true;
         if (advanceIcon != null)
