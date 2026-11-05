@@ -228,7 +228,7 @@ public class AbilityUIController : MonoBehaviour
         {
             GameObject ability = Instantiate(generalAbilityPrefab, generalAbilityListContent);
 
-            ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.abilityName] ,this);
+            ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.UnlockKey] ,this);
         }
 
         addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>

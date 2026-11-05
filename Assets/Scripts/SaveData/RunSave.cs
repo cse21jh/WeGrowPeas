@@ -10,7 +10,7 @@ public static class RunSave
     /// 지금 쓰는 저장 형식 버전. 구조가 바뀌면 올리고 <see cref="Migrate"/>에 보정을 추가한다.
     /// 필드가 늘어나는 정도는 JsonUtility가 기본값으로 채우므로 올릴 필요 없다.
     /// </summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public static bool Exists(string path) => SaveIO.Exists(path);
 
@@ -55,5 +55,14 @@ public static class RunSave
     {
         // v0 → v1: 버전 필드만 추가됨. 데이터 보정 없음.
         if (data.version < 1) data.version = 1;
+
+        // v1 → v2: 구매 이력 키를 표시 이름에서 에셋 이름으로.
+        // 진행 중인 런의 스냅샷도 함께 바꿔야 전날과 비교한 그날 구매분이 맞는다.
+        if (data.version < 2)
+        {
+            LegacySaveKeys.ConvertItems(data.shop.itemName);
+            LegacySaveKeys.ConvertItems(data.recall.days);
+            data.version = 2;
+        }
     }
 }

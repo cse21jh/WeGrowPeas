@@ -9,10 +9,10 @@ public class ShopInventory
 }
 public class ShopManager : Singleton<ShopManager>
 {
-    // 코드가 직접 찾는 아이템의 구매 이력 키. ItemData.PurchaseKey와 같은 값이다.
-    private const string ShopContactKey = "상점 연락처";
-    private const string LandDeedKey = "땅문서";
-    private const string BreedingKitKey = "교배 키트";
+    // 코드가 직접 찾는 아이템의 구매 이력 키. ItemData.PurchaseKey와 같은 값(에셋 이름)이다.
+    private const string ShopContactKey = "ShopContactItemData";
+    private const string LandDeedKey = "AddSoilItem";
+    private const string BreedingKitKey = "BreedCountItemData";
 
     [Header("Inventory (Serialized here)")]
     [SerializeField] private ItemData[] fixedItems = new ItemData[4];  // 상단 고정 4종
@@ -269,7 +269,7 @@ public class ShopManager : Singleton<ShopManager>
         dailyPurchaseCount++;
         dailySpentGold += price;
 
-        // 히스토리(종류별 개수 집계) : 이름(or asset name) 기준
+        // 히스토리(종류별 개수 집계) : 에셋 이름 기준
         var key = data.PurchaseKey;
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;

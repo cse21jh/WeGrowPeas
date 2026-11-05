@@ -13,6 +13,7 @@ public class PlantInfoData : ScriptableObject
     public string LocalizedDescription => Loc.Or(LocKey.For(LocPrefix, name, "description"), description);
 
     public PlayablePlantType type;
+    [Tooltip("식물 종 식별자(PlantIds)이면서 번역 표의 원문이다. 표시 이름은 번역 표에서 고치고, 이 값은 바꾸지 않는다.")]
     [LocText("name")] public string plantName;
     [TextArea, LocText("description")] public string description;
     public Sprite icon;

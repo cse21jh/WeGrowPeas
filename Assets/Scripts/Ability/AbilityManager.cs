@@ -36,7 +36,10 @@ public class AbilityManager : MonoBehaviour
 
     private Dictionary<PlayablePlantType, int> plantAbilityPoint = new();
 
-    private Dictionary<string, bool> isGeneralAbilityDataUnlocked = new(); // 일반 특성 이름, 해당 특성의 해금 여부
+    // 처음부터 해금된 일반 특성의 에셋 이름.
+    private const string DefaultUnlockedGeneralAbility = "AddGoldAbility";
+
+    private Dictionary<string, bool> isGeneralAbilityDataUnlocked = new(); // 일반 특성 에셋 이름, 해당 특성의 해금 여부
 
     private int generalAbilityPoint = 0;
 
@@ -48,7 +51,7 @@ public class AbilityManager : MonoBehaviour
 
     public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
     public Dictionary<PlayablePlantType, int> PlantAbilityPoint => plantAbilityPoint;
-    public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 이름, 해당 특성의 해금 여부
+    public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 에셋 이름, 해당 특성의 해금 여부
     public int GeneralAbilityPoint => generalAbilityPoint;
     public int Genetics => genetics;
 
@@ -100,10 +103,7 @@ public class AbilityManager : MonoBehaviour
 
         foreach(var ability in allGeneralAbilities)
         {
-            if(ability.abilityName == "기본 자금 증가")
-                isGeneralAbilityDataUnlocked.Add(ability.abilityName, true);
-            else
-                isGeneralAbilityDataUnlocked.Add(ability.abilityName, false);
+            isGeneralAbilityDataUnlocked.Add(ability.UnlockKey, ability.UnlockKey == DefaultUnlockedGeneralAbility);
         }
     }
 
@@ -183,12 +183,12 @@ public class AbilityManager : MonoBehaviour
 
     public bool UnlockGeneralAbility(GeneralAbilityData ability)
     {
-        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.abilityName) || isGeneralAbilityDataUnlocked[ability.abilityName]) // 키가 없거나 이미 해금 되어있던 경우
+        if (!isGeneralAbilityDataUnlocked.ContainsKey(ability.UnlockKey) || isGeneralAbilityDataUnlocked[ability.UnlockKey]) // 키가 없거나 이미 해금 되어있던 경우
             return false;
 
         if(UseGenetics(ability.price))
         {
-            isGeneralAbilityDataUnlocked[ability.abilityName] = true;
+            isGeneralAbilityDataUnlocked[ability.UnlockKey] = true;
             return true;
         }
 

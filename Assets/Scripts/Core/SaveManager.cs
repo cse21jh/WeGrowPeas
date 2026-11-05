@@ -15,7 +15,7 @@ public class SaveManager : MonoBehaviour
     /// 프로필 저장 형식 버전. 구조가 바뀌면 올리고 <see cref="MigrateProfile"/>에 보정을 추가한다.
     /// 필드가 늘어나는 정도는 JsonUtility가 기본값으로 채우므로 올릴 필요 없다.
     /// </summary>
-    public const int ProfileVersion = 1;
+    public const int ProfileVersion = 2;
 
     // 로드가 끝나기 전에 저장하면 기본값으로 기존 프로필을 덮어쓴다. 그걸 막는 표시.
     private bool isProfileLoaded;
@@ -216,6 +216,14 @@ public class SaveManager : MonoBehaviour
     {
         // v0 → v1: 없음(v1이 첫 구조화 버전. 그 이전 형식은 LegacySaveMigration이 변환한다).
         if (data.version < 1) data.version = 1;
+
+        // v1 → v2: 일반 특성 키를 표시 이름에서 에셋 이름으로.
+        if (data.version < 2)
+        {
+            foreach (var ability in data.ability.generalAbilities)
+                if (ability != null) ability.name = LegacySaveKeys.GeneralAbility(ability.name);
+            data.version = 2;
+        }
     }
 
     [ContextMenu("Debug: Unlock All Elements")]
@@ -235,13 +243,8 @@ public class SaveManager : MonoBehaviour
 
             foreach (var ability in AbilityManager.Instance.GetAllGeneralAbility())
             {
-                if (ability != null && !string.IsNullOrEmpty(ability.abilityName))
-                {
-                    if (!AbilityManager.Instance.IsGeneralAbilityDataUnlocked.ContainsKey(ability.abilityName))
-                        AbilityManager.Instance.IsGeneralAbilityDataUnlocked.Add(ability.abilityName, true);
-                    else
-                        AbilityManager.Instance.IsGeneralAbilityDataUnlocked[ability.abilityName] = true;
-                }
+                if (ability != null)
+                    AbilityManager.Instance.IsGeneralAbilityDataUnlocked[ability.UnlockKey] = true;
             }
         }
 

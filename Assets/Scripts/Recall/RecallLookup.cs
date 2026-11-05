@@ -97,8 +97,8 @@ public static class RecallLookup
     }
 
     /// <summary>
-    /// 상점 구매 이력의 키로 아이템 정보를 찾는다.
-    /// ShopManager가 DisplayName을 키로 쓰기도 하고 에셋 이름을 쓰기도 해서 둘 다 등록해 둔다.
+    /// 상점 구매 이력의 키(<see cref="ItemData.PurchaseKey"/>)로 아이템 정보를 찾는다.
+    /// 옛 기록의 키는 <see cref="RecallStore"/>가 읽을 때 이미 바꿔 둔다.
     /// </summary>
     public static Entry Item(string itemKey)
     {
@@ -112,17 +112,13 @@ public static class RecallLookup
             {
                 if (it == null) continue;
 
-                var entry = new Entry
+                _items[it.PurchaseKey] = new Entry
                 {
                     found = true,
                     icon = it.Icon,
                     name = string.IsNullOrEmpty(it.DisplayName) ? it.name : it.LocalizedName,
                     description = it.LocalizedDescription
                 };
-
-                if (!_items.ContainsKey(it.name)) _items[it.name] = entry;
-                if (!string.IsNullOrEmpty(it.DisplayName) && !_items.ContainsKey(it.DisplayName))
-                    _items[it.DisplayName] = entry;
             }
         }
 

@@ -184,7 +184,7 @@ public class EconomySave
 [Serializable]
 public class ShopSave
 {
-    // itemName[i]의 구매 횟수가 itemPurchaseCount[i] (인덱스 매칭)
+    // itemName[i](아이템 에셋 이름)의 구매 횟수가 itemPurchaseCount[i] (인덱스 매칭)
     public List<string> itemName = new();
     public List<int> itemPurchaseCount = new();
 

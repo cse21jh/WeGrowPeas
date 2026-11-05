@@ -109,7 +109,7 @@ public static class LegacySaveMigration
         }
 
         for (int i = 0; i < old.generalAbilityDataName.Count && i < old.isGeneralAbilityDataUnlocked.Count; i++)
-            a.generalAbilities.Add(new NamedFlag { name = old.generalAbilityDataName[i], value = old.isGeneralAbilityDataUnlocked[i] });
+            a.generalAbilities.Add(new NamedFlag { name = LegacySaveKeys.GeneralAbility(old.generalAbilityDataName[i]), value = old.isGeneralAbilityDataUnlocked[i] });
 
         if (old.unlockedItems != null) profile.unlock.ids = new List<string>(old.unlockedItems);
         if (old.readMessengerKeys != null) profile.messenger.readKeys = new List<string>(old.readMessengerKeys);

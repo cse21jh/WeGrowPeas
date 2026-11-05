@@ -19,7 +19,7 @@ public static class RecallStore
     /// <summary>
     /// 지금 쓰는 저장 형식 버전. 구조가 바뀌면 올리고 <see cref="MigrateRun"/>에 보정을 추가한다.
     /// </summary>
-    public const int FormatVersion = 1;
+    public const int FormatVersion = 2;
 
     /// <summary>
     /// 읽어줄 수 있는 가장 오래된 버전. 필드가 늘어나는 정도의 변경은 JsonUtility가
@@ -102,11 +102,7 @@ public static class RecallStore
     /// </summary>
     private static void MigrateRun(RecallRunFile run)
     {
-        // v1: 최초 형식. 아직 보정할 것이 없다.
-        //
-        // 형식을 바꿀 때는 이런 식으로 쌓는다:
-        //   if (run.version < 2) { ... v1 → v2 보정 ... }
-        //   if (run.version < 3) { ... v2 → v3 보정 ... }
+        // 형식을 바꿀 때는 아래 v2처럼 버전별 보정을 쌓는다.
         // 파일 자체는 다시 쓰지 않는다. 다음에 읽을 때 또 보정하면 되고,
         // 읽기만으로 사용자 파일을 덮어쓰지 않는 편이 안전하다.
 
@@ -114,6 +110,15 @@ public static class RecallStore
         if (run.summary == null) run.summary = new RunSummary();
         if (run.graph == null) run.graph = new GraphSave();
         if (run.recall == null) run.recall = new RecallSave();
+
+        // v1 → v2: 구매 이력과 일반 특성 키를 표시 이름에서 에셋 이름으로.
+        if (run.version < 2)
+        {
+            run.summary.popularItemName = LegacySaveKeys.Item(run.summary.popularItemName);
+            LegacySaveKeys.ConvertItems(run.recall.days);
+            LegacySaveKeys.ConvertGeneralAbilities(run.generalAbilityNames);
+            run.version = 2;
+        }
     }
 
     /// <summary>사진을 텍스처로 읽는다. 없으면 null.</summary>

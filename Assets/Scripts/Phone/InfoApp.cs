@@ -95,18 +95,10 @@ public class InfoApp : BasePhoneApp
         var allItems = Resources.LoadAll<ItemData>("Data/Item Data");
         foreach (var item in allItems)
         {
-            if (item != null && !itemLookup.ContainsKey(item.name))
+            // 구매 이력의 키로 찾는다.
+            if (item != null && !itemLookup.ContainsKey(item.PurchaseKey))
             {
-                itemLookup.Add(item.name, item);
-            }
-            // Also add by DisplayName if unique? Maybe not, duplicate display names possible.
-            // PurchaseHistory uses item.name (or DisplayName?) -> ShopManager says: 
-            // var key = string.IsNullOrEmpty(data.DisplayName) ? data.name : data.DisplayName;
-            // So we need to match that logic.
-            string key = item.PurchaseKey;
-            if (!itemLookup.ContainsKey(key))
-            {
-                itemLookup.Add(key, item);
+                itemLookup.Add(item.PurchaseKey, item);
             }
         }
     }

@@ -89,7 +89,6 @@ public abstract class ItemData : ScriptableObject
     private const string LocPrefix = "item";
 
     [Header("Meta")]
-    [Tooltip("구매 이력의 저장 키로도 쓰인다. 값을 바꾸면 기존 세이브의 구매 이력이 끊긴다.")]
     [LocText("name")] public string DisplayName;
     public Sprite Icon;
     [TextArea, LocText("description")] public string Description;
@@ -119,8 +118,8 @@ public abstract class ItemData : ScriptableObject
     [Header("Flow")]
     public ShopFlowType FlowType;
 
-    /// <summary>구매 이력의 저장 키. 세이브에 저장되므로 번역하지 않는다.</summary>
-    public string PurchaseKey => string.IsNullOrEmpty(DisplayName) ? name : DisplayName;
+    /// <summary>구매 이력의 저장 키. 에셋 이름을 바꾸면 <see cref="LegacySaveKeys"/>와 ShopManager의 상수도 함께 고친다.</summary>
+    public string PurchaseKey => name;
 
     /// <summary>화면에 보여줄 이름. 저장 키가 필요하면 <see cref="PurchaseKey"/>를 쓴다.</summary>
     public string LocalizedName => Loc.Or(LocKey.For(LocPrefix, name, "name"), DisplayName);
