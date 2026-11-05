@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 205 독점시장: 상점 품목 가격이 무작위(하한~상한 배율)로 결정. ShopUI/ItemData가 CurseState를 읽어 반영.
+// 205 독점시장: 상점 품목 가격이 무작위(하한~상한 배율)로 결정. ItemData가 CurseState를 읽어 반영.
 public class ShopMonopolyCurse : CurseInstance
 {
     public ShopMonopolyCurse(CurseScriptable data, int level) : base(data, level)

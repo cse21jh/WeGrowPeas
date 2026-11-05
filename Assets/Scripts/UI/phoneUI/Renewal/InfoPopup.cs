@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// 정보 팝업(Popup_Info). 정보 앱의 "특성" 탭을 대체한다.
 /// 이번 런에서 고른 식물과 그 식물의 특성 레벨, 일반 특성을 보여준다.
 ///
-/// 값은 <see cref="AbilityManager"/>에서 읽으며 표시 규칙은 정보 앱(<see cref="InfoApp"/>)과 같다.
+/// 값은 <see cref="AbilityManager"/>에서 읽는다.
 /// 행은 PlantTraitRow / CommonTraitRow가 채운다. (프리팹에 붙여 인스펙터에서 연결)
 /// 특성 설명은 마우스를 올리면 <see cref="HoverTooltip"/>으로 뜬다.
 /// </summary>

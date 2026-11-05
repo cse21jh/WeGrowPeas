@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 국세청 앱 화면 컨트롤러. (WeatherApp 등과 동일하게 씬 패널에 붙는 MonoBehaviour)
+/// 국세청 앱 화면 컨트롤러. (씬 패널에 붙는 MonoBehaviour)
 /// 이번에 내야 할 세금액·마감일을 보여주고, [납부] 버튼으로 TaxManager에 납부를 위임한다.
 /// </summary>
 public class TaxApp : MonoBehaviour

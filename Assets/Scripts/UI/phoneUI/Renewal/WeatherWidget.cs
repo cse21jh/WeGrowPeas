@@ -10,7 +10,7 @@ using UnityEngine.UI;
 ///   - 일기예보 특성: 모레 올 웨이브까지
 ///
 /// 내일 웨이브에 저항이 없는 식물이 있으면 알람을 띄운다.
-/// 아이콘·색 배열은 날씨 앱(<see cref="WeatherApp"/>)과 같은 순서(WaveType)로 채운다.
+/// 아이콘·색 배열은 WaveType 순서로 채운다.
 /// </summary>
 public class WeatherWidget : MonoBehaviour
 {

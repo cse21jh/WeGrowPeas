@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 상점의 뷰 비의존 로직(인벤토리 생성/구매 플로우/리롤). MonoBehaviour가 아니므로 어떤 UI에서도 사용 가능.
-/// 기존 ShopUI와 신규 ShopCanvasController(Renewal)가 같은 로직을 공유하기 위해 분리했다.
+/// 화면은 ShopCanvasController(Renewal)가 맡는다.
 ///
 /// 사용:
 ///   var shop = new ShopController(showError: msg => ...);

@@ -47,8 +47,6 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private BreedTimerManager breedTimerManager;
 
-    [SerializeField] private WeatherApp weatherApp;
-
     [SerializeField] public WaveType setWave;
 
     [SerializeField] public SignPostController signPost;
@@ -122,9 +120,6 @@ public class EnemyController : MonoBehaviour
         else
             nextSecondWave = null;
 
-        // 날씨 앱은 홈 위젯+팝업으로 대체될 수 있어 없을 수도 있다(다른 호출부와 같은 규칙).
-        if (weatherApp != null)
-            weatherApp.InitApp(1, currentWave, nextWave, grid.CountNoTraitPlant(currentWave.WaveType));
 
         setWave = currentWave.WaveType;
         FenceUIManager.Instance.SetWaveHighlight(currentWave);
@@ -229,8 +224,6 @@ public class EnemyController : MonoBehaviour
         grid.UpdateResistanceScouterImageInGrid(currentWave.WaveType); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
 
         int stage = GameManager.Instance.stage;
-        if (weatherApp != null)
-            weatherApp.LoadNextDay(stage, lastWave, currentWave, nextWave, stageNoTraitRecord[stage], grid.CountNoTraitPlant(currentWave.WaveType), stageKillRecord[stage]);
         //FlushNextWaveText();
         yield return null;
     }
@@ -300,17 +293,6 @@ public class EnemyController : MonoBehaviour
         nextWave = GetWaveFromWaveType(waveType);
         ShowNextWaveText();
 
-        // 날씨 앱(폰 UI)의 "내일 예상 웨이브" 표시도 갱신.
-        // 폰/자유시간에는 currentWave가 곧 오늘(stage), 아니면 다음 날(stage+1) 웨이브를 보여주므로
-        // UpdateCurrentWave 쪽 규칙과 동일하게 내일 일차를 계산한다.
-        if (weatherApp != null)
-        {
-            int day = GameManager.Instance != null ? GameManager.Instance.stage : 0;
-            bool showsNextDay = PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime()
-                                || (grid != null && !grid.GetIsBreeding());
-            int nextDay = showsNextDay ? day + 2 : day + 1;
-            weatherApp.UpdateNextWave(nextDay, nextWave);
-        }
 
         Debug.Log($"[Debug] 다음 웨이브 → {waveType}");
     }
@@ -374,8 +356,6 @@ public class EnemyController : MonoBehaviour
             waveSkipCount--;
             SetWaveSkipCountText();
             ShowNextWaveText();
-            if (weatherApp != null)
-                weatherApp.UpdateCurrentWave(GameManager.Instance.stage, currentWave, 0);
         }
 
         if (waveSkipCount <= 0)
@@ -502,14 +482,6 @@ public class EnemyController : MonoBehaviour
         stageWaveRecord = saveData.stageWaveRecord;
         stageKillRecord = saveData.stageKillRecord;
         stageNoTraitRecord = saveData.stageNoTraitRecord;
-        if (weatherApp != null)
-        {
-            int count = grid.CountNoTraitPlant(currentWave.WaveType);
-            for (int i = 1; i < stageWaveRecord.Count; i++)
-            {
-                weatherApp.LoadNextDay(i, waves[stageWaveRecord[i]], currentWave, nextWave, stageNoTraitRecord[i], count, stageKillRecord[i]);
-            }
-        }
     }
 
     private void OnValidate()
@@ -670,21 +642,10 @@ public class EnemyController : MonoBehaviour
         waveManager.SkipWaveEffect();
     }
 
-    public void UpdateCurrentWaveAlarm()
-    {
-        if (weatherApp != null)
-            weatherApp.UpdateCurrentWave(PhoneManager.Instance.GetIsPhoneTime() || !grid.GetIsBreeding() ? GameManager.Instance.stage + 1 : GameManager.Instance.stage, currentWave, grid.CountNoTraitPlant(currentWave.WaveType));
-    }
-
     public int PickTraitFromUnlockWave()
     {
         int traitType = (int)PickNextByWeight();
 
         return traitType;
-    }
-
-    public void SetWeatherApp(WeatherApp app)
-    {
-        weatherApp = app;
     }
 }

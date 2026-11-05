@@ -61,16 +61,8 @@ public sealed class ChatMessageList : MonoBehaviour
         if (isFirstMessageOfStage && dateSeparatorPrefab != null && !PhoneManager.Instance.isTutorial)
         {
             GameObject dateObj = Instantiate(dateSeparatorPrefab, content, false);
-            var btnCtrl = dateObj.GetComponent<MessageBoxBtnController>();
-            if (btnCtrl != null)
-            {
-                btnCtrl.SetText(Loc.T("game.common.day", ("day", stageId)));
-            }
-            else
-            {
-                var tmp = dateObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                if (tmp != null) tmp.text = Loc.T("game.common.day", ("day", stageId));
-            }
+            var tmp = dateObj.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (tmp != null) tmp.text = Loc.T("game.common.day", ("day", stageId));
         }
 
         ChatMessageItem selectedPrefab =

@@ -107,9 +107,6 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] TextMeshProUGUI phoneTimerText;
     [SerializeField] public bool isTutorial = false;
 
-    [SerializeField] public GameObject weatherApp_Default;
-    [SerializeField] public GameObject weatherApp_Tomorrow;
-
     private void Awake()
     {
 
@@ -798,22 +795,6 @@ public class PhoneManager : Singleton<PhoneManager>
     public bool GetIsPhoneTime()
     {
         return isPhoneTime;
-    }
-
-    public void SetWeatherForecastPanel()
-    {
-        // 날씨 앱을 홈 위젯+팝업으로 대체하면 이 패널들이 아예 없을 수 있다.
-        // 일기예보 특성 자체는 위젯이 grid.GetHasWeatherForecast()로 직접 보므로 여기서 빠져도 된다.
-        if (weatherApp_Default == null && weatherApp_Tomorrow == null) return;
-
-        bool hasForecast = GameManager.Instance.grid.GetHasWeatherForecast();
-
-        if (weatherApp_Default != null) weatherApp_Default.SetActive(!hasForecast);
-        if (weatherApp_Tomorrow != null) weatherApp_Tomorrow.SetActive(hasForecast);
-
-        GameObject active = hasForecast ? weatherApp_Tomorrow : weatherApp_Default;
-        if (active != null)
-            GameManager.Instance.enemyController.SetWeatherApp(active.GetComponent<WeatherApp>());
     }
 
     public void SetEMPEffect(bool isOn)

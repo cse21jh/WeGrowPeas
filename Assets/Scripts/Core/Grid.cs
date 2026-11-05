@@ -708,7 +708,6 @@ public class Grid : MonoBehaviour
             movablePlant.TryRootAfterPlacement();
 
         UpdateGoldScouterImageInGrid();
-        enemyController.UpdateCurrentWaveAlarm();
 
         // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
         if (!isLoadingGrid)
@@ -1178,7 +1177,7 @@ public class Grid : MonoBehaviour
                 // **주의**: Plant.cs에서도 gridIndex - 3을 체크하고 있음. (오타일 가능성 있으나 기존 로직 유지)
                 // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
                 // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
-                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함. (기존 InfoAppGridSlot 구현과 동일하게)
+                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함.
                 if (plantGrid.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
                 {
                     if (chiliPepper is ChiliPepper) return true;
@@ -2821,10 +2820,7 @@ public class Grid : MonoBehaviour
 
     public void SetWeatherForecast(bool val)
     {
-        if (hasWeatherForecast = val)
-        {
-            GameManager.Instance.phoneManager.SetWeatherForecastPanel();
-        }
+        hasWeatherForecast = val;
     }
 
     public bool GetHasWeatherForecast()

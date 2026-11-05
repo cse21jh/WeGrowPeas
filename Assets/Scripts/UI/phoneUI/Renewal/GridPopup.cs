@@ -19,7 +19,6 @@ public enum TileEffect
 /// 밭 정보 팝업(Popup_Grid). 정보 앱의 "밭 정보" 탭을 대체한다.
 ///
 /// 왼쪽에 밭을 세로 4칸 × 가로 maxCol로 깔고, 칸을 누르면 오른쪽에 그 칸의 효과를 나열한다.
-/// 효과 판정과 설명 문구는 정보 앱(<see cref="InfoAppGridSlot"/>)과 같다.
 ///
 /// 칸과 상세 줄은 각각 <see cref="GridCellSlot"/> / <see cref="GridDetailRow"/>가 채운다.
 /// (프리팹에 붙여 인스펙터에서 연결한다)
