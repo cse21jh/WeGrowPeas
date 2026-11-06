@@ -109,8 +109,8 @@ public class FenceElementController : MonoBehaviour
                         //Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_pea = pea.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_pea.Rebind();
-                        anim_pea.SetInteger("faceIndex", (int)pairDatas[i].y);
-                        anim_pea.SetTrigger("Start");
+                        anim_pea.SetInteger(AnimParams.FaceIndex, (int)pairDatas[i].y);
+                        anim_pea.SetTrigger(AnimParams.Start);
                         pairDatas.RemoveAt(i);
 
                         isSet = true;
@@ -131,8 +131,8 @@ public class FenceElementController : MonoBehaviour
                         //Debug.Log("완두콩 얼굴 애니메이션 설정 완료! " + (TraitType)pairDatas[i].x + " / " + pairDatas[i].y + " in pea #" + (transform.GetSiblingIndex()-4));
                         Animator anim_peanut = peanut.GetComponentInChildren<AnimDelayController>().gameObject.GetComponent<Animator>();
                         anim_peanut.Rebind();
-                        anim_peanut.SetInteger("faceIndex", (int)pairDatas[i].y);
-                        anim_peanut.SetTrigger("Start");
+                        anim_peanut.SetInteger(AnimParams.FaceIndex, (int)pairDatas[i].y);
+                        anim_peanut.SetTrigger(AnimParams.Start);
                         pairDatas.RemoveAt(i);
 
                         isSet = true;

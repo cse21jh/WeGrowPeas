@@ -124,7 +124,7 @@ public class ShopManager : Singleton<ShopManager>
         }
 
         // Resources 폴더 기준 상대 경로로 모든 ItemData 로드
-        ItemData[] items = Resources.LoadAll<ItemData>("Data/Item Data/Rotation");
+        ItemData[] items = Resources.LoadAll<ItemData>(ResourcePaths.RotationItems);
         
         if (items != null && items.Length > 0)
         {

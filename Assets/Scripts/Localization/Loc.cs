@@ -90,10 +90,12 @@ public static class Loc
         return true;
     }
 
-    /// <summary>표를 다시 읽는다. 플레이 중 표를 고쳤을 때 쓴다.</summary>
+    /// <summary>표를 다시 읽는다. 플레이 중 표를 고쳤을 때 쓴다. 지금 보고 있는 언어는 유지한다.</summary>
     public static void Reload()
     {
+        string current = _language;
         Load();
+        if (current != null && _database.Languages.Contains(current)) _language = current;
         LanguageChanged?.Invoke();
     }
 

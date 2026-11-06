@@ -7,6 +7,6 @@ public class NoneWave : Wave
     public override WaveType WaveType => WaveType.None;
     public override string WaveName => "";
     public override string WaveDescription => Loc.T("game.wave.None.description");
-    public override string WaveSoundString => "Aging";
+    public override string WaveSoundString => SoundIds.Aging;
     public const int UnlockStage = 999;
 }

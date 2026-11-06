@@ -2943,50 +2943,6 @@ RectTransform:
   m_AnchoredPosition: {x: 31.400024, y: 69.69989}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &66307780
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 66307782}
-  - component: {fileID: 66307781}
-  m_Layer: 0
-  m_Name: UpgradeManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &66307781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66307780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d280af2f9e8cb478e4cc03d3ea866c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &66307782
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 66307780}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 190.19043, y: 490.07312, z: -0.980704}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &68210656
 GameObject:
   m_ObjectHideFlags: 0
@@ -160315,6 +160271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931e66eeb6db7d843b78df39d24eb7a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnArea: {fileID: 1026844896}
   whiteCirclePrefab: {fileID: 409897769363296186, guid: 22a448ce251d1b64e9aa261654410aa0, type: 3}
 --- !u!1 &2145454268
 GameObject:
@@ -160850,6 +160807,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f335ae22aafbaf4cbd5852ddaf16992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effectVolumeSlider: {fileID: 1627726908}
+  bgmVolumeSlider: {fileID: 492300755}
   SettingPanel: {fileID: 40000972}
   showBreedPopupToggle: {fileID: 0}
   playAlarmForSeenMessagesToggle: {fileID: 0}
@@ -160998,7 +160957,6 @@ SceneRoots:
   - {fileID: 1654424022}
   - {fileID: 415974145}
   - {fileID: 480994820}
-  - {fileID: 66307782}
   - {fileID: 1553829375}
   - {fileID: 1891974903}
   - {fileID: 1305778344}

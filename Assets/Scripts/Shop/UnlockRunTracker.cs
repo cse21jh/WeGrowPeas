@@ -14,7 +14,7 @@ using UnityEngine;
 public static class UnlockRunTracker
 {
     /// <summary>ItemData 에셋이 모여 있는 Resources 경로. (CodexCatalog와 동일)</summary>
-    public const string ItemResourcePath = "Data/Item Data";
+    public const string ItemResourcePath = ResourcePaths.Items;
 
     // 런 시작 시점에 이미 메타 해금돼 있던 아이템의 UnlockId
     private static HashSet<string> runStartUnlocked;

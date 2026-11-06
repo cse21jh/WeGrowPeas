@@ -296,7 +296,7 @@ public class PhoneManager : Singleton<PhoneManager>
     }
     public void PhoneTouchEffect()
     {
-        SoundManager.Instance.PlayEffect("PhoneTouch");
+        SoundManager.Instance.PlayEffect(SoundIds.PhoneTouch);
     }
 
     // 이 밤에 "처음 등장"하는 웨이브가 있으면 해당 경고 메시지(명명 트리거)를 발송한다.

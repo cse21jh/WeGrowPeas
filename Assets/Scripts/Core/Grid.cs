@@ -236,7 +236,7 @@ public class Grid : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        enemyController = GameObject.Find("EnemyController").GetComponent<EnemyController>();
+        enemyController = FindAnyObjectByType<EnemyController>();
         //InitGrid();
         InitSoils();
         plantGrid.Clear();
@@ -338,7 +338,7 @@ public class Grid : MonoBehaviour
                 {
                     breedCount++;
                     Debug.Log("씨 없는 수박 저주로 교배 실패");
-                    SoundManager.Instance.PlayEffect("WrongSelect"); // TODO: 실패 전용 효과음/연기 이펙트
+                    SoundManager.Instance.PlayEffect(SoundIds.WrongSelect); // TODO: 실패 전용 효과음/연기 이펙트
                     UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
                     breedObj1.GetComponent<Plant>().MakeDefaultSprite();
                     breedObj2.GetComponent<Plant>().MakeDefaultSprite();
@@ -376,7 +376,7 @@ public class Grid : MonoBehaviour
                     breedCount++;
                 GameEvents.RaisePeaBreeded();
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
-                SoundManager.Instance.PlayEffect("Breed");
+                SoundManager.Instance.PlayEffect(SoundIds.Breed);
                 totalBreedCount++;
                 if (GameManager.Instance.currentPlant == PlantIds.Pea)
                     totalPeaBreedcount++;
@@ -394,19 +394,19 @@ public class Grid : MonoBehaviour
             else if (breedCount >= currentEffectiveMaxBreedCount)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.no_attempts"), 1);
-                SoundManager.Instance.PlayEffect("WrongSelect");
+                SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
             else if (isEqualPlant)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.species_mismatch"), 1);
-                SoundManager.Instance.PlayEffect("WrongSelect");
+                SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
             else
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.no_space"), 1);
-                SoundManager.Instance.PlayEffect("WrongSelect");
+                SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
         }
@@ -1223,42 +1223,42 @@ public class Grid : MonoBehaviour
         // 저주(꽃가루 실종): 교배 불가 식물은 부모로 새로 선택 불가(이미 선택된 건 취소 허용)
         if (clickedObject != breedObj1 && clickedObject != breedObj2 && !clickedPea.IsBreedable)
         {
-            SoundManager.Instance.PlayEffect("WrongSelect");
+            SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
             return;
         }
 
         if (breedObj1 == clickedObject)
         {
             // 부모 1 선택 취소
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             clickedPea.MakeDefaultSprite();
             breedObj1 = null;
         }
         else if (breedObj2 == clickedObject)
         {
             // 부모 2 선택 취소
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             clickedPea.MakeDefaultSprite();
             breedObj2 = null;
         }
         else if (breedObj1 == null)
         {
             // 부모 1 선택
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj1 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else if (breedObj2 == null)
         {
             // 부모 2 선택
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj2 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else
         {
             // 이미 두 부모 선택됨
-            SoundManager.Instance.PlayEffect("WrongSelect");
+            SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
             Debug.Log("이미 두 부모가 모두 선택된 상태");
             return;
         }
@@ -2018,7 +2018,7 @@ public class Grid : MonoBehaviour
         scouterButton.SetActive(true);
         scouterButton.GetComponent<Button>().onClick.RemoveAllListeners();
         scouterButton.GetComponent<Button>().onClick.AddListener(ToggleScouter);
-        scouterButton.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance.PlayEffect("Button"));
+        scouterButton.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance.PlayEffect(SoundIds.Button));
         HideGoldScouterImageInGrid();
         HideResistanceScouterImageInGrid();
     }

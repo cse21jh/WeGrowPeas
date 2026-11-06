@@ -36,29 +36,20 @@ public class Bug : MonoBehaviour
 
     protected Coroutine movingCoroutine;
 
-    //���� ȿ�� ����
-    [SerializeField] private float dissolveDuration = 1.0f; // ���� �ִϸ��̼� ���� �ð�
+    //각종 효과 관련
+    [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
     private SpriteRenderer[] childSpriteRenderers;
     private Material[] childMaterials;
-    private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
     [SerializeField] private GameObject vanishEffect;
 
 
 
     protected virtual void Start()
     {
-        if (s_bugKillerPrefab == null) s_bugKillerPrefab = Resources.Load<GameObject>("BugKiller");
-        if (s_warningPrefab == null) s_warningPrefab = Resources.Load<GameObject>("Warning");
-        if (s_economyManager == null)
-        {
-            GameObject em = GameObject.Find("EconomyManager");
-            if (em != null) s_economyManager = em.GetComponent<EconomyManager>();
-        }
-        if (s_grid == null)
-        {
-            GameObject g = GameObject.Find("Grid");
-            if (g != null) s_grid = g.GetComponent<Grid>();
-        }
+        if (s_bugKillerPrefab == null) s_bugKillerPrefab = Resources.Load<GameObject>(ResourcePaths.BugKillerPrefab);
+        if (s_warningPrefab == null) s_warningPrefab = Resources.Load<GameObject>(ResourcePaths.WarningPrefab);
+        if (s_economyManager == null) s_economyManager = FindAnyObjectByType<EconomyManager>();
+        if (s_grid == null) s_grid = FindAnyObjectByType<Grid>();
         if (s_mainCamera == null) s_mainCamera = Camera.main;
 
         economyManager = s_economyManager;
@@ -216,7 +207,7 @@ public class Bug : MonoBehaviour
             newTarget++;
         }
 
-        if(plant == null) // ��ǥ�� ã�� ���� (�̹� �Ĺ��� ���� ���. ���� ����)
+        if(plant == null) // 목표를 찾지 못함 (이미 식물이 없는 경우. 게임 오버)
         {
             Destroy(this.gameObject);
         }
@@ -270,7 +261,7 @@ public class Bug : MonoBehaviour
     {
         if (!isDie && !isHit)
         {
-            SoundManager.Instance.PlayEffect("HitBug");
+            SoundManager.Instance.PlayEffect(SoundIds.HitBug);
             isHit = true;
             yield return StartCoroutine(ShowBugKiller());
         }
@@ -330,7 +321,7 @@ public class Bug : MonoBehaviour
 
             for (int i = 0; i < childMaterials.Length; i++)
             {
-                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+                childMaterials[i].SetFloat(ShaderProps.DissolveAmount, lerpedDissolve);
             }
 
 
@@ -344,7 +335,7 @@ public class Bug : MonoBehaviour
         Gizmos.DrawCube(transform.position, new Vector3(hitRange * 2,hitRange * 2));
     }
 
-    public IEnumerator CantHitForOneSecond() // �̰� Ű�� 1�ʵ��� ������ ��ġ���� �ʽ��ϴ�..
+    public IEnumerator CantHitForOneSecond() // 이걸 키면 1초동안 벌레가 터치되지 않습니다..
     {
         isHit = true;
         yield return new WaitForSeconds(1f);

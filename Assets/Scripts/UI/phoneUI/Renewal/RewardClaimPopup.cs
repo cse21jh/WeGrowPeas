@@ -93,7 +93,7 @@ public class RewardClaimPopup : MonoBehaviour
 
         if (claimable.Count == 0)
         {
-            SoundManager.Instance?.PlayEffect("WrongSelect");
+            SoundManager.Instance?.PlayEffect(SoundIds.WrongSelect);
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
                 title = Loc.T("game.common.notice"),

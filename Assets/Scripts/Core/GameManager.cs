@@ -46,7 +46,7 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         SoundManager.Instance.StopBgm();
-        SoundManager.Instance.PlayBgm("Farm");
+        SoundManager.Instance.PlayBgm(SoundIds.Farm);
 
         Time.timeScale = 1;
 

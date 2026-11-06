@@ -230,7 +230,7 @@ public class WaveManager : MonoBehaviour
                 {
                     float meltAmount = 1.2f;
                     DOTween.To(() => meltAmount,
-                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
+                       x => { meltAmount = x; mat.SetFloat(ShaderProps.MeltStrength, x); },
                        -0.2f,
                        snowDuration)
                    .SetEase(snowEase);
@@ -252,7 +252,7 @@ public class WaveManager : MonoBehaviour
                 {
                     float meltAmount = -0.2f;
                     DOTween.To(() => meltAmount,
-                       x => { meltAmount = x; mat.SetFloat("_MeltStrength", x); },
+                       x => { meltAmount = x; mat.SetFloat(ShaderProps.MeltStrength, x); },
                        1.2f,
                        snowDuration)
                    .SetEase(snowEase);
@@ -285,7 +285,7 @@ public class WaveManager : MonoBehaviour
 
                 float dissolveAmount = 0f;
                 DOTween.To(() => dissolveAmount,
-                   x => { dissolveAmount = x; grassMat.SetFloat("_DissolveAmount", x); },
+                   x => { dissolveAmount = x; grassMat.SetFloat(ShaderProps.DissolveAmount, x); },
                    1f,
                    dissolveDuration)
                .SetEase(dissolveEase);
@@ -309,7 +309,7 @@ public class WaveManager : MonoBehaviour
 
                 dissolveAmount = 1f;
                 DOTween.To(() => dissolveAmount,
-                   x => { dissolveAmount = x; grassMat.SetFloat("_DissolveAmount", x); },
+                   x => { dissolveAmount = x; grassMat.SetFloat(ShaderProps.DissolveAmount, x); },
                    0f,
                    dissolveDuration)
                .SetEase(dissolveEase);

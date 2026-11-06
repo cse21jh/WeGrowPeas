@@ -11,13 +11,13 @@ public class WaveTextBoxController : MonoBehaviour
 
     public void ShowWaveTextBox()
     {
-        anim.SetBool("isShow", true);
+        if (isActiveAndEnabled) anim.SetBool(AnimParams.IsShow, true);
     }
 
 
     public void HideWaveTextBox()
     {
-        anim.SetBool("isShow", false);
+        if (isActiveAndEnabled) anim.SetBool(AnimParams.IsShow, false);
     }
 
 

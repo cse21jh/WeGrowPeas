@@ -39,7 +39,7 @@ public class PriceSignController : MonoBehaviour
 
     public void SetPrice(int price)
     {
-        anim.SetBool("isShow", true);
+        anim.SetBool(AnimParams.IsShow, true);
         //Debug.Log(price);
 
         if (priceText != null)
@@ -50,7 +50,7 @@ public class PriceSignController : MonoBehaviour
 
     public void HidePrice()
     {
-        anim.SetBool("isShow", false);
+        anim.SetBool(AnimParams.IsShow, false);
     }
 
     public void ShowTaste(int taste)

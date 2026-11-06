@@ -110,7 +110,7 @@ public class ShopController
         data.StartEffect(ctx,
             onReady: () =>
             {
-                SoundManager.Instance?.PlayEffect("Button");
+                SoundManager.Instance?.PlayEffect(SoundIds.Button);
                 switch (data.FlowType)
                 {
                     case ShopFlowType.Instant:
@@ -222,7 +222,7 @@ public class ShopController
         // 무료 횟수 우선 사용
         if (shopManager.UseReroll())
         {
-            SoundManager.Instance?.PlayEffect("Button");
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
             shopManager.IncrementRerollCount();
             session.ClearThisShop();
             InvalidateInventory();
@@ -232,7 +232,7 @@ public class ShopController
         if (economy != null && economy.HasGold(RerollPrice))
         {
             economy.SpendGold(RerollPrice, GoldFeedbackReason.ShopReroll);
-            SoundManager.Instance?.PlayEffect("Button");
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
             shopManager.IncrementRerollCount();
             session.ClearThisShop();
             InvalidateInventory();
@@ -270,12 +270,7 @@ public class ShopController
         if (economy == null)
             economy = GameManager.Instance != null ? GameManager.Instance.economyManager : UnityEngine.Object.FindAnyObjectByType<EconomyManager>();
 
-        if (placement == null)
-        {
-            var placementObj = GameObject.Find("PlacementController");
-            if (placementObj != null) placement = placementObj.GetComponent<PlacementController>();
-            if (placement == null) placement = UnityEngine.Object.FindAnyObjectByType<PlacementController>();
-        }
+        if (placement == null) placement = UnityEngine.Object.FindAnyObjectByType<PlacementController>();
 
         if (ctx == null)
         {

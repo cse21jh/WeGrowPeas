@@ -6,6 +6,6 @@ public class ColdWave : Wave
 {
     public override WaveType WaveType => WaveType.Cold;
     public override string WaveDescription => Loc.T("game.wave.Cold.description");
-    public override string WaveSoundString => "Cold";
+    public override string WaveSoundString => SoundIds.Cold;
     public const int UnlockStage = 26;
 }

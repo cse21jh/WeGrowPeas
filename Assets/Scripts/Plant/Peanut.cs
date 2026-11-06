@@ -84,28 +84,28 @@ public class Peanut : MovablePlant
     public int FindEmptyGridToCopy()
     {
         List<int> emptyGrid = new List<int>();
-        if ((gridIndex - 1) / 4 == gridIndex / 4) // ��ĭ
+        if ((gridIndex - 1) / 4 == gridIndex / 4) // 위칸
         {
             if (!grid.plantGrid.ContainsKey(gridIndex - 1))
                 emptyGrid.Add(gridIndex - 1);
 
         }
 
-        if ((gridIndex + 1) / 4 == gridIndex / 4) // �Ʒ�ĭ
+        if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래칸
         {
             if (!grid.plantGrid.ContainsKey(gridIndex + 1))
                 emptyGrid.Add(gridIndex + 1);
 
         }
 
-        if ((gridIndex - 4) >= 0) // ����ĭ
+        if ((gridIndex - 4) >= 0) // 왼쪽칸
         {
             if (!grid.plantGrid.ContainsKey(gridIndex - 4))
                 emptyGrid.Add(gridIndex - 4);
 
         }
 
-        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // ������ĭ
+        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // 오른쪽칸
         {
             if (!grid.plantGrid.ContainsKey(gridIndex + 4))
                 emptyGrid.Add(gridIndex + 4);

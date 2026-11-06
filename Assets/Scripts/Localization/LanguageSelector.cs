@@ -5,12 +5,11 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 설정창의 언어 선택 행 ("언어  &lt; 한국어 &gt;").
-/// 설정창이 씬마다 따로 있어서, 공통으로 있는 BGMVolumeBar의 라벨을 복제해 실행 중에 만든다.
+/// 설정창이 씬마다 따로 있어서, 공통으로 있는 배경음 볼륨 행의 라벨을 복제해 실행 중에 만든다.
 /// 폰트와 글자 스타일이 설정창과 자동으로 같아진다.
 /// </summary>
 public class LanguageSelector : MonoBehaviour
 {
-    private const string ReferenceRowName = "BGMVolumeBar";
     private const float RowSpacing = 30f;
     private const float ArrowSize = 30f;
     private const float ArrowInset = 45f; // 슬라이더 구간 안쪽에 맞춰 왼쪽 라벨과 떨어뜨린다
@@ -19,16 +18,15 @@ public class LanguageSelector : MonoBehaviour
     private TMP_Text label;
     private TMP_Text value;
 
-    /// <summary>패널에 언어 행을 추가한다. 고를 언어가 하나뿐이면 만들지 않는다.</summary>
-    public static void AddTo(Transform panel)
+    /// <summary>패널에 언어 행을 추가한다. reference는 위치와 글자 모양을 따를 행이다. 고를 언어가 하나뿐이면 만들지 않는다.</summary>
+    public static void AddTo(Transform panel, RectTransform reference)
     {
         if (Loc.AvailableLanguages.Count < 2) return;
 
-        var reference = panel.Find(ReferenceRowName) as RectTransform;
         var template = reference != null ? reference.GetComponentInChildren<TMP_Text>(true) : null;
         if (template == null)
         {
-            Debug.LogWarning($"[LanguageSelector] {ReferenceRowName} 라벨을 찾지 못해 언어 행을 만들지 않습니다: {panel.name}");
+            Debug.LogWarning($"[LanguageSelector] 볼륨 행의 라벨을 찾지 못해 언어 행을 만들지 않습니다: {panel.name}");
             return;
         }
 

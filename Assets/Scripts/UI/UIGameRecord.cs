@@ -56,7 +56,7 @@ public class UIGameRecord : MonoBehaviour
         if (initialized) return;
         initialized = true;
 
-        peaEmotionSprite = Resources.LoadAll<Sprite>("peaFace_1-sheet");
+        peaEmotionSprite = Resources.LoadAll<Sprite>(ResourcePaths.PeaFaceSheet);
 
         var texts = GetComponentsInChildren<TextMeshProUGUI>(true);
         endingText = texts.FirstOrDefault(t => t.name == "EndingText");

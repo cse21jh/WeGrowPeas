@@ -138,7 +138,7 @@ public class TaxCanvasController : MonoBehaviour
 
         if (tax.TryPay())
         {
-            SoundManager.Instance?.PlayEffect("Button");
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
 
             // 국세청 앱 알람 해제
             PhoneManager.Instance?.UpdateAppAlarmState(AppKey.Tax, AlarmState.None);

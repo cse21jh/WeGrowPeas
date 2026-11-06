@@ -6,14 +6,14 @@ using UnityEngine;
 namespace Game.Util
 {
     /// <summary>
-    /// ����ġ ���� ��ƿ (UnityEngine.Random ���)
-    /// - ����/NaN/Infinity�� 0���� ���
-    /// - ��ü ���� 0�̸� TryPick*�� false�� ��ȯ (���� fallback ó��)
-    /// - System.Random ������ ����(������ �ʿ� ��)
+    /// 가중치 랜덤 유틸 (UnityEngine.Random 사용)
+    /// - 음수/NaN/Infinity는 0으로 취급
+    /// - 전체 합이 0이면 TryPick*는 false를 반환 (직접 fallback 처리)
+    /// - System.Random 버전도 제공(재현성 필요 시)
     /// </summary>
     public static class WeightedRandom
     {
-        // ---------- Index ��� ----------
+        // ---------- Index 기반 ----------
 
         public static bool TryPickIndex(IReadOnlyList<float> weights, out int index)
             => TryPickIndex(weights, out index, minClamp: 0f);
@@ -43,7 +43,7 @@ namespace Game.Util
                 if (r <= acc) { index = i; return true; }
             }
 
-            index = safe.Length - 1; // �ε��Ҽ��� ���� ��ȣ
+            index = safe.Length - 1; // 부동소수점 오차 보호
             return true;
         }
 
@@ -54,7 +54,7 @@ namespace Game.Util
             return idx;
         }
 
-        // ---------- Item + selector ��� ----------
+        // ---------- Item + selector 기반 ----------
 
         public static bool TryPick<T>(IReadOnlyList<T> items, Func<T, float> weightSelector, out T chosen, float minClamp = 0f)
         {
@@ -81,8 +81,8 @@ namespace Game.Util
         }
 
         /// <summary>
-        /// ����ġ ��� '�ߺ� ����' N�� ����.
-        /// �� ���ܸ��� ���� �׸���� ���� ����ġ�� �ٽ� ����.
+        /// 가중치 기반 '중복 없이' N개 추출.
+        /// 각 스텝마다 남은 항목들을 현재 가중치로 다시 뽑음.
         /// </summary>
         public static List<T> PickWithoutReplacement<T>(IList<T> items, Func<T, float> weightSelector, int count, float minClamp = 0f)
         {
@@ -100,7 +100,7 @@ namespace Game.Util
             return result;
         }
 
-        // ---------- Deterministic(System.Random) ���� ----------
+        // ---------- Deterministic(System.Random) 버전 ----------
 
         public static bool TryPickIndex(IReadOnlyList<float> weights, System.Random rng, out int index, float minClamp = 0f)
         {

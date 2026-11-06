@@ -280,10 +280,8 @@ public class AbilityManager : MonoBehaviour
     {
         genetics = val;
         SaveManager.RequestProfileSave(); // 해금·포인트 구매도 여기를 지난다
-        if(GameObject.Find("AbilityPanel") is var a)
-        {
-            a.GetComponent<AbilityUIController>().UpdateGenetics();
-        }
+        var panel = FindAnyObjectByType<AbilityUIController>();
+        if (panel != null) panel.UpdateGenetics();
 
         // 인게임 내에서 변동 등도 필요하면 수정 필요
     }

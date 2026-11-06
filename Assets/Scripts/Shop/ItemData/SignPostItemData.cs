@@ -70,7 +70,7 @@ public class SignPostItemData : ItemData
             (int)pendingWave.Value,                 // 어떤 웨이브를 감소시킬지
             1f - reducePercent,             // 75% 감소 -> multiplier 0.25f
             durationDays,                   // 다음 5일간
-            $"SignPost_{pendingWave.Value}"        // 모드 소스 태그
+            $"{Mod.SignPostTagPrefix}{pendingWave.Value}"        // 모드 소스 태그
         );
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.signpost", ("name", LocalizedName), ("wave", WavePalette.GetName(pendingWave.Value)), ("days", durationDays), ("percent", (int)(reducePercent * 100))));
         pendingWave = null;

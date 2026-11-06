@@ -128,7 +128,7 @@ public class FloatingPopup : BasePopup
             canvasGroup.alpha = 0f;
         }
 
-        SoundManager.Instance?.PlayEffect("Button");
+        SoundManager.Instance?.PlayEffect(SoundIds.Button);
 
         gameObject.SetActive(false);
         OnPopupClosed?.Invoke(this);

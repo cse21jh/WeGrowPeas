@@ -8,6 +8,8 @@ public class SettingUI : MonoBehaviour
     [SerializeField] private GameObject SettingPanel;
     [SerializeField] private Toggle showBreedPopupToggle;
     [SerializeField] private Toggle playAlarmForSeenMessagesToggle;
+    [SerializeField] private Slider bgmVolumeSlider;
+    [SerializeField] private Slider effectVolumeSlider;
 
     void Start()
     {
@@ -32,7 +34,7 @@ public class SettingUI : MonoBehaviour
 
         if (SettingPanel != null)
         {
-            LanguageSelector.AddTo(SettingPanel.transform);
+            LanguageSelector.AddTo(SettingPanel.transform, (RectTransform)bgmVolumeSlider.transform);
             SettingPanel.SetActive(false);
         }
     }
@@ -84,7 +86,7 @@ public class SettingUI : MonoBehaviour
             playAlarmForSeenMessagesToggle.isOn = MessengerSaveSystem.PlayAlarmForSeenMessages;
         }
 
-        SoundManager.Instance.ConnectSlider(SettingPanel.transform.Find("BGMVolumeBar").GetComponent<Slider>(), SettingPanel.transform.Find("EffectVolumeBar").GetComponent<Slider>());
+        SoundManager.Instance.ConnectSlider(bgmVolumeSlider, effectVolumeSlider);
         Time.timeScale = 0;
         ClickRouter.Instance.IsBlockedByUI = true;
         return;
@@ -137,6 +139,6 @@ public class SettingUI : MonoBehaviour
 
     public void PlayButtonClickSound()
     {
-        SoundManager.Instance.PlayEffect("Button");
+        SoundManager.Instance.PlayEffect(SoundIds.Button);
     }
 }

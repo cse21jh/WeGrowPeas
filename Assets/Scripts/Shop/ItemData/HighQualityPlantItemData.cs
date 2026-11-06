@@ -66,7 +66,7 @@ public class HighQualityPlantItemData : ItemData
             ? GameManager.Instance.enemyController.CurrentWave
             : null;
         if (wave == null || wave.WaveType == WaveType.None) return null;
-        return new[] { WaveSchedule.GetWaveDisplayName(wave.WaveType) };
+        return new[] { WavePalette.GetName(wave.WaveType) };
     }
 
     public override void SetSelectedOption(int index)

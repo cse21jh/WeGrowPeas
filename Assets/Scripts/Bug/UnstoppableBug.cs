@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class UnstoppableBug : Bug
 {
-    private SpriteRenderer bodySprite;
-    private SpriteRenderer bodySprite_Main;
+    [SerializeField] private SpriteRenderer bodySprite;
+    [SerializeField] private SpriteRenderer bodySprite_Main;
 
     private Color[] targetColors = new Color[]
         {
@@ -23,8 +23,6 @@ public class UnstoppableBug : Bug
     protected override void Start()
     {
         base.Start();
-        bodySprite = transform.Find("RoachSprite").transform.Find("roach_body").GetComponent<SpriteRenderer>();
-        bodySprite_Main = transform.Find("RoachSprite_Main").transform.Find("roach_body").GetComponent<SpriteRenderer>();
         StartCoroutine(ChangeColor());
     }
 

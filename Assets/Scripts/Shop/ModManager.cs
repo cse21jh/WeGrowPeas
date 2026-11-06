@@ -31,7 +31,11 @@ public class Mod
     public ModOp op;
     public float value;      // Multiply면 곱(예: 0.5), Add면 가산값, Override면 절대값
     public int expireDay;    // 이 날 '이전'까지 유효 (GameManager.stage 기준)
+    public const string SignPostTagPrefix = "SignPost_";
+
     public string sourceTag; // "BugSpray", "SignPost_Wind" 같이 추적용
+
+    public bool IsSignPost => sourceTag != null && sourceTag.StartsWith(SignPostTagPrefix);
     public int priority;     // Override 충돌 시 우선순위(높을수록 우선)
 }
 
@@ -74,7 +78,7 @@ public class ModManager : Singleton<ModManager>
     {
         if (m.id == 0) m.id = nextId++;
         mods.Add(m);
-        if (m.sourceTag.Contains("SignPost"))
+        if (m.IsSignPost)
             GameManager.Instance.enemyController.signPost.SetSignPost(m.key.param);
         return m.id;
     }
@@ -87,7 +91,7 @@ public class ModManager : Singleton<ModManager>
         {
             if(m.expireDay <= day)
             {
-                if (m.sourceTag.Contains("SignPost"))
+                if (m.IsSignPost)
                     GameManager.Instance.enemyController.signPost.HideSignPost();
                 mods.Remove(m);
             }

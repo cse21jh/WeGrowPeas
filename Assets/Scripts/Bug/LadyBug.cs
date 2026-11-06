@@ -62,7 +62,7 @@ public class Ladybug : Bug
         StopCoroutine(movingCoroutine);
         StartCoroutine(CantHitForOneSecond());
         StartCoroutine(bug.CantHitForOneSecond());
-        while (bug != null) // ���� �������� Ż��
+        while (bug != null) // 벌레 없어지면 탈출
         {
             MoveToward(bug.gameObject.transform.position, 50f);
             yield return null;

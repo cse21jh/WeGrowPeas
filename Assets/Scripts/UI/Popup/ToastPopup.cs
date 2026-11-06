@@ -75,7 +75,7 @@ public class ToastPopup : BasePopup
     {
         canvasGroup.blocksRaycasts = false;
 
-        SoundManager.Instance?.PlayEffect("Button");
+        SoundManager.Instance?.PlayEffect(SoundIds.Button);
         canvasGroup.DOFade(0f, 0.5f).SetUpdate(true)
             .OnComplete(() =>
             {

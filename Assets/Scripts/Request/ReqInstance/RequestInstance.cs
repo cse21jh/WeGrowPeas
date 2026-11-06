@@ -104,7 +104,7 @@ public abstract class RequestInstance
     {
         if (!IsCompleted)
         {
-            SoundManager.Instance?.PlayEffect("WrongSelect");
+            SoundManager.Instance?.PlayEffect(SoundIds.WrongSelect);
             return;
         }
         if (rewardGranted) return;
@@ -148,7 +148,7 @@ public abstract class RequestInstance
             AppKey.Quest,
             HasOtherClaimableReward() ? AlarmState.NonMandatory : AlarmState.None);
 
-        SoundManager.Instance?.PlayEffect("QuestSuccess");
+        SoundManager.Instance?.PlayEffect(SoundIds.QuestSuccess);
 
         RequestManager.Instance?.AddCompleteRequestCount();
 

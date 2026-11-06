@@ -42,8 +42,8 @@ public class PeanutSpriteController : MonoBehaviour
     {
         float rand = Random.Range(0f, faceStartMaxDelay);
         yield return new WaitForSeconds(rand);
-        faceAnim.SetInteger("faceIndex", randFaceIndex);
-        faceAnim.SetTrigger("Start");
+        faceAnim.SetInteger(AnimParams.FaceIndex, randFaceIndex);
+        faceAnim.SetTrigger(AnimParams.Start);
     }
 
 

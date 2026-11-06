@@ -43,7 +43,7 @@ public class TutorialManager : Singleton<TutorialManager>
     void Start()
     {
         SoundManager.Instance.StopBgm();
-        SoundManager.Instance.PlayBgm("Farm");
+        SoundManager.Instance.PlayBgm(SoundIds.Farm);
 
         Time.timeScale = 1;
 
@@ -197,7 +197,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
             case 6: // 특정 완두콩 판매
                 yield return new WaitUntil(() =>
-                    GameObject.Find("EconomyManager").GetComponent<EconomyManager>().PeaSellCount >= 1
+                    FindAnyObjectByType<EconomyManager>().PeaSellCount >= 1
                 );
                 _lastClickedObject = null;
                 break;

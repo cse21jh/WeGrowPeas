@@ -45,7 +45,7 @@ public class ReviveBug : Bug
     {
         if (!isDie && !isHit)
         {
-            SoundManager.Instance.PlayEffect("HitBug");
+            SoundManager.Instance.PlayEffect(SoundIds.HitBug);
             isHit = true;
             yield return StartCoroutine(ShowBugKiller());
 

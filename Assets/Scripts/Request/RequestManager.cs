@@ -83,8 +83,7 @@ public class RequestManager : Singleton<RequestManager>
     {
         ClearRequestAlarm();
 
-        // requestId ?? ?? ? ?? ??? ???
-        var valid = requestPool.Where(p => p != null && !(p.requestId.StartsWith("002") && GameManager.Instance.stage < 11)).ToList();
+        var valid = requestPool.Where(p => p != null && GameManager.Instance.stage >= p.minStage).ToList();
 
         if (valid.Count == 0) return;
 

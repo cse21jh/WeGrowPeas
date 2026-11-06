@@ -11,7 +11,6 @@ public class Sprinkler : Plant
         base.Init(gridIndex, grid);
         plantID = 4; // 식물 ID 4
         anim = GetComponentInChildren<Animator>();
-        waterParticle = transform.Find("Water").GetComponent<ParticleSystem>();
     }
 
     public override void ResistWave(WaveType waveType)
@@ -31,7 +30,7 @@ public class Sprinkler : Plant
         int maxIndex = grid.GetMaxCol() * 4;
         int range = 1 + grid.GetSprinklerRangeBonus();
 
-        anim.Play("sprinkler");
+        anim.Play(AnimParams.SprinklerState);
         waterParticle.Play();
 
         // 1. 상 (Up)

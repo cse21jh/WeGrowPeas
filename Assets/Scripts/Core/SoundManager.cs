@@ -51,36 +51,26 @@ public class SoundManager : Singleton<SoundManager>
         EffectVolume = DeviceSettings.Data.effectVolume;
         
 
-        EffectSoundDictionary.Add("SelectPlant", Resources.Load<AudioClip>("Audio/Effect/SelectPlant"));
-        EffectSoundDictionary.Add("Breed", Resources.Load<AudioClip>("Audio/Effect/Breed"));
-        EffectSoundDictionary.Add("WrongSelect", Resources.Load<AudioClip>("Audio/Effect/WrongSelect"));
-        EffectSoundDictionary.Add("Shovel", Resources.Load<AudioClip>("Audio/Effect/Shovel"));
-        EffectSoundDictionary.Add("HitBug", Resources.Load<AudioClip>("Audio/Effect/HitBug"));
+        LoadClips("Audio/Effect/", SoundIds.SelectPlant, SoundIds.Breed, SoundIds.WrongSelect, SoundIds.Shovel, SoundIds.HitBug,
+            SoundIds.Button, SoundIds.PhoneTouch, SoundIds.QuestSuccess, SoundIds.Alarm, SoundIds.Vibration);
+        LoadClips("Audio/Wave/", SoundIds.Aging, SoundIds.Wind, SoundIds.Flood, SoundIds.Pest, SoundIds.Cold,
+            SoundIds.HeavyRain, SoundIds.Heat, SoundIds.Drought);
+        LoadClips("Audio/", SoundIds.Tractor);
 
-        EffectSoundDictionary.Add("Button", Resources.Load<AudioClip>("Audio/Effect/Button"));
-        EffectSoundDictionary.Add("PhoneTouch", Resources.Load<AudioClip>("Audio/Effect/PhoneTouch"));
-        EffectSoundDictionary.Add("QuestSuccess", Resources.Load<AudioClip>("Audio/Effect/QuestSuccess"));
-        EffectSoundDictionary.Add("Alarm", Resources.Load<AudioClip>("Audio/Effect/Alarm"));
-        EffectSoundDictionary.Add("Vibration", Resources.Load<AudioClip>("Audio/Effect/Vibration"));
-
-        EffectSoundDictionary.Add("Aging", Resources.Load<AudioClip>("Audio/Wave/Aging"));
-        EffectSoundDictionary.Add("Wind", Resources.Load<AudioClip>("Audio/Wave/Wind"));
-        EffectSoundDictionary.Add("Flood", Resources.Load<AudioClip>("Audio/Wave/Flood"));
-        EffectSoundDictionary.Add("Pest", Resources.Load<AudioClip>("Audio/Wave/Pest"));
-        EffectSoundDictionary.Add("Cold", Resources.Load<AudioClip>("Audio/Wave/Cold"));
-        EffectSoundDictionary.Add("HeavyRain", Resources.Load<AudioClip>("Audio/Wave/HeavyRain"));
-        EffectSoundDictionary.Add("Heat", Resources.Load<AudioClip>("Audio/Wave/Heat")); 
-        EffectSoundDictionary.Add("Drought", Resources.Load<AudioClip>("Audio/Wave/Drought")); // 폭우와 동일한 임시 사운드 삽입해둠
-
-        EffectSoundDictionary.Add("Tractor", Resources.Load<AudioClip>("Audio/Tractor"));
-
-        EffectSoundDictionary.Add("Farm", Resources.Load<AudioClip>("Audio/BGM/BGM"));
-        EffectSoundDictionary.Add("StartScene", Resources.Load<AudioClip>("Audio/BGM/StartSceneBGM"));
-        EffectSoundDictionary.Add("IntroScene", Resources.Load<AudioClip>("Audio/BGM/IntroSceneBGM"));
+        EffectSoundDictionary.Add(SoundIds.Farm, Resources.Load<AudioClip>("Audio/BGM/BGM"));
+        EffectSoundDictionary.Add(SoundIds.StartScene, Resources.Load<AudioClip>("Audio/BGM/StartSceneBGM"));
+        EffectSoundDictionary.Add(SoundIds.IntroScene, Resources.Load<AudioClip>("Audio/BGM/IntroSceneBGM"));
 
 
         if (SceneManager.GetActiveScene().name == SceneLoader.StartSceneName)
-            PlayBgm("StartScene");
+            PlayBgm(SoundIds.StartScene);
+    }
+
+    // 파일 이름이 곧 소리 이름인 클립을 읽는다.
+    private void LoadClips(string folder, params string[] names)
+    {
+        foreach (string name in names)
+            EffectSoundDictionary.Add(name, Resources.Load<AudioClip>(folder + name));
     }
 
     public void ConnectSlider(Slider BGM, Slider Effect)

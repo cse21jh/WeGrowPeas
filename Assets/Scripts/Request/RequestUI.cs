@@ -135,7 +135,7 @@ public class RequestUI : MonoBehaviour
 
         if (!anyReceived)
         {
-            SoundManager.Instance.PlayEffect("WrongSelect");
+            SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
             // Show floating text
             PhoneNotificationBus.OnShow?.Invoke(
                 new PhoneNotificationData

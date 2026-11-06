@@ -11,26 +11,6 @@ public static class TmiPool
     public const string ResourcePath = "Data/TmiConfig";
 
     // 에셋이 없을 때 쓰는 폴백 겸, 에디터가 에셋을 만들 때의 시드.
-    public static readonly string[] DefaultTips =
-    {
-        "완두콩은 유전자가 좋을수록 비싸게 팔립니다.",
-        "웨이브를 버틸 때마다 식물의 가격이 올라갑니다.",
-        "저항력은 매일 조금씩 떨어지니 방치하면 위험합니다.",
-        "벌레는 클릭해서 잡을 수 있고, 잡으면 골드를 줍니다.",
-        "네펜데스는 벌레를 잡아먹지만 팔 수는 없습니다.",
-        "고추 주변의 우성 형질 식물은 저항력이 올라갑니다.",
-        "페트병은 식물의 죽음을 한 번 막아줍니다.",
-        "세금은 5일마다 내야 하며, 밀리면 압류가 시작됩니다.",
-        "국세청 앱에서 미리 세금을 낼 수 있습니다.",
-        "비료를 뿌린 줄은 해당 웨이브 저항력이 떨어지지 않습니다.",
-        "땅콩은 가끔 스스로 번식합니다.",
-        "교배로 태어난 식물은 아주 낮은 확률로 변종이 됩니다.",
-        "황금 흙에 심은 식물은 모든 저항력이 90%가 됩니다.",
-        "상점은 매일 새로운 물건으로 바뀝니다.",
-        "10일마다 특수 아이템 선물이 도착합니다.",
-        "새벽 모드는 40일을 클리어하면 열립니다.",
-    };
-
     private static bool _loaded;
     private static string _language;
     private static List<string> _tips;
@@ -43,18 +23,9 @@ public static class TmiPool
         _language = Loc.Language;
 
         var cfg = Resources.Load<TmiConfig>(ResourcePath);
-        var tips = cfg != null ? cfg.GetLocalizedTips() : null;
-        if (tips != null && tips.Count > 0)
-        {
-            _tips = tips;
-        }
-        else
-        {
-            _tips = new List<string>(DefaultTips);
-            if (cfg == null)
-                Debug.LogWarning($"[Tmi] Resources/{ResourcePath} 에셋이 없어 기본 문구를 사용합니다. " +
-                                 "TmiConfig 에셋을 만들어 그 경로에 두세요.");
-        }
+        _tips = cfg != null ? cfg.GetLocalizedTips() : new List<string>();
+        if (_tips.Count == 0)
+            Debug.LogWarning($"[Tmi] Resources/{ResourcePath} 또는 번역 표에 문구가 없습니다.");
     }
 
     public static void Reload()

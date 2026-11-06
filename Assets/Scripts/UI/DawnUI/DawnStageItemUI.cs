@@ -34,30 +34,6 @@ public class DawnStageItemUI : MonoBehaviour
             button.onClick.AddListener(OnClick);
         }
 
-        if (stageNumberText == null)
-        {
-            var stageTF = transform.Find("StageText") ?? transform.Find("Text_Stage") ?? transform.Find("StageNumber");
-            if (stageTF != null) stageNumberText = stageTF.GetComponent<TextMeshProUGUI>();
-            if (stageNumberText == null) stageNumberText = GetComponentInChildren<TextMeshProUGUI>();
-        }
-
-        if (constraintDescriptionText == null)
-        {
-            var descTF = transform.Find("ConstraintText") ?? transform.Find("Text_Constraint") ?? transform.Find("Description");
-            if (descTF != null) constraintDescriptionText = descTF.GetComponent<TextMeshProUGUI>();
-        }
-
-        if (lockIcon == null)
-        {
-            var lockTF = transform.Find("LockIcon") ?? transform.Find("Lock") ?? transform.Find("Icon_Lock") ?? transform.Find("LockOverlay");
-            if (lockTF != null) lockIcon = lockTF.gameObject;
-        }
-
-        if (selectionHighlight == null)
-        {
-            var selTF = transform.Find("SelectionHighlight") ?? transform.Find("Highlight") ?? transform.Find("Selected") ?? transform.Find("Outline");
-            if (selTF != null) selectionHighlight = selTF.gameObject;
-        }
     }
 
     public void Setup(int stage, string constraintDescription, bool isUnlocked, bool isSelected, Action<int> onClickUnlocked, Action onClickLocked)
@@ -109,12 +85,12 @@ public class DawnStageItemUI : MonoBehaviour
         if (isUnlocked)
         {
             onClickUnlocked?.Invoke(stage);
-            SoundManager.Instance?.PlayEffect("Button");
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
         }
         else
         {
             onClickLocked?.Invoke();
-            SoundManager.Instance?.PlayEffect("Button");
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
         }
     }
 }

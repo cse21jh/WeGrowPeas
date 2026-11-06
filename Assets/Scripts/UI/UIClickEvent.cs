@@ -118,7 +118,7 @@ public class UIClickEvent : MonoBehaviour
 
     public void PlayButtonClickSound()
     {
-        SoundManager.Instance.PlayEffect("Button");
+        SoundManager.Instance.PlayEffect(SoundIds.Button);
     }
 
     public void OnClickShowSaveSlotPanel()

@@ -26,7 +26,7 @@ public abstract class MovablePlant : Plant
     //[SerializeField] private GameObject resistanceScouterImage;
     //[SerializeField] private GameObject goldScouterImage;
 
-    private ParticleSystem waterParticle;
+    [SerializeField] private ParticleSystem waterParticle;
 
     private bool isReallyMovable = true;
 
@@ -37,7 +37,6 @@ public abstract class MovablePlant : Plant
     public override void Init(int gridIndex, Grid grid)
     {
         base.Init(gridIndex, grid);
-        waterParticle = transform.Find("Water").GetComponent<ParticleSystem>();
         if (isOnGoldenSoil())
             stemController.SetGold(true);
         if (holdGaugeCanvasObj) holdGaugeCanvasObj.SetActive(false);

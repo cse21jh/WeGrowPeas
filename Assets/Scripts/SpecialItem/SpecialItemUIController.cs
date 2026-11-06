@@ -99,7 +99,7 @@ public class SpecialItemUIController : MonoBehaviour
 
         if (!SpecialItemSystem.UseSlotReroll(slot)) return;
 
-        SoundManager.Instance?.PlayEffect("Button");
+        SoundManager.Instance?.PlayEffect(SoundIds.Button);
         _candidates[slot] = replacement;
 
         BuildCards();

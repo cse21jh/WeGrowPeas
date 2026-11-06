@@ -38,7 +38,7 @@ public static class CodexCatalog
     public static List<CodexEntry> GetItems()
     {
         var list = new List<CodexEntry>();
-        foreach (var it in Resources.LoadAll<ItemData>("Data/Item Data"))
+        foreach (var it in Resources.LoadAll<ItemData>(ResourcePaths.Items))
         {
             if (it == null) continue;
             string id = it.UnlockId;
@@ -67,7 +67,7 @@ public static class CodexCatalog
     public static List<CodexEntry> GetPlants()
     {
         var list = new List<CodexEntry>();
-        foreach (var p in Resources.LoadAll<PlantCodexData>("Data/Codex/Plant"))
+        foreach (var p in Resources.LoadAll<PlantCodexData>(ResourcePaths.CodexPlants))
         {
             if (p == null) continue;
             var sb = new StringBuilder();
@@ -96,7 +96,7 @@ public static class CodexCatalog
     public static List<CodexEntry> GetCurses()
     {
         var list = new List<CodexEntry>();
-        foreach (var c in Resources.LoadAll<CurseScriptable>("Data/Codex/Curse"))
+        foreach (var c in Resources.LoadAll<CurseScriptable>(ResourcePaths.CodexCurses))
         {
             if (c == null) continue;
             var sb = new StringBuilder();
@@ -124,7 +124,7 @@ public static class CodexCatalog
     public static List<CodexEntry> GetBugs()
     {
         var list = new List<CodexEntry>();
-        foreach (var b in Resources.LoadAll<BugCodexData>("Data/Codex/Bug"))
+        foreach (var b in Resources.LoadAll<BugCodexData>(ResourcePaths.CodexBugs))
         {
             if (b == null) continue;
             var sb = new StringBuilder();

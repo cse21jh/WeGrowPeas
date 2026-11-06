@@ -33,7 +33,7 @@ public class TransitionController : MonoBehaviour
                 DontDestroyOnLoad(gameObject);
 
                 transitionMat.DOKill(true);
-                transitionMat.SetFloat("_Radius", 1.5f);
+                transitionMat.SetFloat(ShaderProps.Radius, 1.5f);
             }
         }
         else
@@ -45,7 +45,7 @@ public class TransitionController : MonoBehaviour
     private void OnEnable()
     {
         transitionMat.DOKill(true);
-        transitionMat.SetFloat("_Radius", 1.5f);
+        transitionMat.SetFloat(ShaderProps.Radius, 1.5f);
         isFinished = true;
     }
 
@@ -54,7 +54,7 @@ public class TransitionController : MonoBehaviour
         /*
         if (SceneManager.GetActiveScene().name == "StartScene 1")
         {
-            transitionMat.SetFloat("_Radius", 1.5f);
+            transitionMat.SetFloat(ShaderProps.Radius, 1.5f);
             isFinished = true;
         }
         */
@@ -64,9 +64,9 @@ public class TransitionController : MonoBehaviour
     {
         if (isDebug)
         {
-            Debug.Log(transitionMat.GetFloat("_Radius"));
+            Debug.Log(transitionMat.GetFloat(ShaderProps.Radius));
             //transitionMat.DOKill(true);
-            //transitionMat.SetFloat("_Radius", debugRadius);
+            //transitionMat.SetFloat(ShaderProps.Radius, debugRadius);
         }
     }
 
@@ -82,7 +82,7 @@ public class TransitionController : MonoBehaviour
         blocker.SetActive(true);
         transitionMat.DOKill(true);
         Debug.Log("Transition In");
-        transitionMat.SetFloat("_Radius", 0f);
+        transitionMat.SetFloat(ShaderProps.Radius, 0f);
         isFinished = false;
         Transition(1.5f);
     }
@@ -97,8 +97,8 @@ public class TransitionController : MonoBehaviour
 
         blocker.SetActive(true);
         transitionMat.DOKill(true);
-        transitionMat.SetFloat("_Radius", 1.5f);
-        Debug.Log(transitionMat.GetFloat("_Radius"));
+        transitionMat.SetFloat(ShaderProps.Radius, 1.5f);
+        Debug.Log(transitionMat.GetFloat(ShaderProps.Radius));
         isFinished = false;
         Transition(0f);
 
@@ -121,12 +121,12 @@ public class TransitionController : MonoBehaviour
 
         seq.Append(transitionMat.DOFloat(rad, "_Radius", transitionDuration)).SetEase(easeType).SetUpdate(true).SetId("Transition");
         seq.Play();
-        Debug.Log(transitionMat.GetFloat("_Radius"));
+        Debug.Log(transitionMat.GetFloat(ShaderProps.Radius));
         Debug.Log(seq.IsPlaying());
 
         seq.OnComplete(() =>
         {
-            Debug.Log(transitionMat.GetFloat("_Radius"));
+            Debug.Log(transitionMat.GetFloat(ShaderProps.Radius));
             isFinished = true;
             blocker.SetActive(false);
             DOTween.KillAll(true);

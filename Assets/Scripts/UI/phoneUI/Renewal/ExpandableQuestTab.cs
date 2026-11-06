@@ -217,7 +217,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
             if (Time.unscaledTime - lastUncompletedNotificationTime > 0.5f)
             {
                 lastUncompletedNotificationTime = Time.unscaledTime;
-                SoundManager.Instance.PlayEffect("WrongSelect");
+                SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 // Show floating text
                 PhoneNotificationBus.OnShow?.Invoke(
                     new PhoneNotificationData

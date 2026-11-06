@@ -140,7 +140,7 @@ public class TutorialGrid : Grid
                             breedCount++;
                             curBreedCount = TMaxBreedCount - breedCount;
                             Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (curBreedCount) + "입니다");
-                            SoundManager.Instance.PlayEffect("Breed");
+                            SoundManager.Instance.PlayEffect(SoundIds.Breed);
                             //totalBreedCount++;
                             /*if (child.GetType() == typeof(Pea))
                                 totalPeaBreedcount++;
@@ -170,19 +170,19 @@ public class TutorialGrid : Grid
                     else if (breedCount >= TMaxBreedCount)
                     {
                         Debug.Log("최대 교배 횟수 초과");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
+                        SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                         isBreedButtonPressed = false;
                     }
                     else if (isEqualPlant)
                     {
                         Debug.Log("두 종이 일치하지 않습니다");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
+                        SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                         isBreedButtonPressed = false;
                     }
                     else
                     {
                         Debug.Log("키울 공간이 부족합니다");
-                        SoundManager.Instance.PlayEffect("WrongSelect");
+                        SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                         isBreedButtonPressed = false;
                     }
 
@@ -244,35 +244,35 @@ public class TutorialGrid : Grid
         if (breedObj1 == clickedObject)
         {
             // 부모 1 선택 취소
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             clickedPea.MakeDefaultSprite();
             breedObj1 = null;
         }
         else if (breedObj2 == clickedObject)
         {
             // 부모 2 선택 취소
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             clickedPea.MakeDefaultSprite();
             breedObj2 = null;
         }
         else if (breedObj1 == null && clickedPea.gridIndex == 0)
         {
             // 부모 1 선택
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj1 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else if (breedObj2 == null && clickedPea.gridIndex == 1)
         {
             // 부모 2 선택
-            SoundManager.Instance.PlayEffect("SelectPlant");
+            SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj2 = clickedObject;
             clickedPea.MakeSelectedSprite();
         }
         else
         {
             // 이미 두 부모 선택됨
-            //SoundManager.Instance.PlayEffect("WrongSelect");
+            //SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
             Debug.Log("이미 두 부모가 모두 선택된 상태");
             return;
         }

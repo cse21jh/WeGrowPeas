@@ -38,7 +38,11 @@ public class AbilityUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI generalAbilityPointText;
 
     //해금 UI
+    private GeneralAbilityData describedAbility;
+
     [SerializeField] private GameObject unlockUI;
+    [SerializeField] private TextMeshProUGUI unlockText;
+    [SerializeField] private Button unlockConfirmButton;
 
     //유전자 개수 UI
     [SerializeField] private TextMeshProUGUI geneticsInPlantPanel;
@@ -54,6 +58,32 @@ public class AbilityUIController : MonoBehaviour
     private void Start()
     {
         abilityManager = AbilityManager.Instance;
+    }
+
+    private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
+
+    private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
+
+    // 고르던 내용이 사라지지 않게 목록을 다시 만들지 않고 글자만 바꾼다.
+    private void RefreshLocalizedTexts()
+    {
+        foreach (var button in GetComponentsInChildren<PlantSelectionButton>(true)) button.RefreshTexts();
+        foreach (var button in GetComponentsInChildren<PlantAbilityButton>(true)) button.RefreshTexts();
+        foreach (var button in GetComponentsInChildren<GeneralAbilityButton>(true)) button.RefreshTexts();
+
+        if (remainPlantAbilityPoint >= 0)
+            plantAbilityPointText.text = Loc.T("game.ability.points_left", ("count", remainPlantAbilityPoint));
+        if (remainGeneralAbilityPoint >= 0)
+            generalAbilityPointText.text = Loc.T("game.ability.points_left", ("count", remainGeneralAbilityPoint));
+
+        if (describedAbility != null)
+        {
+            generalAbilityName.text = describedAbility.LocalizedName;
+            generalAbilityDescription.text = describedAbility.LocalizedDescription;
+        }
+
+        // 해금 확인창은 호출한 쪽의 문구로 만들어져 있어 닫고 다시 고르게 한다.
+        if (unlockUI != null && unlockUI.activeSelf) CloseUnlockUI();
     }
 
     public void CloseAbilityPanel()
@@ -315,12 +345,14 @@ public class AbilityUIController : MonoBehaviour
         Color c = generalAbilityIcon.color;
         c.a = 1f;
         generalAbilityIcon.color = c;
+        describedAbility = ability;
         generalAbilityName.text = ability.LocalizedName;
         generalAbilityDescription.text = ability.LocalizedDescription;
     }
 
     public void ClearGeneralAbilityDescription()
     {
+        describedAbility = null;
         generalAbilityIcon.sprite = null ;
         Color c = generalAbilityIcon.color;
         c.a = 0f;
@@ -354,20 +386,19 @@ public class AbilityUIController : MonoBehaviour
     public void OpenUnlockUI(string name, int price, Action unlockAction)
     {
         unlockUI.gameObject.SetActive(true);
-        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = Loc.T("game.ability.unlock_confirm", ("name", name), ("price", price));
-        Button b = unlockUI.transform.Find("ConfirmButton").GetComponent<Button>();
-        b.onClick.RemoveAllListeners();
-        b.onClick.AddListener(() =>
+        unlockText.text = Loc.T("game.ability.unlock_confirm", ("name", name), ("price", price));
+        unlockConfirmButton.onClick.RemoveAllListeners();
+        unlockConfirmButton.onClick.AddListener(() =>
         {            
             unlockAction();
-            SoundManager.Instance.PlayEffect("Button");
+            SoundManager.Instance.PlayEffect(SoundIds.Button);
         });
     }
 
     public void FailUnlcok()
     {
-        SoundManager.Instance.PlayEffect("WrongSelect");
-        unlockUI.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = Loc.T("game.ability.cannot_unlock");
+        SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
+        unlockText.text = Loc.T("game.ability.cannot_unlock");
     }
 
     public void CloseUnlockUI()

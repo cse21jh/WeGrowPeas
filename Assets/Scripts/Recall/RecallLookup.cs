@@ -35,11 +35,9 @@ public static class RecallLookup
         _abilities = null;
     }
 
-    public static string WaveName(WaveType type) => WavePalette.GetName(type);
-
     /// <summary>기록에 저장된 웨이브 값의 표시 이름. 알 수 없는 값은 저장된 그대로 보여 준다.</summary>
     public static string SavedWaveName(string saved)
-        => WavePalette.TryParseSaved(saved, out var type) ? WaveName(type) : saved;
+        => WavePalette.TryParseSaved(saved, out var type) ? WavePalette.GetName(type) : saved;
 
     /// <summary>
     /// 식물 종(Plant.speciesname)으로 표시 정보를 찾는다.
@@ -56,7 +54,7 @@ public static class RecallLookup
         {
             _plants = new Dictionary<string, Entry>();
 
-            foreach (var p in Resources.LoadAll<PlantCodexData>("Data/Codex/Plant"))
+            foreach (var p in Resources.LoadAll<PlantCodexData>(ResourcePaths.CodexPlants))
             {
                 if (p == null || string.IsNullOrEmpty(p.plantId)) continue;
                 _plants[p.plantId] = new Entry
@@ -69,7 +67,7 @@ public static class RecallLookup
             }
 
             // 아이콘 보충. plantName이 speciesname과 같은 값을 쓴다.
-            foreach (var info in Resources.LoadAll<PlantInfoData>("Data/AbilityData/PlantAbilityData/Plant"))
+            foreach (var info in Resources.LoadAll<PlantInfoData>(ResourcePaths.PlantInfos))
             {
                 if (info == null || string.IsNullOrEmpty(info.plantName) || info.icon == null) continue;
 
@@ -108,7 +106,7 @@ public static class RecallLookup
         if (_items == null)
         {
             _items = new Dictionary<string, Entry>();
-            foreach (var it in Resources.LoadAll<ItemData>("Data/Item Data"))
+            foreach (var it in Resources.LoadAll<ItemData>(ResourcePaths.Items))
             {
                 if (it == null) continue;
 
@@ -151,7 +149,7 @@ public static class RecallLookup
         if (_curses == null)
         {
             _curses = new Dictionary<string, Entry>();
-            foreach (var c in Resources.LoadAll<CurseScriptable>("Data/Codex/Curse"))
+            foreach (var c in Resources.LoadAll<CurseScriptable>(ResourcePaths.CodexCurses))
             {
                 if (c == null || string.IsNullOrEmpty(c.curseId)) continue;
                 _curses[c.curseId] = new Entry
@@ -177,10 +175,10 @@ public static class RecallLookup
         {
             _abilities = new Dictionary<string, Entry>();
 
-            foreach (var a in Resources.LoadAll<PlantAbilityData>("Data/AbilityData/PlantAbilityData"))
+            foreach (var a in Resources.LoadAll<PlantAbilityData>(ResourcePaths.PlantAbilities))
                 if (a != null) AddAbility(a.name, a.icon, a.LocalizedName, a.LocalizedDescription);
 
-            foreach (var a in Resources.LoadAll<GeneralAbilityData>("Data/AbilityData/GeneralAbilityData"))
+            foreach (var a in Resources.LoadAll<GeneralAbilityData>(ResourcePaths.GeneralAbilities))
                 if (a != null) AddAbility(a.name, a.icon, a.LocalizedName, a.LocalizedDescription);
         }
 

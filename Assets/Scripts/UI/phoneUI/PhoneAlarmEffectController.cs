@@ -125,7 +125,7 @@ public class PhoneAlarmEffectController : MonoBehaviour
 
     public void PlayVibration(int loopCount)
     {
-        SoundManager.Instance.PlayEffect("Vibration");
+        SoundManager.Instance.PlayEffect(SoundIds.Vibration);
 
         // 시퀀스 생성
         Sequence mainSeq = DOTween.Sequence().SetLink(gameObject);

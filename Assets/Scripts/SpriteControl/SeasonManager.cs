@@ -28,11 +28,11 @@ public class SeasonManager : MonoBehaviour
     private void InitSettings()
     {
         currentSeason = previousSeason;
-        grassMat.SetFloat("_Dryness", 0f);
-        flowerMat.SetFloat("_DissolveAmount", 1f);
-        mapleMat.SetFloat("_DissolveAmount", 1f);
+        grassMat.SetFloat(ShaderProps.Dryness, 0f);
+        flowerMat.SetFloat(ShaderProps.DissolveAmount, 1f);
+        mapleMat.SetFloat(ShaderProps.DissolveAmount, 1f);
         foreach (Material snowMat in snowMats)
-            snowMat.SetFloat("_MeltStrength", 1.2f);
+            snowMat.SetFloat(ShaderProps.MeltStrength, 1.2f);
         snowEffect.SetActive(false);
     }
 
@@ -47,7 +47,7 @@ public class SeasonManager : MonoBehaviour
         }
         */
 
-        //Debug.Log(grassMat.GetFloat("_Dryness"));
+        //Debug.Log(grassMat.GetFloat(ShaderProps.Dryness));
     }
 
 
@@ -61,25 +61,25 @@ public class SeasonManager : MonoBehaviour
             case Season.Spring:
                 snowEffect.SetActive(false);
                 foreach (Material snowMat in snowMats)
-                    ChangeMaterialValue(snowMat, "_MeltStrength", 0.6f, 1.2f);       // 눈 쌓이기
-                ChangeMaterialValue(grassMat, "_Dryness", 1f, 0f);
-                grassMat.SetFloat("_Dryness", 0f);
-                ChangeMaterialValue(flowerMat, "_DissolveAmount", 1f, 0f);   // 꽃 나타나기
+                    ChangeMaterialValue(snowMat, ShaderProps.MeltStrength, 0.6f, 1.2f);       // 눈 쌓이기
+                ChangeMaterialValue(grassMat, ShaderProps.Dryness, 1f, 0f);
+                grassMat.SetFloat(ShaderProps.Dryness, 0f);
+                ChangeMaterialValue(flowerMat, ShaderProps.DissolveAmount, 1f, 0f);   // 꽃 나타나기
                 break;
             case Season.Summer:
-                grassMat.SetFloat("_Dryness", 0f);
-                ChangeMaterialValue(flowerMat, "_DissolveAmount", 0f, 1f);   // 꽃 없애기
+                grassMat.SetFloat(ShaderProps.Dryness, 0f);
+                ChangeMaterialValue(flowerMat, ShaderProps.DissolveAmount, 0f, 1f);   // 꽃 없애기
                 break;
             case Season.Fall:
-                ChangeMaterialValue(grassMat, "_Dryness", 0f, 1f);
-                ChangeMaterialValue(mapleMat, "_DissolveAmount", 1f, 0f);   // 단풍잎 나타나기
-                grassMat.SetFloat("_Dryness", 1f);
+                ChangeMaterialValue(grassMat, ShaderProps.Dryness, 0f, 1f);
+                ChangeMaterialValue(mapleMat, ShaderProps.DissolveAmount, 1f, 0f);   // 단풍잎 나타나기
+                grassMat.SetFloat(ShaderProps.Dryness, 1f);
                 break;
             case Season.Winter:
-                grassMat.SetFloat("_Dryness", 1f);
-                ChangeMaterialValue(mapleMat, "_DissolveAmount", 0f, 1f);   // 단풍잎 없애기
+                grassMat.SetFloat(ShaderProps.Dryness, 1f);
+                ChangeMaterialValue(mapleMat, ShaderProps.DissolveAmount, 0f, 1f);   // 단풍잎 없애기
                 foreach (Material snowMat in snowMats)
-                    ChangeMaterialValue(snowMat, "_MeltStrength", 1.2f, 0.6f);       // 눈 쌓이기
+                    ChangeMaterialValue(snowMat, ShaderProps.MeltStrength, 1.2f, 0.6f);       // 눈 쌓이기
                 snowEffect.SetActive(true);
                 break;
         }
@@ -88,7 +88,7 @@ public class SeasonManager : MonoBehaviour
         currentSeason = season;
     }
 
-    private void ChangeMaterialValue(Material mat, string property, float fromValue, float toValue)
+    private void ChangeMaterialValue(Material mat, int property, float fromValue, float toValue)
     {
         DOTween.To(() => fromValue, x => mat.SetFloat(property, x), toValue, changeDuration).SetEase(changeEase);
     }

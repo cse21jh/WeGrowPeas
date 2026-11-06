@@ -117,7 +117,6 @@ public class MessengerApp : MonoBehaviour
 
     private void OnDisable() => Loc.LanguageChanged -= RefreshLocalizedTexts;
 
-    // 대화방에 이미 그려진 말풍선은 대화방에 다시 들어올 때 새 언어로 만들어진다.
     private void RefreshLocalizedTexts()
     {
         RefreshchatPartnerList();
@@ -125,6 +124,13 @@ public class MessengerApp : MonoBehaviour
         if (currentChat == null) return;
         if (chatRoomHeaderName != null) chatRoomHeaderName.text = currentChat.chatPartner.LocalizedName;
         chatMessageList?.SetSender(currentChat.chatPartner.LocalizedName, currentChat.chatPartner.chatPartnerImage);
+
+        // 이미 그린 말풍선을 새 언어로 다시 만든다.
+        if (chatRoomPanel != null && chatRoomPanel.activeSelf)
+        {
+            StopMessageDisplay();
+            StartMessageDisplay(true);
+        }
     }
 
     private void Awake()

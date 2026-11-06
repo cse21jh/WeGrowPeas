@@ -95,7 +95,6 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
     private SpriteRenderer[] childSpriteRenderers;
     private Material[] childMaterials;
-    private int dissolveAmountID = Shader.PropertyToID("_DissolveAmount");
     [SerializeField] private GameObject vanishEffect;
 
     [SerializeField] private GameObject appearEffect;
@@ -363,7 +362,7 @@ public abstract class Plant : MonoBehaviour
 
             for (int i = 0; i < childMaterials.Length; i++)
             {
-                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+                childMaterials[i].SetFloat(ShaderProps.DissolveAmount, lerpedDissolve);
             }
 
 
@@ -382,7 +381,7 @@ public abstract class Plant : MonoBehaviour
 
             for (int i = 0; i < childMaterials.Length; i++)
             {
-                childMaterials[i].SetFloat(dissolveAmountID, lerpedDissolve);
+                childMaterials[i].SetFloat(ShaderProps.DissolveAmount, lerpedDissolve);
             }
 
 
@@ -653,7 +652,7 @@ public abstract class Plant : MonoBehaviour
         foreach (var sr in snowRenderers)
         {
             DOTween.To(() => meltAmount,
-               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               x => { meltAmount = x; sr.material.SetFloat(ShaderProps.MeltStrength, x); },
                -0.2f,
                duration)
            .SetEase(ease).SetLink(sr.gameObject);
@@ -667,7 +666,7 @@ public abstract class Plant : MonoBehaviour
         foreach (var sr in snowRenderers)
         {
             DOTween.To(() => meltAmount,
-               x => { meltAmount = x; sr.material.SetFloat("_MeltStrength", x); },
+               x => { meltAmount = x; sr.material.SetFloat(ShaderProps.MeltStrength, x); },
                1.2f,
                duration)
            .SetEase(ease).SetLink(sr.gameObject);

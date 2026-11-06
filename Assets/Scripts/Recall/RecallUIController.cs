@@ -81,10 +81,12 @@ public class RecallUIController : MonoBehaviour
         if (backToList != null) backToList.onClick.AddListener(BackToList);
         if (resultButton != null) resultButton.onClick.AddListener(ShowResult);
         if (bookTimeline != null) bookTimeline.DayChanged += RefreshBookPageNumbers;
+        Loc.LanguageChanged += RefreshLocalizedTexts;
     }
 
     private void OnDisable()
     {
+        Loc.LanguageChanged -= RefreshLocalizedTexts;
         if (closeMotion != null) closeMotion.CancelAndRestore();
         if (previousPage != null) previousPage.onClick.RemoveListener(PreviousPage);
         if (nextPage != null) nextPage.onClick.RemoveListener(NextPage);
@@ -121,6 +123,17 @@ public class RecallUIController : MonoBehaviour
     }
 
     private void OnDestroy() => ClearList();
+
+    // 책이 움직이는 중에는 건너뛴다. 언어는 이 동작을 멈추는 설정창에서만 바뀐다.
+    private void RefreshLocalizedTexts()
+    {
+        if (!IsOpen || IsBusy) return;
+
+        if (detailUI != null && detailUI.IsOpen) detailUI.Show(_selectedRecordId);
+        else if (bookLayouts == null) BuildList();
+        else if (IsBookDetailVisible) RenderBookDetail();
+        else RenderSpread();
+    }
 
     public void Toggle()
     {

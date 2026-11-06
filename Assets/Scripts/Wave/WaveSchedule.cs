@@ -134,7 +134,7 @@ public static class WaveSchedule
     {
         var waves = GetSelectableWaves(currentStage);
         var names = new string[waves.Count];
-        for (int i = 0; i < waves.Count; i++) names[i] = GetWaveDisplayName(waves[i]);
+        for (int i = 0; i < waves.Count; i++) names[i] = WavePalette.GetName(waves[i]);
         return names;
     }
 
@@ -144,9 +144,6 @@ public static class WaveSchedule
         var waves = GetSelectableWaves(currentStage);
         return (index >= 0 && index < waves.Count) ? waves[index] : (WaveType?)null;
     }
-
-    /// <summary>웨이브 표시명.</summary>
-    public static string GetWaveDisplayName(WaveType waveType) => WavePalette.GetName(waveType);
 
     public static Season GetSeasonByStage(int stage)
     {

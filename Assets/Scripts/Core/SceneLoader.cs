@@ -56,12 +56,12 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadStartScene()
     {
-        StartCoroutine(LoadSceneRoutine(StartSceneName, useLoadingScreen: true, bgm: "StartScene"));
+        StartCoroutine(LoadSceneRoutine(StartSceneName, useLoadingScreen: true, bgm: SoundIds.StartScene));
     }
 
     public void LoadIntroScene()
     {
-        StartCoroutine(LoadSceneRoutine(IntroSceneName, useLoadingScreen: true, bgm: "IntroScene"));
+        StartCoroutine(LoadSceneRoutine(IntroSceneName, useLoadingScreen: true, bgm: SoundIds.IntroScene));
     }
 
     public void LoadTutorialScene()
@@ -172,7 +172,7 @@ public class SceneLoader : MonoBehaviour
         var transition = FindAnyObjectByType<TransitionController>();
         if (transition == null) return;
 
-        transition.transitionMat.SetFloat("_Radius", 0f);
+        transition.transitionMat.SetFloat(ShaderProps.Radius, 0f);
         StartCoroutine(Transition(1.0f));
     }
 

@@ -271,7 +271,7 @@ public class RecallTimelineUI : MonoBehaviour
     private void BuildTexts(DaySnapshot day, DaySnapshot prev)
     {
         if (waveText != null)
-            waveText.text = Loc.T("game.recall.wave_summary", ("wave", RecallLookup.WaveName(day.waveType)), ("died", day.diedCount));
+            waveText.text = Loc.T("game.recall.wave_summary", ("wave", WavePalette.GetName(day.waveType)), ("died", day.diedCount));
 
         if (goldText != null)
         {

@@ -130,7 +130,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 int goldBeforeSale = economyManager.GetGold();
                 Vector3 feedbackWorldOrigin = plant.transform.position;
 
-                SoundManager.Instance.PlayEffect("Shovel");
+                SoundManager.Instance.PlayEffect(SoundIds.Shovel);
                 if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
                     economyManager.AddSellCount(plant.speciesname);
@@ -158,7 +158,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
             FertilizerMarker fertMarker = hit.collider.GetComponent<FertilizerMarker>();
             if (fertMarker != null && fertMarker.IsOn)
             {
-                SoundManager.Instance.PlayEffect("Shovel");
+                SoundManager.Instance.PlayEffect(SoundIds.Shovel);
 
                 int col = fertMarker.transform.parent.GetSiblingIndex();
 
@@ -178,7 +178,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                     // 식물이 있는 경우 제거 불가
                     if (!grid.plantGrid.ContainsKey(idx))
                     {
-                        SoundManager.Instance.PlayEffect("Shovel");
+                        SoundManager.Instance.PlayEffect(SoundIds.Shovel);
                         grid.RemoveGoldSoil(idx);
                         return;
                     }

@@ -6,6 +6,6 @@ public class WindWave : Wave
 {
     public override WaveType WaveType => WaveType.Wind;
     public override string WaveDescription => Loc.T("game.wave.Wind.description");
-    public override string WaveSoundString => "Wind";
+    public override string WaveSoundString => SoundIds.Wind;
     public const int UnlockStage = 11;
 }

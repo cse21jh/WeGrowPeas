@@ -21,23 +21,29 @@ public class PlantAbilityButton : MonoBehaviour
         abilityUIController = controller;
         abilityData = ability;
         icon.sprite = ability.icon;
-        name.text = ability.LocalizedName;
-        description.text = ability.LocalizedDescription;
+        RefreshTexts();
         level.text = "0";
 
         levelUpButton.onClick.AddListener(() =>
         {
             abilityUIController.LevelUpPlantAbility(ability);
             ChangeLevelUI(ability.level);
-            SoundManager.Instance.PlayEffect("Button");
+            SoundManager.Instance.PlayEffect(SoundIds.Button);
         });
 
         levelDownButton.onClick.AddListener(() =>
         {
             abilityUIController.LevelDownPlantAbility(ability);
             ChangeLevelUI(ability.level);
-            SoundManager.Instance.PlayEffect("Button");
+            SoundManager.Instance.PlayEffect(SoundIds.Button);
         });
+    }
+
+    /// <summary>이름과 설명을 지금 언어로 다시 넣는다.</summary>
+    public void RefreshTexts()
+    {
+        name.text = abilityData.LocalizedName;
+        description.text = abilityData.LocalizedDescription;
     }
 
     public void ChangeLevelUI(int var)

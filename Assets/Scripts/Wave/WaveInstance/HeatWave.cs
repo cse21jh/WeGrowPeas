@@ -6,6 +6,6 @@ public class HeatWave : Wave
 {
     public override WaveType WaveType => WaveType.Heat;
     public override string WaveDescription => Loc.T("game.wave.Heat.description");
-    public override string WaveSoundString => "Heat";
+    public override string WaveSoundString => SoundIds.Heat;
     public const int UnlockStage = 26;
 }

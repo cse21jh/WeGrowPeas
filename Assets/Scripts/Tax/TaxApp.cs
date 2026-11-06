@@ -49,7 +49,7 @@ public class TaxApp : MonoBehaviour
         if (tax.TryPay())
         {
             if (statusText != null) statusText.text = Loc.T("game.tax.paid");
-            if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+            if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect(SoundIds.Button);
 
             // 국세청 앱 red dot 해제
             if (PhoneManager.Instance != null)

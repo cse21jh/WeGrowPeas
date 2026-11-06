@@ -21,7 +21,7 @@ public class SignPostController : MonoBehaviour
 
     public void SetSignPost(int waveType)
     {
-        anim.SetBool("isShow", true);
+        anim.SetBool(AnimParams.IsShow, true);
         //Debug.Log(price);
 
         if (waveImage != null)
@@ -32,6 +32,6 @@ public class SignPostController : MonoBehaviour
 
     public void HideSignPost()
     {
-        anim.SetBool("isShow", false);
+        anim.SetBool(AnimParams.IsShow, false);
     }
 }

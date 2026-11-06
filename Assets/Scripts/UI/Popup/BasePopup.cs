@@ -32,7 +32,7 @@ public abstract class BasePopup : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
 
         // 버튼 클릭 효과음 재생
-        SoundManager.Instance?.PlayEffect("Button");
+        SoundManager.Instance?.PlayEffect(SoundIds.Button);
 
         gameObject.SetActive(false);
         OnPopupClosed?.Invoke(this); // 오브젝트 풀에 반환

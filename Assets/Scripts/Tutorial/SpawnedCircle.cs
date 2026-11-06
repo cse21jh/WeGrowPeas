@@ -6,17 +6,7 @@ public class SpawnedCircle : MonoBehaviour
 {
     [SerializeField] private GameObject whiteCirclePrefab;
 
-    private RectTransform spawnArea;
-
-    private void Awake()
-    {
-        Transform child = transform.Find("SpawnedCircle");
-
-        if (child != null )
-        {
-            spawnArea = child.GetComponent<RectTransform>();
-        }
-    }
+    [SerializeField] private RectTransform spawnArea;
 
     public void ShowCircle(Vector3 worldPos, Vector2 size)
     {

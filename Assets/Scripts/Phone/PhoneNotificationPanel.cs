@@ -84,7 +84,7 @@ public class PhoneNotificationPanel : MonoBehaviour
 
     private void ShowImmediate(PhoneNotificationData data)
     {
-        SoundManager.Instance.PlayEffect("Alarm");
+        SoundManager.Instance.PlayEffect(SoundIds.Alarm);
         if (titleText != null) titleText.text = data.title;
         if (messageText != null) messageText.text = data.message;
         if (root != null) root.SetActive(true);

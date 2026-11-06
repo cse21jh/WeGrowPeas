@@ -77099,13 +77099,9 @@ MonoBehaviour:
   shop_panelTransformOrigin: {fileID: 0}
   shop_panelTransformMoved: {fileID: 0}
   shop_panelTransformFinish: {fileID: 0}
-  newspaper_targetPanel: {fileID: 0}
-  newspaper_panelTransformOrigin: {fileID: 0}
-  newspaper_panelTransformMoved: {fileID: 0}
   panelEase: 4
   panelMoveDuration: 0.5
   shopPanelMoveDuration: 2
-  newspaper: {fileID: 0}
   endingDelay: 5
 --- !u!114 &825755753
 MonoBehaviour:
@@ -161007,14 +161003,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 53482929357924352, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: guideText
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 53482929357924352, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: itemSlotPrefab
-      value: 
-      objectReference: {fileID: 4787940912900662695, guid: 18aa6f01966d15e4fbf1597d2bc862eb, type: 3}
     - target: {fileID: 67089093729213918, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -30
@@ -162803,38 +162791,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: line
-      value: 
-      objectReference: {fileID: 4241273723447038705, guid: fd5fe01a063116546a7b048f38d1bbf8, type: 3}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: blocker
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: newspaperData.Array.size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 92cb692493678bf4db92f908effd565b, type: 2}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[2]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 2c16dace6a9f15b49b2e9cd5a1c2741d, type: 2}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[3]'
-      value: 
-      objectReference: {fileID: 11400000, guid: cd09782bab06b444f9345ce4e2de16a0, type: 2}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[4]'
-      value: 
-      objectReference: {fileID: 11400000, guid: f620a3533328123478000f7d1b77fde0, type: 2}
-    - target: {fileID: 7530491432450749554, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[5]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 48090c272f34e6548b329bee50701918, type: 2}
     - target: {fileID: 7538612165437955981, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -163179,18 +163135,6 @@ PrefabInstance:
       propertyPath: bigIconDescription
       value: 
       objectReference: {fileID: 3056526577319340998, guid: 95480f6fea93ca4408d744e4c1212ac3, type: 3}
-    - target: {fileID: 8474383691067113982, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: newspaperAdditionalData
-      value: 
-      objectReference: {fileID: 11400000, guid: a7cbbd4f43001b94b9164b6cd062bca3, type: 2}
-    - target: {fileID: 8474383691067113982, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: newspaperData.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8474383691067113982, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
-      propertyPath: 'newspaperData.Array.data[0]'
-      value: 
-      objectReference: {fileID: 11400000, guid: d7e8e1059d99a7c468ddab6d156d541a, type: 2}
     - target: {fileID: 8495920209240461683, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1

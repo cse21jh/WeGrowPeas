@@ -9,8 +9,8 @@ public class LetterController : MonoBehaviour
     public AnimationCurve curveY;
     public AnimationCurve curveZ;
 
-    public float speed = 1f; // Ŀ�갡 ����Ǵ� �ӵ�
-    public float amplitude = 1f; // �������� ����
+    public float speed = 1f; // 커브가 재생되는 속도
+    public float amplitude = 1f; // 움직임의 세기
 
     private Vector3 startPos;
     private float time;
@@ -37,7 +37,7 @@ public class LetterController : MonoBehaviour
     {
         // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
 
-        //���⿡ ���������� �Ѿ�� �ڵ� �ۼ�
+        //여기에 엔딩씬으로 넘어가는 코드 작성
         StartCoroutine(EndScene(1.1f));
 
         Debug.Log("Letter Clicked!");
@@ -51,6 +51,6 @@ public class LetterController : MonoBehaviour
 
     public void StartEndLetter()
     {
-        GetComponent<Animator>().SetTrigger("StartEndLetter");
+        GetComponent<Animator>().SetTrigger(AnimParams.StartEndLetter);
     }
 }

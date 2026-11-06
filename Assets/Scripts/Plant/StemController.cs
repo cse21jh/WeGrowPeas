@@ -45,7 +45,7 @@ public class StemController : MonoBehaviour
                 float rand = Random.Range(0f, maxStartDelay);
                 //Debug.Log($"Animator {i} start delay: {rand} seconds");
                 yield return new WaitForSeconds(rand);
-                peaAnimators[i].SetTrigger("Start");
+                peaAnimators[i].SetTrigger(AnimParams.Start);
             }
         }
     }

@@ -13,7 +13,7 @@ public class ThiefEffectController : MonoBehaviour
 
     public void PlayLineAnimation()
     {
-        line.SetTrigger("Play");
+        line.SetTrigger(AnimParams.Play);
 
         Sequence fadeSequence = DOTween.Sequence();
         foreach (CanvasGroup image in Images)

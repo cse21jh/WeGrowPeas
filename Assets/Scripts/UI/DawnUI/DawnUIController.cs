@@ -94,13 +94,13 @@ public class DawnUIController : MonoBehaviour
 
     public void OnClickClose()
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect(SoundIds.Button);
         CloseDawnPanel();
     }
 
     public void OnClickPrev()
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect(SoundIds.Button);
         CloseDawnPanel();
 
         if (abilityUIController == null)
@@ -155,7 +155,7 @@ public class DawnUIController : MonoBehaviour
     {
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.PlayEffect("Button");
+            SoundManager.Instance.PlayEffect(SoundIds.Button);
         }
 
         if (UIManager.Instance != null && UIManager.Instance.Popup != null)
@@ -320,7 +320,7 @@ public class DawnUIController : MonoBehaviour
     {
         if (selectedStage < 0) return;
         DawnSystem.SetSelectedStage(selectedStage);
-        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect("Button");
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayEffect(SoundIds.Button);
         if (saveSlotUI != null) saveSlotUI.OnClickNewGame(); // 게임 시작
     }
 }

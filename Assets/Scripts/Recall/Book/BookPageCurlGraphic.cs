@@ -35,9 +35,9 @@ namespace WeGrowPeas.RecallBook
                 instance = new Material(template) { name = "Book Curl (Instance)", hideFlags = HideFlags.HideAndDontSave };
                 material = instance;
             }
-            instance.SetTexture("_BackTex", back);
-            instance.SetVector("_FrontRect", new Vector4(0, 0, 1, 1));
-            instance.SetVector("_BackRect", new Vector4(0, 0, 1, 1));
+            instance.SetTexture(ShaderProps.BackTex, back);
+            instance.SetVector(ShaderProps.FrontRect, new Vector4(0, 0, 1, 1));
+            instance.SetVector(ShaderProps.BackRect, new Vector4(0, 0, 1, 1));
             if (canvas != null) canvas.additionalShaderChannels |= AdditionalCanvasShaderChannels.TexCoord1;
             SetAllDirty();
         }
@@ -55,9 +55,9 @@ namespace WeGrowPeas.RecallBook
             if (instance != null)
             {
                 var stencilMaterial = materialForRendering;
-                stencilMaterial.SetTexture("_BackTex", back);
-                stencilMaterial.SetVector("_FrontRect", instance.GetVector("_FrontRect"));
-                stencilMaterial.SetVector("_BackRect", instance.GetVector("_BackRect"));
+                stencilMaterial.SetTexture(ShaderProps.BackTex, back);
+                stencilMaterial.SetVector(ShaderProps.FrontRect, instance.GetVector(ShaderProps.FrontRect));
+                stencilMaterial.SetVector(ShaderProps.BackRect, instance.GetVector(ShaderProps.BackRect));
             }
             base.UpdateMaterial();
         }

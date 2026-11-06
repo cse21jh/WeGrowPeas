@@ -19,6 +19,9 @@ public class RequestScriptable : ScriptableObject
 
     public string requestId;
 
+    [Min(0), Tooltip("이 일차부터 후보에 오른다. 0이면 처음부터 나온다.")]
+    public int minStage;
+
     public RequestDifficulty requestDifficulty;
 
     public List<RewardEntry> rewards = new List<RewardEntry>();

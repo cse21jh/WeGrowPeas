@@ -32,14 +32,13 @@ namespace WeGrowPeas.RecallBook
         private bool locked;
         public bool IsTurning { get; private set; }
         public bool ReduceMotion { get => reduceMotion; set => reduceMotion = value; }
-        public RectTransform LeftPage { get { ResolvePages(); return leftPage; } }
-        public RectTransform RightPage { get { ResolvePages(); return rightPage; } }
+        public RectTransform LeftPage => leftPage;
+        public RectTransform RightPage => rightPage;
 
         /// <summary>Redraw synchronously, once. Destination data is committed even if capture is unavailable.</summary>
         public bool TryTurn(bool forward, Action redrawDestination)
         {
             if (IsTurning || !isActiveAndEnabled || redrawDestination == null) return false;
-            ResolvePages();
             if (reduceMotion || pageRoot == null || leftPage == null || rightPage == null || snapshot == null || turningPage == null ||
                 stationaryPage == null || pageMaterial == null)
             {
@@ -136,14 +135,6 @@ namespace WeGrowPeas.RecallBook
             }
             animation = null;
             Finish();
-        }
-
-        private void ResolvePages()
-        {
-            // Existing prefab instances created before these fields were added still work.
-            if (pageRoot == null) return;
-            if (leftPage == null) leftPage = pageRoot.Find("LeftPage") as RectTransform;
-            if (rightPage == null) rightPage = pageRoot.Find("RightPage") as RectTransform;
         }
 
         private Rect PageBounds(RectTransform page, Transform relativeTo)
