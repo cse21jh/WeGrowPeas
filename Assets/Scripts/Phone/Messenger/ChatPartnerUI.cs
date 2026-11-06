@@ -30,7 +30,6 @@ public class ChatPartnerUI : MonoBehaviour
 
 
         // 안 읽은 메시지 정보에 따라 적절한 알림을 켠다
-        UnreadStatus.enabled = true;
         if (unreadInfo.hasUnread)
         {
             if (unreadInfo.hasMandatory)
@@ -47,9 +46,6 @@ public class ChatPartnerUI : MonoBehaviour
         {
             if (allReadIndicator != null) UnreadStatus.sprite = allReadIndicator;
             if (unreadCount != null) unreadCount.text = "";
-
-            // 모두 읽음 스프라이트에는 한글이 그려져 있어 다른 언어에서는 숨긴다.
-            UnreadStatus.enabled = Loc.Language == LocTable.SourceLanguage;
         }
 
         GetComponent<Button>().onClick.AddListener(OnItemClick);
