@@ -363,7 +363,7 @@ public class EnemyController : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
             return;
 
-        if (grid.GetIsBreeding() && waveSkipCount > 0 && currentWave != noneWave)
+        if (grid.Breeder.GetIsBreeding() && waveSkipCount > 0 && currentWave != noneWave)
         {
             currentWave = noneWave;
             waveSkipCount--;

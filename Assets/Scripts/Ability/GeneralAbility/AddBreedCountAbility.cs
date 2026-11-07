@@ -5,6 +5,6 @@ public class AddBreedCountAbility : GeneralAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddMaxBreedCount(1);
+        gameManager.grid.Breeder.AddMaxBreedCount(1);
     }
 }

@@ -135,7 +135,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 break;
             case 1: // 완두콩 클릭
                 spawnedCircle.ShowCircle(new Vector3(-4.65f, 1.835f, 0f), new Vector2(75f, 150f));
-                grid.StartTutorialBreeding();
+                FindAnyObjectByType<TutorialBreedingController>().StartTutorialBreeding();
                 grid.MakeMovable();
                 break;
             case 2: // 교배                
@@ -171,7 +171,7 @@ public class TutorialManager : Singleton<TutorialManager>
                 break;
 
             case 1: // 완두콩 클릭
-                yield return new WaitUntil(() => grid.IsBreedObj1Selected());
+                yield return new WaitUntil(() => FindAnyObjectByType<TutorialBreedingController>().IsBreedObj1Selected());
                 _lastClickedObject = null;
                 break;
             case 2: // 교배

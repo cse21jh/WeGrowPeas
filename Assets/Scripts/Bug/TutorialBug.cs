@@ -15,7 +15,7 @@ public class TutorialBug : Bug
 
     protected override void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && canCatchBug /*&& grid.GetIsBreeding()*/)
+        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && canCatchBug /*&& grid.Breeder.GetIsBreeding()*/)
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
             Debug.Log(mousePos);
@@ -41,7 +41,7 @@ public class TutorialBug : Bug
         {
             if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
                 FindNewTargetObj();
-            else if (/*grid.GetIsBreeding() &&*/ !isDie && !isHit)
+            else if (/*grid.Breeder.GetIsBreeding() &&*/ !isDie && !isHit)
             {
                 Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
                 MoveToward(targetPos);

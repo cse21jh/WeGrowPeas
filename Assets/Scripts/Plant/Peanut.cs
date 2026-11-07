@@ -154,7 +154,7 @@ public class Peanut : MovablePlant
             if (inherited > 0) child.AddBonusGoldMultiplier(inherited);
         }
 
-        grid.totalPeanutBreedCount++;
+        grid.Breeder.totalPeanutBreedCount++;
         return;
     }
     private static readonly int[] BasePrices = { 60, 100, 130, 150, 170, 200, 240 };

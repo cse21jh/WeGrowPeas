@@ -46,11 +46,11 @@ public class TimerUI : MonoBehaviour
     {
         if (countdownRoutine != null)
         {
-            maxBreedingTime = (int)GameManager.Instance.grid.GetMaxBreedTimer();
+            maxBreedingTime = (int)GameManager.Instance.grid.Breeder.GetMaxBreedTimer();
             StopCoroutine(countdownRoutine);
         }
 
-        maxBreedingTime = (int)GameManager.Instance.grid.GetMaxBreedTimer();
+        maxBreedingTime = (int)GameManager.Instance.grid.Breeder.GetMaxBreedTimer();
         countdownRoutine = StartCoroutine(BreedingCountdown());
     }
 
@@ -125,7 +125,7 @@ public class TimerUI : MonoBehaviour
 
     public void UpdateMaxTimerCount()
     {
-        textTimer.text = $"{(int)GameManager.Instance.grid.GetMaxBreedTimer()}s";
+        textTimer.text = $"{(int)GameManager.Instance.grid.Breeder.GetMaxBreedTimer()}s";
         breedTimerController.SetFill(1f);
         textTimer.color = Color.black;
     }
@@ -146,8 +146,8 @@ public class TimerUI : MonoBehaviour
         
         if (GameManager.Instance?.grid != null)
         {
-            float currentTimer = GameManager.Instance.grid.GetBreedTimer();
-            float currentMaxTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+            float currentTimer = GameManager.Instance.grid.Breeder.GetBreedTimer();
+            float currentMaxTimer = GameManager.Instance.grid.Breeder.GetMaxBreedTimer();
             if (currentMaxTimer > 0)
                 breedTimerController.SetFillImmediately(currentTimer / currentMaxTimer);
             else
@@ -169,8 +169,8 @@ public class TimerUI : MonoBehaviour
             // Grid의 실제 breedTimer와 동기화
             if (GameManager.Instance?.grid != null)
             {
-                float currentTimer = GameManager.Instance.grid.GetBreedTimer();
-                float currentMaxTimer = GameManager.Instance.grid.GetMaxBreedTimer();
+                float currentTimer = GameManager.Instance.grid.Breeder.GetBreedTimer();
+                float currentMaxTimer = GameManager.Instance.grid.Breeder.GetMaxBreedTimer();
                 
                 if (currentTimer <= 0)
                 {

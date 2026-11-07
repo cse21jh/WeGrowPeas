@@ -96,7 +96,7 @@ public class CurseManager : Singleton<CurseManager>
             // 자유시간 시작 때만 도는 초기화를 디버그 강제 적용 시에도 태워준다.
             // (통신장애는 여기서 지속 시간이 정해지므로, 없으면 다음 날 자유시간까지 효과가 안 보임)
             if (PhoneManager.Instance != null && GameManager.Instance != null && GameManager.Instance.grid != null)
-                PhoneManager.Instance.BeginEmpBlockIfActive(GameManager.Instance.grid.MaxBreedTimer);
+                PhoneManager.Instance.BeginEmpBlockIfActive(GameManager.Instance.grid.Breeder.MaxBreedTimer);
         }
         else
         {

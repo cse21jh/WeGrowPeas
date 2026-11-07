@@ -60,9 +60,9 @@ public class BreedTimerManager : MonoBehaviour
         if (index != -1)
         {
             timers[index].SetActive(true);
-            if (grid != null && grid.GetIsBreeding()) timerUIs[index].StartBreedingTimer();
+            if (grid != null && grid.Breeder.GetIsBreeding()) timerUIs[index].StartBreedingTimer();
             else timerUIs[index].UpdateMaxTimerCount();
-            grid.SetBreedTimerUI(timerUIs[index]);
+            grid.Breeder.SetBreedTimerUI(timerUIs[index]);
         }
     }
 
@@ -76,7 +76,7 @@ public class BreedTimerManager : MonoBehaviour
         // 8번 칸에 추후 폰 타이머 UI 삽입하면 됨
         timers[8].SetActive(true);
         timerUIs[8].UpdatePhoneMaxTimerCount();
-        grid.SetBreedTimerUI(timerUIs[8]);
+        grid.Breeder.SetBreedTimerUI(timerUIs[8]);
     }
 
     // 세금 압류 유예 타이머(폰 타이머 슬롯 재사용)
@@ -86,7 +86,7 @@ public class BreedTimerManager : MonoBehaviour
             timer.SetActive(false);
 
         timers[8].SetActive(true);
-        grid.SetBreedTimerUI(timerUIs[8]);
+        grid.Breeder.SetBreedTimerUI(timerUIs[8]);
         timerUIs[8].StartTaxTimer(seconds);
     }
 

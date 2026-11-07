@@ -80,7 +80,7 @@ public class Bug : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.GetIsBreeding())
+        if (Input.GetMouseButtonDown(0) && !ClickRouter.Instance.IsBlockedByUI && grid.Breeder.GetIsBreeding())
         {
             if (s_mainCamera == null) s_mainCamera = Camera.main;
             Vector3 mousePos = s_mainCamera.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0));
@@ -110,7 +110,7 @@ public class Bug : MonoBehaviour
         StopCoroutine(movingCoroutine);
         while(true)
         {
-            if (!grid.GetIsBreeding() || isDie || isHit)
+            if (!grid.Breeder.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;
                 continue;

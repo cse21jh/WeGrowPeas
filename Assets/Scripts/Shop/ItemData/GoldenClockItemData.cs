@@ -48,7 +48,7 @@ public class GoldenClockItemData : ItemData
             return;
         }
 
-        GameManager.Instance.grid.AddMaxBreedTimer(10);
+        GameManager.Instance.grid.Breeder.AddMaxBreedTimer(10);
         Debug.Log("황금 시계 구매: 교배 시간이 10초 증가했습니다.");
     }
 

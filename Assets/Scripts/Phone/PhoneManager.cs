@@ -424,7 +424,7 @@ public class PhoneManager : Singleton<PhoneManager>
     {
         float ratio = IsPhonePhase ? CurseState.InsomniaFreeTimeRatio : 1f;
         if (GameManager.Instance != null)
-            return GameManager.Instance.grid.GetMaxBreedTimer() * ratio;
+            return GameManager.Instance.grid.Breeder.GetMaxBreedTimer() * ratio;
         return 30f * ratio;
     }
 
@@ -615,12 +615,12 @@ public class PhoneManager : Singleton<PhoneManager>
                 AppKey.Messenger,
                 out AlarmState messengerState)
                 && messengerState == AlarmState.Mandatory;
-            GameManager.Instance.grid.GetBreedTimerUI().ShowPhoneAlarmText(isMessengerMandatory);
+            GameManager.Instance.grid.Breeder.GetBreedTimerUI().ShowPhoneAlarmText(isMessengerMandatory);
         }
         else
         {
             GameManager.Instance.ResumeGame();
-            GameManager.Instance.grid.GetBreedTimerUI().HidePhoneAlarmText();
+            GameManager.Instance.grid.Breeder.GetBreedTimerUI().HidePhoneAlarmText();
         }
     }
 

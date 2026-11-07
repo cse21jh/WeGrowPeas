@@ -23,7 +23,7 @@ public class DefaultBug : Bug
 
             if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
                 FindNewTargetObj();
-            else if (grid.GetIsBreeding() && !isDie && !isHit)
+            else if (grid.Breeder.GetIsBreeding() && !isDie && !isHit)
             {
                 Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
                 MoveToward(targetPos);

@@ -25,7 +25,7 @@ public class Ladybug : Bug
 
         while (true)
         {
-            if (!grid.GetIsBreeding() || isDie || isHit)
+            if (!grid.Breeder.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;
                 continue;

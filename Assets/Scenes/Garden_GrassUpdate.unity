@@ -99622,6 +99622,7 @@ GameObject:
   - component: {fileID: 1072018327}
   - component: {fileID: 1072018329}
   - component: {fileID: 1206488031}
+  - component: {fileID: 1078308087}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -99643,6 +99644,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scouterButton: {fileID: 1793343768}
   isScouterOn: 0
+--- !u!114 &1078308087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072018326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5666d7d57f0141fdaffe5176010b28cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  breedTimerUI: {fileID: 1806027838}
+  breedButton: {fileID: 662809610}
+  breedSkipButton: {fileID: 474649615}
+  breedCountUI: {fileID: 762108089}
 --- !u!114 &1072018327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99676,10 +99693,6 @@ MonoBehaviour:
   - {fileID: 3979688952226491961, guid: a3221e7923e855741a22395dbd976333, type: 3}
   - {fileID: 3979688952226491961, guid: 69d1e16e2bc64cd429f297effd0cfb3e, type: 3}
   ladybugPrefabs: {fileID: 3979688952226491961, guid: 10cb6b8eb5e6fdb47892bbf6b2d01351, type: 3}
-  breedTimerUI: {fileID: 1806027838}
-  breedButton: {fileID: 662809610}
-  breedSkipButton: {fileID: 474649615}
-  breedCountUI: {fileID: 762108089}
   gardenSprites:
   - {fileID: 21300000, guid: 081b6e3e0b202454dab09e4511641b4c, type: 3}
   - {fileID: 21300000, guid: eba7044d5e2e84e4d97cd6c0adc49d66, type: 3}

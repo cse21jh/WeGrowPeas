@@ -335,7 +335,7 @@ public abstract class Plant : MonoBehaviour
         StartCoroutine(Vanish());
         //UIPlantStat.Instance.HideInfo();
         grid.ClearGridIndex(gridIndex);
-        grid.CheckBreedButtonBeforeDie(this.gameObject);
+        grid.Breeder.CheckBreedButtonBeforeDie(this.gameObject);
         if (cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
             grid.Scouter.UpdateGoldScouterImageInGrid();
         if (this is ChiliPepper)
@@ -882,7 +882,7 @@ public abstract class Plant : MonoBehaviour
             priceSign.SetPrice(GetSellingPrice());
     }
 
-    /// <summary>완두커피: 자유시간이 지날 때마다 호출되어 판매 골드 배수를 누적한다. (Grid.Breeding 종료 시)</summary>
+    /// <summary>완두커피: 자유시간이 지날 때마다 호출되어 판매 골드 배수를 누적한다. (Grid.Breeder.Breeding 종료 시)</summary>
     public void OnFreeTimePassed()
     {
         int previousSellingPrice = GetSellingPrice();

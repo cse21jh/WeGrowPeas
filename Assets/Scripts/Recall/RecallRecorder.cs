@@ -65,7 +65,7 @@ public static class RecallRecorder
         if (gm.grid != null)
         {
             snap.maxCol = gm.grid.GetMaxCol();
-            snap.cumBreedCount = gm.grid.totalBreedCount;
+            snap.cumBreedCount = gm.grid.Breeder.totalBreedCount;
 
             int cells = Mathf.Max(0, snap.maxCol * 4);
             var species = new string[cells];

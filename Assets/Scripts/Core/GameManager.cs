@@ -175,7 +175,7 @@ public class GameManager : Singleton<GameManager>
 
         if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
 
-        yield return StartCoroutine(grid.Breeding());
+        yield return StartCoroutine(grid.Breeder.Breeding());
 
         yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
 
@@ -571,8 +571,8 @@ public class GameManager : Singleton<GameManager>
         string itemName = shopManager.ReturnMostPurchasedItem();
 
         GameRecordHolder.SaveRecord(stage,
-            grid.totalPeaBreedcount,
-            grid.totalPeanutBreedCount,
+            grid.Breeder.totalPeaBreedcount,
+            grid.Breeder.totalPeanutBreedCount,
             economyManager.PeaSellCount,
             economyManager.PeanutSellCount,
             grid.killBugCount,

@@ -72,7 +72,7 @@ public abstract class MovablePlant : Plant
 
         if (isDragging)
         {
-            if (!grid.GetIsBreeding() || isDying)
+            if (!grid.Breeder.GetIsBreeding() || isDying)
                 grid.TryPlacePlant(this, Input.mousePosition);
             else
             {
@@ -81,7 +81,7 @@ public abstract class MovablePlant : Plant
             }
         }
 
-        if (!grid.GetIsBreeding() || isFrozen)
+        if (!grid.Breeder.GetIsBreeding() || isFrozen)
         {
             if (isDragging || isHolding)
             {
@@ -102,7 +102,7 @@ public abstract class MovablePlant : Plant
 
     private void OnMouseDown()
     {
-        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.IsPointerOverBreedButton())
+        if (!CanMove() || ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.Breeder.IsPointerOverBreedButton())
             return;
         holdTime = 0f;
         isHolding = true;
@@ -121,8 +121,8 @@ public abstract class MovablePlant : Plant
         }
         else
         {
-            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.IsPointerOverBreedButton()) return;
-            grid.RequestBreedSelect(this.gameObject);
+            if (ClickRouter.Instance.IsBlockedByUI || grid.isDraggingShovel || isFrozen || grid.Breeder.IsPointerOverBreedButton()) return;
+            grid.Breeder.RequestBreedSelect(this.gameObject);
         }
 
         isDragging = false;

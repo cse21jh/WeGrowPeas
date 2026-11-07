@@ -30,7 +30,7 @@ public class RandomMovingBug : Bug
                 eatingPlant = false;
             }
 
-            if (!grid.GetIsBreeding() || isDie || isHit)
+            if (!grid.Breeder.GetIsBreeding() || isDie || isHit)
             {
                 yield return null;
                 continue;
