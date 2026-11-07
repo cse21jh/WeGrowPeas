@@ -262,9 +262,22 @@ public sealed class ExpandableQuestTab : MonoBehaviour
         ApplyStateImmediately(_isExpanded);
     }
 
+    private void OnEnable()
+    {
+        Loc.LanguageChanged += RefreshDescriptionButton;
+        RefreshDescriptionButton();
+    }
+
     private void OnDisable()
     {
+        Loc.LanguageChanged -= RefreshDescriptionButton;
         KillCurrentAnimation();
+    }
+
+    private void RefreshDescriptionButton()
+    {
+        if (descriptionBtn != null)
+            descriptionBtn.text = Loc.T(_isExpanded ? "game.common.close" : "game.quest.details");
     }
 
 #if UNITY_EDITOR
@@ -415,7 +428,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
                 _animationSequence = null;
             });
 
-        descriptionBtn.text = expanded ? Loc.T("game.common.close") : Loc.T("game.quest.details");
+        RefreshDescriptionButton();
     }
 
     /// <summary>
@@ -454,6 +467,7 @@ public sealed class ExpandableQuestTab : MonoBehaviour
             descriptionCanvasGroup.blocksRaycasts = expanded;
         }
 
+        RefreshDescriptionButton();
         RequestLayoutRebuild();
         ForceFinalLayoutRebuild();
     }

@@ -64,6 +64,16 @@ public class FenceElementController : MonoBehaviour
     private void OnEnable()
     {
         Loc.LanguageChanged += RefreshName;
+
+        // 영어 이름은 칸보다 길 수 있어 한 줄을 유지한 채 글자만 줄인다.
+        if (!elementName.enableAutoSizing)
+        {
+            elementName.fontSizeMax = elementName.fontSize;
+            elementName.fontSizeMin = 9f;
+            elementName.textWrappingMode = TextWrappingModes.NoWrap;
+            elementName.enableAutoSizing = true;
+        }
+
         RefreshName();
     }
 
