@@ -28,7 +28,7 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
             return false;
 
         // 최대 레벨(2) 체크
-        if (ctx.Grid.ChiliPepperRangeLevel >= 2)
+        if (ctx.Grid.Modifiers.ChiliPepperRangeLevel >= 2)
         {
             reason = Loc.T("shop.error.max_range");
             return false;
@@ -47,6 +47,6 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
         ctx.Grid.AddChiliPepperRangeLevel(rangeLevelIncrease);
-        ctx.Grid.AddChiliPepperSpawnProbability(probabilityIncrease);
+        ctx.Grid.Modifiers.AddChiliPepperSpawnProbability(probabilityIncrease);
     }
 }

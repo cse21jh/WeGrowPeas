@@ -5,6 +5,6 @@ public class ResistanceAdaptationAbility : PlantAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddResistanceAdaptation(0.01f * level);
+        gameManager.grid.Modifiers.AddResistanceAdaptation(0.01f * level);
     }
 }

@@ -38,6 +38,6 @@ public class TwinsItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.AddTwinBreedProbability(probabilityPerPurchase);
+        ctx.Grid.Modifiers.AddTwinBreedProbability(probabilityPerPurchase);
     }
 }

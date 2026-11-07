@@ -51,6 +51,6 @@ public class BugProcessingUpgradeItemData : ItemData
             return;
 
         // 벌레 처치 시 골드 획득량 50골드 증가
-        ctx.Grid.AddAdditionalBugGold(goldBonus);
+        ctx.Grid.Modifiers.AddAdditionalBugGold(goldBonus);
     }
 }

@@ -26,7 +26,7 @@ public class NepenthesItemData : ItemData
         int baseWeight = rotationWeight;
         if (ctx?.Grid != null)
         {
-            float probabilityBonus = ctx.Grid.NepenthesSpawnProbability;
+            float probabilityBonus = ctx.Grid.Modifiers.NepenthesSpawnProbability;
             // 확률을 가중치로 변환 (예: 0.01 = 1% -> 가중치 1 증가)
             int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
             return baseWeight + weightBonus;

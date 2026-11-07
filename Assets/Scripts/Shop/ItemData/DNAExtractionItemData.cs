@@ -60,7 +60,7 @@ public class DNAExtractionItemData : ItemData
             {
                 int genetics = UnityEngine.Random.Range(0, 3);
                 if(r.traitType == TraitType.Pest)
-                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.GetAdditionalPestResistance()));
+                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.Modifiers.AdditionalPestResistance));
                 else
                     trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
             }

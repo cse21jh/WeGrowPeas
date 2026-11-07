@@ -53,6 +53,6 @@ public class BugLureDeviceItemData : ItemData
         // 벌레 스폰 시간 간격 10% 감소 (음수로 전달하여 감소)
         // Grid의 공식: effectiveBugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement)
         // -0.1f를 더하면 0.9배가 되어 10% 감소
-        ctx.Grid.AddBugSpawnIntervalIncreasement(-intervalReduction);
+        ctx.Grid.Modifiers.AddBugSpawnIntervalIncreasement(-intervalReduction);
     }
 }

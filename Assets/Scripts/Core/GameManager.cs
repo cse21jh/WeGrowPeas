@@ -279,9 +279,9 @@ public class GameManager : Singleton<GameManager>
         grid?.ProcessLandAndBeanRooting();
 
         // 무당벌레당 골드 지급 (웨이브 종료 시)
-        if (grid != null && grid.AdditionalLadybugGoldPerUnit > 0 && grid.ladybugs != null)
+        if (grid != null && grid.Modifiers.AdditionalLadybugGoldPerUnit > 0 && grid.ladybugs != null)
         {
-            int ladybugGold = grid.ladybugs.Count * grid.AdditionalLadybugGoldPerUnit;
+            int ladybugGold = grid.ladybugs.Count * grid.Modifiers.AdditionalLadybugGoldPerUnit;
             if (ladybugGold > 0)
             {
                 economyManager.AddGold(ladybugGold);
@@ -289,7 +289,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         // 치료형 캡사이신: 고추 주변 식물의 저항력 회복
-        if (grid != null && grid.ChiliPepperHealPercent > 0f)
+        if (grid != null && grid.Modifiers.ChiliPepperHealPercent > 0f)
         {
             foreach (var currentPlant in grid.plantGrid.Values)
             {
@@ -302,7 +302,7 @@ public class GameManager : Singleton<GameManager>
                         var traits = nearbyPlant.GetGeneticTrait();
                         for (int i = 0; i < traits.Count; i++)
                         {
-                            float healAmount = grid.ChiliPepperHealPercent;
+                            float healAmount = grid.Modifiers.ChiliPepperHealPercent;
                             float currentResistance = traits[i].resistance;
                             float newResistance = Mathf.Clamp(currentResistance + healAmount, 0.1f, 1.0f);
                             traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);

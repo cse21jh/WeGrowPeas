@@ -28,7 +28,7 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // 페로몬 생성이 활성화되어 있어야 함 (선행 조건)
         if (ctx?.Grid == null) return false;
-        return stage >= BugSchedule.AppearStage && ctx.Grid.HasNepenthesPheromone;
+        return stage >= BugSchedule.AppearStage && ctx.Grid.Modifiers.HasNepenthesPheromone;
     }
 
     public override int GetRotationWeight(ShopContext ctx) => 4;
@@ -36,7 +36,7 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         // 페로몬 생성이 활성화되어 있어야 함 (선행 조건)
-        if (ctx?.Grid == null || !ctx.Grid.HasNepenthesPheromone)
+        if (ctx?.Grid == null || !ctx.Grid.Modifiers.HasNepenthesPheromone)
         {
             reason = Loc.T("shop.error.pheromone_required");
             return false;
@@ -58,6 +58,6 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
         // 네펜데스 페로몬 범위 20% 증가 (중첩 시 합적용)
         ctx.Grid.AddAdditionalNepenthesPheromoneSizeMultiplier(rangeMultiplierIncrease);
         // 네펜데스 등장 확률 2% 증가
-        ctx.Grid.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }
 }

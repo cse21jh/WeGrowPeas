@@ -5,6 +5,6 @@ public class ResistanceDecayReductionAbility : PlantAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddResistanceDecayReduction(0.01f * level);
+        gameManager.grid.Modifiers.AddResistanceDecayReduction(0.01f * level);
     }
 }

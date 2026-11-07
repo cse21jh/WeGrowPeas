@@ -59,7 +59,7 @@ public class BugFanItemData : ItemData
         // 즉시 영구 적용: Grid의 벌레 속도 감소 값에 더함(중첩 가능)
         if (GameManager.Instance?.grid != null)
         {
-            GameManager.Instance.grid.AddBugSpeedDcreasement(reducePercent);
+            GameManager.Instance.grid.Modifiers.AddBugSpeedDcreasement(reducePercent);
             Debug.Log($"{name} 구매: 벌레 이동속도 {reducePercent * 100f}% 영구 감소 적용");
         }
         else

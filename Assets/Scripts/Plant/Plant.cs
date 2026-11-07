@@ -290,7 +290,7 @@ public abstract class Plant : MonoBehaviour
                         // 스프링클러 범위 내에 있다면 시너지 보너스 추가
                         if (grid.IsAffectedBySprinkler(gridIndex))
                         {
-                            resistance += grid.GetSprinklerFertilizerSynergyBonus();
+                            resistance += grid.Modifiers.SprinklerFertilizerSynergyBonus;
                         }
                     }
                 }
@@ -299,7 +299,7 @@ public abstract class Plant : MonoBehaviour
                 // 무당벌레당 저항력 증가 (모든 형질에 적용)
                 if (grid != null && grid.ladybugs != null)
                 {
-                    resistance += grid.ladybugs.Count * grid.AdditionalLadybugResistancePerUnit;
+                    resistance += grid.ladybugs.Count * grid.Modifiers.AdditionalLadybugResistancePerUnit;
                 }
                 // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
                 float dawnBase = Mathf.Max(0f, g.resistance);
@@ -343,7 +343,7 @@ public abstract class Plant : MonoBehaviour
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
         if (GameManager.Instance != null)
-            GameManager.Instance.economyManager.AddGold((int)(GetSellingPrice() * grid.GetBonusRatioWhenDie()));
+            GameManager.Instance.economyManager.AddGold((int)(GetSellingPrice() * grid.Modifiers.BonusRatioWhenDie));
         Destroy(this.gameObject, dissolveDuration);
         return true;
     }
@@ -563,17 +563,17 @@ public abstract class Plant : MonoBehaviour
 
 
 
-        resistance += GameManager.Instance.grid.GetResistanceBonus();
+        resistance += GameManager.Instance.grid.Modifiers.ResistanceBonus;
 
         // 강한 유전자 저항력 보너스 적용
         if (genetics == 2)
         {
-            resistance += GameManager.Instance.grid.GetStrongGenericsResistanceBonus();
+            resistance += GameManager.Instance.grid.Modifiers.StrongGeneticsResistanceBonus;
         }
         // 약한 유전자 저항력 보너스 적용
         else
         {
-            resistance += GameManager.Instance.grid.GetWeakGenericsResistanceBonus();
+            resistance += GameManager.Instance.grid.Modifiers.WeakGeneticsResistanceBonus;
         }
 
 
@@ -596,7 +596,7 @@ public abstract class Plant : MonoBehaviour
 #endif
         return 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
            + (GameManager.Instance != null && GameManager.Instance.grid != null
-              ? GameManager.Instance.grid.SuperMutationChanceBonus : 0f);
+              ? GameManager.Instance.grid.Modifiers.SuperMutationChanceBonus : 0f);
     }
 
     /// <summary>양성 변종: 모든 형질의 저항력을 90~100%로 설정 (유전자는 유지).</summary>
@@ -717,13 +717,13 @@ public abstract class Plant : MonoBehaviour
                     if ((int)waveType != i)
                     {
                         if (GameManager.Instance != null && GameManager.Instance.stage > 25)
-                            ChangeResistance(i, -0.1f + grid.GetResistanceDecayReduction());
+                            ChangeResistance(i, -0.1f + grid.Modifiers.ResistanceDecayReduction);
                         else
-                            ChangeResistance(i, -0.05f + grid.GetResistanceDecayReduction());
+                            ChangeResistance(i, -0.05f + grid.Modifiers.ResistanceDecayReduction);
                     }
                     else
                     {
-                        ChangeResistance(i, grid.GetResistanceAdaptation());
+                        ChangeResistance(i, grid.Modifiers.ResistanceAdaptation);
                     }
                 }
             }
@@ -830,7 +830,7 @@ public abstract class Plant : MonoBehaviour
         if (grid == null) return 0;
 
         int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
-        int badGeneBonus = grid.GetBadGuyMoreRiceLevel() * 5 * GetBadGenesCount();
+        int badGeneBonus = grid.Modifiers.BadGuyMoreRiceLevel * 5 * GetBadGenesCount();
 
         multiplier += travelSellBonus; // 특수(세계여행): 이동 거리 누적 배수
         multiplier += grid.GetColumnGoldMulBonus(gridIndex); // 특수(땅부자): 세로줄 고속 숙성 효과
@@ -840,14 +840,14 @@ public abstract class Plant : MonoBehaviour
             multiplier += 0.1f * grid.CountTileEffects(gridIndex);
 
         // 완두커피: 자유시간이 지난 횟수만큼 판매 골드 배수 추가
-        float freeTimeBonus = grid.GetPeaCoffeeMultiplier() * freeTimePassedCount;
+        float freeTimeBonus = grid.Modifiers.PeaCoffeeMultiplier * freeTimePassedCount;
 
-        int price = (int)((basePrice + grid.GetAdditionalPlantGold() + badGeneBonus)
+        int price = (int)((basePrice + grid.Modifiers.AdditionalPlantGold + badGeneBonus)
                           * (1f + (multiplier * totalMultiplierCount) + freeTimeBonus));
 
         // 땅과 콩: 뿌리를 내린 식물의 가격 증가 (다른 효과와 곱적용)
         if (this is MovablePlant && !IsMovable)
-            price = (int)(price * grid.GetRootedPriceMultiplier());
+            price = (int)(price * grid.Modifiers.GetRootedPriceMultiplier());
 
         return price;
     }

@@ -5,6 +5,6 @@ public class BonusRatioWhenDieAbility : PlantAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddBonusRatioWhenDie(0.05f * level);
+        gameManager.grid.Modifiers.AddBonusRatioWhenDie(0.05f * level);
     }
 }

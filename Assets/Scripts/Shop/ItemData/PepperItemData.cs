@@ -25,7 +25,7 @@ public class ChiliPepperItemData : ItemData
         int baseWeight = rotationWeight;
         if (ctx?.Grid != null)
         {
-            float probabilityBonus = ctx.Grid.ChiliPepperSpawnProbability;
+            float probabilityBonus = ctx.Grid.Modifiers.ChiliPepperSpawnProbability;
             // 확률을 가중치로 변환 (예: 0.02 = 2% -> 가중치 2 증가)
             int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
             return baseWeight + weightBonus;

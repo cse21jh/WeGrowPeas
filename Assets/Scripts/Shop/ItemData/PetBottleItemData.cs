@@ -29,7 +29,7 @@ public class PetBottleItemData : ItemData
         int baseWeight = rotationWeight;
         if (ctx?.Grid != null)
         {
-            float probabilityBonus = ctx.Grid.PetBottleSpawnProbability;
+            float probabilityBonus = ctx.Grid.Modifiers.PetBottleSpawnProbability;
             // 확률을 가중치로 변환 (예: 0.02 = 2% -> 가중치 2 증가)
             int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
             return baseWeight + weightBonus;
@@ -43,7 +43,7 @@ public class PetBottleItemData : ItemData
         int basePrice = 500;
         if (ctx?.Grid != null)
         {
-            Price = Mathf.Max(1, basePrice - ctx.Grid.PetBottlePriceReduction);
+            Price = Mathf.Max(1, basePrice - ctx.Grid.Modifiers.PetBottlePriceReduction);
         }
         else
         {
@@ -54,7 +54,7 @@ public class PetBottleItemData : ItemData
         int baseStock = 3;
         if (ctx?.Grid != null)
         {
-            InitialStock = baseStock + ctx.Grid.PetBottleInitialStockBonus;
+            InitialStock = baseStock + ctx.Grid.Modifiers.PetBottleInitialStockBonus;
         }
         else
         {

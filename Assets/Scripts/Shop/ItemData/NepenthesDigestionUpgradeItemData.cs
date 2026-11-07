@@ -47,8 +47,8 @@ public class NepenthesDigestionUpgradeItemData : ItemData
             return;
 
         // 네펜데스가 벌레 먹을 시 추가 골드 80 증가 (중첩 시 합적용)
-        ctx.Grid.AddAdditionalNepenthesGold(goldBonus);
+        ctx.Grid.Modifiers.AddAdditionalNepenthesGold(goldBonus);
         // 네펜데스 등장 확률 1% 증가
-        ctx.Grid.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }
 }

@@ -67,6 +67,9 @@ public class Grid : MonoBehaviour
     protected Plant breedButtonPlant = null;
     private int hoveredSoilIndex = -1;
 
+    /// <summary>아이템과 능력이 쌓은 밭 전체 보정치. 저장과 불러오기는 <see cref="GridModifiers"/>가 맡는다.</summary>
+    public GridModifiers Modifiers { get; } = new GridModifiers();
+
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
@@ -78,54 +81,27 @@ public class Grid : MonoBehaviour
     protected float bugSpawnTimeInterval = 15.0f;
     protected float lastBugSpawnTimeInterval = 0f;
 
-    protected float bugSpeedDecreasement = 0f;
-    protected float bugSpawnIntervalIncreasement = 0f;
-    protected float ladybugSpawnProbability = 0f;
-    protected int maxLadybugCount = 0; // 최대 무당벌레 수 (0 = 무제한)
-    protected int additionalLadybugGoldPerUnit = 0; // 무당벌레당 골드 (웨이브 종료 시)
-    protected float additionalLadybugResistancePerUnit = 0f; // 무당벌레당 저항력 증가
-    protected int additionalBugGold = 0;
-
-    protected int additionalNepenthesGold = 0; // 네펜데스가 벌레 먹을 때 추가 골드
-    protected bool hasNepenthesPheromone = false; // 네펜데스 페로몬 활성화 여부
-    protected float additionalNepenthesPheromoneSizeMultiplier = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
-    protected float nepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
-
-    protected float weakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
-    protected float strongGeneticsResistanceBonus = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
-    protected float goldenGeneticsProbabilityBonus = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
 
 
-    protected float additionalPlantGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
 
-    protected float additionalPestResistance = 0f;
+
+
 
     //식물 공통 특성
-    protected float resistanceBonus = 0f; // 기본 저항력 보너스
-    protected int additionalPlantGold = 0; // 기본 식물 가격 보너스
 
-    protected int sprinklerRangeBonus = 0; // 스프링클러 범위 보너스
-    protected float sprinklerFertilizerSynergyBonus = 0f; // 스프링클러 비료 시너지 보너스
 
-    protected int timeIsGoldLevel = 0; // 시간은 금이다 레벨
-    protected int badGuyMoreRiceLevel = 0; // 미운 놈 떡 하나 더 준다 레벨
 
     //완두콩 특성
 
     //완두콩 특성
-    protected float resistanceDecayReduction = 0f; // 웨이브를 버텼을 때, 감소하는 저항력의 감소량
-    protected float resistanceAdaptation = 0f; // 웨이브를 버텼을 때, 해당 웨이브의 저항력 증가량
 
     // 땅콩 특성
-    protected float additionalPeanutCopyProbability = 0f; // 땅콩 복사 확률 증가
-    protected float bonusRatioWhenDie = 0f; // 죽었을 때, 추가 골드
 
     //일반 특성
     protected bool hasResistanceScouter = false;
     protected bool hasGoldScouter = false;
     protected bool hasWeatherForecast = false;
 
-    protected int additionalInheritance = 0;
     protected float maxBreedTimer = 50.0f;
     protected int maxBreedCount = 4;
     protected int breedCount = 0;
@@ -135,28 +111,14 @@ public class Grid : MonoBehaviour
     protected bool isCoolingShieldActivated = false; // 냉각 방패 활성화 여부 (1회 사용)
     protected List<int> petBottleTiles = new List<int>();
     protected Dictionary<int, int> petBottleBlockCount = new Dictionary<int, int>(); // 페트병 위치별 보호 횟수 (기본값 1, 재질 강화 시 증가)
-    protected int petBottleInitialStockBonus = 0; // 페트병 일일 최대 구매 횟수 보너스
-    protected int petBottlePriceReduction = 0; // 페트병 가격 감소량
-    protected float petBottleSpawnProbability = 0f; // 페트병 등장 확률 (rotation weight 증가로 구현)
 
-    protected int chiliPepperRangeLevel = 0; // 고추 영향 범위 레벨 (0: 가로 2칸, 1: 십자 4칸, 2: 대각선까지 8칸)
-    protected float chiliPepperSpawnProbability = 0f; // 고추 등장 확률 (rotation weight 증가로 구현)
-    protected float chiliPepperHealPercent = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
 
     // 신용카드: 하루에 3슬롯 이상 구매 시 자유시간에 환급받는 소모 비용 비율
-    protected float creditCardRefundPercent = 0f;
     // 쌍둥이: 교배 시 식물이 하나 더 생성될 확률(0~1)
-    protected float twinBreedProbability = 0f;
 
     //완두콩 전용 아이템
-    protected float peaCoffeeMultiplier = 0f;      // 완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수
-    protected float superMutationChanceBonus = 0f; // 슈퍼 변종: 변종 발생 확률 가산(%p)
-    protected bool hasSuperMutation = false;       // 슈퍼 변종: 양성/악성 변종 확률 반전
 
     //땅콩 전용 아이템
-    protected float activeShellProbability = 0f;   // 활성형 껍질: 미교배 식물의 자가번식 확률 가산
-    protected float successionInheritRatio = 0f;   // 왕위 계승: 자가번식 시 계승되는 가격 배율 비율
-    protected int landAndBeanLevel = 0;            // 땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매
 
     private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
@@ -166,40 +128,17 @@ public class Grid : MonoBehaviour
 
     public float BugSpawnTimeInterval => bugSpawnTimeInterval;
     public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
-    public float BugSpeedDecreasement => bugSpeedDecreasement;
-    public float BugSpawnIntervalIncreasement => bugSpawnIntervalIncreasement;
-    public float LadybugSpawnProbability => ladybugSpawnProbability;
-    public int MaxLadybugCount => maxLadybugCount;
-    public int AdditionalLadybugGoldPerUnit => additionalLadybugGoldPerUnit;
-    public float AdditionalLadybugResistancePerUnit => additionalLadybugResistancePerUnit;
-    public int AdditionalBugGold => additionalBugGold;
-    public int AdditionalNepenthesGold => additionalNepenthesGold;
-    public bool HasNepenthesPheromone => hasNepenthesPheromone;
-    public float AdditionalNepenthesPheromoneSizeMultiplier => additionalNepenthesPheromoneSizeMultiplier;
-    public float NepenthesSpawnProbability => nepenthesSpawnProbability;
-    public float WeakGeneticsResistanceBonus => weakGeneticsResistanceBonus;
-    public float StrongGeneticsResistanceBonus => strongGeneticsResistanceBonus;
-    public float GoldenGeneticsProbabilityBonus => goldenGeneticsProbabilityBonus;
 
     //식물 공통 특성
-    public float ResistanceBonus => resistanceBonus;
-    public int AdditionalPlantGold => additionalPlantGold;
 
     //완두콩 특성
-    public float ResistanceDecayReduction => resistanceDecayReduction;
-    public float ResistanceAdaptation => resistanceAdaptation;
     //땅콩 특성
-    public float AdditionalPeanutCopyProbability => additionalPeanutCopyProbability;
-    public float BonusRatioWhenDie => bonusRatioWhenDie;
 
     //일반 특성
     public bool HasResistanceScouter => hasResistanceScouter;
     public bool HasGoldScouter => hasGoldScouter;
     public bool HasWeatherForecast => hasWeatherForecast;
 
-    public float AdditionalPlantGoldMultiplier => additionalPlantGoldMultiplier;
-    public float AdditionalPestResistance => additionalPestResistance;
-    public int AdditionalInheritance => additionalInheritance;
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
     private HashSet<int> absorbFertilizerTiles = new HashSet<int>(); // 저항력 흡수 비료가 뿌려진 타일 리스트
@@ -207,24 +146,10 @@ public class Grid : MonoBehaviour
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
     public bool HasCoolingShield => hasCoolingShield;
     public List<int> PetBottleTiles => petBottleTiles;
-    public int PetBottleInitialStockBonus => petBottleInitialStockBonus;
-    public int PetBottlePriceReduction => petBottlePriceReduction;
-    public float PetBottleSpawnProbability => petBottleSpawnProbability;
     public int GetPetBottleBlockCountBonus() => petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0;
-    public int ChiliPepperRangeLevel => chiliPepperRangeLevel;
-    public float ChiliPepperSpawnProbability => chiliPepperSpawnProbability;
-    public float ChiliPepperHealPercent => chiliPepperHealPercent;
     public int MostExpensivePlant => mostExpensivePlant;
 
     // 신규 아이템(신용카드·쌍둥이·완두커피·슈퍼 변종·활성형 껍질·왕위 계승·땅과 콩)
-    public float CreditCardRefundPercent => creditCardRefundPercent;
-    public float TwinBreedProbability => twinBreedProbability;
-    public float PeaCoffeeMultiplier => peaCoffeeMultiplier;
-    public float SuperMutationChanceBonus => superMutationChanceBonus;
-    public bool HasSuperMutation => hasSuperMutation;
-    public float ActiveShellProbability => activeShellProbability;
-    public float SuccessionInheritRatio => successionInheritRatio;
-    public int LandAndBeanLevel => landAndBeanLevel;
 
 
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
@@ -358,7 +283,7 @@ public class Grid : MonoBehaviour
                 }
 
                 // 쌍둥이: 확률적으로 교배를 한 번 더 실행해 유전자가 다른 이란성 쌍둥이를 생성
-                if (twinBreedProbability > 0f && Random.Range(0f, 1f) < twinBreedProbability && HasEmptyGrid())
+                if (Modifiers.TwinBreedProbability > 0f && Random.Range(0f, 1f) < Modifiers.TwinBreedProbability && HasEmptyGrid())
                 {
                     // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
                     PlayMutationEffectIfAny(
@@ -448,7 +373,7 @@ public class Grid : MonoBehaviour
         // 신용카드: 어제 상점에서 3슬롯 이상 구매했다면 소모 비용의 일부를 환급 (없어도 일일 집계는 초기화)
         if (ShopManager.Instance != null)
         {
-            int refund = ShopManager.Instance.ConsumeDailyPurchaseRefund(creditCardRefundPercent);
+            int refund = ShopManager.Instance.ConsumeDailyPurchaseRefund(Modifiers.CreditCardRefundPercent);
             if (refund > 0)
             {
                 GameManager.Instance.economyManager.AddGold(refund);
@@ -503,7 +428,7 @@ public class Grid : MonoBehaviour
                 enemyController.WaveSkip();
             }
 
-            if (lastBugSpawnTimeInterval > effectiveBugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement))
+            if (lastBugSpawnTimeInterval > effectiveBugSpawnTimeInterval * (1f + Modifiers.BugSpawnIntervalIncreasement))
             {
                 List<int> targetIdx = new List<int>(plantGrid.Keys);
                 if (targetIdx.Count > 0)
@@ -547,7 +472,7 @@ public class Grid : MonoBehaviour
         if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
 
         // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
-        if (peaCoffeeMultiplier > 0f)
+        if (Modifiers.PeaCoffeeMultiplier > 0f)
         {
             foreach (var p in plantGrid.Values)
                 if (p != null) p.OnFreeTimePassed();
@@ -577,7 +502,7 @@ public class Grid : MonoBehaviour
         if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
         {
             // 악성 비율: 기본 0.8, 슈퍼 변종이면 반전(0.2), 디버그 패널이 지정하면 그 값
-            float malignantRatio = hasSuperMutation ? 0.2f : 0.8f;
+            float malignantRatio = Modifiers.HasSuperMutation ? 0.2f : 0.8f;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
 #endif
@@ -634,8 +559,8 @@ public class Grid : MonoBehaviour
                 case 2: childGenetic += 1; break;
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
-                    int p1Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (additionalInheritance + 50 + p1Bonus) ? 1 : 0);
+                    int p1Bonus = (int)(Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
+                    childGenetic += (Random.Range(1, 101) <= (Modifiers.AdditionalInheritance + 50 + p1Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
@@ -645,8 +570,8 @@ public class Grid : MonoBehaviour
                 case 2: childGenetic += 1; break;
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
-                    int p2Bonus = (int)(goldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (additionalInheritance + 50 + p2Bonus) ? 1 : 0);
+                    int p2Bonus = (int)(Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
+                    childGenetic += (Random.Range(1, 101) <= (Modifiers.AdditionalInheritance + 50 + p2Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
@@ -663,7 +588,7 @@ public class Grid : MonoBehaviour
 
 
             if (trait == TraitType.Pest)
-                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, GetAdditionalPestResistance()));
+                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, Modifiers.AdditionalPestResistance));
             else
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
         }
@@ -887,20 +812,6 @@ public class Grid : MonoBehaviour
         AddPlantToGrid(sprinkler, idx);
     }
 
-    public float GetResistanceBonus()
-    {
-        return resistanceBonus;
-    }
-    public float GetWeakGenericsResistanceBonus()
-    {
-        return weakGeneticsResistanceBonus;
-    }
-
-    public float GetStrongGenericsResistanceBonus()
-    {
-        return strongGeneticsResistanceBonus;
-    }
-
     public Transform GetSoilTransform(int idx)
     {
         try
@@ -1051,21 +962,10 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalPestResistance(float value)
     {
-        additionalPestResistance += value;
-        if (additionalPestResistance > 0.15f)
-            additionalPestResistance = 0.15f;
+        Modifiers.AdditionalPestResistance += value;
+        if (Modifiers.AdditionalPestResistance > 0.15f)
+            Modifiers.AdditionalPestResistance = 0.15f;
         AddAdditionalResistanceInGrid(TraitType.Pest, value);
-    }
-
-    public float GetAdditionalPestResistance()
-    {
-        return additionalPestResistance;
-    }
-
-    public void AddAdditionalInheritance(int value)
-    {
-        additionalInheritance += value;
-        return;
     }
 
     public void AddSoil()
@@ -1140,7 +1040,7 @@ public class Grid : MonoBehaviour
         }
 
         // 1단계: 상하
-        if (chiliPepperRangeLevel >= 1)
+        if (Modifiers.ChiliPepperRangeLevel >= 1)
         {
             if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
             {
@@ -1160,7 +1060,7 @@ public class Grid : MonoBehaviour
         }
 
         // 2단계: 대각선
-        if (chiliPepperRangeLevel >= 2)
+        if (Modifiers.ChiliPepperRangeLevel >= 2)
         {
             // 왼쪽 위
             if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
@@ -1428,17 +1328,17 @@ public class Grid : MonoBehaviour
             return;
 
         // [시간은 금이다] 아이템 효과
-        if (timeIsGoldLevel > 0)
+        if (Modifiers.TimeIsGoldLevel > 0)
         {
             if (breedTimer > 0.1f)
             {
-                int reward = Mathf.CeilToInt(breedTimer) * 10 * timeIsGoldLevel;
+                int reward = Mathf.CeilToInt(breedTimer) * 10 * Modifiers.TimeIsGoldLevel;
                 if (reward > 0)
                 {
                     //GameManager.Instance.economyManager.AddGold(reward);
                     // AddGold에 로그가 있을 수 있으므로 여기서는 로그 생략하거나 필요시 추가
                     GameManager.Instance.economyManager.AddGold(reward);
-                    Debug.Log($"[TimeIsGold] Success! Skipped. Remain: {breedTimer:F2}s, Level: {timeIsGoldLevel}, Reward: {reward}G");
+                    Debug.Log($"[TimeIsGold] Success! Skipped. Remain: {breedTimer:F2}s, Level: {Modifiers.TimeIsGoldLevel}, Reward: {reward}G");
                 }
             }
         }
@@ -1505,10 +1405,10 @@ public class Grid : MonoBehaviour
         int stage = GameManager.Instance.stage;
         if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;
-        if (Random.Range(0, 100) < (ladybugSpawnProbability * 100))
+        if (Random.Range(0, 100) < (Modifiers.LadybugSpawnProbability * 100))
         {
             // 최대 무당벌레 수 제한 확인
-            if (maxLadybugCount > 0 && ladybugs.Count >= maxLadybugCount)
+            if (Modifiers.MaxLadybugCount > 0 && ladybugs.Count >= Modifiers.MaxLadybugCount)
             {
                 // 최대 수에 도달했으므로 일반 벌레 스폰
                 int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
@@ -1717,10 +1617,10 @@ public class Grid : MonoBehaviour
                 isRooted = (p is MovablePlant movable) && !movable.IsMovable
             });
         }
+        Modifiers.Save(save);
         save.maxCol = maxCol;
         save.maxBreedTimer = maxBreedTimer;
         save.maxBreedCount = maxBreedCount;
-        save.additionalInheritance = additionalInheritance;
 
         save.totalBreedCount = totalBreedCount;
         save.totalPeaBreedcount = totalPeaBreedcount;
@@ -1731,38 +1631,16 @@ public class Grid : MonoBehaviour
         save.killBugCount = killBugCount;
         save.bugSpawnTimeInterval = bugSpawnTimeInterval;
         save.lastBugSpawnTimeInterval = lastBugSpawnTimeInterval;
-        save.bugSpeedDecreasement = bugSpeedDecreasement;
-        save.bugSpawnIntervalIncreasement = bugSpawnIntervalIncreasement;
-        save.additionalBugGold = additionalBugGold;
 
-        save.ladybugSpawnProbability = ladybugSpawnProbability;
-        save.maxLadybugCount = maxLadybugCount;
-        save.additionalLadybugGoldPerUnit = additionalLadybugGoldPerUnit;
-        save.additionalLadybugResistancePerUnit = additionalLadybugResistancePerUnit;
 
-        save.nepenthesSpawnProbability = nepenthesSpawnProbability;
-        save.additionalNepenthesGold = additionalNepenthesGold;
-        save.hasNepenthesPheromone = hasNepenthesPheromone;
-        save.additionalNepenthesPheromoneSizeMultiplier = additionalNepenthesPheromoneSizeMultiplier;
 
         // 유전자 보너스
-        save.weakGeneticsResistanceBonus = weakGeneticsResistanceBonus;
-        save.strongGeneticsResistanceBonus = strongGeneticsResistanceBonus;
-        save.goldenGeneticsProbabilityBonus = goldenGeneticsProbabilityBonus;
 
         // 식물 일반 특성
-        save.resistanceBonus = resistanceBonus;
-        save.additionalPlantGold = additionalPlantGold;
-        save.additionalPlantGoldMultiplier = additionalPlantGoldMultiplier;
-        save.additionalPestResistance = additionalPestResistance;
 
         // 완두콩 특성
-        save.resistanceDecayReduction = resistanceDecayReduction;
-        save.resistanceAdaptation = resistanceAdaptation;
 
         // 땅콩 특성
-        save.additionalPeanutCopyProbability = additionalPeanutCopyProbability;
-        save.bonusRatioWhenDie = bonusRatioWhenDie;
 
         // 일반 특성 (정보 표시)
         save.hasResistanceScouter = hasResistanceScouter;
@@ -1771,15 +1649,9 @@ public class Grid : MonoBehaviour
 
         // 페트병
         save.perBottleTiles = new List<int>(petBottleTiles);
-        save.petBottleInitialStockBonus = petBottleInitialStockBonus;
-        save.petBottlePriceReduction = petBottlePriceReduction;
-        save.petBottleSpawnProbability = petBottleSpawnProbability;
         save.petBottleBlockCountBonus = GetPetBottleBlockCountBonus();
 
         // 고추
-        save.chiliPepperRangeLevel = chiliPepperRangeLevel;
-        save.chiliPepperSpawnProbability = chiliPepperSpawnProbability;
-        save.chiliPepperHealPercent = chiliPepperHealPercent;
 
         // 타일 / 비료
         save.goldSoilTiles = new List<int>(goldSoilTiles);
@@ -1793,19 +1665,7 @@ public class Grid : MonoBehaviour
         save.absorbFertilizerTiles = new List<int>(absorbFertilizerTiles);
 
         // 신규 아이템 스탯
-        save.timeIsGoldLevel = timeIsGoldLevel;
-        save.badGuyMoreRiceLevel = badGuyMoreRiceLevel;
-        save.sprinklerRangeBonus = sprinklerRangeBonus;
-        save.sprinklerFertilizerSynergyBonus = sprinklerFertilizerSynergyBonus;
 
-        save.creditCardRefundPercent = creditCardRefundPercent;
-        save.twinBreedProbability = twinBreedProbability;
-        save.peaCoffeeMultiplier = peaCoffeeMultiplier;
-        save.superMutationChanceBonus = superMutationChanceBonus;
-        save.hasSuperMutation = hasSuperMutation;
-        save.activeShellProbability = activeShellProbability;
-        save.successionInheritRatio = successionInheritRatio;
-        save.landAndBeanLevel = landAndBeanLevel;
 
         save.columnGoldMulBonusList = GetColumnGoldMulBonusForSave();
     }
@@ -1854,50 +1714,16 @@ public class Grid : MonoBehaviour
         bugSpawnTimeInterval = saveData.bugSpawnTimeInterval;
         lastBugSpawnTimeInterval = saveData.lastBugSpawnTimeInterval;
 
-        bugSpeedDecreasement = saveData.bugSpeedDecreasement;
-        bugSpawnIntervalIncreasement = saveData.bugSpawnIntervalIncreasement;
-        ladybugSpawnProbability = saveData.ladybugSpawnProbability;
-        maxLadybugCount = saveData.maxLadybugCount;
-        additionalLadybugGoldPerUnit = saveData.additionalLadybugGoldPerUnit;
-        additionalLadybugResistancePerUnit = saveData.additionalLadybugResistancePerUnit;
-        additionalBugGold = saveData.additionalBugGold;
-        additionalNepenthesGold = saveData.additionalNepenthesGold;
-        hasNepenthesPheromone = saveData.hasNepenthesPheromone;
-        additionalNepenthesPheromoneSizeMultiplier = saveData.additionalNepenthesPheromoneSizeMultiplier;
-        nepenthesSpawnProbability = saveData.nepenthesSpawnProbability;
-
-        resistanceBonus = saveData.resistanceBonus; // 식물 공통 특성
-        additionalPlantGold = saveData.additionalPlantGold;
-
-        resistanceDecayReduction = saveData.resistanceDecayReduction; // 완두콩 특성
-        resistanceAdaptation = saveData.resistanceAdaptation;
-
-        additionalPeanutCopyProbability = saveData.additionalPeanutCopyProbability; // 땅콩 특성
-        bonusRatioWhenDie = saveData.bonusRatioWhenDie;
+        Modifiers.Load(saveData);
 
         SetResistanceScouter(saveData.hasResistanceScouter); // 일반 특성
         SetGoldScouter(saveData.hasGoldScouter);
         SetWeatherForecast(saveData.hasWeatherForecast);
 
-        weakGeneticsResistanceBonus = saveData.weakGeneticsResistanceBonus;
-        strongGeneticsResistanceBonus = saveData.strongGeneticsResistanceBonus;
-        goldenGeneticsProbabilityBonus = saveData.goldenGeneticsProbabilityBonus;
 
         // 신규 아이템 스탯 로드
-        timeIsGoldLevel = saveData.timeIsGoldLevel;
-        badGuyMoreRiceLevel = saveData.badGuyMoreRiceLevel;
-        sprinklerRangeBonus = saveData.sprinklerRangeBonus;
-        sprinklerFertilizerSynergyBonus = saveData.sprinklerFertilizerSynergyBonus;
 
         // 신규 아이템 스탯 로드
-        creditCardRefundPercent = saveData.creditCardRefundPercent;
-        twinBreedProbability = saveData.twinBreedProbability;
-        peaCoffeeMultiplier = saveData.peaCoffeeMultiplier;
-        superMutationChanceBonus = saveData.superMutationChanceBonus;
-        hasSuperMutation = saveData.hasSuperMutation;
-        activeShellProbability = saveData.activeShellProbability;
-        successionInheritRatio = saveData.successionInheritRatio;
-        landAndBeanLevel = saveData.landAndBeanLevel;
 
         absorbFertilizerTiles.Clear();
         if (saveData.absorbFertilizerTiles != null)
@@ -1918,18 +1744,12 @@ public class Grid : MonoBehaviour
             }
         }
 
-        additionalPlantGoldMultiplier = saveData.additionalPlantGoldMultiplier;
 
-        additionalPestResistance = saveData.additionalPestResistance;
 
-        additionalInheritance = saveData.additionalInheritance;
         maxBreedTimer = saveData.maxBreedTimer;
         maxBreedCount = saveData.maxBreedCount;
 
         // 페트병 관련 변수 로드
-        petBottleInitialStockBonus = saveData.petBottleInitialStockBonus;
-        petBottlePriceReduction = saveData.petBottlePriceReduction;
-        petBottleSpawnProbability = saveData.petBottleSpawnProbability;
         if (saveData.petBottleBlockCountBonus > 0)
         {
             if (!petBottleBlockCount.ContainsKey(-1))
@@ -1938,9 +1758,6 @@ public class Grid : MonoBehaviour
         }
 
         // 고추 관련 변수 로드
-        chiliPepperRangeLevel = saveData.chiliPepperRangeLevel;
-        chiliPepperSpawnProbability = saveData.chiliPepperSpawnProbability;
-        chiliPepperHealPercent = saveData.chiliPepperHealPercent;
 
         // 황금 비료 로드
         foreach (var i in saveData.goldSoilTiles)
@@ -1955,54 +1772,9 @@ public class Grid : MonoBehaviour
         mostExpensivePlant = saveData.mostExpensivePlant;
     }
 
-    public void AddBugSpeedDcreasement(float value)
-    {
-        bugSpeedDecreasement += value;
-    }
-
-    public float GetBugSpeedDecreasement()
-    {
-        return bugSpeedDecreasement;
-    }
-
-    public void AddBugSpawnIntervalIncreasement(float value)
-    {
-        bugSpawnIntervalIncreasement += value;
-    }
-
-    public void AddLadybugSpawnProbability(float value)
-    {
-        ladybugSpawnProbability += value;
-    }
-
-    public void AddMaxLadybugCount(int value)
-    {
-        maxLadybugCount += value;
-    }
-
-    public void AddAdditionalLadybugGoldPerUnit(int value)
-    {
-        additionalLadybugGoldPerUnit += value;
-    }
-
-    public void AddAdditionalLadybugResistancePerUnit(float value)
-    {
-        additionalLadybugResistancePerUnit += value;
-    }
-
-    public void AddAdditionalBugGold(int value)
-    {
-        additionalBugGold += value;
-    }
-
-    public void AddAdditionalNepenthesGold(int value)
-    {
-        additionalNepenthesGold += value;
-    }
-
     public void SetNepenthesPheromoneEnabled(bool enabled)
     {
-        hasNepenthesPheromone = enabled;
+        Modifiers.HasNepenthesPheromone = enabled;
         // 기존 네펜데스들의 페로몬 활성화/비활성화
         foreach (var plant in plantGrid.Values)
         {
@@ -2108,7 +1880,7 @@ public class Grid : MonoBehaviour
 
     public void AddAdditionalNepenthesPheromoneSizeMultiplier(float value)
     {
-        additionalNepenthesPheromoneSizeMultiplier += value;
+        Modifiers.AdditionalNepenthesPheromoneSizeMultiplier += value;
         // 기존 네펜데스들의 페로몬 크기 업데이트
         foreach (var plant in plantGrid.Values)
         {
@@ -2119,14 +1891,9 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public float GetEffectiveNepenthesPheromoneSizeMultiplier()
-    {
-        return 1f + additionalNepenthesPheromoneSizeMultiplier; // 0.2 = +20% = 1.2배
-    }
-
     public void AddResistanceBonus(float value)
     {
-        resistanceBonus += value;
+        Modifiers.ResistanceBonus += value;
         // 기존 식물들에도 적용
         ApplyResistanceBonusToExistingPlants(value);
     }
@@ -2148,7 +1915,7 @@ public class Grid : MonoBehaviour
 
     public void AddWeakGeneticsResistanceBonus(float value)
     {
-        weakGeneticsResistanceBonus += value;
+        Modifiers.WeakGeneticsResistanceBonus += value;
         // 기존 식물들에도 적용
         ApplyWeakGeneticsResistanceBonusToExistingPlants(value);
     }
@@ -2170,7 +1937,7 @@ public class Grid : MonoBehaviour
 
     public void AddStrongGeneticsResistanceBonus(float value)
     {
-        strongGeneticsResistanceBonus += value;
+        Modifiers.StrongGeneticsResistanceBonus += value;
         // 기존 식물들에도 적용
         ApplyStrongGeneticsResistanceBonusToExistingPlants(value);
     }
@@ -2190,61 +1957,15 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public void AddGoldenGeneticsProbabilityBonus(float value)
-    {
-        goldenGeneticsProbabilityBonus += value;
-    }
-
-    public void AddNepenthesSpawnProbability(float value)
-    {
-        nepenthesSpawnProbability += value;
-    }
-
-    public void AddSprinklerRangeBonus(int val)
-    {
-        sprinklerRangeBonus += val;
-    }
-
-    public int GetSprinklerRangeBonus()
-    {
-        return sprinklerRangeBonus;
-    }
-
     public void AddSprinklerFertilizerSynergyBonus(float val)
     {
-        sprinklerFertilizerSynergyBonus += val;
+        Modifiers.SprinklerFertilizerSynergyBonus += val;
         UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
-    }
-
-    public float GetSprinklerFertilizerSynergyBonus()
-    {
-        return sprinklerFertilizerSynergyBonus;
-    }
-
-    public void AddTimeIsGoldLevel(int val)
-    {
-        timeIsGoldLevel += val;
-    }
-
-    public int GetTimeIsGoldLevel()
-    {
-        return timeIsGoldLevel;
-    }
-
-    public void AddBadGuyMoreRiceLevel(int val)
-    {
-        badGuyMoreRiceLevel += val;
-        //ShowAllPriceSign(); // 가격 변동 갱신
-    }
-
-    public int GetBadGuyMoreRiceLevel()
-    {
-        return badGuyMoreRiceLevel;
     }
 
     public bool IsAffectedBySprinkler(int targetIdx)
     {
-        int range = 1 + sprinklerRangeBonus;
+        int range = 1 + Modifiers.SprinklerRangeBonus;
 
         foreach (var kvp in plantGrid)
         {
@@ -2330,11 +2051,6 @@ public class Grid : MonoBehaviour
             return plant.IsFrozen();
         }
         return false;
-    }
-
-    public void AddPetBottleInitialStockBonus(int value)
-    {
-        petBottleInitialStockBonus += value;
     }
 
     // === 저항력 흡수 비료 ===
@@ -2504,16 +2220,6 @@ public class Grid : MonoBehaviour
         return neighbors.ToArray();
     }
 
-    public void AddPetBottlePriceReduction(int value)
-    {
-        petBottlePriceReduction += value;
-    }
-
-    public void AddPetBottleSpawnProbability(float value)
-    {
-        petBottleSpawnProbability += value;
-    }
-
     public void AddPetBottleBlockCount(int value)
     {
         // 전체 페트병 보호 횟수 보너스 (새로 설치되는 페트병에 적용)
@@ -2532,18 +2238,8 @@ public class Grid : MonoBehaviour
 
     public void AddChiliPepperRangeLevel(int value)
     {
-        chiliPepperRangeLevel = Mathf.Min(2, chiliPepperRangeLevel + value); // 최대 2단계
+        Modifiers.ChiliPepperRangeLevel = Mathf.Min(2, Modifiers.ChiliPepperRangeLevel + value); // 최대 2단계
         UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
-    }
-
-    public void AddChiliPepperSpawnProbability(float value)
-    {
-        chiliPepperSpawnProbability += value;
-    }
-
-    public void AddChiliPepperHealPercent(float value)
-    {
-        chiliPepperHealPercent += value;
     }
 
     /// <summary>
@@ -2555,7 +2251,7 @@ public class Grid : MonoBehaviour
         if (chiliPepper == null) return nearbyPlants;
 
         int chiliIndex = chiliPepper.gridIndex;
-        int rangeLevel = chiliPepperRangeLevel;
+        int rangeLevel = Modifiers.ChiliPepperRangeLevel;
 
         // 0단계: 가로 2칸 (좌우)
         CheckAndAddPlant(chiliIndex - 1, nearbyPlants);
@@ -2589,11 +2285,6 @@ public class Grid : MonoBehaviour
                 list.Add(plant);
             }
         }
-    }
-
-    public int GetAdditionalBugGold()
-    {
-        return additionalBugGold;
     }
 
     private Dictionary<Plant, int> CapturePlantSellingPrices()
@@ -2639,116 +2330,33 @@ public class Grid : MonoBehaviour
     public void AddAdditionalPlantGold(int value)
     {
         Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
-        additionalPlantGold += value;
+        Modifiers.AdditionalPlantGold += value;
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
-    }
-
-    public int GetAdditionalPlantGold()
-    {
-        return additionalPlantGold;
     }
 
     public void AddAdditionalPlantGoldMultiplier(float value)
     {
         Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
-        additionalPlantGoldMultiplier += value;
+        Modifiers.AdditionalPlantGoldMultiplier += value;
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
 
-    public float GetAdditionalPlantGoldMultiplier()
-    {
-        // 특수(마법부여자): 밤낮 전환 발동형 아이템(고속 숙성 등)의 수치 2배 — 기본값(0.2) 초과분만 2배
-        const float baseMul = 0.2f;
-        float added = additionalPlantGoldMultiplier - baseMul;
-        if (added > 0f && SpecialItemSystem.Has("enchanter"))
-            return baseMul + added * 2f;
-        return additionalPlantGoldMultiplier;
-    }
-
-    public void AddAdditionalPeanutCopyProbability(float value)
-    {
-        additionalPeanutCopyProbability += value;
-    }
-
-    public float GetAdditionalPeanutCopyProbability()
-    {
-        return additionalPeanutCopyProbability;
-    }
-
     // ───── 신규 아이템 ─────
-
-    /// <summary>신용카드: 3슬롯 이상 구매한 날의 소모 비용 환급 비율 증가.</summary>
-    public void AddCreditCardRefundPercent(float value)
-    {
-        creditCardRefundPercent += value;
-    }
-
-    /// <summary>쌍둥이: 교배 시 식물이 하나 더 생성될 확률 증가.</summary>
-    public void AddTwinBreedProbability(float value)
-    {
-        twinBreedProbability += value;
-    }
 
     /// <summary>완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수 증가.</summary>
     public void AddPeaCoffeeMultiplier(float value)
     {
         Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
-        peaCoffeeMultiplier += value;
+        Modifiers.PeaCoffeeMultiplier += value;
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
-    }
-
-    public float GetPeaCoffeeMultiplier()
-    {
-        return peaCoffeeMultiplier;
-    }
-
-    /// <summary>슈퍼 변종: 양성/악성 변종 확률을 반전시키고 변종 발생 확률(%p)을 증가.</summary>
-    public void AddSuperMutation(float chanceBonusPercent)
-    {
-        hasSuperMutation = true;
-        superMutationChanceBonus += chanceBonusPercent;
-    }
-
-    /// <summary>활성형 껍질: 한 번도 교배를 시도하지 않은 식물의 자가번식 확률 증가.</summary>
-    public void AddActiveShellProbability(float value)
-    {
-        activeShellProbability += value;
-    }
-
-    public float GetActiveShellProbability()
-    {
-        return activeShellProbability;
-    }
-
-    /// <summary>왕위 계승: 자가번식 시 계승되는 가격 배율 비율 증가.</summary>
-    public void AddSuccessionInheritRatio(float value)
-    {
-        successionInheritRatio += value;
-    }
-
-    public float GetSuccessionInheritRatio()
-    {
-        return successionInheritRatio;
     }
 
     /// <summary>땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매.</summary>
     public void AddLandAndBeanLevel(int value)
     {
         Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
-        landAndBeanLevel += value;
+        Modifiers.LandAndBeanLevel += value;
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
-    }
-
-    /// <summary>땅과 콩: 웨이브가 지나간 후 식물이 뿌리를 내릴 확률(0~1). 구매 1회당 +10%p.</summary>
-    public float GetLandAndBeanRootChance()
-    {
-        return 0.1f * landAndBeanLevel;
-    }
-
-    /// <summary>땅과 콩: 뿌리내린 식물의 가격 배수(구매 1회당 +10%p, 다른 효과와 곱적용).</summary>
-    public float GetRootedPriceMultiplier()
-    {
-        return 1f + 0.1f * landAndBeanLevel;
     }
 
     /// <summary>
@@ -2757,7 +2365,7 @@ public class Grid : MonoBehaviour
     /// </summary>
     public void ProcessLandAndBeanRooting()
     {
-        float chance = GetLandAndBeanRootChance();
+        float chance = Modifiers.GetLandAndBeanRootChance();
         if (chance <= 0f) return;
 
         foreach (var p in plantGrid.Values)
@@ -2768,35 +2376,6 @@ public class Grid : MonoBehaviour
                     mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
             }
         }
-    }
-
-    public void AddResistanceDecayReduction(float value)
-    {
-        resistanceDecayReduction += value;
-    }
-
-    public float GetResistanceDecayReduction()
-    {
-        return resistanceDecayReduction;
-    }
-
-    public void AddResistanceAdaptation(float value)
-    {
-        resistanceAdaptation += value;
-    }
-
-    public float GetResistanceAdaptation()
-    {
-        return resistanceAdaptation;
-    }
-    public void AddBonusRatioWhenDie(float value)
-    {
-        bonusRatioWhenDie += value;
-    }
-
-    public float GetBonusRatioWhenDie()
-    {
-        return bonusRatioWhenDie;
     }
 
     public void SetResistanceScouter(bool val)

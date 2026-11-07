@@ -63,7 +63,7 @@ public class Bug : MonoBehaviour
         }
         //Debug.Log(childMaterials.Length);
 
-        speed = speed * (1f - grid.GetBugSpeedDecreasement());
+        speed = speed * (1f - grid.Modifiers.BugSpeedDecreasement);
         float mul = ModManager.Instance
         ? ModManager.Instance.GetMul(StatId.BugSpeedMul, -1)
         : 1f;
@@ -222,7 +222,7 @@ public class Bug : MonoBehaviour
             if (plant.GetType() == typeof(Nepenthes))
             {
                 int baseGold = 100;
-                int additionalGold = grid != null ? grid.AdditionalNepenthesGold : 0;
+                int additionalGold = grid != null ? grid.Modifiers.AdditionalNepenthesGold : 0;
                 economyManager.AddGold(baseGold + additionalGold);
                 StartCoroutine(KillBug());
                 return;
@@ -276,7 +276,7 @@ public class Bug : MonoBehaviour
             isDie = true;
             GameEvents.RaiseBugKilled();
             CodexProgress.AddBugKill(GetType().Name); // 도감: 벌레 발견 + 종류별/전체 잡은 수
-            economyManager.AddGold(Mathf.Max(0, gold + grid.GetAdditionalBugGold() - DawnSystem.Current.bugPriceReduction)); // 새벽: 벌레 기본 가격 감소
+            economyManager.AddGold(Mathf.Max(0, gold + grid.Modifiers.AdditionalBugGold - DawnSystem.Current.bugPriceReduction)); // 새벽: 벌레 기본 가격 감소
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }

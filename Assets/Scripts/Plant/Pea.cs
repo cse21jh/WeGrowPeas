@@ -123,7 +123,7 @@ public class Pea : MovablePlant
         if (SpecialItemSystem.Has("pea_special_8"))
             basePrice += 50 * grid.CountDistinctNeighborSpecies(gridIndex);
 
-        int price = CalculateSellingPrice(basePrice, grid.GetAdditionalPlantGoldMultiplier());
+        int price = CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
 
         // 특수(임시완두A): 저항력 평균 수치만큼 가격 추가 증가 (곱적용, 보유 형질만 평균)
         if (SpecialItemSystem.Has("pea_special_4") && traits.Count > 0)

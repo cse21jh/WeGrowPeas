@@ -28,7 +28,7 @@ public class Sprinkler : Plant
         // 인접 4칸 식물 찾기 (상하좌우 + 범위 업그레이드 반영)
         List<Plant> neighbors = new List<Plant>();
         int maxIndex = grid.GetMaxCol() * 4;
-        int range = 1 + grid.GetSprinklerRangeBonus();
+        int range = 1 + grid.Modifiers.SprinklerRangeBonus;
 
         anim.Play(AnimParams.SprinklerState);
         waterParticle.Play();

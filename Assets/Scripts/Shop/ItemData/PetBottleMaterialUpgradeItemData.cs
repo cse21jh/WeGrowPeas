@@ -38,6 +38,6 @@ public class PetBottleMaterialUpgradeItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
         ctx.Grid.AddPetBottleBlockCount(blockCountBonus);
-        ctx.Grid.AddPetBottleSpawnProbability(probabilityIncrease);
+        ctx.Grid.Modifiers.AddPetBottleSpawnProbability(probabilityIncrease);
     }
 }

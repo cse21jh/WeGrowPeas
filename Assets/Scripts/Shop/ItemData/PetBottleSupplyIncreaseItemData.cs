@@ -38,7 +38,7 @@ public class PetBottleSupplyIncreaseItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddPetBottleInitialStockBonus(stockBonus);
+        ctx.Grid.Modifiers.AddPetBottleInitialStockBonus(stockBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

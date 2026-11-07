@@ -5,6 +5,6 @@ public class AdditionalPeanutCopyProbabilityAbility : PlantAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddAdditionalPeanutCopyProbability(0.02f * level);
+        gameManager.grid.Modifiers.AddAdditionalPeanutCopyProbability(0.02f * level);
     }
 }

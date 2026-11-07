@@ -35,7 +35,7 @@ public class Nepenthes : Plant
     {
         // 특수(채식주의자): 판매가 500 통일 + 다른 식물과 동일한 가격 상승 공식 적용
         if (SpecialItemSystem.Has("vegetarian") && grid != null)
-            return CalculateSellingPrice(500, grid.GetAdditionalPlantGoldMultiplier());
+            return CalculateSellingPrice(500, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
         return 0;
     }
 
@@ -43,7 +43,7 @@ public class Nepenthes : Plant
     {
         if (NepenthesPheromone != null && grid != null)
         {
-            NepenthesPheromone.SetActive(grid.HasNepenthesPheromone);
+            NepenthesPheromone.SetActive(grid.Modifiers.HasNepenthesPheromone);
         }
     }
 
@@ -51,7 +51,7 @@ public class Nepenthes : Plant
     {
         if (NepenthesPheromone != null && grid != null)
         {
-            float multiplier = grid.GetEffectiveNepenthesPheromoneSizeMultiplier();
+            float multiplier = grid.Modifiers.GetEffectiveNepenthesPheromoneSizeMultiplier();
             float finalSize = pheromoneSize * multiplier;
             NepenthesPheromone.transform.localScale = new Vector3(finalSize, finalSize, 1f);
         }

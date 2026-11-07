@@ -47,6 +47,6 @@ public class LadybugLureDeviceItemData : ItemData
             return;
 
         // 무당벌레 등장 확률 3% 증가 (중첩 시 합적용)
-        ctx.Grid.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

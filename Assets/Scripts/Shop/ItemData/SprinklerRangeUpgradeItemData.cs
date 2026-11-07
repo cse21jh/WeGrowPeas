@@ -34,7 +34,7 @@ public class SprinklerRangeUpgradeItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddSprinklerRangeBonus(rangeBonus);
+        ctx.Grid.Modifiers.AddSprinklerRangeBonus(rangeBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

@@ -34,7 +34,7 @@ public class GoldenGeneticsItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddGoldenGeneticsProbabilityBonus(probabilityBonus);
+        ctx.Grid.Modifiers.AddGoldenGeneticsProbabilityBonus(probabilityBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

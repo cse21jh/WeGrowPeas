@@ -48,8 +48,8 @@ public class HealthyLadybugItemData : ItemData
             return;
 
         // 무당벌레당 모든 기본저항력 0.5% 증가 (중첩 시 합적용)
-        ctx.Grid.AddAdditionalLadybugResistancePerUnit(resistancePerUnit);
+        ctx.Grid.Modifiers.AddAdditionalLadybugResistancePerUnit(resistancePerUnit);
         // 무당벌레 등장 확률 4% 증가
-        ctx.Grid.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

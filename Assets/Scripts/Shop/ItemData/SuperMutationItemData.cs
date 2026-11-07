@@ -40,6 +40,6 @@ public class SuperMutationItemData : ItemData
             return;
 
         // 양성/악성 변종 확률 반전 + 변종 발생 확률 증가
-        ctx.Grid.AddSuperMutation(mutationChanceAddPercent);
+        ctx.Grid.Modifiers.AddSuperMutation(mutationChanceAddPercent);
     }
 }

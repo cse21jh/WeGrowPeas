@@ -38,6 +38,6 @@ public class CreditCardItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.AddCreditCardRefundPercent(refundPercentPerPurchase);
+        ctx.Grid.Modifiers.AddCreditCardRefundPercent(refundPercentPerPurchase);
     }
 }

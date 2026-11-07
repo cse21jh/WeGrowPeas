@@ -120,10 +120,10 @@ public class Peanut : MovablePlant
 
     public void TrySpawnCopy()
     {
-        float copyProbability = peanutCopyProbability + grid.GetAdditionalPeanutCopyProbability();
+        float copyProbability = peanutCopyProbability + grid.Modifiers.AdditionalPeanutCopyProbability;
         // 활성형 껍질: 한 번도 교배를 시도하지 않은 식물은 자가번식 확률 증가
         if (!HasTriedBreed)
-            copyProbability += grid.GetActiveShellProbability();
+            copyProbability += grid.Modifiers.ActiveShellProbability;
 
         if (Random.Range(0f, 100f) >= 100f * copyProbability) // 25% 확률로 복사
             return;
@@ -147,7 +147,7 @@ public class Peanut : MovablePlant
         if (benignMutation) CurseEffectManager.PlayMutation(child, benign: true); // 변종 이펙트
 
         // 왕위 계승: 자가번식한 자식이 부모 가격 배율의 일부를 계승 (유전자로 인한 최종 가격은 계승 X)
-        float inheritRatio = grid.GetSuccessionInheritRatio();
+        float inheritRatio = grid.Modifiers.SuccessionInheritRatio;
         if (child != null && inheritRatio > 0f)
         {
             int inherited = Mathf.FloorToInt((GetResistWaveCount() + GetBonusGoldMultiplierCount()) * inheritRatio);
@@ -170,6 +170,6 @@ public class Peanut : MovablePlant
             return basePrice;
         }
 
-        return CalculateSellingPrice(basePrice, grid.GetAdditionalPlantGoldMultiplier()); 
+        return CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier()); 
     }
 }

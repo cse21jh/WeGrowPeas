@@ -48,8 +48,8 @@ public class GoldenLadybugItemData : ItemData
             return;
 
         // 웨이브 종료 시 무당벌레당 100골드 획득 (중첩 시 합적용)
-        ctx.Grid.AddAdditionalLadybugGoldPerUnit(goldPerUnit);
+        ctx.Grid.Modifiers.AddAdditionalLadybugGoldPerUnit(goldPerUnit);
         // 무당벌레 등장 확률 1% 증가
-        ctx.Grid.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

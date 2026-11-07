@@ -48,8 +48,8 @@ public class LadybugCollectionBoxItemData : ItemData
             return;
 
         // 최대 무당벌레 수 1 증가 (최대 5개까지)
-        ctx.Grid.AddMaxLadybugCount(maxCountIncrease);
+        ctx.Grid.Modifiers.AddMaxLadybugCount(maxCountIncrease);
         // 무당벌레 등장 확률 1% 증가
-        ctx.Grid.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

@@ -39,6 +39,6 @@ public class ActiveShellItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.AddActiveShellProbability(probabilityPerPurchase);
+        ctx.Grid.Modifiers.AddActiveShellProbability(probabilityPerPurchase);
     }
 }

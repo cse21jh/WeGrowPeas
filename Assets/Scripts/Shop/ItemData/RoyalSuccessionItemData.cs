@@ -39,6 +39,6 @@ public class RoyalSuccessionItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.AddSuccessionInheritRatio(inheritRatioPerPurchase);
+        ctx.Grid.Modifiers.AddSuccessionInheritRatio(inheritRatioPerPurchase);
     }
 }
