@@ -86,8 +86,8 @@ public class CurseTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
         fadeTween?.Kill();
         scaleTween?.Kill();
 
-        fadeTween = tooltipCanvasGroup.DOFade(1f, animDuration).SetUpdate(true);
-        scaleTween = tooltipPanel.DOScale(Vector3.one, animDuration).SetEase(showEase).SetUpdate(true);
+        fadeTween = tooltipCanvasGroup.DOFade(1f, animDuration).SetUpdate(true).SetLink(gameObject);
+        scaleTween = tooltipPanel.DOScale(Vector3.one, animDuration).SetEase(showEase).SetUpdate(true).SetLink(gameObject);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -104,8 +104,8 @@ public class CurseTooltipUI : BasePopup, IPointerEnterHandler, IPointerExitHandl
 
         float duration = animDuration * 0.8f;
 
-        fadeTween = tooltipCanvasGroup.DOFade(0f, duration).SetUpdate(true);
-        scaleTween = tooltipPanel.DOScale(new Vector3(0f, 1f, 1f), duration).SetEase(hideEase).SetUpdate(true)
+        fadeTween = tooltipCanvasGroup.DOFade(0f, duration).SetUpdate(true).SetLink(gameObject);
+        scaleTween = tooltipPanel.DOScale(new Vector3(0f, 1f, 1f), duration).SetEase(hideEase).SetUpdate(true).SetLink(gameObject)
             .OnComplete(() => tooltipPanel.gameObject.SetActive(false));
     }
 

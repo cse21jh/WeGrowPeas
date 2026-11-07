@@ -74,11 +74,11 @@ public abstract class Plant : MonoBehaviour
             if (on)
             {
                 mushroomEffect.SetActive(true);
-                mushroomEffect.transform.DOScale(Vector3.one, 0.5f).From(Vector3.zero);
+                mushroomEffect.transform.DOScale(Vector3.one, 0.5f).From(Vector3.zero).SetLink(mushroomEffect);
             }
             else
             {
-                mushroomEffect.transform.DOScale(Vector3.zero, 0.5f).OnComplete(() => mushroomEffect.SetActive(false));
+                mushroomEffect.transform.DOScale(Vector3.zero, 0.5f).OnComplete(() => mushroomEffect.SetActive(false)).SetLink(mushroomEffect);
             }
         }
     }

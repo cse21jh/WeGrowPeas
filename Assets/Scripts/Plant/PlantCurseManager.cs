@@ -52,7 +52,7 @@ public class PlantCurseManager : MonoBehaviour
 
         foreach(SpriteRenderer spriteRenderer in polenRoot.GetComponentsInChildren<SpriteRenderer>())
         {
-            spriteRenderer.DOColor(targetColor, 0.5f);
+            spriteRenderer.DOColor(targetColor, 0.5f).SetLink(spriteRenderer.gameObject);
         }
     }
 

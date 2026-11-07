@@ -90,7 +90,7 @@ public class FloatingPopup : BasePopup
         {
             canvasGroup.blocksRaycasts = false;
             canvasGroup.DOKill();
-            canvasGroup.DOFade(0f, fadeDuration)
+            canvasGroup.DOFade(0f, fadeDuration).SetLink(gameObject)
                 .SetUpdate(true)
                 .OnComplete(() =>
                 {
