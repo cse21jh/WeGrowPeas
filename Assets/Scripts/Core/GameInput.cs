@@ -101,7 +101,19 @@ public static class GameInput
     public static string FormatKey(KeyCode key)
     {
         if (key >= KeyCode.Alpha0 && key <= KeyCode.Alpha9) return ((int)key - (int)KeyCode.Alpha0).ToString();
-        return key.ToString();
+
+        // 버튼 칸이 좁아서 긴 이름은 줄여 쓴다.
+        switch (key)
+        {
+            case KeyCode.LeftShift: return "LShift";
+            case KeyCode.RightShift: return "RShift";
+            case KeyCode.LeftControl: return "LCtrl";
+            case KeyCode.RightControl: return "RCtrl";
+            case KeyCode.LeftAlt: return "LAlt";
+            case KeyCode.RightAlt: return "RAlt";
+            case KeyCode.Return: return "Enter";
+            default: return key.ToString();
+        }
     }
 
     /// <summary>문구 안의 {key_동작} 자리를 현재 키 이름으로 바꾼다.</summary>
