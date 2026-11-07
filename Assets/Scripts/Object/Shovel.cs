@@ -27,7 +27,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        if (GameInput.GetDown(GameAction.Shovel))
         {
 
             if (!isDragging)

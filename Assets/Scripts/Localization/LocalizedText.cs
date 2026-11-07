@@ -61,12 +61,14 @@ public class LocalizedText : MonoBehaviour
     private void OnEnable()
     {
         Loc.LanguageChanged += Refresh;
+        GameInput.BindingsChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
         Loc.LanguageChanged -= Refresh;
+        GameInput.BindingsChanged -= Refresh;
     }
 
     /// <summary>키와 자리표시자 값을 바꾸고 다시 그린다.</summary>
@@ -89,7 +91,7 @@ public class LocalizedText : MonoBehaviour
     {
         if (text == null || string.IsNullOrEmpty(key)) return;
 
-        applied = Loc.Or(key, sourceText, args);
+        applied = GameInput.FormatHints(Loc.Or(key, sourceText, args));
         text.text = applied;
         ApplyFit();
     }

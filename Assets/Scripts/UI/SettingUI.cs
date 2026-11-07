@@ -35,6 +35,7 @@ public class SettingUI : MonoBehaviour
         if (SettingPanel != null)
         {
             LanguageSelector.AddTo(SettingPanel.transform, (RectTransform)bgmVolumeSlider.transform);
+            KeyBindingPanel.AddTo(SettingPanel.transform, (RectTransform)bgmVolumeSlider.transform);
             SettingPanel.SetActive(false);
         }
     }
@@ -43,6 +44,9 @@ public class SettingUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            // 단축키 화면이 ESC를 처리했으면 설정창은 그대로 둔다.
+            if (KeyBindingPanel.BlocksEscape) return;
+
             // 도감이 설정창 위에 떠 있으면 ESC는 도감이 처리한다.
             // 도감을 닫으면 설정창이 그대로 남아 있어야 하므로 여기선 아무것도 하지 않는다.
             var codex = CodexUIController.Instance;

@@ -83,7 +83,6 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private BottomMenuCarousel bottomMenu;  // Renewal 하단 메뉴 (하단 버튼 클릭을 재현할 때 사용)
 
     [Header("Input")]
-    [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
 
     //private readonly Dictionary<AppKey, GameObject> _instances = new();
     private AppKey? _current = null;
@@ -140,7 +139,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(toggleKey))
+        if (GameInput.GetDown(GameAction.Phone))
             Toggle();
 
         UpdateEmpNoise(); // 통신장애 시간이 끝나면 노이즈가 자동으로 꺼지도록
@@ -379,7 +378,7 @@ public class PhoneManager : Singleton<PhoneManager>
                     });
             }
 
-            if (Input.GetKeyDown(KeyCode.S))
+            if (GameInput.GetDown(GameAction.Skip))
             {
                 SkipPhoneTime();
             }

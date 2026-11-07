@@ -37,7 +37,7 @@ public class TutorialBreedingController : BreedingController
         {
             breedTimer -= Time.deltaTime;
 
-            if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
+            if (isBreedButtonPressed || GameInput.GetDown(GameAction.Breed))
             {
                 if (breedObj1 != null && breedObj2 != null) // 교배 버튼 등으로 추후 수정
                 {

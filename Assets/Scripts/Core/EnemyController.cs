@@ -157,7 +157,7 @@ public class EnemyController : MonoBehaviour
         {
             t += Time.deltaTime;
             yield return null;
-            if (Input.GetKeyDown(KeyCode.S))
+            if (GameInput.GetDown(GameAction.Skip))
             {
                 SkipWaveEffect();
             }

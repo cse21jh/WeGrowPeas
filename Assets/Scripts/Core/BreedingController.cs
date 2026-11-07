@@ -282,19 +282,19 @@ public class BreedingController : MonoBehaviour
                 );
             }
 
-            if (Input.GetKeyDown(KeyCode.S))
+            if (GameInput.GetDown(GameAction.Skip))
             {
                 SkipBreed();
             }
 
-            if (Input.GetKeyDown(KeyCode.D))
+            if (GameInput.GetDown(GameAction.WaveSkip))
             {
                 grid.Enemy.WaveSkip();
             }
 
             grid.Bugs.Tick(Time.deltaTime);
 
-            if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
+            if (isBreedButtonPressed || GameInput.GetDown(GameAction.Breed))
             {
                 ExecuteBreeding();
             }

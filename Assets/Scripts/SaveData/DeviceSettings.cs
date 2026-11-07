@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// 기기 공용 설정(settings.json). 프로필을 바꿔도 유지된다.
@@ -37,7 +38,7 @@ public static class DeviceSettings
 [Serializable]
 public class SettingsData
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int version;
 
@@ -52,4 +53,14 @@ public class SettingsData
 
     /// <summary>표시 언어 코드(<see cref="Loc"/>). 비어 있으면 원문 언어를 쓴다.</summary>
     public string language = "";
+
+    /// <summary>바꾼 단축키. 비어 있으면 기본 키를 쓴다.</summary>
+    public List<KeyBindingEntry> keyBindings = new();
+}
+
+[Serializable]
+public class KeyBindingEntry
+{
+    public string action;
+    public int key;
 }

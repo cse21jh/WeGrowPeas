@@ -21,7 +21,7 @@ public class ScouterController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
+        if (GameInput.GetDown(GameAction.Scouter))
         {
             ToggleScouter();
         }
