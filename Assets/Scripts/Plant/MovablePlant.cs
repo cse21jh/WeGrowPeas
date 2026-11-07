@@ -190,7 +190,7 @@ public abstract class MovablePlant : Plant
 
     public void CheckResistanceScouterImage(WaveType wave)
     {
-        if (!grid.GetHasReistanceScouter() || !grid.GetIsScouterOn())
+        if (!grid.Scouter.HasResistanceScouter || !grid.Scouter.IsScouterOn)
             return;
         if(GetResistanceValue((int)wave) <= 0.5f)
         {

@@ -5,6 +5,6 @@ public class GoldScouterAbility : GeneralAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.SetGoldScouter(true);
+        gameManager.grid.Scouter.SetGoldScouter(true);
     }
 }

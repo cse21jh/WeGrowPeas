@@ -10,7 +10,7 @@ public class ThiefCurse : CurseInstance
     public override void Activate()
     {
         int count = Mathf.RoundToInt(Lv != null ? Lv.valueA : 0f);
-        GameManager.Instance?.grid?.StealPlants(count);
+        GameManager.Instance?.grid?.CurseActions.StealPlants(count);
         CurseEffectManager.Instance?.SetThiefCurse(true);
     }
 

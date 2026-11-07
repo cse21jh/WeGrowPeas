@@ -42,8 +42,6 @@ public class Grid : MonoBehaviour
     [SerializeField] protected GameObject breedSkipButton;
     [SerializeField] protected TextMeshProUGUI breedCountUI;
 
-    [SerializeField] protected GameObject scouterButton; // 스카우터 온오프 버튼
-    [SerializeField] protected bool isScouterOn = false;
 
     [SerializeField] protected Sprite[] gardenSprites; // 정원 배경 스프라이트들
     [SerializeField] protected SpriteRenderer gardenRenderer; // 정원 배경 스프라이트 렌더러
@@ -69,6 +67,16 @@ public class Grid : MonoBehaviour
 
     /// <summary>아이템과 능력이 쌓은 밭 전체 보정치. 저장과 불러오기는 <see cref="GridModifiers"/>가 맡는다.</summary>
     public GridModifiers Modifiers { get; } = new GridModifiers();
+
+    /// <summary>저주가 밭에 주는 효과.</summary>
+    public GridCurseActions CurseActions => curseActions ??= new GridCurseActions(this);
+    private GridCurseActions curseActions;
+
+    /// <summary>같은 오브젝트에 붙은 스카우터. 씬에서 연결하지 않아도 찾는다.</summary>
+    public ScouterController Scouter => scouter != null ? scouter : (scouter = GetComponent<ScouterController>());
+    private ScouterController scouter;
+
+    public EnemyController Enemy => enemyController;
 
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
@@ -98,8 +106,6 @@ public class Grid : MonoBehaviour
     // 땅콩 특성
 
     //일반 특성
-    protected bool hasResistanceScouter = false;
-    protected bool hasGoldScouter = false;
     protected bool hasWeatherForecast = false;
 
     protected float maxBreedTimer = 50.0f;
@@ -135,8 +141,6 @@ public class Grid : MonoBehaviour
     //땅콩 특성
 
     //일반 특성
-    public bool HasResistanceScouter => hasResistanceScouter;
-    public bool HasGoldScouter => hasGoldScouter;
     public bool HasWeatherForecast => hasWeatherForecast;
 
     public float MaxBreedTimer => maxBreedTimer;
@@ -154,6 +158,8 @@ public class Grid : MonoBehaviour
 
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
     public event System.Action OnGridStateChanged;
+
+    public void NotifyGridStateChanged() => OnGridStateChanged?.Invoke();
 
     // LoadGrid 중에는 OnGridStateChanged 발생을 억제 (MoneyTree가 로드 순서에 따라 즉시 Die하는 버그 방지)
     private bool isLoadingGrid = false;
@@ -198,10 +204,6 @@ public class Grid : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            ToggleScouter();
-        }
     }
 
     public void InitGrid()
@@ -633,7 +635,7 @@ public class Grid : MonoBehaviour
         if (!isLoadingGrid && plant is MovablePlant movablePlant)
             movablePlant.TryRootAfterPlacement();
 
-        UpdateGoldScouterImageInGrid();
+        Scouter.UpdateGoldScouterImageInGrid();
 
         // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
         if (!isLoadingGrid)
@@ -795,7 +797,7 @@ public class Grid : MonoBehaviour
         GameObject obj = Instantiate(chiliPepperPrefab);
         ChiliPepper chiliPepper = obj.GetComponent<ChiliPepper>();
         AddPlantToGrid(chiliPepper, idx);
-        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+        Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
     }
 
     public void AddMoneyTree(int idx)
@@ -1171,106 +1173,6 @@ public class Grid : MonoBehaviour
 
     // ───── 저주 액션 (CurseInstance.Activate에서 호출) ─────
 
-    /// <summary>저주(꽃가루 실종): 필드 식물 중 ratio(0~1)만큼 무작위로 교배 불가. 나머지는 복구.</summary>
-    public void ApplyPollenLost(float ratio)
-    {
-        var plants = new List<Plant>(plantGrid.Values);
-        foreach (var p in plants) if (p != null) p.SetBreedable(true);
-        if (ratio <= 0f || plants.Count == 0) return;
-
-        int count = Mathf.FloorToInt(plants.Count * ratio); // 소수점 버림
-        ShuffleList(plants);
-        for (int i = 0; i < count && i < plants.Count; i++)
-            if (plants[i] != null) plants[i].SetBreedable(false);
-
-        // 대상이 새로 굴려졌으므로 교배 불가 식물의 색 표시도 갱신
-        CurseEffectManager.Instance?.RefreshPollenPlants(true);
-    }
-
-    /// <summary>저주(도둑): 페트병으로 보호되지 않은 무작위 식물 count개 제거.</summary>
-    public void StealPlants(int count)
-    {
-        if (count <= 0) return;
-        var candidates = new List<int>();
-        foreach (var kv in plantGrid)
-            if (kv.Value != null && !HasPetBottle(kv.Key)) candidates.Add(kv.Key);
-        ShuffleList(candidates);
-
-        int removed = 0;
-        for (int i = 0; i < candidates.Count && removed < count; i++)
-        {
-            int idx = candidates[i];
-            if (plantGrid.TryGetValue(idx, out Plant p) && p != null)
-            {
-                plantGrid.Remove(idx);
-                Destroy(p.gameObject); // TODO: 식물 날아가는 이펙트
-                removed++;
-            }
-        }
-        if (removed > 0)
-        {
-            OnGridStateChanged?.Invoke();
-            if (CheckGameOver()) StartCoroutine(GameManager.Instance.GameOver());
-        }
-    }
-
-    /// <summary>저주(대격변): 이동 가능하고 페트병 없는 식물 중 ratio만큼을 무작위로 위치 교환.</summary>
-    public void RearrangePlants(float ratio)
-    {
-        if (ratio <= 0f) return;
-        var idxs = new List<int>();
-        foreach (var kv in plantGrid)
-            if (kv.Value != null && kv.Value.IsMovable && !HasPetBottle(kv.Key)) idxs.Add(kv.Key);
-        if (idxs.Count < 1) return;
-
-        int affected = Mathf.FloorToInt(idxs.Count * ratio);
-        if (affected < 1) affected = 1;
-        affected = Mathf.Min(affected, idxs.Count);
-
-        ShuffleList(idxs);
-        var selectedPlantsIdx = idxs.GetRange(0, affected);
-        var plantsToMove = new List<Plant>();
-        foreach (var idx in selectedPlantsIdx) plantsToMove.Add(plantGrid[idx]);
-
-        // Remove from grid temporarily to free up space
-        foreach (var idx in selectedPlantsIdx)
-        {
-            plantGrid.Remove(idx);
-        }
-
-        // Find all empty spaces including the ones we just vacated
-        var emptySpaces = new List<int>();
-        for (int i = 0; i < maxCol * 4; i++)
-        {
-            if (!plantGrid.TryGetValue(i, out Plant p) || p == null)
-            {
-                emptySpaces.Add(i);
-            }
-        }
-
-        ShuffleList(emptySpaces);
-
-        // Place them in new random empty spaces
-        for (int i = 0; i < plantsToMove.Count; i++)
-        {
-            int newIdx = emptySpaces[i];
-            Plant p = plantsToMove[i];
-            plantGrid[newIdx] = p;
-            p.SetGridIndex(newIdx);
-            p.transform.position = GetSoilTransform(newIdx).position;
-        }
-        OnGridStateChanged?.Invoke();
-    }
-
-    private static void ShuffleList<T>(List<T> list)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
-        }
-    }
-
     // 마우스 포인터가 교배 버튼 영역 위에 있는지 검사.
     // 식물의 OnMouseUp(콜라이더 이벤트)은 UI를 존중하지 않으므로, 교배 버튼이
     // 선택된 식물 위에 겹쳐 있을 때 식물 클릭이 선택을 취소하는 것을 막기 위해 직접 검사한다.
@@ -1643,8 +1545,8 @@ public class Grid : MonoBehaviour
         // 땅콩 특성
 
         // 일반 특성 (정보 표시)
-        save.hasResistanceScouter = hasResistanceScouter;
-        save.hasGoldScouter = hasGoldScouter;
+        save.hasResistanceScouter = Scouter.HasResistanceScouter;
+        save.hasGoldScouter = Scouter.HasGoldScouter;
         save.hasWeatherForecast = hasWeatherForecast;
 
         // 페트병
@@ -1716,8 +1618,8 @@ public class Grid : MonoBehaviour
 
         Modifiers.Load(saveData);
 
-        SetResistanceScouter(saveData.hasResistanceScouter); // 일반 특성
-        SetGoldScouter(saveData.hasGoldScouter);
+        Scouter.SetResistanceScouter(saveData.hasResistanceScouter); // 일반 특성
+        Scouter.SetGoldScouter(saveData.hasGoldScouter);
         SetWeatherForecast(saveData.hasWeatherForecast);
 
 
@@ -1781,98 +1683,6 @@ public class Grid : MonoBehaviour
             if (plant is Nepenthes nepenthes)
             {
                 nepenthes.UpdatePheromone();
-            }
-        }
-    }
-
-    public void ShowScouterButton()
-    {
-        scouterButton.SetActive(true);
-        scouterButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        scouterButton.GetComponent<Button>().onClick.AddListener(ToggleScouter);
-        scouterButton.GetComponent<Button>().onClick.AddListener(() => SoundManager.Instance.PlayEffect(SoundIds.Button));
-        HideGoldScouterImageInGrid();
-        HideResistanceScouterImageInGrid();
-    }
-
-    public void ToggleScouter()
-    {
-        if (!hasResistanceScouter && !hasGoldScouter)
-            return;
-
-        if (isScouterOn)
-        {
-            isScouterOn = false;
-            if (hasResistanceScouter)
-                HideResistanceScouterImageInGrid();
-            if (hasGoldScouter)
-                HideGoldScouterImageInGrid();
-        }
-        else
-        {
-            isScouterOn = true;
-            if (hasResistanceScouter)
-                UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
-            if (hasGoldScouter)
-                UpdateGoldScouterImageInGrid();
-        }
-    }
-
-    public void UpdateResistanceScouterImageInGrid(WaveType wave)
-    {
-        if (!hasResistanceScouter || !isScouterOn)
-            return;
-        foreach (var plant in plantGrid.Values)
-        {
-            if (plant is MovablePlant p)
-            {
-                p.CheckResistanceScouterImage(wave);
-            }
-        }
-    }
-
-    public void UpdateGoldScouterImageInGrid()
-    {
-        if (!hasGoldScouter || !isScouterOn)
-            return;
-        List<MovablePlant> sortedPlants = plantGrid.Values
-                                                   .OfType<MovablePlant>()
-                                                   .OrderByDescending(p => p.GetSellingPrice()) // GetSellingPrice() 결과가 높은 순으로 정렬
-                                                   .ToList(); // 정렬된 결과를 리스트로 변환
-
-        for (int i = 0; i < sortedPlants.Count; i++)
-        {
-            MovablePlant currentPlant = sortedPlants[i];
-
-            if (i < 3)
-            {
-                currentPlant.ShowGoldScouterImage();
-            }
-            else
-            {
-                currentPlant.HideGoldScouterImage();
-            }
-        }
-    }
-
-    public void HideResistanceScouterImageInGrid()
-    {
-        foreach (var plant in plantGrid.Values)
-        {
-            if (plant is MovablePlant p)
-            {
-                p.HideResistanceScouterImage();
-            }
-        }
-    }
-
-    public void HideGoldScouterImageInGrid()
-    {
-        foreach (var plant in plantGrid.Values)
-        {
-            if (plant is MovablePlant p)
-            {
-                p.HideGoldScouterImage();
             }
         }
     }
@@ -1960,7 +1770,7 @@ public class Grid : MonoBehaviour
     public void AddSprinklerFertilizerSynergyBonus(float val)
     {
         Modifiers.SprinklerFertilizerSynergyBonus += val;
-        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+        Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
     }
 
     public bool IsAffectedBySprinkler(int targetIdx)
@@ -2239,7 +2049,7 @@ public class Grid : MonoBehaviour
     public void AddChiliPepperRangeLevel(int value)
     {
         Modifiers.ChiliPepperRangeLevel = Mathf.Min(2, Modifiers.ChiliPepperRangeLevel + value); // 최대 2단계
-        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+        Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
     }
 
     /// <summary>
@@ -2376,37 +2186,6 @@ public class Grid : MonoBehaviour
                     mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
             }
         }
-    }
-
-    public void SetResistanceScouter(bool val)
-    {
-        if (hasResistanceScouter = val)
-        {
-            ShowScouterButton();
-        }
-    }
-
-    public bool GetHasReistanceScouter()
-    {
-        return hasResistanceScouter;
-    }
-
-    public void SetGoldScouter(bool val)
-    {
-        if (hasGoldScouter = val)
-        {
-            ShowScouterButton();
-        }
-    }
-
-    public bool GetHasGoldScouter()
-    {
-        return hasGoldScouter;
-    }
-
-    public bool GetIsScouterOn()
-    {
-        return isScouterOn;
     }
 
     public void SetWeatherForecast(bool val)
@@ -2597,7 +2376,7 @@ public class Grid : MonoBehaviour
         marker.SetFertilizer(wave);
 
         Debug.Log($"[Grid] Fertilizer placed: col={col}, wave={wave}");
-        UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+        Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
 
         // 전용 비료가 4줄 이상 존재하면 저항력 흡수 비료 해금
         if (fertilizerColumns.Count >= 4)
@@ -2620,7 +2399,7 @@ public class Grid : MonoBehaviour
             }
 
             marker.RemoveFertilizer();
-            UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
+            Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
             Debug.Log($"[Grid] Fertilizer removed at col={soilColT.GetSiblingIndex()}");
         }
     }
@@ -2766,32 +2545,6 @@ public class Grid : MonoBehaviour
         return;
     }
 
-    public void RefreshCurseEffects()
-    {
-        foreach (var plant in plantGrid.Values)
-        {
-            if (plant != null)
-            {
-                bool isFogged = CurseManager.Instance != null && CurseManager.Instance.IsFogged(plant.gridIndex);
-                bool isMushroom = CurseManager.Instance != null && CurseManager.Instance.IsMushroom(plant.gridIndex);
-                plant.SetFogEffect(isFogged);
-                plant.SetMushroomEffect(isMushroom);
-            }
-        }
-
-        if (FenceUIManager.Instance != null)
-        {
-            FenceUIManager.Instance.RefreshCurseEffects();
-        }
-    }
-
-    public void PlayAllPlantsMadness()
-    {
-        foreach (var plant in plantGrid.Values)
-        {
-            if (plant != null) plant.PlayMadnessEffect();
-        }
-    }
 }
 
 

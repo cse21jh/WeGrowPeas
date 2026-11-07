@@ -184,7 +184,7 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
     {
         if (GameManager.Instance != null && GameManager.Instance.grid != null)
         {
-            GameManager.Instance.grid.RefreshCurseEffects();
+            GameManager.Instance.grid.CurseActions.RefreshCurseEffects();
         }
     }
 
@@ -193,7 +193,7 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
     {
         if (GameManager.Instance != null && GameManager.Instance.grid != null)
         {
-            GameManager.Instance.grid.RefreshCurseEffects();
+            GameManager.Instance.grid.CurseActions.RefreshCurseEffects();
         }
     }
 
@@ -202,7 +202,7 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
     {
         if (GameManager.Instance != null && GameManager.Instance.grid != null)
         {
-            GameManager.Instance.grid.PlayAllPlantsMadness();
+            GameManager.Instance.grid.CurseActions.PlayAllPlantsMadness();
         }
     }
 

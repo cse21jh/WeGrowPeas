@@ -5,6 +5,6 @@ public class ResistanceScouterAbility : GeneralAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.SetResistanceScouter(true);
+        gameManager.grid.Scouter.SetResistanceScouter(true);
     }
 }

@@ -337,9 +337,9 @@ public abstract class Plant : MonoBehaviour
         grid.ClearGridIndex(gridIndex);
         grid.CheckBreedButtonBeforeDie(this.gameObject);
         if (cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
-            grid.UpdateGoldScouterImageInGrid();
+            grid.Scouter.UpdateGoldScouterImageInGrid();
         if (this is ChiliPepper)
-            grid.UpdateResistanceScouterImageInGrid(GameManager.Instance.enemyController.CurrentWave.WaveType);
+            grid.Scouter.UpdateResistanceScouterImageInGrid(GameManager.Instance.enemyController.CurrentWave.WaveType);
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
         if (GameManager.Instance != null)
