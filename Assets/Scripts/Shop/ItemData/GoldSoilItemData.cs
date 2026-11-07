@@ -40,7 +40,7 @@ public class GoldSoilItemData : ItemData
             return false;
 
         // 이미 황금 비료가 있는 칸인지 확인
-        if (ctx.Grid.HasGoldSoil(idx.Value))
+        if (ctx.Grid.Soil.HasGoldSoil(idx.Value))
         {
             reason = Loc.T("shop.error.gold_soil_exists");
             return false;
@@ -69,7 +69,7 @@ public class GoldSoilItemData : ItemData
         if (!ValidatePendingIndex(pendingIndex, ctx, out _))
             return;
 
-        if (!ctx.Grid.TryPlaceGoldSoil(pendingIndex.Value))
+        if (!ctx.Grid.Soil.TryPlaceGoldSoil(pendingIndex.Value))
         {
             ctx.ShowError?.Invoke(Loc.T("shop.error.gold_soil_failed"));
             return;

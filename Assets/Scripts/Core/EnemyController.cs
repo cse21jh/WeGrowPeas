@@ -164,7 +164,7 @@ public class EnemyController : MonoBehaviour
         }
 
         // 저항력 흡수 비료 로직 실행 (상대 저항력을 흡수)
-        grid.ProcessResistanceAbsorption();
+        grid.Soil.ProcessResistanceAbsorption();
 
         stageWaveRecord.Add(currentWave.WaveType);
         stageKillRecord.Add(0);

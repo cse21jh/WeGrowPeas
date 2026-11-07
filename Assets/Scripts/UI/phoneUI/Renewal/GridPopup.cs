@@ -276,13 +276,13 @@ public class GridPopup : MonoBehaviour
         var list = new List<TileEffect>();
         if (grid == null) return list;
 
-        if (grid.HasGoldSoil(index)) list.Add(TileEffect.GoldSoil);
-        if (grid.TryGetFertilizerType(index, out _)) list.Add(TileEffect.Fertilizer);
-        if (grid.HasPetBottle(index)) list.Add(TileEffect.PetBottle);
+        if (grid.Soil.HasGoldSoil(index)) list.Add(TileEffect.GoldSoil);
+        if (grid.Soil.TryGetFertilizerType(index, out _)) list.Add(TileEffect.Fertilizer);
+        if (grid.Soil.HasPetBottle(index)) list.Add(TileEffect.PetBottle);
         if (grid.IsAffectedByChiliPepper(index)) list.Add(TileEffect.ChiliPepper);
         if (grid.IsPlantFrozen(index)) list.Add(TileEffect.Freezer);
         if (grid.IsAffectedBySprinkler(index)) list.Add(TileEffect.Sprinkler);
-        if (grid.HasAbsorbFertilizer(index)) list.Add(TileEffect.AbsorbFertilizer);
+        if (grid.Soil.HasAbsorbFertilizer(index)) list.Add(TileEffect.AbsorbFertilizer);
 
         var curse = CurseManager.Instance;
         if (curse != null)
@@ -300,7 +300,7 @@ public class GridPopup : MonoBehaviour
         {
             case TileEffect.GoldSoil: return Loc.T("game.tile.gold_soil");
             case TileEffect.Fertilizer:
-                return grid.TryGetFertilizerType(index, out var type)
+                return grid.Soil.TryGetFertilizerType(index, out var type)
                     ? Loc.T("game.tile.fertilizer_type", ("wave", WavePalette.GetName(type)))
                     : Loc.T("game.tile.fertilizer");
             case TileEffect.PetBottle: return Loc.T("game.tile.pet_bottle");
@@ -324,7 +324,7 @@ public class GridPopup : MonoBehaviour
     private static Color GetIconColor(Grid grid, int index, TileEffect effect)
     {
         if (effect != TileEffect.Fertilizer) return Color.white;
-        if (!grid.TryGetFertilizerType(index, out var type)) return Color.white;
+        if (!grid.Soil.TryGetFertilizerType(index, out var type)) return Color.white;
 
         return WavePalette.GetColor(type);
     }

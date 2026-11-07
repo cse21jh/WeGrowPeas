@@ -282,9 +282,9 @@ public abstract class Plant : MonoBehaviour
         {
             if (traitNum == (int)g.traitType)
             {
-                if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
+                if (grid.Soil.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
                 {
-                    if ((int)grid.GetFertilizerColumns()[gridIndex / 4] == traitNum)
+                    if ((int)grid.Soil.GetFertilizerColumns()[gridIndex / 4] == traitNum)
                     {
                         resistance += 0.05f;
                         // 스프링클러 범위 내에 있다면 시너지 보너스 추가
@@ -318,7 +318,7 @@ public abstract class Plant : MonoBehaviour
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
         // 페트병이 막으면 true 리턴 → 사망 취소
-        if (grid != null && grid.TryInterceptDeath(gridIndex, cause, killer))
+        if (grid != null && grid.Soil.TryInterceptDeath(gridIndex, cause, killer))
             return false;
 
         if (isFrozen && cause == DeathCause.Generic) return false; // 얼어있으면 웨이브(Generic)로 인한 죽음 면역
@@ -326,9 +326,9 @@ public abstract class Plant : MonoBehaviour
         int alive = grid.GetLivingPlantCount();
 
         // 냉각 방패: 식물이 1개 이하가 될 경우 1회에 한해 보호
-        if (alive <= 1 && grid != null && grid.HasCoolingShield && !grid.IsCoolingShieldActivated())
+        if (alive <= 1 && grid != null && grid.Soil.HasCoolingShield && !grid.Soil.IsCoolingShieldActivated())
         {
-            grid.SetCoolingShieldActivated();
+            grid.Soil.SetCoolingShieldActivated();
             return false; // 살아있는 식물이 1개 이하이고 냉각 방패가 있으면 죽지 않음
         }
         isDying = true;
@@ -677,9 +677,9 @@ public abstract class Plant : MonoBehaviour
     {
         if (!IsMovable) return false;
         // 칸에 페트병이 놓여있으면 이동 금지
-        if (grid != null && grid.HasPetBottle(gridIndex)) return false;
+        if (grid != null && grid.Soil.HasPetBottle(gridIndex)) return false;
         // 황금 비료에 심어진 식물은 이동 불가
-        if (grid != null && grid.HasGoldSoil(gridIndex)) return false;
+        if (grid != null && grid.Soil.HasGoldSoil(gridIndex)) return false;
         return true;
     }
 
@@ -705,8 +705,8 @@ public abstract class Plant : MonoBehaviour
         }
 
         int fertilizer = -1;
-        if (grid.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 저항력 감소가 되지 않습니다
-            fertilizer = (int)grid.GetFertilizerColumns()[gridIndex / 4];
+        if (grid.Soil.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 저항력 감소가 되지 않습니다
+            fertilizer = (int)grid.Soil.GetFertilizerColumns()[gridIndex / 4];
 
         if (!isGold)
         {
@@ -737,7 +737,7 @@ public abstract class Plant : MonoBehaviour
         float totalDailyDecay = dawnDailyDecay + curseDailyDecay;
         bool isGoldPlant = stemController != null && stemController.IsGold();
 
-        bool hasMatchingFertilizer = grid != null && grid.HasFertilizerAt(gridIndex) && (int)grid.GetFertilizerColumns()[gridIndex / 4] == (int)waveType;
+        bool hasMatchingFertilizer = grid != null && grid.Soil.HasFertilizerAt(gridIndex) && (int)grid.Soil.GetFertilizerColumns()[gridIndex / 4] == (int)waveType;
 
         if (totalDailyDecay > 0f && !isGoldPlant)
         {
@@ -833,7 +833,7 @@ public abstract class Plant : MonoBehaviour
         int badGeneBonus = grid.Modifiers.BadGuyMoreRiceLevel * 5 * GetBadGenesCount();
 
         multiplier += travelSellBonus; // 특수(세계여행): 이동 거리 누적 배수
-        multiplier += grid.GetColumnGoldMulBonus(gridIndex); // 특수(땅부자): 세로줄 고속 숙성 효과
+        multiplier += grid.Soil.GetColumnGoldMulBonus(gridIndex); // 특수(땅부자): 세로줄 고속 숙성 효과
 
         // 특수(알록달록): 땅에 적용 중인 효과 1개당 판매 배수 +0.1
         if (SpecialItemSystem.Has("colorful"))
@@ -948,6 +948,6 @@ public abstract class Plant : MonoBehaviour
 
     public bool isOnGoldenSoil()
     {
-        return grid.HasGoldSoil(gridIndex);
+        return grid.Soil.HasGoldSoil(gridIndex);
     }
 }

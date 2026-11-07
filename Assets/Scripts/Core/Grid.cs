@@ -50,9 +50,6 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject goldSoilMarkerPrefab;
     [SerializeField] private Material soilHighlightMaterial;
 
-    private Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
-    protected List<int> goldSoilTiles = new List<int>(); // 황금 비료가 뿌려진 타일들
-    private Dictionary<int, GameObject> goldSoilMarkers = new Dictionary<int, GameObject>(); // 황금 비료 마커들
 
     private const float FertilizerResistBonus = 0.05f; // +5%p
 
@@ -78,6 +75,14 @@ public class Grid : MonoBehaviour
 
     public EnemyController Enemy => enemyController;
 
+    /// <summary>벌레와 무당벌레 소환.</summary>
+    public BugSpawner Bugs => bugs ??= new BugSpawner(this, bugPrefabs, ladybugPrefabs);
+    private BugSpawner bugs;
+
+    /// <summary>비료, 황금 토양, 페트병처럼 땅에 놓이는 효과.</summary>
+    public SoilEffects Soil => soil ??= new SoilEffects(this, petBottleMarkerPrefab, goldSoilMarkerPrefab);
+    private SoilEffects soil;
+
     //저장 필요
     public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
     [HideInInspector] public int maxCol = 4;
@@ -86,8 +91,6 @@ public class Grid : MonoBehaviour
     public int totalPeaBreedcount = 0;
     public int totalPeanutBreedCount = 0;
 
-    protected float bugSpawnTimeInterval = 15.0f;
-    protected float lastBugSpawnTimeInterval = 0f;
 
 
 
@@ -113,10 +116,6 @@ public class Grid : MonoBehaviour
     protected int breedCount = 0;
     private int? shownBreedCount;
 
-    protected bool hasCoolingShield = false; // 냉각 방패 보유 여부
-    protected bool isCoolingShieldActivated = false; // 냉각 방패 활성화 여부 (1회 사용)
-    protected List<int> petBottleTiles = new List<int>();
-    protected Dictionary<int, int> petBottleBlockCount = new Dictionary<int, int>(); // 페트병 위치별 보호 횟수 (기본값 1, 재질 강화 시 증가)
 
 
     // 신용카드: 하루에 3슬롯 이상 구매 시 자유시간에 환급받는 소모 비용 비율
@@ -126,14 +125,10 @@ public class Grid : MonoBehaviour
 
     //땅콩 전용 아이템
 
-    private readonly Dictionary<int, WaveType> fertilizerColumns = new();
 
     private int mostExpensivePlant = 0;
 
-    public List<int> GoldSoilTiles => goldSoilTiles;
 
-    public float BugSpawnTimeInterval => bugSpawnTimeInterval;
-    public float LastBugSpawnTimeInterval => lastBugSpawnTimeInterval;
 
     //식물 공통 특성
 
@@ -145,12 +140,8 @@ public class Grid : MonoBehaviour
 
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
-    private HashSet<int> absorbFertilizerTiles = new HashSet<int>(); // 저항력 흡수 비료가 뿌려진 타일 리스트
 
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
-    public bool HasCoolingShield => hasCoolingShield;
-    public List<int> PetBottleTiles => petBottleTiles;
-    public int GetPetBottleBlockCountBonus() => petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0;
     public int MostExpensivePlant => mostExpensivePlant;
 
     // 신규 아이템(신용카드·쌍둥이·완두커피·슈퍼 변종·활성형 껍질·왕위 계승·땅과 콩)
@@ -184,25 +175,7 @@ public class Grid : MonoBehaviour
             MoveBreedButton(breedButtonPlant.transform.position);
         }
 
-        // petMarker가 항상 표시되도록 보장 (부모 비활성화 방지 + UI 전환 시 Culling 방지)
-        foreach (var kvp in petMarkers)
-        {
-            if (kvp.Value != null)
-            {
-                // 비활성화되었으면 다시 활성화
-                if (!kvp.Value.activeSelf)
-                {
-                    kvp.Value.SetActive(true);
-                }
-
-                // SpriteRenderer가 있으면 강제로 렌더링 활성화
-                var sr = kvp.Value.GetComponent<SpriteRenderer>();
-                if (sr != null && !sr.enabled)
-                {
-                    sr.enabled = true;
-                }
-            }
-        }
+        Soil.KeepPetMarkersVisible();
 
     }
 
@@ -218,12 +191,6 @@ public class Grid : MonoBehaviour
             AddPlantToGrid(plant);
         }
 
-    }
-
-    public bool TryGetFertilizerType(int gridIndex, out WaveType type)
-    {
-        int col = gridIndex / 4;
-        return fertilizerColumns.TryGetValue(col, out type);
     }
 
     private void ExecuteBreeding()
@@ -355,9 +322,6 @@ public class Grid : MonoBehaviour
 
         //int breedCount = 0;
         int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
-        // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
-        float dawnAdjustedBase = Mathf.Max(0.5f, BugSpawnTimeInterval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
-        float effectiveBugSpawnTimeInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
         // 저주: 불면증 — 밤시간(폰 페이즈) 단축으로 변경되어 교배시간 영향 제거
         float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
@@ -392,8 +356,7 @@ public class Grid : MonoBehaviour
         enemyController.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
-        if (GameManager.Instance.stage == BugSchedule.AppearStage)
-            lastBugSpawnTimeInterval = 0f;
+        Bugs.BeginDay();
 
         while (breedTimer > 0 && !isBreedSkipButtonPressed)
         {
@@ -403,7 +366,6 @@ public class Grid : MonoBehaviour
                 continue;
             }
 
-            lastBugSpawnTimeInterval += Time.deltaTime;
             breedTimer -= Time.deltaTime;
 
             if (breedTimer < 15f && !_warned15s)
@@ -430,16 +392,7 @@ public class Grid : MonoBehaviour
                 enemyController.WaveSkip();
             }
 
-            if (lastBugSpawnTimeInterval > effectiveBugSpawnTimeInterval * (1f + Modifiers.BugSpawnIntervalIncreasement))
-            {
-                List<int> targetIdx = new List<int>(plantGrid.Keys);
-                if (targetIdx.Count > 0)
-                {
-                    SpawnRandomBug();
-                    if (CurseState.BugFestival) SpawnRandomBug(); // 저주: 벌레 대발생(한 번에 2마리)
-                    lastBugSpawnTimeInterval = 0f;
-                }
-            }
+            Bugs.Tick(Time.deltaTime);
 
             if (isBreedButtonPressed || Input.GetKeyDown(KeyCode.Space))
             {
@@ -690,13 +643,13 @@ public class Grid : MonoBehaviour
     public int CountTileEffects(int idx)
     {
         int count = 0;
-        if (HasGoldSoil(idx)) count++;
-        if (TryGetFertilizerType(idx, out _)) count++;
-        if (HasPetBottle(idx)) count++;
+        if (Soil.HasGoldSoil(idx)) count++;
+        if (Soil.TryGetFertilizerType(idx, out _)) count++;
+        if (Soil.HasPetBottle(idx)) count++;
         if (IsAffectedByChiliPepper(idx)) count++;
         if (IsPlantFrozen(idx)) count++;
         if (IsAffectedBySprinkler(idx)) count++;
-        if (HasAbsorbFertilizer(idx)) count++;
+        if (Soil.HasAbsorbFertilizer(idx)) count++;
         return count;
     }
 
@@ -716,39 +669,8 @@ public class Grid : MonoBehaviour
     }
 
     // 특수(땅부자): 세로줄별 고속 숙성 배수 보너스 (col → +mul, 중첩 가능)
-    private Dictionary<int, float> columnGoldMulBonus = new Dictionary<int, float>();
-
-    /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
-    public void AddLandRichColumn()
-    {
-        Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
-        int col = Random.Range(0, maxCol);
-        if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
-        columnGoldMulBonus[col] += 0.5f;
-        RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
-        Debug.Log($"[SpecialItem] 땅부자: {col + 1}번째 세로줄에 고속 숙성 효과 (+0.5, 누적 {columnGoldMulBonus[col]})");
-    }
-
-    public float GetColumnGoldMulBonus(int idx)
-        => columnGoldMulBonus.TryGetValue(idx / 4, out float v) ? v : 0f;
 
     // 특수(땅부자) 세로줄 배수 저장/복원 (index = col)
-    public List<float> GetColumnGoldMulBonusForSave()
-    {
-        var list = new List<float>();
-        for (int col = 0; col < maxCol; col++)
-            list.Add(columnGoldMulBonus.TryGetValue(col, out float v) ? v : 0f);
-        return list;
-    }
-
-    public void LoadColumnGoldMulBonus(List<float> list)
-    {
-        columnGoldMulBonus.Clear();
-        if (list == null) return;
-        for (int col = 0; col < list.Count; col++)
-            if (list[col] > 0f) columnGoldMulBonus[col] = list[col];
-    }
-
     /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
     public void HealNeighborsBySell(int idx)
     {
@@ -1268,7 +1190,7 @@ public class Grid : MonoBehaviour
     /// <summary>디버그 전용: 벌레(또는 확률에 따라 무당벌레) 1마리를 즉시 소환한다. 등장 스테이지 제한 무시.</summary>
     public void DebugSpawnBug()
     {
-        SpawnRandomBug(ignoreStageGate: true);
+        Bugs.Spawn(ignoreStageGate: true);
     }
 
     /// <summary>디버그 전용: 현재 재배 중인 식물을 무작위 형질로 1개 추가한다.</summary>
@@ -1297,32 +1219,6 @@ public class Grid : MonoBehaviour
         Plant plant = AddMovablePlant(traits);
         Debug.Log($"[Debug] {GameManager.Instance.currentPlant} 추가: {trait} (유전자 {genetics})");
         return plant;
-    }
-
-    private void SpawnRandomBug(bool ignoreStageGate = false)
-    {
-        if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
-            return;
-
-        int stage = GameManager.Instance.stage;
-        if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
-            return;
-        if (Random.Range(0, 100) < (Modifiers.LadybugSpawnProbability * 100))
-        {
-            // 최대 무당벌레 수 제한 확인
-            if (Modifiers.MaxLadybugCount > 0 && ladybugs.Count >= Modifiers.MaxLadybugCount)
-            {
-                // 최대 수에 도달했으므로 일반 벌레 스폰
-                int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
-                Instantiate(bugPrefabs[bugIndex]);
-                return;
-            }
-            Instantiate(ladybugPrefabs);
-            return;
-        }
-        int i = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
-        Instantiate(bugPrefabs[i]);
-        return;
     }
 
 
@@ -1531,8 +1427,7 @@ public class Grid : MonoBehaviour
 
         // 벌레 / 무당벌레 / 네펜데스
         save.killBugCount = killBugCount;
-        save.bugSpawnTimeInterval = bugSpawnTimeInterval;
-        save.lastBugSpawnTimeInterval = lastBugSpawnTimeInterval;
+        Bugs.Save(save);
 
 
 
@@ -1550,26 +1445,26 @@ public class Grid : MonoBehaviour
         save.hasWeatherForecast = hasWeatherForecast;
 
         // 페트병
-        save.perBottleTiles = new List<int>(petBottleTiles);
-        save.petBottleBlockCountBonus = GetPetBottleBlockCountBonus();
+        save.perBottleTiles = new List<int>(Soil.PetBottleTiles);
+        save.petBottleBlockCountBonus = Soil.GetPetBottleBlockCountBonus();
 
         // 고추
 
         // 타일 / 비료
-        save.goldSoilTiles = new List<int>(goldSoilTiles);
+        save.goldSoilTiles = new List<int>(Soil.GoldSoilTiles);
         save.fertilizerColumns.Clear();
         save.fertilizerType.Clear();
-        foreach (KeyValuePair<int, WaveType> fer in GetFertilizerColumns())
+        foreach (KeyValuePair<int, WaveType> fer in Soil.GetFertilizerColumns())
         {
             save.fertilizerColumns.Add(fer.Key);
             save.fertilizerType.Add(fer.Value);
         }
-        save.absorbFertilizerTiles = new List<int>(absorbFertilizerTiles);
+        save.absorbFertilizerTiles = new List<int>(Soil.AbsorbFertilizerTiles);
 
         // 신규 아이템 스탯
 
 
-        save.columnGoldMulBonusList = GetColumnGoldMulBonusForSave();
+        save.columnGoldMulBonusList = Soil.GetColumnGoldMulBonusForSave();
     }
 
     public void LoadGrid(GridSave saveData)
@@ -1607,14 +1502,13 @@ public class Grid : MonoBehaviour
         OnGridStateChanged?.Invoke();
         maxCol = saveData.maxCol;
         UpdateSoil();
-        LoadColumnGoldMulBonus(saveData.columnGoldMulBonusList); // 특수(땅부자) 세로줄 배수 복원
+        Soil.LoadColumnGoldMulBonus(saveData.columnGoldMulBonusList); // 특수(땅부자) 세로줄 배수 복원
         killBugCount = saveData.killBugCount;
         totalBreedCount = saveData.totalBreedCount;
         totalPeaBreedcount = saveData.totalPeaBreedcount;
         totalPeanutBreedCount = saveData.totalPeanutBreedCount;
 
-        bugSpawnTimeInterval = saveData.bugSpawnTimeInterval;
-        lastBugSpawnTimeInterval = saveData.lastBugSpawnTimeInterval;
+        Bugs.Load(saveData);
 
         Modifiers.Load(saveData);
 
@@ -1627,12 +1521,12 @@ public class Grid : MonoBehaviour
 
         // 신규 아이템 스탯 로드
 
-        absorbFertilizerTiles.Clear();
+        Soil.AbsorbFertilizerTiles.Clear();
         if (saveData.absorbFertilizerTiles != null)
         {
             foreach (int idx in saveData.absorbFertilizerTiles)
             {
-                absorbFertilizerTiles.Add(idx);
+                Soil.AbsorbFertilizerTiles.Add(idx);
             }
         }
 
@@ -1653,22 +1547,18 @@ public class Grid : MonoBehaviour
 
         // 페트병 관련 변수 로드
         if (saveData.petBottleBlockCountBonus > 0)
-        {
-            if (!petBottleBlockCount.ContainsKey(-1))
-                petBottleBlockCount[-1] = 0;
-            petBottleBlockCount[-1] = saveData.petBottleBlockCountBonus;
-        }
+            Soil.SetPetBottleBlockCountBonus(saveData.petBottleBlockCountBonus);
 
         // 고추 관련 변수 로드
 
         // 황금 비료 로드
         foreach (var i in saveData.goldSoilTiles)
-            TryPlaceGoldSoil(i);
+            Soil.TryPlaceGoldSoil(i);
 
         foreach (var i in saveData.perBottleTiles)
-            PlacePetBottle(i);
+            Soil.PlacePetBottle(i);
         for (int i = 0; i < saveData.fertilizerColumns.Count; i++)
-            TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
+            Soil.TryPlaceFertilizer(saveData.fertilizerColumns[i] * 4, saveData.fertilizerType[i]);
 
         RefreshAllPlantSellingPriceDisplays();
         mostExpensivePlant = saveData.mostExpensivePlant;
@@ -1864,188 +1754,6 @@ public class Grid : MonoBehaviour
     }
 
     // === 저항력 흡수 비료 ===
-    public void AddAbsorbFertilizer(int index)
-    {
-        if (index < 0 || index >= maxCol * 4) return;
-        if (!absorbFertilizerTiles.Contains(index))
-        {
-            absorbFertilizerTiles.Add(index);
-            OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
-            // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
-            Debug.Log($"Absorb Fertilizer Added at {index}");
-        }
-    }
-
-    public List<int> GetAbsorbFertilizerTiles()
-    {
-        return absorbFertilizerTiles.ToList();
-    }
-
-    public bool HasAbsorbFertilizer(int index)
-    {
-        return absorbFertilizerTiles.Contains(index);
-    }
-
-    public void ProcessResistanceAbsorption()
-    {
-        Debug.Log("[AbsorbFertilizer] Start Processing...");
-        // 흡수 비료가 있는 타일 순회
-        foreach (int centerIdx in absorbFertilizerTiles)
-        {
-            // 중심 타일에 식물이 있어야 함
-            if (!plantGrid.TryGetValue(centerIdx, out Plant centerPlant)) continue;
-            if (centerPlant.isDying) continue;
-
-            List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait().ToList();
-
-            // 상하좌우 인접 타일 검사
-            int[] neighborIndices = GetNeighborIndices(centerIdx);
-
-            foreach (int neighborIdx in neighborIndices)
-            {
-                if (!plantGrid.TryGetValue(neighborIdx, out Plant neighborPlant)) continue;
-                if (neighborPlant.isDying) continue;
-                if (centerPlant == neighborPlant) continue; // 혹시라도 자기 자신이면 패스
-
-                List<GeneticTrait> neighborTraits = neighborPlant.GetGeneticTrait().ToList();
-
-                // 겹치는 형질 찾기
-                foreach (var cTrait in centerTraits)
-                {
-                    foreach (var nTrait in neighborTraits)
-                    {
-                        if (cTrait.traitType == nTrait.traitType)
-                        {
-                            // 겹치는 형질 발견! 흡수 진행
-                            // 이웃 식물의 저항력을 3% 깎음 (하한선 10%)
-                            float currentNeighborRes = neighborPlant.GetResistanceValue((int)nTrait.traitType);
-                            // 기본 저항력(traits의 resistance)을 가져와야 하는데 GetResistanceValue는 보정치 포함임.
-                            // 하지만 ChangeResistance는 delta를 받아서 traits의 resistance를 수정함.
-                            // 따라서 "현재 저항력이 10% 이상일 때만" 깎아야 함.
-                            // Plant.ChangeResistance 내부 로직상 "traits[i].resistance"를 직접 수정하고 0.1f 하한선을 둠.
-                            // 하지만 여기서 하한선을 체크하려면 neighborPlant의 순수 resistance를 알아야 함.
-                            // ChangeResistance가 0.1f 미만으로 안 떨어지게 내부 방어 로직이 있으므로,
-                            // 그냥 -0.03f를 호출하면 됨. 
-                            // 단, "뺏어옴"이므로, 상대가 잃은 만큼 내가 가져와야 함.
-                            // 만약 상대가 이미 0.1f라서 못 잃으면? 나도 못 가져오는 게 맞음.
-
-                            // -> ChangeResistance는 bool을 리턴하지 않고 void였음 (수정 전).
-                            // 아까 public bool ChangeResistance로 바꿨음! 
-                            // ChangeResistance 내부에서: var < 0.1f 면 var = 0.1f로 보정함.
-                            // 근데 "실제로 깎였는지"를 알아야 내가 가져올 수 있음.
-
-                            // 로직 개선:
-                            // 1. 상대의 현재 raw 저항력을 안쪽에서 알기 어려우므로(public 접근자 부족),
-                            //    ChangeResistance가 "실제 변동량"을 리턴하거나, 
-                            //    외부에서 예측해야 함.
-
-                            // 여기서는 간단하게 구현: "일단 깎아보고, 깎는데 성공했으면 나도 올린다"
-                            // 근데 ChangeResistance는 "변동 후 값"을 리턴하거나 하지 않음.
-                            // bool 리턴도 그냥 "amount != 0"이면 true였음 (수정 전 추측).
-
-                            // Plant.ChangeResistance를 다시 보자.
-                            // if (var < 0.1f) var = 0.1f;
-                            // 이렇게 되어있음. 
-                            // 즉, 이미 0.1이면 더 안 깎임.
-
-                            // 정확한 흡수를 위해선 상대 줄이기 -> 성공 여부/량 확인 -> 나 늘리기 순서가 필요.
-                            // 지금 Plant 구조상 private List<GeneticTrait> traits; 이고 GetGeneticTrait()는 리스트 반환.
-                            // 리스트의 요소는 struct면 복사본.. class면 참조.
-                            // GeneticTrait는 struct인가 class인가? -> 확인 필요.
-
-                            // 보통 struct로 구현했을 가능성 높음. Plant.cs 보면 traits[i] = new GeneticTrait(...) 이렇게 덮어쓰고 있음. struct임.
-
-                            // 따라서 ChangeResistance를 믿어야 함.
-                            // ChangeResistance를 조금 더 똑똑하게 수정해서 "실제 적용된 수치"를 반환하게 하거나
-                            // 아니면 "줄일 수 있는지 확인"하는 메서드가 필요함.
-
-                            // 여기서는 "하한선 10%" 규칙이 있으므로,
-                            // 상대방의 해당 형질 저항력이 0.13f 이상일 때만 흡수 가능하다고 가정.
-                            // 근데 GetResistanceValue는 보정된 값(비료 등 포함)이라 raw resistance가 아님.
-
-                            // -> 정밀한 구현을 위해 ChangeResistance를 활용하되,
-                            // 이번 기획은 "3%p씩 뺏어옴"이므로, 
-                            // 그냥 -0.03f 호출하고, +0.03f 호출하는 식으로 진행. (상대가 0.1f여도 나는 오르면 '창조 흡수'가 되지만, 게임적 허용범위일 수 있음)
-                            // "하한선 10%"는 뺏기는 쪽에 적용되는 룰.
-                            // "뺏어옴"이라는 워딩을 엄격하게 지키려면 상대가 잃어야만 얻어야 함.
-
-                            // 로직:
-                            // 1. nTrait의 resistance가 0.1f보다 큰지 확인 (traits 리스트 순회해서 직접 확인해야 함)
-                            // 2. 크다면 0.03f 감소 시도. (0.1f 밑으로는 안 내려가게)
-                            // 3. 감소된 실제 양만큼 내 저항력 증가.
-
-                            float amountToAbsorb = 0.03f;
-
-                            // 이웃 식물의 해당 형질 raw resistance 찾기
-                            float neighborRawRes = 0f;
-                            // GetGeneticTrait()로 리스트 가져와서 찾기
-                            var nTargetTrait = neighborTraits.FirstOrDefault(t => t.traitType == cTrait.traitType);
-                            // default(struct) 체크
-                            // GeneticTrait가 struct라면 traitType 비교가 애매할 수 있으니 loop로 찾자. (어차피 위에서 찾음)
-                            neighborRawRes = nTargetTrait.resistance;
-
-                            // 흡수 가능량 계산
-                            float actualAbsorb = 0f;
-                            if (neighborRawRes > 0.1f)
-                            {
-                                if (neighborRawRes - amountToAbsorb < 0.1f)
-                                {
-                                    actualAbsorb = neighborRawRes - 0.1f; // 0.1f까지만 뺌
-                                }
-                                else
-                                {
-                                    actualAbsorb = amountToAbsorb;
-                                }
-                            }
-
-                            if (actualAbsorb > 0.0001f)
-                            {
-                                neighborPlant.ChangeResistance((int)nTrait.traitType, -actualAbsorb);
-                                centerPlant.ChangeResistance((int)cTrait.traitType, actualAbsorb);
-                                Debug.Log($"[Absorb] {centerIdx} absorbed {actualAbsorb:F3} from {neighborIdx} ({nTrait.traitType})");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        Debug.Log("[AbsorbFertilizer] Process Complete.");
-    }
-
-    private int[] GetNeighborIndices(int centerIdx)
-    {
-        List<int> neighbors = new List<int>();
-        int col = centerIdx / 4;
-        int row = centerIdx % 4;
-
-        // 상 (row + 1)
-        if (row + 1 < 4) neighbors.Add(centerIdx + 1);
-        // 하 (row - 1)
-        if (row - 1 >= 0) neighbors.Add(centerIdx - 1);
-        // 좌 (col - 1)
-        if (col - 1 >= 0) neighbors.Add(centerIdx - 4);
-        // 우 (col + 1)
-        if (col + 1 < maxCol) neighbors.Add(centerIdx + 4);
-
-        return neighbors.ToArray();
-    }
-
-    public void AddPetBottleBlockCount(int value)
-    {
-        // 전체 페트병 보호 횟수 보너스 (새로 설치되는 페트병에 적용)
-        if (!petBottleBlockCount.ContainsKey(-1))
-            petBottleBlockCount[-1] = 0;
-        petBottleBlockCount[-1] += value;
-
-        // 기존 페트병에도 보호 횟수 추가
-        foreach (var idx in petBottleTiles)
-        {
-            if (!petBottleBlockCount.ContainsKey(idx))
-                petBottleBlockCount[idx] = 0;
-            petBottleBlockCount[idx] += value;
-        }
-    }
-
     public void AddChiliPepperRangeLevel(int value)
     {
         Modifiers.ChiliPepperRangeLevel = Mathf.Min(2, Modifiers.ChiliPepperRangeLevel + value); // 최대 2단계
@@ -2097,7 +1805,7 @@ public class Grid : MonoBehaviour
         }
     }
 
-    private Dictionary<Plant, int> CapturePlantSellingPrices()
+    public Dictionary<Plant, int> CapturePlantSellingPrices()
     {
         var previousPrices = new Dictionary<Plant, int>();
         foreach (Plant plant in plantGrid.Values)
@@ -2111,7 +1819,7 @@ public class Grid : MonoBehaviour
         return previousPrices;
     }
 
-    private void RefreshPlantSellingPricesAndNotify(
+    public void RefreshPlantSellingPricesAndNotify(
         Dictionary<Plant, int> previousPrices,
         PlantValueChangeReason reason)
     {
@@ -2200,142 +1908,9 @@ public class Grid : MonoBehaviour
 
 
 
-    public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
 
-    public bool HasGoldSoil(int idx) => goldSoilTiles.Contains(idx);
-
-    public bool TryPlaceGoldSoil(int idx)
-    {
-        if (goldSoilTiles.Contains(idx))
-        {
-            return false; // 이미 황금 비료가 있는 칸
-        }
-        if (plantGrid.ContainsKey(idx))
-        {
-            return false; // 식물이 있는 칸에는 황금 비료를 뿌릴 수 없음
-        }
-
-        goldSoilTiles.Add(idx);
-        OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
-
-        // 시각화 (황금색 마커)
-        if (goldSoilMarkerPrefab != null)
-        {
-            var soilT = GetSoilTransform(idx);
-            var marker = Instantiate(goldSoilMarkerPrefab, soilT.position, Quaternion.identity, soilT);
-            goldSoilMarkers[idx] = marker;
-        }
-
-        Debug.Log($"[Grid] 황금 비료 설치: idx={idx}");
-        return true;
-    }
-
-    public void RemoveGoldSoil(int idx)
-    {
-        if (goldSoilTiles.Contains(idx))
-        {
-            goldSoilTiles.Remove(idx);
-
-            if (goldSoilMarkers.TryGetValue(idx, out var marker) && marker != null)
-            {
-                Destroy(marker);
-                goldSoilMarkers.Remove(idx);
-            }
-        }
-    }
-
-    public void PlacePetBottle(int idx)
-    {
-        try
-        {
-            if (petBottleTiles.Contains(idx))
-            {
-                return;
-            }
-
-            // 인덱스 범위 체크
-            if (idx < 0 || idx >= maxCol * 4)
-            {
-                Debug.LogError($"[Grid] PlacePetBottle: Invalid idx={idx}, maxCol={maxCol}, maxIdx={maxCol * 4}");
-                return;
-            }
-
-            petBottleTiles.Add(idx);
-            OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
-            // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
-            int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
-            petBottleBlockCount[idx] = baseBlockCount;
-
-            // 시각화(선택)
-            if (petBottleMarkerPrefab != null)
-            {
-                var soilT = GetSoilTransform(idx);
-                if (soilT != null)
-                {
-                    // petMarker를 부모 없이 생성하여 부모 비활성화 영향 방지 (고추 ghost prefab과 동일한 방식)
-                    var marker = Instantiate(petBottleMarkerPrefab, soilT.position + new Vector3(-0.1f, 0f, 0f), Quaternion.identity);
-                    petMarkers[idx] = marker;
-                    // 항상 표시되도록 보장
-                    if (marker != null)
-                    {
-                        marker.SetActive(true);
-                    }
-                }
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[Grid] PlacePetBottle exception: idx={idx}, error={e.Message}\n{e.StackTrace}");
-        }
-    }
-    public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
-    {
-        if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // 웨이브나 삽에 의해 제거될 때, 페트병이 있는 경우
-        {
-            // 보호 횟수 확인
-            if (petBottleBlockCount.ContainsKey(idx) && petBottleBlockCount[idx] > 0)
-            {
-                petBottleBlockCount[idx]--;
-                if (petBottleBlockCount[idx] <= 0)
-                {
-                    // 보호 횟수 소진 → 페트병 제거
-                    petBottleTiles.Remove(idx);
-                    petBottleBlockCount.Remove(idx);
-
-                    if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
-                    {
-                        Destroy(marker);
-                        petMarkers.Remove(idx);
-                    }
-                }
-                return true; // 보호 성공
-            }
-            else
-            {
-                // 보호 횟수가 없으면 기존 로직대로 제거
-                petBottleTiles.Remove(idx);
-                petBottleBlockCount.Remove(idx);
-
-                if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
-                {
-                    Destroy(marker);
-                    petMarkers.Remove(idx);
-                }
-                return true;
-            }
-        }
-
-        if (cause == DeathCause.Bug && killer != null && ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
-        {
-            StartCoroutine(ladybugs[0].KillFuckingBug(killer));
-            return true;
-        }
-
-        return false; // 죽음 방어 실패
-    }
 
     //-----전용 비료------
-    public bool HasFertilizerAt(int idx) => fertilizerColumns.ContainsKey(GetCol(idx));
 
     public bool HasBreedablePlantAt(int idx)
     {
@@ -2346,65 +1921,6 @@ public class Grid : MonoBehaviour
         return false;
     }
 
-    public Dictionary<int, WaveType> GetFertilizerColumns()
-    {
-        return fertilizerColumns;
-    }
-
-    public WaveType GetFertilizerType(int idx)
-    {
-        return fertilizerColumns[GetCol(idx)];
-    }
-
-    public bool TryPlaceFertilizer(int idx, WaveType wave)
-    {
-        if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있으면 불가
-
-        int col = GetCol(idx);
-
-        fertilizerColumns.Add(col, wave);
-        OnGridStateChanged?.Invoke(); // 밭 정보 UI 갱신
-
-        Transform soilColT = transform.GetChild(col);
-        var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
-
-        if (marker == null)
-        {
-            Debug.Log($"[Grid] No marker: col={col}, wave={wave}");
-            return false;
-        }
-        marker.SetFertilizer(wave);
-
-        Debug.Log($"[Grid] Fertilizer placed: col={col}, wave={wave}");
-        Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
-
-        // 전용 비료가 4줄 이상 존재하면 저항력 흡수 비료 해금
-        if (fertilizerColumns.Count >= 4)
-            UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.FertilizerFourColumns);
-
-        return true;
-    }
-
-    public void RemoveFertilizerAt(int col)
-    {
-        // SoilCol Transform 가져오기
-        Transform soilColT = transform.GetChild(col);
-        var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
-
-        if (marker != null && marker.IsOn)
-        {
-            if (fertilizerColumns.ContainsKey(col))
-            {
-                fertilizerColumns.Remove(col);
-            }
-
-            marker.RemoveFertilizer();
-            Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
-            Debug.Log($"[Grid] Fertilizer removed at col={soilColT.GetSiblingIndex()}");
-        }
-    }
-
-    int GetCol(int index) => index / 4;
 
     private TraitType MapWaveToTrait(WaveType w)
     {
@@ -2418,31 +1934,6 @@ public class Grid : MonoBehaviour
             WaveType.HeavyRain => TraitType.HeavyRain,
             _ => TraitType.NaturalDeath
         };
-    }
-
-    /// <summary>
-    /// 냉각 방패 활성화 (구매 시 호출)
-    /// </summary>
-    public void ActivateCoolingShield()
-    {
-        hasCoolingShield = true;
-    }
-
-    /// <summary>
-    /// 냉각 방패가 활성화되었는지 확인 (1회 사용됨 여부)
-    /// </summary>
-    public bool IsCoolingShieldActivated()
-    {
-        return isCoolingShieldActivated;
-    }
-
-    /// <summary>
-    /// 냉각 방패 사용 처리 (1회 사용)
-    /// </summary>
-    public void SetCoolingShieldActivated()
-    {
-        isCoolingShieldActivated = true;
-        hasCoolingShield = false; // 사용 후 소멸
     }
 
     public int GetLivingPlantCount()
@@ -2466,18 +1957,6 @@ public class Grid : MonoBehaviour
         for (int idx = 0; idx < maxCol * 4; idx++)
         {
             if (!plantGrid.ContainsKey(idx))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool HasEmptyFetrilizerGrid()
-    {
-        for (int idx = 0; idx < maxCol; idx++)
-        {
-            if (!fertilizerColumns.ContainsKey(idx))
             {
                 return true;
             }

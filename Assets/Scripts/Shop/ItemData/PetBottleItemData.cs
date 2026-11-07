@@ -92,7 +92,7 @@ public class PetBottleItemData : ItemData
         int idx = target.gridIndex;
 
         // 이미 페트병이 위치한 칸 불가
-        if (ctx.Grid.HasPetBottle(idx))
+        if (ctx.Grid.Soil.HasPetBottle(idx))
         {
             reason = Loc.T("shop.error.bottle_exists");
             return false;
@@ -147,7 +147,7 @@ public class PetBottleItemData : ItemData
                 return;
             }
 
-            ctx.Grid.PlacePetBottle(idx);
+            ctx.Grid.Soil.PlacePetBottle(idx);
             ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
         }
         catch (System.Exception e)

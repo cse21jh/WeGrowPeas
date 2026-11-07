@@ -89,7 +89,7 @@ public class AddSoilItemData : ItemData
 
         // 특수(땅부자): 구매할 때마다 무작위 세로줄에 고속 숙성 효과 추가
         if (SpecialItemSystem.Has("land_rich"))
-            ctx.Grid.AddLandRichColumn();
+            ctx.Grid.Soil.AddLandRichColumn();
 
         // 가격 업데이트 (구매 이력이 업데이트된 후)
         UpdatePrice(ctx);

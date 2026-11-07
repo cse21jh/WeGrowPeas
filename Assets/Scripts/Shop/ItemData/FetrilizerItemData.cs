@@ -68,7 +68,7 @@ public class FertilizerItemData : ItemData
             Debug.LogError("[Fertilizer] Grid not found.");
             return;
         }
-        if (!g.TryPlaceFertilizer(selectedIdx.Value, pendingWave.Value))
+        if (!g.Soil.TryPlaceFertilizer(selectedIdx.Value, pendingWave.Value))
         {
             ctx.ShowError?.Invoke(Loc.T("shop.error.fertilizer_exists"));
             return;
@@ -94,7 +94,7 @@ public class FertilizerItemData : ItemData
         int? idx = g.GetGridIndexFromPosition(worldPos);
         if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
 
-        if (g.HasFertilizerAt(idx.Value)) { reason = Loc.T("shop.error.fertilizer_exists"); return false; }
+        if (g.Soil.HasFertilizerAt(idx.Value)) { reason = Loc.T("shop.error.fertilizer_exists"); return false; }
 
         return true;
     }

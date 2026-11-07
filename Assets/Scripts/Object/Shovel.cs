@@ -162,7 +162,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
 
                 int col = fertMarker.transform.parent.GetSiblingIndex();
 
-                grid.RemoveFertilizerAt(col);
+                grid.Soil.RemoveFertilizerAt(col);
 
                 return;
             }
@@ -173,13 +173,13 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
             if (soil != null)
             {
                 int idx = soil.GridIndex;
-                if (grid.HasGoldSoil(idx))
+                if (grid.Soil.HasGoldSoil(idx))
                 {
                     // 식물이 있는 경우 제거 불가
                     if (!grid.plantGrid.ContainsKey(idx))
                     {
                         SoundManager.Instance.PlayEffect(SoundIds.Shovel);
-                        grid.RemoveGoldSoil(idx);
+                        grid.Soil.RemoveGoldSoil(idx);
                         return;
                     }
                 }

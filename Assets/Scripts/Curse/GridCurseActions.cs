@@ -32,7 +32,7 @@ public class GridCurseActions
         if (count <= 0) return;
         var candidates = new List<int>();
         foreach (var kv in grid.plantGrid)
-            if (kv.Value != null && !grid.HasPetBottle(kv.Key)) candidates.Add(kv.Key);
+            if (kv.Value != null && !grid.Soil.HasPetBottle(kv.Key)) candidates.Add(kv.Key);
         ShuffleList(candidates);
 
         int removed = 0;
@@ -58,7 +58,7 @@ public class GridCurseActions
         if (ratio <= 0f) return;
         var idxs = new List<int>();
         foreach (var kv in grid.plantGrid)
-            if (kv.Value != null && kv.Value.IsMovable && !grid.HasPetBottle(kv.Key)) idxs.Add(kv.Key);
+            if (kv.Value != null && kv.Value.IsMovable && !grid.Soil.HasPetBottle(kv.Key)) idxs.Add(kv.Key);
         if (idxs.Count < 1) return;
 
         int affected = Mathf.FloorToInt(idxs.Count * ratio);

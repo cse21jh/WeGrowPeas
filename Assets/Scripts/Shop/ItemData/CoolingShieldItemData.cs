@@ -22,7 +22,7 @@ public class CoolingShieldItemData : ItemData
             return false;
 
         // 이미 구매했는지 확인
-        if (ctx.Grid.HasCoolingShield)
+        if (ctx.Grid.Soil.HasCoolingShield)
         {
             reason = Loc.T("shop.error.cooling_owned");
             return false;
@@ -40,7 +40,7 @@ public class CoolingShieldItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.ActivateCoolingShield();
+        ctx.Grid.Soil.ActivateCoolingShield();
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.cooling", ("name", LocalizedName)));
     }
 }

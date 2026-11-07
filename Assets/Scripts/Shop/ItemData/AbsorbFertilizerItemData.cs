@@ -41,7 +41,7 @@ public class AbsorbFertilizerItemData : ItemData
 
         // 이미 비료가 있는 곳에는 못 뿌리게? -> 일단 중복 허용하되 효과는 중복 안되게 Grid에서 처리 (HashSet 사용중이라 OK)
         // 하지만 사용자 경험상 이미 뿌려진 곳은 막는 게 좋을 수 있음.
-        if (ctx.Grid.HasAbsorbFertilizer(idx.Value))
+        if (ctx.Grid.Soil.HasAbsorbFertilizer(idx.Value))
         {
              reason = Loc.T("shop.error.absorb_exists");
              return false;
@@ -61,7 +61,7 @@ public class AbsorbFertilizerItemData : ItemData
         if (pendingIndex == null) return;
 
         // 실제 효과 적용
-        ctx.Grid.AddAbsorbFertilizer(pendingIndex.Value);
+        ctx.Grid.Soil.AddAbsorbFertilizer(pendingIndex.Value);
         Debug.Log($"[AbsorbFertilizer] Committed on index {pendingIndex.Value}");
 
         pendingIndex = null;
