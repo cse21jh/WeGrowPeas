@@ -288,7 +288,7 @@ public abstract class Plant : MonoBehaviour
                     {
                         resistance += 0.05f;
                         // 스프링클러 범위 내에 있다면 시너지 보너스 추가
-                        if (grid.IsAffectedBySprinkler(gridIndex))
+                        if (grid.Soil.IsAffectedBySprinkler(gridIndex))
                         {
                             resistance += grid.Modifiers.SprinklerFertilizerSynergyBonus;
                         }
@@ -297,9 +297,9 @@ public abstract class Plant : MonoBehaviour
                 if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
                     resistance += 0.2f;
                 // 무당벌레당 저항력 증가 (모든 형질에 적용)
-                if (grid != null && grid.ladybugs != null)
+                if (grid != null && grid.Board.Ladybugs != null)
                 {
-                    resistance += grid.ladybugs.Count * grid.Modifiers.AdditionalLadybugResistancePerUnit;
+                    resistance += grid.Board.Ladybugs.Count * grid.Modifiers.AdditionalLadybugResistancePerUnit;
                 }
                 // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
                 float dawnBase = Mathf.Max(0f, g.resistance);
@@ -323,7 +323,7 @@ public abstract class Plant : MonoBehaviour
 
         if (isFrozen && cause == DeathCause.Generic) return false; // 얼어있으면 웨이브(Generic)로 인한 죽음 면역
 
-        int alive = grid.GetLivingPlantCount();
+        int alive = grid.Board.CountLivingPlants();
 
         // 냉각 방패: 식물이 1개 이하가 될 경우 1회에 한해 보호
         if (alive <= 1 && grid != null && grid.Soil.HasCoolingShield && !grid.Soil.IsCoolingShieldActivated())
@@ -613,7 +613,7 @@ public abstract class Plant : MonoBehaviour
     public bool CheckChiliPepper()
     {
         if (grid == null) return false;
-        return grid.IsAffectedByChiliPepper(gridIndex);
+        return grid.Soil.IsAffectedByChiliPepper(gridIndex);
     }
 
     public int GetTaste()
@@ -837,7 +837,7 @@ public abstract class Plant : MonoBehaviour
 
         // 특수(알록달록): 땅에 적용 중인 효과 1개당 판매 배수 +0.1
         if (SpecialItemSystem.Has("colorful"))
-            multiplier += 0.1f * grid.CountTileEffects(gridIndex);
+            multiplier += 0.1f * grid.Soil.CountTileEffects(gridIndex);
 
         // 완두커피: 자유시간이 지난 횟수만큼 판매 골드 배수 추가
         float freeTimeBonus = grid.Modifiers.PeaCoffeeMultiplier * freeTimePassedCount;

@@ -1,50 +1,52 @@
-﻿/// <summary>
+﻿using UnityEngine;
+
+/// <summary>
 /// 아이템과 능력이 쌓은 밭 전체 보정치. 씬 참조 없이 숫자만 들고 있다.
-/// 값을 바꾸면서 식물이나 표시도 갱신해야 하는 항목은 <see cref="Grid"/>의 Add 메서드를 거친다.
+/// 값은 Add 메서드로만 바꾼다. 식물이나 표시도 갱신해야 하면 <see cref="Grid"/>의 같은 이름 메서드를 쓴다.
 /// </summary>
 public class GridModifiers
 {
-    public float BugSpeedDecreasement = 0f;
-    public float BugSpawnIntervalIncreasement = 0f;
-    public float LadybugSpawnProbability = 0f;
-    public int MaxLadybugCount = 0; // 최대 무당벌레 수 (0 = 무제한)
-    public int AdditionalLadybugGoldPerUnit = 0; // 무당벌레당 골드 (웨이브 종료 시)
-    public float AdditionalLadybugResistancePerUnit = 0f; // 무당벌레당 저항력 증가
-    public int AdditionalBugGold = 0;
-    public int AdditionalNepenthesGold = 0; // 네펜데스가 벌레 먹을 때 추가 골드
-    public bool HasNepenthesPheromone = false; // 네펜데스 페로몬 활성화 여부
-    public float AdditionalNepenthesPheromoneSizeMultiplier = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
-    public float NepenthesSpawnProbability = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
-    public float WeakGeneticsResistanceBonus = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
-    public float StrongGeneticsResistanceBonus = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
-    public float GoldenGeneticsProbabilityBonus = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
-    public float AdditionalPlantGoldMultiplier = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
-    public float AdditionalPestResistance = 0f;
-    public float ResistanceBonus = 0f; // 기본 저항력 보너스
-    public int AdditionalPlantGold = 0; // 기본 식물 가격 보너스
-    public int SprinklerRangeBonus = 0; // 스프링클러 범위 보너스
-    public float SprinklerFertilizerSynergyBonus = 0f; // 스프링클러 비료 시너지 보너스
-    public int TimeIsGoldLevel = 0; // 시간은 금이다 레벨
-    public int BadGuyMoreRiceLevel = 0; // 미운 놈 떡 하나 더 준다 레벨
-    public float ResistanceDecayReduction = 0f; // 웨이브를 버텼을 때, 감소하는 저항력의 감소량
-    public float ResistanceAdaptation = 0f; // 웨이브를 버텼을 때, 해당 웨이브의 저항력 증가량
-    public float AdditionalPeanutCopyProbability = 0f; // 땅콩 복사 확률 증가
-    public float BonusRatioWhenDie = 0f; // 죽었을 때, 추가 골드
-    public int AdditionalInheritance = 0;
-    public int PetBottleInitialStockBonus = 0; // 페트병 일일 최대 구매 횟수 보너스
-    public int PetBottlePriceReduction = 0; // 페트병 가격 감소량
-    public float PetBottleSpawnProbability = 0f; // 페트병 등장 확률 (rotation weight 증가로 구현)
-    public int ChiliPepperRangeLevel = 0; // 고추 영향 범위 레벨 (0: 가로 2칸, 1: 십자 4칸, 2: 대각선까지 8칸)
-    public float ChiliPepperSpawnProbability = 0f; // 고추 등장 확률 (rotation weight 증가로 구현)
-    public float ChiliPepperHealPercent = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
-    public float CreditCardRefundPercent = 0f;
-    public float TwinBreedProbability = 0f;
-    public float PeaCoffeeMultiplier = 0f; // 완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수
-    public float SuperMutationChanceBonus = 0f; // 슈퍼 변종: 변종 발생 확률 가산(%p)
-    public bool HasSuperMutation = false; // 슈퍼 변종: 양성/악성 변종 확률 반전
-    public float ActiveShellProbability = 0f; // 활성형 껍질: 미교배 식물의 자가번식 확률 가산
-    public float SuccessionInheritRatio = 0f; // 왕위 계승: 자가번식 시 계승되는 가격 배율 비율
-    public int LandAndBeanLevel = 0; // 땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매
+    public float BugSpeedDecreasement { get; private set; } = 0f;
+    public float BugSpawnIntervalIncreasement { get; private set; } = 0f;
+    public float LadybugSpawnProbability { get; private set; } = 0f;
+    public int MaxLadybugCount { get; private set; } = 0; // 최대 무당벌레 수 (0 = 무제한)
+    public int AdditionalLadybugGoldPerUnit { get; private set; } = 0; // 무당벌레당 골드 (웨이브 종료 시)
+    public float AdditionalLadybugResistancePerUnit { get; private set; } = 0f; // 무당벌레당 저항력 증가
+    public int AdditionalBugGold { get; private set; } = 0;
+    public int AdditionalNepenthesGold { get; private set; } = 0; // 네펜데스가 벌레 먹을 때 추가 골드
+    public bool HasNepenthesPheromone { get; private set; } = false; // 네펜데스 페로몬 활성화 여부
+    public float AdditionalNepenthesPheromoneSizeMultiplier { get; private set; } = 0f; // 네펜데스 페로몬 범위 증가 배수 (합적용, 0 = 기본값, 0.2 = +20%)
+    public float NepenthesSpawnProbability { get; private set; } = 0f; // 네펜데스 등장 확률 (rotation weight 증가로 구현)
+    public float WeakGeneticsResistanceBonus { get; private set; } = 0f; // 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질) 저항력 증가 보너스
+    public float StrongGeneticsResistanceBonus { get; private set; } = 0f; // 강한 유전자(우성, 최초 저항력 80%인 형질) 저항력 증가 보너스
+    public float GoldenGeneticsProbabilityBonus { get; private set; } = 0f; // 황금 유전자 확률 보너스 (genetics = 1에서 우수한 형질이 나올 확률 증가)
+    public float AdditionalPlantGoldMultiplier { get; private set; } = 0.2f; // 기본값 0.2f (웨이브 저항 횟수당 골드 배수)
+    public float AdditionalPestResistance { get; private set; } = 0f;
+    public float ResistanceBonus { get; private set; } = 0f; // 기본 저항력 보너스
+    public int AdditionalPlantGold { get; private set; } = 0; // 기본 식물 가격 보너스
+    public int SprinklerRangeBonus { get; private set; } = 0; // 스프링클러 범위 보너스
+    public float SprinklerFertilizerSynergyBonus { get; private set; } = 0f; // 스프링클러 비료 시너지 보너스
+    public int TimeIsGoldLevel { get; private set; } = 0; // 시간은 금이다 레벨
+    public int BadGuyMoreRiceLevel { get; private set; } = 0; // 미운 놈 떡 하나 더 준다 레벨
+    public float ResistanceDecayReduction { get; private set; } = 0f; // 웨이브를 버텼을 때, 감소하는 저항력의 감소량
+    public float ResistanceAdaptation { get; private set; } = 0f; // 웨이브를 버텼을 때, 해당 웨이브의 저항력 증가량
+    public float AdditionalPeanutCopyProbability { get; private set; } = 0f; // 땅콩 복사 확률 증가
+    public float BonusRatioWhenDie { get; private set; } = 0f; // 죽었을 때, 추가 골드
+    public int AdditionalInheritance { get; private set; } = 0;
+    public int PetBottleInitialStockBonus { get; private set; } = 0; // 페트병 일일 최대 구매 횟수 보너스
+    public int PetBottlePriceReduction { get; private set; } = 0; // 페트병 가격 감소량
+    public float PetBottleSpawnProbability { get; private set; } = 0f; // 페트병 등장 확률 (rotation weight 증가로 구현)
+    public int ChiliPepperRangeLevel { get; private set; } = 0; // 고추 영향 범위 레벨 (0: 가로 2칸, 1: 십자 4칸, 2: 대각선까지 8칸)
+    public float ChiliPepperSpawnProbability { get; private set; } = 0f; // 고추 등장 확률 (rotation weight 증가로 구현)
+    public float ChiliPepperHealPercent { get; private set; } = 0f; // 치료형 캡사이신 회복 퍼센트 (구매 횟수 * 3%)
+    public float CreditCardRefundPercent { get; private set; } = 0f;
+    public float TwinBreedProbability { get; private set; } = 0f;
+    public float PeaCoffeeMultiplier { get; private set; } = 0f; // 완두커피: 자유시간이 지날 때마다 붙는 판매 골드 배수
+    public float SuperMutationChanceBonus { get; private set; } = 0f; // 슈퍼 변종: 변종 발생 확률 가산(%p)
+    public bool HasSuperMutation { get; private set; } = false; // 슈퍼 변종: 양성/악성 변종 확률 반전
+    public float ActiveShellProbability { get; private set; } = 0f; // 활성형 껍질: 미교배 식물의 자가번식 확률 가산
+    public float SuccessionInheritRatio { get; private set; } = 0f; // 왕위 계승: 자가번식 시 계승되는 가격 배율 비율
+    public int LandAndBeanLevel { get; private set; } = 0; // 땅과 콩: 웨이브 후 뿌리 확률 +10%p/구매 + 뿌리내린 식물 가격 +10%p/구매
 
     /// <summary><see cref="Load"/>와 짝이다. 저장 파일의 필드 이름은 바꾸지 않는다.</summary>
     public void Save(GridSave save)
@@ -309,5 +311,65 @@ public class GridModifiers
     public float GetRootedPriceMultiplier()
     {
         return 1f + 0.1f * LandAndBeanLevel;
+    }
+
+    public void AddAdditionalPestResistance(float value)
+    {
+        AdditionalPestResistance = Mathf.Min(AdditionalPestResistance + value, 0.15f);
+    }
+
+    public void SetNepenthesPheromone(bool enabled)
+    {
+        HasNepenthesPheromone = enabled;
+    }
+
+    public void AddAdditionalNepenthesPheromoneSizeMultiplier(float value)
+    {
+        AdditionalNepenthesPheromoneSizeMultiplier += value;
+    }
+
+    public void AddResistanceBonus(float value)
+    {
+        ResistanceBonus += value;
+    }
+
+    public void AddWeakGeneticsResistanceBonus(float value)
+    {
+        WeakGeneticsResistanceBonus += value;
+    }
+
+    public void AddStrongGeneticsResistanceBonus(float value)
+    {
+        StrongGeneticsResistanceBonus += value;
+    }
+
+    public void AddSprinklerFertilizerSynergyBonus(float value)
+    {
+        SprinklerFertilizerSynergyBonus += value;
+    }
+
+    public void AddChiliPepperRangeLevel(int value)
+    {
+        ChiliPepperRangeLevel = Mathf.Min(2, ChiliPepperRangeLevel + value); // 최대 2단계
+    }
+
+    public void AddAdditionalPlantGold(int value)
+    {
+        AdditionalPlantGold += value;
+    }
+
+    public void AddAdditionalPlantGoldMultiplier(float value)
+    {
+        AdditionalPlantGoldMultiplier += value;
+    }
+
+    public void AddPeaCoffeeMultiplier(float value)
+    {
+        PeaCoffeeMultiplier += value;
+    }
+
+    public void AddLandAndBeanLevel(int value)
+    {
+        LandAndBeanLevel += value;
     }
 }

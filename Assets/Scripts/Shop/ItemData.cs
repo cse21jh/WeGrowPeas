@@ -325,7 +325,7 @@ public abstract class ItemData : ScriptableObject
         if (!ValidateGrid(ctx, out reason))
             return false;
 
-        if (!ctx.Grid.HasEmptyGrid())
+        if (!ctx.Grid.Board.HasEmptyCell())
         {
             reason = Loc.T("shop.error.no_space");
             return false;

@@ -185,7 +185,7 @@ public class GameManager : Singleton<GameManager>
             yield return null;
 
         yield return new WaitForSeconds(2.0f);
-        PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+        PlayerRecordForGraph.SetSP(grid.Board.Plants.Count);
 
         /*if (stage == endStage)
         {
@@ -263,10 +263,10 @@ public class GameManager : Singleton<GameManager>
     {
         Plant plant;
         List<Peanut> peanutList = new List<Peanut>();
-        for (int idx = 0; idx < grid.maxCol * 4; idx++)
+        for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
         {
             plant = null;
-            grid.plantGrid.TryGetValue(idx, out plant);
+            grid.Board.Plants.TryGetValue(idx, out plant);
             if (plant == null)
                 continue;
             if (plant.GetType() == typeof(Peanut))
@@ -276,12 +276,12 @@ public class GameManager : Singleton<GameManager>
             peanutList[i].TrySpawnCopy();
 
         // 땅과 콩: 웨이브가 지나간 후 식물이 확률적으로 뿌리를 내림
-        grid?.ProcessLandAndBeanRooting();
+        grid?.Upgrades.ProcessLandAndBeanRooting();
 
         // 무당벌레당 골드 지급 (웨이브 종료 시)
-        if (grid != null && grid.Modifiers.AdditionalLadybugGoldPerUnit > 0 && grid.ladybugs != null)
+        if (grid != null && grid.Modifiers.AdditionalLadybugGoldPerUnit > 0 && grid.Board.Ladybugs != null)
         {
-            int ladybugGold = grid.ladybugs.Count * grid.Modifiers.AdditionalLadybugGoldPerUnit;
+            int ladybugGold = grid.Board.Ladybugs.Count * grid.Modifiers.AdditionalLadybugGoldPerUnit;
             if (ladybugGold > 0)
             {
                 economyManager.AddGold(ladybugGold);
@@ -291,11 +291,11 @@ public class GameManager : Singleton<GameManager>
         // 치료형 캡사이신: 고추 주변 식물의 저항력 회복
         if (grid != null && grid.Modifiers.ChiliPepperHealPercent > 0f)
         {
-            foreach (var currentPlant in grid.plantGrid.Values)
+            foreach (var currentPlant in grid.Board.Plants.Values)
             {
                 if (currentPlant is ChiliPepper chiliPepper)
                 {
-                    var nearbyPlants = grid.GetPlantsNearChiliPepper(chiliPepper);
+                    var nearbyPlants = grid.Soil.GetPlantsNearChiliPepper(chiliPepper);
                     foreach (var nearbyPlant in nearbyPlants)
                     {
                         // 모든 저항력을 회복 (구매 횟수 * 3%)
@@ -387,7 +387,7 @@ public class GameManager : Singleton<GameManager>
         int debt = Mathf.Max(0, -economyManager.GetGold());
 
         var seizable = new System.Collections.Generic.List<Plant>();
-        foreach (var p in grid.plantGrid.Values)
+        foreach (var p in grid.Board.Plants.Values)
             if (p != null && (p is Pea || p is Peanut)) seizable.Add(p);
         seizable.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
 
@@ -414,7 +414,7 @@ public class GameManager : Singleton<GameManager>
         gameOver = true;
 
         //Debug.Log("게임오버");
-        PlayerRecordForGraph.SetSP(grid.plantGrid.Count);
+        PlayerRecordForGraph.SetSP(grid.Board.Plants.Count);
 
         // 회상: 게임오버 당일은 자유시간을 채우지 못하고 끝나므로 여기서 마지막 스냅샷을 찍는다.
         // PushEarnedGold보다 앞이어야 오늘 번 골드가 아직 남아 있다.
@@ -511,7 +511,7 @@ public class GameManager : Singleton<GameManager>
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
         }
         // 특수 아이템까지 복원된 최종 판매가를 표시한다. 로드 자체는 가치 상승 연출 대상이 아니다.
-        grid.RefreshAllPlantSellingPriceDisplays();
+        grid.Upgrades.RefreshAllPlantSellingPriceDisplays();
         PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
         RecallRecorder.LoadFromSave(saveData.recall);
 
@@ -580,7 +580,7 @@ public class GameManager : Singleton<GameManager>
             economyManager.ConsumeGold,
             mostKillWave,
             itemName,
-            grid.MostExpensivePlant,
+            grid.Upgrades.MostExpensivePlant,
             requestManager.CompleteRequestCount
             );
             

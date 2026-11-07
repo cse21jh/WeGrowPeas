@@ -4,7 +4,8 @@ using UnityEngine;
 /// <summary>낮 동안의 벌레와 무당벌레 소환을 맡는다. 시간은 교배 진행 쪽에서 <see cref="Tick"/>으로 넘겨 준다.</summary>
 public class BugSpawner
 {
-    private readonly Grid grid;
+    private readonly PlantBoard board;
+    private readonly GridModifiers modifiers;
     private readonly List<GameObject> bugPrefabs;
     private readonly GameObject ladybugPrefab;
 
@@ -12,9 +13,10 @@ public class BugSpawner
     private float lastSpawnTime = 0f;
     private float effectiveInterval;
 
-    public BugSpawner(Grid grid, List<GameObject> bugPrefabs, GameObject ladybugPrefab)
+    public BugSpawner(PlantBoard board, GridModifiers modifiers, List<GameObject> bugPrefabs, GameObject ladybugPrefab)
     {
-        this.grid = grid;
+        this.board = board;
+        this.modifiers = modifiers;
         this.bugPrefabs = bugPrefabs;
         this.ladybugPrefab = ladybugPrefab;
     }
@@ -34,9 +36,9 @@ public class BugSpawner
     {
         lastSpawnTime += deltaTime;
 
-        if (lastSpawnTime > effectiveInterval * (1f + grid.Modifiers.BugSpawnIntervalIncreasement))
+        if (lastSpawnTime > effectiveInterval * (1f + modifiers.BugSpawnIntervalIncreasement))
         {
-            List<int> targetIdx = new List<int>(grid.plantGrid.Keys);
+            List<int> targetIdx = new List<int>(board.Plants.Keys);
             if (targetIdx.Count > 0)
             {
                 Spawn();
@@ -54,10 +56,10 @@ public class BugSpawner
         int stage = GameManager.Instance.stage;
         if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;
-        if (Random.Range(0, 100) < (grid.Modifiers.LadybugSpawnProbability * 100))
+        if (Random.Range(0, 100) < (modifiers.LadybugSpawnProbability * 100))
         {
             // 최대 무당벌레 수 제한 확인
-            if (grid.Modifiers.MaxLadybugCount > 0 && grid.ladybugs.Count >= grid.Modifiers.MaxLadybugCount)
+            if (modifiers.MaxLadybugCount > 0 && board.Ladybugs.Count >= modifiers.MaxLadybugCount)
             {
                 // 최대 수에 도달했으므로 일반 벌레 스폰
                 int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));

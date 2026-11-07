@@ -77,7 +77,7 @@ public class Peanut : MovablePlant
     {
         //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
-        if(!grid.showingAllPrice)
+        if(!grid.Upgrades.showingAllPrice)
             priceSign.gameObject.SetActive(false);
     }
 
@@ -86,28 +86,28 @@ public class Peanut : MovablePlant
         List<int> emptyGrid = new List<int>();
         if ((gridIndex - 1) / 4 == gridIndex / 4) // 위칸
         {
-            if (!grid.plantGrid.ContainsKey(gridIndex - 1))
+            if (!grid.Board.Plants.ContainsKey(gridIndex - 1))
                 emptyGrid.Add(gridIndex - 1);
 
         }
 
         if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래칸
         {
-            if (!grid.plantGrid.ContainsKey(gridIndex + 1))
+            if (!grid.Board.Plants.ContainsKey(gridIndex + 1))
                 emptyGrid.Add(gridIndex + 1);
 
         }
 
         if ((gridIndex - 4) >= 0) // 왼쪽칸
         {
-            if (!grid.plantGrid.ContainsKey(gridIndex - 4))
+            if (!grid.Board.Plants.ContainsKey(gridIndex - 4))
                 emptyGrid.Add(gridIndex - 4);
 
         }
 
-        if ((gridIndex + 4) < grid.GetMaxCol() * 4) // 오른쪽칸
+        if ((gridIndex + 4) < grid.Board.MaxCol * 4) // 오른쪽칸
         {
-            if (!grid.plantGrid.ContainsKey(gridIndex + 4))
+            if (!grid.Board.Plants.ContainsKey(gridIndex + 4))
                 emptyGrid.Add(gridIndex + 4);
 
         }
@@ -143,7 +143,7 @@ public class Peanut : MovablePlant
             Debug.Log("[변종] 자가번식 양성 변종 발생!");
         }
 
-        Plant child = grid.AddMovablePlant(copyTriats, spawnGridIdx);
+        Plant child = grid.Spawner.AddMovablePlant(copyTriats, spawnGridIdx);
         if (benignMutation) CurseEffectManager.PlayMutation(child, benign: true); // 변종 이펙트
 
         // 왕위 계승: 자가번식한 자식이 부모 가격 배율의 일부를 계승 (유전자로 인한 최종 가격은 계승 X)

@@ -64,14 +64,14 @@ public static class RecallRecorder
         // ── 밭 (칸별 식물 종) ─────────────────────────────────────────────
         if (gm.grid != null)
         {
-            snap.maxCol = gm.grid.GetMaxCol();
+            snap.maxCol = gm.grid.Board.MaxCol;
             snap.cumBreedCount = gm.grid.Breeder.totalBreedCount;
 
             int cells = Mathf.Max(0, snap.maxCol * 4);
             var species = new string[cells];
             for (int i = 0; i < cells; i++)
             {
-                species[i] = gm.grid.plantGrid.TryGetValue(i, out Plant p) && p != null
+                species[i] = gm.grid.Board.Plants.TryGetValue(i, out Plant p) && p != null
                     ? p.speciesname
                     : string.Empty;
             }

@@ -62,7 +62,7 @@ public class ScouterController : MonoBehaviour
     {
         if (!hasResistanceScouter || !isScouterOn)
             return;
-        foreach (var plant in Grid.plantGrid.Values)
+        foreach (var plant in Grid.Board.Plants.Values)
         {
             if (plant is MovablePlant p)
             {
@@ -74,7 +74,7 @@ public class ScouterController : MonoBehaviour
     {
         if (!hasGoldScouter || !isScouterOn)
             return;
-        List<MovablePlant> sortedPlants = Grid.plantGrid.Values
+        List<MovablePlant> sortedPlants = Grid.Board.Plants.Values
                                                    .OfType<MovablePlant>()
                                                    .OrderByDescending(p => p.GetSellingPrice()) // GetSellingPrice() 결과가 높은 순으로 정렬
                                                    .ToList(); // 정렬된 결과를 리스트로 변환
@@ -95,7 +95,7 @@ public class ScouterController : MonoBehaviour
     }
     public void HideResistanceScouterImageInGrid()
     {
-        foreach (var plant in Grid.plantGrid.Values)
+        foreach (var plant in Grid.Board.Plants.Values)
         {
             if (plant is MovablePlant p)
             {
@@ -105,7 +105,7 @@ public class ScouterController : MonoBehaviour
     }
     public void HideGoldScouterImageInGrid()
     {
-        foreach (var plant in Grid.plantGrid.Values)
+        foreach (var plant in Grid.Board.Plants.Values)
         {
             if (plant is MovablePlant p)
             {

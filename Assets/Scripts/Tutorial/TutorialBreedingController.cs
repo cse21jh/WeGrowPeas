@@ -46,9 +46,9 @@ public class TutorialBreedingController : BreedingController
                     //자식 완두콩 형질 계산 후 Instantiate
 
                     bool canBreed = false;
-                    for (int idx = 0; idx < grid.maxCol * 4; idx++) // 빈 칸이 있는가
+                    for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++) // 빈 칸이 있는가
                     {
-                        if (!grid.plantGrid.ContainsKey(idx))
+                        if (!grid.Board.Plants.ContainsKey(idx))
                         {
                             canBreed = true;
                             break;
@@ -65,9 +65,9 @@ public class TutorialBreedingController : BreedingController
                     {
                         GameObject childObj = null;
                         if (parent1.GetType() == typeof(Pea))
-                            childObj = grid.InstantiatePlant(PlantIds.Pea);
+                            childObj = grid.Spawner.InstantiatePlant(PlantIds.Pea);
                         else if (parent1.GetType() == typeof(Peanut))
-                            childObj = grid.InstantiatePlant(PlantIds.Peanut);
+                            childObj = grid.Spawner.InstantiatePlant(PlantIds.Peanut);
                         Plant child = childObj.GetComponent<Plant>();
                         if (child != null)
                         {

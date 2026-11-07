@@ -40,7 +40,7 @@ public class ChiliPepperItemData : ItemData
             reason = Loc.T("shop.error.no_game_state");
             return false;
         }
-        if (!ctx.Grid.HasEmptyGrid())
+        if (!ctx.Grid.Board.HasEmptyCell())
         {
             reason = Loc.T("shop.error.no_empty_cell");
             return false;
@@ -70,7 +70,7 @@ public class ChiliPepperItemData : ItemData
             return false;
         }
 
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
         {
             reason = Loc.T("shop.error.occupied");
             return false;
@@ -94,7 +94,7 @@ public class ChiliPepperItemData : ItemData
             return;
         }
 
-        ctx.Grid.AddChiliPepper(pendingIndex.Value);
+        ctx.Grid.Spawner.AddChiliPepper(pendingIndex.Value);
 
         pendingIndex = null;
     }

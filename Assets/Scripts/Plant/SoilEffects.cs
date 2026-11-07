@@ -6,6 +6,7 @@ using UnityEngine;
 public class SoilEffects
 {
     private readonly Grid grid;
+    private readonly PlantBoard board;
     private readonly GameObject petBottleMarkerPrefab;
     private readonly GameObject goldSoilMarkerPrefab;
 
@@ -28,6 +29,7 @@ public class SoilEffects
     public SoilEffects(Grid grid, GameObject petBottleMarkerPrefab, GameObject goldSoilMarkerPrefab)
     {
         this.grid = grid;
+        board = grid.Board;
         this.petBottleMarkerPrefab = petBottleMarkerPrefab;
         this.goldSoilMarkerPrefab = goldSoilMarkerPrefab;
     }
@@ -71,11 +73,11 @@ public class SoilEffects
 
     public void AddAbsorbFertilizer(int index)
     {
-        if (index < 0 || index >= grid.maxCol * 4) return;
+        if (index < 0 || index >= board.MaxCol * 4) return;
         if (!absorbFertilizerTiles.Contains(index))
         {
             absorbFertilizerTiles.Add(index);
-            grid.NotifyGridStateChanged(); // 밭 정보 UI 갱신
+            board.NotifyChanged(); // 밭 정보 UI 갱신
             // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
             Debug.Log($"Absorb Fertilizer Added at {index}");
         }
@@ -95,7 +97,7 @@ public class SoilEffects
         foreach (int centerIdx in absorbFertilizerTiles)
         {
             // 중심 타일에 식물이 있어야 함
-            if (!grid.plantGrid.TryGetValue(centerIdx, out Plant centerPlant)) continue;
+            if (!board.Plants.TryGetValue(centerIdx, out Plant centerPlant)) continue;
             if (centerPlant.isDying) continue;
 
             List<GeneticTrait> centerTraits = centerPlant.GetGeneticTrait().ToList();
@@ -105,7 +107,7 @@ public class SoilEffects
 
             foreach (int neighborIdx in neighborIndices)
             {
-                if (!grid.plantGrid.TryGetValue(neighborIdx, out Plant neighborPlant)) continue;
+                if (!board.Plants.TryGetValue(neighborIdx, out Plant neighborPlant)) continue;
                 if (neighborPlant.isDying) continue;
                 if (centerPlant == neighborPlant) continue; // 혹시라도 자기 자신이면 패스
 
@@ -226,7 +228,7 @@ public class SoilEffects
         // 좌 (col - 1)
         if (col - 1 >= 0) neighbors.Add(centerIdx - 4);
         // 우 (col + 1)
-        if (col + 1 < grid.maxCol) neighbors.Add(centerIdx + 4);
+        if (col + 1 < board.MaxCol) neighbors.Add(centerIdx + 4);
 
         return neighbors.ToArray();
     }
@@ -236,13 +238,13 @@ public class SoilEffects
         {
             return false; // 이미 황금 비료가 있는 칸
         }
-        if (grid.plantGrid.ContainsKey(idx))
+        if (board.Plants.ContainsKey(idx))
         {
             return false; // 식물이 있는 칸에는 황금 비료를 뿌릴 수 없음
         }
 
         goldSoilTiles.Add(idx);
-        grid.NotifyGridStateChanged(); // 밭 정보 UI 갱신
+        board.NotifyChanged(); // 밭 정보 UI 갱신
 
         // 시각화 (황금색 마커)
         if (goldSoilMarkerPrefab != null)
@@ -278,14 +280,14 @@ public class SoilEffects
             }
 
             // 인덱스 범위 체크
-            if (idx < 0 || idx >= grid.maxCol * 4)
+            if (idx < 0 || idx >= board.MaxCol * 4)
             {
-                Debug.LogError($"[Grid] PlacePetBottle: Invalid idx={idx}, grid.maxCol={grid.maxCol}, maxIdx={grid.maxCol * 4}");
+                Debug.LogError($"[Grid] PlacePetBottle: Invalid idx={idx}, board.MaxCol={board.MaxCol}, maxIdx={board.MaxCol * 4}");
                 return;
             }
 
             petBottleTiles.Add(idx);
-            grid.NotifyGridStateChanged(); // 밭 정보 UI 갱신
+            board.NotifyChanged(); // 밭 정보 UI 갱신
             // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
             int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
             petBottleBlockCount[idx] = baseBlockCount;
@@ -349,9 +351,9 @@ public class SoilEffects
             }
         }
 
-        if (cause == DeathCause.Bug && killer != null && grid.ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
+        if (cause == DeathCause.Bug && killer != null && board.Ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
         {
-            grid.StartCoroutine(grid.ladybugs[0].KillFuckingBug(killer));
+            grid.StartCoroutine(board.Ladybugs[0].KillFuckingBug(killer));
             return true;
         }
 
@@ -372,7 +374,7 @@ public class SoilEffects
         int col = GetCol(idx);
 
         fertilizerColumns.Add(col, wave);
-        grid.NotifyGridStateChanged(); // 밭 정보 UI 갱신
+        board.NotifyChanged(); // 밭 정보 UI 갱신
 
         Transform soilColT = grid.transform.GetChild(col);
         var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
@@ -413,7 +415,7 @@ public class SoilEffects
     }
     public bool HasEmptyFetrilizerGrid()
     {
-        for (int idx = 0; idx < grid.maxCol; idx++)
+        for (int idx = 0; idx < board.MaxCol; idx++)
         {
             if (!fertilizerColumns.ContainsKey(idx))
             {
@@ -467,17 +469,17 @@ public class SoilEffects
     /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
     public void AddLandRichColumn()
     {
-        Dictionary<Plant, int> previousPrices = grid.CapturePlantSellingPrices();
-        int col = Random.Range(0, grid.maxCol);
+        Dictionary<Plant, int> previousPrices = grid.Upgrades.CapturePlantSellingPrices();
+        int col = Random.Range(0, board.MaxCol);
         if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
         columnGoldMulBonus[col] += 0.5f;
-        grid.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
+        grid.Upgrades.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
         Debug.Log($"[SpecialItem] 땅부자: {col + 1}번째 세로줄에 고속 숙성 효과 (+0.5, 누적 {columnGoldMulBonus[col]})");
     }
     public List<float> GetColumnGoldMulBonusForSave()
     {
         var list = new List<float>();
-        for (int col = 0; col < grid.maxCol; col++)
+        for (int col = 0; col < board.MaxCol; col++)
             list.Add(columnGoldMulBonus.TryGetValue(col, out float v) ? v : 0f);
         return list;
     }
@@ -487,5 +489,262 @@ public class SoilEffects
         if (list == null) return;
         for (int col = 0; col < list.Count; col++)
             if (list[col] > 0f) columnGoldMulBonus[col] = list[col];
+    }
+
+    /// <summary>특수(알록달록): 해당 칸에 적용 중인 땅/식물 효과 개수 (정보 UI 기준과 동일).</summary>
+    public int CountTileEffects(int idx)
+    {
+        int count = 0;
+        if (HasGoldSoil(idx)) count++;
+        if (TryGetFertilizerType(idx, out _)) count++;
+        if (HasPetBottle(idx)) count++;
+        if (IsAffectedByChiliPepper(idx)) count++;
+        if (IsPlantFrozen(idx)) count++;
+        if (IsAffectedBySprinkler(idx)) count++;
+        if (HasAbsorbFertilizer(idx)) count++;
+        return count;
+    }
+    /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
+    public int CountDistinctNeighborSpecies(int idx)
+    {
+        var species = new HashSet<string>();
+        int row = idx % 4;
+        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
+        foreach (int n in neighbors)
+        {
+            if (n < 0 || n >= board.MaxCol * 4) continue;
+            if (board.Plants.TryGetValue(n, out Plant p) && p != null && !string.IsNullOrEmpty(p.speciesname))
+                species.Add(p.speciesname);
+        }
+        return species.Count;
+    }
+    /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
+    public void HealNeighborsBySell(int idx)
+    {
+        if (!SpecialItemSystem.Has("circulation")) return;
+
+        int row = idx % 4;
+        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
+        foreach (int n in neighbors)
+        {
+            if (n < 0 || n >= board.MaxCol * 4) continue;
+            if (!board.Plants.TryGetValue(n, out Plant p) || p == null) continue;
+
+            var traits = p.GetGeneticTrait();
+            for (int i = 0; i < traits.Count; i++)
+            {
+                float cur = traits[i].resistance;
+                if (cur >= 0.9f) continue;
+                p.ChangeResistance((int)traits[i].traitType, Mathf.Min(0.05f, 0.9f - cur));
+            }
+        }
+    }
+    public bool IsAffectedBySprinkler(int targetIdx)
+    {
+        int range = 1 + grid.Modifiers.SprinklerRangeBonus;
+
+        foreach (var kvp in board.Plants)
+        {
+            if (kvp.Value is Sprinkler)
+            {
+                if (kvp.Key == targetIdx)
+                    return false; // 본인 자체에는 효과 X
+
+                int sIdx = kvp.Key;
+
+                int sRow = sIdx % 4;
+                int tRow = targetIdx % 4;
+                int sCol = sIdx / 4;
+                int tCol = targetIdx / 4;
+                // 같은 열이므로 Col은 같음. Row 차이 확인
+                if (sCol == tCol && Mathf.Abs(sRow - tRow) <= range) return true;
+
+                // 같은 행이므로 Row는 같음. Col 차이 확인
+                if (sRow == tRow && Mathf.Abs(sCol - tCol) <= range) return true;
+            }
+        }
+        return false;
+    }
+    public bool IsAffectedByChiliPepper(int gridIndex)
+    {
+        Plant chiliPepper;
+        int maxIndex = board.MaxCol * 4;
+
+        // 0단계: 좌우
+        if ((gridIndex - 4) >= 0) // 왼쪽
+        {
+            if (board.Plants.TryGetValue(gridIndex - 4, out chiliPepper))
+            {
+                if (chiliPepper is ChiliPepper) return true;
+            }
+        }
+
+        if ((gridIndex + 4) < maxIndex) // 오른쪽
+        {
+            if (board.Plants.TryGetValue(gridIndex + 4, out chiliPepper))
+            {
+                if (chiliPepper is ChiliPepper) return true;
+            }
+        }
+
+        // 1단계: 상하
+        if (grid.Modifiers.ChiliPepperRangeLevel >= 1)
+        {
+            if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
+            {
+                if (board.Plants.TryGetValue(gridIndex - 1, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래
+            {
+                if (board.Plants.TryGetValue(gridIndex + 1, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+        }
+
+        // 2단계: 대각선
+        if (grid.Modifiers.ChiliPepperRangeLevel >= 2)
+        {
+            // 왼쪽 위
+            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
+            {
+                if (board.Plants.TryGetValue(gridIndex - 5, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            // 오른쪽 위
+            // Plant.cs의 로직 참고: index - 3
+            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex - 1) % 4)
+            {
+                // **주의**: Plant.cs에서도 gridIndex - 3을 체크하고 있음. (오타일 가능성 있으나 기존 로직 유지)
+                // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
+                // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
+                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함.
+                if (board.Plants.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+            // Plant.cs 원본 로직을 그대로 따르려면 -3이어야 하지만, InfoAppGridSlot에서 +3으로 구현했었음.
+            // 여기서는 논리적으로 맞는 +3 (오른쪽 위)을 사용. 
+            // 만약 Plant.cs가 -3을 의도한거라면 (왼쪽 아래?) ... 아니, 대각선은 4방향이어야 함.
+            // 왼쪽 위(-5), 오른쪽 위(+3), 왼쪽 아래(-3), 오른쪽 아래(+5) 가 맞음.
+
+            // 왼쪽 아래
+            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
+            {
+                if (board.Plants.TryGetValue(gridIndex - 3, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+
+            // 오른쪽 아래
+            if ((gridIndex + 5) < maxIndex && (gridIndex + 5) % 4 == (gridIndex + 1) % 4)
+            {
+                if (board.Plants.TryGetValue(gridIndex + 5, out chiliPepper))
+                {
+                    if (chiliPepper is ChiliPepper) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    /// <summary>
+    /// 고추 주변의 식물들을 반환합니다 (고추 제외)
+    /// </summary>
+    public List<Plant> GetPlantsNearChiliPepper(ChiliPepper chiliPepper)
+    {
+        List<Plant> nearbyPlants = new List<Plant>();
+        if (chiliPepper == null) return nearbyPlants;
+
+        int chiliIndex = chiliPepper.gridIndex;
+        int rangeLevel = grid.Modifiers.ChiliPepperRangeLevel;
+
+        // 0단계: 가로 2칸 (좌우)
+        CheckAndAddPlant(chiliIndex - 1, nearbyPlants);
+        CheckAndAddPlant(chiliIndex + 1, nearbyPlants);
+
+        // 1단계 이상: 십자 4칸 (상하 추가)
+        if (rangeLevel >= 1)
+        {
+            CheckAndAddPlant(chiliIndex - 4, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 4, nearbyPlants);
+        }
+
+        // 2단계: 대각선까지 8칸 (대각선 4칸 추가)
+        if (rangeLevel >= 2)
+        {
+            CheckAndAddPlant(chiliIndex - 5, nearbyPlants);
+            CheckAndAddPlant(chiliIndex - 3, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 3, nearbyPlants);
+            CheckAndAddPlant(chiliIndex + 5, nearbyPlants);
+        }
+
+        return nearbyPlants;
+    }
+    private void CheckAndAddPlant(int idx, List<Plant> list)
+    {
+        if (idx >= 0 && idx < board.MaxCol * 4 && board.Plants.TryGetValue(idx, out Plant plant))
+        {
+            if (plant != null && !(plant is ChiliPepper))
+            {
+                list.Add(plant);
+            }
+        }
+    }
+    public void ApplyRapidFreezer(int centerIdx)
+    {
+        int centerCol = centerIdx / 4;
+        int centerRow = centerIdx % 4;
+
+        // 3x3 범위 순회
+        for (int c = centerCol - 1; c <= centerCol + 1; c++)
+        {
+            for (int r = centerRow - 1; r <= centerRow + 1; r++)
+            {
+                if (c >= 0 && c < board.MaxCol && r >= 0 && r < 4)
+                {
+                    int targetIdx = c * 4 + r;
+                    if (board.Plants.ContainsKey(targetIdx))
+                    {
+                        board.Plants[targetIdx].SetFrozen(true);
+
+                        grid.Breeder.DeselectPlant(board.Plants[targetIdx]);
+                    }
+
+                    // 시각적 피드백 (얼음 이펙트 등) 추가 가능
+                    // 현재는 Plant.SetFrozen 내부에서 색상 변경 처리
+                }
+            }
+        }
+        Debug.Log($"[RapidFreezer] Applied to 3x3 around index {centerIdx}");
+    }
+    public void UnfreezeAllPlants()
+    {
+        foreach (var plant in board.Plants.Values)
+        {
+            if (plant.IsFrozen())
+            {
+                plant.SetFrozen(false);
+            }
+        }
+        Debug.Log("[RapidFreezer] All plants unfrozen.");
+    }
+    public bool IsPlantFrozen(int gridIndex)
+    {
+        if (board.Plants.TryGetValue(gridIndex, out Plant plant))
+        {
+            return plant.IsFrozen();
+        }
+        return false;
     }
 }

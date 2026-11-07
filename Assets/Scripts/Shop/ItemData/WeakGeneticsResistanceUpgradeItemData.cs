@@ -34,7 +34,7 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddWeakGeneticsResistanceBonus(resistanceBonus);
+        ctx.Grid.Upgrades.AddWeakGeneticsResistanceBonus(resistanceBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

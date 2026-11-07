@@ -192,11 +192,11 @@ public class Bug : MonoBehaviour
     {
         Plant plant = null;
         int newTarget = targetObjIdx + 1;
-        for(int i = 0; i < grid.maxCol * 4; i++)
+        for(int i = 0; i < grid.Board.MaxCol * 4; i++)
         {
-            if (newTarget >= grid.maxCol * 4)
+            if (newTarget >= grid.Board.MaxCol * 4)
                 newTarget = 0;
-            if (grid.plantGrid.TryGetValue(newTarget, out plant))
+            if (grid.Board.Plants.TryGetValue(newTarget, out plant))
             {
                 if (plant.GetType() != typeof(Nepenthes))
                 {
@@ -272,7 +272,7 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
-            grid.AddAdditionalPestResistance(0.002f);
+            grid.Upgrades.AddAdditionalPestResistance(0.002f);
             isDie = true;
             GameEvents.RaiseBugKilled();
             CodexProgress.AddBugKill(GetType().Name); // 도감: 벌레 발견 + 종류별/전체 잡은 수

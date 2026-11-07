@@ -38,6 +38,6 @@ public class PeaMaturationUpgradeItemData : ItemData
             return;
 
         // 완두콩 웨이브 저항 횟수당 골드 배수 0.1 증가
-        ctx.Grid.AddAdditionalPlantGoldMultiplier(multiplierBonus);
+        ctx.Grid.Upgrades.AddAdditionalPlantGoldMultiplier(multiplierBonus);
     }
 }

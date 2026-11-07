@@ -58,7 +58,7 @@ public class NepenthesPheromoneItemData : ItemData
             return;
 
         // 네펜데스 페로몬 활성화
-        ctx.Grid.SetNepenthesPheromoneEnabled(true);
+        ctx.Grid.Upgrades.SetNepenthesPheromoneEnabled(true);
         // 네펜데스 등장 확률 5% 증가
         ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }

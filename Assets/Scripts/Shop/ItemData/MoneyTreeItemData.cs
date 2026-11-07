@@ -41,7 +41,7 @@ public class MoneyTreeItemData : ItemData
             return false;
 
         // 빈 칸인지 확인
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
         {
             reason = Loc.T("shop.error.occupied");
             return false;
@@ -62,7 +62,7 @@ public class MoneyTreeItemData : ItemData
             return;
 
         // 실제 배치
-        ctx.Grid.AddMoneyTree(pendingIndex.Value);
+        ctx.Grid.Spawner.AddMoneyTree(pendingIndex.Value);
 
         pendingIndex = null;
     }

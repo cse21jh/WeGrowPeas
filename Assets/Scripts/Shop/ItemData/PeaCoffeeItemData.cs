@@ -39,6 +39,6 @@ public class PeaCoffeeItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.AddPeaCoffeeMultiplier(multiplierPerPurchase);
+        ctx.Grid.Upgrades.AddPeaCoffeeMultiplier(multiplierPerPurchase);
     }
 }

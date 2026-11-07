@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -113,10 +114,10 @@ public class GameDebugPanel : MonoBehaviour
                 gm.DebugSetStage(gm.EndStage);
 
             if (GUILayout.Button($"{gm.currentPlant} 1개 생성 (무작위 형질)"))
-                gm.grid?.DebugSpawnRandomPlant();
+                DebugSpawnRandomPlant();
 
             if (GUILayout.Button("벌레 1마리 소환"))
-                gm.grid?.DebugSpawnBug();
+                DebugSpawnBug();
 
             // 다음 웨이브 지정
             var ec = gm.enemyController;
@@ -170,6 +171,39 @@ public class GameDebugPanel : MonoBehaviour
 
         GUILayout.EndScrollView();
         GUILayout.EndArea();
+    }
+
+    /// <summary>디버그 전용: 벌레(또는 확률에 따라 무당벌레) 1마리를 즉시 소환한다. 등장 스테이지 제한 무시.</summary>
+    private static void DebugSpawnBug()
+    {
+        GameManager.Instance.grid.Bugs.Spawn(ignoreStageGate: true);
+    }
+    /// <summary>디버그 전용: 현재 재배 중인 식물을 무작위 형질로 1개 추가한다.</summary>
+    private static Plant DebugSpawnRandomPlant()
+    {
+        if (!GameManager.Instance.grid.Board.HasEmptyCell())
+        {
+            Debug.LogWarning("[Debug] 빈 칸이 없어 식물을 추가할 수 없습니다.");
+            return null;
+        }
+
+        // 대응 형질(가뭄·더위)은 SetTrait에서 자동으로 채워주므로 여기서는 제외한다.
+        TraitType[] pickable =
+        {
+            TraitType.NaturalDeath, TraitType.Pest, TraitType.Wind,
+            TraitType.Flood, TraitType.HeavyRain, TraitType.Cold
+        };
+        TraitType trait = pickable[Random.Range(0, pickable.Length)];
+        int genetics = Random.Range(0, 3);
+
+        var traits = new List<GeneticTrait>
+        {
+            new GeneticTrait(trait, Plant.GetResistanceBasedOnGenetics(trait, genetics), genetics, 0f)
+        };
+
+        Plant plant = GameManager.Instance.grid.Spawner.AddMovablePlant(traits);
+        Debug.Log($"[Debug] {GameManager.Instance.currentPlant} 추가: {trait} (유전자 {genetics})");
+        return plant;
     }
 
     private void DrawProfileSection()

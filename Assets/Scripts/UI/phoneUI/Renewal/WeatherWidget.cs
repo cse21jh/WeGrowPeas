@@ -181,8 +181,8 @@ public class WeatherWidget : MonoBehaviour
         if (grid == null) return;
 
         int atRisk = 0;
-        if (next != null && next.WaveType != WaveType.None) atRisk += grid.CountNoTraitPlant(next.WaveType);
-        if (second != null && second.WaveType != WaveType.None) atRisk += grid.CountNoTraitPlant(second.WaveType);
+        if (next != null && next.WaveType != WaveType.None) atRisk += grid.Board.CountNoTraitPlant(next.WaveType);
+        if (second != null && second.WaveType != WaveType.None) atRisk += grid.Board.CountNoTraitPlant(second.WaveType);
 
         hasRisk = atRisk > 0;
 

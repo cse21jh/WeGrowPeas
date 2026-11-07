@@ -168,15 +168,15 @@ public class EnemyController : MonoBehaviour
 
         stageWaveRecord.Add(currentWave.WaveType);
         stageKillRecord.Add(0);
-        stageNoTraitRecord.Add(grid.CountNoTraitPlant(currentWave.WaveType));
+        stageNoTraitRecord.Add(grid.Board.CountNoTraitPlant(currentWave.WaveType));
 
         if (currentWave != noneWave)
         {
-            for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+            for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
             {
-                if (grid.plantGrid.ContainsKey(idx))
+                if (grid.Board.Plants.ContainsKey(idx))
                 {
-                    Plant plant = grid.plantGrid[idx];
+                    Plant plant = grid.Board.Plants[idx];
 
                     if (plant.CanResist(wave.WaveType))
                     {
@@ -208,11 +208,11 @@ public class EnemyController : MonoBehaviour
             Wave second = nextSecondWave ?? PickSecondWave(currentWave.WaveType);
             if (second != null && second != noneWave)
             {
-                for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+                for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
                 {
-                    if (grid.plantGrid.ContainsKey(idx))
+                    if (grid.Board.Plants.ContainsKey(idx))
                     {
-                        Plant plant = grid.plantGrid[idx];
+                        Plant plant = grid.Board.Plants[idx];
                         if (!plant.CanResist(second.WaveType))
                         {
                             GameEvents.RaisePeaDied();
@@ -227,7 +227,7 @@ public class EnemyController : MonoBehaviour
         CurseManager.Instance?.ResolveMushroomWave();
 
         // 웨이브 처리 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
-        grid.UnfreezeAllPlants();
+        grid.Soil.UnfreezeAllPlants();
 
 
         SetNextSeason();
@@ -614,11 +614,11 @@ public class EnemyController : MonoBehaviour
 
         if (currentWave != noneWave)
         {
-            for (int idx = 0; idx < grid.GetMaxCol() * 4; idx++)
+            for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
             {
-                if (grid.plantGrid.ContainsKey(idx))
+                if (grid.Board.Plants.ContainsKey(idx))
                 {
-                    Plant plant = grid.plantGrid[idx];
+                    Plant plant = grid.Board.Plants[idx];
 
                     if (idx == 0 || idx == 2) plant.Die();
                     else plant.ResistWave(wave.WaveType);

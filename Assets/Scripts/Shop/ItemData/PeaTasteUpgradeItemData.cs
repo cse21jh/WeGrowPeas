@@ -35,6 +35,6 @@ public class PeaTasteUpgradeItemData : ItemData
             return;
 
         // 완두콩 기본 가격 40골드 증가
-        ctx.Grid.AddAdditionalPlantGold(goldBonus);
+        ctx.Grid.Upgrades.AddAdditionalPlantGold(goldBonus);
     }
 }

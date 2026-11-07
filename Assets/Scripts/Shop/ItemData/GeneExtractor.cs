@@ -34,11 +34,11 @@ public class GeneExtractorItemData : ItemData
         var g = ctx.Grid;
         if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
 
-        int maxSlots = g.maxCol * 4;
-        int empty = maxSlots - g.plantGrid.Count;
+        int maxSlots = g.Board.MaxCol * 4;
+        int empty = maxSlots - g.Board.Plants.Count;
         if (empty <= 0) { reason = Loc.T("shop.error.no_empty_cell"); return false; }
 
-        if (g.plantGrid.Count <= 0) { reason = Loc.T("shop.error.no_selectable_plant"); return false; }
+        if (g.Board.Plants.Count <= 0) { reason = Loc.T("shop.error.no_selectable_plant"); return false; }
 
         return true;
     }
@@ -77,14 +77,14 @@ public class GeneExtractorItemData : ItemData
 
         List<GeneticTrait> genes = selected.GetGeneticTrait();
 
-        int maxSlots = g.maxCol * 4;
-        int empty = maxSlots - g.plantGrid.Count;
+        int maxSlots = g.Board.MaxCol * 4;
+        int empty = maxSlots - g.Board.Plants.Count;
         int toSpawn = Mathf.Clamp(3, 0, empty);
 
         int spawned = 0;
         for (int i = 0; i < toSpawn; i++)
         {
-            g.AddMovablePlant(genes);
+            g.Spawner.AddMovablePlant(genes);
             spawned++;
         }
 

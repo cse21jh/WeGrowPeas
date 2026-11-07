@@ -107,9 +107,9 @@ public class BreedingController : MonoBehaviour
             int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
 
             bool canBreed = false;
-            for (int idx = 0; idx < grid.maxCol * 4; idx++) // 빈 칸이 있는가
+            for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++) // 빈 칸이 있는가
             {
-                if (!grid.plantGrid.ContainsKey(idx))
+                if (!grid.Board.Plants.ContainsKey(idx))
                 {
                     canBreed = true;
                     break;
@@ -145,7 +145,7 @@ public class BreedingController : MonoBehaviour
 
                 // 저주: 광란 — 확률적으로 랜덤 교배
                 bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
-                Plant plant = grid.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
+                Plant plant = grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
                 PlayMutationEffectIfAny(plant); // 변종(돌연변이) 이펙트
                 if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting)
                 {
@@ -153,11 +153,11 @@ public class BreedingController : MonoBehaviour
                 }
 
                 // 쌍둥이: 확률적으로 교배를 한 번 더 실행해 유전자가 다른 이란성 쌍둥이를 생성
-                if (grid.Modifiers.TwinBreedProbability > 0f && Random.Range(0f, 1f) < grid.Modifiers.TwinBreedProbability && grid.HasEmptyGrid())
+                if (grid.Modifiers.TwinBreedProbability > 0f && Random.Range(0f, 1f) < grid.Modifiers.TwinBreedProbability && grid.Board.HasEmptyCell())
                 {
                     // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
                     PlayMutationEffectIfAny(
-                        grid.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
+                        grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
                     UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.twins"), 1);
                     totalBreedCount++;
                     if (GameManager.Instance.currentPlant == PlantIds.Pea)
@@ -249,7 +249,7 @@ public class BreedingController : MonoBehaviour
 
         // 특수(세계여행): 낮 시작 시 각 식물의 위치 마킹 (웨이브 후 이동 거리 계산용)
         if (SpecialItemSystem.Has("world_travel"))
-            foreach (var p in grid.plantGrid.Values)
+            foreach (var p in grid.Board.Plants.Values)
                 if (p != null) p.MarkDayStartPosition();
 
         breedSkipButton.SetActive(true);
@@ -329,7 +329,7 @@ public class BreedingController : MonoBehaviour
         // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
         if (grid.Modifiers.PeaCoffeeMultiplier > 0f)
         {
-            foreach (var p in grid.plantGrid.Values)
+            foreach (var p in grid.Board.Plants.Values)
                 if (p != null) p.OnFreeTimePassed();
         }
         //GardenGrid 리로드

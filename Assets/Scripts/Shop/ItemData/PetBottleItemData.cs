@@ -138,7 +138,7 @@ public class PetBottleItemData : ItemData
             int idx = pendingIndex.Value;
             
             // 유효한 인덱스 범위 체크
-            int maxIdx = ctx.Grid.maxCol * 4;
+            int maxIdx = ctx.Grid.Board.MaxCol * 4;
             if (idx < 0 || idx >= maxIdx)
             {
                 Debug.LogError($"[PetBottle] Commit: Invalid idx={idx}, maxIdx={maxIdx}");

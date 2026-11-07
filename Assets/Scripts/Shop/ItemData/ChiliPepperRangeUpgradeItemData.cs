@@ -46,7 +46,7 @@ public class ChiliPepperRangeUpgradeItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddChiliPepperRangeLevel(rangeLevelIncrease);
+        ctx.Grid.Upgrades.AddChiliPepperRangeLevel(rangeLevelIncrease);
         ctx.Grid.Modifiers.AddChiliPepperSpawnProbability(probabilityIncrease);
     }
 }

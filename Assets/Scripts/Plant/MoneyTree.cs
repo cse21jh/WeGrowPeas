@@ -15,8 +15,8 @@ public class MoneyTree : Plant
         // 이벤트 구독 (중복 방지)
         if (this.grid != null)
         {
-            this.grid.OnGridStateChanged -= OnGridStateChanged;
-            this.grid.OnGridStateChanged += OnGridStateChanged;
+            this.grid.Board.Changed -= OnGridStateChanged;
+            this.grid.Board.Changed += OnGridStateChanged;
         }
 
         // 다음 프레임에 인접 식물 체크 (초기화 완료 후 체크)
@@ -27,7 +27,7 @@ public class MoneyTree : Plant
     {
         if (grid != null)
         {
-            grid.OnGridStateChanged -= OnGridStateChanged;
+            grid.Board.Changed -= OnGridStateChanged;
         }
     }
 
@@ -118,7 +118,7 @@ public class MoneyTree : Plant
         if (grid == null)
             return false;
 
-        int maxIndex = grid.GetMaxCol() * 4;
+        int maxIndex = grid.Board.MaxCol * 4;
         // offset: -4(왼쪽), +4(오른쪽), -1(위), +1(아래)
         int[] adjacentOffsets = { -4, 4, -1, 1 };
 
@@ -148,7 +148,7 @@ public class MoneyTree : Plant
             }
 
             // 인접 칸에 식물이 있는지 확인
-            if (grid.plantGrid.TryGetValue(adjacentIndex, out Plant adjacentPlant))
+            if (grid.Board.Plants.TryGetValue(adjacentIndex, out Plant adjacentPlant))
             {
                 // 완두콩류 식물인지 확인
                 if (adjacentPlant is Pea || adjacentPlant is Peanut)

@@ -34,7 +34,7 @@ public class StrongGeneticsResistanceUpgradeItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.AddStrongGeneticsResistanceBonus(resistanceBonus);
+        ctx.Grid.Upgrades.AddStrongGeneticsResistanceBonus(resistanceBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

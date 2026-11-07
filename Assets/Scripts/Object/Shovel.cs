@@ -34,7 +34,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
             {
                 grid.isDraggingShovel = true;
                 isDragging = true;
-                grid.ShowAllPriceSign();
+                grid.Upgrades.ShowAllPriceSign();
                 UpdatePosition();
             }
             else
@@ -65,7 +65,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
         {
             grid.isDraggingShovel = true;
             isDragging = true;
-            grid.ShowAllPriceSign();
+            grid.Upgrades.ShowAllPriceSign();
             UpdatePosition();
         }
     }
@@ -75,7 +75,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     {
         if (!IsEnabled)
         {
-            grid.HideAllPriceSign();
+            grid.Upgrades.HideAllPriceSign();
             return;
         }
         if (isDragging)
@@ -135,8 +135,8 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 {
                     economyManager.AddSellCount(plant.speciesname);
                     economyManager.AddGold(sellingPrice);
-                    grid.TryUpdateMostExpensivePlant(sellingPrice);
-                    grid.HealNeighborsBySell(plant.gridIndex); // 특수(순환): 주변 저항 회복
+                    grid.Upgrades.TryUpdateMostExpensivePlant(sellingPrice);
+                    grid.Soil.HealNeighborsBySell(plant.gridIndex); // 특수(순환): 주변 저항 회복
 
                     // Die() 내부의 사망 보너스까지 포함해 실제 잔액 변화량과 연출 금액을 일치시킨다.
                     int totalEarned = economyManager.GetGold() - goldBeforeSale;
@@ -176,7 +176,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 if (grid.Soil.HasGoldSoil(idx))
                 {
                     // 식물이 있는 경우 제거 불가
-                    if (!grid.plantGrid.ContainsKey(idx))
+                    if (!grid.Board.Plants.ContainsKey(idx))
                     {
                         SoundManager.Instance.PlayEffect(SoundIds.Shovel);
                         grid.Soil.RemoveGoldSoil(idx);
@@ -193,7 +193,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     private void ResetShovel()
     {
         isDragging = false;
-        grid.HideAllPriceSign();
+        grid.Upgrades.HideAllPriceSign();
         grid.isDraggingShovel = false;
         shovelRectTransform.localPosition = initialPos;
     }

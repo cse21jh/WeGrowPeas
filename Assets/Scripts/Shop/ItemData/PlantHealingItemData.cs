@@ -68,7 +68,7 @@ public class PlantHealingItemData : ItemData
         int healedCount = 0;
 
         // 모든 식물을 순회하며 해당 웨이브에 대한 저항력 회복
-        foreach (var plant in ctx.Grid.plantGrid.Values)
+        foreach (var plant in ctx.Grid.Board.Plants.Values)
         {
             var traits = plant.GetGeneticTrait();
             bool hasTraitForWave = traits.Any(t => t.traitType == (TraitType)targetWave);

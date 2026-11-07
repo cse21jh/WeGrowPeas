@@ -7,7 +7,7 @@ public class Ladybug : Bug
     protected override void Start()
     {
         base.Start();
-        grid.ladybugs.Add(this);
+        grid.Board.Ladybugs.Add(this);
     }
 
     protected override IEnumerator Moving()
@@ -100,7 +100,7 @@ public class Ladybug : Bug
 
     public override IEnumerator KillBug()
     {
-        grid.ladybugs.Remove(this);
+        grid.Board.Ladybugs.Remove(this);
         yield return StartCoroutine(base.KillBug());
     }
 }

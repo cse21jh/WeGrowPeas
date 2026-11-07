@@ -61,7 +61,7 @@ public class RapidFreezerItemData : ItemData
         if (pendingIndex == null) return;
 
         // 실제 효과 적용
-        ctx.Grid.ApplyRapidFreezer(pendingIndex.Value);
+        ctx.Grid.Soil.ApplyRapidFreezer(pendingIndex.Value);
         Debug.Log($"[RapidFreezer] Committed on index {pendingIndex.Value}");
 
         pendingIndex = null;

@@ -36,6 +36,6 @@ public class LandAndBeanItemData : ItemData
             return;
 
         // 웨이브 후 뿌리 확률 +10%p + 뿌리내린 식물의 가격 +10%p
-        ctx.Grid.AddLandAndBeanLevel(1);
+        ctx.Grid.Upgrades.AddLandAndBeanLevel(1);
     }
 }

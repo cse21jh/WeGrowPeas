@@ -101,7 +101,7 @@ public class Pea : MovablePlant
     {
         //UIPlantStat.Instance.HideInfo();
         FenceUIManager.Instance.HideFenceElements();
-        if (!grid.showingAllPrice)
+        if (!grid.Upgrades.showingAllPrice)
             priceSign.gameObject.SetActive(false);
     }
 
@@ -121,7 +121,7 @@ public class Pea : MovablePlant
 
         // 특수(임시완두B): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50골드
         if (SpecialItemSystem.Has("pea_special_8"))
-            basePrice += 50 * grid.CountDistinctNeighborSpecies(gridIndex);
+            basePrice += 50 * grid.Soil.CountDistinctNeighborSpecies(gridIndex);
 
         int price = CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
 

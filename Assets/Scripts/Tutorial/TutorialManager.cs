@@ -301,10 +301,10 @@ public class TutorialManager : Singleton<TutorialManager>
 
     private void FenceToggleOn(int index)
     {
-        if (grid.plantGrid.ContainsKey(index))
-            FenceUIManager.Instance.ToggleOn(0, grid.plantGrid[index]);
+        if (grid.Board.Plants.ContainsKey(index))
+            FenceUIManager.Instance.ToggleOn(0, grid.Board.Plants[index]);
         else
-            FenceUIManager.Instance.ToggleOn(0, grid.plantGrid.First().Value);
+            FenceUIManager.Instance.ToggleOn(0, grid.Board.Plants.First().Value);
 
     }
 }

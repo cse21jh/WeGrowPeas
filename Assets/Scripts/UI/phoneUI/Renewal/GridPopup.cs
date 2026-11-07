@@ -98,12 +98,12 @@ public class GridPopup : MonoBehaviour
         Unsubscribe();
 
         subscribedGrid = grid;
-        if (subscribedGrid != null) subscribedGrid.OnGridStateChanged += Refresh;
+        if (subscribedGrid != null) subscribedGrid.Board.Changed += Refresh;
     }
 
     private void Unsubscribe()
     {
-        if (subscribedGrid != null) subscribedGrid.OnGridStateChanged -= Refresh;
+        if (subscribedGrid != null) subscribedGrid.Board.Changed -= Refresh;
         subscribedGrid = null;
     }
 
@@ -137,7 +137,7 @@ public class GridPopup : MonoBehaviour
             return;
         }
 
-        int maxCol = grid.GetMaxCol();
+        int maxCol = grid.Board.MaxCol;
 
         for (int col = 0; col < maxCol; col++)
         {
@@ -236,7 +236,7 @@ public class GridPopup : MonoBehaviour
         Clear(detailContent);
 
         Grid grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
-        bool hasSelection = grid != null && index >= 0 && index < grid.GetMaxCol() * FarmRows;
+        bool hasSelection = grid != null && index >= 0 && index < grid.Board.MaxCol * FarmRows;
 
         if (detailEmptyText != null) detailEmptyText.SetActive(!hasSelection);
         if (!hasSelection || detailContent == null || detailRowPrefab == null) return;
@@ -279,9 +279,9 @@ public class GridPopup : MonoBehaviour
         if (grid.Soil.HasGoldSoil(index)) list.Add(TileEffect.GoldSoil);
         if (grid.Soil.TryGetFertilizerType(index, out _)) list.Add(TileEffect.Fertilizer);
         if (grid.Soil.HasPetBottle(index)) list.Add(TileEffect.PetBottle);
-        if (grid.IsAffectedByChiliPepper(index)) list.Add(TileEffect.ChiliPepper);
-        if (grid.IsPlantFrozen(index)) list.Add(TileEffect.Freezer);
-        if (grid.IsAffectedBySprinkler(index)) list.Add(TileEffect.Sprinkler);
+        if (grid.Soil.IsAffectedByChiliPepper(index)) list.Add(TileEffect.ChiliPepper);
+        if (grid.Soil.IsPlantFrozen(index)) list.Add(TileEffect.Freezer);
+        if (grid.Soil.IsAffectedBySprinkler(index)) list.Add(TileEffect.Sprinkler);
         if (grid.Soil.HasAbsorbFertilizer(index)) list.Add(TileEffect.AbsorbFertilizer);
 
         var curse = CurseManager.Instance;

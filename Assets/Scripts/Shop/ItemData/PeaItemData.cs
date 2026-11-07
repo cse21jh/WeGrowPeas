@@ -85,7 +85,7 @@ public class PeaItemData : ItemData
         }
 
         // grididx를 지정하지 않으면 Grid.AddPea가 자동으로 가장 빠른 빈 칸에 설치
-        ctx.Grid.AddMovablePlant(pendingTraits);
+        ctx.Grid.Spawner.AddMovablePlant(pendingTraits);
 
         // 초기화
         pendingTraits = null;

@@ -110,7 +110,7 @@ public class HighQualityPlantItemData : ItemData
         };
 
         // 완두콩 추가 (자동으로 가장 빠른 빈 칸에 설치)
-        ctx.Grid.AddMovablePlant(traits);
+        ctx.Grid.Spawner.AddMovablePlant(traits);
 
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.high_quality", ("name", LocalizedName), ("wave", WavePalette.GetName(targetWave))));
         pendingWave = null;

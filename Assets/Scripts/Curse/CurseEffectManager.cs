@@ -155,7 +155,7 @@ public class CurseEffectManager : Singleton<CurseEffectManager>
         var grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
         if (grid == null) return;
 
-        foreach (var plant in grid.plantGrid.Values)
+        foreach (var plant in grid.Board.Plants.Values)
         {
             if (plant == null) continue;
             var pcm = plant.GetComponent<PlantCurseManager>();

@@ -479,9 +479,9 @@ public class PlacementController : MonoBehaviour
                 try
                 {
                     int? idx = grid.GetGridIndexFromPosition(Input.mousePosition);
-                    if (idx.HasValue && grid.plantGrid != null)
+                    if (idx.HasValue && grid.Board.Plants != null)
                     {
-                        if (grid.plantGrid.TryGetValue(idx.Value, out var p) && p != null)
+                        if (grid.Board.Plants.TryGetValue(idx.Value, out var p) && p != null)
                             return p;
                     }
                 }

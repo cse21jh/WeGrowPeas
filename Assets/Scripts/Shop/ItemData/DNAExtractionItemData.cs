@@ -50,7 +50,7 @@ public class DNAExtractionItemData : ItemData
             Debug.LogError("[DNAExtraction] Grid not found.");
             return;
         }
-        Plant plant = g.plantGrid[selectedIdx.Value];
+        Plant plant = g.Board.Plants[selectedIdx.Value];
 
         List<GeneticTrait> trait;
         for (int i = 0; i < copyCount; i++)
@@ -64,7 +64,7 @@ public class DNAExtractionItemData : ItemData
                 else
                     trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
             }
-            g.AddMovablePlant(trait);
+            g.Spawner.AddMovablePlant(trait);
         }
 
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.dna", ("name", LocalizedName)));
@@ -84,7 +84,7 @@ public class DNAExtractionItemData : ItemData
         int? idx = g.GetGridIndexFromPosition(worldPos);
         if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
 
-        if (!g.HasBreedablePlantAt(idx.Value)) { reason = Loc.T("shop.error.no_breedable"); return false; }
+        if (!g.Board.HasBreedablePlantAt(idx.Value)) { reason = Loc.T("shop.error.no_breedable"); return false; }
 
         return true;
     }

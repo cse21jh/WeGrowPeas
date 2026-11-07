@@ -47,7 +47,7 @@ public class GoldSoilItemData : ItemData
         }
 
         // 식물이 있는 칸인지 확인
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
         {
             reason = Loc.T("shop.error.gold_soil_occupied");
             return false;

@@ -52,7 +52,7 @@ public class NepenthesItemData : ItemData
             return false;
 
         // 빈 칸인지 확인
-        if (ctx.Grid.plantGrid.ContainsKey(idx.Value))
+        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
         {
             reason = Loc.T("shop.error.occupied");
             return false;
@@ -73,7 +73,7 @@ public class NepenthesItemData : ItemData
             return;
 
         // 실제 배치
-        ctx.Grid.AddNepenthes(pendingIndex.Value);
+        ctx.Grid.Spawner.AddNepenthes(pendingIndex.Value);
 
         pendingIndex = null;
     }

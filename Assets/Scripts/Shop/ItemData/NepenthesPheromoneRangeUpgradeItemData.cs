@@ -56,7 +56,7 @@ public class NepenthesPheromoneRangeUpgradeItemData : ItemData
             return;
 
         // 네펜데스 페로몬 범위 20% 증가 (중첩 시 합적용)
-        ctx.Grid.AddAdditionalNepenthesPheromoneSizeMultiplier(rangeMultiplierIncrease);
+        ctx.Grid.Upgrades.AddAdditionalNepenthesPheromoneSizeMultiplier(rangeMultiplierIncrease);
         // 네펜데스 등장 확률 2% 증가
         ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }

@@ -6,7 +6,7 @@ using System.Linq;
 
 public class TutorialGrid : Grid
 {
-    //public Dictionary<int, Plant> plantGrid = new Dictionary<int, Plant>();
+    //public Dictionary<int, Plant> Board.Plants = new Dictionary<int, Plant>();
 
     [SerializeField] private GameObject tutorialBug;
 
@@ -77,7 +77,7 @@ public class TutorialGrid : Grid
     }
     public void MakeMovable()
     {
-        Pea movablePea = plantGrid[0].GetComponent<Pea>();        
+        Pea movablePea = Board.Plants[0].GetComponent<Pea>();        
 
         bool targetValue = !movablePea.IsMovable;
 
@@ -86,7 +86,7 @@ public class TutorialGrid : Grid
 
     public void MakeAllUnmovable()
     {
-        foreach(var peas in plantGrid)
+        foreach(var peas in Board.Plants)
         {
             if(peas.Value is Pea p)
             {

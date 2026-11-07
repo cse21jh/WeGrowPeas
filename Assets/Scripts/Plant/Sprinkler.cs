@@ -27,7 +27,7 @@ public class Sprinkler : Plant
 
         // 인접 4칸 식물 찾기 (상하좌우 + 범위 업그레이드 반영)
         List<Plant> neighbors = new List<Plant>();
-        int maxIndex = grid.GetMaxCol() * 4;
+        int maxIndex = grid.Board.MaxCol * 4;
         int range = 1 + grid.Modifiers.SprinklerRangeBonus;
 
         anim.Play(AnimParams.SprinklerState);
@@ -79,7 +79,7 @@ public class Sprinkler : Plant
 
     private void CheckAndAddNeighbor(int adjIndex, List<Plant> neighbors)
     {
-        if (grid.plantGrid.TryGetValue(adjIndex, out Plant plant))
+        if (grid.Board.Plants.TryGetValue(adjIndex, out Plant plant))
         {
             // 살아있고 판매 가능한 식물만 대상 (스프링클러, 돈나무 등 제외)
             if (plant != null && !plant.isDying && plant.GetSellingPrice() > 0)

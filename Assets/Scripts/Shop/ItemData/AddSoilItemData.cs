@@ -52,7 +52,7 @@ public class AddSoilItemData : ItemData
         }
 
         // maxCol이 이미 최대치인지 확인 — 땅부자 보유 시엔 확장 없이도 구매 가능(고속 숙성 부여)
-        if (ctx.Grid.maxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
+        if (ctx.Grid.Board.MaxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
         {
             reason = Loc.T("shop.error.max_expand");
             return false;
@@ -84,7 +84,7 @@ public class AddSoilItemData : ItemData
         }
 
         // 땅 확장은 최대 크기(8열) 한도 내에서만
-        if (ctx.Grid.maxCol < MAX_COL)
+        if (ctx.Grid.Board.MaxCol < MAX_COL)
             ctx.Grid.AddSoil();
 
         // 특수(땅부자): 구매할 때마다 무작위 세로줄에 고속 숙성 효과 추가

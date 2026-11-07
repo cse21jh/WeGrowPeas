@@ -30,7 +30,7 @@ public class ReviveBug : Bug
                 eatingPlant = false;
             }
 
-            if (!grid.plantGrid.TryGetValue(targetObjIdx, out Plant plant))
+            if (!grid.Board.Plants.TryGetValue(targetObjIdx, out Plant plant))
                 FindNewTargetObj();
             else if (grid.Breeder.GetIsBreeding() && !isDie && !isHit)
             {

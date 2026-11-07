@@ -5,6 +5,6 @@ public class AdditionalPlantGoldAbility : PlantAbilityData
 {
     public override void ApplyEffect(GameManager gameManager)
     {
-        gameManager.grid.AddAdditionalPlantGold(20 * level);
+        gameManager.grid.Upgrades.AddAdditionalPlantGold(20 * level);
     }
 }

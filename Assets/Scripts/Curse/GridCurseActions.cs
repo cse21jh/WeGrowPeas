@@ -5,16 +5,18 @@ using UnityEngine;
 public class GridCurseActions
 {
     private readonly Grid grid;
+    private readonly PlantBoard board;
 
     public GridCurseActions(Grid grid)
     {
         this.grid = grid;
+        board = grid.Board;
     }
 
     /// <summary>저주(꽃가루 실종): 필드 식물 중 ratio(0~1)만큼 무작위로 교배 불가. 나머지는 복구.</summary>
     public void ApplyPollenLost(float ratio)
     {
-        var plants = new List<Plant>(grid.plantGrid.Values);
+        var plants = new List<Plant>(board.Plants.Values);
         foreach (var p in plants) if (p != null) p.SetBreedable(true);
         if (ratio <= 0f || plants.Count == 0) return;
 
@@ -31,7 +33,7 @@ public class GridCurseActions
     {
         if (count <= 0) return;
         var candidates = new List<int>();
-        foreach (var kv in grid.plantGrid)
+        foreach (var kv in board.Plants)
             if (kv.Value != null && !grid.Soil.HasPetBottle(kv.Key)) candidates.Add(kv.Key);
         ShuffleList(candidates);
 
@@ -39,16 +41,16 @@ public class GridCurseActions
         for (int i = 0; i < candidates.Count && removed < count; i++)
         {
             int idx = candidates[i];
-            if (grid.plantGrid.TryGetValue(idx, out Plant p) && p != null)
+            if (board.Plants.TryGetValue(idx, out Plant p) && p != null)
             {
-                grid.plantGrid.Remove(idx);
+                board.Plants.Remove(idx);
                 Object.Destroy(p.gameObject); // TODO: 식물 날아가는 이펙트
                 removed++;
             }
         }
         if (removed > 0)
         {
-            grid.NotifyGridStateChanged();
+            board.NotifyChanged();
             if (grid.CheckGameOver()) grid.StartCoroutine(GameManager.Instance.GameOver());
         }
     }
@@ -57,7 +59,7 @@ public class GridCurseActions
     {
         if (ratio <= 0f) return;
         var idxs = new List<int>();
-        foreach (var kv in grid.plantGrid)
+        foreach (var kv in board.Plants)
             if (kv.Value != null && kv.Value.IsMovable && !grid.Soil.HasPetBottle(kv.Key)) idxs.Add(kv.Key);
         if (idxs.Count < 1) return;
 
@@ -68,19 +70,19 @@ public class GridCurseActions
         ShuffleList(idxs);
         var selectedPlantsIdx = idxs.GetRange(0, affected);
         var plantsToMove = new List<Plant>();
-        foreach (var idx in selectedPlantsIdx) plantsToMove.Add(grid.plantGrid[idx]);
+        foreach (var idx in selectedPlantsIdx) plantsToMove.Add(board.Plants[idx]);
 
         // Remove from grid temporarily to free up space
         foreach (var idx in selectedPlantsIdx)
         {
-            grid.plantGrid.Remove(idx);
+            board.Plants.Remove(idx);
         }
 
         // Find all empty spaces including the ones we just vacated
         var emptySpaces = new List<int>();
-        for (int i = 0; i < grid.maxCol * 4; i++)
+        for (int i = 0; i < board.MaxCol * 4; i++)
         {
-            if (!grid.plantGrid.TryGetValue(i, out Plant p) || p == null)
+            if (!board.Plants.TryGetValue(i, out Plant p) || p == null)
             {
                 emptySpaces.Add(i);
             }
@@ -93,11 +95,11 @@ public class GridCurseActions
         {
             int newIdx = emptySpaces[i];
             Plant p = plantsToMove[i];
-            grid.plantGrid[newIdx] = p;
+            board.Plants[newIdx] = p;
             p.SetGridIndex(newIdx);
             p.transform.position = grid.GetSoilTransform(newIdx).position;
         }
-        grid.NotifyGridStateChanged();
+        board.NotifyChanged();
     }
     private static void ShuffleList<T>(List<T> list)
     {
@@ -109,7 +111,7 @@ public class GridCurseActions
     }
     public void RefreshCurseEffects()
     {
-        foreach (var plant in grid.plantGrid.Values)
+        foreach (var plant in board.Plants.Values)
         {
             if (plant != null)
             {
@@ -127,7 +129,7 @@ public class GridCurseActions
     }
     public void PlayAllPlantsMadness()
     {
-        foreach (var plant in grid.plantGrid.Values)
+        foreach (var plant in board.Plants.Values)
         {
             if (plant != null) plant.PlayMadnessEffect();
         }

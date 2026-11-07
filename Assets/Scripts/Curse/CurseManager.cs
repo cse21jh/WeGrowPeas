@@ -162,7 +162,7 @@ public class CurseManager : Singleton<CurseManager>
         if (grid == null) return;
 
         foreach (int idx in _mushroomTiles)
-            if (grid.plantGrid.TryGetValue(idx, out Plant p) && p != null)
+            if (grid.Board.Plants.TryGetValue(idx, out Plant p) && p != null)
                 p.Die(DeathCause.Generic); // Die가 페트병을 자동 방어
     }
 
@@ -171,7 +171,7 @@ public class CurseManager : Singleton<CurseManager>
         var grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
         if (grid == null) return;
 
-        int tiles = grid.GetMaxCol() * 4;
+        int tiles = grid.Board.MaxCol * 4;
         var idxs = new List<int>();
         for (int i = 0; i < tiles; i++) idxs.Add(i);
         for (int i = idxs.Count - 1; i > 0; i--)
