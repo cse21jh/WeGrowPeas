@@ -1308,7 +1308,7 @@ public sealed class EconomyFeedbackController : MonoBehaviour
 
         Sequence sequence = DOTween.Sequence()
             .SetUpdate(true)
-            .SetLink(gameObject)
+            .SetLink(popup.Root.gameObject)
             .Append(popup.Group.DOFade(1f, 0.12f).SetEase(Ease.OutQuad))
             .Join(popup.Root.DOScale(1f, 0.18f).SetEase(Ease.OutBack))
             .Join(popup.Root.DOAnchorPos(safeEndPosition, moveDuration).SetEase(Ease.OutCubic))
@@ -1403,7 +1403,7 @@ public sealed class EconomyFeedbackController : MonoBehaviour
         float duration = UnityEngine.Random.Range(0.34f, 0.42f);
         Sequence sequence = DOTween.Sequence()
             .SetUpdate(true)
-            .SetLink(gameObject)
+            .SetLink(plus.Root.gameObject)
             .Append(plus.Root.DOAnchorPos(endPosition, duration).SetEase(Ease.OutCubic))
             .Join(plus.Root.DOScale(0.96f, duration * 0.46f).SetEase(Ease.OutBack))
             .Join(plus.Group.DOFade(0f, duration * 0.68f).SetDelay(duration * 0.32f))

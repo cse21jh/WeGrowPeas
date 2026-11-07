@@ -19,6 +19,9 @@ public class PopupHideController : MonoBehaviour
 
     private void Awake()
     {
+        // 튜토리얼 시작 안내처럼 최소화 없이 쓰는 팝업은 나머지 참조가 비어 있다.
+        if (maximizedPanel == null || minimizedPanel == null) return;
+
         maxPanelOriginalScale = maximizedPanel.localScale;
         minPanelOriginalScale = minimizedPanel.localScale;
 
@@ -26,8 +29,8 @@ public class PopupHideController : MonoBehaviour
         minimizedPanel.gameObject.SetActive(false);
 
         // 이벤트 연결
-        minimizeButton.onClick.AddListener(MinimizePanel);
-        maximizeButton.onClick.AddListener(MaximizePanel);
+        if (minimizeButton != null) minimizeButton.onClick.AddListener(MinimizePanel);
+        if (maximizeButton != null) maximizeButton.onClick.AddListener(MaximizePanel);
     }
 
     public void MinimizePanel()

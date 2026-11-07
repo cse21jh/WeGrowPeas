@@ -72,7 +72,7 @@ public class Grid : MonoBehaviour
     public void SkipBreed() => Breeder.SkipBreed();
 
     /// <summary>식물 생성과 추가.</summary>
-    public PlantSpawner Spawner => spawner ??= new PlantSpawner(this, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
+    public PlantSpawner Spawner => spawner ??= new PlantSpawner(Board, AddPlantToGrid, RefreshResistanceScouter, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
     private PlantSpawner spawner;
 
     /// <summary>값을 올리면서 밭 위 식물과 가격 표시도 갱신하는 강화.</summary>
@@ -80,7 +80,7 @@ public class Grid : MonoBehaviour
     private GridUpgrades upgrades;
 
     /// <summary>마우스가 올라간 칸의 강조 표시.</summary>
-    public SoilHighlighter Highlighter => highlighter ??= new SoilHighlighter(this, soilHighlightMaterial);
+    public SoilHighlighter Highlighter => highlighter ??= new SoilHighlighter(GetSoilTransform, soilHighlightMaterial);
     private SoilHighlighter highlighter;
 
     /// <summary>칸과 식물 데이터. 다른 시스템은 Grid 대신 이 객체로 밭을 읽는다.</summary>
@@ -136,6 +136,8 @@ public class Grid : MonoBehaviour
 
     // 직전 Breed()의 변종 결과. 생성된 식물에 이펙트를 재생하기 위해 호출부가 참조한다.
     // (0 = 변종 없음, 1 = 악성, 2 = 양성)
+
+    private void RefreshResistanceScouter() => Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
 
     public void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
     {

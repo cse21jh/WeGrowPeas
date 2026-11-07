@@ -1,15 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>마우스가 올라간 밭 칸의 강조 표시를 맡는다.</summary>
 public class SoilHighlighter
 {
-    private readonly Grid grid;
+    private readonly Func<int, Transform> getSoilTransform;
     private readonly Material soilHighlightMaterial;
     private int hoveredSoilIndex = -1;
 
-    public SoilHighlighter(Grid grid, Material soilHighlightMaterial)
+    public SoilHighlighter(Func<int, Transform> getSoilTransform, Material soilHighlightMaterial)
     {
-        this.grid = grid;
+        this.getSoilTransform = getSoilTransform;
         this.soilHighlightMaterial = soilHighlightMaterial;
     }
 
@@ -18,7 +19,7 @@ public class SoilHighlighter
         // 1. Un-highlight previous
         if (hoveredSoilIndex != -1 && (!targetIndex.HasValue || hoveredSoilIndex != targetIndex.Value))
         {
-            Transform oldSoilT = grid.GetSoilTransform(hoveredSoilIndex);
+            Transform oldSoilT = getSoilTransform(hoveredSoilIndex);
             if (oldSoilT != null)
             {
                 Soil oldSoil = oldSoilT.GetComponent<Soil>();
@@ -33,7 +34,7 @@ public class SoilHighlighter
             int idx = targetIndex.Value;
             if (hoveredSoilIndex != idx)
             {
-                Transform newSoilT = grid.GetSoilTransform(idx);
+                Transform newSoilT = getSoilTransform(idx);
                 if (newSoilT != null)
                 {
                     Soil newSoil = newSoilT.GetComponent<Soil>();
@@ -51,7 +52,7 @@ public class SoilHighlighter
     {
         if (hoveredSoilIndex != -1)
         {
-            Transform oldSoilT = grid.GetSoilTransform(hoveredSoilIndex);
+            Transform oldSoilT = getSoilTransform(hoveredSoilIndex);
             if (oldSoilT != null)
             {
                 Soil oldSoil = oldSoilT.GetComponent<Soil>();
