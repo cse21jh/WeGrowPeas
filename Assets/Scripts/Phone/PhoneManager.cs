@@ -88,6 +88,17 @@ public class PhoneManager : Singleton<PhoneManager>
     private AppKey? _current = null;
     public AppKey? CurrentApp => _current;
     private bool _isOpen;
+    private PhonePanelMotion phoneMotion;
+
+    private PhonePanelMotion PhoneMotion
+    {
+        get
+        {
+            if (phoneMotion == null && phoneBtn != null)
+                phoneMotion = phoneBtn.GetComponentInParent<PhonePanelMotion>(true);
+            return phoneMotion;
+        }
+    }
 
 
     public MessengerApp messengerApp;
@@ -119,8 +130,13 @@ public class PhoneManager : Singleton<PhoneManager>
     private void Awake()
     {
 
-        if (phoneRoot != null) phoneRoot.SetActive(false);
         _isOpen = false;
+        if (PhoneMotion != null) PhoneMotion.SetOpenImmediate(false);
+        else
+        {
+            if (phoneRoot != null) phoneRoot.SetActive(false);
+            if (phoneBtn != null) phoneBtn.SetActive(true);
+        }
 
         foreach (AppKey key in Enum.GetValues(typeof(AppKey)))
             appAlarmStates[key] = AlarmState.None;
@@ -192,26 +208,35 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public void SetOpen(bool open)
     {
+        if (_isOpen == open) return;
         PhoneTouchEffect();
         _isOpen = open;
-        if (phoneRoot != null) phoneRoot.SetActive(open);
-        phoneBtn.SetActive(!open);
-        messengerApp.CheckCoroutineByTab(open);
-        if (open)
-        {
-            AlarmController?.DisableAlarm();
-        }
-        else
+        AlarmController?.DisableAlarm();
+        if (!open)
         {
             // 핸드폰을 닫을 때 notification이 표시 중이면 먼저 닫기 (알람과의 충돌 방지)
             PhoneNotificationBus.OnHide?.Invoke();
             // 핸드폰을 닫을 때 알람 UI 닫기
-            mandatoryAlarm.SetActive(false);
-            nonMandatoryAlarm.SetActive(false);
-            AlarmController?.EnableAlarm();
+            if (mandatoryAlarm != null) mandatoryAlarm.SetActive(false);
+            if (nonMandatoryAlarm != null) nonMandatoryAlarm.SetActive(false);
         }
+
+        if (PhoneMotion != null)
+            PhoneMotion.SetOpen(open, OnPhoneMotionCompleted);
+        else
+        {
+            if (phoneRoot != null) phoneRoot.SetActive(open);
+            if (phoneBtn != null) phoneBtn.SetActive(!open);
+            OnPhoneMotionCompleted();
+        }
+        if (messengerApp != null) messengerApp.CheckCoroutineByTab(open);
         //FindAnyObjectByType<UIAnimationManager>().SwitchFollowTarget();
         //if (open) RefreshTopBar();
+    }
+
+    private void OnPhoneMotionCompleted()
+    {
+        if (!_isOpen) AlarmController?.EnableAlarm();
     }
 
 
