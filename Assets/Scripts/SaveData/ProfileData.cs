@@ -25,6 +25,7 @@ public class ProfileData
     public DawnProfile dawn = new();
     public MessengerProfile messenger = new();
     public AchievementProfile achievement = new();
+    public CustomizeProfile customize = new();
 }
 
 /// <summary>프로필 선택 화면에 보여줄 정보.</summary>
@@ -90,6 +91,17 @@ public class AchievementProfile
 {
     public List<string> unlocked = new();
     public List<long> unlockedAtUnix = new();
+}
+
+/// <summary>
+/// 보유(구매·획득)한 치장 아이템 id (CustomizeInventory). id는 아이템 에셋 이름.
+/// 기본 아이템(isDefault)은 처음부터 보유한 것으로 보므로 여기 넣지 않는다.
+/// 치장 아이템의 해금은 다른 해금과 같이 <see cref="UnlockProfile"/>에 들어간다.
+/// </summary>
+[Serializable]
+public class CustomizeProfile
+{
+    public List<string> ownedIds = new();
 }
 
 /// <summary>읽은 메신저 메시지 (MessengerSaveSystem).</summary>

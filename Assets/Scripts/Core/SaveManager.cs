@@ -101,6 +101,7 @@ public class SaveManager : MonoBehaviour
         DawnSystem.LoadFrom(profileData.dawn);
         MessengerSaveSystem.LoadFrom(profileData.messenger);
         AchievementSystem.LoadFrom(profileData.achievement);
+        CustomizeInventory.LoadFrom(profileData.customize);
 
         isProfileLoaded = true;
     }
@@ -126,6 +127,7 @@ public class SaveManager : MonoBehaviour
         DawnSystem.SaveTo(profileData.dawn);
         MessengerSaveSystem.SaveTo(profileData.messenger);
         AchievementSystem.SaveTo(profileData.achievement);
+        CustomizeInventory.SaveTo(profileData.customize);
 
         SaveIO.Write(ProfileStore.CurrentProfileFile, profileData);
     }
@@ -207,7 +209,8 @@ public class SaveManager : MonoBehaviour
         DawnSystem.SetSelectedStage(0);
         MessengerSaveSystem.LoadFrom(null);
         AchievementSystem.LoadFrom(null);
-        CodexProgress.Invalidate();                                   // 다음 접근 때 새 프로필의 codex.json을 읽는다
+        CustomizeInventory.LoadFrom(null);
+        CodexProgress.Invalidate();                                  // 다음 접근 때 새 프로필의 codex.json을 읽는다
         if (SaveContext.Instance != null) SaveContext.Instance.ClearSlot(); // 이전 프로필 슬롯을 가리키지 않도록
     }
 
@@ -304,6 +307,7 @@ public class SaveManager : MonoBehaviour
         // 2. 메모리 상의 해금 목록·새벽 진행 초기화
         UnlockManager.ResetAll();
         DawnSystem.ResetAllPlantProgress();
+        CustomizeInventory.LoadFrom(null);
 
         // 3. PlayerPrefs(디버그 패널 등) 초기화
         PlayerPrefs.DeleteAll();

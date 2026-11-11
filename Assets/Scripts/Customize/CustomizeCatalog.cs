@@ -10,6 +10,16 @@ public static class CustomizeCatalog
     private static Dictionary<CustomizeCategory, List<CustomizeItemData>> _byCategory;
     private static Dictionary<string, CustomizeItemData> _byId;
 
+    // 이 프로젝트는 Play 진입 시 도메인 리로드를 끄고 쓴다(Enter Play Mode Options).
+    // 그러면 static 값이 이전 Play나 에디터에서 읽은 그대로 남아, 에셋을 추가·수정해도 반영되지 않는다.
+    // Play가 시작될 때마다 비워서 처음 쓸 때 다시 읽게 한다.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        _byCategory = null;
+        _byId = null;
+    }
+
     private static void EnsureLoaded()
     {
         if (_byCategory != null) return;

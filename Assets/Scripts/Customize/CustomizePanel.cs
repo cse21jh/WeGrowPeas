@@ -32,8 +32,17 @@ public class CustomizePanel : MonoBehaviour
         }
     }
 
-    private void OnEnable() => CustomizeState.EquippedChanged += OnEquippedChanged;
-    private void OnDisable() => CustomizeState.EquippedChanged -= OnEquippedChanged;
+    private void OnEnable()
+    {
+        CustomizeState.EquippedChanged += OnItemStateChanged;
+        CustomizeInventory.OwnedChanged += OnItemStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        CustomizeState.EquippedChanged -= OnItemStateChanged;
+        CustomizeInventory.OwnedChanged -= OnItemStateChanged;
+    }
 
     private void Start()
     {
@@ -56,22 +65,27 @@ public class CustomizePanel : MonoBehaviour
             slot.Setup(item, OnSlotClicked);
             _slots.Add(slot);
         }
-        RefreshEquipped();
+        RefreshSlotStates();
 
         scrollRect.StopMovement();
         scrollRect.verticalNormalizedPosition = 1f; // 맨 위부터
     }
 
+    // 보유하지 않은 아이템은 CustomizeState.Equip이 무시한다. (구매 창은 나중에 여기서 띄운다.)
     private void OnSlotClicked(CustomizeItemSlot clicked) => CustomizeState.Equip(clicked.Item);
 
-    private void OnEquippedChanged(CustomizeItemData item)
+    private void OnItemStateChanged(CustomizeItemData item)
     {
-        if (item.category == CurrentCategory) RefreshEquipped();
+        if (item.category == CurrentCategory) RefreshSlotStates();
     }
 
-    /// <summary>장착 중인 아이템 슬롯에만 "사용중"을 켠다.</summary>
-    private void RefreshEquipped()
+    /// <summary>슬롯마다 보유 여부(자물쇠)와 장착 여부("사용중")를 다시 표시한다.</summary>
+    private void RefreshSlotStates()
     {
-        foreach (var slot in _slots) slot.SetEquipped(CustomizeState.IsEquipped(slot.Item));
+        foreach (var slot in _slots)
+        {
+            slot.SetOwned(CustomizeInventory.IsOwned(slot.Item));
+            slot.SetEquipped(CustomizeState.IsEquipped(slot.Item));
+        }
     }
 }
