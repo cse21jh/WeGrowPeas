@@ -9,6 +9,7 @@ public static class ResourcePaths
     public const string PlantInfos = "Data/AbilityData/PlantAbilityData/Plant";
     public const string PlantAbilities = "Data/AbilityData/PlantAbilityData";
     public const string GeneralAbilities = "Data/AbilityData/GeneralAbilityData";
+    public const string CustomizeItems = "Data/Customize";
     public const string BugKillerPrefab = "BugKiller";
     public const string WarningPrefab = "Warning";
     public const string PeaFaceSheet = "peaFace_1-sheet";
