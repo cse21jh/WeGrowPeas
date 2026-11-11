@@ -13,6 +13,7 @@ public class SceneLoader : MonoBehaviour
     private const string TutorialSceneName = "Tutorial";
     private const string GameSceneName = "Garden_GrassUpdate";
     private const string GameOverSceneName = "GameOverScene";
+    private const string CustomizeSceneName = "CustomizeScene";
 
     public static SceneLoader Instance;
 
@@ -72,6 +73,11 @@ public class SceneLoader : MonoBehaviour
     public void LoadGardenScene()
     {
         StartCoroutine(LoadSceneRoutine(GameSceneName, useLoadingScreen: true));
+    }
+
+    public void LoadCustomizeScene()
+    {
+        StartCoroutine(LoadSceneRoutine(CustomizeSceneName, useLoadingScreen: true));
     }
 
     [Header("Loading")]

@@ -70,6 +70,11 @@ public class UIClickEvent : MonoBehaviour
         recall.OpenRecall();
     }
 
+    public void OnClick_GoToCustomizeScene()
+    {
+        SceneLoader.Instance?.LoadCustomizeScene();
+    }
+
     public void OnClick_GoToTutorial()
     {
         SceneLoader.Instance?.LoadTutorialScene();
