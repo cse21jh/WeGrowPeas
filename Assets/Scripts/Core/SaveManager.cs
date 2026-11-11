@@ -284,10 +284,17 @@ public class SaveManager : MonoBehaviour
         UnlockManager.Unlock(UnlockManager.Ids.WinterReached);
         UnlockManager.Unlock(UnlockManager.Ids.FertilizerFourColumns);
 
+        // 5. 치장 아이템 모두 해금 + 보유 (목록에 뜨게 하고, 자물쇠도 풀어서 바로 장착할 수 있게)
+        foreach (var item in Resources.LoadAll<CustomizeItemData>(ResourcePaths.CustomizeItems))
+        {
+            if (item.requiresUnlock) UnlockManager.Unlock(item.UnlockId);
+            CustomizeInventory.Grant(item);
+        }
+
         // 변경 사항 저장
         SaveProfileData();
 
-        Debug.Log("[SaveManager] 디버그: 모든 새벽 단계 및 아이템을 성공적으로 해금했습니다.");
+        Debug.Log("[SaveManager] 디버그: 모든 새벽 단계, 아이템, 치장 아이템을 성공적으로 해금했습니다.");
     }
 
     [ContextMenu("Debug: Reset All Data")]
