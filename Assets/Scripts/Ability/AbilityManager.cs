@@ -340,11 +340,30 @@ public class AbilityManager : MonoBehaviour
         storage += num;
     }
 
+    /// <summary>게임 종료 시 얻은 유전자 몇 개마다 치장 토큰 1개를 주는가.</summary>
+    public const int GeneticsPerCustomizeToken = 100;
+
+    /// <summary>
+    /// 이번 판에 모은 유전자(storage)를 지급한다. 런이 끝날 때 한 번만 불린다(RunRecordFormatter.AwardGenetics).
+    /// 같은 양을 기준으로 치장 토큰도 함께 지급한다(유전자 100개마다 1개, 나머지는 버림).
+    /// </summary>
     public void AddGenetics()
     {
-        genetics += storage;
-        GameRecordHolder.SaveGenetics(storage);
+        int earned = storage;
+        genetics += earned;
+        GameRecordHolder.SaveGenetics(earned);
         storage = 0;
+
+        AddCustomizeTokensForGenetics(earned);
         SaveManager.RequestProfileSave();
+    }
+
+    /// <summary>얻은 유전자에 맞춰 치장 토큰을 준다. 토큰 잔액은 CustomizeInventory가 프로필에 저장한다.</summary>
+    private static void AddCustomizeTokensForGenetics(int earnedGenetics)
+    {
+        int tokens = earnedGenetics / GeneticsPerCustomizeToken;
+        if (tokens <= 0) return;
+        CustomizeInventory.AddTokens(tokens);
+        Debug.Log($"[Customize] 유전자 {earnedGenetics}개 획득 → 치장 토큰 {tokens}개 지급 (잔액 {CustomizeInventory.Tokens})");
     }
 }

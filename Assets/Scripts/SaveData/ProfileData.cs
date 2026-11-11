@@ -94,13 +94,14 @@ public class AchievementProfile
 }
 
 /// <summary>
-/// 보유(구매·획득)한 치장 아이템 id (CustomizeInventory). id는 아이템 에셋 이름.
-/// 기본 아이템(isDefault)은 처음부터 보유한 것으로 보므로 여기 넣지 않는다.
-/// 치장 아이템의 해금은 다른 해금과 같이 <see cref="UnlockProfile"/>에 들어간다.
+/// 치장 토큰과 토큰으로 산 치장 아이템 id (CustomizeInventory). id는 아이템 에셋 이름.
+/// 기본 아이템(isDefault)과 업적으로 해금되는 장식품은 따로 판정하므로 여기 넣지 않는다.
 /// </summary>
 [Serializable]
 public class CustomizeProfile
 {
+    // 이 칸이 없는 예전 프로필 파일을 읽어도 기본 토큰을 받도록 초깃값을 둔다.
+    public int tokens = CustomizeInventory.DefaultTokens;
     public List<string> ownedIds = new();
 }
 

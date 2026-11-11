@@ -284,12 +284,9 @@ public class SaveManager : MonoBehaviour
         UnlockManager.Unlock(UnlockManager.Ids.WinterReached);
         UnlockManager.Unlock(UnlockManager.Ids.FertilizerFourColumns);
 
-        // 5. 치장 아이템 모두 해금 + 보유 (목록에 뜨게 하고, 자물쇠도 풀어서 바로 장착할 수 있게)
+        // 5. 치장 아이템 모두 해금 (토큰·업적 조건 무시하고 보유 처리)
         foreach (var item in Resources.LoadAll<CustomizeItemData>(ResourcePaths.CustomizeItems))
-        {
-            if (item.requiresUnlock) UnlockManager.Unlock(item.UnlockId);
             CustomizeInventory.Grant(item);
-        }
 
         // 변경 사항 저장
         SaveProfileData();
