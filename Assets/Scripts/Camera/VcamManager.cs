@@ -62,6 +62,9 @@ public class VcamManager : MonoBehaviour
     [Tooltip("Screen Space - Camera 또는 World Space Canvas에서 사용하는 카메라")]
     [SerializeField] private Camera phoneUICamera;
 
+    [Tooltip("휴대폰 UI 말고도 카메라 드래그·줌을 막을 UI 영역 (예: 치장 씬의 치장 패널). 꺼져 있는 영역은 무시한다.")]
+    [SerializeField] private RectTransform[] extraBlockingUIAreas;
+
     private bool isDragging;
     private Vector3 previousMousePosition;
 
@@ -481,17 +484,38 @@ public class VcamManager : MonoBehaviour
             return false;
         }
 
-        if (phoneUIInputArea == null)
+        if (IsPointerOverArea(phoneUIInputArea))
+        {
+            return true;
+        }
+
+        if (extraBlockingUIAreas != null)
+        {
+            foreach (RectTransform area in extraBlockingUIAreas)
+            {
+                if (IsPointerOverArea(area))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsPointerOverArea(RectTransform area)
+    {
+        if (area == null)
         {
             return false;
         }
 
-        if (!phoneUIInputArea.gameObject.activeInHierarchy)
+        if (!area.gameObject.activeInHierarchy)
         {
             return false;
         }
 
-        Canvas canvas = phoneUIInputArea.GetComponentInParent<Canvas>();
+        Canvas canvas = area.GetComponentInParent<Canvas>();
 
         Camera eventCamera = null;
 
@@ -503,7 +527,7 @@ public class VcamManager : MonoBehaviour
         }
 
         return RectTransformUtility.RectangleContainsScreenPoint(
-            phoneUIInputArea,
+            area,
             Input.mousePosition,
             eventCamera
         );
