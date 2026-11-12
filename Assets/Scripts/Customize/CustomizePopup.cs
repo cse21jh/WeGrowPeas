@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 치장 화면의 간단한 확인 창. 메시지 + 확인 버튼(+ 취소 버튼).
-/// 구매 확인, 토큰 부족 안내, 업적 해금 안내에 쓴다.
+/// 구매 확인, 토큰 부족 안내, 업적 해금 안내, 저장하지 않고 나갈 때 확인에 쓴다.
 /// </summary>
 public class CustomizePopup : MonoBehaviour
 {
@@ -17,6 +17,9 @@ public class CustomizePopup : MonoBehaviour
     [SerializeField] private Button cancelButton;
 
     private Action _onConfirm;
+
+    /// <summary>창이 떠 있는가.</summary>
+    public bool IsOpen => root.activeSelf;
 
     private void Awake()
     {

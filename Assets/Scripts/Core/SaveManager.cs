@@ -110,6 +110,7 @@ public class SaveManager : MonoBehaviour
         MessengerSaveSystem.LoadFrom(profileData.messenger);
         AchievementSystem.LoadFrom(profileData.achievement);
         CustomizeInventory.LoadFrom(profileData.customize);
+        CustomizeState.LoadFrom(profileData.customize);
 
         isProfileLoaded = true;
     }
@@ -180,6 +181,7 @@ public class SaveManager : MonoBehaviour
         MessengerSaveSystem.SaveTo(profileData.messenger);
         AchievementSystem.SaveTo(profileData.achievement);
         CustomizeInventory.SaveTo(profileData.customize);
+        CustomizeState.SaveTo(profileData.customize);
 
         return profileData;
     }
@@ -265,6 +267,7 @@ public class SaveManager : MonoBehaviour
         MessengerSaveSystem.LoadFrom(null);
         AchievementSystem.LoadFrom(null);
         CustomizeInventory.LoadFrom(null);
+        CustomizeState.LoadFrom(null);
         CodexProgress.Invalidate();                                  // 다음 접근 때 새 프로필의 codex.json을 읽는다
         if (SaveContext.Instance != null) SaveContext.Instance.ClearSlot(); // 이전 프로필 슬롯을 가리키지 않도록
     }
@@ -367,6 +370,7 @@ public class SaveManager : MonoBehaviour
         UnlockManager.ResetAll();
         DawnSystem.ResetAllPlantProgress();
         CustomizeInventory.LoadFrom(null);
+        CustomizeState.LoadFrom(null);
 
         // 3. PlayerPrefs(디버그 패널 등) 초기화
         PlayerPrefs.DeleteAll();

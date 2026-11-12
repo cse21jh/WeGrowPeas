@@ -29,6 +29,12 @@ public class UIClickEvent : MonoBehaviour
     [SerializeField] private GameObject saveSlotPanel;
     [SerializeField] private TutorialChapterSelectionPopup tutorialChapterSelectionPopup;
 
+    [Header("치장 씬")]
+    [Tooltip("치장 씬의 확인 창. 치장 씬에서만 연결한다.")]
+    [SerializeField] private CustomizePopup customizePopup;
+
+    private bool isLeavingCustomize;
+
     // 씬 전환 연출(덮기/열기)은 SceneLoader가 담당한다. 여기서 Transition_Out을 직접 부르지 않는다.
     public void OnClick_StartNewGame(int slotIndex)
     {
@@ -142,5 +148,52 @@ public class UIClickEvent : MonoBehaviour
     {
         buttonPanel.SetActive(true);
         saveSlotPanel.SetActive(false);
+    }
+
+    // ── 치장 씬 ───────────────────────────────────────────────────────────────
+
+    /// <summary>치장 씬 되돌리기: 마지막으로 저장한 치장 상태로 되돌린다.</summary>
+    public void OnClick_CustomizeUndo()
+    {
+        if (isLeavingCustomize) return;
+        if (!CustomizeState.HasUnsavedChanges)
+        {
+            customizePopup.Notice("되돌릴 변경 사항이 없어요.");
+            return;
+        }
+        CustomizeState.RevertToSaved();
+    }
+
+    /// <summary>치장 씬 저장하기: 지금 치장 상태를 저장한다.</summary>
+    public void OnClick_CustomizeSave()
+    {
+        if (isLeavingCustomize) return;
+        CustomizeState.Save();
+        customizePopup.Notice("현재 치장 상태를 저장했어요.");
+    }
+
+    /// <summary>치장 씬 메인으로: 시작 화면으로 돌아간다. 저장하지 않은 변경이 있으면 먼저 묻는다.</summary>
+    public void OnClick_CustomizeGoToMain()
+    {
+        if (isLeavingCustomize) return;
+        if (!CustomizeState.HasUnsavedChanges)
+        {
+            CustomizeLeaveToMain();
+            return;
+        }
+
+        customizePopup.Ask("현재 상태가 저장되지 않았습니다.\n정말 나가시겠습니까?", "저장하지 않고 나가기", () =>
+        {
+            // 저장하지 않은 장착이 메모리에 남아 다른 화면에 보이지 않도록 되돌린 뒤 나간다.
+            CustomizeState.RevertToSaved();
+            CustomizeLeaveToMain();
+        });
+    }
+
+    private void CustomizeLeaveToMain()
+    {
+        isLeavingCustomize = true;
+        if (SceneLoader.Instance != null) SceneLoader.Instance.LoadStartScene();
+        else UnityEngine.SceneManagement.SceneManager.LoadScene(SceneLoader.StartSceneName); // 치장 씬을 바로 Play한 경우
     }
 }
