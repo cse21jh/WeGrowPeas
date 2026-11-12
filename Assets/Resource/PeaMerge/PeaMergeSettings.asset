@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8e83d1efcce9c149902231f97f2126f, type: 3}
+  m_Name: PeaMergeSettings
+  m_EditorClassIdentifier: Assembly-CSharp::WeGrowPeas.PeaMerge.PeaMergeSettings
+  peaPrefab: {fileID: 7386216367759649172, guid: 6e5afc4496b238647aee3564005078d1, type: 3}
+  tiers:
+  - label: "\uC644\uB450\uCF69"
+    appearanceIndex: 0
+    radius: 0.32
+    mergeScore: 2
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 0}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uB9C8\uB978\uCF69"
+    appearanceIndex: 2
+    radius: 0.42
+    mergeScore: 4
+    bodyIcon: {fileID: 21300000, guid: a1f2e83f227014445b99f35e1a94ff1b, type: 3}
+    accessoryIcon: {fileID: 0}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uAC08\uC0C9\uCF69"
+    appearanceIndex: 1
+    radius: 0.54
+    mergeScore: 8
+    bodyIcon: {fileID: 21300000, guid: bc646e60ea9f1774d875daaf8cb907da, type: 3}
+    accessoryIcon: {fileID: 0}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uBC14\uB78C\uCF69"
+    appearanceIndex: 3
+    radius: 0.67
+    mergeScore: 16
+    bodyIcon: {fileID: 21300000, guid: 7283a9104f1822f488b9c38a454200d2, type: 3}
+    accessoryIcon: {fileID: 0}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uBE44\uC637\uCF69"
+    appearanceIndex: 5
+    radius: 0.82
+    mergeScore: 32
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 21300000, guid: 0874c072738b1b944b1a501010d6ce56, type: 3}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uC5BC\uC74C\uCF69"
+    appearanceIndex: 4
+    radius: 1
+    mergeScore: 64
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 21300000, guid: 4d532401468a8c949b08a09684fcc0eb, type: 3}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 0.65}
+  - label: "\uBC8C\uB808\uCF69"
+    appearanceIndex: 7
+    radius: 1.2
+    mergeScore: 128
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 21300000, guid: 510d3d9b3add75843a1ff34d20908046, type: 3}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 0.65}
+  - label: "\uB354\uC704\uCF69"
+    appearanceIndex: 8
+    radius: 1.43
+    mergeScore: 256
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 21300000, guid: 8632c5ab8aa1a574aa9cb88ca2004ee9, type: 3}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  - label: "\uBB3C\uBC29\uC6B8\uCF69"
+    appearanceIndex: 6
+    radius: 1.7
+    mergeScore: 512
+    bodyIcon: {fileID: 21300000, guid: a5deb9b816432cd48b2f1d6d0125301f, type: 3}
+    accessoryIcon: {fileID: 21300000, guid: 4e96911034625394bba9bdb83c30c093, type: 3}
+    accessoryTint: {r: 1, g: 1, b: 1, a: 1}
+  halfWidth: 4.45
+  floorY: -6
+  wallTopY: 4.15
+  dangerY: 3
+  dropY: 4.95
+  randomTierCount: 4
+  dropCooldown: 0.55
+  overflowSeconds: 2
+  spawnGraceSeconds: 1
+  bestScoreKey: WeGrowPeas.PeaMerge.BestScore.v1
