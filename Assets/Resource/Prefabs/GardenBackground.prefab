@@ -33606,6 +33606,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6838987464536766666}
   - component: {fileID: 3042697699421035156}
+  - component: {fileID: 5327823572130608859}
   m_Layer: 0
   m_Name: Garden
   m_TagString: Untagged
@@ -33687,6 +33688,24 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5327823572130608859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4308767196496668362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 0
+  spriteRenderers:
+  - {fileID: 3042697699421035156}
+  images: []
+  meshRenderers: []
+  logChanges: 1
 --- !u!1 &4418045472512992917
 GameObject:
   m_ObjectHideFlags: 0
@@ -45176,6 +45195,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 837346869582116645}
+  - component: {fileID: 7771518524442127177}
   m_Layer: 0
   m_Name: Folliage
   m_TagString: Untagged
@@ -45206,6 +45226,32 @@ Transform:
   - {fileID: 5826138755930683979}
   m_Father: {fileID: 863819738328084646}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7771518524442127177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6620034906721520753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 20
+  spriteRenderers: []
+  images: []
+  meshRenderers:
+  - {fileID: 5894459792066368540}
+  - {fileID: 398072491395740989}
+  - {fileID: 4209369951597787333}
+  - {fileID: 3109368614025459327}
+  - {fileID: 7129254853354454550}
+  - {fileID: 7677015369851241151}
+  - {fileID: 3797033894667601870}
+  - {fileID: 6984659680738458260}
+  - {fileID: 3172955563216869899}
+  logChanges: 1
 --- !u!1 &6637179678142553430
 GameObject:
   m_ObjectHideFlags: 0

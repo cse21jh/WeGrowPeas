@@ -26,6 +26,9 @@ public static class CustomizeState
     /// <summary>장착이 바뀌었다(새로 장착한 아이템).</summary>
     public static event Action<CustomizeItemData> EquippedChanged;
 
+    /// <summary>프로필에서 장착 상태를 새로 읽었다(게임 시작, 프로필 전환 등). 모든 종류가 바뀌었을 수 있다.</summary>
+    public static event Action Loaded;
+
     // 도메인 리로드를 끈 상태에서도 Play마다 처음 상태로 시작하게 한다. (CustomizeCatalog 참고)
     // 실제 값은 그 뒤 SaveManager가 프로필을 읽으면서 채운다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -34,6 +37,7 @@ public static class CustomizeState
         _equipped.Clear();
         _saved.Clear();
         EquippedChanged = null;
+        Loaded = null;
     }
 
     // ── 프로필 저장 ───────────────────────────────────────────────────────────
@@ -61,6 +65,8 @@ public static class CustomizeState
 
         _equipped.Clear();
         foreach (var pair in _saved) _equipped[pair.Key] = pair.Value;
+
+        Loaded?.Invoke();
     }
 
     // ── 장착 ──────────────────────────────────────────────────────────────────

@@ -1392,6 +1392,8 @@ GameObject:
   - component: {fileID: 2376175578050882694}
   - component: {fileID: 331083342710061183}
   - component: {fileID: 2022889689521895622}
+  - component: {fileID: 4258578112395435419}
+  - component: {fileID: 2073126977128584626}
   m_Layer: 0
   m_Name: PhoneCanvas
   m_TagString: Untagged
@@ -1565,6 +1567,42 @@ MonoBehaviour:
   buttonShowDuration: 0.22
   phoneSlideDuration: 0.32
   offscreenPadding: 24
+--- !u!114 &4258578112395435419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2712232760839542562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 30
+  spriteRenderers: []
+  images:
+  - {fileID: 4990556318537289678}
+  meshRenderers: []
+  logChanges: 1
+--- !u!114 &2073126977128584626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2712232760839542562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 31
+  spriteRenderers: []
+  images:
+  - {fileID: 3410668549164209412}
+  meshRenderers: []
+  logChanges: 1
 --- !u!1 &2729385182188530451
 GameObject:
   m_ObjectHideFlags: 0

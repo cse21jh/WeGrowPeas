@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>치장 아이템을 얻는 방법. 아이템 종류(category)로 정해진다.</summary>
@@ -32,8 +33,9 @@ public class CustomizeItemData : ScriptableObject
     [Tooltip("목록 슬롯에 보이는 아이콘. 비우면 빈 칸으로 보인다.")]
     public Sprite icon;
 
-    [Tooltip("게임 화면에 실제로 그려질 모습. 비우면 아이콘을 쓴다.")]
-    public Sprite appearance;
+    [Tooltip("게임 화면에서 부위별로 바꿔 끼울 그림. 목록에 없는 부위는 원래 그림 그대로. " +
+             "이 아이템 종류의 부위만 넣는다(예: 목재 → WoodFence, WoodBorder).")]
+    public List<CustomizePartSprite> parts = new List<CustomizePartSprite>();
 
     [Header("해금")]
     [Tooltip("토양·목재·풀밭·케이스: 구매에 드는 치장 토큰 수.")]
@@ -49,6 +51,28 @@ public class CustomizeItemData : ScriptableObject
     public CustomizeUnlockMethod UnlockMethod
         => category == CustomizeCategory.Decoration ? CustomizeUnlockMethod.Achievement : CustomizeUnlockMethod.Token;
 
-    /// <summary>게임 화면에 그릴 스프라이트.</summary>
-    public Sprite AppearanceOrIcon => appearance != null ? appearance : icon;
+    /// <summary>그 부위에 쓸 그림 정보. 이 아이템이 그 부위를 바꾸지 않으면 null.</summary>
+    public CustomizePartSprite GetPart(CustomizePart part)
+    {
+        if (parts == null) return null;
+        foreach (var p in parts)
+            if (p != null && p.part == part) return p;
+        return null;
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (parts == null) return;
+        var seen = new HashSet<CustomizePart>();
+        foreach (var p in parts)
+        {
+            if (p == null) continue;
+            if (CustomizePartInfo.CategoryOf(p.part) != category)
+                Debug.LogWarning($"[Customize] '{name}'({category})에 다른 종류의 부위 {p.part}({CustomizePartInfo.CategoryOf(p.part)})가 들어 있습니다. 적용되지 않습니다.", this);
+            if (!seen.Add(p.part))
+                Debug.LogWarning($"[Customize] '{name}'에 부위 {p.part}가 두 번 들어 있습니다. 첫 번째 것만 씁니다.", this);
+        }
+    }
+#endif
 }

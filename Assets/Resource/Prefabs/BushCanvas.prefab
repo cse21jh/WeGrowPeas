@@ -477,6 +477,8 @@ GameObject:
   - component: {fileID: 7096454014579539021}
   - component: {fileID: 8651329464867372405}
   - component: {fileID: 8922817908762093247}
+  - component: {fileID: 4543720435757384711}
+  - component: {fileID: 7088178223331258849}
   m_Layer: 0
   m_Name: BushCanvas
   m_TagString: Untagged
@@ -578,6 +580,52 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4543720435757384711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4958511210212611492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 22
+  spriteRenderers: []
+  images:
+  - {fileID: 2677447490567163166}
+  - {fileID: 7099604035467781670}
+  - {fileID: 3422828272542123696}
+  - {fileID: 8900154626165020152}
+  - {fileID: 1405947024352227182}
+  - {fileID: 3443326814465291839}
+  - {fileID: 8805243932793605241}
+  - {fileID: 8847907851405339021}
+  meshRenderers: []
+  logChanges: 1
+--- !u!114 &7088178223331258849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4958511210212611492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 23
+  spriteRenderers: []
+  images:
+  - {fileID: 8796986738166006580}
+  - {fileID: 1082977171410920969}
+  - {fileID: 8886080208415904975}
+  - {fileID: 8572481924413684830}
+  meshRenderers: []
+  logChanges: 1
 --- !u!1 &5716650819975769722
 GameObject:
   m_ObjectHideFlags: 0
