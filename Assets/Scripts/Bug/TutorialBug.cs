@@ -6,6 +6,7 @@ public class TutorialBug : Bug
 {
     private bool letMove = true;
     public bool canCatchBug = false;
+    private Vector3 spawnPosition = new Vector3(10f, -1f, 0f);
 
     protected override void Start()
     {
@@ -59,12 +60,24 @@ public class TutorialBug : Bug
     public override IEnumerator KillBug()
     {
         yield return StartCoroutine(base.KillBug());
-        TutorialManager.Instance.OnCatchBug();
+        TutorialManager.Instance?.OnCatchBug();
     }
 
     private void SetFixedPosition()
     {
-        transform.position = new Vector3(10.0f, -1.0f, 0);
+        transform.position = spawnPosition;
+    }
+
+    public void PrepareStationaryPractice(Vector3 position)
+    {
+        spawnPosition = position;
+        letMove = false;
+        canCatchBug = true;
+    }
+
+    protected override void OnTriggerEnter(Collider other)
+    {
+        if (letMove) base.OnTriggerEnter(other);
     }
 
     public void StopMoving()

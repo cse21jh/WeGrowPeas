@@ -124,6 +124,7 @@ public class EconomyManager : MonoBehaviour
         if(plantName == PlantIds.Pea)
         {
             peaSellCount++;
+            if (GameManager.Instance?.Tutorial != null) return;
             CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
             CodexProgress.AddSold(true);
             return;
@@ -131,6 +132,7 @@ public class EconomyManager : MonoBehaviour
         else if(plantName == PlantIds.Peanut)
         {
             peanutSellCount++;
+            if (GameManager.Instance?.Tutorial != null) return;
             CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
             CodexProgress.AddSold(false);
             return;

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+public enum TutorialCompletion { Awarded, AlreadyCompleted, SaveFailed }
+
 /// <summary>
 /// 계정(프로필) 진행을 파일(<see cref="ProfileData"/>)과 주고받는다.
 /// 무엇을 저장하는지는 각 시스템의 SaveTo/LoadFrom이 알고, 여기서는 순서와 파일 입출력만 맡는다.
@@ -19,6 +21,9 @@ public class SaveManager : MonoBehaviour
 
     // 로드가 끝나기 전에 저장하면 기본값으로 기존 프로필을 덮어쓴다. 그걸 막는 표시.
     private bool isProfileLoaded;
+    private bool tutorialChapter1Cleared;
+    private bool tutorialChapter2Cleared;
+    private bool tutorialChapter3Cleared;
 
     // 저장 요청 표시. 매니저가 아직 없을 때 요청돼도 로드 후 첫 LateUpdate에 반영된다.
     private static bool saveRequested;
@@ -94,6 +99,9 @@ public class SaveManager : MonoBehaviour
         MigrateProfile(profileData);
 
         playTimeSeconds = profileData.meta.playTimeSeconds;
+        tutorialChapter1Cleared = profileData.meta.tutorialChapter1Cleared;
+        tutorialChapter2Cleared = profileData.meta.tutorialChapter2Cleared;
+        tutorialChapter3Cleared = profileData.meta.tutorialChapter3Cleared;
 
         // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadFrom이 안다.
         AbilityManager.Instance.LoadProfile(profileData.ability);
@@ -117,9 +125,53 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
+        SaveIO.Write(ProfileStore.CurrentProfileFile, CreateProfileSnapshot());
+    }
+
+    public bool HasClearedTutorialChapter(int chapter) => isProfileLoaded && (chapter switch
+    {
+        1 => tutorialChapter1Cleared,
+        2 => tutorialChapter2Cleared,
+        3 => tutorialChapter3Cleared,
+        _ => false
+    });
+
+    public TutorialCompletion TryCompleteTutorialChapter1() => TryCompleteTutorialChapter(1);
+
+    public TutorialCompletion TryCompleteTutorialChapter(int chapter)
+    {
+        if (chapter < 1 || chapter > 3)
+            throw new System.ArgumentOutOfRangeException(nameof(chapter));
+        if (!isProfileLoaded || AbilityManager.Instance == null)
+            return TutorialCompletion.SaveFailed;
+        if (HasClearedTutorialChapter(chapter))
+            return TutorialCompletion.AlreadyCompleted;
+
+        ProfileData profile = CreateProfileSnapshot();
+        if (chapter == 1) profile.meta.tutorialChapter1Cleared = true;
+        else if (chapter == 2) profile.meta.tutorialChapter2Cleared = true;
+        else profile.meta.tutorialChapter3Cleared = true;
+        // Chapter 3 has no specified genetic reward yet.
+        profile.ability.genetics += chapter == 1 ? 1000 : chapter == 2 ? 2000 : 0;
+        if (!SaveIO.Write(ProfileStore.CurrentProfileFile, profile))
+            return TutorialCompletion.SaveFailed;
+
+        tutorialChapter1Cleared = profile.meta.tutorialChapter1Cleared;
+        tutorialChapter2Cleared = profile.meta.tutorialChapter2Cleared;
+        tutorialChapter3Cleared = profile.meta.tutorialChapter3Cleared;
+        saveRequested = false;
+        AbilityManager.Instance.ChangeGenetics(profile.ability.genetics, requestSave: false);
+        return TutorialCompletion.Awarded;
+    }
+
+    private ProfileData CreateProfileSnapshot()
+    {
         var profileData = new ProfileData { version = ProfileVersion };
         profileData.meta.lastSavedUnix = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         profileData.meta.playTimeSeconds = playTimeSeconds;
+        profileData.meta.tutorialChapter1Cleared = tutorialChapter1Cleared;
+        profileData.meta.tutorialChapter2Cleared = tutorialChapter2Cleared;
+        profileData.meta.tutorialChapter3Cleared = tutorialChapter3Cleared;
 
         // 시스템별 저장. LoadProfileData와 같은 순서로 두어 짝을 눈으로 확인할 수 있게 한다.
         AbilityManager.Instance.SaveProfile(profileData.ability);
@@ -129,7 +181,7 @@ public class SaveManager : MonoBehaviour
         AchievementSystem.SaveTo(profileData.achievement);
         CustomizeInventory.SaveTo(profileData.customize);
 
-        SaveIO.Write(ProfileStore.CurrentProfileFile, profileData);
+        return profileData;
     }
 
     // ── 프로필 전환 ───────────────────────────────────────────────────────────
@@ -189,6 +241,9 @@ public class SaveManager : MonoBehaviour
         isProfileLoaded = false;
         saveRequested = false;
         playTimeSeconds = 0;
+        tutorialChapter1Cleared = false;
+        tutorialChapter2Cleared = false;
+        tutorialChapter3Cleared = false;
 
         ResetProfileState();
         LoadProfileData();

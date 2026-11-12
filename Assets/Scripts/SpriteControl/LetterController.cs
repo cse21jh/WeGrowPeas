@@ -35,6 +35,7 @@ public class LetterController : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (GameManager.Instance?.Tutorial != null) return;
         // 화면 덮기/열기 연출은 SceneLoader가 담당한다.
 
         //여기에 엔딩씬으로 넘어가는 코드 작성

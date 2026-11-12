@@ -131,7 +131,8 @@ public abstract class Plant : MonoBehaviour
 
         // 밭에 등장했으면 도감에 발견 처리. 하위 클래스가 speciesname을 정한 뒤 base.Init을 부르므로
         // 여기가 모든 식물이 거치는 유일한 지점이다. (이미 발견된 종이면 아무 일도 하지 않는다)
-        CodexProgress.Discover(CodexProgress.Category.Plant, speciesname);
+        if (GameManager.Instance?.Tutorial == null)
+            CodexProgress.Discover(CodexProgress.Category.Plant, speciesname);
 
         //holdCanvas.worldCamera = FindAnyObjectByType<UIAnimationManager>().camManagers[3].GetComponent<Camera>();
         holdCanvas.worldCamera = FindAnyObjectByType<VcamManager>().holdCanvasCamera;
@@ -317,6 +318,9 @@ public abstract class Plant : MonoBehaviour
 
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
+        if (GameManager.Instance?.Tutorial != null && grid != null && grid.Board.CountLivingPlants() <= 1)
+            return false;
+
         // 페트병이 막으면 true 리턴 → 사망 취소
         if (grid != null && grid.Soil.TryInterceptDeath(gridIndex, cause, killer))
             return false;

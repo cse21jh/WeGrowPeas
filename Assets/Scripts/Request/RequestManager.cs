@@ -69,6 +69,7 @@ public class RequestManager : Singleton<RequestManager>
 
     public void StartNewCycle(int startRound)
     {
+        if (GameManager.Instance?.Tutorial?.CanUseQuests == false) return;
         cycleEndRound = startRound + cycle - 1;
         dayPassed = 0;
 

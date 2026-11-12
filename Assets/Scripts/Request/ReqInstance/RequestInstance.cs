@@ -102,6 +102,7 @@ public abstract class RequestInstance
 
     public virtual void GrantRewardOnce()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseQuests == false) return;
         if (!IsCompleted)
         {
             SoundManager.Instance?.PlayEffect(SoundIds.WrongSelect);
@@ -124,16 +125,17 @@ public abstract class RequestInstance
             }
         }
 
-        switch (Data.requestDifficulty)
+        if (GameManager.Instance?.Tutorial == null)
         {
-            case RequestDifficulty.Easy:
-                break;
-            case RequestDifficulty.Normal:
-                AbilityManager.Instance?.AddGeneStorage(5);
-                break;
-            case RequestDifficulty.Hard:
-                AbilityManager.Instance?.AddGeneStorage(10);
-                break;
+            switch (Data.requestDifficulty)
+            {
+                case RequestDifficulty.Normal:
+                    AbilityManager.Instance?.AddGeneStorage(5);
+                    break;
+                case RequestDifficulty.Hard:
+                    AbilityManager.Instance?.AddGeneStorage(10);
+                    break;
+            }
         }
 
         //customize token 추가

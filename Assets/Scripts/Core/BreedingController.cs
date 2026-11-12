@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>낮 교배 진행. 부모 선택, 버튼, 남은 횟수, 자식 형질 계산을 맡는다.</summary>
 public class BreedingController : MonoBehaviour
@@ -147,7 +148,8 @@ public class BreedingController : MonoBehaviour
                 bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
                 Plant plant = grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
                 PlayMutationEffectIfAny(plant); // 변종(돌연변이) 이펙트
-                if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting)
+                if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting &&
+                    GameManager.Instance.Tutorial?.CanBreedDuringOpeningMessage != true)
                 {
                     UIManager.Instance.Popup.ShowBreedPopup(plant);
                 }
@@ -213,8 +215,10 @@ public class BreedingController : MonoBehaviour
     }
     public IEnumerator Breeding()
     {
+        TutorialChapter tutorial = GameManager.Instance.Tutorial;
+        bool untimedPractice = tutorial != null && tutorial.IsUntimedDay;
         //breedTimer 만큼 동안 아래 과정 반복 진행 가능
-        grid.Enemy.SetCurrentWaveTimer();
+        if (!untimedPractice) grid.Enemy.SetCurrentWaveTimer();
         //교배할 부모 완두콩 두 개 선택
         isBreeding = true;
         breedObj1 = null;
@@ -223,7 +227,8 @@ public class BreedingController : MonoBehaviour
         //int breedCount = 0;
         int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
         // 저주: 불면증 — 밤시간(폰 페이즈) 단축으로 변경되어 교배시간 영향 제거
-        float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
+        float effectiveMaxBreedTimer = tutorial != null ? TutorialChapter.DaySeconds
+            : MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
 
         //임시 알람
         bool _warned15s = false;
@@ -231,7 +236,7 @@ public class BreedingController : MonoBehaviour
         //Debug.Log(effectiveMaxBreedTimer + "초 시작. 최대 교배 횟수는 " + effectiveMaxBreedCount + "입니다");
         UpdateBreedCountUI(effectiveMaxBreedCount);
         breedTimer = effectiveMaxBreedTimer;
-        breedTimerUI.StartBreedingTimer();
+        if (!untimedPractice) breedTimerUI.StartBreedingTimer();
 
         // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
         if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
@@ -252,23 +257,28 @@ public class BreedingController : MonoBehaviour
             foreach (var p in grid.Board.Plants.Values)
                 if (p != null) p.MarkDayStartPosition();
 
+        Button practiceSkipButton = untimedPractice ? breedSkipButton.GetComponent<Button>() : null;
+        if (practiceSkipButton != null)
+            practiceSkipButton.interactable = tutorial.CanSkipDay && !GameManager.Instance.GetGameIsStopped();
         breedSkipButton.SetActive(true);
-        grid.Enemy.ShowWaveSkipButton();
+        if (tutorial == null) grid.Enemy.ShowWaveSkipButton();
         isBreedSkipButtonPressed = false;
 
-        grid.Bugs.BeginDay();
+        if (tutorial?.CanSpawnBugs != false) grid.Bugs.BeginDay();
 
-        while (breedTimer > 0 && !isBreedSkipButtonPressed)
+        while ((untimedPractice || breedTimer > 0) && !isBreedSkipButtonPressed)
         {
-            if (GameManager.Instance.GetGameIsStopped())
+            bool gameIsStopped = GameManager.Instance.GetGameIsStopped();
+            if (practiceSkipButton != null) practiceSkipButton.interactable = tutorial.CanSkipDay && !gameIsStopped;
+            if (gameIsStopped && tutorial?.CanBreedDuringOpeningMessage != true)
             {
                 yield return null;
                 continue;
             }
 
-            breedTimer -= Time.deltaTime;
+            if (!untimedPractice) breedTimer -= Time.deltaTime;
 
-            if (breedTimer < 15f && !_warned15s)
+            if (tutorial == null && breedTimer < 15f && !_warned15s)
             {
                 _warned15s = true;
 
@@ -287,12 +297,12 @@ public class BreedingController : MonoBehaviour
                 SkipBreed();
             }
 
-            if (GameInput.GetDown(GameAction.WaveSkip))
+            if (tutorial == null && GameInput.GetDown(GameAction.WaveSkip))
             {
                 grid.Enemy.WaveSkip();
             }
 
-            grid.Bugs.Tick(Time.deltaTime);
+            if (tutorial?.CanSpawnBugs != false) grid.Bugs.Tick(Time.deltaTime);
 
             if (isBreedButtonPressed || GameInput.GetDown(GameAction.Breed))
             {
@@ -309,7 +319,7 @@ public class BreedingController : MonoBehaviour
         if (breedObj1 != null) breedObj1.GetComponent<Plant>().MakeDefaultSprite();
         if (breedObj2 != null) breedObj2.GetComponent<Plant>().MakeDefaultSprite();
 
-        breedTimerUI.StopTimer();
+        if (!untimedPractice) breedTimerUI.StopTimer();
 
         int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
         int remainingBreeds = Mathf.Max(0, currentEffectiveMaxBreedCount - breedCount);
@@ -322,6 +332,7 @@ public class BreedingController : MonoBehaviour
         grid.Enemy.HideWaveSkipButton();
         isBreeding = false;
         breedSkipButton.SetActive(false);
+        if (practiceSkipButton != null) practiceSkipButton.interactable = true;
 
         // 저주(통신장애): 자유시간이 끝나면(스킵 포함) 노이즈도 바로 끈다
         if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
@@ -483,6 +494,7 @@ public class BreedingController : MonoBehaviour
     }
     public float GetMaxBreedTimer()
     {
+        if (GameManager.Instance?.Tutorial != null) return TutorialChapter.DaySeconds;
         float effectiveMaxBreedTimer = MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
         return effectiveMaxBreedTimer;
     }
@@ -614,6 +626,8 @@ public class BreedingController : MonoBehaviour
     {
         if (GameManager.Instance.GetGameIsStopped())
             return;
+        TutorialChapter tutorial = GameManager.Instance.Tutorial;
+        if (tutorial != null && (!isBreeding || !tutorial.CanSkipDay)) return;
 
         // [시간은 금이다] 아이템 효과
         if (grid.Modifiers.TimeIsGoldLevel > 0)

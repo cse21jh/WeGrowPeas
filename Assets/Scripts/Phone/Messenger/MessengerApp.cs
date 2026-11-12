@@ -133,8 +133,11 @@ public class MessengerApp : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void Awake() => Initialize();
+
+    private void Initialize()
     {
+        if (progress != null) return;
         progress = new MessengerProgress();
         mandatoryMessagePopup?.Initialize(
             ShowPreviousMandatoryMessage,
@@ -237,6 +240,31 @@ public class MessengerApp : MonoBehaviour
         ReportAlarmState();
     }
 
+    public bool ConfigureTutorialChat(Chat chat, IEnumerable<string> requiredTriggers, string practiceTrigger,
+        out MandatoryMessageHandle practiceHandle)
+    {
+        practiceHandle = default;
+        if (chat == null || chat.chatPartner == null || !chat.useSaveSlotReadStateOnly ||
+            chat.messages == null || mandatoryMessagePopup == null ||
+            chat.messages.Any(message => message == null || !message.isMandatory) ||
+            !requiredTriggers.All(trigger => chat.messages.Any(message => message.triggerId == trigger)))
+            return false;
+
+        ChatMessage practiceMessage = practiceTrigger == null ? null :
+            chat.messages.LastOrDefault(message => message.triggerId == practiceTrigger);
+        if ((practiceTrigger != null && (practiceMessage == null || !practiceMessage.waitForAdvanceSignal)) ||
+            chat.messages.Any(message => message != practiceMessage && message.waitForAdvanceSignal))
+            return false;
+
+        allChats = new List<Chat> { chat };
+        Initialize();
+        SetProgress(null);
+        if (practiceMessage != null)
+            practiceHandle = new MandatoryMessageHandle(
+                chat.chatPartner.chatPartnerName, chat.messages.IndexOf(practiceMessage), practiceTrigger);
+        return true;
+    }
+
     public bool TryGetAwaitingMandatoryAdvance(string triggerId, out MandatoryMessageHandle handle)
     {
         foreach (MandatoryEntry entry in mandatoryEntries)
@@ -315,7 +343,7 @@ public class MessengerApp : MonoBehaviour
             UpdateMessenger();
         }
 
-        if (reference.message.waitForAdvanceSignal && !entry.waitEventRaised)
+        if (reference.message.waitForAdvanceSignal && !entry.advanceUnlocked && !entry.waitEventRaised)
         {
             entry.waitEventRaised = true;
             OnMandatoryAdvanceBlocked?.Invoke(reference.Handle);

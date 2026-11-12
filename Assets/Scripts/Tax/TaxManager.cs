@@ -69,12 +69,15 @@ public class TaxManager : Singleton<TaxManager>
     }
 
     /// <summary>지금 보유 골드로 이번 세금을 낼 수 있는가.</summary>
-    public bool CanPayNow() => Economy != null && Economy.HasGold(DueAmount);
+    public bool CanPayNow() => GameManager.Instance?.Tutorial?.CanPayTax(DueTaxStage) != false &&
+        Economy != null && Economy.HasGold(DueAmount);
 
     /// <summary>이번 세금 납부 시도. 성공 시 골드 차감 + 납부 처리.</summary>
     public bool TryPay()
     {
         if (DueTaxStage == 40) return false;
+        TutorialChapter tutorial = GameManager.Instance?.Tutorial;
+        if (tutorial != null && !tutorial.CanPayTax(DueTaxStage)) return false;
 
         int taxStage = DueTaxStage;
         int amount = TaxSchedule.GetTaxAmount(taxStage);

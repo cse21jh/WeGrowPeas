@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05e92e4919d75c040981d0a214fba377, type: 3}
+  m_Name: Tutorial3Chat
+  m_EditorClassIdentifier: 
+  chatPartner: {fileID: 11400000, guid: a65dbf890b994d81bc947b4df1675ac1, type: 2}
+  messages:
+  - locId: m001
+    triggerId: tutorial3.day01.start
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m002
+    triggerId: tutorial3.day01.start
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m003
+    triggerId: tutorial3.day10.special
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m004
+    triggerId: tutorial3.day10.special
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m005
+    triggerId: tutorial3.day21.season
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m006
+    triggerId: tutorial3.day21.season
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m007
+    triggerId: tutorial3.complete.ending
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m008
+    triggerId: tutorial3.complete.ending
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m009
+    triggerId: tutorial3.complete.awarded
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m010
+    triggerId: tutorial3.complete.replay
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m011
+    triggerId: tutorial3.complete.save_failed
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  useSaveSlotReadStateOnly: 1

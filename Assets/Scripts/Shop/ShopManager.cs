@@ -76,6 +76,7 @@ public class ShopManager : Singleton<ShopManager>
     /// </summary>
     public bool UseReroll()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseShop == false) return false;
         if (dailyRerollCount > 0)
         {
             dailyRerollCount--;
@@ -245,6 +246,8 @@ public class ShopManager : Singleton<ShopManager>
     public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
     {
         error = null;
+        if (GameManager.Instance?.Tutorial?.CanUseShop == false)
+            return false;
 
         if (data == null)
         {
@@ -274,7 +277,8 @@ public class ShopManager : Singleton<ShopManager>
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
 
-        CodexProgress.Discover(CodexProgress.Category.Item, data.UnlockId); // 도감: 아이템 발견
+        if (GameManager.Instance?.Tutorial == null)
+            CodexProgress.Discover(CodexProgress.Category.Item, data.UnlockId);
 
         // 효과 확정 반영
         data.Commit(ctx);

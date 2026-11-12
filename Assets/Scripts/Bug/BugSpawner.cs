@@ -50,6 +50,7 @@ public class BugSpawner
 
     public void Spawn(bool ignoreStageGate = false)
     {
+        if (GameManager.Instance?.Tutorial?.CanSpawnBugs == false) return;
         if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
             return;
 

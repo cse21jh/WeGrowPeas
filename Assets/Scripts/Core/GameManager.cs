@@ -41,6 +41,9 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private TextMeshProUGUI textStage;
 
     [SerializeField] private int endStage = 40;
+    [UnityEngine.Serialization.FormerlySerializedAs("tutorialChapter1")]
+    [SerializeField] private TutorialChapter tutorialChapter;
+    public TutorialChapter Tutorial => tutorialChapter;
 
     // Start is called before the first frame update
     void Start()
@@ -51,6 +54,12 @@ public class GameManager : Singleton<GameManager>
         Time.timeScale = 1;
 
         ClickRouter.Instance.IsBlockedByUI = false;
+
+        if (Tutorial != null)
+        {
+            StartCoroutine(Tutorial.Run(this));
+            return;
+        }
 
         // 결과창에서 "이번 판에 새로 해금된 아이템"을 뽑기 위한 시작 시점 스냅샷
         UnlockRunTracker.CaptureRunStart();
@@ -95,7 +104,8 @@ public class GameManager : Singleton<GameManager>
     void Update()
     {
         // 프로필 플레이 시간: 런을 하는 동안의 실제 시간(일시정지 포함, 창 비활성 제외)
-        if (SaveManager.Instance != null) SaveManager.Instance.AddPlayTime(Time.unscaledDeltaTime);
+        if (Tutorial == null && SaveManager.Instance != null)
+            SaveManager.Instance.AddPlayTime(Time.unscaledDeltaTime);
     }
 
     private void OnEnable()
@@ -241,6 +251,14 @@ public class GameManager : Singleton<GameManager>
     {
         textStage.text = $"{stage}";
     }
+
+    public void SetTutorialStage(int value)
+    {
+        stage = value;
+        UpdateStageUI();
+    }
+
+    public void SetTutorialNightGlow(bool enabled) => gcController.ToggleGlow(enabled);
 
     /// <summary>엔딩(클리어) 일차.</summary>
     public int EndStage => endStage;
@@ -520,6 +538,7 @@ public class GameManager : Singleton<GameManager>
 
     private void SaveGame()
     {
+        if (Tutorial != null) return;
         var saveData = new SaveData();
 
         // 진행 상황

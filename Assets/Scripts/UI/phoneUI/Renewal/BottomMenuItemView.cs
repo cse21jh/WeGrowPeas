@@ -24,6 +24,7 @@ public sealed class BottomMenuItemView : MonoBehaviour
     private CanvasGroup tintCanvasGroup;
 
     private Action<BottomMenuItemView> _clickCallback;
+    private CanvasGroup _accessCanvasGroup;
 
     /// <summary>
     /// 캐러셀에서 실제로 이동시킬 버튼 루트 RectTransform.
@@ -49,6 +50,18 @@ public sealed class BottomMenuItemView : MonoBehaviour
     public CanvasGroup TintCanvasGroup
     {
         get { return tintCanvasGroup; }
+    }
+
+    public void SetLocked(bool locked)
+    {
+        if (_accessCanvasGroup == null)
+            _accessCanvasGroup = GetComponent<CanvasGroup>();
+        if (_accessCanvasGroup == null)
+            _accessCanvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        // Keep lock opacity separate from the child Tint selection animation.
+        _accessCanvasGroup.alpha = locked ? 0.5f : 1f;
+        gameObject.SetActive(true);
     }
 
     private void Awake()

@@ -32,6 +32,10 @@ public class ProfileData
 [Serializable]
 public class ProfileMeta
 {
+    public bool tutorialChapter1Cleared;
+    public bool tutorialChapter2Cleared;
+    public bool tutorialChapter3Cleared;
+
     /// <summary>마지막으로 저장한 시각(UTC, 유닉스 초).</summary>
     public long lastSavedUnix;
 

@@ -27,6 +27,12 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     // Update is called once per frame
     void Update()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseShovel == false)
+        {
+            if (isDragging) ResetShovel();
+            return;
+        }
+
         if (GameInput.GetDown(GameAction.Shovel))
         {
 
@@ -55,7 +61,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!IsEnabled) return;
+        if (!IsEnabled || GameManager.Instance?.Tutorial?.CanUseShovel == false) return;
 
         if (isDragging) // 삽을 들고 있는 경우
         {
@@ -113,6 +119,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
 
     private void TryDestroyUnderMouse()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseShovel == false) return;
         Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
 
         if(Physics.Raycast(ray, out RaycastHit hit))

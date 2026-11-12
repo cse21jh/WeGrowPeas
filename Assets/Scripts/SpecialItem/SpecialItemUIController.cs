@@ -23,7 +23,8 @@ public class SpecialItemUIController : MonoBehaviour
 
     private void Update()
     {
-        bool hasGift = SpecialItemSystem.PendingGifts > 0;
+        bool hasGift = SpecialItemSystem.PendingGifts > 0 &&
+            GameManager.Instance?.Tutorial?.CanUseSpecialItems != false;
         if (giftButtonRoot != null && giftButtonRoot.activeSelf != hasGift)
             giftButtonRoot.SetActive(hasGift);
         if (hasGift && giftCountText != null)
@@ -33,6 +34,7 @@ public class SpecialItemUIController : MonoBehaviour
     /// <summary>선물 버튼 클릭 → 3택 패널 열기.</summary>
     public void OpenChoicePanel()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
         if (SpecialItemSystem.PendingGifts <= 0) return;
 
         if (_candidates == null || _candidates.Count == 0)

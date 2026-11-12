@@ -77,6 +77,7 @@ public static class SpecialItemSystem
     /// <summary>해당 칸의 리롤 1회 소모. 성공하면 true.</summary>
     public static bool UseSlotReroll(int slot)
     {
+        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return false;
         if (!CanRerollSlot(slot)) return false;
         _slotRerolls[slot]--;
         return true;
@@ -92,6 +93,7 @@ public static class SpecialItemSystem
     /// <summary>10·20·30일 자유시간 시작 시 호출 — 선물 +1 (수령 전까지 유지·누적).</summary>
     public static void AddGift()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
         PendingGifts++;
         Debug.Log($"[SpecialItem] 선물 도착 (미수령 {PendingGifts}개)");
     }
@@ -146,6 +148,7 @@ public static class SpecialItemSystem
     /// <summary>3택에서 하나 선택 — 보유 등록 + 선물 1개 소모.</summary>
     public static void Acquire(SpecialItemData item)
     {
+        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
         if (item == null || string.IsNullOrEmpty(item.id)) return;
         _owned.Add(item.id);
         PendingGifts = Mathf.Max(0, PendingGifts - 1);

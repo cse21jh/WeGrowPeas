@@ -84,6 +84,7 @@ public class ShopController
     /// </summary>
     public void Buy(ItemData data, Action onPurchased = null)
     {
+        if (GameManager.Instance?.Tutorial?.CanUseShop == false) return;
         InitializeIfNeeded();
         if (data == null) return;
 
@@ -216,6 +217,7 @@ public class ShopController
     /// <summary>사용자가 리롤 요청. 성공 시 true(호출 측에서 목록 다시 그림).</summary>
     public bool TryReroll()
     {
+        if (GameManager.Instance?.Tutorial?.CanUseShop == false) return false;
         InitializeIfNeeded();
         if (shopManager == null) return false;
 

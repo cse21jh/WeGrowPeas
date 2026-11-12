@@ -140,6 +140,7 @@ public class EnemyController : MonoBehaviour
 
     public IEnumerator EnemyWaveCoroutine()
     {
+        bool tutorial = GameManager.Instance.Tutorial != null;
         //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
         Wave wave = currentWave;
         // Debug.Log("현재 웨이브 타입 : " + currentWave);
@@ -190,6 +191,8 @@ public class EnemyController : MonoBehaviour
                     }
                     else
                     {
+                        if (tutorial && grid.Board.CountLivingPlants() <= 1)
+                            continue;
                         waveKillCount[(int)currentWave.WaveType] += 1;
                         stageKillRecord[GameManager.Instance.stage]++;
                         GameEvents.RaisePeaDied();
@@ -230,8 +233,13 @@ public class EnemyController : MonoBehaviour
         grid.Soil.UnfreezeAllPlants();
 
 
-        SetNextSeason();
-        SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
+        if (tutorial)
+            lastWave = currentWave;
+        else
+        {
+            SetNextSeason();
+            SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
+        }
 
         grid.Scouter.UpdateGoldScouterImageInGrid(); // 웨이브로 인해 단체로 죽을 때는 한 번만 갱신해서 연산량 줄이기
         grid.Scouter.UpdateResistanceScouterImageInGrid(currentWave.WaveType); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
@@ -278,6 +286,31 @@ public class EnemyController : MonoBehaviour
             nextSecondWave = null;
 
         GameEvents.RaiseWaveScheduleChanged(); // 예보 UI(홈 위젯 등) 즉시 갱신
+    }
+
+    public void SetTutorialWave(WaveType current, WaveType next)
+    {
+        currentWave = GetWaveFromWaveType(current);
+        nextWave = GetWaveFromWaveType(next);
+        setWave = current;
+        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        breedTimerManager.SetTimer(current);
+        ShowNextWaveText();
+        GameEvents.RaiseWaveScheduleChanged();
+    }
+
+    public void RecordTutorialDayWithoutWave()
+    {
+        lastWave = currentWave;
+        stageWaveRecord.Add(WaveType.None);
+        stageKillRecord.Add(0);
+        stageNoTraitRecord.Add(0);
+    }
+
+    public void AdvanceTutorialWave(WaveType following)
+    {
+        lastWave = currentWave;
+        SetTutorialWave(nextWave.WaveType, following);
     }
 
     public void UpdateSecondWaveIfNull()
@@ -360,6 +393,7 @@ public class EnemyController : MonoBehaviour
 
     public void WaveSkip()
     {
+        if (GameManager.Instance?.Tutorial != null) return;
         if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
             return;
 

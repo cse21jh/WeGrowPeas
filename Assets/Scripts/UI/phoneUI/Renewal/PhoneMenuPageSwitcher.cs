@@ -38,6 +38,7 @@ public sealed class PhoneMenuPageSwitcher : MonoBehaviour
     /// </summary>
     public void ShowPage(int pageIndex)
     {
+        if (PhoneManager.Instance?.TryAccessApp(pageIndex) == false) return;
         if (!IsValidIndex(pageIndex))
         {
             Debug.LogWarning(

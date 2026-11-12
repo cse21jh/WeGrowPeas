@@ -18,6 +18,7 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private FloatingPopup defaultFloatingPopupPrefab;
     [SerializeField] private UnlockPopup defaultUnlockPopupPrefab;
     [SerializeField] private Transform popupCanvasParent;
+    internal Transform PopupCanvasParent => popupCanvasParent;
     private void Awake()
     {
         if (Instance != null && Instance != this)

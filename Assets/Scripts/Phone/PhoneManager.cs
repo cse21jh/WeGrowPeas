@@ -208,7 +208,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public void SetOpen(bool open)
     {
-        if (_isOpen == open) return;
+        if ((open && !CanOpenPhone) || _isOpen == open) return;
         PhoneTouchEffect();
         _isOpen = open;
         AlarmController?.DisableAlarm();
@@ -226,7 +226,7 @@ public class PhoneManager : Singleton<PhoneManager>
         else
         {
             if (phoneRoot != null) phoneRoot.SetActive(open);
-            if (phoneBtn != null) phoneBtn.SetActive(!open);
+            if (phoneBtn != null) phoneBtn.SetActive(!open && CanOpenPhone);
             OnPhoneMotionCompleted();
         }
         if (messengerApp != null) messengerApp.CheckCoroutineByTab(open);
@@ -236,12 +236,15 @@ public class PhoneManager : Singleton<PhoneManager>
 
     private void OnPhoneMotionCompleted()
     {
-        if (!_isOpen) AlarmController?.EnableAlarm();
+        if (_isOpen) return;
+        if (!CanOpenPhone && phoneBtn != null) phoneBtn.SetActive(false);
+        AlarmController?.EnableAlarm();
     }
 
 
     public void OpenAppByIndex(int index)
     {
+        if (!TryAccessApp(index)) return;
         bool isInitialPageSetup = pageSwitcher != null && !pageSwitcher.IsInitialized;
         if (!isInitialPageSetup)
             PhoneTouchEffect();
@@ -293,6 +296,7 @@ public class PhoneManager : Singleton<PhoneManager>
     /// </summary>
     public void SelectBottomMenu(int menuIndex)
     {
+        if (!TryAccessApp(menuIndex)) return;
         if (bottomMenu == null)
         {
             // 폰이 닫혀 있으면 하단 메뉴도 비활성 상태이므로 Include로 찾는다.
@@ -361,13 +365,24 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public IEnumerator PhonePhase()
     {
+        TutorialChapter tutorial = GameManager.Instance.Tutorial;
         isPhoneTime = true;
         ClickRouter.Instance.IsBlockedByUI = true;
+        if (tutorial != null && tutorial.WaitingForFirstTax)
+        {
+            phoneTimer = 0f;
+            skipPhoneTimeButton.SetActive(false);
+            yield return new WaitUntil(() => !tutorial.WaitingForFirstTax);
+        }
         SetPhoneTimer();
-        messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString()); // 챗 트리거(플라이바이 메시지)
-        FireWaveUnlockTriggers(GameManager.Instance.stage);                   // 앱 해금 처리(폰 트리거)
-        FireBugTriggers(GameManager.Instance.stage);                          // 첫 해충/익충(폰 트리거)
+        if (tutorial == null)
+        {
+            messengerApp.ActivateTrigger(GameManager.Instance.stage.ToString());
+            FireWaveUnlockTriggers(GameManager.Instance.stage);
+            FireBugTriggers(GameManager.Instance.stage);
+        }
 
+        if (tutorial != null) skipPhoneTime = false;
         skipPhoneTimeButton.SetActive(true);
         phoneTimer = GetMaxPhoneTimer();
         phoneTimerUI.StartPhoneTimer();
@@ -375,7 +390,7 @@ public class PhoneManager : Singleton<PhoneManager>
         // 세금 미납 경고: 국세청(Tax) 앱 아이콘에 빨간 red dot(Mandatory)을 띄우되,
         // pauseIfMandatory:false 로 게임은 멈추지 않게 한다(밤 타이머는 계속 흘러 실패 판정 가능).
         // 납부 시 TaxApp에서 None으로 해제.
-        if (IsTaxUnpaidNight())
+        if (tutorial == null && IsTaxUnpaidNight())
             UpdateAppAlarmState(AppKey.Tax, AlarmState.Mandatory, pauseIfMandatory: false);
 
         bool _warned15s = false;
@@ -390,7 +405,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
             phoneTimer -= Time.deltaTime;
 
-            if (phoneTimer < 15f && !_warned15s)
+            if (tutorial == null && phoneTimer < 15f && !_warned15s)
             {
                 _warned15s = true;
 
@@ -446,6 +461,7 @@ public class PhoneManager : Singleton<PhoneManager>
 
     public float GetMaxPhoneTimer()
     {
+        if (GameManager.Instance?.Tutorial != null) return TutorialChapter.PhoneSeconds;
         float ratio = IsPhonePhase ? CurseState.InsomniaFreeTimeRatio : 1f;
         if (GameManager.Instance != null)
             return GameManager.Instance.grid.Breeder.GetMaxBreedTimer() * ratio;
@@ -456,7 +472,33 @@ public class PhoneManager : Singleton<PhoneManager>
     {
         if (GameManager.Instance.GetGameIsStopped())
             return;
+        TutorialChapter tutorial = GameManager.Instance.Tutorial;
+        if (tutorial != null && (!isPhoneTime || tutorial.WaitingForFirstTax)) return;
         skipPhoneTime = true;
+    }
+
+    public float RemainingPhoneTime => phoneTimer;
+
+    private bool CanOpenPhone => GameManager.Instance?.Tutorial?.CanOpenPhone != false;
+
+    public bool CanOpenApp(int index) => GameManager.Instance?.Tutorial?.CanOpenApp(index) != false;
+
+    public bool TryAccessApp(int index)
+    {
+        if (CanOpenApp(index)) return true;
+        UIManager.Instance?.Popup?.ShowFloatingPopup(Loc.T("game.phone.feature_locked"), 2);
+        return false;
+    }
+
+    public void RefreshTutorialAccess()
+    {
+        if (phoneBtn != null && PhoneMotion?.IsTransitioning != true)
+            phoneBtn.SetActive(!_isOpen && CanOpenPhone);
+        if (bottomMenu == null)
+            bottomMenu = phoneRoot.GetComponentInChildren<BottomMenuCarousel>(true);
+        bottomMenu?.RefreshTutorialAccess(this);
+        foreach (PhoneWidgetMenuButton widget in phoneRoot.GetComponentsInChildren<PhoneWidgetMenuButton>(true))
+            widget.RefreshTutorialAccess(this);
     }
 
     /*
@@ -639,12 +681,12 @@ public class PhoneManager : Singleton<PhoneManager>
                 AppKey.Messenger,
                 out AlarmState messengerState)
                 && messengerState == AlarmState.Mandatory;
-            GameManager.Instance.grid.Breeder.GetBreedTimerUI().ShowPhoneAlarmText(isMessengerMandatory);
+            GameManager.Instance.grid.Breeder.GetBreedTimerUI()?.ShowPhoneAlarmText(isMessengerMandatory);
         }
         else
         {
             GameManager.Instance.ResumeGame();
-            GameManager.Instance.grid.Breeder.GetBreedTimerUI().HidePhoneAlarmText();
+            GameManager.Instance.grid.Breeder.GetBreedTimerUI()?.HidePhoneAlarmText();
         }
     }
 

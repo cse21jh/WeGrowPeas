@@ -190,6 +190,7 @@ public sealed class BottomMenuCarousel : MonoBehaviour
 
     private int _currentIndex;
     private bool _initialized;
+    private int _initialRequestedIndex = -1;
 
     private Coroutine _refreshAfterEnableCoroutine;
 
@@ -378,8 +379,9 @@ public sealed class BottomMenuCarousel : MonoBehaviour
 
         _currentIndex =
             Mod(
-                initialSelectedIndex,
+                _initialRequestedIndex >= 0 ? _initialRequestedIndex : initialSelectedIndex,
                 items.Count);
+        _initialRequestedIndex = -1;
 
         _scrollSlots = 0f;
         _initialized = true;
@@ -444,8 +446,7 @@ public sealed class BottomMenuCarousel : MonoBehaviour
     /// </summary>
     public void SelectIndex(int targetIndex)
     {
-        if (!_initialized ||
-            items.Count == 0)
+        if (items.Count == 0)
         {
             return;
         }
@@ -454,6 +455,15 @@ public sealed class BottomMenuCarousel : MonoBehaviour
             Mod(
                 targetIndex,
                 items.Count);
+
+        if (PhoneManager.Instance?.TryAccessApp(targetIndex) == false)
+            return;
+
+        if (!_initialized)
+        {
+            _initialRequestedIndex = targetIndex;
+            return;
+        }
 
         switch (behaviorMode)
         {
@@ -496,6 +506,12 @@ public sealed class BottomMenuCarousel : MonoBehaviour
         RecalculateLayout();
         ApplyCurrentModeImmediately();
         BringSelectedItemToFront();
+    }
+
+    public void RefreshTutorialAccess(PhoneManager phone)
+    {
+        for (int i = 0; i < items.Count; i++)
+            items[i].SetLocked(!phone.CanOpenApp(i));
     }
 
     /// <summary>

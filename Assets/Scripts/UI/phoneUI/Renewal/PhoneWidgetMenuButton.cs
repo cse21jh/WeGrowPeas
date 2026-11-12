@@ -24,6 +24,7 @@ public sealed class PhoneWidgetMenuButton : MonoBehaviour
         "0 메신저 / 1 국세청 / 2 홈 / 3 상점 / 4 퀘스트")]
     [SerializeField]
     private int menuIndex = PhoneManager.MENU_INDEX_TAX;
+    private CanvasGroup accessCanvasGroup;
 
     private void Awake()
     {
@@ -43,6 +44,8 @@ public sealed class PhoneWidgetMenuButton : MonoBehaviour
 
         button.onClick.RemoveListener(HandleClick);
         button.onClick.AddListener(HandleClick);
+        if (GameManager.Instance?.Tutorial != null && PhoneManager.Instance != null)
+            RefreshTutorialAccess(PhoneManager.Instance);
     }
 
     private void OnDestroy()
@@ -71,5 +74,16 @@ public sealed class PhoneWidgetMenuButton : MonoBehaviour
          * 캐러셀이 선택 강조를 처리하고, 그 결과로 PhoneManager.OpenAppByIndex가 호출된다.
          */
         phone.SelectBottomMenu(menuIndex);
+    }
+
+    public void RefreshTutorialAccess(PhoneManager phone)
+    {
+        if (accessCanvasGroup == null)
+            accessCanvasGroup = GetComponent<CanvasGroup>();
+        if (accessCanvasGroup == null)
+            accessCanvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        accessCanvasGroup.alpha = phone.CanOpenApp(menuIndex) ? 1f : 0.5f;
+        gameObject.SetActive(true);
     }
 }

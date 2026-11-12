@@ -35,6 +35,7 @@ public class GameDebugPanel : MonoBehaviour
 
     private void OnGUI()
     {
+        if (GameManager.Instance?.Tutorial != null) return;
         if (!DebugPanels.Enabled || !show) return;
 
         if (wrapLabel == null)

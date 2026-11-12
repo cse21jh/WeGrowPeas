@@ -70,6 +70,22 @@ public class SceneLoader : MonoBehaviour
         StartCoroutine(LoadSceneRoutine(TutorialSceneName, useLoadingScreen: true));
     }
 
+    public static bool CanStartTutorialChapter(int chapter) => chapter switch
+    {
+        1 => true,
+        2 or 3 => SaveManager.Instance?.HasClearedTutorialChapter(chapter - 1) == true,
+        _ => false
+    };
+
+    public bool TryLoadTutorialChapter(int chapter)
+    {
+        if (isLoading || !CanStartTutorialChapter(chapter)) return false;
+
+        if (chapter == 1) LoadIntroScene();
+        else LoadWithLoadingScreen(chapter == 2 ? "TutorialChapter2" : "TutorialChapter3");
+        return true;
+    }
+
     public void LoadGardenScene()
     {
         StartCoroutine(LoadSceneRoutine(GameSceneName, useLoadingScreen: true));

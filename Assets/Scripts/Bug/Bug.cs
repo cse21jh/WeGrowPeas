@@ -275,7 +275,8 @@ public class Bug : MonoBehaviour
             grid.Upgrades.AddAdditionalPestResistance(0.002f);
             isDie = true;
             GameEvents.RaiseBugKilled();
-            CodexProgress.AddBugKill(GetType().Name); // 도감: 벌레 발견 + 종류별/전체 잡은 수
+            if (GameManager.Instance?.Tutorial == null)
+                CodexProgress.AddBugKill(GetType().Name);
             economyManager.AddGold(Mathf.Max(0, gold + grid.Modifiers.AdditionalBugGold - DawnSystem.Current.bugPriceReduction)); // 새벽: 벌레 기본 가격 감소
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);

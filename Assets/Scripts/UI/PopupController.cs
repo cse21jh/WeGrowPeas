@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PopupController : MonoBehaviour
 {
+    public event System.Action Closed;
+
     [SerializeField] private RectTransform self;
     [SerializeField] private float easeDuration;
     [SerializeField] private Ease ease;
@@ -20,5 +22,6 @@ public class PopupController : MonoBehaviour
         if (self != null) self.DOKill();
 
         gameObject.SetActive(false);
+        Closed?.Invoke();
     }
 }

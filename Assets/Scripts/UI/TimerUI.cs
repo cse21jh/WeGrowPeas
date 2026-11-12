@@ -200,6 +200,26 @@ public class TimerUI : MonoBehaviour
 
     private IEnumerator PhoneCountdown()
     {
+        if (GameManager.Instance?.Tutorial != null)
+        {
+            PhoneManager phone = GameManager.Instance.phoneManager;
+            int displayedSeconds = -1;
+            while (phone.IsPhonePhase)
+            {
+                float remaining = Mathf.Max(0f, phone.RemainingPhoneTime);
+                int seconds = Mathf.CeilToInt(remaining);
+                if (seconds != displayedSeconds)
+                {
+                    textTimer.color = remaining <= 10f ? Color.red : Color.white;
+                    textTimer.text = $"{seconds}s";
+                    displayedSeconds = seconds;
+                }
+                breedTimerController.SetFill(1f - remaining / maxBreedingTime);
+                yield return null;
+            }
+            yield break;
+        }
+
         int timeLeft = maxBreedingTime;
         textTimer.color = Color.white;
         breedTimerController.SetFillImmediately(0f);

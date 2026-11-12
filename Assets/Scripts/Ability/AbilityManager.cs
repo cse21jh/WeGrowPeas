@@ -276,10 +276,12 @@ public class AbilityManager : MonoBehaviour
         }
         return false;
     }
-    public void ChangeGenetics(int val)
+    public void ChangeGenetics(int val) => ChangeGenetics(val, requestSave: true);
+
+    internal void ChangeGenetics(int val, bool requestSave)
     {
         genetics = val;
-        SaveManager.RequestProfileSave(); // 해금·포인트 구매도 여기를 지난다
+        if (requestSave) SaveManager.RequestProfileSave();
         var panel = FindAnyObjectByType<AbilityUIController>();
         if (panel != null) panel.UpdateGenetics();
 

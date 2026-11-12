@@ -47,6 +47,7 @@ public static class UnlockGrants
     /// </summary>
     public static void GrantEventUnlocks(string eventId)
     {
+        if (GameManager.Instance?.Tutorial != null) return;
         if (string.IsNullOrEmpty(eventId)) return;
 
         // 사건 id 자체도 기록(하위 호환/디버그 표시용)

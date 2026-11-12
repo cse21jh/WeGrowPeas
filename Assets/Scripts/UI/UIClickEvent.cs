@@ -27,6 +27,7 @@ public class UIClickEvent : MonoBehaviour
     [SerializeField] private GameObject restartPopup;
     [SerializeField] private GameObject buttonPanel;
     [SerializeField] private GameObject saveSlotPanel;
+    [SerializeField] private TutorialChapterSelectionPopup tutorialChapterSelectionPopup;
 
     // 씬 전환 연출(덮기/열기)은 SceneLoader가 담당한다. 여기서 Transition_Out을 직접 부르지 않는다.
     public void OnClick_StartNewGame(int slotIndex)
@@ -78,6 +79,11 @@ public class UIClickEvent : MonoBehaviour
     public void OnClick_GoToTutorial()
     {
         SceneLoader.Instance?.LoadTutorialScene();
+    }
+
+    public void OnClick_OpenTutorialSelection()
+    {
+        tutorialChapterSelectionPopup?.Open();
     }
 
     public void OnClick_GoToIntro()
