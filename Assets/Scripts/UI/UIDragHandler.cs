@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 {
     [SerializeField] private RectTransform handleArea;  // 드래그 가능한 영역 (예: 상단바)
+    [SerializeField] private bool leftButtonOnly;
 
     private RectTransform rectTransform;   // 패널 자체
     private Canvas canvas;                 // 최상위 Canvas
@@ -19,7 +20,8 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
     public void OnBeginDrag(PointerEventData eventData)
     {
         // 핸들 영역 안에서만 드래그 시작 허용
-        if (!RectTransformUtility.RectangleContainsScreenPoint(handleArea, eventData.position, eventData.pressEventCamera))
+        if ((leftButtonOnly && eventData.button != PointerEventData.InputButton.Left) ||
+            !RectTransformUtility.RectangleContainsScreenPoint(handleArea, eventData.position, eventData.pressEventCamera))
         {
             isDragging = false;
             return;
@@ -27,7 +29,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         isDragging = true;
 
-        RectTransform canvasRect = canvas.transform as RectTransform;
+        RectTransform canvasRect = leftButtonOnly ? rectTransform.parent as RectTransform : canvas.transform as RectTransform;
 
         Vector2 localPointerPos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -42,9 +44,9 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging) return;
+        if (!isDragging || (leftButtonOnly && eventData.button != PointerEventData.InputButton.Left)) return;
 
-        RectTransform canvasRect = canvas.transform as RectTransform;
+        RectTransform canvasRect = leftButtonOnly ? rectTransform.parent as RectTransform : canvas.transform as RectTransform;
 
         // 먼저 마우스 위치를 Canvas 화면 크기 안으로 Clamp
         Vector2 clampedScreenPos = eventData.position;
@@ -65,7 +67,18 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler
             eventData.pressEventCamera,
             out localPointerPos))
         {
-            rectTransform.localPosition = localPointerPos - pointerOffset;
+            Vector2 position = localPointerPos - pointerOffset;
+            if (leftButtonOnly)
+            {
+                var screenCanvas = (RectTransform)canvas.rootCanvas.transform;
+                Vector2 screenMin = canvasRect.InverseTransformPoint(screenCanvas.TransformPoint(screenCanvas.rect.min));
+                Vector2 screenMax = canvasRect.InverseTransformPoint(screenCanvas.TransformPoint(screenCanvas.rect.max));
+                // Keep the header within reach, even when the checklist is dragged to a screen edge.
+                position.x = Mathf.Clamp(position.x, screenMin.x - rectTransform.rect.xMin,
+                    screenMax.x - rectTransform.rect.xMax);
+                position.y = Mathf.Clamp(position.y, screenMin.y + handleArea.rect.height, screenMax.y);
+            }
+            rectTransform.localPosition = position;
         }
     }
 }

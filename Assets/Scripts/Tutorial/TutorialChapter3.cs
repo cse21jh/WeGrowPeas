@@ -8,6 +8,7 @@ public sealed class TutorialChapter3 : TutorialChapter
 
     public override int ChapterNumber => 3;
     public override int FinalStage => 40;
+    protected override IEnumerable<string> PracticeTriggers => new[] { "day10.special", "day21.season" };
     protected override string[] RequiredMessages => new[]
     {
         "day01.start", "day10.special", "day21.season", "complete.ending"
@@ -30,22 +31,40 @@ public sealed class TutorialChapter3 : TutorialChapter
     protected override IEnumerator StartDay(int stage)
     {
         yield return base.StartDay(stage);
-        if (stage == 21) yield return PlayMessages("day21.season");
+        if (stage == 21)
+        {
+            var timer = game.grid.Breeder.GetBreedTimerUI();
+            int previewsBefore = timer.WavePreviewCount;
+            var forecast = FindAnyObjectByType<WeatherWidget>(FindObjectsInactive.Include);
+            yield return PlayPractice("day21.season",
+                new PracticeGoal("inspect_timer", () => timer.WavePreviewCount > previewsBefore, HighlightTimer),
+                new PracticeGoal("inspect_phone_forecast",
+                    () => IsPhoneHomeOpen && (forecast == null || forecast.isActiveAndEnabled),
+                    () => { if (IsPhoneHomeOpen) Highlight(forecast?.transform as RectTransform);
+                        else HighlightPhoneApp(PhoneManager.MENU_INDEX_HOME); }));
+        }
     }
 
     protected override IEnumerator StartFreeTime(int stage)
     {
         if (stage == 10)
         {
-            yield return PlayMessages("day10.special");
             specialItemsUnlocked = true;
             GiveSpecialItem();
-            yield return new WaitUntil(() => SpecialItemSystem.PendingGifts == 0);
+            yield return PlayPractice("day10.special",
+                new PracticeGoal("open_gift", () => IsGiftChoiceOpen || SpecialItemSystem.PendingGifts == 0, HighlightGift),
+                new PracticeGoal("choose_gift", () => SpecialItemSystem.PendingGifts == 0, HighlightGift));
         }
         else if (stage == 20 || stage == 30)
         {
             GiveSpecialItem();
         }
+    }
+
+    protected override void DrawMessageHighlights(string messageId)
+    {
+        if (messageId == "m005" || messageId == "m015") HighlightTimer();
+        if (messageId == "m015") HighlightPhone();
     }
 
     protected override IEnumerator BeforeComplete()

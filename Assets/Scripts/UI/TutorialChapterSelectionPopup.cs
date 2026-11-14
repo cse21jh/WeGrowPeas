@@ -17,6 +17,7 @@ public sealed class TutorialChapterSelectionPopup : MonoBehaviour
     [SerializeField] private ChapterButton[] chapters;
     [SerializeField] private TMP_Text titleLabel;
     [SerializeField] private TMP_Text closeLabel;
+    [SerializeField] private AbilityUIController abilityUIController;
 
     private GameObject previousSelection;
 
@@ -54,6 +55,16 @@ public sealed class TutorialChapterSelectionPopup : MonoBehaviour
 
     public void SelectChapter(int chapter)
     {
+        if (!SceneLoader.CanStartTutorialChapter(chapter)) return;
+
+        if (chapter > 1)
+        {
+            Close();
+            abilityUIController.OpenForTutorialChapter(chapter, Open);
+            SoundManager.Instance?.PlayEffect(SoundIds.Button);
+            return;
+        }
+
         if (SceneLoader.Instance?.TryLoadTutorialChapter(chapter) == true)
             SoundManager.Instance?.PlayEffect(SoundIds.Button);
     }

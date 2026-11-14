@@ -14,6 +14,7 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
     [SerializeField] private float targetFillAmount = 1f;
 
     public bool isLocked = false;
+    internal int WavePreviewCount { get; private set; }
 
     public void SetFill(float fillAmount)
     {
@@ -48,6 +49,7 @@ public class BreedTimerController : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!isLocked && PhoneManager.Instance?.IsPhonePhase != true) WavePreviewCount++;
         // 마우스가 버튼 위에 올려졌을 때
         if (!isLocked)
         {

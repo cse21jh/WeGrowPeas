@@ -12,6 +12,8 @@ public class TimerUI : MonoBehaviour
     private bool alarmIsMandatory;
 
     [SerializeField] private BreedTimerController breedTimerController;
+    internal RectTransform BarRect => breedTimerController != null ? breedTimerController.transform as RectTransform : null;
+    internal int WavePreviewCount => breedTimerController != null ? breedTimerController.WavePreviewCount : 0;
 
     private void OnEnable() => Loc.LanguageChanged += RefreshAlarmText;
 

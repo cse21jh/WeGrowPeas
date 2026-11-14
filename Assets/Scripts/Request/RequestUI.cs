@@ -5,6 +5,16 @@ using UnityEngine.UI;
 
 public class RequestUI : MonoBehaviour
 {
+    internal bool HasExpandedRequest
+    {
+        get
+        {
+            foreach (Transform child in questItemContentParent)
+                if (child.TryGetComponent(out ExpandableQuestTab tab) && tab.IsExpanded) return true;
+            return false;
+        }
+    }
+
     [SerializeField] private Transform questItemContentParent;
     [SerializeField] private GameObject questItem;
     [SerializeField] private TextMeshProUGUI nullText;

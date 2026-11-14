@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05e92e4919d75c040981d0a214fba377, type: 3}
+  m_Script: {fileID: 11500000, guid: d09274abe3654ea9818ccef5311dc2fb, type: 3}
   m_Name: Tutorial2Chat
   m_EditorClassIdentifier: 
   chatPartner: {fileID: 11400000, guid: 5dcbea32434a4fd39df298eb6c2b1e85, type: 2}
@@ -19,7 +19,17 @@ MonoBehaviour:
     isMandatory: 1
     waitForAdvanceSignal: 0
     delayAfterPrevious: 0
+  - locId: m012
+    triggerId: tutorial2.day01.start
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
   - locId: m002
+    triggerId: tutorial2.day01.start
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m013
     triggerId: tutorial2.day01.start
     isMandatory: 1
     waitForAdvanceSignal: 0
@@ -29,10 +39,30 @@ MonoBehaviour:
     isMandatory: 1
     waitForAdvanceSignal: 0
     delayAfterPrevious: 0
+  - locId: m014
+    triggerId: tutorial2.day03.shop
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m020
+    triggerId: tutorial2.day03.shop
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
   - locId: m004
     triggerId: tutorial2.day03.shop
     isMandatory: 1
     waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m015
+    triggerId: tutorial2.day03.shop
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m016
+    triggerId: tutorial2.day03.shop
+    isMandatory: 1
+    waitForAdvanceSignal: 1
     delayAfterPrevious: 0
   - locId: m005
     triggerId: tutorial2.day11.bugs
@@ -44,7 +74,17 @@ MonoBehaviour:
     isMandatory: 1
     waitForAdvanceSignal: 0
     delayAfterPrevious: 0
+  - locId: m017
+    triggerId: tutorial2.day11.bugs
+    isMandatory: 1
+    waitForAdvanceSignal: 1
+    delayAfterPrevious: 0
   - locId: m007
+    triggerId: tutorial2.day16.quests
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m018
     triggerId: tutorial2.day16.quests
     isMandatory: 1
     waitForAdvanceSignal: 0
@@ -52,9 +92,14 @@ MonoBehaviour:
   - locId: m008
     triggerId: tutorial2.day16.quests
     isMandatory: 1
-    waitForAdvanceSignal: 0
+    waitForAdvanceSignal: 1
     delayAfterPrevious: 0
   - locId: m009
+    triggerId: tutorial2.complete.awarded
+    isMandatory: 1
+    waitForAdvanceSignal: 0
+    delayAfterPrevious: 0
+  - locId: m019
     triggerId: tutorial2.complete.awarded
     isMandatory: 1
     waitForAdvanceSignal: 0

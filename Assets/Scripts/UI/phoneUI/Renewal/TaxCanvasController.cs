@@ -31,6 +31,8 @@ public class TaxCanvasController : MonoBehaviour
     [Tooltip("두 버튼 각각의 '현재 보유액' 텍스트")]
     [SerializeField] private TMP_Text[] currentGoldTexts;
 
+    internal RectTransform PayButtonRect => payBtn_Payable != null ? payBtn_Payable.transform as RectTransform : null;
+
     private void OnEnable()
     {
         Loc.LanguageChanged += Refresh;

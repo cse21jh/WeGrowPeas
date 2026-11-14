@@ -112,6 +112,8 @@ public class MessengerApp : MonoBehaviour
     public bool IsDisplayingMessages { get; private set; }
     public bool IsMandatoryPopupOpen => mandatoryPopupOpen;
     public event Action<MandatoryMessageHandle> OnMandatoryAdvanceBlocked;
+    internal event Action<Chat, ChatMessage> OnMandatoryMessageShown;
+    internal event Action OnMandatoryMessagesClosed;
 
     private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
 
@@ -240,28 +242,26 @@ public class MessengerApp : MonoBehaviour
         ReportAlarmState();
     }
 
-    public bool ConfigureTutorialChat(Chat chat, IEnumerable<string> requiredTriggers, string practiceTrigger,
-        out MandatoryMessageHandle practiceHandle)
+    internal bool ConfigureTutorialChat(Chat chat, IEnumerable<string> requiredTriggers, IEnumerable<string> practiceTriggers)
     {
-        practiceHandle = default;
         if (chat == null || chat.chatPartner == null || !chat.useSaveSlotReadStateOnly ||
             chat.messages == null || mandatoryMessagePopup == null ||
             chat.messages.Any(message => message == null || !message.isMandatory) ||
             !requiredTriggers.All(trigger => chat.messages.Any(message => message.triggerId == trigger)))
             return false;
 
-        ChatMessage practiceMessage = practiceTrigger == null ? null :
-            chat.messages.LastOrDefault(message => message.triggerId == practiceTrigger);
-        if ((practiceTrigger != null && (practiceMessage == null || !practiceMessage.waitForAdvanceSignal)) ||
-            chat.messages.Any(message => message != practiceMessage && message.waitForAdvanceSignal))
-            return false;
+        var practiceMessages = new HashSet<ChatMessage>();
+        foreach (string trigger in practiceTriggers)
+        {
+            var last = chat.messages.LastOrDefault(message => message.triggerId == trigger);
+            if (last == null || !last.waitForAdvanceSignal) return false;
+            practiceMessages.Add(last);
+        }
+        if (chat.messages.Any(message => message.waitForAdvanceSignal != practiceMessages.Contains(message))) return false;
 
         allChats = new List<Chat> { chat };
         Initialize();
         SetProgress(null);
-        if (practiceMessage != null)
-            practiceHandle = new MandatoryMessageHandle(
-                chat.chatPartner.chatPartnerName, chat.messages.IndexOf(practiceMessage), practiceTrigger);
         return true;
     }
 
@@ -323,6 +323,7 @@ public class MessengerApp : MonoBehaviour
         mandatoryEntries.Clear();
         heldOptionalMessages.Clear();
         mandatoryPopupIndex = 0;
+        OnMandatoryMessagesClosed?.Invoke();
         UpdateMessenger();
     }
 
@@ -350,6 +351,7 @@ public class MessengerApp : MonoBehaviour
         }
 
         RefreshMandatoryNavigation();
+        OnMandatoryMessageShown?.Invoke(reference.chat, reference.message);
     }
 
     private void RefreshMandatoryNavigation()

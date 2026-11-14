@@ -29,6 +29,10 @@ public class BreedingController : MonoBehaviour
     public float MaxBreedTimer => maxBreedTimer;
     public int MaxBreedCount => maxBreedCount;
     public int BreedCount => breedCount; // 스테이지 단위 저장이라 아직 ㄱㅊ
+    internal RectTransform BreedButtonRect => breedButton.transform as RectTransform;
+    internal RectTransform BreedSkipRect => breedSkipButton.transform as RectTransform;
+    internal RectTransform BreedCountRect => breedCountUI.rectTransform;
+    internal event System.Action OnParentSelected;
     private int lastMutationKind = 0;
 
     /// <summary>직전 교배에서 변종이 발생했는가.</summary>
@@ -558,6 +562,7 @@ public class BreedingController : MonoBehaviour
             SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj1 = clickedObject;
             clickedPea.MakeSelectedSprite();
+            OnParentSelected?.Invoke();
         }
         else if (breedObj2 == null)
         {
@@ -565,6 +570,7 @@ public class BreedingController : MonoBehaviour
             SoundManager.Instance.PlayEffect(SoundIds.SelectPlant);
             breedObj2 = clickedObject;
             clickedPea.MakeSelectedSprite();
+            OnParentSelected?.Invoke();
         }
         else
         {

@@ -77,10 +77,11 @@ public class SceneLoader : MonoBehaviour
         _ => false
     };
 
-    public bool TryLoadTutorialChapter(int chapter)
+    public bool TryLoadTutorialChapter(int chapter, System.Action beforeLoad = null)
     {
         if (isLoading || !CanStartTutorialChapter(chapter)) return false;
 
+        beforeLoad?.Invoke();
         if (chapter == 1) LoadIntroScene();
         else LoadWithLoadingScreen(chapter == 2 ? "TutorialChapter2" : "TutorialChapter3");
         return true;

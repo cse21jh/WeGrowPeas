@@ -97,7 +97,9 @@ public class WeatherWidget : MonoBehaviour
 
         // 폰을 보는 시점(밤) 기준으로 CurrentWave가 "내일 올 웨이브"다.
         // EnemyController가 날씨 앱에 UpdateCurrentWave(stage + 1, currentWave)로 넘기는 것과 같은 규칙.
-        Wave tomorrow = enemy.CurrentWave;
+        // This lesson opens the home screen before the normal night rollover.
+        Wave tomorrow = GameManager.Instance.Tutorial?.IsDayForecastPractice == true
+            ? enemy.NextWave : enemy.CurrentWave;
 
         // 같은 날 두 번째로 오는 웨이브 (이중 웨이브 저주). 없으면 null.
         Wave sameDaySecond = Valid(enemy.GetNextSecondWave()) ? enemy.GetNextSecondWave() : null;

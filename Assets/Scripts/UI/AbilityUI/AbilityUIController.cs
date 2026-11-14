@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class AbilityUIController : MonoBehaviour
@@ -49,8 +50,10 @@ public class AbilityUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI geneticsInGeneralPanel;
 
     private PlayablePlantType selectedPlant = PlayablePlantType.Pea;
-    private List<PlantAbilityData> selectedPlantAbilities = new();
-    private List<GeneralAbilityData> selectedGeneralAbilities = new();
+    private readonly Dictionary<PlantAbilityData, int> selectedPlantAbilityLevels = new();
+    private readonly List<GeneralAbilityData> selectedGeneralAbilities = new();
+    private int tutorialChapter;
+    private Action onTutorialSelectionCanceled;
 
     private int remainPlantAbilityPoint = -1;
     private int remainGeneralAbilityPoint = -1;
@@ -58,6 +61,10 @@ public class AbilityUIController : MonoBehaviour
     private void Start()
     {
         abilityManager = AbilityManager.Instance;
+        addGeneralAbilityButton.onClick.AddListener(() =>
+        {
+            OpenUnlockUI(Loc.T("game.ability.general_point"), abilityManager.GeneralAbilityPoint * 500, TryAddGeneralAbilityPoint);
+        });
     }
 
     private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
@@ -92,11 +99,38 @@ public class AbilityUIController : MonoBehaviour
         generalAbilityPanel.SetActive(false);
 
         selectedPlant = PlayablePlantType.Pea;
-        selectedPlantAbilities.Clear();
+        selectedPlantAbilityLevels.Clear();
         selectedGeneralAbilities.Clear();
 
         remainPlantAbilityPoint = -1;
         remainGeneralAbilityPoint = -1;
+
+        var onCanceled = onTutorialSelectionCanceled;
+        tutorialChapter = 0;
+        onTutorialSelectionCanceled = null;
+        onCanceled?.Invoke();
+    }
+
+    public void OpenForTutorialChapter(int chapter, Action onCanceled)
+    {
+        tutorialChapter = chapter;
+        onTutorialSelectionCanceled = onCanceled;
+        EventSystem.current?.SetSelectedGameObject(null);
+        OpenPlantAbilityPanel();
+    }
+
+    public void BackToPlantAbilityPanel()
+    {
+        if (tutorialChapter == 0)
+        {
+            CloseAbilityPanel();
+            OpenPlantAbilityPanel();
+            return;
+        }
+
+        generalAbilityPanel.SetActive(false);
+        plantAbilityPanel.SetActive(true);
+        UpdateGenetics();
     }
 
     public void OpenPlantAbilityPanel() // 첫 시작
@@ -157,14 +191,13 @@ public class AbilityUIController : MonoBehaviour
     private void UpdatePlantAbilityList(PlayablePlantType plant) // 식물을 고르면 해당 식물에 대한 특성들 띄워주는 함수
     {
         foreach (Transform child in plantAbilityListContent) Destroy(child.gameObject);
-        selectedPlantAbilities.Clear();
+        selectedPlantAbilityLevels.Clear();
 
         var abilities = abilityManager.GetAllPlantAbility().Where(ability => ability.type == plant);
 
         foreach(var a in abilities) 
         {
             GameObject ability = Instantiate(plantAbilityPrefab, plantAbilityListContent);
-            a.level = 0;
             ability.GetComponent<PlantAbilityButton>().Init(a, this);
         }
     }
@@ -176,48 +209,28 @@ public class AbilityUIController : MonoBehaviour
         //UI에 적용 필요
     }
 
-    public bool LevelUpPlantAbility(PlantAbilityData ability) // 특정 특성 레벨 + 1
+    public int GetPlantAbilityLevel(PlantAbilityData ability)
     {
-        if (remainPlantAbilityPoint <= 0) return false; // 스킬 포인트 없
-
-        int idx = selectedPlantAbilities.FindIndex(item => item == ability);
-
-        if (idx == -1) // 아직 리스트에 삽입 안 된 경우
-        {
-            ability.level = 1;
-            selectedPlantAbilities.Add(ability);
-            UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint - 1);
-            return true;
-        }
-        // 리스트 안에 들어있는 경우
-
-        if (selectedPlantAbilities[idx].level == AbilityManager.MaxPlantAbilityLevel) // 이미 최고랩
-            return false;
-
-        selectedPlantAbilities[idx].level++; // 들어 있고, 최고랩이 아닌 경우
-        UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint - 1);
-        return true;
+        return selectedPlantAbilityLevels.TryGetValue(ability, out int level) ? level : 0;
     }
 
-    public bool LevelDownPlantAbility(PlantAbilityData ability)// 특정 특성 레벨 - 1
-    {        
-        int idx = selectedPlantAbilities.FindIndex(item => item == ability);
+    public void LevelUpPlantAbility(PlantAbilityData ability)
+    {
+        int level = GetPlantAbilityLevel(ability);
+        if (remainPlantAbilityPoint <= 0 || level >= AbilityManager.MaxPlantAbilityLevel) return;
 
-        if (idx == -1) // 아직 리스트에 삽입 안 된 경우
-            return false;
+        selectedPlantAbilityLevels[ability] = level + 1;
+        UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint - 1);
+    }
 
-        // 리스트 안에 들어있는 경우
-        if (selectedPlantAbilities[idx].level == 1) // 풀에서 제거
-        {
-            selectedPlantAbilities[idx].level--;
-            selectedPlantAbilities.Remove(ability);
-            UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint + 1);
-            return true;
-        }
+    public void LevelDownPlantAbility(PlantAbilityData ability)
+    {
+        if (!selectedPlantAbilityLevels.TryGetValue(ability, out int level)) return;
 
-        selectedPlantAbilities[idx].level--; // 들어 있고, 1렙이 아닌 경우
+        if (level == 1) selectedPlantAbilityLevels.Remove(ability);
+        else selectedPlantAbilityLevels[ability] = level - 1;
+
         UpdateRemainPlantAbilityPoint(remainPlantAbilityPoint + 1);
-        return true;
     }
 
     public void TryAddPlantAbilityPoint(PlayablePlantType plant) // 해당 식물의 특성 포인트 증가
@@ -260,11 +273,6 @@ public class AbilityUIController : MonoBehaviour
 
             ability.GetComponent<GeneralAbilityButton>().Init(a, abilityManager.IsGeneralAbilityDataUnlocked[a.UnlockKey] ,this);
         }
-
-        addGeneralAbilityButton.GetComponent<Button>().onClick.AddListener(() =>
-        {
-            OpenUnlockUI(Loc.T("game.ability.general_point"), AbilityManager.Instance.GeneralAbilityPoint * 500, () => TryAddGeneralAbilityPoint());            
-        });
 
         remainGeneralAbilityPoint = abilityManager.GetGeneralAbilityPoint();
         UpdateRemainGeneralAbilityPoint(remainGeneralAbilityPoint);
@@ -363,9 +371,14 @@ public class AbilityUIController : MonoBehaviour
 
     public void ConfirmAbility()
     {
-        abilityManager.SetPlantByEnum(selectedPlant);
-        abilityManager.SetPlantAbility(selectedPlantAbilities);
-        abilityManager.SetGeneralAbility(selectedGeneralAbilities);
+        if (tutorialChapter != 0)
+        {
+            if (SceneLoader.Instance?.TryLoadTutorialChapter(tutorialChapter, ApplySelection) == true)
+                onTutorialSelectionCanceled = null;
+            return;
+        }
+
+        ApplySelection();
 
         // 새벽 모드가 해금됐으면 새벽 단계 선택 패널을 띄우고(거기서 시작),
         // 미해금이면 기존대로 바로 게임 시작.
@@ -382,6 +395,19 @@ public class AbilityUIController : MonoBehaviour
         }
     }
 
+    private void ApplySelection()
+    {
+        var plantAbilities = new List<PlantAbilityData>(selectedPlantAbilityLevels.Count);
+        foreach (var selection in selectedPlantAbilityLevels)
+        {
+            selection.Key.level = selection.Value;
+            plantAbilities.Add(selection.Key);
+        }
+
+        abilityManager.SetPlantByEnum(selectedPlant);
+        abilityManager.SetPlantAbility(plantAbilities);
+        abilityManager.SetGeneralAbility(new List<GeneralAbilityData>(selectedGeneralAbilities));
+    }
 
     public void OpenUnlockUI(string name, int price, Action unlockAction)
     {

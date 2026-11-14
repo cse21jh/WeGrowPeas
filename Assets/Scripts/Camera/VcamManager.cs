@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 
 public class VcamManager : MonoBehaviour
 {
+    internal event System.Action OnCameraDragged;
+    internal event System.Action<bool> OnCameraZoomed;
+
     [Header("References")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Transform sharedFollowTarget;
@@ -212,11 +215,17 @@ public class VcamManager : MonoBehaviour
             currentMousePosition
         );
 
-        targetPosition += worldDelta;
-
-        ApplyCameraState(!enableSmoothZoom);
-
+        ApplyDragInput(worldDelta);
         previousMousePosition = currentMousePosition;
+    }
+
+    private void ApplyDragInput(Vector3 worldDelta)
+    {
+        Vector3 beforeDrag = targetPosition;
+        targetPosition += worldDelta;
+        ApplyCameraState(!enableSmoothZoom);
+        if (((Vector2)(targetPosition - beforeDrag)).sqrMagnitude > 0.00000001f)
+            OnCameraDragged?.Invoke();
     }
 
     private void HandleZoom()
@@ -238,14 +247,18 @@ public class VcamManager : MonoBehaviour
             return;
         }
 
-        scroll = Mathf.Clamp(scroll, -maxScrollPerFrame, maxScrollPerFrame);
+        ApplyZoomInput(scroll, Input.mousePosition);
+    }
 
-        Vector3 mousePosition = Input.mousePosition;
+    private void ApplyZoomInput(float scroll, Vector3 mousePosition)
+    {
+        scroll = Mathf.Clamp(scroll, -maxScrollPerFrame, maxScrollPerFrame);
 
         Vector3 mouseWorldBeforeZoom = zoomAroundMousePosition
             ? ScreenToWorldByOrthographicSize(mousePosition, targetPosition, targetOrthographicSize)
             : Vector3.zero;
 
+        float beforeZoom = targetOrthographicSize;
         targetOrthographicSize -= scroll * zoomSensitivity;
         targetOrthographicSize = ClampOrthographicSize(targetOrthographicSize);
 
@@ -261,6 +274,8 @@ public class VcamManager : MonoBehaviour
         }
 
         ApplyCameraState(!enableSmoothZoom);
+        if (!Mathf.Approximately(targetOrthographicSize, beforeZoom))
+            OnCameraZoomed?.Invoke(targetOrthographicSize < beforeZoom);
     }
 
     private Vector3 GetMouseDragWorldDelta(Vector3 previousScreenPosition, Vector3 currentScreenPosition)

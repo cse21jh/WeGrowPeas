@@ -12,6 +12,7 @@ public class FenceUIManager : MonoBehaviour
     [SerializeField] private FenceElementController[] fenceElements;
     [SerializeField] private RectTransform[] showPos;
     [SerializeField] private RectTransform[] hidePos;
+    internal IReadOnlyList<RectTransform> TraitDisplayPositions => showPos;
     [SerializeField] private float showDelay = 0.1f;
     [SerializeField] private float moveDuration = 0.3f;
     [SerializeField] private Ease moveEase = Ease.OutBack;
@@ -21,6 +22,7 @@ public class FenceUIManager : MonoBehaviour
     [SerializeField] private PriceSignController priceSign;
 
     private int showingPlantGridIndex = -1;
+    internal bool HasVisiblePlant => showingPlantGridIndex >= 0;
 
 
     [Space(10)]

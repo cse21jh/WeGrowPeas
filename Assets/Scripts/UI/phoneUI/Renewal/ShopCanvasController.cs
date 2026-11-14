@@ -76,6 +76,9 @@ public class ShopCanvasController : MonoBehaviour
 
     // 상세 패널에서 보고 있는 아이템
     private ItemController selectedSlot;
+    internal bool IsItemDetailOpen => descriptionLayer.gameObject.activeInHierarchy && selectedSlot != null;
+    internal int SuccessfulRerolls { get; private set; }
+    internal RectTransform RerollRect => rerollButton != null ? rerollButton.transform as RectTransform : null;
 
     // 마지막으로 선택한 탭 (0=전체, 1=고정, 2=로테이션) — 리롤/구매 후 같은 탭 유지
     private int currentTab = 0;
@@ -124,6 +127,7 @@ public class ShopCanvasController : MonoBehaviour
 
         if (shop.TryReroll())
         {
+            SuccessfulRerolls++;
             CloseItemDetailPanel();
             RefreshCurrentTab();
             UpdateRerollButton();
@@ -181,6 +185,7 @@ public class ShopCanvasController : MonoBehaviour
     {
         // 유일하게 내가 미리 구현해두는 함수
 
+        descriptionLayer.DOKill();
         descriptionLayer.gameObject.SetActive(true);
         descriptionLayer.DOAnchorPosY(layerOpenRect.anchoredPosition.y, layerMoveDuration).SetEase(layerMoveEase).OnComplete(() =>
         {
@@ -192,6 +197,7 @@ public class ShopCanvasController : MonoBehaviour
     {
         // 유일하게 내가 미리 구현해두는 함수
 
+        descriptionLayer.DOKill();
         itemListLayer.gameObject.SetActive(true);
         descriptionLayer.DOAnchorPosY(layerCloseRect.anchoredPosition.y, layerMoveDuration).SetEase(layerMoveEase).OnComplete(() =>
         {

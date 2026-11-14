@@ -131658,7 +131658,7 @@ PrefabInstance:
     - target: {fileID: 331083342710061183, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: 'allChats.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: d0b646ac59cf4e088893b0deb96753ee, type: 2}
+      objectReference: {fileID: 11400000, guid: 8a999ea777554665a587488087fde808, type: 2}
     - target: {fileID: 344107230263782797, guid: 1ee79c2c769a9f84584ff9e3b00c98a0, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -161264,16 +161264,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1461606226}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 079751634a6d4709ab59a48b8a7c6859, type: 3}
+  m_Script: {fileID: 11500000, guid: f49e63a3d49c1b5459634ede63ae8515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chat: {fileID: 11400000, guid: d0b646ac59cf4e088893b0deb96753ee, type: 2}
+  chat: {fileID: 11400000, guid: 8a999ea777554665a587488087fde808, type: 2}
   shovel: {fileID: 1978311946}
   shovelBackground: {fileID: 921100000000000002}
   breedRulePopup: {fileID: 3411097808476539923, guid: f49092047142c1c4194e0a57b697e45d, type: 3}
-  tutorialBugPrefab: {fileID: 0}
-  specialItemPrefab: {fileID: 0}
-  startingGold: 0
+  tutorialBugPrefab: {fileID: 3979688952226491961, guid: 6ff2184563927e24ca2fcb1504e3b426, type: 3}
+  specialItemPrefab: {fileID: 9058216730086518056, guid: ca420808dd1f1204992783e3b484bd0f, type: 3}
+  startingGold: 2000
+  highlightPrefab: {fileID: 1773187341836639372, guid: 22a448ce251d1b64e9aa261654410aa0, type: 3}
+  goalPopupPrefab: {fileID: 6174041837863606105, guid: 5611a3a0c9034e93870eed3e2a17f41e, type: 3}
 --- !u!1 &921100000000000002 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8987400508516073267, guid: 294bf5dea5bd3f64c97a02adc1770dae, type: 3}

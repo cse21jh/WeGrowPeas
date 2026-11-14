@@ -27,14 +27,14 @@ public class PlantAbilityButton : MonoBehaviour
         levelUpButton.onClick.AddListener(() =>
         {
             abilityUIController.LevelUpPlantAbility(ability);
-            ChangeLevelUI(ability.level);
+            ChangeLevelUI(abilityUIController.GetPlantAbilityLevel(ability));
             SoundManager.Instance.PlayEffect(SoundIds.Button);
         });
 
         levelDownButton.onClick.AddListener(() =>
         {
             abilityUIController.LevelDownPlantAbility(ability);
-            ChangeLevelUI(ability.level);
+            ChangeLevelUI(abilityUIController.GetPlantAbilityLevel(ability));
             SoundManager.Instance.PlayEffect(SoundIds.Button);
         });
     }

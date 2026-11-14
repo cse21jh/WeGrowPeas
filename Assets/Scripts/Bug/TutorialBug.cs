@@ -6,6 +6,7 @@ public class TutorialBug : Bug
 {
     private bool letMove = true;
     public bool canCatchBug = false;
+    internal bool HasBeenCaught => isHit || isDie;
     private Vector3 spawnPosition = new Vector3(10f, -1f, 0f);
 
     protected override void Start()
@@ -72,7 +73,8 @@ public class TutorialBug : Bug
     {
         spawnPosition = position;
         letMove = false;
-        canCatchBug = true;
+        canCatchBug = false;
+        transform.position = position;
     }
 
     protected override void OnTriggerEnter(Collider other)

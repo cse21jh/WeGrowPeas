@@ -289,6 +289,9 @@ public class PhoneManager : Singleton<PhoneManager>
     public const int MENU_INDEX_SHOP = 3;
     public const int MENU_INDEX_QUEST = 4;
 
+    internal RectTransform OpenButtonRect => phoneBtn != null ? phoneBtn.transform as RectTransform : null;
+    internal RectTransform GetMenuButtonRect(int index) => bottomMenu?.GetButtonRect(index);
+
     /// <summary>
     /// 하단 메뉴 버튼을 실제로 누른 것과 동일하게 동작한다.
     /// 버튼 강조 연출은 캐러셀이 처리하고, 그 결과로 OpenAppByIndex가 호출된다.
@@ -681,7 +684,11 @@ public class PhoneManager : Singleton<PhoneManager>
                 AppKey.Messenger,
                 out AlarmState messengerState)
                 && messengerState == AlarmState.Mandatory;
-            GameManager.Instance.grid.Breeder.GetBreedTimerUI()?.ShowPhoneAlarmText(isMessengerMandatory);
+            var timer = GameManager.Instance.grid.Breeder.GetBreedTimerUI();
+            if (GameManager.Instance.Tutorial?.ShowWavePreviewDuringMessage == true)
+                timer?.HidePhoneAlarmText();
+            else
+                timer?.ShowPhoneAlarmText(isMessengerMandatory);
         }
         else
         {

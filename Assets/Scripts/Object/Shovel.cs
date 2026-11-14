@@ -17,6 +17,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
     private Vector2 initialPos;
 
     public bool IsEnabled { get; set; } = true;
+    internal RectTransform HandleRect => shovelRectTransform;
 
     // Start is called before the first frame update
     void Start()

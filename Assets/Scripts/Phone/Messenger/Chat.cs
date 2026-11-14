@@ -7,6 +7,7 @@ using System.Linq;
 public class Chat : ScriptableObject, ILocListSource
 {
     private const string LocPrefix = "chat";
+    protected virtual string LocalizationPrefix => LocPrefix;
 
     public ChatPartner chatPartner;
     public List<ChatMessage> messages;
@@ -15,7 +16,7 @@ public class Chat : ScriptableObject, ILocListSource
 
     /// <summary>화면에 보여줄 메시지 문구.</summary>
     public string GetText(ChatMessage message)
-        => Loc.T(LocKey.For(LocPrefix, name, message.locId));
+        => Loc.T(LocKey.For(LocalizationPrefix, name, message.locId));
 
     public IEnumerable<string> GetLocIds() => messages.Where(m => m != null).Select(m => m.locId);
 

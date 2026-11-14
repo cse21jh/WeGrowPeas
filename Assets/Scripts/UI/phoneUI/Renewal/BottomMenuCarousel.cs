@@ -514,6 +514,9 @@ public sealed class BottomMenuCarousel : MonoBehaviour
             items[i].SetLocked(!phone.CanOpenApp(i));
     }
 
+    internal RectTransform GetButtonRect(int index) =>
+        index >= 0 && index < items.Count && items[index] != null ? items[index].MoveTarget : null;
+
     /// <summary>
     /// 현재 부모 크기와 설정값을 기준으로 레이아웃을 다시 계산한다.
     /// </summary>

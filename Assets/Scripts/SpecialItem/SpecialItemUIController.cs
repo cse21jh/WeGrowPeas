@@ -12,6 +12,7 @@ public class SpecialItemUIController : MonoBehaviour
 {
     [Header("Gift Button (미수령 선물 있을 때 표시)")]
     [SerializeField] private GameObject giftButtonRoot;
+    [SerializeField] private RectTransform giftButton;
     [SerializeField] private TMP_Text giftCountText;
 
     [Header("Choice Panel (전체화면 3택)")]
@@ -20,6 +21,9 @@ public class SpecialItemUIController : MonoBehaviour
     [SerializeField] private SpecialItemCard[] cards;
 
     private List<SpecialItemData> _candidates; // 이번 선물의 후보(선택/소진 전까지 고정)
+
+    internal RectTransform GiftButtonRect => choicePanel?.activeInHierarchy != true ? giftButton : null;
+    internal bool IsChoicePanelOpen => choicePanel != null && choicePanel.activeInHierarchy;
 
     private void Update()
     {
