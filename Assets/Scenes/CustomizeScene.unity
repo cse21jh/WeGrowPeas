@@ -1733,6 +1733,7 @@ GameObject:
   - component: {fileID: 376843487}
   - component: {fileID: 376843486}
   - component: {fileID: 376843485}
+  - component: {fileID: 376843490}
   m_Layer: 5
   m_Name: SaveBtn
   m_TagString: Untagged
@@ -1906,6 +1907,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376843483}
   m_CullTransparentMesh: 1
+--- !u!114 &376843490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376843483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 376843488}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &407426805
 GameObject:
   m_ObjectHideFlags: 0
@@ -2964,6 +2983,7 @@ GameObject:
   - component: {fileID: 786288573}
   - component: {fileID: 786288572}
   - component: {fileID: 786288571}
+  - component: {fileID: 786288576}
   m_Layer: 5
   m_Name: UndoBtn
   m_TagString: Untagged
@@ -3137,6 +3157,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786288569}
   m_CullTransparentMesh: 1
+--- !u!114 &786288576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786288569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 786288574}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &812112929
 GameObject:
   m_ObjectHideFlags: 0
@@ -3331,6 +3369,7 @@ GameObject:
   - component: {fileID: 884316847}
   - component: {fileID: 884316846}
   - component: {fileID: 884316845}
+  - component: {fileID: 884316850}
   m_Layer: 5
   m_Name: MainBtn
   m_TagString: Untagged
@@ -3504,6 +3543,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 884316843}
   m_CullTransparentMesh: 1
+--- !u!114 &884316850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884316843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 884316848}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &898847278
 GameObject:
   m_ObjectHideFlags: 0

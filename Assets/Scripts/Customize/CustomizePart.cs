@@ -19,7 +19,7 @@ public enum CustomizePart
 
     // 목재
     WoodBorder = 10,  // 텃밭 테두리 나무밑동 (garden_4에서 분리 예정, 아직 연결된 대상 없음)
-    WoodFence = 11,   // 앞쪽 울타리 (Background/fence_re.png)
+    // 11: 예전 WoodFence(울타리). UI의 UIFence로 옮겼으므로 다시 쓰지 않는다.
 
     // 풀밭
     GrassTexture = 20, // 바닥 풀잎 텍스처, 풀 메시 (Grass/grassss.png)
@@ -29,6 +29,13 @@ public enum CustomizePart
     // 케이스
     PhoneSmall = 30,  // 접힌 휴대전화, 오른쪽 Tab 버튼 (Legacy/ReNew/Btn_phoneToggleNew1.png)
     PhoneLarge = 31,  // 펼친 휴대전화 프레임 (Renewal/Frame1.png)
+
+    // UI
+    UIFence = 40,        // 형질 울타리, 화면 아래 캔버스 울타리 (Background/fence_re.png)
+    UITimeBar = 41,      // 타임바 바탕 (Legacy/ReNew/BG_TimeBar.png)
+    UIBtnWood = 42,      // 나무 버튼, 여러 씬·프리팹 (Legacy/ReNew/Btn_wood.png) - 에디터 도구로 일괄 연결
+    UIBaseWood = 43,     // 나무 받침 (Legacy/ReNew/Base_wood.png) - 에디터 도구로 일괄 연결
+    UIBaseLongWood = 44, // 긴 나무 받침 (Legacy/ReNew/Base_longWood.png) - 에디터 도구로 일괄 연결
 }
 
 public static class CustomizePartInfo
@@ -42,7 +49,6 @@ public static class CustomizePartInfo
             case CustomizePart.SoilCell:
                 return CustomizeCategory.Soil;
             case CustomizePart.WoodBorder:
-            case CustomizePart.WoodFence:
                 return CustomizeCategory.Wood;
             case CustomizePart.GrassTexture:
             case CustomizePart.Bush1:
@@ -51,6 +57,12 @@ public static class CustomizePartInfo
             case CustomizePart.PhoneSmall:
             case CustomizePart.PhoneLarge:
                 return CustomizeCategory.PhoneCase;
+            case CustomizePart.UIFence:
+            case CustomizePart.UITimeBar:
+            case CustomizePart.UIBtnWood:
+            case CustomizePart.UIBaseWood:
+            case CustomizePart.UIBaseLongWood:
+                return CustomizeCategory.UI;
             default:
                 return CustomizeCategory.Decoration;
         }

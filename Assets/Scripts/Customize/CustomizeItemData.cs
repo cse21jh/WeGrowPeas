@@ -38,7 +38,7 @@ public class CustomizeItemData : ScriptableObject
     public Sprite icon;
 
     [Tooltip("게임 화면에서 부위별로 바꿔 끼울 그림. 목록에 없는 부위는 원래 그림 그대로. " +
-             "이 아이템 종류의 부위만 넣는다(예: 목재 → WoodFence, WoodBorder).")]
+             "이 아이템 종류의 부위만 넣는다(예: UI → UIFence, UITimeBar, UIBtnWood).")]
     public List<CustomizePartSprite> parts = new List<CustomizePartSprite>();
 
     [Header("해금")]

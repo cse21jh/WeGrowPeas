@@ -4044,6 +4044,7 @@ GameObject:
   - component: {fileID: 345157981}
   - component: {fileID: 345157980}
   - component: {fileID: 345157979}
+  - component: {fileID: 345157982}
   m_Layer: 5
   m_Name: BreedCnt
   m_TagString: Untagged
@@ -4142,6 +4143,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 345157977}
   m_CullTransparentMesh: 1
+--- !u!114 &345157982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345157977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 345157980}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &359992649
 GameObject:
   m_ObjectHideFlags: 0
@@ -9401,6 +9420,7 @@ GameObject:
   - component: {fileID: 585403184}
   - component: {fileID: 585403183}
   - component: {fileID: 585403182}
+  - component: {fileID: 585403185}
   m_Layer: 5
   m_Name: Coin
   m_TagString: Untagged
@@ -9499,6 +9519,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 585403180}
   m_CullTransparentMesh: 1
+--- !u!114 &585403185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585403180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 585403183}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &585547041
 GameObject:
   m_ObjectHideFlags: 0
@@ -20836,6 +20874,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handleArea: {fileID: 963027125}
+  leftButtonOnly: 0
 --- !u!114 &1284927598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26547,6 +26586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handleArea: {fileID: 1621215682}
+  leftButtonOnly: 0
 --- !u!114 &1621215685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28333,6 +28373,7 @@ GameObject:
   - component: {fileID: 1749507014}
   - component: {fileID: 1749507013}
   - component: {fileID: 1749507012}
+  - component: {fileID: 1749507015}
   m_Layer: 5
   m_Name: Left_Status
   m_TagString: Untagged
@@ -28432,6 +28473,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1749507010}
   m_CullTransparentMesh: 1
+--- !u!114 &1749507015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749507010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 44
+  spriteRenderers: []
+  images:
+  - {fileID: 1749507013}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &1751048725
 GameObject:
   m_ObjectHideFlags: 0
@@ -34617,6 +34676,7 @@ GameObject:
   - component: {fileID: 1853624526}
   - component: {fileID: 1853624525}
   - component: {fileID: 1853624524}
+  - component: {fileID: 1853624527}
   m_Layer: 5
   m_Name: Stage
   m_TagString: Untagged
@@ -34715,6 +34775,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1853624522}
   m_CullTransparentMesh: 1
+--- !u!114 &1853624527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853624522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 43
+  spriteRenderers: []
+  images:
+  - {fileID: 1853624525}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &1853887774
 GameObject:
   m_ObjectHideFlags: 0

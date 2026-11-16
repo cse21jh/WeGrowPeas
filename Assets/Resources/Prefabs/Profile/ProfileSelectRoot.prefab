@@ -685,6 +685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0064
   sourceText: "\uC5C5\uB370\uC774\uD2B8\uB428"
+  minFontScale: 0.6
 --- !u!1 &1006289599276927265
 GameObject:
   m_ObjectHideFlags: 0
@@ -837,6 +838,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0066
   sourceText: "\uC0AD\uC81C"
+  minFontScale: 0.6
 --- !u!1 &1263956883501771083
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,6 +1125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0065
   sourceText: "\uBE44\uC5B4\uC788\uC74C"
+  minFontScale: 0.6
 --- !u!1 &1734363025311457423
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,6 +1299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0063
   sourceText: "\uD50C\uB808\uC774 \uC2DC\uAC04"
+  minFontScale: 0.6
 --- !u!1 &2017978857472488521
 GameObject:
   m_ObjectHideFlags: 0
@@ -1468,6 +1472,7 @@ GameObject:
   - component: {fileID: 6755511618992659646}
   - component: {fileID: 7846320609215628858}
   - component: {fileID: 2067565822713312813}
+  - component: {fileID: 4304485102773471334}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -1628,6 +1633,24 @@ MonoBehaviour:
   baked: 0
   modifiedFromInspector: 0
   bakedShadows: []
+--- !u!114 &4304485102773471334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2165561699113126061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f24434a7e284c44f8a5ed4788c0e83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomizeTarget
+  part: 42
+  spriteRenderers: []
+  images:
+  - {fileID: 7858478422480271889}
+  meshRenderers: []
+  logChanges: 0
 --- !u!1 &2337709271184952099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1801,6 +1824,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0064
   sourceText: "\uC5C5\uB370\uC774\uD2B8\uB428"
+  minFontScale: 0.6
 --- !u!1 &2342456016992202798
 GameObject:
   m_ObjectHideFlags: 0
@@ -2216,6 +2240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0065
   sourceText: "\uBE44\uC5B4\uC788\uC74C"
+  minFontScale: 0.6
 --- !u!1 &4082739053035885678
 GameObject:
   m_ObjectHideFlags: 0
@@ -2489,6 +2514,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0067
   sourceText: "\uB4A4\uB85C"
+  minFontScale: 0.6
 --- !u!1 &4675171005665663747
 GameObject:
   m_ObjectHideFlags: 0
@@ -2642,6 +2668,7 @@ MonoBehaviour:
   key: ui.t0062
   sourceText: "\uD50C\uB808\uC774\uD560 \uC138\uC774\uBE0C \uD504\uB85C\uD544\uC744
     \uC120\uD0DD\uD558\uC138\uC694!"
+  minFontScale: 0.6
 --- !u!1 &4732129555433928496
 GameObject:
   m_ObjectHideFlags: 0
@@ -3453,6 +3480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0068
   sourceText: "\uCDE8\uC18C"
+  minFontScale: 0.6
 --- !u!1 &5943009486203254641
 GameObject:
   m_ObjectHideFlags: 0
@@ -3763,6 +3791,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0063
   sourceText: "\uD50C\uB808\uC774 \uC2DC\uAC04"
+  minFontScale: 0.6
 --- !u!1 &7021107663682287552
 GameObject:
   m_ObjectHideFlags: 0
@@ -4271,6 +4300,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0063
   sourceText: "\uD50C\uB808\uC774 \uC2DC\uAC04"
+  minFontScale: 0.6
 --- !u!1 &7353591468027388957
 GameObject:
   m_ObjectHideFlags: 0
@@ -4444,6 +4474,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0064
   sourceText: "\uC5C5\uB370\uC774\uD2B8\uB428"
+  minFontScale: 0.6
 --- !u!1 &7447225291585508165
 GameObject:
   m_ObjectHideFlags: 0
@@ -4596,6 +4627,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0065
   sourceText: "\uBE44\uC5B4\uC788\uC74C"
+  minFontScale: 0.6
 --- !u!1 &7498835950879326191
 GameObject:
   m_ObjectHideFlags: 0
@@ -5331,6 +5363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0066
   sourceText: "\uC0AD\uC81C"
+  minFontScale: 0.6
 --- !u!1 &8141163843452310561
 GameObject:
   m_ObjectHideFlags: 0
@@ -5676,6 +5709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0066
   sourceText: "\uC0AD\uC81C"
+  minFontScale: 0.6
 --- !u!1 &8398593701061452572
 GameObject:
   m_ObjectHideFlags: 0
@@ -6223,3 +6257,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   key: ui.t0066
   sourceText: "\uC0AD\uC81C"
+  minFontScale: 0.6
