@@ -186,7 +186,11 @@ public class CustomizePanel : MonoBehaviour
             return;
         }
 
-        popup.Ask($"'{item.displayName}'을(를)\n토큰 {item.tokenPrice}개로 구매할까요?\n(보유 {have}개)", "구매", () =>
+        // 설명이 있으면 이름 아래에 조금 작게 붙인다.
+        string message = string.IsNullOrWhiteSpace(item.description)
+            ? $"'{item.displayName}'을(를)\n토큰 {item.tokenPrice}개로 구매할까요?\n(보유 {have}개)"
+            : $"'{item.displayName}'\n<size=80%>{item.description.Trim()}</size>\n\n토큰 {item.tokenPrice}개로 구매할까요?\n(보유 {have}개)";
+        popup.Ask(message, "구매", () =>
         {
             // 사면 해금(자물쇠 해제)만 된다. 장착은 한 번 더 눌러서 한다.
             var result = CustomizeInventory.TryPurchase(item);

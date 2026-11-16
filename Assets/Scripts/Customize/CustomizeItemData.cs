@@ -21,6 +21,10 @@ public class CustomizeItemData : ScriptableObject
     [Tooltip("목록에 보이는 이름.")]
     public string displayName;
 
+    [Tooltip("아이템 설명. 여러 줄로 쓸 수 있다.")]
+    [TextArea(2, 5)]
+    public string description;
+
     public CustomizeCategory category;
 
     [Tooltip("같은 종류 안에서의 표시 순서. 작을수록 위. 같으면 에셋 이름 순.")]
