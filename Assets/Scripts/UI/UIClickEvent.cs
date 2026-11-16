@@ -32,6 +32,8 @@ public class UIClickEvent : MonoBehaviour
     [Header("치장 씬")]
     [Tooltip("치장 씬의 확인 창. 치장 씬에서만 연결한다.")]
     [SerializeField] private CustomizePopup customizePopup;
+    [Tooltip("치장 씬의 계절 미리보기. 치장 씬에서만 연결한다.")]
+    [SerializeField] private CustomizeSeasonPreview customizeSeasonPreview;
 
     private bool isLeavingCustomize;
 
@@ -188,6 +190,13 @@ public class UIClickEvent : MonoBehaviour
             CustomizeState.RevertToSaved();
             CustomizeLeaveToMain();
         });
+    }
+
+    /// <summary>치장 씬 계절 버튼: 미리보기 계절을 다음 계절로 넘긴다(여름 → 가을 → 겨울 → 봄).</summary>
+    public void OnClick_CustomizeNextSeason()
+    {
+        if (isLeavingCustomize || customizeSeasonPreview == null) return;
+        customizeSeasonPreview.NextSeason();
     }
 
     private void CustomizeLeaveToMain()
