@@ -18,7 +18,7 @@ using UnityEngine.UI;
 /// </summary>
 public class CustomizePanel : MonoBehaviour
 {
-    [Tooltip("CustomizeCategory 순서(토양, 목재, 풀밭, 케이스, 장식품)대로.")]
+    [Tooltip("CustomizeCategory 순서(토양, 목재, 풀밭, 케이스, UI, 장식품)대로.")]
     [SerializeField] private Toggle[] tabs;
 
     [SerializeField] private ScrollRect scrollRect;
@@ -63,9 +63,13 @@ public class CustomizePanel : MonoBehaviour
         _openX = _rect.anchoredPosition.x;
         toggleButton.onClick.AddListener(ToggleOpen);
 
-        for (int i = 0; i < tabs.Length; i++)
+        var order = CustomizeCategoryInfo.TabOrder;
+        if (tabs.Length != order.Length)
+            Debug.LogWarning($"[Customize] 탭 수({tabs.Length})와 치장 종류 수({order.Length})가 다릅니다. CategoryTabs와 tabs 목록을 확인하세요.", this);
+
+        for (int i = 0; i < tabs.Length && i < order.Length; i++)
         {
-            var category = (CustomizeCategory)i;
+            var category = order[i];
             // 이미 보고 있는 탭이면 다시 그리지 않는다.
             // (에디터에서는 UI를 다시 계산할 때 Toggle이 "켜짐"을 한 번 더 보내는데,
             //  그때 목록을 지우면 "rebuild loop" 에러가 난다.)
@@ -99,8 +103,9 @@ public class CustomizePanel : MonoBehaviour
     {
         SetOpen(startOpen, animate: false);
         OnTokensChanged(CustomizeInventory.Tokens);
+        var order = CustomizeCategoryInfo.TabOrder;
         int on = Array.FindIndex(tabs, t => t.isOn);
-        Show(on >= 0 ? (CustomizeCategory)on : CustomizeCategory.Soil);
+        Show(on >= 0 && on < order.Length ? order[on] : order[0]);
     }
 
     /// <summary>그 종류의 아이템으로 목록을 다시 채운다.</summary>
