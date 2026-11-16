@@ -136,9 +136,10 @@ public abstract class RequestInstance
                     AbilityManager.Instance?.AddGeneStorage(10);
                     break;
             }
-        }
 
-        //customize token 추가
+            // 치장 토큰: 바로 주지 않고 쌓아 뒀다가 런이 끝날 때 유전자와 함께 지급한다.
+            AbilityManager.Instance?.AddCustomizeSeed(AbilityManager.CustomizeTokensPerQuest);
+        }
 
         State = RequestState.Granted;
 

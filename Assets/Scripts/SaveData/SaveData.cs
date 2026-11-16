@@ -248,13 +248,16 @@ public class ChatMessageStateData
     public List<int> readIndices = new();
 }
 
-/// <summary>보유 능력 / 유전자 저장고 (AbilityManager).</summary>
+/// <summary>보유 능력 / 유전자 저장고 / 치장 토큰 저장고 (AbilityManager).</summary>
 [Serializable]
 public class AbilitySave
 {
     public List<PlantAbilityData> currentPlantAbility = new();
     public List<GeneralAbilityData> currentGeneralAbility = new();
     public int geneStorage;
+
+    /// <summary>이번 판에 모은, 아직 지급하지 않은 치장 토큰. 런이 끝날 때 지급된다.</summary>
+    public int customizeSeed;
 }
 
 /// <summary>진행 중인 저주 (CurseManager).</summary>

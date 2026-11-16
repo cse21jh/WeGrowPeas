@@ -69,7 +69,10 @@ public class GameManager : Singleton<GameManager>
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
                 if (AbilityManager.Instance != null)
+                {
+                    AbilityManager.Instance.ResetRunStorage(); // 이전 판에서 남은 유전자·치장 토큰 저장고를 비운다
                     AbilityManager.Instance.ApplyAbilities(this);
+                }
                 enemyController.InitEnemyController();
                 grid.InitGrid();                
                 economyManager.InitEconomyManager();

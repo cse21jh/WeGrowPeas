@@ -49,6 +49,10 @@ public class AbilityManager : MonoBehaviour
     private int storage = 0; //퀘스트, 등 게임 중간에 저장해 뒀다가 일정 기간을 두고 추가
     public int Storage => storage;
 
+    // 이번 판에 모은 치장 토큰. 유전자 저장고(storage)처럼 판 세이브에 저장해 뒀다가 런이 끝날 때 한꺼번에 지급한다.
+    private int customizeSeed = 0;
+    public int CustomizeSeed => customizeSeed;
+
     public Dictionary<PlayablePlantType, bool> IsPlantUnlocked => isPlantUnlocked;
     public Dictionary<PlayablePlantType, int> PlantAbilityPoint => plantAbilityPoint;
     public Dictionary<string, bool> IsGeneralAbilityDataUnlocked => isGeneralAbilityDataUnlocked; // 일반 특성 에셋 이름, 해당 특성의 해금 여부
@@ -224,12 +228,13 @@ public class AbilityManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>보유 능력과 유전자 저장고를 저장 데이터에 담는다. <see cref="LoadCurrentAbilityManager"/>와 짝.</summary>
+    /// <summary>보유 능력과 유전자 저장고·치장 토큰 저장고를 저장 데이터에 담는다. <see cref="LoadCurrentAbilityManager"/>와 짝.</summary>
     public void SaveCurrentAbilityManager(AbilitySave save)
     {
         save.currentPlantAbility = CurrentPlantAbility;
         save.currentGeneralAbility = CurrentGeneralAbility;
         save.geneStorage = Storage;
+        save.customizeSeed = CustomizeSeed;
     }
 
     // 각 세이브 파일별 저장이 필요한 AbilityManager를 Load
@@ -240,6 +245,7 @@ public class AbilityManager : MonoBehaviour
         SetPlantAbility(saveData.currentPlantAbility);
         SetGeneralAbility(saveData.currentGeneralAbility);
         storage = saveData.geneStorage;
+        customizeSeed = saveData.customizeSeed;
     }
 
 
@@ -342,12 +348,29 @@ public class AbilityManager : MonoBehaviour
         storage += num;
     }
 
-    /// <summary>게임 종료 시 얻은 유전자 몇 개마다 치장 토큰 1개를 주는가.</summary>
-    public const int GeneticsPerCustomizeToken = 100;
+    /// <summary>
+    /// 이번 판에 쌓아 둔 유전자·치장 토큰 저장고를 비운다. 새 게임을 시작할 때 부른다.
+    /// 이전 판의 값은 그 판의 세이브 파일에 남아 있으므로(이어하기로 복원) 여기서 비워도 사라지지 않는다.
+    /// </summary>
+    public void ResetRunStorage()
+    {
+        storage = 0;
+        customizeSeed = 0;
+    }
+
+    /// <summary>퀘스트 하나를 완료할 때 쌓이는 치장 토큰 수.</summary>
+    public const int CustomizeTokensPerQuest = 10;
+
+    /// <summary>이번 판의 치장 토큰 저장고에 더한다. 바로 지급하지 않고 런이 끝날 때 <see cref="AddGenetics"/>에서 지급한다.</summary>
+    public void AddCustomizeSeed(int num)
+    {
+        if (num <= 0) return;
+        customizeSeed += num;
+    }
 
     /// <summary>
-    /// 이번 판에 모은 유전자(storage)를 지급한다. 런이 끝날 때 한 번만 불린다(RunRecordFormatter.AwardGenetics).
-    /// 같은 양을 기준으로 치장 토큰도 함께 지급한다(유전자 100개마다 1개, 나머지는 버림).
+    /// 이번 판에 모은 유전자(storage)와 치장 토큰(customizeSeed)을 지급한다.
+    /// 런이 끝날 때 한 번만 불린다(RunRecordFormatter.AwardGenetics).
     /// </summary>
     public void AddGenetics()
     {
@@ -356,16 +379,17 @@ public class AbilityManager : MonoBehaviour
         GameRecordHolder.SaveGenetics(earned);
         storage = 0;
 
-        AddCustomizeTokensForGenetics(earned);
+        AwardCustomizeSeed();
         SaveManager.RequestProfileSave();
     }
 
-    /// <summary>얻은 유전자에 맞춰 치장 토큰을 준다. 토큰 잔액은 CustomizeInventory가 프로필에 저장한다.</summary>
-    private static void AddCustomizeTokensForGenetics(int earnedGenetics)
+    /// <summary>모아 둔 치장 토큰을 지급하고 저장고를 비운다. 토큰 잔액은 CustomizeInventory가 프로필에 저장한다.</summary>
+    private void AwardCustomizeSeed()
     {
-        int tokens = earnedGenetics / GeneticsPerCustomizeToken;
+        int tokens = customizeSeed;
+        customizeSeed = 0;
         if (tokens <= 0) return;
         CustomizeInventory.AddTokens(tokens);
-        Debug.Log($"[Customize] 유전자 {earnedGenetics}개 획득 → 치장 토큰 {tokens}개 지급 (잔액 {CustomizeInventory.Tokens})");
+        Debug.Log($"[Customize] 이번 판 치장 토큰 {tokens}개 지급 (잔액 {CustomizeInventory.Tokens})");
     }
 }
