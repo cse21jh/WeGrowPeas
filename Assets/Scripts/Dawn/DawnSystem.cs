@@ -107,6 +107,7 @@ public static class DawnSystem
 
         // 이번 런에서 클리어한 새벽 단계에 맞춰, 조건을 만족하는 상점/특수 아이템을 실제로 해금(기록).
         UnlockGrants.GrantDawnClearUnlocks(plant, SelectedDawnStage);
+        AchievementHooks.OnDawnCleared(plant, SelectedDawnStage);
 
         Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
     }

@@ -142,6 +142,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
                     economyManager.AddSellCount(plant.speciesname);
+                    AchievementHooks.OnPlantSold(sellingPrice);
                     economyManager.AddGold(sellingPrice);
                     grid.Upgrades.TryUpdateMostExpensivePlant(sellingPrice);
                     grid.Soil.HealNeighborsBySell(plant.gridIndex); // 특수(순환): 주변 저항 회복
