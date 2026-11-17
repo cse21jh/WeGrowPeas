@@ -41,6 +41,9 @@ public class CustomizeItemData : ScriptableObject
              "이 아이템 종류의 부위만 넣는다(예: UI → UIFence, UITimeBar, UIBtnWood).")]
     public List<CustomizePartSprite> parts = new List<CustomizePartSprite>();
 
+    [Tooltip("장식품: 농장에 놓았을 때의 높이(월드 단위). 아이콘 그림을 이 높이에 맞춰 줄여서 놓는다. 텃밭 한 칸이 약 1.1.")]
+    [Min(0.1f)] public float placedHeight = 2f;
+
     [Header("해금")]
     [Tooltip("토양·목재·풀밭·케이스: 구매에 드는 치장 토큰 수.")]
     [Min(0)] public int tokenPrice;

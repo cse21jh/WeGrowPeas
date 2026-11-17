@@ -110,6 +110,9 @@ public class CustomizeProfile
 
     /// <summary>마지막으로 저장한 장착 아이템(종류마다 하나). 없는 종류는 기본 아이템.</summary>
     public List<string> equippedIds = new();
+
+    /// <summary>마지막으로 저장한 장식품 배치 (<see cref="DecorationLayout"/>).</summary>
+    public List<DecorationPlacement> decorations = new();
 }
 
 /// <summary>읽은 메신저 메시지 (MessengerSaveSystem).</summary>

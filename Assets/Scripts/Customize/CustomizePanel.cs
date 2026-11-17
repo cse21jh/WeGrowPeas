@@ -11,6 +11,8 @@ using UnityEngine.UI;
 /// 슬롯을 눌렀을 때
 ///   보유한 아이템   → 장착(<see cref="CustomizeState"/>), "사용중" 표시를 옮긴다.
 ///   토큰 아이템     → 구매 확인 창 → 토큰을 내고 사면 해금만 된다(장착은 다시 눌러서).
+///   보유한 장식품   → 장식품을 들고 농장에 놓는다(<see cref="DecorationPlacer"/>). 같은 장식품은 하나만 놓을 수 있고,
+///                     놓여 있으면 "사용중"으로 표시된다. 사용중인 것을 누르면 아무 일도 일어나지 않는다.
 ///   장식품(업적)    → 어떤 업적을 달성해야 하는지 알려 준다.
 ///
 /// 패널은 화면 오른쪽 밖으로 밀어 넣었다 꺼낼 수 있다(<see cref="Open"/> / <see cref="Close"/> / <see cref="ToggleOpen"/>).
@@ -29,6 +31,10 @@ public class CustomizePanel : MonoBehaviour
     [Tooltip("보유 토큰 수를 보여 줄 글자.")]
     [SerializeField] private TMP_Text tokenText;
     [SerializeField] private CustomizePopup popup;
+
+    [Header("장식품")]
+    [Tooltip("보유한 장식품을 누르면 이걸로 농장에 놓는다.")]
+    [SerializeField] private DecorationPlacer decorationPlacer;
 
     [Header("열고 닫기")]
     [Tooltip("화살표 스프라이트를 쓴 버튼. 열림/닫힘에 따라 버튼 자체를 돌린다.")]
@@ -82,6 +88,7 @@ public class CustomizePanel : MonoBehaviour
         CustomizeState.EquippedChanged += OnItemStateChanged;
         CustomizeInventory.OwnedChanged += OnItemStateChanged;
         CustomizeInventory.TokensChanged += OnTokensChanged;
+        DecorationLayout.Changed += OnDecorationsChanged;
     }
 
     private void OnDisable()
@@ -89,6 +96,7 @@ public class CustomizePanel : MonoBehaviour
         CustomizeState.EquippedChanged -= OnItemStateChanged;
         CustomizeInventory.OwnedChanged -= OnItemStateChanged;
         CustomizeInventory.TokensChanged -= OnTokensChanged;
+        DecorationLayout.Changed -= OnDecorationsChanged;
     }
 
     private void OnDestroy()
@@ -174,6 +182,12 @@ public class CustomizePanel : MonoBehaviour
         var item = clicked.Item;
         if (CustomizeInventory.IsOwned(item))
         {
+            if (item.category == CustomizeCategory.Decoration)
+            {
+                // 이미 놓여 있으면(사용중) 아무것도 하지 않는다. 옮기려면 농장에서 X로 치운 뒤 다시 놓는다.
+                if (!DecorationLayout.IsPlaced(item) && decorationPlacer != null) decorationPlacer.BeginPlacing(item);
+                return;
+            }
             CustomizeState.Equip(item);
             return;
         }
@@ -218,6 +232,11 @@ public class CustomizePanel : MonoBehaviour
         if (item.category == CurrentCategory) RefreshSlotStates();
     }
 
+    private void OnDecorationsChanged()
+    {
+        if (CurrentCategory == CustomizeCategory.Decoration) RefreshSlotStates();
+    }
+
     private void OnTokensChanged(int tokens)
     {
         if (tokenText != null) tokenText.text = $"토큰 {tokens}";
@@ -229,7 +248,9 @@ public class CustomizePanel : MonoBehaviour
         foreach (var slot in _slots)
         {
             slot.SetOwned(CustomizeInventory.IsOwned(slot.Item));
-            slot.SetEquipped(CustomizeState.IsEquipped(slot.Item));
+            slot.SetEquipped(slot.Item.category == CustomizeCategory.Decoration
+                ? DecorationLayout.IsPlaced(slot.Item)
+                : CustomizeState.IsEquipped(slot.Item));
         }
     }
 

@@ -14,6 +14,7 @@ using UnityEngine;
 /// <see cref="HasUnsavedChanges"/>로 저장하지 않은 변경이 있는지 알 수 있다.
 ///
 /// 저장 흐름은 다른 프로필 시스템과 같다(SaveManager가 LoadFrom / SaveTo를 부른다).
+/// 장식품 배치(<see cref="DecorationLayout"/>)도 치장 상태의 일부라서, 저장·되돌리기·읽기·변경 확인을 여기서 함께 처리한다.
 /// </summary>
 public static class CustomizeState
 {
@@ -48,6 +49,7 @@ public static class CustomizeState
         profile.equippedIds = new List<string>();
         foreach (var item in _saved.Values)
             if (item != null) profile.equippedIds.Add(item.Id);
+        DecorationLayout.SaveTo(profile);
     }
 
     /// <summary>프로필에서 읽는다. null이면 새 프로필(전부 기본 아이템). 지금 상태도 저장된 상태로 맞춘다.</summary>
@@ -66,6 +68,7 @@ public static class CustomizeState
         _equipped.Clear();
         foreach (var pair in _saved) _equipped[pair.Key] = pair.Value;
 
+        DecorationLayout.LoadFrom(profile);
         Loaded?.Invoke();
     }
 
@@ -101,7 +104,7 @@ public static class CustomizeState
         {
             foreach (CustomizeCategory c in Enum.GetValues(typeof(CustomizeCategory)))
                 if (GetEquipped(c) != GetSaved(c)) return true;
-            return false;
+            return DecorationLayout.HasUnsavedChanges;
         }
     }
 
@@ -114,6 +117,7 @@ public static class CustomizeState
             var item = GetEquipped(c);
             if (item != null) _saved[c] = item;
         }
+        DecorationLayout.Save();
         SaveManager.RequestProfileSave();
         Debug.Log("[Customize] 치장 상태 저장");
     }
@@ -130,6 +134,7 @@ public static class CustomizeState
             else _equipped.Remove(c);
             if (saved != null) EquippedChanged?.Invoke(saved);
         }
+        DecorationLayout.RevertToSaved();
     }
 
     private static CustomizeItemData Resolve(Dictionary<CustomizeCategory, CustomizeItemData> map, CustomizeCategory category)
