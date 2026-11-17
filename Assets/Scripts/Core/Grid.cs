@@ -443,6 +443,7 @@ public class Grid : MonoBehaviour
                 survivedTurns = (p is MoneyTree mt) ? mt.GetSurvivedTurns() : 0,
                 travelSellBonus = p.GetTravelSellBonus(),
                 freeTimePassedCount = p.GetFreeTimePassedCount(),
+                daysOnField = p.DaysOnField,
                 hasTriedBreed = p.HasTriedBreed,
                 isRooted = (p is MovablePlant movable) && !movable.IsMovable
             });
@@ -508,6 +509,7 @@ public class Grid : MonoBehaviour
             plant.SetTaste(item.taste);
             plant.SetResistWaveCount(item.resistWaveCount);
             plant.SetTravelSellBonus(item.travelSellBonus); // 특수(세계여행) 복원
+            plant.SetDaysOnField(item.daysOnField);
             plant.SetFreeTimePassedCount(item.freeTimePassedCount); // 완두커피 복원
             plant.SetHasTriedBreed(item.hasTriedBreed); // 활성형 껍질 복원
 

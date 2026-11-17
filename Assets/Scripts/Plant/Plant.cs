@@ -39,6 +39,7 @@ public abstract class Plant : MonoBehaviour
 
     // 완두커피: 완두커피 보유 중에 지나간 자유시간 횟수(판매 골드 배수에 가산)
     protected int freeTimePassedCount = 0;
+    protected int daysOnField = 0; // 업적: 밭에 심긴 뒤 지난 날 수
     // 활성형 껍질: 한 번이라도 교배를 시도했는가(시도한 식물은 자가번식 확률 보너스 제외)
     protected bool hasTriedBreed = false;
 
@@ -895,6 +896,11 @@ public abstract class Plant : MonoBehaviour
     }
 
     public int GetFreeTimePassedCount() => freeTimePassedCount;
+
+    /// <summary>밭에 심긴 뒤 지난 날 수. 옮겨 심어도 유지된다.</summary>
+    public int DaysOnField => daysOnField;
+    public void AddDayOnField() => daysOnField++;
+    public void SetDaysOnField(int value) => daysOnField = Mathf.Max(0, value);
     public void SetFreeTimePassedCount(int value) => freeTimePassedCount = Mathf.Max(0, value);
 
     /// <summary>활성형 껍질: 교배를 시도한 식물로 표시. (Grid.ExecuteBreeding에서 호출)</summary>

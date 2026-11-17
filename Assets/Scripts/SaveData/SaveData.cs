@@ -345,6 +345,7 @@ public class PlantData
     public int survivedTurns; // MoneyTree 생존 턴 수
     public float travelSellBonus; // 특수(세계여행) 누적 배수
     public int freeTimePassedCount; // 완두커피: 자유시간 경과 횟수
+    public int daysOnField; // 업적: 밭에 심긴 뒤 지난 날 수 (이전 세이브는 0)
     public bool hasTriedBreed; // 활성형 껍질: 교배 시도 여부
     public bool isRooted; // 뿌리내림(이동 불가). 새벽 뿌리 효과 + 땅과 콩 가격 보너스 판정에 사용
 }

@@ -243,6 +243,11 @@ public class GameManager : Singleton<GameManager>
         */
         GameEvents.RaiseQuestDayPassed();
 
+        // 업적: 식물별 생존 일수
+        foreach (var plant in grid.Board.Plants.Values)
+            if (plant != null && !plant.isDying) plant.AddDayOnField();
+        AchievementHooks.OnDayEnded(grid.Board);
+
         // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
         // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
         RecallRecorder.CaptureDay();
@@ -464,6 +469,7 @@ public class GameManager : Singleton<GameManager>
             TaxManager.Instance.MarkPaidForcibly();
         }
 
+        AchievementHooks.OnRunCleared(economyManager.GetGold());
         DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)
 
         // 런 종료 공통 처리. 엔딩 연출(카메라 전환 + 편지)이 시작되기 전이라

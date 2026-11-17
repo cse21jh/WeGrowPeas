@@ -171,6 +171,10 @@ public class EnemyController : MonoBehaviour
         stageKillRecord.Add(0);
         stageNoTraitRecord.Add(grid.Board.CountNoTraitPlant(currentWave.WaveType));
 
+        // 업적: 모든 칸이 찬 상태에서 웨이브를 맞는지 기록
+        bool fullFieldWave = currentWave != noneWave && !tutorial && !grid.Board.HasEmptyCell();
+        int plantsBeforeWave = grid.Board.Plants.Count;
+
         if (currentWave != noneWave)
         {
             for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
@@ -228,6 +232,8 @@ public class EnemyController : MonoBehaviour
 
         // 저주(버섯): 버섯 타일 위 식물은 이번 웨이브에 피해(페트병은 방어)
         CurseManager.Instance?.ResolveMushroomWave();
+
+        if (fullFieldWave) AchievementHooks.OnFullFieldWaveEnded(plantsBeforeWave, grid.Board.Plants.Count);
 
         // 웨이브 처리 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
         grid.Soil.UnfreezeAllPlants();
