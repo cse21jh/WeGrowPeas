@@ -195,13 +195,17 @@ public class GrassChunkController : MonoBehaviour
         // 낮은 y일수록 앞에 보이게 된다.
         instances.Sort((a, b) => b.basePosition.y.CompareTo(a.basePosition.y));
 
-        List<Vector3> vertices = new();
-        List<Vector2> uvs = new();
-        List<Vector4> customData = new();
-        List<Color32> colors = new();
-        List<Vector3> normals = new();
-        List<Vector4> tangents = new();
-        List<int> triangles = new();
+        // 청크마다 리스트를 새로 만들고 늘려 가면 로드 중 GC가 여러 번 돈다.
+        // 메인 스레드에서만 빌드하므로 정적 버퍼를 재사용하고 필요한 크기를 미리 잡는다.
+        int vertexCount = instances.Count * (BuildXSegments + 1) * (BuildYSegments + 1);
+        int indexCount = instances.Count * BuildXSegments * BuildYSegments * 6;
+        List<Vector3> vertices = PrepareBuffer(BuildVertices, vertexCount);
+        List<Vector2> uvs = PrepareBuffer(BuildUvs, vertexCount);
+        List<Vector4> customData = PrepareBuffer(BuildCustomData, vertexCount);
+        List<Color32> colors = PrepareBuffer(BuildColors, vertexCount);
+        List<Vector3> normals = PrepareBuffer(BuildNormals, vertexCount);
+        List<Vector4> tangents = PrepareBuffer(BuildTangents, vertexCount);
+        List<int> triangles = PrepareBuffer(BuildTriangles, indexCount);
 
         foreach (GrassInstance instance in instances)
         {
@@ -221,10 +225,41 @@ public class GrassChunkController : MonoBehaviour
         ApplyRendererSettings();
     }
 
+    private static readonly List<Vector3> BuildVertices = new();
+    private static readonly List<Vector2> BuildUvs = new();
+    private static readonly List<Vector4> BuildCustomData = new();
+    private static readonly List<Color32> BuildColors = new();
+    private static readonly List<Vector3> BuildNormals = new();
+    private static readonly List<Vector4> BuildTangents = new();
+    private static readonly List<int> BuildTriangles = new();
+
+    private static List<T> PrepareBuffer<T>(List<T> buffer, int capacity)
+    {
+        buffer.Clear();
+        if (buffer.Capacity < capacity) buffer.Capacity = capacity;
+        return buffer;
+    }
+
+    // 그래픽 품질(GraphicsQuality)이 정하는 실행 중 상한. 기본값은 인스펙터 값을 그대로 쓴다.
+    // 에디터의 Build Grass Chunk 메뉴에서도 같은 값이 적용되지만 Play 밖에서는 항상 기본값이다.
+    public static float QualityDensityScale = 1f;
+    public static int QualityMaxXSegments = int.MaxValue;
+    public static int QualityMaxYSegments = int.MaxValue;
+
+    private int BuildXSegments => Mathf.Clamp(xSegments, 1, Mathf.Max(1, QualityMaxXSegments));
+    private int BuildYSegments => Mathf.Clamp(ySegments, 1, Mathf.Max(1, QualityMaxYSegments));
+
+    /// <summary>품질 값이 바뀐 뒤 열려 있는 씬의 잔디를 다시 만든다.</summary>
+    public static void RebuildAll()
+    {
+        foreach (var chunk in FindObjectsByType<GrassChunkController>(FindObjectsSortMode.None))
+            chunk.Build();
+    }
+
     private int CalculateTargetCount()
     {
         float area = areaSize.x * areaSize.y;
-        return Mathf.Max(1, Mathf.RoundToInt(area * grassDensity));
+        return Mathf.Max(1, Mathf.RoundToInt(area * grassDensity * Mathf.Clamp01(QualityDensityScale)));
     }
 
     private List<GrassInstance> CreateGrassInstances(System.Random rng, int targetCount)
@@ -384,13 +419,13 @@ public class GrassChunkController : MonoBehaviour
     {
         int vertexStart = vertices.Count;
 
-        for (int y = 0; y <= ySegments; y++)
+        for (int y = 0; y <= BuildYSegments; y++)
         {
-            float v = y / (float)ySegments;
+            float v = y / (float)BuildYSegments;
 
-            for (int x = 0; x <= xSegments; x++)
+            for (int x = 0; x <= BuildXSegments; x++)
             {
-                float u = x / (float)xSegments;
+                float u = x / (float)BuildXSegments;
 
                 float localX = (u - 0.5f) * instance.width;
                 float localY = v * instance.height;
@@ -421,11 +456,11 @@ public class GrassChunkController : MonoBehaviour
             }
         }
 
-        int row = xSegments + 1;
+        int row = BuildXSegments + 1;
 
-        for (int y = 0; y < ySegments; y++)
+        for (int y = 0; y < BuildYSegments; y++)
         {
-            for (int x = 0; x < xSegments; x++)
+            for (int x = 0; x < BuildXSegments; x++)
             {
                 int i0 = vertexStart + y * row + x;
                 int i1 = vertexStart + y * row + x + 1;

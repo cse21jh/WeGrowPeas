@@ -54,6 +54,9 @@ public class SettingsData
     /// <summary>표시 언어 코드(<see cref="Loc"/>). 비어 있으면 원문 언어를 쓴다.</summary>
     public string language = "";
 
+    /// <summary>그래픽 품질(<see cref="GraphicsQualityLevel"/>). -1이면 기기 사양으로 자동 선택한다.</summary>
+    public int graphicsQuality = GraphicsQuality.Auto;
+
     /// <summary>바꾼 단축키. 비어 있으면 기본 키를 쓴다.</summary>
     public List<KeyBindingEntry> keyBindings = new();
 }

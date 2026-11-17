@@ -36,6 +36,15 @@ public class SettingUI : MonoBehaviour
         {
             LanguageSelector.AddTo(SettingPanel.transform, (RectTransform)bgmVolumeSlider.transform);
             KeyBindingPanel.AddTo(SettingPanel.transform, (RectTransform)bgmVolumeSlider.transform);
+            // 단축키 버튼까지 만든 뒤에 넣어야 버튼들이 함께 한 줄 내려간다.
+            // 튜토리얼 설정창에는 토글이 없으므로 있는 행 중 맨 아래 행 밑에 붙인다.
+            Component lastRow = playAlarmForSeenMessagesToggle != null ? playAlarmForSeenMessagesToggle
+                : showBreedPopupToggle != null ? showBreedPopupToggle
+                : effectVolumeSlider;
+            if (lastRow != null)
+                GraphicsQualitySelector.AddTo(SettingPanel.transform,
+                    (RectTransform)lastRow.transform,
+                    (RectTransform)bgmVolumeSlider.transform);
             SettingPanel.SetActive(false);
         }
     }

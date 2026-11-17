@@ -8,6 +8,21 @@ public class RTResizeController : MonoBehaviour
     [SerializeField] private RenderTexture[] rtArray;
     [SerializeField] private Camera[] camArray;
 
+    /// <summary>외곽선 RT 해상도 배율. <see cref="GraphicsQuality"/>가 정한다.</summary>
+    public static float OutlineResolutionScale = 1f;
+
+    private static bool IsOutlineTexture(RenderTexture rt)
+    {
+        return rt != null && rt.name.IndexOf("Outline", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    /// <summary>품질이 바뀌었을 때 열려 있는 씬의 RT를 다시 만든다.</summary>
+    public static void ResizeAll()
+    {
+        foreach (var controller in FindObjectsByType<RTResizeController>(FindObjectsSortMode.None))
+            controller.ResizeRenderTextures();
+    }
+
     private int previousWidth;
     private int previousHeight;
 
@@ -34,8 +49,10 @@ public class RTResizeController : MonoBehaviour
             {
                 rt.Release();
             }
-            rt.width = Screen.width;
-            rt.height = Screen.height;
+            // 외곽선 RT는 품질 설정에 따라 낮은 해상도로 그린다. 화면에 늘려 그려도 외곽선은 거의 티가 나지 않는다.
+            float scale = IsOutlineTexture(rt) ? Mathf.Clamp(OutlineResolutionScale, 0.25f, 1f) : 1f;
+            rt.width = Mathf.Max(1, Mathf.RoundToInt(Screen.width * scale));
+            rt.height = Mathf.Max(1, Mathf.RoundToInt(Screen.height * scale));
             rt.Create();
 
             
