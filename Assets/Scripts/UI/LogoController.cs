@@ -20,9 +20,6 @@ public class LogoController : MonoBehaviour
         });
     }
 
-    private void Update()
-    {
-    }
 
 
     private void OnMouseEnter()

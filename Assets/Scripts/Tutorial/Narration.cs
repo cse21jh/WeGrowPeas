@@ -19,11 +19,6 @@ public class Narration : MonoBehaviour
         narrationBoxContent = GetComponent<RectTransform>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-       
-    }
 
     public void AddLine(string text)
     {

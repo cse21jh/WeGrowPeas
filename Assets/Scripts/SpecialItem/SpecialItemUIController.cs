@@ -31,9 +31,15 @@ public class SpecialItemUIController : MonoBehaviour
             GameManager.Instance?.Tutorial?.CanUseSpecialItems != false;
         if (giftButtonRoot != null && giftButtonRoot.activeSelf != hasGift)
             giftButtonRoot.SetActive(hasGift);
-        if (hasGift && giftCountText != null)
-            giftCountText.text = SpecialItemSystem.PendingGifts > 1 ? $"x{SpecialItemSystem.PendingGifts}" : "";
+        // 개수가 바뀔 때만 문자열을 만들어 매 프레임 할당과 텍스트 재빌드를 피한다.
+        if (hasGift && giftCountText != null && SpecialItemSystem.PendingGifts != _shownGiftCount)
+        {
+            _shownGiftCount = SpecialItemSystem.PendingGifts;
+            giftCountText.text = _shownGiftCount > 1 ? $"x{_shownGiftCount}" : "";
+        }
     }
+
+    private int _shownGiftCount = -1;
 
     /// <summary>선물 버튼 클릭 → 3택 패널 열기.</summary>
     public void OpenChoicePanel()

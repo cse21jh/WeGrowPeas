@@ -52,11 +52,6 @@ public class TutorialManager : Singleton<TutorialManager>
         StartCoroutine(RunTutorial());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     private IEnumerator RunTutorial()
     {
@@ -171,7 +166,13 @@ public class TutorialManager : Singleton<TutorialManager>
                 break;
 
             case 1: // 완두콩 클릭
-                yield return new WaitUntil(() => FindAnyObjectByType<TutorialBreedingController>().IsBreedObj1Selected());
+                // 매 프레임 씬 전체를 검색하지 않도록 한 번 찾은 참조를 재사용한다.
+                TutorialBreedingController breeding = null;
+                yield return new WaitUntil(() =>
+                {
+                    if (breeding == null) breeding = FindAnyObjectByType<TutorialBreedingController>();
+                    return breeding.IsBreedObj1Selected();
+                });
                 _lastClickedObject = null;
                 break;
             case 2: // 교배
@@ -196,9 +197,12 @@ public class TutorialManager : Singleton<TutorialManager>
                 break;
 
             case 6: // 특정 완두콩 판매
+                EconomyManager economy = null;
                 yield return new WaitUntil(() =>
-                    FindAnyObjectByType<EconomyManager>().PeaSellCount >= 1
-                );
+                {
+                    if (economy == null) economy = FindAnyObjectByType<EconomyManager>();
+                    return economy.PeaSellCount >= 1;
+                });
                 _lastClickedObject = null;
                 break;
             case 7: // 최종 확인 이후 PlayTutorialSequence에서 종료 연출

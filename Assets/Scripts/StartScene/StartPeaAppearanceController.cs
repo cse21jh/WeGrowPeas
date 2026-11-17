@@ -40,6 +40,21 @@ public sealed class StartPeaAppearanceController : MonoBehaviour
     private Bounds faceBounds;
     private readonly Vector3[] faceSamples = new Vector3[9];
     private static readonly Dictionary<Sprite, Vector2[][]> OutlineCache = new();
+
+    // 가림 판정용 프레임 캐시. PrepareFaceOcclusion에서 채운다.
+    // 한 LateUpdate 안에서는 위치·스프라이트·활성 상태가 바뀌지 않으므로 같은 결과를 낸다.
+    // (정렬 순서는 같은 프레임 안에서 바뀌므로 캐시하지 않는다.)
+    private struct OccluderShape
+    {
+        public bool valid;
+        public Matrix4x4 worldToLocal;
+        public Bounds spriteBounds;
+        public bool flipX, flipY;
+        public Vector2[][] outline;
+    }
+    private OccluderShape bodyShape;
+    private OccluderShape accessoryShape;
+    private bool occlusionActive;
     public int AppearanceIndex { get; private set; } = -1;
     public int TraitCount => appearances == null ? 0 : Mathf.Max(0, appearances.Length - 1);
     public string AppearanceName => AppearanceIndex >= 0 ? appearances[AppearanceIndex].name : string.Empty;
@@ -139,6 +154,9 @@ public sealed class StartPeaAppearanceController : MonoBehaviour
 
     public void PrepareFaceOcclusion()
     {
+        occlusionActive = isActiveAndEnabled;
+        bodyShape = CaptureShape(bodyRenderer, bodyOutline);
+        accessoryShape = CaptureShape(accessoryRenderer, accessoryOutline);
         if (bodyRenderer == null || faceRenderer == null || faceRenderer.sprite == null) return;
         occluderBounds = bodyRenderer.bounds;
         if (accessoryRenderer != null && accessoryRenderer.enabled && accessoryRenderer.sprite != null)
@@ -175,9 +193,11 @@ public sealed class StartPeaAppearanceController : MonoBehaviour
             return;
         }
         bool visible = true;
-        foreach (StartPeaAppearanceController other in peas)
+        // 인터페이스 foreach는 열거자를 박싱해 매번 할당하므로 인덱스로 돈다.
+        for (int i = 0; i < peas.Count; i++)
         {
-            if (other == null || other == this || !other.isActiveAndEnabled ||
+            StartPeaAppearanceController other = peas[i];
+            if (ReferenceEquals(other, this) || other == null || !other.occlusionActive ||
                 !other.IsInFrontOf(this) || !other.CoversFaceOf(this)) continue;
             visible = false;
             break;
@@ -198,25 +218,25 @@ public sealed class StartPeaAppearanceController : MonoBehaviour
 
     private bool IsFacePointCovered(Vector3 point, IReadOnlyList<StartPeaAppearanceController> peas)
     {
-        foreach (StartPeaAppearanceController other in peas)
+        for (int i = 0; i < peas.Count; i++)
         {
-            if (other == null || other == this || !other.isActiveAndEnabled || !other.IsInFrontOf(this)) continue;
-            if (point.x < other.occluderBounds.min.x || point.x > other.occluderBounds.max.x ||
-                point.y < other.occluderBounds.min.y || point.y > other.occluderBounds.max.y) continue;
-            if (ContainsPoint(other.bodyRenderer, other.bodyOutline, point) ||
-                ContainsPoint(other.accessoryRenderer, other.accessoryOutline, point)) return true;
+            StartPeaAppearanceController other = peas[i];
+            if (ReferenceEquals(other, this) || other == null || !other.occlusionActive) continue;
+            Bounds ob = other.occluderBounds;
+            if (point.x < ob.min.x || point.x > ob.max.x || point.y < ob.min.y || point.y > ob.max.y) continue;
+            if (!other.IsInFrontOf(this)) continue;
+            if (ContainsPoint(other.bodyShape, point) || ContainsPoint(other.accessoryShape, point)) return true;
         }
         return false;
     }
 
     public bool CoversFaceOf(StartPeaAppearanceController other)
     {
-        if (other == null || other == this || !isActiveAndEnabled ||
+        if (other == null || other == this || !occlusionActive ||
             !OverlapsXY(occluderBounds, other.faceBounds)) return false;
         foreach (Vector3 point in other.faceSamples)
         {
-            if (ContainsPoint(bodyRenderer, bodyOutline, point) ||
-                ContainsPoint(accessoryRenderer, accessoryOutline, point)) return true;
+            if (ContainsPoint(bodyShape, point) || ContainsPoint(accessoryShape, point)) return true;
         }
         return false;
     }
@@ -259,13 +279,41 @@ public sealed class StartPeaAppearanceController : MonoBehaviour
         return shapes;
     }
 
+    private static OccluderShape CaptureShape(SpriteRenderer renderer, Vector2[][] outline)
+    {
+        if (renderer == null || !renderer.enabled || renderer.sprite == null || outline == null)
+            return default;
+        return new OccluderShape
+        {
+            valid = true,
+            worldToLocal = renderer.transform.worldToLocalMatrix,
+            spriteBounds = renderer.sprite.bounds,
+            flipX = renderer.flipX,
+            flipY = renderer.flipY,
+            outline = outline,
+        };
+    }
+
+    private static bool ContainsPoint(in OccluderShape shape, Vector3 worldPoint)
+    {
+        if (!shape.valid) return false;
+        Vector2 point = shape.worldToLocal.MultiplyPoint3x4(worldPoint);
+        if (shape.flipX) point.x = -point.x;
+        if (shape.flipY) point.y = -point.y;
+        return ContainsLocalPoint(shape.spriteBounds, shape.outline, point);
+    }
+
     private static bool ContainsPoint(SpriteRenderer renderer, Vector2[][] outline, Vector3 worldPoint)
     {
         if (renderer == null || !renderer.enabled || renderer.sprite == null || outline == null) return false;
         Vector2 point = renderer.transform.InverseTransformPoint(worldPoint);
         if (renderer.flipX) point.x = -point.x;
         if (renderer.flipY) point.y = -point.y;
-        Bounds bounds = renderer.sprite.bounds;
+        return ContainsLocalPoint(renderer.sprite.bounds, outline, point);
+    }
+
+    private static bool ContainsLocalPoint(Bounds bounds, Vector2[][] outline, Vector2 point)
+    {
         if (point.x < bounds.min.x || point.x > bounds.max.x ||
             point.y < bounds.min.y || point.y > bounds.max.y) return false;
         if (outline.Length == 0) return true;

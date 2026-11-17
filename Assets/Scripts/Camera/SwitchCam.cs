@@ -8,9 +8,4 @@ public class SwitchCam : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

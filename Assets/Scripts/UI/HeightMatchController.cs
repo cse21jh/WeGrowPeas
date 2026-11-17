@@ -17,9 +17,4 @@ public class HeightMatchController : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, canvas.sizeDelta.y * sizeMatch);
         rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, canvas.sizeDelta.y * pivotValue); 
     }
-
-    [ExecuteInEditMode]
-    private void Update()
-    {
-    }
 }
