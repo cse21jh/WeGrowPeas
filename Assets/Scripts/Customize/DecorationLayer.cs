@@ -10,12 +10,17 @@ using UnityEngine;
 /// 앞뒤 순서는 바위·통나무와 같은 방식을 따른다. 풀밭은 위에서 아래로 여러 줄(<see cref="depthRows"/>)로 나뉘어 있고
 /// 줄마다 정렬 레이어·순서·z가 다르다. 장식품은 그림 아래쪽 끝이 걸린 줄과 같은 레이어·순서를 쓰고,
 /// z를 그 줄보다 조금 앞(카메라 쪽)으로 두어 그 줄의 풀보다 앞, 아래 줄의 풀보다 뒤에 그려지게 한다.
+/// 다만 계절 효과(봄 꽃, 가을 단풍, 겨울 눈 더미, <see cref="seasonEffects"/>)와 겹치면 그 효과보다 한 단계 앞으로 올려
+/// 계절이 바뀌어도 장식품이 가려지지 않게 한다.
 /// 콜라이더는 붙이지 않는다(농장 씬의 다른 클릭을 가리지 않게). 치장 씬에서 클릭 판정은 <see cref="HitTest"/>로 한다.
 /// </summary>
 public class DecorationLayer : MonoBehaviour
 {
     [Tooltip("풀밭 줄들(GrassProps의 Grass_ (0)~(8)), 위쪽 줄부터 순서대로. 장식품의 앞뒤 순서를 이 줄들에 맞춘다.")]
     [SerializeField] private Renderer[] depthRows;
+
+    [Tooltip("장식품이 가려지면 안 되는 계절 효과(Spring_Flower, Fall_Maple, winter_snow 아래 그림들). 겹치면 장식품을 이것들보다 앞에 그린다. 떨어지는 눈 같은 날씨 효과는 넣지 않는다.")]
+    [SerializeField] private Renderer[] seasonEffects;
 
     [Tooltip("풀밭 줄을 지정하지 않았을 때 쓸 정렬 레이어.")]
     [SerializeField] private string fallbackSortingLayer = "BG";
@@ -62,8 +67,9 @@ public class DecorationLayer : MonoBehaviour
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = item.icon;
             if (material != null) sr.sharedMaterial = material;
-            float baseY = RectAt(item, placement.Position).yMin;
-            ApplyDepth(sr, baseY, out float z);
+            var rect = RectAt(item, placement.Position);
+            ApplyDepth(sr, rect.yMin, out float z);
+            RaiseAboveSeasonEffects(sr, rect);
             go.transform.position = new Vector3(placement.x, placement.y, z);
 
             var view = go.AddComponent<DecorationView>();
@@ -120,6 +126,34 @@ public class DecorationLayer : MonoBehaviour
         float nextY = row + 1 < depthRows.Length && depthRows[row + 1] != null ? depthRows[row + 1].transform.position.y : rowY - 2f;
         float t = rowY > nextY ? Mathf.Clamp01((rowY - baseY) / (rowY - nextY)) : 0f;
         z = r.transform.position.z - 0.1f - 0.8f * t;
+    }
+
+    /// <summary>
+    /// 장식품과 겹치는 계절 효과 중 장식품보다 앞에 그려지는 것이 있으면, 그중 가장 앞인 것보다 한 단계 앞으로 올린다.
+    /// 효과의 그림 자체는 계절에 따라 보였다 숨었다 하지만(머티리얼 값) 오브젝트는 늘 켜져 있으므로, 계절과 상관없이 한 번 정한다.
+    /// </summary>
+    private void RaiseAboveSeasonEffects(SpriteRenderer sr, Rect rect)
+    {
+        if (seasonEffects == null) return;
+        foreach (var fx in seasonEffects)
+        {
+            if (fx == null || !fx.enabled || !fx.gameObject.activeInHierarchy) continue;
+            var b = fx.bounds;
+            var fxRect = new Rect(b.min.x, b.min.y, b.size.x, b.size.y);
+            if (!fxRect.Overlaps(rect)) continue;
+            if (IsDrawnBefore(fx.sortingLayerID, fx.sortingOrder, sr.sortingLayerID, sr.sortingOrder)) continue;
+
+            sr.sortingLayerID = fx.sortingLayerID;
+            sr.sortingOrder = fx.sortingOrder + 1;
+        }
+    }
+
+    /// <summary>a(레이어, 순서)가 b보다 먼저(뒤에) 그려지는가.</summary>
+    private static bool IsDrawnBefore(int layerA, int orderA, int layerB, int orderB)
+    {
+        int la = SortingLayer.GetLayerValueFromID(layerA);
+        int lb = SortingLayer.GetLayerValueFromID(layerB);
+        return la != lb ? la < lb : orderA < orderB;
     }
 
     // ── 크기·영역 계산 (배치 미리보기와 공용) ─────────────────────────────────
