@@ -57,6 +57,9 @@ public class SettingsData
     /// <summary>그래픽 품질(<see cref="GraphicsQualityLevel"/>). -1이면 기기 사양으로 자동 선택한다.</summary>
     public int graphicsQuality = GraphicsQuality.Auto;
 
+    /// <summary>무한 모드(테스트). 켜져 있으면 엔딩 뒤에도 계속할 수 있다.</summary>
+    public bool endlessModeEnabled = false;
+
     /// <summary>바꾼 단축키. 비어 있으면 기본 키를 쓴다.</summary>
     public List<KeyBindingEntry> keyBindings = new();
 }

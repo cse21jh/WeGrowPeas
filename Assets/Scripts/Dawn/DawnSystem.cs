@@ -103,13 +103,33 @@ public static class DawnSystem
     public static void RecordRunCleared()
     {
         string plant = CurrentPlant;
+        int before = GetMaxUnlockedStage(plant);
         UnlockUpTo(SelectedDawnStage + 1, plant);
+        DawnUnlockAnnouncement.Record(before, GetMaxUnlockedStage(plant));
 
         // 이번 런에서 클리어한 새벽 단계에 맞춰, 조건을 만족하는 상점/특수 아이템을 실제로 해금(기록).
         UnlockGrants.GrantDawnClearUnlocks(plant, SelectedDawnStage);
         AchievementHooks.OnDawnCleared(plant, SelectedDawnStage);
 
         Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
+    }
+
+    /// <summary>
+    /// 무한 모드에서 엔딩 뒤 일정 일수를 더 버텼을 때 호출. 선택 단계 + 1 + extraStages까지 건너뛰어 해금한다.
+    /// 새로 열린 단계 아래는 모두 클리어한 것으로 보고 보상을 준다(보상 지급은 누적 판정이라 한 번이면 된다).
+    /// 12단계 업적은 실제로 12단계를 클리어해야 하므로 여기서는 주지 않는다.
+    /// </summary>
+    public static void RecordEndlessMilestone(int extraStages)
+    {
+        string plant = CurrentPlant;
+        int before = GetMaxUnlockedStage(plant);
+        UnlockUpTo(SelectedDawnStage + 1 + extraStages, plant);
+        int after = GetMaxUnlockedStage(plant);
+        if (after <= before) return;
+
+        UnlockGrants.GrantDawnClearUnlocks(plant, after - 1);
+        DawnUnlockAnnouncement.Record(before, after);
+        Debug.Log($"[Dawn] {plant} 무한 모드 건너뛰기 해금: {before}단계 → {after}단계");
     }
 
     /// <summary>테스트용: 모든 식물의 새벽 진행도 초기화.</summary>

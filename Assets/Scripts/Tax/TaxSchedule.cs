@@ -11,11 +11,13 @@ public static class TaxSchedule
     public const int DefaultInterval = 5;
     public static readonly int[] DefaultSchedule = { 1000, 3000, 8000, 22000, 60000, 150000 };
     public const float DefaultBeyondGrowth = 2f;
+    public const float DefaultEndlessGrowth = 3f;
 
     private static bool _loaded;
     private static int _interval = DefaultInterval;
     private static int[] _schedule = DefaultSchedule;
     private static float _beyondGrowth = DefaultBeyondGrowth;
+    private static float _endlessGrowth = DefaultEndlessGrowth;
 
     private static void EnsureLoaded()
     {
@@ -28,6 +30,7 @@ public static class TaxSchedule
             _interval = cfg.interval > 0 ? cfg.interval : DefaultInterval;
             _schedule = (cfg.schedule != null && cfg.schedule.Length > 0) ? cfg.schedule : DefaultSchedule;
             _beyondGrowth = cfg.beyondTableGrowth > 0 ? cfg.beyondTableGrowth : DefaultBeyondGrowth;
+            _endlessGrowth = cfg.endlessGrowth > 0 ? cfg.endlessGrowth : DefaultEndlessGrowth;
         }
         else
         {
@@ -64,10 +67,14 @@ public static class TaxSchedule
         EnsureLoaded();
         if (_interval <= 0 || taxStage < _interval) return 0;
 
+        // 무한 모드(엔딩 뒤): 마지막으로 낸 세금(엔딩 전날 마감분)에서 납부 주기마다 endlessGrowth배씩 오른다.
+        // 엔딩 날 세금은 걷지 않으므로 그날을 건너뛰고 이어서 계산한다.
+        int endlessSteps = 0;
         int effectiveTaxStage = taxStage;
-        if (taxStage > 40)
+        if (taxStage > EndlessMode.StartStage)
         {
-            effectiveTaxStage -= _interval; // 40 스테이지 건너뜀으로 인한 인덱스 조정
+            endlessSteps = (taxStage - EndlessMode.StartStage + _interval - 1) / _interval;
+            effectiveTaxStage = EndlessMode.StartStage - _interval;
         }
 
         int idx = effectiveTaxStage / _interval - 1; // 5→0, 10→1 …
@@ -87,8 +94,13 @@ public static class TaxSchedule
             baseAmount = Mathf.RoundToInt(last * Mathf.Pow(growth, over));
         }
 
-        // 새벽 세금 배수 적용
+        float amount = baseAmount;
+        if (endlessSteps > 0)
+            amount *= Mathf.Pow(_endlessGrowth > 0 ? _endlessGrowth : DefaultEndlessGrowth, endlessSteps);
+
+        // 새벽 세금 배수 적용. 무한 모드 세금은 int 범위를 넘을 수 있으므로 상한에서 멈춘다.
         float dawnMul = DawnSystem.Current.taxMultiplier;
-        return Mathf.RoundToInt(baseAmount * (dawnMul > 0f ? dawnMul : 1f));
+        amount *= dawnMul > 0f ? dawnMul : 1f;
+        return amount >= int.MaxValue ? int.MaxValue : Mathf.RoundToInt(amount);
     }
 }

@@ -24,7 +24,7 @@ public class GameManager : Singleton<GameManager>
     private int gameMode = 0; //0: normal 1: endless
 
     /// <summary>저주가 이번 런에서 도는가. 무한모드(1) 또는 새벽 모드(저주 레벨 &gt; 0)일 때.</summary>
-    private bool CurseActive => gameMode == 1 || DawnSystem.Current.curseLevel > 0;
+    private bool CurseActive => DawnSystem.Current.curseLevel > 0;
 
     public Grid grid;
     public EnemyController enemyController;
@@ -81,6 +81,7 @@ public class GameManager : Singleton<GameManager>
                 RecallRecorder.ResetRun(); // 회상: 일자별 스냅샷 초기화
                 CurseState.ResetAll(); // 저주 상태 초기화
                 SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
+                DawnUnlockAnnouncement.Clear(); // 지난 런의 해금 연출이 남지 않게
                 gameMode = 0;
                 StageUpdate();
                 break;
@@ -151,11 +152,14 @@ public class GameManager : Singleton<GameManager>
         {
             UpdateStageUI();
 
-            curseManager.ApplyCurse();
+            if (CurseActive) curseManager.ApplyCurse(); // 새벽 저주만. 무한 모드 자체의 상시 저주는 없다.
 
             yield return StartCoroutine(StartStage());
+            if (gameOver) break;
 
-            //curseManager.SelectCurse(stage);
+            // 엔딩 뒤 5일을 더 버틸 때마다 새벽 단계를 건너뛰어 연다(바로 저장된다).
+            EndlessMode.OnDaySurvived(stage);
+
             StageUpdate();
             SaveGame();
         }
@@ -278,7 +282,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void DebugSetStage(int newStage)
     {
-        stage = Mathf.Clamp(newStage, 1, endStage);
+        // 무한 모드에서는 엔딩 뒤 일차로도 옮길 수 있다.
+        stage = Mathf.Clamp(newStage, 1, gameMode == 1 ? 999 : endStage);
         // 일차별 기록 리스트(kill/wave/noTrait)를 새 일차 크기까지 0으로 채워 인덱스 접근 오류를 막는다.
         enemyController?.DebugPadStageRecords(stage);
         UpdateStageUI();
