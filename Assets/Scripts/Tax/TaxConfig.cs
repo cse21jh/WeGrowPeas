@@ -20,4 +20,8 @@ public class TaxConfig : ScriptableObject
     [Balance("표 초과 증가율")]
     [Tooltip("표를 넘어선 관문의 세금 = 마지막 표값 × growth^(초과 횟수). 지수적으로 계속 상승")]
     public float beyondTableGrowth = 2f;
+
+    [Balance("무한 모드 증가율")]
+    [Tooltip("엔딩 뒤(무한 모드) 세금 = 엔딩 전 마지막 세금 × growth^(엔딩 뒤 납부 횟수). 납부 주기마다 이만큼 곱해진다")]
+    public float endlessGrowth = 3f;
 }

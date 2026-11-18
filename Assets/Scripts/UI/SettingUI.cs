@@ -41,10 +41,17 @@ public class SettingUI : MonoBehaviour
             Component lastRow = playAlarmForSeenMessagesToggle != null ? playAlarmForSeenMessagesToggle
                 : showBreedPopupToggle != null ? showBreedPopupToggle
                 : effectVolumeSlider;
-            if (lastRow != null)
-                GraphicsQualitySelector.AddTo(SettingPanel.transform,
+            RectTransform graphicsRow = lastRow != null
+                ? GraphicsQualitySelector.AddTo(SettingPanel.transform,
                     (RectTransform)lastRow.transform,
-                    (RectTransform)bgmVolumeSlider.transform);
+                    (RectTransform)bgmVolumeSlider.transform)
+                : null;
+            if (graphicsRow != null)
+                SettingStepperRow.AddTo(SettingPanel.transform, graphicsRow,
+                    (RectTransform)bgmVolumeSlider.transform, "EndlessModeRow",
+                    () => Loc.T("settings.endless"),
+                    () => Loc.T(EndlessMode.Enabled ? "settings.endless.on" : "settings.endless.off"),
+                    direction => EndlessMode.Enabled = direction > 0);
             SettingPanel.SetActive(false);
         }
     }

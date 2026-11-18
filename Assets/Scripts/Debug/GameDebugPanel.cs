@@ -155,6 +155,17 @@ public class GameDebugPanel : MonoBehaviour
         }
         if (GUILayout.Button("새벽 전체 초기화")) DawnSystem.ResetAllPlantProgress();
 
+        // 결과 화면의 새벽 해금 연출을 바로 띄워 본다(진행도는 바꾸지 않는다).
+        GUILayout.Label("해금 연출 미리보기", wrapLabel);
+        GUILayout.BeginHorizontal();
+        int current = DawnSystem.GetMaxUnlockedStage(DawnSystem.CurrentPlant);
+        int next = Mathf.Min(current + 3, 12);
+        if (GUILayout.Button(current > 0 && current < 12 ? $"{current}→{next}" : "3→6"))
+            DawnUnlockOverlay.Show(current > 0 && current < 12 ? current : 3, current > 0 && current < 12 ? next : 6, 0f);
+        if (GUILayout.Button("첫 해금 0→1")) DawnUnlockOverlay.Show(0, 1, 0f);
+        if (GUILayout.Button("11→12")) DawnUnlockOverlay.Show(11, 12, 0f);
+        GUILayout.EndHorizontal();
+
         // 인게임 사건 해금(황금 비료·급속 냉각기·냉각 방패·저항력 흡수 비료)
         GUILayout.Label("사건 해금: "
             + (UnlockManager.IsUnlocked(UnlockManager.Ids.GoldenPlantCreated) ? "황금식물 " : "")

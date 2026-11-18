@@ -122,7 +122,8 @@ public class UIClickEvent : MonoBehaviour
 
     public void OnClick_OpenGameOverPopup()
     {
-        if (GameStartContext.StartType == GameStartType.GameOver)
+        // 게임오버였거나 무한 모드(테스트)가 꺼져 있으면 엔딩 뒤 이어하기를 숨긴다.
+        if (GameStartContext.StartType == GameStartType.GameOver || !EndlessMode.Enabled)
         {
             continueEndlessButton.gameObject.SetActive(false);
         }
