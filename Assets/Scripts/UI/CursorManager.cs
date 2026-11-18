@@ -61,6 +61,14 @@ public class CursorManager : MonoBehaviour
         }
     }
 
+    // 커서 이미지가 사라지면(씬 전환 등) 시스템 커서라도 보이게 한다. 숨긴 채로 두면 커서가 아예 없어진다.
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        Instance = null;
+        Cursor.visible = true;
+    }
+
     // 게임 창이 포커스를 잃었을 때 (창을 벗어나거나 Alt+Tab 등)
     void OnApplicationFocus(bool hasFocus)
     {
