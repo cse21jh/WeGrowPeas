@@ -152,8 +152,8 @@ public class TransitionController : MonoBehaviour
             Debug.Log(transitionMat.GetFloat(ShaderProps.Radius));
             isFinished = true;
             blocker.SetActive(false);
-            DOTween.KillAll(true);
-            //DOTween.Kill("Transition", true);
+            // This sequence auto-kills on completion. Keep independent UI animations alive,
+            // including a settings dialog opened while the scene transition is finishing.
             StopAllCoroutines();
         });
     }

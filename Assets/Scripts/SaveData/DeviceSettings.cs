@@ -38,7 +38,7 @@ public static class DeviceSettings
 [Serializable]
 public class SettingsData
 {
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
 
     public int version;
 
@@ -62,6 +62,20 @@ public class SettingsData
 
     /// <summary>바꾼 단축키. 비어 있으면 기본 키를 쓴다.</summary>
     public List<KeyBindingEntry> keyBindings = new();
+
+    /// <summary>미설정(null)이면 프로젝트의 기존 그래픽 기본값을 그대로 사용한다.</summary>
+    public DisplaySettingsData display;
+}
+
+[Serializable]
+public class DisplaySettingsData
+{
+    public int width;
+    public int height;
+    public int fullScreenMode = -1;
+    public int qualityLevel = -1;
+    public int vSyncCount = -1;
+    public int frameRate;
 }
 
 [Serializable]

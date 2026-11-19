@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class SettingUI : MonoBehaviour
 {
+    [SerializeField] private WeGrowPeas.UI.SettingsDialogView settingsDialog;
     [SerializeField] private GameObject SettingPanel;
     [SerializeField] private Toggle showBreedPopupToggle;
     [SerializeField] private Toggle playAlarmForSeenMessagesToggle;
@@ -13,6 +14,13 @@ public class SettingUI : MonoBehaviour
 
     void Start()
     {
+        // 새 프리팹이 있는 씬에서는 기존 버튼/ESC 진입점을 그대로 새 창에 연결한다.
+        if (settingsDialog == null) settingsDialog = FindFirstObjectByType<WeGrowPeas.UI.SettingsDialogView>();
+        if (settingsDialog != null)
+        {
+            if (SettingPanel != null) SettingPanel.SetActive(false);
+            return;
+        }
         if (showBreedPopupToggle != null)
         {
             showBreedPopupToggle.onValueChanged.AddListener((isOn) =>
@@ -60,6 +68,8 @@ public class SettingUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            // 새 창은 드롭다운·키 지정·도감의 ESC 우선순위를 직접 처리한다.
+            if (settingsDialog != null && (settingsDialog.IsOpen || settingsDialog.ConsumedEscapeThisFrame)) return;
             // 단축키 화면이 ESC를 처리했으면 설정창은 그대로 둔다.
             if (KeyBindingPanel.BlocksEscape) return;
 
@@ -91,6 +101,7 @@ public class SettingUI : MonoBehaviour
 
     public void ShowSettingPanel()
     {
+        if (settingsDialog != null) { settingsDialog.Open(); return; }
         if (SettingPanel == null)
             return;
 
@@ -114,6 +125,7 @@ public class SettingUI : MonoBehaviour
 
     public void HideSettingPanel()
     {
+        if (settingsDialog != null) { settingsDialog.Close(); return; }
         if (SettingPanel == null)
             return;
         SettingPanel.SetActive(false);
@@ -127,6 +139,11 @@ public class SettingUI : MonoBehaviour
 
     public void ToggleSettingPanel()
     {
+        if (settingsDialog != null)
+        {
+            if (settingsDialog.IsOpen) settingsDialog.Close(); else settingsDialog.Open();
+            return;
+        }
         if (SettingPanel == null)
             return;
         if (SettingPanel.activeSelf)

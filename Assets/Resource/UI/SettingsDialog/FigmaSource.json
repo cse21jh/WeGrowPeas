@@ -1,0 +1,114 @@
+{
+  "source": "https://www.figma.com/design/VLFS95iAYAulwtVnyfDBxt/?node-id=183-70",
+  "sourceFrame": {
+    "width": 3079,
+    "height": 1671
+  },
+  "coordinateOrigin": {
+    "x": 671,
+    "y": 347
+  },
+  "referenceResolution": {
+    "width": 2552,
+    "height": 1437
+  },
+  "notes": [
+    "Original node PNG exports preserve alpha; vector artwork exported at 4x, content at 2x, raster panel at design size.",
+    "The reference gameplay screenshot is not a UI asset; the dialog now overlays the existing game scenes.",
+    "The original visual layout is filled with General, Graphics, Sound and Controls settings backed by existing game systems and DeviceSettings.",
+    "Per-entry ScriptableObjects use LocGroup/ILocKeyed; names and descriptions live only in Resources/Localization/settings-dialog.csv and can be edited from the prefab inspector.",
+    "FigmaAlphaBlend compensates for sRGB compositing over the window's uniform wood/content colors in this Linear-color project."
+  ],
+  "sprites": [
+    {
+      "file": "Sprites/CloseHover.png",
+      "nodeId": "188:102",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/DropdownPanel.png",
+      "nodeId": "188:135",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/DropdownDivider.png",
+      "nodeId": "188:142",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/DropdownCheck.png",
+      "nodeId": "188:163",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Panel.png",
+      "nodeId": "150:68",
+      "scale": 1
+    },
+    {
+      "file": "Sprites/Gear.png",
+      "nodeId": "103:137",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Title.png",
+      "nodeId": "100:73",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Close.png",
+      "nodeId": "150:160",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Arrow.png",
+      "nodeId": "151:161",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Bullet.png",
+      "nodeId": "151:164",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Divider.png",
+      "nodeId": "151:219",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Tab.png",
+      "nodeId": "150:70",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/Content.png",
+      "nodeId": "150:104",
+      "scale": 2
+    },
+    {
+      "file": "Sprites/Field.png",
+      "nodeId": "150:107",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/ScrollTrack.png",
+      "nodeId": "150:101",
+      "scale": 4
+    },
+    {
+      "file": "Sprites/ScrollThumb.png",
+      "nodeId": "150:102",
+      "scale": 4
+    }
+  ],
+  "fonts": [
+    {
+      "file": "Fonts/Cafe24Ssurround.ttf",
+      "source": "Locally installed Cafe24Ssurround-v2.0.ttf"
+    },
+    {
+      "file": "Assets/TextMesh Pro/Fonts/Tenada/Tenada.ttf",
+      "source": "Existing project font"
+    }
+  ]
+}
