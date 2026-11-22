@@ -78,7 +78,7 @@ namespace WeGrowPeas.UI
         private void Update()
         {
             if (savePending && Time.unscaledTime >= saveAt) Flush();
-            if (!IsOpen) return;
+            if (!IsOpen || ConsumedEscapeThisFrame) return;
             if (IsClosing) return;
             if (capturing != null)
             {
@@ -106,6 +106,8 @@ namespace WeGrowPeas.UI
         private void LateUpdate() => dropdownWasOpen = rows.Any(r => r.dropdown != null && r.dropdown.IsExpanded);
         public void Open()
         {
+            // SettingUI가 이 프레임의 Esc로 창을 열었다면 Update에서 같은 입력으로 닫지 않는다.
+            if (!IsOpen && Input.GetKeyDown(KeyCode.Escape)) escapeFrame = Time.frameCount;
             afterClose = null;
             if (!ownsPause)
             {

@@ -55,6 +55,7 @@ public class GameManager : Singleton<GameManager>
 
         ClickRouter.Instance.IsBlockedByUI = false;
 
+        grid.Initialize();
         if (Tutorial != null)
         {
             StartCoroutine(Tutorial.Run(this));

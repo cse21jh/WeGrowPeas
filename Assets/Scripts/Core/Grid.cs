@@ -103,14 +103,19 @@ public class Grid : MonoBehaviour
     // LoadGrid 중에는 Board.Changed 발생을 억제 (MoneyTree가 로드 순서에 따라 즉시 Die하는 버그 방지)
     private bool isLoadingGrid = false;
 
-    // Start is called before the first frame update
-    protected virtual void Start()
+    private bool initialized;
+
+    // 별도 GameManager가 없는 씬에서도 그리드를 준비한다.
+    protected virtual void Start() => Initialize();
+
+    internal void Initialize()
     {
+        if (initialized) return;
         enemyController = FindAnyObjectByType<EnemyController>();
-        //InitGrid();
         InitSoils();
         Board.Plants.Clear();
         Breeder.Initialize();
+        initialized = true;
     }
 
     // Update is called once per frame

@@ -62,7 +62,7 @@ public class BreedingController : MonoBehaviour
         }
     }
 
-    /// <summary>Grid.Start에서 호출한다. 초기화 순서를 유지하려고 자체 Start를 쓰지 않는다.</summary>
+    /// <summary>그리드를 준비할 때 첫 교배가 시작되기 전에 호출한다.</summary>
     public virtual void Initialize()
     {
         breedButton.SetActive(false);
