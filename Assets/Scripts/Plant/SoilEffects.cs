@@ -470,7 +470,7 @@ public class SoilEffects
     public void AddLandRichColumn()
     {
         Dictionary<Plant, int> previousPrices = grid.Upgrades.CapturePlantSellingPrices();
-        int col = Random.Range(0, board.MaxCol);
+        int col = GameRun.Rng.Item.Range(0, board.MaxCol);
         if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
         columnGoldMulBonus[col] += 0.5f;
         grid.Upgrades.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);

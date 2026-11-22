@@ -59,7 +59,7 @@ public class Sprinkler : Plant
         if (neighbors.Count > 0)
         {
             // 무작위 1개 식물 선택
-            Plant luckyPlant = neighbors[Random.Range(0, neighbors.Count)];
+            Plant luckyPlant = neighbors[GameRun.Rng.Field.Range(0, neighbors.Count)];
 
             // 판매 골드 배수 2회 획득 효과
             // = 이미 로직상 1회 올랐을 것이므로, 여기서 1회 더 올려줌

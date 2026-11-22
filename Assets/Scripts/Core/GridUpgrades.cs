@@ -209,7 +209,7 @@ public class GridUpgrades
         {
             if (p is MovablePlant mp && mp.IsMovable && !mp.isDying)
             {
-                if (Random.value < chance)
+                if (GameRun.Rng.Field.Value < chance)
                     mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
             }
         }

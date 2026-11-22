@@ -196,7 +196,7 @@ public class ShopManager : Singleton<ShopManager>
         if (gameUniqueSeed == -1)
         {
             // 새 게임 시작 시 랜덤 시드 생성
-            gameUniqueSeed = UnityEngine.Random.Range(0, int.MaxValue);
+            gameUniqueSeed = GameRun.Rng.Item.Range(0, int.MaxValue);
             Debug.Log($"[ShopManager] 새 게임 고유 시드 생성: {gameUniqueSeed}");
         }
     }

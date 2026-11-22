@@ -128,7 +128,7 @@ public abstract class Plant : MonoBehaviour
     {
         this.gridIndex = gridIndex;
         this.grid = grid;
-        taste = UnityEngine.Random.Range(0, 7);
+        taste = GameRun.Rng.Field.Range(0, 7);
 
         // 밭에 등장했으면 도감에 발견 처리. 하위 클래스가 speciesname을 정한 뒤 base.Init을 부르므로
         // 여기가 모든 식물이 거치는 유일한 지점이다. (이미 발견된 종이면 아무 일도 하지 않는다)
@@ -251,7 +251,7 @@ public abstract class Plant : MonoBehaviour
 
     public bool CanResist(WaveType wave) // if can't resist, Call Die()
     {
-        int randomNumber = UnityEngine.Random.Range(0, 100);
+        int randomNumber = GameRun.Rng.Survival.Range(0, 100);
         if (isFrozen) return true; // 얼어있으면 무조건 저항 성공
 
         if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
@@ -263,7 +263,7 @@ public abstract class Plant : MonoBehaviour
         if (SpecialItemSystem.Has("double_try"))
         {
             // TODO: 파란색 배리어 이펙트
-            randomNumber = UnityEngine.Random.Range(0, 100);
+            randomNumber = GameRun.Rng.Survival.Range(0, 100);
             if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
                 return true;
         }
@@ -564,7 +564,7 @@ public abstract class Plant : MonoBehaviour
             minResistance = maxResistance;
 
         // 변종 판정은 식물 단위로 이동(Grid.Breed / Peanut 자가번식) — 여기서는 일반 롤만
-        resistance += Mathf.Round(UnityEngine.Random.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
+        resistance += Mathf.Round(GameRun.Rng.Breed.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
 
 
 
@@ -609,7 +609,7 @@ public abstract class Plant : MonoBehaviour
     {
         for (int i = 0; i < traitList.Count; i++)
             traitList[i] = new GeneticTrait(traitList[i].traitType,
-                UnityEngine.Random.Range(90, 101) / 100f,
+                GameRun.Rng.Breed.Range(90, 101) / 100f,
                 traitList[i].genetics, traitList[i].additionalResistance);
     }
 

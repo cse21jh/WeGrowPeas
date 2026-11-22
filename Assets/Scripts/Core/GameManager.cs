@@ -55,6 +55,10 @@ public class GameManager : Singleton<GameManager>
 
         ClickRouter.Instance.IsBlockedByUI = false;
 
+        // 이번 판의 난수를 새로 만든다. 이어하기면 LoadGame이 저장된 상태로 되돌린다.
+        GameRun.StartNew();
+        Debug.Log($"[GameRun] 시드 {GameRun.Rng.Seed}");
+
         grid.Initialize();
         if (Tutorial != null)
         {
@@ -548,7 +552,11 @@ public class GameManager : Singleton<GameManager>
         PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
         RecallRecorder.LoadFromSave(saveData.recall);
 
-        Debug.Log("불러옴");
+        // 반드시 마지막. 위에서 식물을 다시 만들면서 난수를 쓰기 때문에(맛 등),
+        // 먼저 되돌리면 저장했을 때와 다른 지점에서 이어 가게 된다.
+        GameRun.Current.RestoreRng(saveData.rng);
+
+        Debug.Log($"불러옴 (시드 {GameRun.Rng.Seed})");
     }
 
     private void SaveGame()
@@ -581,6 +589,7 @@ public class GameManager : Singleton<GameManager>
         }
         PlayerRecordForGraph.SaveTo(saveData.graph);
         RecallRecorder.SaveTo(saveData.recall);
+        GameRun.Rng.Save(saveData.rng);
 
         RunSave.Save(GetSavePath(), saveData);
         GameStartContext.SetStartType(GameStartType.ContinueGame);

@@ -171,7 +171,7 @@ public abstract class MovablePlant : Plant
         if (!isReallyMovable) return; // 이미 뿌리내림
         float chance = DawnSystem.Current.rootChancePercent;
         if (chance <= 0f) return;
-        if (UnityEngine.Random.Range(0f, 100f) < chance)
+        if (GameRun.Rng.Field.Range(0f, 100f) < chance)
         {
             SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
 

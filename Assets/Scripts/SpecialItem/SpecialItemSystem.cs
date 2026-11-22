@@ -106,7 +106,7 @@ public static class SpecialItemSystem
         // 셔플 후 앞에서 count개
         for (int i = pool.Count - 1; i > 0; i--)
         {
-            int j = Random.Range(0, i + 1);
+            int j = GameRun.Rng.Item.Range(0, i + 1);
             (pool[i], pool[j]) = (pool[j], pool[i]);
         }
         return pool.GetRange(0, Mathf.Min(count, pool.Count));
@@ -125,7 +125,7 @@ public static class SpecialItemSystem
             pool.RemoveAll(d => current.Contains(d));
 
         if (pool.Count == 0) return null;
-        return pool[Random.Range(0, pool.Count)];
+        return pool[GameRun.Rng.Item.Range(0, pool.Count)];
     }
 
     /// <summary>획득 가능한(미보유 + 조건 충족) 아이템 목록.</summary>

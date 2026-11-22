@@ -158,7 +158,7 @@ public class Bug : MonoBehaviour
 
     protected void InitRandomPos()
     {
-        spawnEdge = Random.Range(0, 4);
+        spawnEdge = GameRun.Rng.Bug.Range(0, 4);
 
         float x = 0f;
         float y = 0f;
@@ -166,20 +166,20 @@ public class Bug : MonoBehaviour
         switch (spawnEdge)
         {
             case 0:
-                x = Random.Range(-9f, 9f);
+                x = GameRun.Rng.Bug.Range(-9f, 9f);
                 y = 6.0f;
                 break;
             case 1:
                 x = 10.0f;
-                y = Random.Range(-5f, 5f);
+                y = GameRun.Rng.Bug.Range(-5f, 5f);
                 break;
             case 2:
-                x = Random.Range(-9f, 9f);
+                x = GameRun.Rng.Bug.Range(-9f, 9f);
                 y = -6.0f;
                 break;
             case 3:
                 x = -10.0f;
-                y = Random.Range(-5f, 5f);
+                y = GameRun.Rng.Bug.Range(-5f, 5f);
                 break;
         }
 

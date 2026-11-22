@@ -76,7 +76,7 @@ public class Ladybug : Bug
 
     private Vector2 SetRandomPos()
     {
-        return new Vector2(Random.Range(-9.0f, 9.0f), Random.Range(-5.0f, 5.0f));
+        return new Vector2(GameRun.Rng.Bug.Range(-9.0f, 9.0f), GameRun.Rng.Bug.Range(-5.0f, 5.0f));
     }
 
     protected override void OnTriggerEnter(Collider obj)

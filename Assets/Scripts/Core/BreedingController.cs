@@ -134,7 +134,7 @@ public class BreedingController : MonoBehaviour
                 parent2.MarkBreedAttempted();
 
                 // 저주: 씨 없는 수박 — 확률적으로 교배 실패(시도는 소모)
-                if (CurseState.SeedlessFailPercent > 0f && Random.Range(0f, 100f) < CurseState.SeedlessFailPercent)
+                if (CurseState.SeedlessFailPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < CurseState.SeedlessFailPercent)
                 {
                     breedCount++;
                     Debug.Log("씨 없는 수박 저주로 교배 실패");
@@ -149,7 +149,7 @@ public class BreedingController : MonoBehaviour
                 }
 
                 // 저주: 광란 — 확률적으로 랜덤 교배
-                bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
+                bool madnessBreed = CurseState.BreedMadnessPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < CurseState.BreedMadnessPercent;
                 Plant plant = grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
                 PlayMutationEffectIfAny(plant); // 변종(돌연변이) 이펙트
                 if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting &&
@@ -159,7 +159,7 @@ public class BreedingController : MonoBehaviour
                 }
 
                 // 쌍둥이: 확률적으로 교배를 한 번 더 실행해 유전자가 다른 이란성 쌍둥이를 생성
-                if (grid.Modifiers.TwinBreedProbability > 0f && Random.Range(0f, 1f) < grid.Modifiers.TwinBreedProbability && grid.Board.HasEmptyCell())
+                if (grid.Modifiers.TwinBreedProbability > 0f && GameRun.Rng.Breed.Range(0f, 1f) < grid.Modifiers.TwinBreedProbability && grid.Board.HasEmptyCell())
                 {
                     // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
                     PlayMutationEffectIfAny(
@@ -173,7 +173,7 @@ public class BreedingController : MonoBehaviour
                 }
 
                 // 특수(밑장빼기): 25% 확률로 교배 횟수 미소모
-                if (!(SpecialItemSystem.Has("bottom_deal") && Random.Range(0f, 100f) < 25f))
+                if (!(SpecialItemSystem.Has("bottom_deal") && GameRun.Rng.Breed.Range(0f, 100f) < 25f))
                     breedCount++;
                 GameEvents.RaisePeaBreeded();
                 Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
@@ -359,7 +359,7 @@ public class BreedingController : MonoBehaviour
         // - 악성: 부모 무관 유전자 무작위, 저항력은 해당 유전자의 일반 범위 롤
         // - 양성: 유전자는 부모 상속, 모든 저항력 90~100%
         bool malignant = false, benign = false;
-        if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
+        if (GameRun.Rng.Breed.Range(0f, 100f) < Plant.GetMutationChancePercent())
         {
             // 악성 비율: 기본 0.8, 슈퍼 변종이면 반전(0.2), 디버그 패널이 지정하면 그 값
             float malignantRatio = grid.Modifiers.HasSuperMutation ? 0.2f : 0.8f;
@@ -368,7 +368,7 @@ public class BreedingController : MonoBehaviour
 #endif
 
             if (SpecialItemSystem.Has("peanut_special_8")) malignant = true; // 특수(임시땅콩B): 교배 시 악성만
-            else if (Random.value < malignantRatio) malignant = true;
+            else if (GameRun.Rng.Breed.Value < malignantRatio) malignant = true;
             else benign = true;
             Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!");
         }
@@ -420,7 +420,7 @@ public class BreedingController : MonoBehaviour
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p1Bonus = (int)(grid.Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p1Bonus) ? 1 : 0);
+                    childGenetic += (GameRun.Rng.Breed.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p1Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
@@ -431,12 +431,12 @@ public class BreedingController : MonoBehaviour
                 case 1:
                     // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
                     int p2Bonus = (int)(grid.Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p2Bonus) ? 1 : 0);
+                    childGenetic += (GameRun.Rng.Breed.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p2Bonus) ? 1 : 0);
                     break;
                 default: break;
             }
 
-            if (randomBreed || malignant) childGenetic = Random.Range(0, 3); // 저주: 광란 / 악성 변종(유전자 무작위)
+            if (randomBreed || malignant) childGenetic = GameRun.Rng.Breed.Range(0, 3); // 저주: 광란 / 악성 변종(유전자 무작위)
 
             // 특수(임시완두C): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로 변경
             if (benign && SpecialItemSystem.Has("pea_special_12"))
@@ -444,7 +444,7 @@ public class BreedingController : MonoBehaviour
 
             float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
 
-            if (benign) resistance = Random.Range(90, 101) / 100f; // 양성 변종: 모든 저항 90~100%
+            if (benign) resistance = GameRun.Rng.Breed.Range(90, 101) / 100f; // 양성 변종: 모든 저항 90~100%
 
             if (trait == TraitType.Pest)
                 childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, grid.Modifiers.AdditionalPestResistance));

@@ -176,7 +176,7 @@ public class CurseManager : Singleton<CurseManager>
         for (int i = 0; i < tiles; i++) idxs.Add(i);
         for (int i = idxs.Count - 1; i > 0; i--)
         {
-            int j = UnityEngine.Random.Range(0, i + 1);
+            int j = GameRun.Rng.Curse.Range(0, i + 1);
             (idxs[i], idxs[j]) = (idxs[j], idxs[i]);
         }
 
@@ -302,7 +302,7 @@ public class CurseManager : Singleton<CurseManager>
         var validCurses = temporalCursePool.Where(c => c != null && currentStage >= c.unlockStage).ToList();
         if (validCurses.Count == 0) return;
 
-        var data = validCurses[UnityEngine.Random.Range(0, validCurses.Count)];
+        var data = validCurses[GameRun.Rng.Curse.Range(0, validCurses.Count)];
         int level = GetCurseLevel();
         currentTempCurse = CreateInstanceById(data, level);
         var lv = data.GetLevel(level);
@@ -323,7 +323,7 @@ public class CurseManager : Singleton<CurseManager>
     {
         if (seasonalCursePool == null || seasonalCursePool.Count == 0) return;
 
-        var data = seasonalCursePool[UnityEngine.Random.Range(0, seasonalCursePool.Count)];
+        var data = seasonalCursePool[GameRun.Rng.Curse.Range(0, seasonalCursePool.Count)];
         currentSeasonCurse = CreateInstanceById(data, GetCurseLevel());
         remainingCurseDay = seasonInterval;
 

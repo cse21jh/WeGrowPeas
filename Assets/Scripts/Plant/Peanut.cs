@@ -115,7 +115,7 @@ public class Peanut : MovablePlant
         if (emptyGrid.Count == 0)
             return -1;
 
-        return emptyGrid[Random.Range(0, emptyGrid.Count)];
+        return emptyGrid[GameRun.Rng.Field.Range(0, emptyGrid.Count)];
     }
 
     public void TrySpawnCopy()
@@ -125,7 +125,7 @@ public class Peanut : MovablePlant
         if (!HasTriedBreed)
             copyProbability += grid.Modifiers.ActiveShellProbability;
 
-        if (Random.Range(0f, 100f) >= 100f * copyProbability) // 25% 확률로 복사
+        if (GameRun.Rng.Field.Range(0f, 100f) >= 100f * copyProbability) // 25% 확률로 복사
             return;
         int spawnGridIdx = FindEmptyGridToCopy();
 
@@ -136,7 +136,7 @@ public class Peanut : MovablePlant
 
         // 특수(임시땅콩B): 자가번식 시 양성 변종만 등장 (변종 확률로 판정, 유전자 유지 + 모든 저항 90~100%)
         bool benignMutation = SpecialItemSystem.Has("peanut_special_8")
-            && Random.Range(0f, 100f) < Plant.GetMutationChancePercent();
+            && GameRun.Rng.Field.Range(0f, 100f) < Plant.GetMutationChancePercent();
         if (benignMutation)
         {
             Plant.ApplyBenignResistance(copyTriats);

@@ -57,20 +57,20 @@ public class BugSpawner
         int stage = GameManager.Instance.stage;
         if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;
-        if (Random.Range(0, 100) < (modifiers.LadybugSpawnProbability * 100))
+        if (GameRun.Rng.Bug.Range(0, 100) < (modifiers.LadybugSpawnProbability * 100))
         {
             // 최대 무당벌레 수 제한 확인
             if (modifiers.MaxLadybugCount > 0 && board.Ladybugs.Count >= modifiers.MaxLadybugCount)
             {
                 // 최대 수에 도달했으므로 일반 벌레 스폰
-                int bugIndex = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
+                int bugIndex = GameRun.Rng.Bug.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
                 Object.Instantiate(bugPrefabs[bugIndex]);
                 return;
             }
             Object.Instantiate(ladybugPrefab);
             return;
         }
-        int i = Random.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
+        int i = GameRun.Rng.Bug.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
         Object.Instantiate(bugPrefabs[i]);
         return;
     }

@@ -600,7 +600,7 @@ public class EnemyController : MonoBehaviour
         if (sum <= 0f)
             return WaveType.Aging;
 
-        float r = Random.Range(0f, sum);
+        float r = GameRun.Rng.Wave.Range(0f, sum);
         float acc = 0f;
         foreach (var kv in map)
         {
@@ -625,7 +625,7 @@ public class EnemyController : MonoBehaviour
             candidates.Add(kv.Key);
         }
         if (candidates.Count == 0) return null;
-        return GetWaveFromWaveType(candidates[Random.Range(0, candidates.Count)]);
+        return GetWaveFromWaveType(candidates[GameRun.Rng.Wave.Range(0, candidates.Count)]);
     }
 
     public void TutorialWave()
