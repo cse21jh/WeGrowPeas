@@ -42,26 +42,39 @@ public sealed class FieldState
         return -1;
     }
 
-    /// <summary>
-    /// 씬 없이 새 식물을 심는다. 자리가 없으면 false. (시뮬레이터용)
-    /// 게임에서는 Grid.AddPlantToGrid와 Grid.PlantPlant가 같은 순서로 같은 함수들을 부르고, 사이에 화면 처리를 넣는다.
-    /// 순서를 바꿀 때는 양쪽을 함께 바꾼다.
-    /// </summary>
-    public bool AddPlant(PlantState plant, int preferredIdx = -1)
+    /// <summary>식물을 심는다. 자리가 없으면 false.</summary>
+    /// <param name="view">화면 처리. 씬이 없으면 null.</param>
+    public bool AddPlant(PlantState plant, int preferredIdx = -1, IPlantingView view = null)
     {
         int idx = FindCellFor(preferredIdx);
         if (idx < 0) return false;
 
         plant.OnPlanted(this, idx);
         Board.PlaceState(idx, plant);
-        plant.TryRootByDawn();
+        view?.OnPlaced(idx);
+
+        // 새벽: 심길 때 확률로 뿌리를 내린다
+        int previousPrice = plant.GetSellingPrice();
+        if (plant.TryRootByDawn()) view?.OnRooted(previousPrice);
+
+        view?.OnSettled();
         Board.NotifyChanged();
         return true;
     }
 
-    /// <summary>특수(신상품): 새 식물이 심겼을 때 받는 골드.</summary>
-    public static int GetPlantingGold(PlantState plant)
-        => SpecialItemSystem.Has("new_product") ? (int)System.Math.Round(plant.GetSellingPrice() * 0.5f) : 0;
+    /// <summary>태어나거나 산 식물을 심고 그에 따른 골드를 준다. 시작 식물과 불러오기는 <see cref="AddPlant"/>를 쓴다.</summary>
+    public bool AddNewPlant(PlantState plant, int preferredIdx, IPlantingView view, System.Action<int> addGold)
+    {
+        if (!AddPlant(plant, preferredIdx, view)) return false;
+
+        // 특수(신상품): 새 식물이 생겨날 때 가격의 50% 골드
+        if (SpecialItemSystem.Has("new_product"))
+        {
+            int gold = (int)System.Math.Round(plant.GetSellingPrice() * 0.5f);
+            if (gold > 0) addGold(gold);
+        }
+        return true;
+    }
 
     /// <summary>해충 저항력을 올린다. 지금 있는 식물과 앞으로 태어날 식물에 모두 적용된다.</summary>
     public void AddPestResistance(float value)
@@ -108,6 +121,16 @@ public sealed class FieldState
             BonusGold = (int)(plant.GetSellingPrice() * Modifiers.BonusRatioWhenDie),
         };
     }
+}
+
+/// <summary>식물을 심는 동안의 화면 처리.</summary>
+public interface IPlantingView
+{
+    /// <summary>칸에 놓인 직후.</summary>
+    void OnPlaced(int idx);
+    void OnRooted(int previousPrice);
+    /// <summary>뿌리 판정까지 끝난 뒤, 밭이 바뀌었다고 알리기 전.</summary>
+    void OnSettled();
 }
 
 public enum DeathResult

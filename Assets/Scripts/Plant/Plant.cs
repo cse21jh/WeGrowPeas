@@ -128,10 +128,10 @@ public abstract class Plant : MonoBehaviour
 
     protected float bonusGoldRatio = 0.2f; // 웨이브를 버틸 수록 추가되는 골드 비율
 
+    /// <summary>밭에 놓인 식물의 화면을 준비한다. 칸과 맛은 <see cref="FieldState.AddPlant"/>가 먼저 정한다.</summary>
     public virtual void Init(int gridIndex, Grid grid)
     {
         this.grid = grid;
-        State.OnPlanted(grid.Field, gridIndex); // 칸을 정하고 맛을 굴린다
         State.ResistanceChanged -= OnResistanceChanged;
         State.ResistanceChanged += OnResistanceChanged;
 

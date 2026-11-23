@@ -174,11 +174,9 @@ public abstract class MovablePlant : Plant
             RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
     }
 
-    /// <summary>새 식물이 실제 흙 위치에 놓인 뒤 등장 시 뿌리 판정을 수행한다.</summary>
-    public void TryRootAfterPlacement()
-    {
-        TryRootByDawn();
-    }
+    /// <summary>심기면서 뿌리를 내렸을 때.</summary>
+    public void OnRootedWhenPlanted(int previousSellingPrice)
+        => RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.Rooted);
 
     public void CheckResistanceScouterImage(WaveType wave)
     {

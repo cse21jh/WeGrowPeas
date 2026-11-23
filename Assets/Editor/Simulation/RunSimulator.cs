@@ -415,14 +415,12 @@ public sealed partial class RunSimulator : IFieldActions
     private float Roll(TraitType trait, int genetics)
         => BreedingRules.RollResistance(config.species, field.Modifiers, trait, genetics);
 
-    // Plant.SetTrait → Grid.AddPlantToGrid와 같은 순서
+    // PlantSpawner.AddMovablePlant와 같은 순서: 형질 → 심기
     private PlantState Plant(List<GeneticTrait> traits, int cell)
     {
         var plant = new PlantState(kind) { Traits = traits };
         RefreshTraits(plant);
-        if (!field.AddPlant(plant, cell)) return null;
-        economy.Add(FieldState.GetPlantingGold(plant));
-        return plant;
+        return field.AddNewPlant(plant, cell, null, economy.Add) ? plant : null;
     }
 
     // ───── IFieldActions ─────

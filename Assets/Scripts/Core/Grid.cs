@@ -72,7 +72,7 @@ public class Grid : MonoBehaviour, IBugTargets
     public void SkipBreed() => Breeder.SkipBreed();
 
     /// <summary>식물 생성과 추가.</summary>
-    public PlantSpawner Spawner => spawner ??= new PlantSpawner(Board, AddPlantToGrid, RefreshResistanceScouter, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
+    public PlantSpawner Spawner => spawner ??= new PlantSpawner(AddPlantToGrid, AddNewPlantToGrid, RefreshResistanceScouter, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
     private PlantSpawner spawner;
 
     /// <summary>값을 올리면서 밭 위 식물과 가격 표시도 갱신하는 강화.</summary>
@@ -104,8 +104,6 @@ public class Grid : MonoBehaviour, IBugTargets
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
 
 
-    // LoadGrid 중에는 Board.Changed 발생을 억제 (MoneyTree가 로드 순서에 따라 즉시 Die하는 버그 방지)
-    private bool isLoadingGrid = false;
 
     private bool initialized;
 
@@ -149,35 +147,48 @@ public class Grid : MonoBehaviour, IBugTargets
 
     private void RefreshResistanceScouter() => Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
 
-    public void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
+    /// <summary>이미 만든 식물 오브젝트를 심는다. 자리가 없으면 오브젝트를 없앤다.</summary>
+    /// <param name="grididx">-1이면 앞에서부터 첫 빈 칸.</param>
+    public void AddPlantToGrid(Plant plant, int grididx = -1)
     {
-        // 심는 순서는 FieldState.AddPlant(씬 없는 쪽)와 같다. 순서를 바꿀 때는 양쪽을 함께 바꾼다.
-        int idx = Field.FindCellFor(grididx);
-        if (idx < 0)
+        if (!Field.AddPlant(plant.State, grididx, new PlantingView(this, plant)))
+            Destroy(plant.gameObject);
+    }
+
+    /// <summary>태어나거나 산 식물을 심는다.</summary>
+    private void AddNewPlantToGrid(Plant plant, int grididx)
+    {
+        if (!Field.AddNewPlant(plant.State, grididx, new PlantingView(this, plant), GameManager.Instance.economyManager.AddGold))
+            Destroy(plant.gameObject);
+    }
+
+    private sealed class PlantingView : IPlantingView
+    {
+        private readonly Grid grid;
+        private readonly Plant plant;
+
+        public PlantingView(Grid grid, Plant plant)
         {
-            Destroy(plant.gameObject); // 빈 칸이 없다
-            return;
+            this.grid = grid;
+            this.plant = plant;
         }
 
-        plant.Init(idx, this);
-        PlantPlant(plant);
+        public void OnPlaced(int idx)
+        {
+            plant.Init(idx, grid);
+            grid.PlaceOnSoil(plant);
+        }
+
+        // 실제 흙 위치로 옮긴 뒤라서 가격 상승 팝업이 올바른 곳에서 시작한다
+        public void OnRooted(int previousPrice) => ((MovablePlant)plant).OnRootedWhenPlanted(previousPrice);
+
+        public void OnSettled() => grid.Scouter.UpdateGoldScouterImageInGrid();
     }
-    private void PlantPlant(Plant plant)
+
+    private void PlaceOnSoil(Plant plant)
     {
         Board.Place(plant.gridIndex, plant);
-        Transform soilT = GetSoilTransform(plant.gridIndex);
-        plant.transform.position = soilT.position;
-
-        // 저장 복원 중에는 기존 뿌리 상태를 아래에서 그대로 불러온다.
-        // 새 식물은 실제 흙 위치로 옮긴 뒤 판정해야 가격 상승 팝업도 올바른 곳에서 시작한다.
-        if (!isLoadingGrid && plant is MovablePlant movablePlant)
-            movablePlant.TryRootAfterPlacement();
-
-        Scouter.UpdateGoldScouterImageInGrid();
-
-        // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
-        if (!isLoadingGrid)
-            Board.NotifyChanged();
+        plant.transform.position = GetSoilTransform(plant.gridIndex).position;
     }
 
     // 특수(땅부자): 세로줄별 고속 숙성 배수 보너스 (col → +mul, 중첩 가능)
@@ -519,15 +530,14 @@ public class Grid : MonoBehaviour, IBugTargets
 
     public void LoadGrid(GridSave saveData)
     {
-        // 로딩 중 Board.Changed 억제 (MoneyTree 등이 로드 순서에 따라 조기 사망하는 것 방지)
-        isLoadingGrid = true;
-
+        // 다 놓은 뒤에 한 번만 알린다. 도중에 알리면 MoneyTree가 이웃 식물보다 먼저 놓였을 때 죽는다.
         List<PlantData> plantList = saveData.plantList;
         foreach (var item in plantList)
         {
             GameObject obj = Spawner.InstantiatePlant(item.speciesname);
 
             Plant plant = obj.GetComponent<Plant>();
+            plant.State.OnPlanted(Field, item.gridIndex);
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
             plant.SetTaste(item.taste);
@@ -545,11 +555,11 @@ public class Grid : MonoBehaviour, IBugTargets
             if (plant is MoneyTree moneyTree)
                 moneyTree.SetSurvivedTurns(item.survivedTurns);
 
-            PlantPlant(plant);
+            PlaceOnSoil(plant);
+            Scouter.UpdateGoldScouterImageInGrid();
         }
 
         // 모든 식물 로드 완료 후 Board.Changed 한 번 발송
-        isLoadingGrid = false;
         Board.NotifyChanged();
         Board.MaxCol = saveData.maxCol;
         UpdateSoil();
