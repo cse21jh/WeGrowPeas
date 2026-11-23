@@ -348,11 +348,10 @@ public class GameManager : Singleton<GameManager>
         else
         {
             // 압류분 강제매각(비싼 것부터, 골드 0 이상 될 때까지)
-            var toSell = new System.Collections.Generic.List<Plant>(seized);
-            toSell.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
-            foreach (var p in toSell)
+            RefreshSeizure(seized); // 유예 중 압류 식물이 벌레에 먹혔을 수 있어 매각 대상과 스티커를 맞춘다
+            foreach (PlantState target in TaxState.PickSeizure(grid.Board, -economyManager.GetGold()))
             {
-                if (p == null) continue;
+                if (!grid.Board.Plants.TryGetValue(target.GridIndex, out Plant p) || p.State != target) continue;
                 if (economyManager.GetGold() >= 0) { p.SetSeized(false); continue; }
                 economyManager.AddGold(p.GetSellingPrice());
                 p.Die(DeathCause.Other);
@@ -369,21 +368,9 @@ public class GameManager : Singleton<GameManager>
     // 현재 빚(-gold)만큼 Pea/Peanut을 비싼 순으로 압류. seized 집합과 스티커를 갱신.
     private void RefreshSeizure(System.Collections.Generic.HashSet<Plant> seized)
     {
-        int debt = Mathf.Max(0, -economyManager.GetGold());
-
-        var seizable = new System.Collections.Generic.List<Plant>();
-        foreach (var p in grid.Board.Plants.Values)
-            if (p != null && (p is Pea || p is Peanut)) seizable.Add(p);
-        seizable.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
-
         var needed = new System.Collections.Generic.HashSet<Plant>();
-        int sum = 0;
-        foreach (var p in seizable)
-        {
-            if (sum >= debt) break;
-            needed.Add(p);
-            sum += p.GetSellingPrice();
-        }
+        foreach (PlantState plant in TaxState.PickSeizure(grid.Board, Mathf.Max(0, -economyManager.GetGold())))
+            needed.Add(grid.Board.Plants[plant.GridIndex]);
 
         // 더 이상 불필요한 압류 해제
         foreach (var p in new System.Collections.Generic.List<Plant>(seized))
@@ -423,10 +410,7 @@ public class GameManager : Singleton<GameManager>
      
     private IEnumerator ClearNormalMode()
     {
-        if (TaxManager.Instance != null && TaxManager.Instance.DueTaxStage == 40)
-        {
-            TaxManager.Instance.MarkPaidForcibly();
-        }
+        TaxManager.Instance?.State.SettleAtEnding();
 
         AchievementHooks.OnRunCleared(economyManager.GetGold());
         DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)

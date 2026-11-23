@@ -8,21 +8,19 @@ public class EconomyManager : MonoBehaviour
     
     [SerializeField] private TextMeshProUGUI CoinUI;
 
-    // 저장 필요
+    [Tooltip("새 게임의 시작 골드.")]
     [SerializeField] private int gold = 0;
 
-    private int peaSellCount = 0;
-    private int peanutSellCount = 0;
-    public int PeaSellCount => peaSellCount;
-    public int PeanutSellCount => peanutSellCount;
+    /// <summary>골드와 판매 집계. 이 컴포넌트는 값이 바뀔 때 화면을 맞춘다.</summary>
+    public EconomyState State => state ??= new EconomyState(gold);
+    private EconomyState state;
 
-    private int totalGold = 0;
-    private int consumeGold = 0;
-    private int earnedGoldToday = 0;
-    public int TotalGold => totalGold;
-    public int ConsumeGold => consumeGold;
+    public int PeaSellCount => State.PeaSellCount;
+    public int PeanutSellCount => State.PeanutSellCount;
+    public int TotalGold => State.TotalGold;
+    public int ConsumeGold => State.ConsumeGold;
     /// <summary>오늘 번 골드. <see cref="PushEarnedGold"/>로 그래프에 밀어넣으면 0으로 초기화된다.</summary>
-    public int EarnedGoldToday => earnedGoldToday;
+    public int EarnedGoldToday => State.EarnedToday;
 
     private void Awake()
     {
@@ -31,40 +29,30 @@ public class EconomyManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateCoinUI(gold);
+        UpdateCoinUI(State.Gold);
     }
 
-    public void InitEconomyManager()
-    {
-        peaSellCount = 0;
-        peanutSellCount = 0;
-        totalGold = 0;
-        consumeGold = 0;
-        earnedGoldToday = 0;
-    }
+    public void InitEconomyManager() => State.ResetCounters();
 
-    public bool HasGold(int amount) => gold >= amount;
+    public bool HasGold(int amount) => State.HasGold(amount);
 
     public void SpendGold(int amount, GoldFeedbackReason reason = GoldFeedbackReason.Other)
     {
-        gold -= amount;
-        consumeGold += amount;
-        UpdateCoinUI(gold);
+        State.Spend(amount);
+        UpdateCoinUI(State.Gold);
         if (amount > 0)
         {
             GameEvents.RaiseGoldFeedback(
-                GoldFeedbackData.HudOnly(-amount, gold, reason));
+                GoldFeedbackData.HudOnly(-amount, State.Gold, reason));
         }
-        Debug.Log($"골드 {amount} 사용 → 남은 {gold}");
+        Debug.Log($"골드 {amount} 사용 → 남은 {State.Gold}");
     }
 
     public void AddGold(int amount)
     {
-        gold += amount;
-        totalGold += amount;
-        earnedGoldToday += amount;
-        UpdateCoinUI(gold);
-        Debug.Log($"골드 {amount} 획득 → 합계 {gold}");
+        State.Add(amount);
+        UpdateCoinUI(State.Gold);
+        Debug.Log($"골드 {amount} 획득 → 합계 {State.Gold}");
     }
 
     public static string ToAbbreviatedString(int number)
@@ -94,54 +82,25 @@ public class EconomyManager : MonoBehaviour
         GameEvents.RaiseGoldChanged(val);
     }
 
-    public int GetGold()
-    {
-        return gold;
-    }
+    public int GetGold() => State.Gold;
 
     /// <summary>골드/판매 집계를 저장 데이터에 담는다. <see cref="LoadEconomyManager"/>와 짝.</summary>
-    public void SaveEconomyManager(EconomySave save)
-    {
-        save.gold = gold;
-        save.sellCount[0] = peaSellCount;
-        save.sellCount[1] = peanutSellCount;
-        save.totalGold = totalGold;
-        save.consumeGold = consumeGold;
-    }
+    public void SaveEconomyManager(EconomySave save) => State.Save(save);
 
     public void LoadEconomyManager(EconomySave saveData)
     {
-        gold = saveData.gold;
-        UpdateCoinUI(gold);
-        peaSellCount = saveData.sellCount[0];
-        peanutSellCount = saveData.sellCount[1];
-        totalGold = saveData.totalGold;
-        consumeGold = saveData.consumeGold;
+        State.Load(saveData);
+        UpdateCoinUI(State.Gold);
     }
 
-    public void AddSellCount(string plantName)
+    public void AddSellCount(PlantState plant)
     {
-        if(plantName == PlantIds.Pea)
-        {
-            peaSellCount++;
-            if (GameManager.Instance?.Tutorial != null) return;
-            CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
-            CodexProgress.AddSold(true);
-            return;
-        }
-        else if(plantName == PlantIds.Peanut)
-        {
-            peanutSellCount++;
-            if (GameManager.Instance?.Tutorial != null) return;
-            CodexProgress.Discover(CodexProgress.Category.Plant, plantName);
-            CodexProgress.AddSold(false);
-            return;
-        }
+        if (!plant.IsMovableKind) return; // 완두와 땅콩만 센다
+        State.CountSale(plant.Kind);
+        if (GameManager.Instance?.Tutorial != null) return;
+        CodexProgress.Discover(CodexProgress.Category.Plant, plant.Species);
+        CodexProgress.AddSold(plant.Kind == PlantKind.Pea);
     }
 
-    public void PushEarnedGold()
-    {
-        PlayerRecordForGraph.SetEG(earnedGoldToday);
-        earnedGoldToday = 0;
-    }
+    public void PushEarnedGold() => PlayerRecordForGraph.SetEG(State.TakeEarnedToday());
 }

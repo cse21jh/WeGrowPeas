@@ -50,7 +50,7 @@ public class SimRunResult
 /// 씬 없이 한 판을 돌린다. 교배, 웨이브, 죽음, 저항력, 판매가는 게임과 같은 코드를 쓴다.
 ///
 /// 아직 없는 것: 모종 이외의 상점 아이템, 특수 아이템, 저주, 의뢰, 특성, 벌레.
-/// 세금 징수(<see cref="CollectOverdueTax"/>)는 게임의 TaxCollectionRoutine을 따로 옮긴 것이라 한쪽을 고치면 함께 고쳐야 한다.
+/// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
 public sealed class RunSimulator : IFieldActions
 {
@@ -62,9 +62,9 @@ public sealed class RunSimulator : IFieldActions
     private readonly PlantKind kind;
 
     private int stage;
-    private int gold;
-    private int totalGold;
-    private int lastPaidTaxStage;
+    private readonly EconomyState economy;
+    private readonly TaxState tax = new TaxState();
+    private readonly ModState mods = new ModState();
     private WaveType currentWave;
     private WaveType nextWave;
 
@@ -75,7 +75,8 @@ public sealed class RunSimulator : IFieldActions
         kind = config.species == PlantIds.Peanut ? PlantKind.Peanut : PlantKind.Pea;
         result = new SimRunResult { Seed = seed };
         botRng = new RngStream(unchecked((ulong)(uint)seed) ^ 0xB07B07B07UL);
-        gold = config.startGold;
+        economy = new EconomyState(config.startGold);
+        deck.WeightMultiplier = type => mods.GetMul(StatId.WaveWeightMul, (int)type, stage);
     }
 
     // ───── 여러 판 ─────
@@ -157,16 +158,18 @@ public sealed class RunSimulator : IFieldActions
             NextStage();
         }
 
-        result.Gold = gold;
+        result.Gold = economy.Gold;
         result.Mix(result.DeathDay);
-        result.Mix(gold);
+        result.Mix(economy.Gold);
     }
 
     private bool IsWipedOut => field.Board.CountLivingPlants() == 0;
 
     private void NextStage()
     {
+        economy.TakeEarnedToday();
         stage++;
+        mods.ExpireOn(stage);
         deck.Unlock(stage);
     }
 
@@ -179,9 +182,9 @@ public sealed class RunSimulator : IFieldActions
     private void Record()
     {
         result.Plants.Add(field.Board.CountLivingPlants());
-        result.GoldByDay.Add(gold);
+        result.GoldByDay.Add(economy.Gold);
         result.Mix(stage * 31 + (int)currentWave);
-        result.Mix(gold);
+        result.Mix(economy.Gold);
         foreach (PlantState plant in SortedPlants())
         {
             result.Mix(plant.GridIndex * 1000 + plant.Taste);
@@ -197,7 +200,8 @@ public sealed class RunSimulator : IFieldActions
         int used = 0;
         for (int guard = 0; guard < 50; guard++)
         {
-            int max = BreedingRules.GetMaxAttempts(config.breedAttempts, 1f, totalGold);
+            int max = BreedingRules.GetMaxAttempts(config.breedAttempts,
+                mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
             if (used >= max) break;
             if (!field.Board.HasEmptyCell() && !SellWorst(6)) break;
 
@@ -271,32 +275,29 @@ public sealed class RunSimulator : IFieldActions
 
     // ───── 밤: 세금과 모종 ─────
 
-    private int DueTaxStage => lastPaidTaxStage + TaxSchedule.Interval;
-
     private void NightPhase()
     {
-        // 엔딩 날 세금은 걷지 않는다
-        if (config.payTax && stage >= DueTaxStage && DueTaxStage != 40)
+        if (config.payTax && tax.IsDue(stage))
         {
-            int due = TaxSchedule.GetTaxAmount(DueTaxStage);
-            while (gold < due && SellWorst(4)) { }
-            if (gold >= due)
+            while (!tax.CanPay(economy, out _) && economy.Gold < tax.DueAmount && SellWorst(4)) { }
+            if (tax.CanPay(economy, out int due))
             {
-                gold -= due;
-                lastPaidTaxStage = DueTaxStage;
+                economy.Spend(due);
+                tax.MarkPaid();
             }
         }
+        if (stage == EndlessMode.StartStage) tax.SettleAtEnding();
 
         if (!config.buySeedlings) return;
         int price = SeedlingPrice;
-        if (gold < price) return;
+        if (!economy.HasGold(price)) return;
         if (!field.Board.HasEmptyCell() && !SellWorst(6)) return;
 
         List<TraitType[]> sets = TraitOptions.GetTraitSets(stage, isNight: true);
         TraitType[] set = PickSeedling(sets);
         if (set == null) return;
 
-        gold -= price;
+        economy.Spend(price);
         var traits = new List<GeneticTrait>();
         foreach (TraitType t in set) traits.Add(new GeneticTrait(t, Roll(t, 1), 1, 0f));
         Plant(traits, -1);
@@ -355,32 +356,29 @@ public sealed class RunSimulator : IFieldActions
         int price = plant.GetSellingPrice();
         DeathOutcome outcome = field.TryKill(plant, DeathCause.Shovel);
         if (!outcome.Died) return false;
-        AddGold(price + outcome.BonusGold);
+        // Shovel과 같은 순서: 사망 보너스 → 판매 집계 → 판매가 → 특수(순환)
+        economy.Add(outcome.BonusGold);
+        economy.CountSale(plant.Kind);
+        economy.Add(price);
+        field.Soil.HealNeighborsBySell(plant.GridIndex);
         return true;
     }
 
     // GameManager.TaxCollectionRoutine: 연체 세금을 강제로 걷고, 모자라면 비싼 식물부터 판다
     private void CollectOverdueTax()
     {
-        if (!config.payTax || stage <= DueTaxStage) return;
+        if (!config.payTax || !tax.IsOverdue(stage)) return;
 
-        gold -= TaxSchedule.GetTaxAmount(DueTaxStage);
-        lastPaidTaxStage = DueTaxStage;
-        if (gold >= 0) return;
+        int owed = tax.DueAmount;
+        tax.MarkPaid();
+        economy.Spend(owed);
+        if (economy.Gold >= 0) return;
 
-        List<PlantState> plants = SortedPlants();
-        plants.Sort((a, b) =>
+        foreach (PlantState plant in TaxState.PickSeizure(field.Board, -economy.Gold))
         {
-            int c = b.GetSellingPrice().CompareTo(a.GetSellingPrice());
-            return c != 0 ? c : a.GridIndex.CompareTo(b.GridIndex);
-        });
-        foreach (PlantState plant in plants)
-        {
-            if (gold >= 0) break;
-            int price = plant.GetSellingPrice();
-            AddGold(price);
-            DeathOutcome outcome = field.TryKill(plant, DeathCause.Other);
-            if (outcome.Died) AddGold(outcome.BonusGold);
+            if (economy.Gold >= 0) break;
+            economy.Add(plant.GetSellingPrice());
+            economy.Add(field.TryKill(plant, DeathCause.Other).BonusGold);
         }
     }
 
@@ -421,7 +419,7 @@ public sealed class RunSimulator : IFieldActions
     public void OnWaveHit(PlantState plant, WaveType wave, bool isSecondWave) => result.WaveHits[(int)wave]++;
     public void ResolveMushrooms() { }
     public void Unfreeze(PlantState plant) => plant.SetFrozen(false);
-    public void AddGold(int amount) { gold += amount; totalGold += amount; }
+    public void AddGold(int amount) => economy.Add(amount);
     public void Root(PlantState plant) => plant.IsRooted = true;
 
     public void RefreshTraits(PlantState plant)

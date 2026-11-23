@@ -226,6 +226,25 @@ public sealed class SoilState
         }
     }
 
+    /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
+    public void HealNeighborsBySell(int idx)
+    {
+        if (!SpecialItemSystem.Has("circulation")) return;
+
+        int row = idx % 4;
+        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
+        foreach (int n in neighbors)
+        {
+            if (n < 0 || n >= board.CellCount || !board.States.TryGetValue(n, out PlantState plant)) continue;
+            for (int i = 0; i < plant.Traits.Count; i++)
+            {
+                float current = plant.Traits[i].resistance;
+                if (current < 0.9f)
+                    plant.ChangeResistance((int)plant.Traits[i].traitType, Math.Min(0.05f, 0.9f - current));
+            }
+        }
+    }
+
     private bool IsChiliPepperAt(int idx)
         => board.States.TryGetValue(idx, out PlantState plant) && plant.Kind == PlantKind.ChiliPepper;
 }

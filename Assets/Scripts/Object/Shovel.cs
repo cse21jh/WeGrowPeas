@@ -141,7 +141,7 @@ public class Shovel : MonoBehaviour, IPointerDownHandler
                 SoundManager.Instance.PlayEffect(SoundIds.Shovel);
                 if(plant.Die(DeathCause.Shovel)) // false라면 페트병 제거
                 {
-                    economyManager.AddSellCount(plant.speciesname);
+                    economyManager.AddSellCount(plant.State);
                     AchievementHooks.OnPlantSold(sellingPrice);
                     economyManager.AddGold(sellingPrice);
                     grid.Upgrades.TryUpdateMostExpensivePlant(sellingPrice);

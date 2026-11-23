@@ -316,26 +316,7 @@ public class SoilEffects
     /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
     public int CountDistinctNeighborSpecies(int idx) => State.CountDistinctNeighborSpecies(idx);
     /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
-    public void HealNeighborsBySell(int idx)
-    {
-        if (!SpecialItemSystem.Has("circulation")) return;
-
-        int row = idx % 4;
-        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
-        foreach (int n in neighbors)
-        {
-            if (n < 0 || n >= board.MaxCol * 4) continue;
-            if (!board.Plants.TryGetValue(n, out Plant p) || p == null) continue;
-
-            var traits = p.GetGeneticTrait();
-            for (int i = 0; i < traits.Count; i++)
-            {
-                float cur = traits[i].resistance;
-                if (cur >= 0.9f) continue;
-                p.ChangeResistance((int)traits[i].traitType, Mathf.Min(0.05f, 0.9f - cur));
-            }
-        }
-    }
+    public void HealNeighborsBySell(int idx) => State.HealNeighborsBySell(idx);
     public bool IsAffectedBySprinkler(int targetIdx) => State.IsAffectedBySprinkler(targetIdx);
     public bool IsAffectedByChiliPepper(int gridIndex) => State.IsAffectedByChiliPepper(gridIndex);
     public void ApplyRapidFreezer(int centerIdx)
