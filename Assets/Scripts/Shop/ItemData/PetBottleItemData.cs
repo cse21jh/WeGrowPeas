@@ -6,9 +6,6 @@ public class PetBottleItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 8;
 
-    // 배치 확정 시 사용할 그리드 인덱스
-    private int? pendingIndex;
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 500;
@@ -27,9 +24,9 @@ public class PetBottleItemData : ItemData
     {
         // 페트병 등장 확률 증가 적용
         int baseWeight = rotationWeight;
-        if (ctx?.Grid != null)
+        if (ctx?.Field != null)
         {
-            float probabilityBonus = ctx.Grid.Modifiers.PetBottleSpawnProbability;
+            float probabilityBonus = ctx.Modifiers.PetBottleSpawnProbability;
             // 확률을 가중치로 변환 (예: 0.02 = 2% -> 가중치 2 증가)
             int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
             return baseWeight + weightBonus;
@@ -41,9 +38,9 @@ public class PetBottleItemData : ItemData
     {
         // 동적 가격 계산 (기본 가격 - 가격 감소량)
         int basePrice = 500;
-        if (ctx?.Grid != null)
+        if (ctx?.Field != null)
         {
-            Price = Mathf.Max(1, basePrice - ctx.Grid.Modifiers.PetBottlePriceReduction);
+            Price = Mathf.Max(1, basePrice - ctx.Modifiers.PetBottlePriceReduction);
         }
         else
         {
@@ -52,9 +49,9 @@ public class PetBottleItemData : ItemData
 
         // 동적 재고 계산 (기본 재고 + 재고 보너스)
         int baseStock = 3;
-        if (ctx?.Grid != null)
+        if (ctx?.Field != null)
         {
-            InitialStock = baseStock + ctx.Grid.Modifiers.PetBottleInitialStockBonus;
+            InitialStock = baseStock + ctx.Modifiers.PetBottleInitialStockBonus;
         }
         else
         {
@@ -76,47 +73,13 @@ public class PetBottleItemData : ItemData
         return true;
     }
 
-    public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
+    public override bool ValidateTarget(ShopContext ctx, PlantState target, out string reason)
     {
         reason = null;
-
-        if (!ValidateGrid(ctx, out reason))
-            return false;
-        
-        if (target == null)
-        {
-            reason = Loc.T("shop.error.no_plant_selected");
-            return false;
-        }
-        
-        int idx = target.gridIndex;
-
-        // 이미 페트병이 위치한 칸 불가
-        if (ctx.Grid.Soil.HasPetBottle(idx))
-        {
-            reason = Loc.T("shop.error.bottle_exists");
-            return false;
-        }
-
-        if (!target.IsMovable)
-        {
-            reason = Loc.T("shop.error.invalid_plant");
-            return false;
-        }
-
-        return true;
-    }
-
-    public override void SetSelectedPlant(Plant plant)
-    {
-        if (plant != null)
-        {
-            pendingIndex = plant.gridIndex;
-        }
-        else
-        {
-            pendingIndex = null;
-        }
+        if (target == null) reason = Loc.T("shop.error.no_plant_selected");
+        else if (ctx.Soil.HasPetBottle(target.GridIndex)) reason = Loc.T("shop.error.bottle_exists");
+        else if (!target.IsMovable) reason = Loc.T("shop.error.invalid_plant");
+        return reason == null;
     }
 
     public override void StartEffect(ShopContext ctx, System.Action onReady, System.Action<string> onError)
@@ -124,45 +87,10 @@ public class PetBottleItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
-
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
-            return;
-
-        try
-        {
-            int idx = pendingIndex.Value;
-            
-            // 유효한 인덱스 범위 체크
-            int maxIdx = ctx.Grid.Board.MaxCol * 4;
-            if (idx < 0 || idx >= maxIdx)
-            {
-                Debug.LogError($"[PetBottle] Commit: Invalid idx={idx}, maxIdx={maxIdx}");
-                ctx.ShowError?.Invoke(Loc.T("shop.error.invalid_position"));
-                pendingIndex = null;
-                return;
-            }
-
-            ctx.Grid.Soil.PlacePetBottle(idx);
-            ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[PetBottle] Commit error: {e.Message}\n{e.StackTrace}");
-            ctx.ShowError?.Invoke(Loc.T("shop.error.placement_failed", ("error", e.Message)));
-        }
-        finally
-        {
-            pendingIndex = null;
-        }
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
+        if (!TakeSelectedCell(ctx, out int cell)) return;
+        ctx.World.PlacePetBottle(cell);
+        ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
     }
 }

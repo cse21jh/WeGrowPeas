@@ -6,8 +6,6 @@ public class SprinklerItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4; // 희귀 등급
 
-    private int? pendingIndex;
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -35,41 +33,16 @@ public class SprinklerItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        reason = null;
-        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
-            return false;
-
-        // 빈 칸인지 확인
-        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
-        {
-            reason = Loc.T("shop.error.occupied");
-            return false;
-        }
-
-        // 문제 없으면 확정 후보 저장
-        pendingIndex = idx.Value;
-        return true;
+        bool occupied = ctx.Board.States.ContainsKey(cell);
+        reason = occupied ? Loc.T("shop.error.occupied") : null;
+        return !occupied;
     }
-
-    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
-            return;
-
-        // 실제 배치
-        ctx.Grid.Spawner.AddSprinkler(pendingIndex.Value);
-
-        pendingIndex = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
+        if (TakeSelectedCell(ctx, out int cell))
+            ctx.World.PlantFixed(PlantKind.Sprinkler, cell);
     }
 }

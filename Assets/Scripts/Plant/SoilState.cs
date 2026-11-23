@@ -245,6 +245,67 @@ public sealed class SoilState
         }
     }
 
+    // ───── 놓기 ─────
+
+    public bool PlaceFertilizer(int idx, WaveType wave)
+    {
+        if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있다
+        FertilizerColumns.Add(idx / 4, wave);
+        board.NotifyChanged();
+        return true;
+    }
+
+    public bool PlaceGoldSoil(int idx)
+    {
+        if (HasGoldSoil(idx) || board.States.ContainsKey(idx)) return false; // 빈 칸에만 놓는다
+        GoldSoilTiles.Add(idx);
+        board.NotifyChanged();
+        return true;
+    }
+
+    public bool PlacePetBottle(int idx)
+    {
+        if (HasPetBottle(idx) || idx < 0 || idx >= board.CellCount) return false;
+        PetBottleTiles.Add(idx);
+        board.NotifyChanged();
+        PetBottleBlockCount[idx] = 1 + (PetBottleBlockCount.TryGetValue(-1, out int bonus) ? bonus : 0);
+        return true;
+    }
+
+    /// <summary>페트병 재질 강화: 이미 놓인 것과 앞으로 놓을 것의 보호 횟수가 함께 는다.</summary>
+    public void AddPetBottleBlockCount(int value)
+    {
+        PetBottleBlockCount[-1] = (PetBottleBlockCount.TryGetValue(-1, out int bonus) ? bonus : 0) + value;
+        foreach (int idx in PetBottleTiles)
+            PetBottleBlockCount[idx] = (PetBottleBlockCount.TryGetValue(idx, out int count) ? count : 0) + value;
+    }
+
+    public bool AddAbsorbFertilizer(int idx)
+    {
+        if (idx < 0 || idx >= board.CellCount || !AbsorbFertilizerTiles.Add(idx)) return false;
+        board.NotifyChanged();
+        return true;
+    }
+
+    /// <summary>특수(땅부자): 무작위 세로줄에 판매 배수 +0.5. 고른 세로줄을 돌려준다.</summary>
+    public int AddLandRichColumn()
+    {
+        int col = GameRun.Rng.Item.Range(0, board.MaxCol);
+        ColumnGoldMulBonus[col] = (ColumnGoldMulBonus.TryGetValue(col, out float v) ? v : 0f) + 0.5f;
+        return col;
+    }
+
+    /// <summary>급속 냉각기가 얼리는 3x3 범위의 식물.</summary>
+    public List<PlantState> GetFreezeTargets(int centerIdx)
+    {
+        var targets = new List<PlantState>();
+        for (int c = centerIdx / 4 - 1; c <= centerIdx / 4 + 1; c++)
+            for (int r = centerIdx % 4 - 1; r <= centerIdx % 4 + 1; r++)
+                if (c >= 0 && c < board.MaxCol && r >= 0 && r < 4 && board.States.TryGetValue(c * 4 + r, out PlantState plant))
+                    targets.Add(plant);
+        return targets;
+    }
+
     private bool IsChiliPepperAt(int idx)
         => board.States.TryGetValue(idx, out PlantState plant) && plant.Kind == PlantKind.ChiliPepper;
 }

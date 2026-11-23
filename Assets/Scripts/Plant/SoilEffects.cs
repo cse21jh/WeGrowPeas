@@ -78,14 +78,8 @@ public class SoilEffects
 
     public void AddAbsorbFertilizer(int index)
     {
-        if (index < 0 || index >= board.MaxCol * 4) return;
-        if (!absorbFertilizerTiles.Contains(index))
-        {
-            absorbFertilizerTiles.Add(index);
-            board.NotifyChanged(); // 밭 정보 UI 갱신
-            // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
-            Debug.Log($"Absorb Fertilizer Added at {index}");
-        }
+        if (State.AddAbsorbFertilizer(index))
+            Debug.Log($"Absorb Fertilizer Added at {index}"); // 시각적 피드백 (예: 보라색 비료 파티클 등) - 필요 시 구현
     }
     public List<int> GetAbsorbFertilizerTiles()
     {
@@ -94,17 +88,7 @@ public class SoilEffects
     public bool HasAbsorbFertilizer(int index) => State.HasAbsorbFertilizer(index);
     public bool TryPlaceGoldSoil(int idx)
     {
-        if (goldSoilTiles.Contains(idx))
-        {
-            return false; // 이미 황금 비료가 있는 칸
-        }
-        if (board.Plants.ContainsKey(idx))
-        {
-            return false; // 식물이 있는 칸에는 황금 비료를 뿌릴 수 없음
-        }
-
-        goldSoilTiles.Add(idx);
-        board.NotifyChanged(); // 밭 정보 UI 갱신
+        if (!State.PlaceGoldSoil(idx)) return false;
 
         // 시각화 (황금색 마커)
         if (goldSoilMarkerPrefab != null)
@@ -134,23 +118,7 @@ public class SoilEffects
     {
         try
         {
-            if (petBottleTiles.Contains(idx))
-            {
-                return;
-            }
-
-            // 인덱스 범위 체크
-            if (idx < 0 || idx >= board.MaxCol * 4)
-            {
-                Debug.LogError($"[Grid] PlacePetBottle: Invalid idx={idx}, board.MaxCol={board.MaxCol}, maxIdx={board.MaxCol * 4}");
-                return;
-            }
-
-            petBottleTiles.Add(idx);
-            board.NotifyChanged(); // 밭 정보 UI 갱신
-            // 기본 보호 횟수 1 (재질 강화 아이템으로 증가 가능)
-            int baseBlockCount = 1 + (petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0); // -1은 전체 보호 횟수 보너스
-            petBottleBlockCount[idx] = baseBlockCount;
+            if (!State.PlacePetBottle(idx)) return;
 
             // 시각화(선택)
             if (petBottleMarkerPrefab != null)
@@ -193,12 +161,8 @@ public class SoilEffects
     }
     public bool TryPlaceFertilizer(int idx, WaveType wave)
     {
-        if (HasFertilizerAt(idx)) return false; // 이미 다른 전용 비료가 있으면 불가
-
+        if (!State.PlaceFertilizer(idx, wave)) return false;
         int col = GetCol(idx);
-
-        fertilizerColumns.Add(col, wave);
-        board.NotifyChanged(); // 밭 정보 UI 갱신
 
         Transform soilColT = grid.transform.GetChild(col);
         var marker = soilColT.GetComponentInChildren<FertilizerMarker>(true);
@@ -248,21 +212,7 @@ public class SoilEffects
         }
         return false;
     }
-    public void AddPetBottleBlockCount(int value)
-    {
-        // 전체 페트병 보호 횟수 보너스 (새로 설치되는 페트병에 적용)
-        if (!petBottleBlockCount.ContainsKey(-1))
-            petBottleBlockCount[-1] = 0;
-        petBottleBlockCount[-1] += value;
-
-        // 기존 페트병에도 보호 횟수 추가
-        foreach (var idx in petBottleTiles)
-        {
-            if (!petBottleBlockCount.ContainsKey(idx))
-                petBottleBlockCount[idx] = 0;
-            petBottleBlockCount[idx] += value;
-        }
-    }
+    public void AddPetBottleBlockCount(int value) => State.AddPetBottleBlockCount(value);
     /// <summary>
     /// 냉각 방패 활성화 (구매 시 호출)
     /// </summary>
@@ -290,9 +240,7 @@ public class SoilEffects
     public void AddLandRichColumn()
     {
         Dictionary<Plant, int> previousPrices = grid.Upgrades.CapturePlantSellingPrices();
-        int col = GameRun.Rng.Item.Range(0, board.MaxCol);
-        if (!columnGoldMulBonus.ContainsKey(col)) columnGoldMulBonus[col] = 0f;
-        columnGoldMulBonus[col] += 0.5f;
+        int col = State.AddLandRichColumn();
         grid.Upgrades.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
         Debug.Log($"[SpecialItem] 땅부자: {col + 1}번째 세로줄에 고속 숙성 효과 (+0.5, 누적 {columnGoldMulBonus[col]})");
     }
@@ -321,28 +269,11 @@ public class SoilEffects
     public bool IsAffectedByChiliPepper(int gridIndex) => State.IsAffectedByChiliPepper(gridIndex);
     public void ApplyRapidFreezer(int centerIdx)
     {
-        int centerCol = centerIdx / 4;
-        int centerRow = centerIdx % 4;
-
-        // 3x3 범위 순회
-        for (int c = centerCol - 1; c <= centerCol + 1; c++)
+        foreach (PlantState target in State.GetFreezeTargets(centerIdx))
         {
-            for (int r = centerRow - 1; r <= centerRow + 1; r++)
-            {
-                if (c >= 0 && c < board.MaxCol && r >= 0 && r < 4)
-                {
-                    int targetIdx = c * 4 + r;
-                    if (board.Plants.ContainsKey(targetIdx))
-                    {
-                        board.Plants[targetIdx].SetFrozen(true);
-
-                        grid.Breeder.DeselectPlant(board.Plants[targetIdx]);
-                    }
-
-                    // 시각적 피드백 (얼음 이펙트 등) 추가 가능
-                    // 현재는 Plant.SetFrozen 내부에서 색상 변경 처리
-                }
-            }
+            Plant plant = board.Plants[target.GridIndex];
+            plant.SetFrozen(true);
+            grid.Breeder.DeselectPlant(plant);
         }
         Debug.Log($"[RapidFreezer] Applied to 3x3 around index {centerIdx}");
     }

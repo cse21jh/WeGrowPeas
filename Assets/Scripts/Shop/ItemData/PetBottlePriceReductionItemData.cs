@@ -37,7 +37,7 @@ public class PetBottlePriceReductionItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Modifiers.AddPetBottlePriceReduction(priceReduction);
-        ctx.Grid.Modifiers.AddPetBottleSpawnProbability(probabilityIncrease);
+        ctx.Modifiers.AddPetBottlePriceReduction(priceReduction);
+        ctx.Modifiers.AddPetBottleSpawnProbability(probabilityIncrease);
     }
 }

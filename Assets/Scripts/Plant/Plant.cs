@@ -381,32 +381,12 @@ public abstract class Plant : MonoBehaviour
     /// <summary>
     /// 약한 유전자(열성이 아닌 형질, 최초 저항력 80%가 아닌 형질)의 최초 저항력을 증가시킵니다.
     /// </summary>
-    public void IncreaseWeakGeneticsResistance(float bonus)
-    {
-        for (int i = 0; i < traits.Count; i++)
-        {
-            // 열성이 아니고(genetics != 0) 최초 저항력이 80%가 아닌(resistance != 0.8f) 형질
-            if (traits[i].genetics != 2)
-            {
-                ChangeResistance((int)traits[i].traitType, bonus);
-            }
-        }
-    }
+    public void IncreaseWeakGeneticsResistance(float bonus) => State.IncreaseResistance(false, bonus);
 
     /// <summary>
     /// 강한 유전자(우성, 최초 저항력 80%인 형질)의 최초 저항력을 증가시킵니다.
     /// </summary>
-    public void IncreaseStrongGeneticsResistance(float bonus)
-    {
-        for (int i = 0; i < traits.Count; i++)
-        {
-            // 우성(genetics == 2)이고 최초 저항력이 80%인(resistance == 0.8f) 형질
-            if (traits[i].genetics == 2)
-            {
-                ChangeResistance((int)traits[i].traitType, bonus);
-            }
-        }
-    }
+    public void IncreaseStrongGeneticsResistance(float bonus) => State.IncreaseResistance(true, bonus);
 
     /// <summary>지금 판의 식물과 밭 보정으로 저항력을 굴린다. 공식은 <see cref="BreedingRules.RollResistance"/>에 있다.</summary>
     public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics, float p1Resistance = 0f, float p2Resistance = 0f)

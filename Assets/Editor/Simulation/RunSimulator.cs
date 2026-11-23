@@ -21,7 +21,11 @@ public class SimConfig
     public int dawnStage = 0;
     public int startGold = 3000;       // 정원 씬 EconomyManager의 시작 골드
     public int breedAttempts = 4;      // BreedingController의 기본 교배 횟수
-    public int seedlingPrice = 500;    // 창에서 돌릴 때 PeaItemData 에셋 가격으로 덮어쓴다
+    /// <summary>모종 말고 다른 상점 아이템도 산다.</summary>
+    public bool buyItems = true;
+    /// <summary>새벽 클리어나 사건으로 해금되는 아이템도 진열한다. 끄면 처음부터 열려 있는 것만.</summary>
+    public bool allUnlocked = true;
+    public int rotationCount = 6;      // 정원 씬 ShopManager의 로테이션 칸 수
     public bool buySeedlings = true;
     public bool payTax = true;
 }
@@ -39,6 +43,9 @@ public class SimRunResult
     public readonly List<int> Plants = new List<int>();
     public readonly List<int> GoldByDay = new List<int>();
     public readonly int[] WaveHits = new int[Wave.NumberOfWave];
+    /// <summary>산 아이템 이름과 처음 산 날.</summary>
+    public readonly Dictionary<string, int> FirstBought = new Dictionary<string, int>();
+    public int Purchases;
     public readonly int[] WaveFaced = new int[Wave.NumberOfWave];
     /// <summary>판 전체의 요약값. 같은 시드로 두 번 돌려 같은지 비교한다.</summary>
     public ulong Digest = 14695981039346656037UL;
@@ -49,10 +56,10 @@ public class SimRunResult
 /// <summary>
 /// 씬 없이 한 판을 돌린다. 교배, 웨이브, 죽음, 저항력, 판매가는 게임과 같은 코드를 쓴다.
 ///
-/// 아직 없는 것: 모종 이외의 상점 아이템, 특수 아이템, 저주, 의뢰, 특성, 벌레.
+/// 아직 없는 것: 특수 아이템, 저주, 의뢰, 특성, 벌레, 교배 시간 제한(시간은 금이다), 리롤.
 /// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
-public sealed class RunSimulator : IFieldActions
+public sealed partial class RunSimulator : IFieldActions
 {
     private readonly SimConfig config;
     private readonly FieldState field;
@@ -75,7 +82,9 @@ public sealed class RunSimulator : IFieldActions
         kind = config.species == PlantIds.Peanut ? PlantKind.Peanut : PlantKind.Pea;
         result = new SimRunResult { Seed = seed };
         botRng = new RngStream(unchecked((ulong)(uint)seed) ^ 0xB07B07B07UL);
+        shopContext = new ShopContext(this);
         economy = new EconomyState(config.startGold);
+        field.Board.Changed += KillLonelyMoneyTrees;
         deck.WeightMultiplier = type => mods.GetMul(StatId.WaveWeightMul, (int)type, stage);
     }
 
@@ -93,6 +102,7 @@ public sealed class RunSimulator : IFieldActions
         DawnSystem.Reload();
 
         int savedDawn = DawnSystem.SelectedDawnStage;
+        LoadItems();
         var results = new List<SimRunResult>(config.runs);
         try
         {
@@ -110,6 +120,7 @@ public sealed class RunSimulator : IFieldActions
         finally
         {
             DawnSystem.SetSelectedStage(savedDawn);
+            RestoreItems();
             GameRun.StartNew();
         }
         return results;
@@ -118,6 +129,7 @@ public sealed class RunSimulator : IFieldActions
     private static SimRunResult RunOne(SimConfig config, int seed)
     {
         GameRun.StartNew(seed);
+        RestoreItems(); // 앞 판에서 바뀐 가격을 되돌린다
         var sim = new RunSimulator(config, seed);
         sim.Play();
         return sim.result;
@@ -133,6 +145,7 @@ public sealed class RunSimulator : IFieldActions
         nextWave = deck.PickNext(currentWave, stage);
         for (int i = 0; i < 2; i++)
             Plant(new List<GeneticTrait> { new GeneticTrait(TraitType.NaturalDeath, Roll(TraitType.NaturalDeath, 1), 1, 0f) }, -1);
+        _ = shopContext.Shop.UniqueSeed; // 새 게임에서 정해지는 순서와 맞춘다
         NextStage();
 
         while (true)
@@ -140,9 +153,12 @@ public sealed class RunSimulator : IFieldActions
             CollectOverdueTax();
             if (IsWipedOut) { result.DiedToTax = true; result.DeathDay = stage; break; }
 
+            economy.Add(shopContext.Shop.ConsumeDailyPurchaseRefund(field.Modifiers.CreditCardRefundPercent));
             BreedPhase();
+            DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
+            UseWaveSkip();
 
-            result.WaveFaced[(int)currentWave]++;
+            if (currentWave != WaveType.None) result.WaveFaced[(int)currentWave]++;
             WaveType faced = currentWave;
             DayRules.ResolveWave(field, currentWave, () => deck.PickSecond(currentWave, stage), this);
             if (IsWipedOut) { result.DeathWave = faced; result.DeathDay = stage; break; }
@@ -171,6 +187,7 @@ public sealed class RunSimulator : IFieldActions
         stage++;
         mods.ExpireOn(stage);
         deck.Unlock(stage);
+        shopContext.Shop.StartDay();
     }
 
     private void AdvanceWave()
@@ -200,7 +217,7 @@ public sealed class RunSimulator : IFieldActions
         int used = 0;
         for (int guard = 0; guard < 50; guard++)
         {
-            int max = BreedingRules.GetMaxAttempts(config.breedAttempts,
+            int max = BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
                 mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
             if (used >= max) break;
             if (!field.Board.HasEmptyCell() && !SellWorst(6)) break;
@@ -238,13 +255,16 @@ public sealed class RunSimulator : IFieldActions
                 {
                     if (weights[t] <= 0f) continue;
                     float ra = plants[i].GetResistanceValue(t), rb = plants[j].GetResistanceValue(t);
-                    score += weights[t] * (Math.Max(ra, rb) + (ra + rb) * 0.25f + 0.1f * (Genetics(plants[i], t) + Genetics(plants[j], t)));
+                    score += weights[t] * (Math.Max(ra, rb) + (ra + rb) * 0.25f + GeneticsWeight * (Genetics(plants[i], t) + Genetics(plants[j], t)));
                 }
                 if (score > best) { best = score; pick = (plants[i], plants[j]); }
             }
         }
         return pick;
     }
+
+    // 교배 짝과 남길 식물을 고를 때 유전자(0~2) 하나를 저항력 얼마로 치는가
+    private const float GeneticsWeight = 0.3f;
 
     private static int Genetics(PlantState plant, int trait)
     {
@@ -269,7 +289,7 @@ public sealed class RunSimulator : IFieldActions
     {
         float score = 0f;
         for (int t = 0; t < weights.Length; t++)
-            score += weights[t] * plant.GetResistanceValue(t);
+            score += weights[t] * (plant.GetResistanceValue(t) + GeneticsWeight * Genetics(plant, t));
         return score;
     }
 
@@ -288,45 +308,7 @@ public sealed class RunSimulator : IFieldActions
         }
         if (stage == EndlessMode.StartStage) tax.SettleAtEnding();
 
-        if (!config.buySeedlings) return;
-        int price = SeedlingPrice;
-        if (!economy.HasGold(price)) return;
-        if (!field.Board.HasEmptyCell() && !SellWorst(6)) return;
-
-        List<TraitType[]> sets = TraitOptions.GetTraitSets(stage, isNight: true);
-        TraitType[] set = PickSeedling(sets);
-        if (set == null) return;
-
-        economy.Spend(price);
-        var traits = new List<GeneticTrait>();
-        foreach (TraitType t in set) traits.Add(new GeneticTrait(t, Roll(t, 1), 1, 0f));
-        Plant(traits, -1);
-    }
-
-    private int SeedlingPrice
-    {
-        get
-        {
-            float mul = DawnSystem.Current.shopPriceMultiplier;
-            return (int)Math.Round(config.seedlingPrice * (mul > 0f ? mul : 1f));
-        }
-    }
-
-    // 가진 식물이 가장 적은 형질을 산다. 모든 형질을 3포기 이상이 갖고 있으면 사지 않는다.
-    private TraitType[] PickSeedling(List<TraitType[]> sets)
-    {
-        if (config.bot == SimBotKind.Random) return sets[botRng.Range(0, sets.Count)];
-
-        TraitType[] best = null;
-        int fewest = 3;
-        foreach (TraitType[] set in sets)
-        {
-            int owners = 0;
-            foreach (PlantState plant in field.Board.States.Values)
-                if (plant.HasTrait((WaveType)(int)set[0])) owners++;
-            if (owners < fewest) { fewest = owners; best = set; }
-        }
-        return best;
+        ShopPhase();
     }
 
     /// <summary>가장 쓸모없는 식물을 판다. minKeep포기 이하로는 팔지 않는다.</summary>
@@ -407,7 +389,32 @@ public sealed class RunSimulator : IFieldActions
 
     // ───── IFieldActions ─────
 
-    public void Survive(PlantState plant, WaveType wave) => plant.ResistWave(wave);
+    public void Survive(PlantState plant, WaveType wave)
+    {
+        switch (plant.Kind)
+        {
+            case PlantKind.Sprinkler:
+                plant.SprinklerAfterWave(out _, out _);
+                break;
+            case PlantKind.MoneyTree:
+                MoneyTreeResult outcome = plant.MoneyTreeAfterWave();
+                if (outcome == MoneyTreeResult.Growing) break;
+                if (outcome == MoneyTreeResult.Matured) economy.Add(PlantState.MoneyTreeRewardGold);
+                economy.Add(field.TryKill(plant, DeathCause.Other).BonusGold);
+                break;
+            default:
+                plant.ResistWave(wave);
+                break;
+        }
+    }
+
+    // MoneyTree.OnGridStateChanged: 주변에 완두나 땅콩이 없어진 돈나무는 죽는다
+    private void KillLonelyMoneyTrees()
+    {
+        foreach (PlantState tree in new List<PlantState>(field.Board.StatesInOrder()))
+            if (tree.Kind == PlantKind.MoneyTree && !tree.IsDying && !tree.HasAdjacentBreedablePlant())
+                economy.Add(field.TryKill(tree, DeathCause.Other).BonusGold);
+    }
 
     public bool Kill(PlantState plant)
     {
@@ -424,6 +431,7 @@ public sealed class RunSimulator : IFieldActions
 
     public void RefreshTraits(PlantState plant)
     {
+        if (!plant.IsMovableKind) return;
         BreedingRules.CompletePairs(plant.Traits, Roll);
         plant.UpdateGoldFromTraits();
     }

@@ -9,7 +9,6 @@ public class PetBottleSupplyIncreaseItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 8;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -38,7 +37,7 @@ public class PetBottleSupplyIncreaseItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Modifiers.AddPetBottleInitialStockBonus(stockBonus);
+        ctx.Modifiers.AddPetBottleInitialStockBonus(stockBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

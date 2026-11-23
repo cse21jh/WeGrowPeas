@@ -29,9 +29,6 @@ public static class TraitOptions
     public static List<TraitType[]> GetTraitSets(int currentStage, bool isNight)
         => Build(currentStage, isNight).ConvertAll(o => o.traits);
 
-    private static List<Option> Build(int currentStage)
-        => Build(currentStage, WaveSchedule.IsNightNow);
-
     private static List<Option> Build(int currentStage, bool isNight)
     {
         var list = new List<Option>();
@@ -54,23 +51,23 @@ public static class TraitOptions
     }
 
     /// <summary>드롭다운에 표시할 이름 목록.</summary>
-    public static string[] GetNames(int currentStage)
+    public static string[] GetNames(int currentStage, bool isNight)
     {
-        var opts = Build(currentStage);
+        var opts = Build(currentStage, isNight);
         var names = new string[opts.Count];
         for (int i = 0; i < opts.Count; i++) names[i] = opts[i].Name;
         return names;
     }
 
     /// <summary>선택 인덱스에 해당하는 형질 목록 생성. 범위를 벗어나면 기본(자연사).</summary>
-    public static List<GeneticTrait> BuildTraits(int index, int currentStage)
+    public static List<GeneticTrait> BuildTraits(int index, ShopContext ctx)
     {
-        var opts = Build(currentStage);
+        var opts = Build(ctx.Stage, ctx.World.IsNight);
         var picked = (index >= 0 && index < opts.Count) ? opts[index] : opts[0];
 
         var result = new List<GeneticTrait>();
         foreach (var t in picked.traits)
-            result.Add(new GeneticTrait(t, Plant.GetResistanceBasedOnGenetics(t, 1), 1, 0.0f));
+            result.Add(new GeneticTrait(t, ctx.World.RollResistance(t, 1), 1, 0.0f));
         return result;
     }
 

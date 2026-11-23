@@ -120,31 +120,31 @@ public static class WaveSchedule
     }
 
     /// <summary>현재 스테이지에서 선택 가능한 웨이브 목록(None 제외).</summary>
-    public static List<WaveType> GetSelectableWaves(int currentStage)
+    public static List<WaveType> GetSelectableWaves(int currentStage, bool isNight)
     {
         var list = new List<WaveType>();
         foreach (WaveType type in System.Enum.GetValues(typeof(WaveType)))
         {
             if (type == WaveType.None) continue;
-            if (type != WaveType.Aging && !IsShopWaveUnlocked(type, currentStage)) continue;
+            if (type != WaveType.Aging && !IsShopWaveUnlocked(type, currentStage, isNight)) continue;
             list.Add(type);
         }
         return list;
     }
 
     /// <summary>현재 선택 가능한 웨이브들의 표시명 배열. (상점 드롭다운용)</summary>
-    public static string[] GetSelectableWaveNames(int currentStage)
+    public static string[] GetSelectableWaveNames(int currentStage, bool isNight)
     {
-        var waves = GetSelectableWaves(currentStage);
+        var waves = GetSelectableWaves(currentStage, isNight);
         var names = new string[waves.Count];
         for (int i = 0; i < waves.Count; i++) names[i] = WavePalette.GetName(waves[i]);
         return names;
     }
 
     /// <summary>드롭다운 인덱스 → 웨이브. 범위를 벗어나면 null.</summary>
-    public static WaveType? GetSelectableWaveAt(int index, int currentStage)
+    public static WaveType? GetSelectableWaveAt(int index, int currentStage, bool isNight)
     {
-        var waves = GetSelectableWaves(currentStage);
+        var waves = GetSelectableWaves(currentStage, isNight);
         return (index >= 0 && index < waves.Count) ? waves[index] : (WaveType?)null;
     }
 

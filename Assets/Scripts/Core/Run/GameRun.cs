@@ -17,6 +17,9 @@ public sealed class GameRun
 
     public GameRng Random { get; private set; }
 
+    /// <summary>이번 판의 상점.</summary>
+    public ShopState Shop { get; } = new ShopState();
+
     private GameRun(int seed)
     {
         Random = new GameRng(seed);

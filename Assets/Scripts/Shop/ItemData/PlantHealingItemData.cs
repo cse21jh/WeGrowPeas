@@ -23,7 +23,7 @@ public class PlantHealingItemData : ItemData
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
         // 등장하는 웨이브만 구매 가능
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 최소 1웨이브는 해금되어 있어야 함
         return stage >= 1;
     }
@@ -37,11 +37,11 @@ public class PlantHealingItemData : ItemData
     }
 
     // 웨이브는 상세 패널의 드롭다운으로 고른다.
-    public override string[] GetSelectableOptions()
-        => WaveSchedule.GetSelectableWaveNames(GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override string[] GetSelectableOptions(ShopContext ctx)
+        => WaveSchedule.GetSelectableWaveNames(ctx.Stage, ctx.World.IsNight);
 
-    public override void SetSelectedOption(int index)
-        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override void SetSelectedOption(ShopContext ctx, int index)
+        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, ctx.Stage, ctx.World.IsNight);
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
@@ -68,32 +68,20 @@ public class PlantHealingItemData : ItemData
         int healedCount = 0;
 
         // 모든 식물을 순회하며 해당 웨이브에 대한 저항력 회복
-        foreach (var plant in ctx.Grid.Board.Plants.Values)
+        foreach (PlantState plant in ctx.Board.StatesInOrder())
         {
-            var traits = plant.GetGeneticTrait();
-            bool hasTraitForWave = traits.Any(t => t.traitType == (TraitType)targetWave);
+            if (!plant.HasTrait(targetWave)) continue;
 
-            if (hasTraitForWave)
+            List<GeneticTrait> traits = plant.Traits;
+            for (int i = 0; i < traits.Count; i++)
             {
-                // 해당 웨이브에 대한 저항력을 최대로 회복하고, 추가로 10%p 증가
-                for (int i = 0; i < traits.Count; i++)
-                {
-                    if ((int)traits[i].traitType == (int)targetWave)
-                    {
-                        // 최대 회복 (1.0f) + 추가 보너스 (10%p)
-                        float newResistance = Mathf.Clamp(1.0f + bonusResistancePercent, 0.1f, 1.0f);
-                        traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
-                    }
-                }
-                plant.SetTrait(traits);
-                healedCount++;
+                if ((int)traits[i].traitType != (int)targetWave) continue;
+                // 저항력을 100%로 설정 + 추가 (상한 100%)
+                float healed = Mathf.Clamp(1.0f + bonusResistancePercent, 0.1f, 1.0f);
+                traits[i] = new GeneticTrait(traits[i].traitType, healed, traits[i].genetics, traits[i].additionalResistance);
             }
-            else
-            {
-                // 형질이 없어도 기본 저항력(0.1f)은 있으므로 최대 회복
-                // 형질을 추가하지 않고, 저항력만 회복하는 경우는 없으므로
-                // 형질이 없는 식물은 치료하지 않음
-            }
+            ctx.World.RefreshTraits(plant);
+            healedCount++;
         }
 
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.healed", ("name", LocalizedName), ("wave", WavePalette.GetName(targetWave)), ("count", healedCount)));
@@ -102,6 +90,7 @@ public class PlantHealingItemData : ItemData
 
     public override void Cancel(ShopContext ctx)
     {
+        base.Cancel(ctx);
         pendingWave = null;
     }
 }

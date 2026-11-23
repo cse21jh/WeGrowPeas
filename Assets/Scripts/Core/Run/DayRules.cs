@@ -80,6 +80,13 @@ public static class DayRules
             if (plant.IsFrozen) actions.Unfreeze(plant);
     }
 
+    /// <summary>낮(교배 시간)이 끝날 때. 완두커피를 갖고 있으면 자유시간 횟수가 쌓인다.</summary>
+    public static void EndFreeTime(FieldState field, Action<PlantState> countFreeTime)
+    {
+        if (field.Modifiers.PeaCoffeeMultiplier <= 0f) return;
+        foreach (PlantState plant in field.Board.StatesInOrder()) countFreeTime(plant);
+    }
+
     /// <summary>웨이브가 지나간 뒤 밤이 되기 전. 땅콩 자가번식 → 뿌리내림 → 무당벌레 골드 → 고추 치료.</summary>
     public static void AfterWave(FieldState field, IFieldActions actions)
     {

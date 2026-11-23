@@ -284,11 +284,7 @@ public class BreedingController : MonoBehaviour
         if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
 
         // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
-        if (grid.Modifiers.PeaCoffeeMultiplier > 0f)
-        {
-            foreach (var p in grid.Board.Plants.Values)
-                if (p != null) p.OnFreeTimePassed();
-        }
+        DayRules.EndFreeTime(grid.Field, plant => grid.Board.Plants[plant.GridIndex].OnFreeTimePassed());
         //GardenGrid 리로드
 
         yield return null;

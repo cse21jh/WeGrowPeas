@@ -7,7 +7,6 @@ public class SuperMutationItemData : ItemData
     [Tooltip("구매 1회당 증가하는 변종 발생 확률(%p)")]
     [SerializeField] private float mutationChanceAddPercent = 2.5f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 2000;
@@ -20,7 +19,7 @@ public class SuperMutationItemData : ItemData
     }
 
     // 완두콩 전용 아이템 (새벽 10단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Pea);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Pea);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Special;
 
@@ -40,6 +39,6 @@ public class SuperMutationItemData : ItemData
             return;
 
         // 양성/악성 변종 확률 반전 + 변종 발생 확률 증가
-        ctx.Grid.Modifiers.AddSuperMutation(mutationChanceAddPercent);
+        ctx.Modifiers.AddSuperMutation(mutationChanceAddPercent);
     }
 }

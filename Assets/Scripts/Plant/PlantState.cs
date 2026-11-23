@@ -255,6 +255,14 @@ public sealed class PlantState
         return false;
     }
 
+    /// <summary>유전자가 2인 형질(강자생존) 또는 2가 아닌 형질(약자생존)의 저항력을 올린다.</summary>
+    public void IncreaseResistance(bool strongGenes, float bonus)
+    {
+        for (int i = 0; i < Traits.Count; i++)
+            if ((Traits[i].genetics == 2) == strongGenes)
+                ChangeResistance((int)Traits[i].traitType, bonus);
+    }
+
     public bool HasTrait(WaveType wave)
     {
         for (int i = 0; i < Traits.Count; i++)

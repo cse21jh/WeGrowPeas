@@ -22,7 +22,7 @@ public class BugFanItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
 
@@ -54,19 +54,5 @@ public class BugFanItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override void Commit(ShopContext ctx)
-    {
-        // 즉시 영구 적용: Grid의 벌레 속도 감소 값에 더함(중첩 가능)
-        if (GameManager.Instance?.grid != null)
-        {
-            GameManager.Instance.grid.Modifiers.AddBugSpeedDcreasement(reducePercent);
-            Debug.Log($"{name} 구매: 벌레 이동속도 {reducePercent * 100f}% 영구 감소 적용");
-        }
-        else
-        {
-            Debug.LogWarning("BugFan: GameManager.Instance.grid가 없습니다.");
-        }
-    }
-
-    public override void Cancel(ShopContext ctx) { }
+    public override void Commit(ShopContext ctx) => ctx.Modifiers.AddBugSpeedDcreasement(reducePercent);
 }

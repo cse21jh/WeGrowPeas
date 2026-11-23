@@ -45,14 +45,14 @@ public class AddSoilItemData : ItemData
     {
         reason = null;
 
-        if (ctx?.Grid == null)
+        if (ctx?.Field == null)
         {
             reason = Loc.T("shop.error.no_game_state");
             return false;
         }
 
         // maxCol이 이미 최대치인지 확인 — 땅부자 보유 시엔 확장 없이도 구매 가능(고속 숙성 부여)
-        if (ctx.Grid.Board.MaxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
+        if (ctx.Board.MaxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
         {
             reason = Loc.T("shop.error.max_expand");
             return false;
@@ -77,21 +77,13 @@ public class AddSoilItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            Debug.Log("그리드가 없습니다.");
-            return;
-        }
+        if (ctx?.Field == null) return;
 
-        // 땅 확장은 최대 크기(8열) 한도 내에서만
-        if (ctx.Grid.Board.MaxCol < MAX_COL)
-            ctx.Grid.AddSoil();
-
-        // 특수(땅부자): 구매할 때마다 무작위 세로줄에 고속 숙성 효과 추가
+        // 최대 열 수까지만 밭을 넓히고, 특수(땅부자)면 구매할 때마다 무작위 세로줄을 강화한다
+        if (ctx.Board.MaxCol < MAX_COL)
+            ctx.World.ExpandField();
         if (SpecialItemSystem.Has("land_rich"))
-            ctx.Grid.Soil.AddLandRichColumn();
-
-        // 가격 업데이트 (구매 이력이 업데이트된 후)
+            ctx.World.AddLandRichColumn();
         UpdatePrice(ctx);
     }
 

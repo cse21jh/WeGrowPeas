@@ -28,10 +28,13 @@ public class SimulatorWindow : EditorWindow
         config.dawnStage = Mathf.Clamp(EditorGUILayout.IntField("새벽 단계", config.dawnStage), 0, DawnSystem.StageCount);
         config.startGold = EditorGUILayout.IntField("시작 골드", config.startGold);
         config.breedAttempts = EditorGUILayout.IntField("교배 횟수", config.breedAttempts);
+        config.buyItems = EditorGUILayout.Toggle("아이템 구매", config.buyItems);
+        config.allUnlocked = EditorGUILayout.Toggle("모든 아이템 해금", config.allUnlocked);
+        config.rotationCount = Mathf.Max(0, EditorGUILayout.IntField("로테이션 칸 수", config.rotationCount));
         config.buySeedlings = EditorGUILayout.Toggle("모종 구매", config.buySeedlings);
         config.payTax = EditorGUILayout.Toggle("세금", config.payTax);
 
-        EditorGUILayout.HelpBox("저주, 벌레, 의뢰, 특성, 모종 이외의 상점 아이템은 아직 없습니다. "
+        EditorGUILayout.HelpBox("저주, 벌레, 의뢰, 특성, 특수 아이템은 아직 없습니다. 벌레 관련 아이템은 사지 않습니다. "
             + "절대 수치보다 값을 바꾸기 전후의 비교로 읽어 주세요.", MessageType.Info);
 
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
@@ -46,7 +49,6 @@ public class SimulatorWindow : EditorWindow
 
     private void Run()
     {
-        LoadSeedlingPrice(config);
         var watch = Stopwatch.StartNew();
         try
         {
@@ -55,14 +57,6 @@ public class SimulatorWindow : EditorWindow
         }
         finally { EditorUtility.ClearProgressBar(); }
         report = BuildReport(config, results) + $"\n{watch.Elapsed.TotalSeconds:F1}초";
-    }
-
-    /// <summary>모종 가격은 게임과 같은 에셋에서 읽는다.</summary>
-    public static void LoadSeedlingPrice(SimConfig config)
-    {
-        var item = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/Resources/Data/Item Data/Fixed/PeaItemData.asset");
-        if (item != null) config.seedlingPrice = item.Price;
-        else UnityEngine.Debug.LogWarning("[시뮬레이터] PeaItemData 에셋을 찾지 못해 기본 모종 가격을 씁니다.");
     }
 
     public static string BuildReport(SimConfig config, List<SimRunResult> results)
@@ -103,7 +97,49 @@ public class SimulatorWindow : EditorWindow
         sb.AppendLine("웨이브 | 한 번에 못 버틴 식물 평균 | 전멸시킨 판");
         for (int i = 0; i < hits.Length; i++)
             if (faced[i] > 0) sb.AppendLine($"{(WaveType)i} | {(double)hits[i] / faced[i]:F2} | {wipes[i]}");
+        AppendItems(sb, results);
         return sb.ToString();
+    }
+
+    // 늦게 산 아이템은 오래 산 판에만 있어 좋아 보인다(생존 편향). 그래서 처음 산 날 이후 며칠을 더 버텼는지와,
+    // 같은 날까지 살아 있던 다른 판이 버틴 날을 견준다.
+    private static void AppendItems(StringBuilder sb, List<SimRunResult> results)
+    {
+        var buyers = new Dictionary<string, List<SimRunResult>>();
+        foreach (var r in results)
+            foreach (string name in r.FirstBought.Keys)
+            {
+                if (!buyers.TryGetValue(name, out var list)) buyers[name] = list = new List<SimRunResult>();
+                list.Add(r);
+            }
+        if (buyers.Count == 0) return;
+
+        var survivedFrom = new Dictionary<int, double>();
+        double AverageAfter(int day)
+        {
+            if (survivedFrom.TryGetValue(day, out double cached)) return cached;
+            double sum = 0; int n = 0;
+            foreach (var r in results)
+                if (r.Plants.Count >= day) { sum += r.Plants.Count - day; n++; }
+            return survivedFrom[day] = n == 0 ? 0 : sum / n;
+        }
+
+        var rows = new List<(string name, int count, double diff)>();
+        foreach (var kv in buyers)
+        {
+            double diff = 0; int n = 0;
+            foreach (var r in kv.Value)
+            {
+                int day = r.FirstBought[kv.Key];
+                if (r.Plants.Count < day) continue;
+                diff += r.Plants.Count - day - AverageAfter(day);
+                n++;
+            }
+            if (n > 0) rows.Add((kv.Key, n, diff / n));
+        }
+        rows.Sort((a, b) => b.diff.CompareTo(a.diff));
+        sb.AppendLine().AppendLine("아이템 | 산 판 | 산 뒤 더 버틴 날(같은 날 생존 판 평균 대비)");
+        foreach (var row in rows) sb.AppendLine($"{row.name} | {row.count} | {row.diff:+0.0;-0.0;0.0}");
     }
 
     /// <summary>비율의 95% 신뢰 구간.</summary>

@@ -30,7 +30,7 @@ public class AdrenalineItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -45,27 +45,18 @@ public class AdrenalineItemData : ItemData
     {
         int days = durationDays;
 
-        ExtendOrAddMod("Adrenaline_Spawn", StatId.BugSpawnIntervalMul, spawnIntervalMul, days);
-        ExtendOrAddMod("Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
-        ExtendOrAddMod("Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
+        ExtendOrAddMod(ctx, "Adrenaline_Spawn", StatId.BugSpawnIntervalMul, spawnIntervalMul, days);
+        ExtendOrAddMod(ctx, "Adrenaline_BreedTime", StatId.BreedingPhaseDurationMul, breedingDurationMul, days);
+        ExtendOrAddMod(ctx, "Adrenaline_BreedCount", StatId.BreedingAttemptsMul, breedingAttemptsMul, days);
 
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.adrenaline", ("name", LocalizedName), ("days", days),
             ("spawn", (1f / spawnIntervalMul).ToString("0.#")), ("duration", breedingDurationMul.ToString("0.#")), ("attempts", breedingAttemptsMul.ToString("0.#"))));
     }
 
-    private void ExtendOrAddMod(string sourceTag, StatId stat, float multiplier, int days)
+    private static void ExtendOrAddMod(ShopContext ctx, string sourceTag, StatId stat, float multiplier, int days)
     {
-        var existingMod = ModManager.Instance.Mods.FirstOrDefault(m => m.sourceTag == sourceTag);
-        
-        if (existingMod != null)
-        {
-            existingMod.expireDay += days;
-        }
-        else
-        {
-            ModManager.Instance.AddTimedMultiplier(stat, -1, multiplier, days, sourceTag);
-        }
+        Mod existing = ctx.World.Mods.Mods.Find(m => m.sourceTag == sourceTag);
+        if (existing != null) existing.expireDay += days;
+        else ctx.World.AddTimedMultiplier(stat, -1, multiplier, days, sourceTag);
     }
-
-    public override void Cancel(ShopContext ctx) { }
 }

@@ -7,7 +7,6 @@ public class TwinsItemData : ItemData
     [Tooltip("구매 1회당 증가하는 쌍둥이 발생 확률 (0.05 = 5%p)")]
     [SerializeField] private float probabilityPerPurchase = 0.05f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 2500;
@@ -38,6 +37,6 @@ public class TwinsItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.Modifiers.AddTwinBreedProbability(probabilityPerPurchase);
+        ctx.Modifiers.AddTwinBreedProbability(probabilityPerPurchase);
     }
 }
