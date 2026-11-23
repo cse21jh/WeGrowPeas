@@ -43,8 +43,8 @@ public class PetBottleSupplyIncreaseItemData : ItemData
 
     public override void InitializePrice(ShopContext ctx)
     {
-        // 가격: 1000 * (구매횟수)
+        // 가격: 기본 가격 * (구매 횟수 + 1)
         int purchaseCount = GetTotalPurchaseCount();
-        Price = 1000 * (purchaseCount + 1);
+        CurrentPrice = Price * (purchaseCount + 1);
     }
 }

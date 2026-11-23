@@ -495,6 +495,7 @@ public class Grid : MonoBehaviour
 
         // 신규 아이템 스탯
 
+        save.hasCoolingShield = Soil.HasCoolingShield;
         save.columnGoldMulBonusList = Soil.GetColumnGoldMulBonusForSave();
     }
 
@@ -534,6 +535,7 @@ public class Grid : MonoBehaviour
         Board.NotifyChanged();
         Board.MaxCol = saveData.maxCol;
         UpdateSoil();
+        if (saveData.hasCoolingShield) Soil.ActivateCoolingShield();
         Soil.LoadColumnGoldMulBonus(saveData.columnGoldMulBonusList); // 특수(땅부자) 세로줄 배수 복원
         killBugCount = saveData.killBugCount;
 

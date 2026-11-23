@@ -33,7 +33,7 @@ public class LegacySpendGoldRequest : RequestInstance
     {
         if (IsCompleted || IsFailed) return;
 
-        currentCount += item.Price;
+        currentCount += item.CurrentPrice;
 
         if (currentCount >= requiredCount) CompleteOnce();
         else RaiseChanged();

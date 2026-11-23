@@ -45,6 +45,12 @@ public class ShopManager : Singleton<ShopManager>
     private int dailyPurchaseCount = 0;
     private int dailySpentGold = 0;
     public int DailyPurchaseCount => dailyPurchaseCount;
+
+    // 오늘 아이템별 구매 횟수 (하루 구매 한도용)
+    private readonly Dictionary<string, int> dailyPurchases = new Dictionary<string, int>();
+    public int GetDailyPurchaseCount(ItemData data)
+        => data != null && dailyPurchases.TryGetValue(data.PurchaseKey, out int count) ? count : 0;
+
     public int DailySpentGold => dailySpentGold;
 
     /// <summary>
@@ -165,6 +171,7 @@ public class ShopManager : Singleton<ShopManager>
             if (!it.IsRotationUnlockOk(ctx)) continue;           // 스테이지 등 로테이션 해금 조건(각 아이템 override)
             if (it.GetRotationWeight(ctx) <= 0) continue;        // 가중치 0 이하는 제외
             if (!it.CanPurchaseByLimit()) continue;              // 구매 제한에 도달한 아이템 제외
+            if (it.IsSoldOutToday()) continue;                   // 오늘 재고를 다 산 아이템 제외
             candidates.Add(it);
         }
 
@@ -242,6 +249,7 @@ public class ShopManager : Singleton<ShopManager>
         currentRerollCount = 0;
         // 날짜가 바뀌면 확률 증가 이벤트 초기화
         isProbabilityEqualized = false;
+        dailyPurchases.Clear();
     }
 
     public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
@@ -277,6 +285,7 @@ public class ShopManager : Singleton<ShopManager>
         var key = data.PurchaseKey;
         if (purchaseHistory.ContainsKey(key)) purchaseHistory[key]++;
         else purchaseHistory[key] = 1;
+        dailyPurchases[key] = GetDailyPurchaseCount(data) + 1;
 
         if (GameManager.Instance?.Tutorial == null)
             CodexProgress.Discover(CodexProgress.Category.Item, data.UnlockId);

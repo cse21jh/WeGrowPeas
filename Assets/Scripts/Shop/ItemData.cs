@@ -90,7 +90,16 @@ public abstract class ItemData : ScriptableObject
 
     [Header("Meta")]
     public Sprite Icon;
+    /// <summary>기본 가격. 판마다 달라지는 값은 에셋을 고치지 않고 <see cref="CurrentPrice"/>에 둔다.</summary>
     [Balance("가격")] public int Price;
+
+    [System.NonSerialized] private int? currentPrice;
+    /// <summary>구매 횟수 등이 반영된 지금 가격. 아이템이 <see cref="InitializePrice"/>에서 정한다.</summary>
+    public int CurrentPrice
+    {
+        get => currentPrice ?? Price;
+        protected set => currentPrice = value;
+    }
 
     [Header("Rarity")]
     [Balance("등급")] public ItemRarity Rarity = ItemRarity.Common;
@@ -230,11 +239,11 @@ public abstract class ItemData : ScriptableObject
         // int.MaxValue는 "더 이상 구매 불가"를 뜻하는 신호값이다.
         // 배수를 곱하면 float로 넘어가며 자릿수가 넘쳐 int.MinValue로 뒤집히고,
         // 그러면 가격표를 떼는 조건(price == int.MaxValue)이 전부 깨진다. 그대로 돌려준다.
-        if (Price == int.MaxValue) return int.MaxValue;
+        if (CurrentPrice == int.MaxValue) return int.MaxValue;
 
         // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
         float mul = DawnSystem.Current.shopPriceMultiplier;
-        float price = Price * (mul > 0f ? mul : 1f);
+        float price = CurrentPrice * (mul > 0f ? mul : 1f);
 
         // 저주(독점시장): 품목별 가격이 무작위 배율(하루 동안 고정)로 변동
         if (CurseState.ShopMonopoly)
@@ -276,6 +285,21 @@ public abstract class ItemData : ScriptableObject
     /// 구매 차단은 각 아이템의 CanPurchase가 담당하므로 이 값은 표시 전용이다.
     /// </summary>
     public virtual int EffectivePurchaseLimit => MaxPurchaseCount;
+
+    /// <summary>하루 구매 한도. -1이면 무제한. 리롤해도 늘지 않고 날이 바뀌면 다시 찬다.</summary>
+    public virtual int DailyPurchaseLimit => -1;
+
+    /// <summary>오늘 살 수 있는 횟수를 다 썼는가.</summary>
+    public bool IsSoldOutToday()
+        => DailyPurchaseLimit >= 0 && ShopManager.Instance != null && ShopManager.Instance.GetDailyPurchaseCount(this) >= DailyPurchaseLimit;
+
+    /// <summary>앞으로 더 살 수 있는 횟수(표시용). -1이면 무제한.</summary>
+    public int GetRemainingPurchaseCount()
+    {
+        if (DailyPurchaseLimit >= 0)
+            return Mathf.Max(0, DailyPurchaseLimit - (ShopManager.Instance != null ? ShopManager.Instance.GetDailyPurchaseCount(this) : 0));
+        return EffectivePurchaseLimit < 0 ? -1 : Mathf.Max(0, EffectivePurchaseLimit - GetTotalPurchaseCount());
+    }
 
     // === 공통 헬퍼 메서드 ===
 

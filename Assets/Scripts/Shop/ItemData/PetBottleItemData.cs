@@ -40,32 +40,18 @@ public class PetBottleItemData : ItemData
     public override void InitializePrice(ShopContext ctx)
     {
         // 동적 가격 계산 (기본 가격 - 가격 감소량)
-        int basePrice = 500;
-        if (ctx?.Grid != null)
-        {
-            Price = Mathf.Max(1, basePrice - ctx.Grid.Modifiers.PetBottlePriceReduction);
-        }
-        else
-        {
-            Price = basePrice;
-        }
-
-        // 동적 재고 계산 (기본 재고 + 재고 보너스)
-        int baseStock = 3;
-        if (ctx?.Grid != null)
-        {
-            InitialStock = baseStock + ctx.Grid.Modifiers.PetBottleInitialStockBonus;
-        }
-        else
-        {
-            InitialStock = baseStock;
-        }
+        int reduction = ctx?.Grid != null ? ctx.Grid.Modifiers.PetBottlePriceReduction : 0;
+        CurrentPrice = Mathf.Max(1, Price - reduction);
     }
+
+    // 하루 구매 횟수 = 기본 재고 + 납품량 증가
+    public override int DailyPurchaseLimit
+        => InitialStock + (GameManager.Instance?.grid != null ? GameManager.Instance.grid.Modifiers.PetBottleInitialStockBonus : 0);
 
     public override int GetDisplayPrice()
     {
         // InitializePrice가 호출되기 전에는 기본 가격 반환
-        return Price;
+        return CurrentPrice;
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)

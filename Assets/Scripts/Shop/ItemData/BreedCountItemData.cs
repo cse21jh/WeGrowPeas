@@ -7,7 +7,6 @@ public class BreedCountItemData : ItemData
 {
 
     [Header("Pricing (exponential)")]
-    [SerializeField] private int basePrice = 1000;
     [SerializeField] private float factor = 2f;
 
     private void OnValidate()
@@ -22,9 +21,9 @@ public class BreedCountItemData : ItemData
         int i;
         if (!ctx.Shop.PurchaseHistory.TryGetValue(key, out i))
             i = 0;
-        double priceD = basePrice * Math.Pow(factor, i);
-        if (priceD > int.MaxValue) Price = int.MaxValue;
-        else Price = (int)priceD;
+        double priceD = Price * Math.Pow(factor, i);
+        if (priceD > int.MaxValue) CurrentPrice = int.MaxValue;
+        else CurrentPrice = (int)priceD;
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
@@ -63,8 +62,8 @@ public class BreedCountItemData : ItemData
         int i;
         if (!ctx.Shop.PurchaseHistory.TryGetValue(key, out i))
             i = 0;
-        double priceD = basePrice * Math.Pow(factor, i);
-        if (priceD > int.MaxValue) Price = int.MaxValue;
-        else Price = (int)priceD;
+        double priceD = Price * Math.Pow(factor, i);
+        if (priceD > int.MaxValue) CurrentPrice = int.MaxValue;
+        else CurrentPrice = (int)priceD;
     } 
 }
