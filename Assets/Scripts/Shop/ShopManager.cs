@@ -184,6 +184,7 @@ public class ShopManager : Singleton<ShopManager>
             rng,
             rotationCount
         );
+        foreach (var it in inv.Rotation) it.InitializePrice(ctx);
 
         return inv;
     }

@@ -42,9 +42,6 @@ public class SprinklerRangeUpgradeItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        if (purchaseCount > 0)
-        {
-            Price = 2000 + (purchaseCount * 1000); 
-        }
+        Price = 2000 + (purchaseCount * 1000); 
     }
 }

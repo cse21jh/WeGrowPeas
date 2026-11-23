@@ -42,9 +42,6 @@ public class GoldenGeneticsItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        if (purchaseCount > 0)
-        {
-            Price = 3000 + (purchaseCount * 1000); // 구매 횟수당 1000골드 증가
-        }
+        Price = 3000 + (purchaseCount * 1000); // 구매 횟수당 1000골드 증가
     }
 }

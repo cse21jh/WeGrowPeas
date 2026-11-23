@@ -119,14 +119,14 @@ public class Pea : MovablePlant
             return basePrice;
         }
 
-        // 특수(임시완두B): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50골드
-        if (SpecialItemSystem.Has("pea_special_8"))
+        // 특수(군체): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50골드
+        if (SpecialItemSystem.Has("colony"))
             basePrice += 50 * grid.Soil.CountDistinctNeighborSpecies(gridIndex);
 
         int price = CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
 
-        // 특수(임시완두A): 저항력 평균 수치만큼 가격 추가 증가 (곱적용, 보유 형질만 평균)
-        if (SpecialItemSystem.Has("pea_special_4") && traits.Count > 0)
+        // 특수(보양식): 저항력 평균 수치만큼 가격 추가 증가 (곱적용, 보유 형질만 평균)
+        if (SpecialItemSystem.Has("health_food") && traits.Count > 0)
         {
             float sum = 0f;
             foreach (var t in traits) sum += GetResistanceValue((int)t.traitType);

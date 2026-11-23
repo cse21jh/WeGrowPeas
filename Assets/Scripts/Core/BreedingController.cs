@@ -198,7 +198,7 @@ public class BreedingController : MonoBehaviour
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
-            else if (isEqualPlant)
+            else if (!isEqualPlant)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.species_mismatch"), 1);
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
@@ -367,7 +367,7 @@ public class BreedingController : MonoBehaviour
             if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
 #endif
 
-            if (SpecialItemSystem.Has("peanut_special_8")) malignant = true; // 특수(임시땅콩B): 교배 시 악성만
+            if (SpecialItemSystem.Has("extreme_mutation")) malignant = true; // 특수(극단적 변이): 교배 시 악성만
             else if (Random.value < malignantRatio) malignant = true;
             else benign = true;
             Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!");
@@ -438,8 +438,8 @@ public class BreedingController : MonoBehaviour
 
             if (randomBreed || malignant) childGenetic = Random.Range(0, 3); // 저주: 광란 / 악성 변종(유전자 무작위)
 
-            // 특수(임시완두C): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로 변경
-            if (benign && SpecialItemSystem.Has("pea_special_12"))
+            // 특수(적응형 유전자): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로 변경
+            if (benign && SpecialItemSystem.Has("adaptive_genetics"))
                 childGenetic = GetSeasonFavoredGenetics(trait);
 
             float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
@@ -460,7 +460,7 @@ public class BreedingController : MonoBehaviour
         CurseEffectManager.PlayMutation(plant, LastBreedWasBenign);
     }
     /// <summary>
-    /// 특수(임시완두C): 양성 변종의 계절 유리 유전자.
+    /// 특수(적응형 유전자): 양성 변종의 계절 유리 유전자.
     /// 앞쪽 4개(자연사·해충·바람·홍수) = 금색 2개(genetics 2).
     /// 뒤쪽 2개(장마·추위) = 계절 따라: 겨울·가을 → 금색(2, 장마/추위 저항↑), 여름·봄 → 회색(0, 짝 형질 가뭄/더위 저항↑).
     /// // 계절→유불리 매핑은 기획 확정 시 조정

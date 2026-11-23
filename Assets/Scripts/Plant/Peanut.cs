@@ -84,7 +84,7 @@ public class Peanut : MovablePlant
     public int FindEmptyGridToCopy()
     {
         List<int> emptyGrid = new List<int>();
-        if ((gridIndex - 1) / 4 == gridIndex / 4) // 위칸
+        if (gridIndex % 4 > 0) // 위칸
         {
             if (!grid.Board.Plants.ContainsKey(gridIndex - 1))
                 emptyGrid.Add(gridIndex - 1);
@@ -134,8 +134,8 @@ public class Peanut : MovablePlant
 
         List<GeneticTrait> copyTriats = traits.ToList();
 
-        // 특수(임시땅콩B): 자가번식 시 양성 변종만 등장 (변종 확률로 판정, 유전자 유지 + 모든 저항 90~100%)
-        bool benignMutation = SpecialItemSystem.Has("peanut_special_8")
+        // 특수(극단적 변이): 자가번식 시 양성 변종만 등장 (변종 확률로 판정, 유전자 유지 + 모든 저항 90~100%)
+        bool benignMutation = SpecialItemSystem.Has("extreme_mutation")
             && Random.Range(0f, 100f) < Plant.GetMutationChancePercent();
         if (benignMutation)
         {

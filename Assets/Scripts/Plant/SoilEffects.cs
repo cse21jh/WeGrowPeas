@@ -445,6 +445,7 @@ public class SoilEffects
     public void ActivateCoolingShield()
     {
         hasCoolingShield = true;
+        isCoolingShieldActivated = false; // 쓴 뒤 다시 산 경우
     }
     /// <summary>
     /// 냉각 방패가 활성화되었는지 확인 (1회 사용됨 여부)
@@ -567,95 +568,8 @@ public class SoilEffects
     }
     public bool IsAffectedByChiliPepper(int gridIndex)
     {
-        Plant chiliPepper;
-        int maxIndex = board.MaxCol * 4;
-
-        // 0단계: 좌우
-        if ((gridIndex - 4) >= 0) // 왼쪽
-        {
-            if (board.Plants.TryGetValue(gridIndex - 4, out chiliPepper))
-            {
-                if (chiliPepper is ChiliPepper) return true;
-            }
-        }
-
-        if ((gridIndex + 4) < maxIndex) // 오른쪽
-        {
-            if (board.Plants.TryGetValue(gridIndex + 4, out chiliPepper))
-            {
-                if (chiliPepper is ChiliPepper) return true;
-            }
-        }
-
-        // 1단계: 상하
-        if (grid.Modifiers.ChiliPepperRangeLevel >= 1)
-        {
-            if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
-            {
-                if (board.Plants.TryGetValue(gridIndex - 1, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래
-            {
-                if (board.Plants.TryGetValue(gridIndex + 1, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-        }
-
-        // 2단계: 대각선
-        if (grid.Modifiers.ChiliPepperRangeLevel >= 2)
-        {
-            // 왼쪽 위
-            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex - 5, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            // 오른쪽 위
-            // Plant.cs의 로직 참고: index - 3
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex - 1) % 4)
-            {
-                // **주의**: Plant.cs에서도 gridIndex - 3을 체크하고 있음. (오타일 가능성 있으나 기존 로직 유지)
-                // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
-                // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
-                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함.
-                if (board.Plants.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-            // Plant.cs 원본 로직을 그대로 따르려면 -3이어야 하지만, InfoAppGridSlot에서 +3으로 구현했었음.
-            // 여기서는 논리적으로 맞는 +3 (오른쪽 위)을 사용. 
-            // 만약 Plant.cs가 -3을 의도한거라면 (왼쪽 아래?) ... 아니, 대각선은 4방향이어야 함.
-            // 왼쪽 위(-5), 오른쪽 위(+3), 왼쪽 아래(-3), 오른쪽 아래(+5) 가 맞음.
-
-            // 왼쪽 아래
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex - 3, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            // 오른쪽 아래
-            if ((gridIndex + 5) < maxIndex && (gridIndex + 5) % 4 == (gridIndex + 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex + 5, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-        }
-
+        foreach (int idx in GetChiliPepperRange(gridIndex))
+            if (board.Plants.TryGetValue(idx, out Plant plant) && plant is ChiliPepper) return true;
         return false;
     }
     /// <summary>
@@ -666,39 +580,29 @@ public class SoilEffects
         List<Plant> nearbyPlants = new List<Plant>();
         if (chiliPepper == null) return nearbyPlants;
 
-        int chiliIndex = chiliPepper.gridIndex;
-        int rangeLevel = grid.Modifiers.ChiliPepperRangeLevel;
-
-        // 0단계: 가로 2칸 (좌우)
-        CheckAndAddPlant(chiliIndex - 1, nearbyPlants);
-        CheckAndAddPlant(chiliIndex + 1, nearbyPlants);
-
-        // 1단계 이상: 십자 4칸 (상하 추가)
-        if (rangeLevel >= 1)
-        {
-            CheckAndAddPlant(chiliIndex - 4, nearbyPlants);
-            CheckAndAddPlant(chiliIndex + 4, nearbyPlants);
-        }
-
-        // 2단계: 대각선까지 8칸 (대각선 4칸 추가)
-        if (rangeLevel >= 2)
-        {
-            CheckAndAddPlant(chiliIndex - 5, nearbyPlants);
-            CheckAndAddPlant(chiliIndex - 3, nearbyPlants);
-            CheckAndAddPlant(chiliIndex + 3, nearbyPlants);
-            CheckAndAddPlant(chiliIndex + 5, nearbyPlants);
-        }
+        foreach (int idx in GetChiliPepperRange(chiliPepper.gridIndex))
+            if (board.Plants.TryGetValue(idx, out Plant plant) && plant != null && !(plant is ChiliPepper))
+                nearbyPlants.Add(plant);
 
         return nearbyPlants;
     }
-    private void CheckAndAddPlant(int idx, List<Plant> list)
+    /// <summary>고추의 영향이 닿는 칸. 0단계: 좌우, 1단계: 상하 추가, 2단계: 대각선까지 8칸.</summary>
+    private IEnumerable<int> GetChiliPepperRange(int center)
     {
-        if (idx >= 0 && idx < board.MaxCol * 4 && board.Plants.TryGetValue(idx, out Plant plant))
+        int level = grid.Modifiers.ChiliPepperRangeLevel;
+        bool hasUp = center % 4 > 0, hasDown = center % 4 < 3;
+
+        yield return center - 4;
+        yield return center + 4;
+        if (level >= 1)
         {
-            if (plant != null && !(plant is ChiliPepper))
-            {
-                list.Add(plant);
-            }
+            if (hasUp) yield return center - 1;
+            if (hasDown) yield return center + 1;
+        }
+        if (level >= 2)
+        {
+            if (hasUp) { yield return center - 5; yield return center + 3; }
+            if (hasDown) { yield return center - 3; yield return center + 5; }
         }
     }
     public void ApplyRapidFreezer(int centerIdx)

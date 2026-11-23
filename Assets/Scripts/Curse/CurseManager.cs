@@ -323,7 +323,12 @@ public class CurseManager : Singleton<CurseManager>
     {
         if (seasonalCursePool == null || seasonalCursePool.Count == 0) return;
 
-        var data = seasonalCursePool[UnityEngine.Random.Range(0, seasonalCursePool.Count)];
+        // 내일부터 걸리므로 내일 일차로 해금을 따진다
+        int tomorrow = (GameManager.Instance != null ? GameManager.Instance.stage : 1) + 1;
+        var validCurses = seasonalCursePool.Where(c => c != null && tomorrow >= c.unlockStage).ToList();
+        if (validCurses.Count == 0) return;
+
+        var data = validCurses[UnityEngine.Random.Range(0, validCurses.Count)];
         currentSeasonCurse = CreateInstanceById(data, GetCurseLevel());
         remainingCurseDay = seasonInterval;
 

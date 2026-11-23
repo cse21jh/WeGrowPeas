@@ -39,9 +39,6 @@ public class TimeIsGoldItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        if (purchaseCount > 0)
-        {
-            Price = 1000 + (purchaseCount * 500); 
-        }
+        Price = 1000 + (purchaseCount * 500); 
     }
 }

@@ -175,8 +175,8 @@ public abstract class MovablePlant : Plant
         {
             SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
 
-            // 특수(임시땅콩C): 뿌리를 내리면 모든 저항력 40%p 증가
-            if (SpecialItemSystem.Has("peanut_special_12"))
+            // 특수(뿌리 식물): 뿌리를 내리면 모든 저항력 40%p 증가
+            if (SpecialItemSystem.Has("root_plant"))
                 for (int i = 0; i < Wave.NumberOfWave; i++)
                     ChangeResistance(i, 0.4f);
         }
