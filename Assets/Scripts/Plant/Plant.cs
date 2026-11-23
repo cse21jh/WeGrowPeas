@@ -224,7 +224,7 @@ public abstract class Plant : MonoBehaviour
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
         // 벌레가 죽이려는데 밭에 무당벌레가 있으면 무당벌레가 대신 벌레를 잡는다
-        bool ladybugCanIntercept = cause == DeathCause.Bug && killer != null && grid.Board.Ladybugs.Count != 0;
+        bool ladybugCanIntercept = cause == DeathCause.Bug && killer != null && grid.Board.LadybugCount != 0;
 
         DeathOutcome outcome = grid.Field.TryKill(State, cause, ladybugCanIntercept);
         if (!outcome.Died)
@@ -232,7 +232,7 @@ public abstract class Plant : MonoBehaviour
             if (outcome.PetBottleRemoved)
                 grid.Soil.RemovePetBottleMarker(gridIndex);
             if (outcome.Result == DeathResult.BlockedByLadybug)
-                grid.StartCoroutine(grid.Board.Ladybugs[0].KillFuckingBug(killer));
+                grid.StartCoroutine(grid.FirstLadybug.KillFuckingBug(killer));
             return false;
         }
 
@@ -346,13 +346,8 @@ public abstract class Plant : MonoBehaviour
         {
             if (traits[i].traitType == traitType)
             {
-                float resistance = traits[i].resistance;
-
-                if (byUpgrade)
-                    resistance = GetResistanceBasedOnGenetics(traitType, traits[i].genetics);
-
-                traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, traits[i].additionalResistance + value);
-                if (State.IsMovableKind) State.UpdateGoldFromTraits();
+                State.AddAdditionalResistance(traitType, value,
+                    byUpgrade ? GetResistanceBasedOnGenetics(traitType, traits[i].genetics) : (float?)null);
 
                 if (stemController != null)
                 {

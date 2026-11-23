@@ -17,6 +17,7 @@ public class SimBotParams
     public float requestSale = 1.69f;      // 의뢰 보상을 얼마나 확실하다고 보고 파는가
     public float taxDays = 1f;             // 마감 며칠 전부터 세금 낼 돈을 남기는가
     public float liquidation = 0.25f;      // 식물을 팔아 세금에 보탤 수 있다고 보는 비율
+    public float feedBugPlants = 12f;    // 식물이 이보다 많으면 먹히는 의뢰를 위해 벌레를 내버려 둔다
     public float buyRequest = 0.87f;       // 구매 의뢰를 채우려고 보상의 얼마까지 쓰는가
     public float priceExponent = 0.3f;     // 아이템 점수를 가격으로 나누는 정도
     public float buyThreshold = 35f;
@@ -30,6 +31,9 @@ public class SimBotParams
     public float chili = 23f, chiliMax = 2f, sprinkler = 40f, sprinklerMax = 1f, moneyTree = 40f, moneyTreeMax = 5f;
     public float freezer = 49f, petBottle = 77f, petBottleMax = 3f, goldSoil = 20f;
     public float strong = 27f, weak = 55f, goldenGenetics = 48f, maturation = 31f, taste = 161f, badGuy = 40f, twins = 45f, coffee = 54f;
+    public float nepenthes = 25f, nepenthesMax = 2f, pheromone = 25f, pheromoneRange = 15f, digestion = 25f;
+    public float bugLure = 20f, bugProcessing = 30f, bugSpray = 10f, bugFan = 20f, clock = 25f;
+    public float ladybugLure = 20f, ladybugBox = 15f, goldenLadybug = 15f, healthyLadybug = 20f;
     public float landAndBean = 30f, royal = 41f, activeShell = 40f, capsaicin = 25f, chiliRange = 40f, sprinklerRange = 34f, synergy = 26f;
 }
 

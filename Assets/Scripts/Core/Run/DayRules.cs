@@ -113,7 +113,7 @@ public static class DayRules
 
         if (modifiers.AdditionalLadybugGoldPerUnit > 0)
         {
-            int gold = field.Board.Ladybugs.Count * modifiers.AdditionalLadybugGoldPerUnit;
+            int gold = field.Board.LadybugCount * modifiers.AdditionalLadybugGoldPerUnit;
             if (gold > 0) actions.AddGold(gold);
         }
 

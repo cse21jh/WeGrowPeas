@@ -18,7 +18,8 @@ public class PlantBoard
     /// </summary>
     public IReadOnlyDictionary<int, PlantState> States => states;
 
-    public List<Ladybug> Ladybugs { get; } = new List<Ladybug>();
+    /// <summary>밭에 있는 무당벌레 수.</summary>
+    public int LadybugCount { get; set; }
     public int MaxCol { get; set; } = 4;
     public int CellCount => MaxCol * RowCount;
 

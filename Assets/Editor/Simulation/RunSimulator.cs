@@ -31,6 +31,9 @@ public class SimConfig
     public bool requests = true;
     public bool specialItems = true;
     public bool payTax = true;
+    public bool bugs = true;
+    /// <summary>벌레가 움직이기 시작하고 잡을 때까지 걸리는 평균 시간(초). 마리마다 0.5~1.5배.</summary>
+    public float bugReaction = 1.5f;
     [NonSerialized] public SimBotParams botParams = new SimBotParams();
 }
 
@@ -41,6 +44,9 @@ public class SimRunResult
     /// <summary>전멸한 날. 클리어했으면 0.</summary>
     public int DeathDay;
     public bool DiedToTax;
+    public bool DiedToBug;
+    public int BugsKilled;
+    public int PlantsEaten;
     public WaveType DeathWave = WaveType.None;
     public int Gold;
     /// <summary>하루가 끝났을 때의 완두·땅콩 수와 골드 (0번이 1일차).</summary>
@@ -63,7 +69,7 @@ public class SimRunResult
 /// <summary>
 /// 씬 없이 한 판을 돌린다. 교배, 웨이브, 죽음, 저항력, 판매가는 게임과 같은 코드를 쓴다.
 ///
-/// 아직 없는 것: 특성, 벌레, 교배 시간 제한(시간은 금이다).
+/// 아직 없는 것: 특성, 교배 시간 제한(시간은 금이다).
 /// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
 public sealed partial class RunSimulator : IFieldActions
@@ -179,6 +185,8 @@ public sealed partial class RunSimulator : IFieldActions
             DecideNoSell();
             BreedPhase();
             MovePlantsForRequest();
+            BugPhase();
+            if (IsWipedOut) { result.DiedToBug = true; result.DeathDay = stage; break; }
             UseWaveSkip();
             if (IsPlanner) SellDoomed();
             DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);

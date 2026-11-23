@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class UnstoppableBug : Bug
 {
+    protected override BugMove Move => BugMove.Chase;
+    protected override bool StopsToEat => false;
+
     [SerializeField] private SpriteRenderer bodySprite;
     [SerializeField] private SpriteRenderer bodySprite_Main;
 
@@ -26,33 +29,10 @@ public class UnstoppableBug : Bug
         StartCoroutine(ChangeColor());
     }
 
-    protected override IEnumerator Moving()
-    {
-        yield return StartCoroutine(base.Moving());
-
-        while(true)
-        {
-
-            if (!grid.Board.Plants.TryGetValue(targetObjIdx, out Plant plant))
-                FindNewTargetObj();
-            else if (grid.Breeder.GetIsBreeding() && !isDie && !isHit)
-            {
-                Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
-                MoveToward(targetPos);
-            }
-            yield return null;
-        }
-    }
-
     protected override IEnumerator HitBug()
     {
         yield return StartCoroutine(base.HitBug());
         yield return StartCoroutine(KillBug());
-    }
-
-    public override IEnumerator KillBug()
-    {
-        yield return StartCoroutine(base.KillBug());
     }
 
     private IEnumerator ChangeColor()

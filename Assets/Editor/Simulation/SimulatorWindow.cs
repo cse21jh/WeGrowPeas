@@ -35,11 +35,13 @@ public class SimulatorWindow : EditorWindow
         config.buySeedlings = EditorGUILayout.Toggle("모종 구매", config.buySeedlings);
         config.payTax = EditorGUILayout.Toggle("세금", config.payTax);
 
+        config.bugs = EditorGUILayout.Toggle("벌레", config.bugs);
+        config.bugReaction = Mathf.Max(0f, EditorGUILayout.FloatField("벌레 잡는 시간(초)", config.bugReaction));
         config.curses = EditorGUILayout.Toggle("저주 (새벽 단계에 따라)", config.curses);
         config.requests = EditorGUILayout.Toggle("의뢰", config.requests);
         config.specialItems = EditorGUILayout.Toggle("특수 아이템", config.specialItems);
 
-        EditorGUILayout.HelpBox("벌레와 특성은 아직 없습니다. 벌레 관련 아이템은 사지 않습니다. "
+        EditorGUILayout.HelpBox("특성과 교배 시간 제한은 아직 없습니다. 벌레는 정해진 시간 뒤에 잡는 것으로 칩니다. "
             + "절대 수치보다 값을 바꾸기 전후의 비교로 읽어 주세요. 밸런스를 크게 바꿨으면 봇도 다시 튜닝해야 공정합니다.", MessageType.Info);
 
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
@@ -79,7 +81,7 @@ public class SimulatorWindow : EditorWindow
 
     public static string BuildReport(SimConfig config, List<SimRunResult> results)
     {
-        int n = results.Count, cleared = 0, taxDeaths = 0;
+        int n = results.Count, cleared = 0, taxDeaths = 0, bugDeaths = 0;
         var deaths = new int[config.days + 1];
         var hits = new long[Wave.NumberOfWave];
         var faced = new long[Wave.NumberOfWave];
@@ -89,6 +91,7 @@ public class SimulatorWindow : EditorWindow
             if (r.Cleared) cleared++;
             else deaths[r.DeathDay]++;
             if (r.DiedToTax) taxDeaths++;
+            else if (r.DiedToBug) bugDeaths++;
             else if (!r.Cleared) wipes[(int)r.DeathWave]++;
             for (int i = 0; i < hits.Length; i++) { hits[i] += r.WaveHits[i]; faced[i] += r.WaveFaced[i]; }
         }
@@ -98,9 +101,10 @@ public class SimulatorWindow : EditorWindow
         sb.AppendLine($"{n}판, {config.species}, 봇 {config.bot}, 새벽 {config.dawnStage}, 시드 {config.firstSeed}~");
         sb.AppendLine($"{config.days}일 클리어 {100.0 * cleared / n:F1}%  (95% 구간 {low * 100:F1}~{high * 100:F1}%)");
         sb.AppendLine($"세금 때문에 전멸 {taxDeaths}판");
-        double requests = 0, curses = 0;
-        foreach (var r in results) { requests += r.RequestsCompleted; curses += r.CursesApplied; }
+        double requests = 0, curses = 0, bugs = 0, eaten = 0;
+        foreach (var r in results) { requests += r.RequestsCompleted; curses += r.CursesApplied; bugs += r.BugsKilled; eaten += r.PlantsEaten; }
         sb.AppendLine($"판마다 달성한 의뢰 {requests / n:F1}개, 겪은 단발형 저주 {curses / n:F1}일");
+        sb.AppendLine($"판마다 잡은 벌레 {bugs / n:F1}마리, 벌레에게 먹힌 식물 {eaten / n:F1}포기, 벌레 때문에 전멸 {bugDeaths}판");
         sb.AppendLine();
         sb.AppendLine("일차 | 도달 전 전멸(누적) | 그날 전멸 | 남은 식물 평균 | 골드 평균");
         int dead = 0;

@@ -190,7 +190,7 @@ public sealed class PlantState
                 if (Field.Soil.IsAffectedByChiliPepper(GridIndex) && g.genetics <= 1)
                     resistance += 0.2f;
                 // 무당벌레 한 마리당 저항력 증가 (모든 형질)
-                resistance += Field.Board.Ladybugs.Count * Field.Modifiers.AdditionalLadybugResistancePerUnit;
+                resistance += Field.Board.LadybugCount * Field.Modifiers.AdditionalLadybugResistancePerUnit;
             }
 
             // 기본 저항력 + 추가 저항력(업그레이드, 벌레잡기)
@@ -250,6 +250,21 @@ public sealed class PlantState
             Traits[i] = new GeneticTrait((TraitType)traitNum, value, Traits[i].genetics, Traits[i].additionalResistance);
             if (IsMovableKind) UpdateGoldFromTraits();
             ResistanceChanged?.Invoke(traitNum);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>추가 저항력을 올린다. 해당 형질이 없으면 false.</summary>
+    /// <param name="newResistance">기본 저항력도 바꿀 때의 값.</param>
+    public bool AddAdditionalResistance(TraitType trait, float value, float? newResistance = null)
+    {
+        for (int i = 0; i < Traits.Count; i++)
+        {
+            GeneticTrait t = Traits[i];
+            if (t.traitType != trait) continue;
+            Traits[i] = new GeneticTrait(trait, newResistance ?? t.resistance, t.genetics, t.additionalResistance + value);
+            if (IsMovableKind) UpdateGoldFromTraits();
             return true;
         }
         return false;

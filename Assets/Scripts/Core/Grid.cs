@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Grid : MonoBehaviour
+public class Grid : MonoBehaviour, IBugTargets
 {
     protected EnemyController enemyController;
     [SerializeField] protected EconomyManager economyManager;
@@ -259,6 +259,33 @@ public class Grid : MonoBehaviour
                 return false;
         }
         return true;
+    }
+
+    // ───── 벌레 ─────
+
+    private readonly List<Ladybug> ladybugs = new List<Ladybug>();
+    public Ladybug FirstLadybug => ladybugs[0];
+
+    public void AddLadybug(Ladybug ladybug)
+    {
+        ladybugs.Add(ladybug);
+        Board.LadybugCount = ladybugs.Count;
+    }
+
+    public void RemoveLadybug(Ladybug ladybug)
+    {
+        ladybugs.Remove(ladybug);
+        Board.LadybugCount = ladybugs.Count;
+    }
+
+    int IBugTargets.CellCount => Board.CellCount;
+
+    bool IBugTargets.TryGetPlant(int cell, out Vector2 position, out bool isNepenthes)
+    {
+        bool found = Board.Plants.TryGetValue(cell, out Plant plant) && plant != null;
+        position = found ? (Vector2)plant.transform.position : Vector2.zero;
+        isNepenthes = found && plant is Nepenthes;
+        return found;
     }
 
     public void AddSoil()

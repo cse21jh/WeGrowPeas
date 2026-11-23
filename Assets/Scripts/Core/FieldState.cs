@@ -63,6 +63,13 @@ public sealed class FieldState
     public static int GetPlantingGold(PlantState plant)
         => SpecialItemSystem.Has("new_product") ? (int)System.Math.Round(plant.GetSellingPrice() * 0.5f) : 0;
 
+    /// <summary>해충 저항력을 올린다. 지금 있는 식물과 앞으로 태어날 식물에 모두 적용된다. (시뮬레이터용, 게임은 GridUpgrades)</summary>
+    public void AddPestResistance(float value)
+    {
+        Modifiers.AddAdditionalPestResistance(value);
+        foreach (PlantState plant in Board.StatesInOrder()) plant.AddAdditionalResistance(TraitType.Pest, value);
+    }
+
     // ───── 죽음 ─────
 
     /// <summary>

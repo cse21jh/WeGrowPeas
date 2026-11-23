@@ -17,6 +17,7 @@ public sealed partial class RunSimulator : IShopWorld
 
     private static void LoadItems()
     {
+        LoadBugs();
         fixedItems = Resources.LoadAll<ItemData>("Data/Item Data/Fixed");
         rotationItems = Resources.LoadAll<ItemData>(ResourcePaths.RotationItems);
 
@@ -260,7 +261,25 @@ public sealed partial class RunSimulator : IShopWorld
             case SprinklerRangeUpgradeItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && !late ? Bot.sprinklerRange : 0f; break;
             case SprinklerFertilizerSynergyItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && field.Soil.FertilizerColumns.Count > 0 ? Bot.synergy : 0f; break;
 
-            // 벌레, 리롤, 교배 시간처럼 시뮬레이터에 없는 것을 돕는 아이템은 사지 않는다
+            case NepenthesItemData _:
+                if (empty < 2 || stage < BugSchedule.AppearStage - 1 || late) return default;
+                choice.cell = CellWithMostNeighbours(item, vertical: true);
+                choice.score = CountKind(PlantKind.Nepenthes) < (int)Bot.nepenthesMax ? Bot.nepenthes : 0f;
+                break;
+            case NepenthesPheromoneItemData _: choice.score = CountKind(PlantKind.Nepenthes) > 0 ? Bot.pheromone : 0f; break;
+            case NepenthesPheromoneRangeUpgradeItemData _: choice.score = CountKind(PlantKind.Nepenthes) > 0 && !late ? Bot.pheromoneRange : 0f; break;
+            case NepenthesDigestionUpgradeItemData _: choice.score = CountKind(PlantKind.Nepenthes) > 0 && !late ? Bot.digestion : 0f; break;
+            case BugLureDeviceItemData _: choice.score = late ? 0f : Bot.bugLure; break;
+            case BugProcessingUpgradeItemData _: choice.score = late ? 0f : Bot.bugProcessing; break;
+            case BugSprayItemData _: choice.score = Bot.bugSpray; break;
+            case BugFanItemData _: choice.score = late ? 0f : Bot.bugFan; break;
+            case GoldenClockItemData _: choice.score = late ? 0f : Bot.clock; break;
+            case LadybugLureDeviceItemData _: choice.score = late ? 0f : Bot.ladybugLure; break;
+            case LadybugCollectionBoxItemData _: choice.score = late ? 0f : Bot.ladybugBox; break;
+            case GoldenLadybugItemData _: choice.score = late ? 0f : Bot.goldenLadybug; break;
+            case HealthyLadybugItemData _: choice.score = late ? 0f : Bot.healthyLadybug; break;
+
+            // 시뮬레이터에 없는 것(웨이브 스킵 보상 등)을 돕는 아이템은 사지 않는다
             default: return default;
         }
 
@@ -417,7 +436,7 @@ public sealed partial class RunSimulator : IShopWorld
     }
 
     void IShopWorld.AddBreedAttempts(int count) => bonusBreedAttempts += count;
-    void IShopWorld.AddBreedSeconds(int seconds) { } // 교배 시간 제한이 없다
+    void IShopWorld.AddBreedSeconds(int seconds) => bonusDaySeconds += seconds;
     void IShopWorld.AddWaveSkips(int count) => waveSkips += count;
 
     void IShopWorld.AddTimedMultiplier(StatId stat, int param, float multiplier, int days, string sourceTag)

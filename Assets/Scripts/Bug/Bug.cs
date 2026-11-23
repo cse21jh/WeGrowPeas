@@ -8,9 +8,13 @@ public class Bug : MonoBehaviour
     protected Grid grid;
     protected EconomyManager economyManager;
 
-    protected int targetObjIdx = 999;
-    protected int spawnEdge;
-    protected int gold = 100;
+    protected int gold = BugRules.BaseGold;
+
+    protected virtual BugMove Move => BugMove.Chase;
+    /// <summary>식물에 닿으면 멈춰서 먹는가.</summary>
+    protected virtual bool StopsToEat => true;
+    protected BugMotion Motion { get; private set; }
+    protected IBugTargets Targets => grid;
 
     [SerializeField]
     protected float speed;
@@ -30,9 +34,6 @@ public class Bug : MonoBehaviour
 
     private GameObject bugKiller;
     private GameObject WarningSign;
-
-    protected bool eatingPlant = false;
-    protected float eatingTime = 1.0f;
 
     protected Coroutine movingCoroutine;
 
@@ -63,18 +64,19 @@ public class Bug : MonoBehaviour
         }
         //Debug.Log(childMaterials.Length);
 
-        speed = speed * (1f - grid.Modifiers.BugSpeedDecreasement);
         float mul = ModManager.Instance
         ? ModManager.Instance.GetMul(StatId.BugSpeedMul, -1)
         : 1f;
-        speed = speed * mul;
+        speed = BugRules.GetSpeed(speed, grid.Modifiers, mul);
+        Motion = new BugMotion(Move, speed, StopsToEat) { Position = transform.position };
 
         InitBug();
     }
 
     protected virtual void InitBug()
     {
-        InitRandomPos();
+        Motion.PlaceAtRandomEdge();
+        transform.position = Motion.Position;
         StartCoroutine(Warning());
     }
 
@@ -95,42 +97,48 @@ public class Bug : MonoBehaviour
     protected virtual IEnumerator Warning()
     {
         ShowWarningSign();
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(BugRules.WarningSeconds);
         DestroyWarningSign(2.0f);
         movingCoroutine = StartCoroutine(Moving());
     }
 
     protected virtual IEnumerator Moving()
     {
+        Motion.Begin();
         yield return null;
-    }
 
-    public virtual IEnumerator MoveToNepenthes(GameObject nepenthes)
-    {
-        StopCoroutine(movingCoroutine);
-        while(true)
+        while (Motion.Step(Time.deltaTime, grid.Breeder.GetIsBreeding() && !isDie && !isHit, Targets))
         {
-            if (!grid.Breeder.GetIsBreeding() || isDie || isHit)
-            {
-                yield return null;
-                continue;
-            }
-            if (nepenthes == null)
-                break;
-            MoveToward(nepenthes.transform.position, speed * 0.5f);
+            ApplyMotion();
             yield return null;
         }
-        //    浥   ٽ  ƾ 
-        movingCoroutine = StartCoroutine(Moving());
-        yield return null;
+        Destroy(gameObject);
     }
+
+    /// <summary>움직인 자리로 옮기고 진행 방향을 본다.</summary>
+    protected void ApplyMotion()
+    {
+        Vector2 delta = Motion.Position - (Vector2)transform.position;
+        if (delta == Vector2.zero) return;
+        Face(delta);
+        transform.position = new Vector3(Motion.Position.x, Motion.Position.y, transform.position.z);
+    }
+
+    private void Face(Vector2 direction)
+    {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle + rotationOffset);
+    }
+
+    /// <summary>네펜데스의 페로몬에 이끌린다.</summary>
+    public void LureTo(Nepenthes nepenthes) => Motion?.LureTo(nepenthes.gridIndex);
 
     private void ShowWarningSign()
     {
         WarningSign = Instantiate(s_warningPrefab);
         Vector3 pos = this.transform.position;
 
-        switch (spawnEdge)
+        switch (Motion.Edge)
         {
             case 0:
                 pos.y += -2f;
@@ -156,64 +164,6 @@ public class Bug : MonoBehaviour
     }
 
 
-    protected void InitRandomPos()
-    {
-        spawnEdge = GameRun.Rng.Bug.Range(0, 4);
-
-        float x = 0f;
-        float y = 0f;
-
-        switch (spawnEdge)
-        {
-            case 0:
-                x = GameRun.Rng.Bug.Range(-9f, 9f);
-                y = 6.0f;
-                break;
-            case 1:
-                x = 10.0f;
-                y = GameRun.Rng.Bug.Range(-5f, 5f);
-                break;
-            case 2:
-                x = GameRun.Rng.Bug.Range(-9f, 9f);
-                y = -6.0f;
-                break;
-            case 3:
-                x = -10.0f;
-                y = GameRun.Rng.Bug.Range(-5f, 5f);
-                break;
-        }
-
-        transform.position = new Vector3(x, y, 0f);
-
-        return;
-    }
-
-    protected void FindNewTargetObj()
-    {
-        Plant plant = null;
-        int newTarget = targetObjIdx + 1;
-        for(int i = 0; i < grid.Board.MaxCol * 4; i++)
-        {
-            if (newTarget >= grid.Board.MaxCol * 4)
-                newTarget = 0;
-            if (grid.Board.Plants.TryGetValue(newTarget, out plant))
-            {
-                if (plant.GetType() != typeof(Nepenthes))
-                {
-                    targetObjIdx = newTarget;
-                    break;
-                }
-            }
-            newTarget++;
-        }
-
-        if(plant == null) // 목표를 찾지 못함 (이미 식물이 없는 경우. 게임 오버)
-        {
-            Destroy(this.gameObject);
-        }
-    }
-    
-
     protected virtual void OnTriggerEnter(Collider obj)
     {
         Plant plant = obj.gameObject.GetComponent<Plant>();
@@ -221,9 +171,7 @@ public class Bug : MonoBehaviour
         {
             if (plant.GetType() == typeof(Nepenthes))
             {
-                int baseGold = 100;
-                int additionalGold = grid != null ? grid.Modifiers.AdditionalNepenthesGold : 0;
-                economyManager.AddGold(baseGold + additionalGold);
+                economyManager.AddGold(BugRules.GetNepenthesGold(grid.Modifiers));
                 StartCoroutine(KillBug());
                 return;
             }
@@ -232,29 +180,16 @@ public class Bug : MonoBehaviour
             {
                 GameEvents.RaisePeaDiedByBug();
             }
-            eatingPlant = true;
+            Motion.Eat();
         }
     }
 
-    protected void MoveToward(Vector2 targetPos, float s = 0f)
+    protected void MoveToward(Vector2 targetPos, float s)
     {
-        Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
-        float distanceToTarget2D = Vector2.Distance(currentPos, targetPos);
-
-        Vector2 directionToTarget = (targetPos - currentPos).normalized;
-
-        if (directionToTarget != Vector2.zero)
-        {
-            float angleInRadians = Mathf.Atan2(directionToTarget.y, directionToTarget.x);
-            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-
-            transform.rotation = Quaternion.Euler(0f, 0f, angleInDegrees + rotationOffset);
-        }
-
-        Vector2 newPosition2D = Vector2.MoveTowards(currentPos, targetPos, ((s == 0) ? speed : s) * Time.deltaTime);
-        transform.position = new Vector3(newPosition2D.x, newPosition2D.y, transform.position.z);
-
-        return;
+        Vector2 current = transform.position;
+        if (targetPos != current) Face(targetPos - current);
+        Vector2 next = Vector2.MoveTowards(current, targetPos, s * Time.deltaTime);
+        transform.position = new Vector3(next.x, next.y, transform.position.z);
     }
 
     protected virtual IEnumerator HitBug()
@@ -272,12 +207,12 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
-            grid.Upgrades.AddAdditionalPestResistance(0.002f);
+            grid.Upgrades.AddAdditionalPestResistance(BugRules.PestResistancePerKill);
             isDie = true;
             GameEvents.RaiseBugKilled();
             if (GameManager.Instance?.Tutorial == null)
                 CodexProgress.AddBugKill(GetType().Name);
-            economyManager.AddGold(Mathf.Max(0, gold + grid.Modifiers.AdditionalBugGold - DawnSystem.Current.bugPriceReduction)); // 새벽: 벌레 기본 가격 감소
+            economyManager.AddGold(BugRules.GetKillGold(gold, grid.Modifiers));
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }

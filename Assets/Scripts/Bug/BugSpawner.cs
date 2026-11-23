@@ -9,9 +9,7 @@ public class BugSpawner
     private readonly List<GameObject> bugPrefabs;
     private readonly GameObject ladybugPrefab;
 
-    private float spawnTimeInterval = 15.0f;
-    private float lastSpawnTime = 0f;
-    private float effectiveInterval;
+    private readonly BugSpawnState state = new BugSpawnState();
 
     public BugSpawner(PlantBoard board, GridModifiers modifiers, List<GameObject> bugPrefabs, GameObject ladybugPrefab)
     {
@@ -23,29 +21,12 @@ public class BugSpawner
 
     /// <summary>하루를 시작하며 오늘의 소환 주기를 계산한다.</summary>
     public void BeginDay()
-    {
-        // 새벽: 벌레 등장 딜레이 감소(더 자주 등장). 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
-        float dawnAdjustedBase = Mathf.Max(0.5f, spawnTimeInterval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
-        effectiveInterval = dawnAdjustedBase * ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1);
-
-        if (GameManager.Instance.stage == BugSchedule.AppearStage)
-            lastSpawnTime = 0f;
-    }
+        => state.BeginDay(GameManager.Instance.stage, ModManager.Instance.GetMul(StatId.BugSpawnIntervalMul, -1));
 
     public void Tick(float deltaTime)
     {
-        lastSpawnTime += deltaTime;
-
-        if (lastSpawnTime > effectiveInterval * (1f + modifiers.BugSpawnIntervalIncreasement))
-        {
-            List<int> targetIdx = new List<int>(board.Plants.Keys);
-            if (targetIdx.Count > 0)
-            {
-                Spawn();
-                if (CurseState.BugFestival) Spawn(); // 저주: 벌레 대발생(한 번에 2마리)
-                lastSpawnTime = 0f;
-            }
-        }
+        for (int count = state.Tick(deltaTime, modifiers, board.Plants.Count > 0); count > 0; count--)
+            Spawn();
     }
 
     public void Spawn(bool ignoreStageGate = false)
@@ -57,33 +38,20 @@ public class BugSpawner
         int stage = GameManager.Instance.stage;
         if (!ignoreStageGate && stage < BugSchedule.AppearStage) // 벌레 등장 전엔 스폰 X
             return;
-        if (GameRun.Rng.Bug.Range(0, 100) < (modifiers.LadybugSpawnProbability * 100))
-        {
-            // 최대 무당벌레 수 제한 확인
-            if (modifiers.MaxLadybugCount > 0 && board.Ladybugs.Count >= modifiers.MaxLadybugCount)
-            {
-                // 최대 수에 도달했으므로 일반 벌레 스폰
-                int bugIndex = GameRun.Rng.Bug.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count));
-                Object.Instantiate(bugPrefabs[bugIndex]);
-                return;
-            }
-            Object.Instantiate(ladybugPrefab);
-            return;
-        }
-        int i = GameRun.Rng.Bug.Range(0, Mathf.Min(BugSchedule.GetVarietyCount(stage), bugPrefabs.Count)); //벌레 해금 시기와 일치하도록 설정
-        Object.Instantiate(bugPrefabs[i]);
-        return;
+
+        int kind = BugSpawnState.RollKind(modifiers, board.LadybugCount, stage, bugPrefabs.Count);
+        Object.Instantiate(kind == BugSpawnState.Ladybug ? ladybugPrefab : bugPrefabs[kind]);
     }
 
     public void Save(GridSave save)
     {
-        save.bugSpawnTimeInterval = spawnTimeInterval;
-        save.lastBugSpawnTimeInterval = lastSpawnTime;
+        save.bugSpawnTimeInterval = state.Interval;
+        save.lastBugSpawnTimeInterval = state.Elapsed;
     }
 
     public void Load(GridSave saveData)
     {
-        spawnTimeInterval = saveData.bugSpawnTimeInterval;
-        lastSpawnTime = saveData.lastBugSpawnTimeInterval;
+        state.Interval = saveData.bugSpawnTimeInterval;
+        state.Elapsed = saveData.lastBugSpawnTimeInterval;
     }
 }
