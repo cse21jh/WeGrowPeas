@@ -10,13 +10,13 @@ public class RadiationCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.RadiationDecayPercent = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.RadiationDecayPercent = Lv != null ? Lv.valueA : 0f;
         World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
-        CurseState.RadiationDecayPercent = 0f;
+        GameRun.Curse.RadiationDecayPercent = 0f;
         World.ShowEffect(Data.curseId, false);
     }
 }

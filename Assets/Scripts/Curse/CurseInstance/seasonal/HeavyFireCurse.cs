@@ -11,13 +11,13 @@ public class HeavyFireCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.HeavyFire = true;
-        CurseState.HeavyFireExtraDecayPercent = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.HeavyFire = true;
+        GameRun.Curse.HeavyFireExtraDecayPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        CurseState.HeavyFire = false;
-        CurseState.HeavyFireExtraDecayPercent = 0f;
+        GameRun.Curse.HeavyFire = false;
+        GameRun.Curse.HeavyFireExtraDecayPercent = 0f;
     }
 }

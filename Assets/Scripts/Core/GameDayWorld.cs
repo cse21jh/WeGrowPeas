@@ -17,7 +17,7 @@ public sealed class GameDayWorld : IDayWorld
     public TaxState Tax => TaxManager.Instance.State;
     public IFieldActions Actions { get; }
 
-    public bool CursesActive => DawnSystem.Current.curseLevel > 0; // 새벽 저주만. 무한 모드 자체의 상시 저주는 없다
+    public bool CursesActive => GameRun.Dawn.curseLevel > 0; // 새벽 저주만. 무한 모드 자체의 상시 저주는 없다
     public bool RequestsActive => true;
     public bool SpecialItemsActive => true;
     public int RemainingBreeds => game.grid.Breeder.LastRemainingBreeds;

@@ -138,7 +138,7 @@ public class CurseManager : Singleton<CurseManager>
 
         var sb = new System.Text.StringBuilder();
         sb.AppendLine("<b>── 저주 상태 (F9) ──</b>");
-        sb.AppendLine($"저주 레벨: {DawnSystem.Current.curseLevel}");
+        sb.AppendLine($"저주 레벨: {GameRun.Dawn.curseLevel}");
         sb.AppendLine(currentSeasonCurse != null
             ? $"지속형: <color=#FF6E6E>{currentSeasonCurse.Data.LocalizedTitle}</color>  ({RemainingCurseDay}일 남음)"
             : "지속형: 없음");
@@ -147,19 +147,19 @@ public class CurseManager : Singleton<CurseManager>
             : "단발형: 없음");
 
         sb.AppendLine("<b>[활성 수정자]</b>");
-        AppendMod(sb, CurseState.RadiationDecayPercent > 0, $"방사능 -{CurseState.RadiationDecayPercent}%p/일");
-        AppendMod(sb, CurseState.MutationAddPercent > 0, $"돌연변이 변종 +{CurseState.MutationAddPercent}%p");
-        AppendMod(sb, CurseState.PollenLostRatio > 0, $"꽃가루실종 {CurseState.PollenLostRatio * 100f:0}% 교배불가");
-        AppendMod(sb, CurseState.ShopMonopoly, $"독점시장 {CurseState.ShopPriceMinMul * 100f:0}~{CurseState.ShopPriceMaxMul * 100f:0}%");
-        AppendMod(sb, CurseState.InsomniaFreeTimeRatio < 1f, $"불면증 자유시간 {CurseState.InsomniaFreeTimeRatio * 100f:0}%");
-        AppendMod(sb, CurseState.SeedlessFailPercent > 0, $"씨없는수박 실패 {CurseState.SeedlessFailPercent}%");
-        AppendMod(sb, CurseState.BugFestival, $"벌레대발생 딜레이 -{CurseState.BugFestivalDelayReduce}s, 2마리");
-        AppendMod(sb, CurseState.HeavyFire, $"집중포화 저항 -{CurseState.HeavyFireExtraDecayPercent}%p");
-        AppendMod(sb, CurseState.ReversePercent > 0, $"반란 ±{CurseState.ReversePercent}%p");
-        AppendMod(sb, CurseState.WaveBlind, "기상이변 웨이브 확인불가");
-        AppendMod(sb, CurseState.DoubleWave, "이중 웨이브");
-        AppendMod(sb, CurseState.EmpBlockRatio > 0, $"통신장애 낮 {CurseState.EmpBlockRatio * 100f:0}%");
-        AppendMod(sb, CurseState.BreedMadnessPercent > 0, $"광란 랜덤교배 {CurseState.BreedMadnessPercent}%");
+        AppendMod(sb, GameRun.Curse.RadiationDecayPercent > 0, $"방사능 -{GameRun.Curse.RadiationDecayPercent}%p/일");
+        AppendMod(sb, GameRun.Curse.MutationAddPercent > 0, $"돌연변이 변종 +{GameRun.Curse.MutationAddPercent}%p");
+        AppendMod(sb, GameRun.Curse.PollenLostRatio > 0, $"꽃가루실종 {GameRun.Curse.PollenLostRatio * 100f:0}% 교배불가");
+        AppendMod(sb, GameRun.Curse.ShopMonopoly, $"독점시장 {GameRun.Curse.ShopPriceMinMul * 100f:0}~{GameRun.Curse.ShopPriceMaxMul * 100f:0}%");
+        AppendMod(sb, GameRun.Curse.InsomniaFreeTimeRatio < 1f, $"불면증 자유시간 {GameRun.Curse.InsomniaFreeTimeRatio * 100f:0}%");
+        AppendMod(sb, GameRun.Curse.SeedlessFailPercent > 0, $"씨없는수박 실패 {GameRun.Curse.SeedlessFailPercent}%");
+        AppendMod(sb, GameRun.Curse.BugFestival, $"벌레대발생 딜레이 -{GameRun.Curse.BugFestivalDelayReduce}s, 2마리");
+        AppendMod(sb, GameRun.Curse.HeavyFire, $"집중포화 저항 -{GameRun.Curse.HeavyFireExtraDecayPercent}%p");
+        AppendMod(sb, GameRun.Curse.ReversePercent > 0, $"반란 ±{GameRun.Curse.ReversePercent}%p");
+        AppendMod(sb, GameRun.Curse.WaveBlind, "기상이변 웨이브 확인불가");
+        AppendMod(sb, GameRun.Curse.DoubleWave, "이중 웨이브");
+        AppendMod(sb, GameRun.Curse.EmpBlockRatio > 0, $"통신장애 낮 {GameRun.Curse.EmpBlockRatio * 100f:0}%");
+        AppendMod(sb, GameRun.Curse.BreedMadnessPercent > 0, $"광란 랜덤교배 {GameRun.Curse.BreedMadnessPercent}%");
 
         var box = new Rect(5, 5, 470, 30 + 18 * (sb.ToString().Split('\n').Length));
         var prev = GUI.color;
@@ -221,7 +221,6 @@ public class CurseManager : Singleton<CurseManager>
 
     public void LoadCurseManager(CurseSave saveData)
     {
-        CurseState.ResetAll(); // 다른 판에서 켜진 저주 수치가 남지 않게. 걸린 저주는 낮이 시작될 때 다시 발동한다
         Board.Load(saveData);
         UpdateCurseUI();
         UpdateTempCurseUI();

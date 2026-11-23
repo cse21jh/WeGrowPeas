@@ -46,7 +46,7 @@ public sealed class CurseBoard
     public List<int> MushroomTiles { get; } = new List<int>();
 
     /// <summary>이번 판의 저주 레벨(1~3).</summary>
-    public static int Level => Math.Max(1, DawnSystem.Current.curseLevel);
+    public static int Level => Math.Max(1, GameRun.Dawn.curseLevel);
 
     // ───── 하루 ─────
 

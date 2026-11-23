@@ -10,15 +10,15 @@ public class BugFestivalCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.BugFestival = true;
-        CurseState.BugFestivalDelayReduce = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.BugFestival = true;
+        GameRun.Curse.BugFestivalDelayReduce = Lv != null ? Lv.valueA : 0f;
         World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
-        CurseState.BugFestival = false;
-        CurseState.BugFestivalDelayReduce = 0f;
+        GameRun.Curse.BugFestival = false;
+        GameRun.Curse.BugFestivalDelayReduce = 0f;
         World.ShowEffect(Data.curseId, false);
     }
 }

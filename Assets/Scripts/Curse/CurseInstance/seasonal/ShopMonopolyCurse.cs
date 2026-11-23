@@ -10,15 +10,15 @@ public class ShopMonopolyCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.ShopMonopoly = true;
-        CurseState.ShopPriceMinMul = (Lv != null ? Lv.valueA : 100f) / 100f;
-        CurseState.ShopPriceMaxMul = (Lv != null ? Lv.valueB : 100f) / 100f;
+        GameRun.Curse.ShopMonopoly = true;
+        GameRun.Curse.ShopPriceMinMul = (Lv != null ? Lv.valueA : 100f) / 100f;
+        GameRun.Curse.ShopPriceMaxMul = (Lv != null ? Lv.valueB : 100f) / 100f;
     }
 
     public override void Deactivate()
     {
-        CurseState.ShopMonopoly = false;
-        CurseState.ShopPriceMinMul = 1f;
-        CurseState.ShopPriceMaxMul = 1f;
+        GameRun.Curse.ShopMonopoly = false;
+        GameRun.Curse.ShopPriceMinMul = 1f;
+        GameRun.Curse.ShopPriceMaxMul = 1f;
     }
 }

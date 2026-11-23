@@ -10,11 +10,11 @@ public class MutationCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.MutationAddPercent = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.MutationAddPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        CurseState.MutationAddPercent = 0f;
+        GameRun.Curse.MutationAddPercent = 0f;
     }
 }

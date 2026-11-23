@@ -10,12 +10,12 @@ public class ReverseCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.ReversePercent = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.ReversePercent = Lv != null ? Lv.valueA : 0f;
         World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
-        CurseState.ReversePercent = 0f;
+        GameRun.Curse.ReversePercent = 0f;
     }
 }

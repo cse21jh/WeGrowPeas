@@ -94,9 +94,9 @@ public static class RecallRecorder
         }
 
         // ── 특수 아이템 ───────────────────────────────────────────────────
-        if (SpecialItemSystem.OwnedIds != null)
+        if (GameRun.Special.OwnedIds != null)
         {
-            snap.specialItemIds = new List<string>(SpecialItemSystem.OwnedIds).ToArray();
+            snap.specialItemIds = new List<string>(GameRun.Special.OwnedIds).ToArray();
         }
 
         // ── 그날 효과가 적용된 저주 ───────────────────────────────────────

@@ -16,7 +16,7 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
 
     // ───── 저주 ─────
 
-    private bool CursesActive => config.curses && DawnSystem.Current.curseLevel > 0;
+    private bool CursesActive => config.curses && GameRun.Dawn.curseLevel > 0;
 
     FieldState ICurseWorld.Field => field;
 
@@ -93,13 +93,13 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
     // 10일마다 받는 선물. 봇은 후보 중 아무거나 고른다(아이템별 효과를 견줄 수 있게).
     private void TakeSpecialItem()
     {
-        if (SpecialItemSystem.PendingGifts == 0) return;
+        if (GameRun.Special.PendingGifts == 0) return;
 
-        List<SpecialItemData> candidates = SpecialItemSystem.RollCandidates(config.species, 3, data => config.allUnlocked || !data.plantSpecific);
+        List<SpecialItemData> candidates = GameRun.Special.RollCandidates(config.species, 3, data => config.allUnlocked || !data.plantSpecific);
         if (candidates.Count == 0) return;
 
         SpecialItemData picked = candidates[botRng.Range(0, candidates.Count)];
-        SpecialItemSystem.Acquire(picked);
+        GameRun.Special.Acquire(picked);
         result.SpecialItems.Add(picked.id);
     }
 }

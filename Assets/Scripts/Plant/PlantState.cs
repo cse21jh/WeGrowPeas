@@ -145,14 +145,14 @@ public sealed class PlantState
     public bool TryRootByDawn()
     {
         if (!IsMovableKind || IsRooted) return false;
-        float chance = DawnSystem.Current.rootChancePercent;
+        float chance = GameRun.Dawn.rootChancePercent;
         if (chance <= 0f) return false;
         if (GameRun.Rng.Field.Range(0f, 100f) >= chance) return false;
 
         IsRooted = true;
 
         // 특수(뿌리 식물): 뿌리를 내리면 모든 저항력 40%p 증가
-        if (SpecialItemSystem.Has("root_plant"))
+        if (GameRun.Special.Has("root_plant"))
             for (int i = 0; i < Wave.NumberOfWave; i++)
                 ChangeResistance(i, 0.4f);
 
@@ -197,8 +197,8 @@ public sealed class PlantState
             resistance += Math.Max(0f, g.resistance) + g.additionalResistance;
 
             // 저주(반란): 우성 아님(0·1) +%p, 우성(2) -%p
-            if (CurseState.ReversePercent > 0f)
-                resistance += (g.genetics <= 1 ? 1f : -1f) * (CurseState.ReversePercent / 100f);
+            if (GameRun.Curse.ReversePercent > 0f)
+                resistance += (g.genetics <= 1 ? 1f : -1f) * (GameRun.Curse.ReversePercent / 100f);
 
             if (resistance < 0f) resistance = 0f;
             return resistance >= 1f ? 1f : resistance; // 총합 상한 1.0
@@ -218,7 +218,7 @@ public sealed class PlantState
             return true;
 
         // 특수(이중 시도): 실패하면 한 번 더 굴린다
-        if (SpecialItemSystem.Has("double_try"))
+        if (GameRun.Special.Has("double_try"))
         {
             roll = GameRun.Rng.Survival.Range(0, 100);
             if (roll < (int)(GetResistanceValue((int)wave) * 100))
@@ -241,7 +241,7 @@ public sealed class PlantState
             float value = Traits[i].resistance + amount;
 
             // 특수(프로모션): 10% 이하가 되면 90%로
-            if (value <= 0.1f && SpecialItemSystem.Has("promotion"))
+            if (value <= 0.1f && GameRun.Special.Has("promotion"))
                 value = 0.9f;
 
             if (value < 0.1f)
@@ -316,7 +316,7 @@ public sealed class PlantState
         if (!IsMovableKind)
         {
             // 특수(채식주의자): 고추와 네펜데스도 버틸 때마다 가치 증가
-            if ((Kind == PlantKind.ChiliPepper || Kind == PlantKind.Nepenthes) && SpecialItemSystem.Has("vegetarian"))
+            if ((Kind == PlantKind.ChiliPepper || Kind == PlantKind.Nepenthes) && GameRun.Special.Has("vegetarian"))
                 ResistWaveCount++;
             return;
         }
@@ -326,15 +326,15 @@ public sealed class PlantState
         ResistWaveCount++;
 
         // 특수(세계여행): 낮 동안 옮긴 거리(처음 칸과 마지막 칸의 맨해튼 거리) 한 칸마다 배수 +0.1
-        if (SpecialItemSystem.Has("world_travel") && DayStartGridIndex >= 0)
+        if (GameRun.Special.Has("world_travel") && DayStartGridIndex >= 0)
         {
             int dist = Math.Abs(GridIndex / 4 - DayStartGridIndex / 4) + Math.Abs(GridIndex % 4 - DayStartGridIndex % 4);
             if (dist > 0) TravelSellBonus += 0.1f * dist;
         }
 
         // 새벽과 저주(방사능): 웨이브를 지날 때마다 모든 저항력 감소. 황금 식물은 제외.
-        float dawnDailyDecay = DawnSystem.Current.dailyResistanceDecayAddPercent / 100f;
-        float curseDailyDecay = CurseState.RadiationDecayPercent / 100f;
+        float dawnDailyDecay = GameRun.Dawn.dailyResistanceDecayAddPercent / 100f;
+        float curseDailyDecay = GameRun.Curse.RadiationDecayPercent / 100f;
         float totalDailyDecay = dawnDailyDecay + curseDailyDecay;
         bool isGoldPlant = IsGold;
 
@@ -353,8 +353,8 @@ public sealed class PlantState
         }
 
         // 저주(집중포화): 이번 웨이브에 대한 저항력 추가 감소
-        if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant && !hasMatchingFertilizer)
-            ChangeResistance((int)waveType, -CurseState.HeavyFireExtraDecayPercent / 100f);
+        if (GameRun.Curse.HeavyFire && GameRun.Curse.HeavyFireExtraDecayPercent > 0f && !isGoldPlant && !hasMatchingFertilizer)
+            ChangeResistance((int)waveType, -GameRun.Curse.HeavyFireExtraDecayPercent / 100f);
     }
 
     /// <summary>
@@ -389,7 +389,7 @@ public sealed class PlantState
         target = lucky;
         previousPrice = lucky.GetSellingPrice();
         // 특수(마법부여자): 밤낮 전환 발동형 아이템 수치 2배
-        lucky.BonusGoldMultiplierCount += SpecialItemSystem.Has("enchanter") ? 2 : 1;
+        lucky.BonusGoldMultiplierCount += GameRun.Special.Has("enchanter") ? 2 : 1;
         return true;
     }
 
@@ -451,13 +451,13 @@ public sealed class PlantState
                 if (Field == null) return basePrice;
 
                 // 특수(군체): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50
-                if (SpecialItemSystem.Has("colony"))
+                if (GameRun.Special.Has("colony"))
                     basePrice += 50 * Field.Soil.CountDistinctNeighborSpecies(GridIndex);
 
                 int price = CalculateSellingPrice(basePrice, Field.Modifiers.GetAdditionalPlantGoldMultiplier());
 
                 // 특수(보양식): 보유 형질의 저항력 평균만큼 가격 추가 증가 (곱적용)
-                if (SpecialItemSystem.Has("health_food") && Traits.Count > 0)
+                if (GameRun.Special.Has("health_food") && Traits.Count > 0)
                 {
                     float sum = 0f;
                     foreach (var t in Traits) sum += GetResistanceValue((int)t.traitType);
@@ -473,11 +473,11 @@ public sealed class PlantState
             }
             case PlantKind.ChiliPepper:
                 // 특수(채식주의자): 다른 식물과 같은 가격 상승 공식 적용
-                if (SpecialItemSystem.Has("vegetarian") && Field != null)
+                if (GameRun.Special.Has("vegetarian") && Field != null)
                     return CalculateSellingPrice(VegetarianBasePrice, Field.Modifiers.GetAdditionalPlantGoldMultiplier());
                 return 500;
             case PlantKind.Nepenthes:
-                if (SpecialItemSystem.Has("vegetarian") && Field != null)
+                if (GameRun.Special.Has("vegetarian") && Field != null)
                     return CalculateSellingPrice(VegetarianBasePrice, Field.Modifiers.GetAdditionalPlantGoldMultiplier());
                 return 0;
             default:
@@ -500,7 +500,7 @@ public sealed class PlantState
         multiplier += Field.Soil.GetColumnGoldMulBonus(GridIndex); // 특수(땅부자)
 
         // 특수(알록달록): 땅에 적용 중인 효과 1개당 배수 +0.1
-        if (SpecialItemSystem.Has("colorful"))
+        if (GameRun.Special.Has("colorful"))
             multiplier += 0.1f * Field.Soil.CountTileEffects(GridIndex);
 
         // 완두커피: 자유시간이 지난 횟수만큼 배수 추가

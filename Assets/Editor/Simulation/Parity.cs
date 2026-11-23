@@ -82,7 +82,7 @@ public sealed class ParityScript
         Claim(a);
         if (a.Tax.IsDue(a.Stage) && a.Gold >= a.Tax.DueAmount && Chance(70)) a.PayTax();
 
-        if (SpecialItemSystem.PendingGifts > 0) AcquireSpecial(a);
+        if (GameRun.Special.PendingGifts > 0) AcquireSpecial(a);
 
         for (int i = rng.Range(1, 6); i > 0; i--) BuyRandom(a);
         if (Chance(20) && a.Gold >= ShopController.RerollPrice)
@@ -96,11 +96,11 @@ public sealed class ParityScript
 
     private void AcquireSpecial(IParityActor a)
     {
-        List<SpecialItemData> items = SpecialItemSystem.RollCandidates(a.Species, 3, _ => true);
+        List<SpecialItemData> items = GameRun.Special.RollCandidates(a.Species, 3, _ => true);
         if (items.Count == 0) return;
         SpecialItemData pick = items[rng.Range(0, items.Count)];
         Note("특수 " + pick.id);
-        SpecialItemSystem.Acquire(pick);
+        GameRun.Special.Acquire(pick);
     }
 
     private List<GeneticTrait> SupplyTraits()
@@ -227,9 +227,9 @@ public sealed class ParityScript
         sb.Append($"  의뢰 완료 {a.Requests.CompletedCount} 진행");
         foreach (RequestInstance r in a.Requests.Active) sb.Append($" {r.Data.requestId}:{r.State}:{r.GetProgressText()}");
         sb.AppendLine();
-        var special = new List<string>(SpecialItemSystem.OwnedIds);
+        var special = new List<string>(GameRun.Special.OwnedIds);
         special.Sort(StringComparer.Ordinal);
-        sb.AppendLine($"  특수 {string.Join(",", special)} 선물 {SpecialItemSystem.PendingGifts}");
+        sb.AppendLine($"  특수 {string.Join(",", special)} 선물 {GameRun.Special.PendingGifts}");
 
         var rngSave = new RngSave();
         GameRun.Rng.Save(rngSave);

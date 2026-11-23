@@ -207,7 +207,7 @@ public sealed class SoilState
     /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
     public void HealNeighborsBySell(int idx)
     {
-        if (!SpecialItemSystem.Has("circulation")) return;
+        if (!GameRun.Special.Has("circulation")) return;
 
         int row = idx % 4;
         int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };

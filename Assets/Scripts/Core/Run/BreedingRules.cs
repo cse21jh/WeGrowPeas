@@ -30,7 +30,7 @@ public static class BreedingRules
 
     /// <summary>특수(왕의 귀환): 기본 교배 횟수 -2, 누적 획득 골드 5000당 +1.</summary>
     private static int GetKingReturnDelta(int totalGold)
-        => SpecialItemSystem.Has("king_return") ? -2 + totalGold / 5000 : 0;
+        => GameRun.Special.Has("king_return") ? -2 + totalGold / 5000 : 0;
 
     public static BreedCheck Check(FieldState field, PlantState a, PlantState b, int usedAttempts, int maxAttempts)
     {
@@ -48,11 +48,11 @@ public static class BreedingRules
         b.HasTriedBreed = true;
 
         // 저주(씨 없는 수박): 확률적으로 실패
-        if (CurseState.SeedlessFailPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < CurseState.SeedlessFailPercent)
+        if (GameRun.Curse.SeedlessFailPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < GameRun.Curse.SeedlessFailPercent)
             return new BreedOutcome { Failed = true, ConsumesAttempt = true };
 
         // 저주(광란): 확률적으로 랜덤 교배
-        bool madness = CurseState.BreedMadnessPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < CurseState.BreedMadnessPercent;
+        bool madness = GameRun.Curse.BreedMadnessPercent > 0f && GameRun.Rng.Breed.Range(0f, 100f) < GameRun.Curse.BreedMadnessPercent;
 
         List<GeneticTrait> child = CreateChild(a.Traits, b.Traits, field.Modifiers, species, season, madness, out MutationKind mutation);
         spawn(child, mutation, false);
@@ -68,7 +68,7 @@ public static class BreedingRules
         }
 
         // 특수(밑장빼기): 25% 확률로 교배 횟수를 쓰지 않는다
-        bool free = SpecialItemSystem.Has("bottom_deal") && GameRun.Rng.Breed.Range(0f, 100f) < 25f;
+        bool free = GameRun.Special.Has("bottom_deal") && GameRun.Rng.Breed.Range(0f, 100f) < 25f;
         return new BreedOutcome { HasTwin = twin, ConsumesAttempt = !free };
     }
 
@@ -92,7 +92,7 @@ public static class BreedingRules
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
 #endif
-            if (SpecialItemSystem.Has("extreme_mutation")) mutation = MutationKind.Malignant; // 특수(극단적 변이): 교배 시 악성만
+            if (GameRun.Special.Has("extreme_mutation")) mutation = MutationKind.Malignant; // 특수(극단적 변이): 교배 시 악성만
             else if (GameRun.Rng.Breed.Value < malignantRatio) mutation = MutationKind.Malignant;
             else mutation = MutationKind.Benign;
         }
@@ -109,7 +109,7 @@ public static class BreedingRules
                 genetics = GameRun.Rng.Breed.Range(0, 3);
 
             // 특수(적응형 유전자): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로
-            if (mutation == MutationKind.Benign && SpecialItemSystem.Has("adaptive_genetics"))
+            if (mutation == MutationKind.Benign && GameRun.Special.Has("adaptive_genetics"))
                 genetics = GetSeasonFavoredGenetics(trait, season);
 
             float resistance = RollResistance(species, modifiers, trait, genetics, has1 ? t1.resistance : 0f, has2 ? t2.resistance : 0f);
@@ -197,7 +197,7 @@ public static class BreedingRules
         resistance += genetics == 2 ? modifiers.StrongGeneticsResistanceBonus : modifiers.WeakGeneticsResistanceBonus;
 
         // 특수(이중 시도): 최초 저항력 35% 감소 (대신 생존 시도 2회)
-        if (SpecialItemSystem.Has("double_try"))
+        if (GameRun.Special.Has("double_try"))
             resistance *= 0.65f;
 
         return Math.Min(resistance, 1f);
@@ -220,7 +220,7 @@ public static class BreedingRules
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (MutationDebug.HasChanceOverride) return MutationDebug.ChanceOverride; // 디버그 패널(F11)
 #endif
-        return 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
+        return 1f + GameRun.Dawn.mutationChanceAddPercent + GameRun.Curse.MutationAddPercent
             + (modifiers != null ? modifiers.SuperMutationChanceBonus : 0f);
     }
 

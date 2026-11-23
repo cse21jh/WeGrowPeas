@@ -52,7 +52,7 @@ public static class BugRules
     }
 
     public static int GetKillGold(int baseGold, GridModifiers modifiers)
-        => Math.Max(0, baseGold + modifiers.AdditionalBugGold - DawnSystem.Current.bugPriceReduction); // 새벽: 벌레 기본 가격 감소
+        => Math.Max(0, baseGold + modifiers.AdditionalBugGold - GameRun.Dawn.bugPriceReduction); // 새벽: 벌레 기본 가격 감소
 
     public static int GetNepenthesGold(GridModifiers modifiers) => NepenthesBaseGold + modifiers.AdditionalNepenthesGold;
 
@@ -76,7 +76,7 @@ public sealed class BugSpawnState
     public void BeginDay(int stage, float intervalMultiplier)
     {
         // 새벽: 벌레 등장 딜레이 감소. 저주(벌레 대발생)도 추가 감소. 최소 0.5초 보장.
-        float interval = Math.Max(0.5f, Interval - DawnSystem.Current.bugDelayReduction - CurseState.BugFestivalDelayReduce);
+        float interval = Math.Max(0.5f, Interval - GameRun.Dawn.bugDelayReduction - GameRun.Curse.BugFestivalDelayReduce);
         todayInterval = interval * intervalMultiplier;
         if (stage == BugSchedule.AppearStage) Elapsed = 0f;
     }
@@ -87,7 +87,7 @@ public sealed class BugSpawnState
         Elapsed += deltaTime;
         if (Elapsed <= todayInterval * (1f + modifiers.BugSpawnIntervalIncreasement) || !hasPlants) return 0;
         Elapsed = 0f;
-        return CurseState.BugFestival ? 2 : 1; // 저주: 벌레 대발생
+        return GameRun.Curse.BugFestival ? 2 : 1; // 저주: 벌레 대발생
     }
 
     /// <summary>소환할 종류의 번호. 무당벌레면 <see cref="Ladybug"/>.</summary>

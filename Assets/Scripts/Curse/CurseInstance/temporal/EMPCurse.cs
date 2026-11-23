@@ -8,13 +8,13 @@ public class EMPCurse : CurseInstance
 
     public override void Activate()
     {
-        CurseState.EmpBlockRatio = (Lv != null ? Lv.valueA : 0f) / 100f;
+        GameRun.Curse.EmpBlockRatio = (Lv != null ? Lv.valueA : 0f) / 100f;
         World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
-        CurseState.EmpBlockRatio = 0f;
+        GameRun.Curse.EmpBlockRatio = 0f;
         World.ShowEffect(Data.curseId, false);
     }
 }

@@ -69,7 +69,7 @@ public sealed partial class RunSimulator
     {
         if (wave == WaveType.None || plant.IsFrozen || field.Soil.HasPetBottle(plant.GridIndex)) return 1f;
         float r = plant.GetResistanceValue((int)wave);
-        return SpecialItemSystem.Has("double_try") ? 1f - (1f - r) * (1f - r) : r;
+        return GameRun.Special.Has("double_try") ? 1f - (1f - r) * (1f - r) : r;
     }
 
     private float FutureSurvival(PlantState plant)
@@ -88,7 +88,7 @@ public sealed partial class RunSimulator
         float growth = (multiplier + field.Modifiers.PeaCoffeeMultiplier) / (1f + multiplier * count
             + field.Modifiers.PeaCoffeeMultiplier * plant.FreeTimePassedCount);
 
-        bool blind = CurseState.WaveBlind;
+        bool blind = GameRun.Curse.WaveBlind;
         float future = FutureSurvival(plant), alive = 1f, best = 0f;
         int days = Math.Min(HoldDays, config.days - stage + 1);
         for (int day = 1; day <= days; day++)

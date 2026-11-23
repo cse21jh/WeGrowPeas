@@ -77,7 +77,7 @@ public sealed class DayFlow
         yield return DayStep.Evening;
 
         if (world.CursesActive) world.Curses.Select(Stage); // 내일 걸릴 저주
-        if (world.SpecialItemsActive && IsGiftNight) SpecialItemSystem.AddGift();
+        if (world.SpecialItemsActive && IsGiftNight) GameRun.Special.AddGift();
         yield return DayStep.Night;
 
         PassQuestDay();

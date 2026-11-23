@@ -255,14 +255,14 @@ public abstract class ItemData : ScriptableObject
         if (CurrentPrice == int.MaxValue) return int.MaxValue;
 
         // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
-        float mul = DawnSystem.Current.shopPriceMultiplier;
+        float mul = GameRun.Dawn.shopPriceMultiplier;
         float price = CurrentPrice * (mul > 0f ? mul : 1f);
 
         // 저주(독점시장): 품목별 가격이 무작위 배율(하루 동안 고정)로 변동
-        if (CurseState.ShopMonopoly)
+        if (GameRun.Curse.ShopMonopoly)
         {
             float h = StableHash01(name + "#" + GameRun.Current.Stage);
-            price *= Mathf.Lerp(CurseState.ShopPriceMinMul, CurseState.ShopPriceMaxMul, h);
+            price *= Mathf.Lerp(GameRun.Curse.ShopPriceMinMul, GameRun.Curse.ShopPriceMaxMul, h);
         }
         return Mathf.RoundToInt(price);
     }

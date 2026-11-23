@@ -33,7 +33,7 @@ public sealed class WaveState
 
     public void PrepareSecond(int? stage)
     {
-        if (CurseState.DoubleWave && Second == null && Next.HasValue) Second = Deck.PickSecond(Next.Value, stage);
+        if (GameRun.Curse.DoubleWave && Second == null && Next.HasValue) Second = Deck.PickSecond(Next.Value, stage);
     }
 
     /// <summary>타임 머신: 오늘 웨이브를 건너뛴다.</summary>

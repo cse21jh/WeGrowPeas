@@ -306,7 +306,7 @@ public class EnemyController : MonoBehaviour
         return;
     }
 
-    public string NextWaveDescription => CurseState.WaveBlind ? "???" : CurrentWave.WaveDescription;
+    public string NextWaveDescription => GameRun.Curse.WaveBlind ? "???" : CurrentWave.WaveDescription;
 
     public void ShowNextWaveText()
     {

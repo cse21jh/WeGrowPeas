@@ -127,13 +127,11 @@ public sealed partial class RunSimulator : IFieldActions, IDayWorld
         TaxSchedule.Reload();
         DawnSystem.Reload();
 
-        int savedDawn = DawnSystem.SelectedDawnStage;
         LoadItems();
         var results = new List<SimRunResult>(config.runs);
         try
         {
             MutationDebug.Reset();
-            DawnSystem.SetSelectedStage(config.dawnStage);
 
             for (int i = 0; i < config.runs; i++)
             {
@@ -143,10 +141,7 @@ public sealed partial class RunSimulator : IFieldActions, IDayWorld
         }
         finally
         {
-            DawnSystem.SetSelectedStage(savedDawn);
             ResetItems();
-            CurseState.ResetAll();
-            SpecialItemSystem.ResetRun();
             GameRun.StartNew();
         }
         return results;
@@ -154,10 +149,8 @@ public sealed partial class RunSimulator : IFieldActions, IDayWorld
 
     private static SimRunResult RunOne(SimConfig config, int seed, ParityScript script)
     {
-        GameRun.StartNew(seed);
+        GameRun.StartNew(seed, config.dawnStage);
         ResetItems();
-        CurseState.ResetAll();
-        SpecialItemSystem.ResetRun();
         var sim = new RunSimulator(config, seed) { script = script };
         sim.Play();
         return sim.result;
@@ -341,7 +334,7 @@ public sealed partial class RunSimulator : IFieldActions, IDayWorld
         for (int t = 0; t < weights.Length; t++)
             if (t == (int)WaveType.Aging || WaveSchedule.IsShopWaveUnlocked((WaveType)t, stage, true))
                 weights[t] = Bot.weightFuture;
-        if (CurseState.WaveBlind) return weights; // 저주(기상이변): 웨이브를 볼 수 없다
+        if (GameRun.Curse.WaveBlind) return weights; // 저주(기상이변): 웨이브를 볼 수 없다
         if (nextWave != WaveType.None) weights[(int)nextWave] += Bot.weightNext;
         if (currentWave != WaveType.None) weights[(int)currentWave] += Bot.weightToday;
         return weights;

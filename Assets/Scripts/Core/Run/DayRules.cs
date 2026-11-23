@@ -44,7 +44,7 @@ public static class DayRules
                 if (plant.CanResist(wave))
                 {
                     // 특수(도박꾼): 저항력 40% 이하인 웨이브를 스스로 버티면 가격의 20%
-                    if (SpecialItemSystem.Has("gambler") && !plant.IsFrozen && plant.GetResistanceValue((int)wave) <= 0.4f)
+                    if (GameRun.Special.Has("gambler") && !plant.IsFrozen && plant.GetResistanceValue((int)wave) <= 0.4f)
                         actions.AddGold((int)Math.Round(plant.GetSellingPrice() * 0.2f));
 
                     actions.Survive(plant, wave);
@@ -59,7 +59,7 @@ public static class DayRules
             }
 
             // 저주(이중 웨이브): 저항력 감소가 두 번 일어나지 않게 죽이는 판정만 한다
-            if (CurseState.DoubleWave)
+            if (GameRun.Curse.DoubleWave)
             {
                 WaveType? second = pickSecondWave();
                 if (second.HasValue && second.Value != WaveType.None)
@@ -151,7 +151,7 @@ public static class DayRules
         var traits = new List<GeneticTrait>(peanut.Traits);
 
         // 특수(극단적 변이): 자가번식 때 양성 변종만 나온다
-        bool benign = SpecialItemSystem.Has("extreme_mutation")
+        bool benign = GameRun.Special.Has("extreme_mutation")
             && GameRun.Rng.Field.Range(0f, 100f) < BreedingRules.GetMutationChancePercent(field.Modifiers);
         if (benign) BreedingRules.ApplyBenignResistance(traits);
 

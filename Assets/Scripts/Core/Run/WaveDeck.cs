@@ -51,7 +51,7 @@ public sealed class WaveDeck
     public WaveType PickNext(WaveType? current, int? stage)
     {
         // 저주(집중포화): 같은 웨이브 고정
-        if (CurseState.HeavyFire && current.HasValue && current.Value != WaveType.None)
+        if (GameRun.Curse.HeavyFire && current.HasValue && current.Value != WaveType.None)
             return current.Value;
 
         Dictionary<WaveType, float> map = GetEffectiveWeights(stage);
@@ -71,7 +71,7 @@ public sealed class WaveDeck
     }
 
     /// <summary>다음 웨이브를 정할 때 함께 정해 두는 두 번째 웨이브. 이중 웨이브가 아니면 null.</summary>
-    public WaveType? PickNextSecond(WaveType next, int? stage) => CurseState.DoubleWave ? PickSecond(next, stage) : null;
+    public WaveType? PickNextSecond(WaveType next, int? stage) => GameRun.Curse.DoubleWave ? PickSecond(next, stage) : null;
 
     /// <summary>
     /// 저주(이중 웨이브): exclude와 다르고 이미 정식 등장 중인 웨이브 하나. 없으면 null.

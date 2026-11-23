@@ -274,7 +274,7 @@ public class CurseSave
     public int remainTempCurseDay;
 }
 
-/// <summary>특수 아이템 보유/선물 (SpecialItemSystem).</summary>
+/// <summary>특수 아이템 보유/선물 (SpecialItemState).</summary>
 [Serializable]
 public class SpecialItemSave
 {

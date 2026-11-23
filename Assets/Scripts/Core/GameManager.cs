@@ -45,8 +45,13 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private TutorialChapter tutorialChapter;
     public TutorialChapter Tutorial => tutorialChapter;
 
-    // 이전 판의 일차가 다른 스크립트의 Start에 보이지 않게
-    private void Awake() => stage = 0;
+    // 다른 스크립트의 Start에 이전 판의 값이 보이지 않게, 씬이 열리자마자 새 판을 만든다.
+    // 이어하기면 LoadGame이 저장된 상태로 되돌린다.
+    private void Awake()
+    {
+        GameRun.StartNew();
+        Debug.Log($"[GameRun] 시드 {GameRun.Rng.Seed}");
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -57,10 +62,6 @@ public class GameManager : Singleton<GameManager>
         Time.timeScale = 1;
 
         ClickRouter.Instance.IsBlockedByUI = false;
-
-        // 이번 판의 난수를 새로 만든다. 이어하기면 LoadGame이 저장된 상태로 되돌린다.
-        GameRun.StartNew();
-        Debug.Log($"[GameRun] 시드 {GameRun.Rng.Seed}");
 
         grid.Initialize();
         if (Tutorial != null)
@@ -76,9 +77,6 @@ public class GameManager : Singleton<GameManager>
         {
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
-                // 시작 식물과 첫 웨이브가 이전 판의 값에 영향받지 않게 먼저 비운다
-                CurseState.ResetAll(); // 저주 상태 초기화
-                SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 if (AbilityManager.Instance != null)
                 {
                     AbilityManager.Instance.ResetRunStorage(); // 이전 판에서 남은 유전자·치장 토큰 저장고를 비운다
@@ -205,7 +203,7 @@ public class GameManager : Singleton<GameManager>
         {
             case DayStep.DayStarted:
                 UpdateStageUI();
-                if (DawnSystem.Current.curseLevel > 0) curseManager.OnCurseApplied();
+                if (GameRun.Dawn.curseLevel > 0) curseManager.OnCurseApplied();
                 return null;
 
             case DayStep.TaxOverdue: // 낮 시작 직후(웨이브 전) 강제징수/압류
@@ -490,7 +488,8 @@ public class GameManager : Singleton<GameManager>
         seenFirstGold = saveData.progress.seenFirstGold;
         currentPlant = saveData.progress.currentPlant;
         if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.progress.lastPaidTaxStage);
-        DawnSystem.SetSelectedStage(saveData.progress.selectedDawnStage); // 새벽 제약이 이어하기에도 적용되도록
+        DawnSystem.SetSelectedStage(saveData.progress.selectedDawnStage);
+        GameRun.Current.DawnStage = saveData.progress.selectedDawnStage; // 새벽 제약이 이어하기에도 적용되도록
 
         // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadXxx가 안다.
         // 순서를 바꾸면 로드 중 초기화 순서가 달라지므로 주의.
@@ -502,7 +501,7 @@ public class GameManager : Singleton<GameManager>
         requestManager.LoadRequestManager(saveData.request);
         phoneManager.LoadPhoneManager(saveData.phone);
         curseManager.LoadCurseManager(saveData.curse);
-        SpecialItemSystem.LoadFromSave(saveData.specialItem);
+        GameRun.Special.LoadFromSave(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
@@ -529,7 +528,7 @@ public class GameManager : Singleton<GameManager>
         saveData.progress.seenFirstGold = seenFirstGold;
         saveData.progress.currentPlant = currentPlant;
         saveData.progress.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
-        saveData.progress.selectedDawnStage = DawnSystem.SelectedDawnStage;
+        saveData.progress.selectedDawnStage = GameRun.Current.DawnStage;
         // 불러올 때 무조건 이어하기 상태로 시작하도록 정규화해서 저장
         saveData.progress.gst = stage > endStage ? GameStartType.ContinueAfterEnding : GameStartType.ContinueGame;
 
@@ -542,7 +541,7 @@ public class GameManager : Singleton<GameManager>
         requestManager.SaveRequestManager(saveData.request);
         phoneManager.SavePhoneManager(saveData.phone);
         curseManager.SaveCurseManager(saveData.curse);
-        SpecialItemSystem.SaveTo(saveData.specialItem);
+        GameRun.Special.SaveTo(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.SaveCurrentAbilityManager(saveData.ability);

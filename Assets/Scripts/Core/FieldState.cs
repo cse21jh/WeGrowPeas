@@ -68,7 +68,7 @@ public sealed class FieldState
         if (!AddPlant(plant, preferredIdx, view)) return false;
 
         // 특수(신상품): 새 식물이 생겨날 때 가격의 50% 골드
-        if (SpecialItemSystem.Has("new_product"))
+        if (GameRun.Special.Has("new_product"))
         {
             int gold = (int)System.Math.Round(plant.GetSellingPrice() * 0.5f);
             if (gold > 0) addGold(gold);
