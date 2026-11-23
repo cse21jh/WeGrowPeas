@@ -5,6 +5,8 @@ public class Sprinkler : Plant
 {
     private Animator anim;
     public ParticleSystem waterParticle;
+    public override PlantKind Kind => PlantKind.Sprinkler;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Sprinkler;
@@ -87,18 +89,5 @@ public class Sprinkler : Plant
                 neighbors.Add(plant);
             }
         }
-    }
-
-    public override float GetResistanceValue(int order)
-    {
-        // 무적
-        return 1f;
-    }
-
-    public override int GetSellingPrice()
-    {
-        // 판매 불가 (MoneyTree와 동일하게 처리)
-        // 1000골드짜리지만 판매 시 0골드 (전략적 배치 필요)
-        return 0;
     }
 }

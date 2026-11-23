@@ -43,7 +43,7 @@ public class GridCurseActions
             int idx = candidates[i];
             if (board.Plants.TryGetValue(idx, out Plant p) && p != null)
             {
-                board.Plants.Remove(idx);
+                board.Remove(idx);
                 Object.Destroy(p.gameObject); // TODO: 식물 날아가는 이펙트
                 removed++;
             }
@@ -75,7 +75,7 @@ public class GridCurseActions
         // Remove from grid temporarily to free up space
         foreach (var idx in selectedPlantsIdx)
         {
-            board.Plants.Remove(idx);
+            board.Remove(idx);
         }
 
         // Find all empty spaces including the ones we just vacated
@@ -95,7 +95,7 @@ public class GridCurseActions
         {
             int newIdx = emptySpaces[i];
             Plant p = plantsToMove[i];
-            board.Plants[newIdx] = p;
+            board.Place(newIdx, p);
             p.SetGridIndex(newIdx);
             p.transform.position = grid.GetSoilTransform(newIdx).position;
         }

@@ -11,6 +11,8 @@ public class Peanut : MovablePlant
     [SerializeField] private Sprite[] selectedSprite;
 
     private float peanutCopyProbability = 0.25f;
+    public override PlantKind Kind => PlantKind.Peanut;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Peanut;
@@ -156,20 +158,5 @@ public class Peanut : MovablePlant
 
         grid.Breeder.totalPeanutBreedCount++;
         return;
-    }
-    private static readonly int[] BasePrices = { 60, 100, 130, 150, 170, 200, 240 };
-
-    public override int GetSellingPrice()
-    {
-        //if (isFrozen) return frozenPrice;
-
-        int basePrice = (taste >= 0 && taste < BasePrices.Length) ? BasePrices[taste] : 0;
-
-        if (grid == null)
-        {
-            return basePrice;
-        }
-
-        return CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier()); 
     }
 }

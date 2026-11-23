@@ -11,15 +11,20 @@ public class SoilEffects
     private readonly GameObject goldSoilMarkerPrefab;
 
     private readonly Dictionary<int, GameObject> petMarkers = new Dictionary<int, GameObject>();
-    private readonly List<int> goldSoilTiles = new List<int>(); // 황금 비료가 뿌려진 타일들
     private readonly Dictionary<int, GameObject> goldSoilMarkers = new Dictionary<int, GameObject>();
-    private readonly List<int> petBottleTiles = new List<int>();
-    private readonly Dictionary<int, int> petBottleBlockCount = new Dictionary<int, int>(); // 페트병 위치별 남은 보호 횟수. -1은 전체 보너스
-    private readonly Dictionary<int, WaveType> fertilizerColumns = new();
-    private readonly HashSet<int> absorbFertilizerTiles = new HashSet<int>(); // 저항력 흡수 비료가 뿌려진 타일들
-    private readonly Dictionary<int, float> columnGoldMulBonus = new Dictionary<int, float>(); // 땅부자: col → +mul
-    private bool hasCoolingShield = false;
-    private bool isCoolingShieldActivated = false;
+
+    /// <summary>어느 칸에 무엇이 있는지. 규칙 계산은 이쪽을 보고, 이 클래스는 마커와 연출을 더한다.</summary>
+    public SoilState State { get; }
+
+    // 아래는 State의 값을 예전 이름으로 가리킨다.
+    private List<int> goldSoilTiles => State.GoldSoilTiles;
+    private List<int> petBottleTiles => State.PetBottleTiles;
+    private Dictionary<int, int> petBottleBlockCount => State.PetBottleBlockCount;
+    private Dictionary<int, WaveType> fertilizerColumns => State.FertilizerColumns;
+    private HashSet<int> absorbFertilizerTiles => State.AbsorbFertilizerTiles;
+    private Dictionary<int, float> columnGoldMulBonus => State.ColumnGoldMulBonus;
+    private bool hasCoolingShield { get => State.HasCoolingShield; set => State.HasCoolingShield = value; }
+    private bool isCoolingShieldActivated { get => State.IsCoolingShieldActivated; set => State.IsCoolingShieldActivated = value; }
 
     public List<int> GoldSoilTiles => goldSoilTiles;
     public List<int> PetBottleTiles => petBottleTiles;
@@ -30,6 +35,7 @@ public class SoilEffects
     {
         this.grid = grid;
         board = grid.Board;
+        State = new SoilState(grid.Board, grid.Modifiers);
         this.petBottleMarkerPrefab = petBottleMarkerPrefab;
         this.goldSoilMarkerPrefab = goldSoilMarkerPrefab;
     }
@@ -63,13 +69,12 @@ public class SoilEffects
         petBottleBlockCount[-1] = value;
     }
 
-    public bool HasPetBottle(int idx) => petBottleTiles.Contains(idx);
-    public bool HasGoldSoil(int idx) => goldSoilTiles.Contains(idx);
-    public bool HasFertilizerAt(int idx) => fertilizerColumns.ContainsKey(GetCol(idx));
+    public bool HasPetBottle(int idx) => State.HasPetBottle(idx);
+    public bool HasGoldSoil(int idx) => State.HasGoldSoil(idx);
+    public bool HasFertilizerAt(int idx) => State.HasFertilizerAt(idx);
     private int GetCol(int index) => index / 4;
     public int GetPetBottleBlockCountBonus() => petBottleBlockCount.ContainsKey(-1) ? petBottleBlockCount[-1] : 0;
-    public float GetColumnGoldMulBonus(int idx)
-        => columnGoldMulBonus.TryGetValue(idx / 4, out float v) ? v : 0f;
+    public float GetColumnGoldMulBonus(int idx) => State.GetColumnGoldMulBonus(idx);
 
     public void AddAbsorbFertilizer(int index)
     {
@@ -86,10 +91,7 @@ public class SoilEffects
     {
         return absorbFertilizerTiles.ToList();
     }
-    public bool HasAbsorbFertilizer(int index)
-    {
-        return absorbFertilizerTiles.Contains(index);
-    }
+    public bool HasAbsorbFertilizer(int index) => State.HasAbsorbFertilizer(index);
     public void ProcessResistanceAbsorption()
     {
         Debug.Log("[AbsorbFertilizer] Start Processing...");
@@ -461,11 +463,7 @@ public class SoilEffects
         isCoolingShieldActivated = true;
         hasCoolingShield = false; // 사용 후 소멸
     }
-    public bool TryGetFertilizerType(int gridIndex, out WaveType type)
-    {
-        int col = gridIndex / 4;
-        return fertilizerColumns.TryGetValue(col, out type);
-    }
+    public bool TryGetFertilizerType(int gridIndex, out WaveType type) => State.TryGetFertilizerType(gridIndex, out type);
     /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
     public void AddLandRichColumn()
     {
@@ -492,32 +490,9 @@ public class SoilEffects
     }
 
     /// <summary>특수(알록달록): 해당 칸에 적용 중인 땅/식물 효과 개수 (정보 UI 기준과 동일).</summary>
-    public int CountTileEffects(int idx)
-    {
-        int count = 0;
-        if (HasGoldSoil(idx)) count++;
-        if (TryGetFertilizerType(idx, out _)) count++;
-        if (HasPetBottle(idx)) count++;
-        if (IsAffectedByChiliPepper(idx)) count++;
-        if (IsPlantFrozen(idx)) count++;
-        if (IsAffectedBySprinkler(idx)) count++;
-        if (HasAbsorbFertilizer(idx)) count++;
-        return count;
-    }
+    public int CountTileEffects(int idx) => State.CountTileEffects(idx);
     /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
-    public int CountDistinctNeighborSpecies(int idx)
-    {
-        var species = new HashSet<string>();
-        int row = idx % 4;
-        int[] neighbors = { idx - 4, idx + 4, row > 0 ? idx - 1 : -1, row < 3 ? idx + 1 : -1 };
-        foreach (int n in neighbors)
-        {
-            if (n < 0 || n >= board.MaxCol * 4) continue;
-            if (board.Plants.TryGetValue(n, out Plant p) && p != null && !string.IsNullOrEmpty(p.speciesname))
-                species.Add(p.speciesname);
-        }
-        return species.Count;
-    }
+    public int CountDistinctNeighborSpecies(int idx) => State.CountDistinctNeighborSpecies(idx);
     /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
     public void HealNeighborsBySell(int idx)
     {
@@ -539,125 +514,8 @@ public class SoilEffects
             }
         }
     }
-    public bool IsAffectedBySprinkler(int targetIdx)
-    {
-        int range = 1 + grid.Modifiers.SprinklerRangeBonus;
-
-        foreach (var kvp in board.Plants)
-        {
-            if (kvp.Value is Sprinkler)
-            {
-                if (kvp.Key == targetIdx)
-                    return false; // 본인 자체에는 효과 X
-
-                int sIdx = kvp.Key;
-
-                int sRow = sIdx % 4;
-                int tRow = targetIdx % 4;
-                int sCol = sIdx / 4;
-                int tCol = targetIdx / 4;
-                // 같은 열이므로 Col은 같음. Row 차이 확인
-                if (sCol == tCol && Mathf.Abs(sRow - tRow) <= range) return true;
-
-                // 같은 행이므로 Row는 같음. Col 차이 확인
-                if (sRow == tRow && Mathf.Abs(sCol - tCol) <= range) return true;
-            }
-        }
-        return false;
-    }
-    public bool IsAffectedByChiliPepper(int gridIndex)
-    {
-        Plant chiliPepper;
-        int maxIndex = board.MaxCol * 4;
-
-        // 0단계: 좌우
-        if ((gridIndex - 4) >= 0) // 왼쪽
-        {
-            if (board.Plants.TryGetValue(gridIndex - 4, out chiliPepper))
-            {
-                if (chiliPepper is ChiliPepper) return true;
-            }
-        }
-
-        if ((gridIndex + 4) < maxIndex) // 오른쪽
-        {
-            if (board.Plants.TryGetValue(gridIndex + 4, out chiliPepper))
-            {
-                if (chiliPepper is ChiliPepper) return true;
-            }
-        }
-
-        // 1단계: 상하
-        if (grid.Modifiers.ChiliPepperRangeLevel >= 1)
-        {
-            if ((gridIndex - 1) / 4 == gridIndex / 4) // 위
-            {
-                if (board.Plants.TryGetValue(gridIndex - 1, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래
-            {
-                if (board.Plants.TryGetValue(gridIndex + 1, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-        }
-
-        // 2단계: 대각선
-        if (grid.Modifiers.ChiliPepperRangeLevel >= 2)
-        {
-            // 왼쪽 위
-            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex - 5, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            // 오른쪽 위
-            // Plant.cs의 로직 참고: index - 3
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex - 1) % 4)
-            {
-                // **주의**: Plant.cs에서도 gridIndex - 3을 체크하고 있음. (오타일 가능성 있으나 기존 로직 유지)
-                // 하지만 논리적으로 오른쪽 위는 +4 -1 = +3 이어야 함.
-                // Plant.cs 로직이 `(gridIndex + 3) >= 0` 조건에 `gridIndex - 3`을 체크하는 이상한 형태임.
-                // 여기서는 "오른쪽 위"라는 의도에 맞게 +3으로 수정하여 구현함.
-                if (board.Plants.TryGetValue(gridIndex + 3, out chiliPepper)) // +3으로 수정
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-            // Plant.cs 원본 로직을 그대로 따르려면 -3이어야 하지만, InfoAppGridSlot에서 +3으로 구현했었음.
-            // 여기서는 논리적으로 맞는 +3 (오른쪽 위)을 사용. 
-            // 만약 Plant.cs가 -3을 의도한거라면 (왼쪽 아래?) ... 아니, 대각선은 4방향이어야 함.
-            // 왼쪽 위(-5), 오른쪽 위(+3), 왼쪽 아래(-3), 오른쪽 아래(+5) 가 맞음.
-
-            // 왼쪽 아래
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex - 3, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-
-            // 오른쪽 아래
-            if ((gridIndex + 5) < maxIndex && (gridIndex + 5) % 4 == (gridIndex + 1) % 4)
-            {
-                if (board.Plants.TryGetValue(gridIndex + 5, out chiliPepper))
-                {
-                    if (chiliPepper is ChiliPepper) return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    public bool IsAffectedBySprinkler(int targetIdx) => State.IsAffectedBySprinkler(targetIdx);
+    public bool IsAffectedByChiliPepper(int gridIndex) => State.IsAffectedByChiliPepper(gridIndex);
     /// <summary>
     /// 고추 주변의 식물들을 반환합니다 (고추 제외)
     /// </summary>
@@ -739,12 +597,5 @@ public class SoilEffects
         }
         Debug.Log("[RapidFreezer] All plants unfrozen.");
     }
-    public bool IsPlantFrozen(int gridIndex)
-    {
-        if (board.Plants.TryGetValue(gridIndex, out Plant plant))
-        {
-            return plant.IsFrozen();
-        }
-        return false;
-    }
+    public bool IsPlantFrozen(int gridIndex) => State.IsPlantFrozen(gridIndex);
 }

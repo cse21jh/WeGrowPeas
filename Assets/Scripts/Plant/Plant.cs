@@ -25,28 +25,32 @@ public enum PlayablePlantType
 
 public abstract class Plant : MonoBehaviour
 {
-    //저장이 필요한 값들
     public string speciesname;
-    protected List<GeneticTrait> traits = new List<GeneticTrait>();
-    public int gridIndex { get; private set; }
-    protected int taste;
-    protected int resistWaveCount = 0;
-    protected int bonusGoldMultiplierCount = 0; // 스프링클러 등으로 인한 추가 배수 카운트
 
-    // 특수(세계여행): 낮 이동 거리 누적 배수(웨이브 저항 횟수당 골드 배수에 가산). 낮 시작 위치는 Grid.Breeding에서 마킹.
-    protected float travelSellBonus = 0f;
-    private int dayStartGridIndex = -1;
+    /// <summary>이 식물의 종류. 하위 클래스가 정한다.</summary>
+    public abstract PlantKind Kind { get; }
 
-    // 완두커피: 완두커피 보유 중에 지나간 자유시간 횟수(판매 골드 배수에 가산)
-    protected int freeTimePassedCount = 0;
-    protected int daysOnField = 0; // 업적: 밭에 심긴 뒤 지난 날 수
-    // 활성형 껍질: 한 번이라도 교배를 시도했는가(시도한 식물은 자가번식 확률 보너스 제외)
-    protected bool hasTriedBreed = false;
+    /// <summary>
+    /// 판정에 쓰는 값과 공식. 저항력, 판매가, 웨이브 통과 처리는 모두 여기 있고,
+    /// 이 컴포넌트는 그 결과를 화면에 보여 주는 일을 맡는다.
+    /// </summary>
+    public PlantState State => state ??= new PlantState(Kind);
+    private PlantState state;
 
+    // 아래는 State의 값을 예전 이름으로 가리킨다. 새 코드는 State를 직접 쓴다.
+    protected List<GeneticTrait> traits { get => State.Traits; set => State.Traits = value; }
+    public int gridIndex { get => State.GridIndex; private set => State.GridIndex = value; }
+    protected int taste { get => State.Taste; set => State.Taste = value; }
+    protected int resistWaveCount { get => State.ResistWaveCount; set => State.ResistWaveCount = value; }
+    protected int bonusGoldMultiplierCount { get => State.BonusGoldMultiplierCount; set => State.BonusGoldMultiplierCount = value; }
+    protected float travelSellBonus { get => State.TravelSellBonus; set => State.TravelSellBonus = value; }
+    private int dayStartGridIndex { get => State.DayStartGridIndex; set => State.DayStartGridIndex = value; }
+    protected int freeTimePassedCount { get => State.FreeTimePassedCount; set => State.FreeTimePassedCount = value; }
+    protected int daysOnField { get => State.DaysOnField; set => State.DaysOnField = value; }
+    protected bool hasTriedBreed { get => State.HasTriedBreed; set => State.HasTriedBreed = value; }
+    public bool isDying { get => State.IsDying; set => State.IsDying = value; }
 
     protected Grid grid;
-
-    public bool isDying = false;
 
     // 세금 압류
     [Header("시각 효과")]
@@ -54,7 +58,7 @@ public abstract class Plant : MonoBehaviour
     [SerializeField] private ParticleSystem fogEffect; // 안개 연출 (102)
     [SerializeField] private GameObject mushroomEffect; // 버섯 연출
     [SerializeField] private ParticleSystem madnessEffect; // 광란 연출
-    public bool IsSeized { get; private set; }
+    public bool IsSeized { get => State.IsSeized; private set => State.IsSeized = value; }
     public void SetSeized(bool on)
     {
         IsSeized = on;
@@ -90,8 +94,7 @@ public abstract class Plant : MonoBehaviour
     }
 
     // 급속 냉각기 관련
-    protected bool isFrozen = false;
-    protected int frozenPrice = 0;
+    protected bool isFrozen => State.IsFrozen;
 
     [SerializeField] private float dissolveDuration = 1.0f; // 분해 애니메이션 지속 시간
     private SpriteRenderer[] childSpriteRenderers;
@@ -117,7 +120,7 @@ public abstract class Plant : MonoBehaviour
     public virtual bool IsMovable => false;
 
     // 저주(꽃가루 실종): 교배 불가 상태
-    private bool breedable = true;
+    private bool breedable { get => State.Breedable; set => State.Breedable = value; }
     public bool IsBreedable => breedable;
 
     protected int plantID = -1;
@@ -126,8 +129,10 @@ public abstract class Plant : MonoBehaviour
 
     public virtual void Init(int gridIndex, Grid grid)
     {
-        this.gridIndex = gridIndex;
         this.grid = grid;
+        State.Attach(grid.Field, gridIndex);
+        State.ResistanceChanged -= OnResistanceChanged;
+        State.ResistanceChanged += OnResistanceChanged;
         taste = GameRun.Rng.Field.Range(0, 7);
 
         // 밭에 등장했으면 도감에 발견 처리. 하위 클래스가 speciesname을 정한 뒤 base.Init을 부르므로
@@ -203,26 +208,14 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public void SetTaste(int val)
-    {
-        if (isFrozen) return; // 얼어있으면 맛(가격) 변동 없음
-        taste = val;
-    }
+    public void SetTaste(int val) => State.SetTaste(val);
 
     public void SetFrozen(bool freeze)
     {
         if (this is MovablePlant p)
         {
-            isFrozen = freeze;
-            if (isFrozen)
-            {
-                frozenPrice = GetSellingPrice(); // 현재 가격 저장
-                p.SetIceEffect(isFrozen);
-            }
-            else
-            {
-                p.SetIceEffect(isFrozen);
-            }
+            State.SetFrozen(freeze);
+            p.SetIceEffect(freeze);
         }
     }
 
@@ -249,73 +242,11 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public bool CanResist(WaveType wave) // if can't resist, Call Die()
-    {
-        int randomNumber = GameRun.Rng.Survival.Range(0, 100);
-        if (isFrozen) return true; // 얼어있으면 무조건 저항 성공
+    /// <summary>웨이브를 버티는지 굴린다. 못 버티면 호출한 쪽이 Die()를 부른다.</summary>
+    public bool CanResist(WaveType wave) => State.CanResist(wave);
 
-        if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
-        {
-            return true;
-        }
-
-        // 특수(이중 시도): 생존 시도를 2회 시행 (1회 실패 시 재시도)
-        if (SpecialItemSystem.Has("double_try"))
-        {
-            // TODO: 파란색 배리어 이펙트
-            randomNumber = GameRun.Rng.Survival.Range(0, 100);
-            if (randomNumber < (int)(GetResistanceValue((int)wave) * 100))
-                return true;
-        }
-
-        return false;
-    }
-
-    public virtual float GetResistanceValue(int traitNum) // (int)waveType 혹은 (int)traitType으로 가능
-    {
-        // 황금 비료에 심어진 식물은 모든 저항력 90%
-        if (grid != null && isOnGoldenSoil())
-        {
-            return 0.9f;
-        }
-
-        float resistance = 0f;
-        foreach (var g in traits)
-        {
-            if (traitNum == (int)g.traitType)
-            {
-                if (grid.Soil.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 0.05 더해줌
-                {
-                    if ((int)grid.Soil.GetFertilizerColumns()[gridIndex / 4] == traitNum)
-                    {
-                        resistance += 0.05f;
-                        // 스프링클러 범위 내에 있다면 시너지 보너스 추가
-                        if (grid.Soil.IsAffectedBySprinkler(gridIndex))
-                        {
-                            resistance += grid.Modifiers.SprinklerFertilizerSynergyBonus;
-                        }
-                    }
-                }
-                if (CheckChiliPepper() && g.genetics <= 1) // 고추가 주변에 있고, 우성인 경우 추가 저항력 20 제공
-                    resistance += 0.2f;
-                // 무당벌레당 저항력 증가 (모든 형질에 적용)
-                if (grid != null && grid.Board.Ladybugs != null)
-                {
-                    resistance += grid.Board.Ladybugs.Count * grid.Modifiers.AdditionalLadybugResistancePerUnit;
-                }
-                // 새벽: 유전자 기반 최대 저항력(우성/열성 base)이 상한선만큼 감소
-                float dawnBase = Mathf.Max(0f, g.resistance);
-                resistance += dawnBase + g.additionalResistance; // 기본 저항력과 추가 저항력(업그레이드 및 벌레잡기) 더해줌
-                // 저주: 반란 — 우성(genetics 0·1) 저항 +%p / 열성(genetics 2) -%p
-                if (CurseState.ReversePercent > 0f)
-                    resistance += (g.genetics <= 1 ? 1f : -1f) * (CurseState.ReversePercent / 100f);
-                if (resistance < 0f) resistance = 0f;
-                return resistance = resistance >= 1f ? 1f : resistance; // 총합 상한은 1.0 유지
-            }
-        }
-
-        return 0.1f; // 저항력 없는 경우 0.1 return
-    }
+    /// <summary>(int)waveType 또는 (int)traitType에 대한 최종 저항력.</summary>
+    public float GetResistanceValue(int traitNum) => State.GetResistanceValue(traitNum);
 
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
@@ -613,7 +544,7 @@ public abstract class Plant : MonoBehaviour
                 traitList[i].genetics, traitList[i].additionalResistance);
     }
 
-    public abstract int GetSellingPrice();
+    public int GetSellingPrice() => State.GetSellingPrice();
 
     public bool CheckChiliPepper()
     {
@@ -647,6 +578,7 @@ public abstract class Plant : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (state != null) state.ResistanceChanged -= OnResistanceChanged;
         DOTween.Kill(this);
     }
 
@@ -678,85 +610,14 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
-    public bool CanMove()
-    {
-        if (!IsMovable) return false;
-        // 칸에 페트병이 놓여있으면 이동 금지
-        if (grid != null && grid.Soil.HasPetBottle(gridIndex)) return false;
-        // 황금 비료에 심어진 식물은 이동 불가
-        if (grid != null && grid.Soil.HasGoldSoil(gridIndex)) return false;
-        return true;
-    }
+    public bool CanMove() => State.CanMove();
 
     public virtual void ResistWave(WaveType waveType)
     {
         if (isFrozen) return;
 
         int previousSellingPrice = GetSellingPrice();
-        resistWaveCount++;
-
-        // 특수(세계여행): 낮 동안 이동한 맨해튼 거리(최초↔최종 위치) 한 칸마다 판매 골드 배수 +0.1
-        if (SpecialItemSystem.Has("world_travel") && dayStartGridIndex >= 0)
-        {
-            int dist = Mathf.Abs(gridIndex / 4 - dayStartGridIndex / 4) + Mathf.Abs(gridIndex % 4 - dayStartGridIndex % 4);
-            if (dist > 0) travelSellBonus += 0.1f * dist;
-        }
-
-        /*
-        bool isGold = false;
-        if (stemController != null) //황금 완두콩이면 저항력 감소 아예 X
-        {
-            isGold = stemController.IsGold();
-        }
-
-        int fertilizer = -1;
-        if (grid.Soil.HasFertilizerAt(gridIndex)) // 해당 타입에 해당하는 비료가 있다면 저항력 감소가 되지 않습니다
-            fertilizer = (int)grid.Soil.GetFertilizerColumns()[gridIndex / 4];
-
-        if (!isGold)
-        {
-            for (int i = 0; i < Wave.NumberOfWave; i++)
-            {
-                if (fertilizer != i)
-                {
-                    if ((int)waveType != i)
-                    {
-                        if (GameManager.Instance != null && GameManager.Instance.stage > 25)
-                            ChangeResistance(i, -0.1f + grid.Modifiers.ResistanceDecayReduction);
-                        else
-                            ChangeResistance(i, -0.05f + grid.Modifiers.ResistanceDecayReduction);
-                    }
-                    else
-                    {
-                        ChangeResistance(i, grid.Modifiers.ResistanceAdaptation);
-                    }
-                }
-            }
-        }
-        */
-
-        // 새벽: 매일(웨이브 통과 시) 모든 저항력 감소. (일반 모드는 위 블록이 폐기되어 감소 없음)
-        // 황금 완두콩은 기존 규칙대로 저항력 감소 제외.
-        float dawnDailyDecay = DawnSystem.Current.dailyResistanceDecayAddPercent / 100f;
-        float curseDailyDecay = CurseState.RadiationDecayPercent / 100f; // 저주: 방사능
-        float totalDailyDecay = dawnDailyDecay + curseDailyDecay;
-        bool isGoldPlant = stemController != null && stemController.IsGold();
-
-        bool hasMatchingFertilizer = grid != null && grid.Soil.HasFertilizerAt(gridIndex) && (int)grid.Soil.GetFertilizerColumns()[gridIndex / 4] == (int)waveType;
-
-        if (totalDailyDecay > 0f && !isGoldPlant)
-        {
-            for (int i = 0; i < Wave.NumberOfWave; i++)
-            {
-                if (hasMatchingFertilizer && i == (int)waveType)
-                    continue; // 해당 웨이브와 동일한 비료가 깔려 있다면, 해당 웨이브 저항력은 감소하지 않음
-                ChangeResistance(i, -totalDailyDecay);
-            }
-        }
-
-        // 저주(집중포화): 이번(현재) 웨이브에 대한 저항력 추가 감소
-        if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant && !hasMatchingFertilizer)
-            ChangeResistance((int)waveType, -CurseState.HeavyFireExtraDecayPercent / 100f);
+        State.ResistWave(waveType);
 
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
         {
@@ -765,39 +626,21 @@ public abstract class Plant : MonoBehaviour
         RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.WaveSurvived);
     }
 
-    public bool ChangeResistance(int traitNum, float amount) // 기본 저항력이 바뀔 때는 무조건 해당 함수를 거치도록 (타입을 넣어서 작동)
+    /// <summary>기본 저항력을 바꾼다. 기본 저항력은 반드시 이 함수(또는 State의 같은 함수)로만 바꾼다.</summary>
+    public bool ChangeResistance(int traitNum, float amount) => State.ChangeResistance(traitNum, amount);
+
+    // 기본 저항력이 바뀔 때마다 State가 알려 준다. 황금 식물 여부와 스카우터 표시를 맞춘다.
+    private void OnResistanceChanged(int traitNum)
     {
-        if (amount == 0)
-            return false;
-
-        for (int i = 0; i < traits.Count; i++)
+        if (stemController != null)
         {
-            if ((int)traits[i].traitType == traitNum)
-            {
-                float var = traits[i].resistance;
-                var += amount;
-
-                // 특수(프로모션): 저항력이 10% 이하가 되면 해당 저항력을 90%로 변경
-                if (var <= 0.1f && SpecialItemSystem.Has("promotion"))
-                    var = 0.9f;
-
-                if (var < 0.1f)
-                    var = 0.1f;
-
-                traits[i] = new GeneticTrait((TraitType)(int)traitNum, var, traits[i].genetics, traits[i].additionalResistance);
-                if (stemController != null)
-                {
-                    if (stemController.CheckGold(traits))
-                        stemController.SetGold(true);
-                }
-                if (this is MovablePlant p && traitNum == (int)GameManager.Instance.enemyController.CurrentWave.WaveType) // 바뀐 저항력이 현 웨이브랑 동일한 저항력이면 스카우터 체크 
-                {
-                    p.CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
-                }
-                return true;
-            }
+            if (stemController.CheckGold(traits))
+                stemController.SetGold(true);
         }
-        return false;
+        if (this is MovablePlant p && traitNum == (int)GameManager.Instance.enemyController.CurrentWave.WaveType) // 바뀐 저항력이 현 웨이브랑 동일한 저항력이면 스카우터 체크 
+        {
+            p.CheckResistanceScouterImage(GameManager.Instance.enemyController.CurrentWave.WaveType);
+        }
     }
 
     public int GetPlantID()
@@ -812,50 +655,7 @@ public abstract class Plant : MonoBehaviour
 
 
 
-    public int GetBadGenesCount()
-    {
-        int count = 0;
-        foreach (var trait in traits)
-        {
-            // 자연사, 해충, 바람, 홍수 중 우성(genetics <= 1)인 경우
-            if (trait.genetics <= 1 &&
-               (trait.traitType == TraitType.NaturalDeath ||
-                trait.traitType == TraitType.Pest ||
-                trait.traitType == TraitType.Wind ||
-                trait.traitType == TraitType.Flood))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    protected int CalculateSellingPrice(int basePrice, float multiplier)
-    {
-        if (grid == null) return 0;
-
-        int totalMultiplierCount = GetResistWaveCount() + GetBonusGoldMultiplierCount();
-        int badGeneBonus = grid.Modifiers.BadGuyMoreRiceLevel * 5 * GetBadGenesCount();
-
-        multiplier += travelSellBonus; // 특수(세계여행): 이동 거리 누적 배수
-        multiplier += grid.Soil.GetColumnGoldMulBonus(gridIndex); // 특수(땅부자): 세로줄 고속 숙성 효과
-
-        // 특수(알록달록): 땅에 적용 중인 효과 1개당 판매 배수 +0.1
-        if (SpecialItemSystem.Has("colorful"))
-            multiplier += 0.1f * grid.Soil.CountTileEffects(gridIndex);
-
-        // 완두커피: 자유시간이 지난 횟수만큼 판매 골드 배수 추가
-        float freeTimeBonus = grid.Modifiers.PeaCoffeeMultiplier * freeTimePassedCount;
-
-        int price = (int)((basePrice + grid.Modifiers.AdditionalPlantGold + badGeneBonus)
-                          * (1f + (multiplier * totalMultiplierCount) + freeTimeBonus));
-
-        // 땅과 콩: 뿌리를 내린 식물의 가격 증가 (다른 효과와 곱적용)
-        if (this is MovablePlant && !IsMovable)
-            price = (int)(price * grid.Modifiers.GetRootedPriceMultiplier());
-
-        return price;
-    }
+    public int GetBadGenesCount() => State.GetBadGenesCount();
 
     protected void RefreshSellingPriceAndNotify(int previousPrice, PlantValueChangeReason reason)
     {
@@ -946,15 +746,7 @@ public abstract class Plant : MonoBehaviour
         priceSign.gameObject.SetActive(false);
     }
 
-    public bool HasTrait(WaveType wave)
-    {
-        for (int i = 0; i < traits.Count; i++)
-        {
-            if ((int)traits[i].traitType == (int)wave)
-                return true;
-        }
-        return false;
-    }
+    public bool HasTrait(WaveType wave) => State.HasTrait(wave);
 
     public bool isOnGoldenSoil()
     {

@@ -169,6 +169,21 @@ public class StemController : MonoBehaviour
 
     public bool CheckGold(List<GeneticTrait> traits)
     {
+        bool result = CheckGoldInternal(traits);
+        SyncGoldToPlantState();
+        return result;
+    }
+
+    // 황금 여부는 웨이브 뒤 저항력 감소 판정에도 쓰이므로, 바뀔 때마다 식물 상태에 그대로 넣어 준다.
+    private Plant ownerPlant;
+    private void SyncGoldToPlantState()
+    {
+        if (ownerPlant == null) ownerPlant = GetComponentInParent<Plant>();
+        if (ownerPlant != null) ownerPlant.State.IsGold = isGold;
+    }
+
+    private bool CheckGoldInternal(List<GeneticTrait> traits)
+    {
         int n = 0;
         foreach(var t in traits)
         {
@@ -224,6 +239,7 @@ public class StemController : MonoBehaviour
             goldCrown.SetActive(false);
             isGold = false;
         }
+        SyncGoldToPlantState();
     }
 
     public bool IsGold()

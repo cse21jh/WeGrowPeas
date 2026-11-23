@@ -28,7 +28,8 @@ public abstract class MovablePlant : Plant
 
     [SerializeField] private ParticleSystem waterParticle;
 
-    private bool isReallyMovable = true;
+    // 뿌리를 내리면 옮길 수 없다. 값은 State에 있다.
+    private bool isReallyMovable { get => !State.IsRooted; set => State.IsRooted = !value; }
 
     [SerializeField] private GameObject iceEffect;
 

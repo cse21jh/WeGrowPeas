@@ -86,6 +86,10 @@ public class Grid : MonoBehaviour
     /// <summary>칸과 식물 데이터. 다른 시스템은 Grid 대신 이 객체로 밭을 읽는다.</summary>
     public PlantBoard Board { get; } = new PlantBoard();
 
+    /// <summary>규칙 계산이 참조하는 밭 상태 묶음. 식물 상태(<see cref="PlantState"/>)가 이것만 보고 계산한다.</summary>
+    public FieldState Field => field ??= new FieldState(Board, Modifiers, Soil.State);
+    private FieldState field;
+
     //저장 필요
     public int killBugCount = 0;
 
@@ -113,7 +117,7 @@ public class Grid : MonoBehaviour
         if (initialized) return;
         enemyController = FindAnyObjectByType<EnemyController>();
         InitSoils();
-        Board.Plants.Clear();
+        Board.Clear();
         Breeder.Initialize();
         initialized = true;
     }
@@ -173,7 +177,7 @@ public class Grid : MonoBehaviour
     }
     private void PlantPlant(Plant plant)
     {
-        Board.Plants[plant.gridIndex] = plant;
+        Board.Place(plant.gridIndex, plant);
         Transform soilT = GetSoilTransform(plant.gridIndex);
         plant.transform.position = soilT.position;
 
@@ -245,7 +249,7 @@ public class Grid : MonoBehaviour
     {
         if (Board.Plants.ContainsKey(gridIndex))
         {
-            Board.Plants.Remove(gridIndex);
+            Board.Remove(gridIndex);
             Board.NotifyChanged();
         }
 
@@ -365,8 +369,8 @@ public class Grid : MonoBehaviour
             targetPlant.transform.position = fromSoil.position;
 
             // Board.Plants 업데이트
-            Board.Plants[toIndex] = plant;
-            Board.Plants[fromIndex] = targetPlant;
+            Board.Place(toIndex, plant);
+            Board.Place(fromIndex, targetPlant);
 
             //스카우터 확인 (고추, 비료 때문)
             if (plant is MovablePlant p1)
@@ -387,10 +391,10 @@ public class Grid : MonoBehaviour
         {
             Dictionary<Plant, int> previousPrices = Upgrades.CapturePlantSellingPrices();
             // 빈 칸이면 원래대로 심기
-            Board.Plants.Remove(fromIndex); // 원래 위치에서 제거
+            Board.Remove(fromIndex); // 원래 위치에서 제거
             plant.SetGridIndex(toIndex);
             plant.transform.position = GetSoilTransform(toIndex).position;
-            Board.Plants[toIndex] = plant;
+            Board.Place(toIndex, plant);
 
             if (plant is MovablePlant p1)
             {

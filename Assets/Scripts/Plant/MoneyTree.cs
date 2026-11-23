@@ -6,6 +6,8 @@ public class MoneyTree : Plant
     private const int REQUIRED_TURNS = 5;
     private const int REWARD_GOLD = 5000;
 
+    public override PlantKind Kind => PlantKind.MoneyTree;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.MoneyTree;
@@ -96,18 +98,6 @@ public class MoneyTree : Plant
             // 자동 소멸
             Die(DeathCause.Other);
         }
-    }
-
-    public override float GetResistanceValue(int order)
-    {
-        // 네펜데스처럼 모든 웨이브에 100% 저항
-        return 1f;
-    }
-
-    public override int GetSellingPrice()
-    {
-        // 판매 불가 (네펜데스와 동일)
-        return 0;
     }
 
     /// <summary>
