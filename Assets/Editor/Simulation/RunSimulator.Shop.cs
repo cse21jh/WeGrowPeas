@@ -8,7 +8,6 @@ public sealed partial class RunSimulator : IShopWorld
 
     private static ItemData[] fixedItems;
     private static ItemData[] rotationItems;
-    private static readonly Dictionary<ItemData, (int price, int stock)> savedItems = new Dictionary<ItemData, (int, int)>();
 
     private readonly ShopContext shopContext;
     private int bonusBreedAttempts;
@@ -35,21 +34,13 @@ public sealed partial class RunSimulator : IShopWorld
         }
         found.Sort((a, b) => string.CompareOrdinal(a.requestId, b.requestId));
         requestPool = found;
-
-        // 아이템이 자기 가격과 재고를 고치므로(가격 상승 등) 판마다, 그리고 끝나고 되돌린다
-        savedItems.Clear();
-        foreach (ItemData item in fixedItems) savedItems[item] = (item.Price, item.InitialStock);
-        foreach (ItemData item in rotationItems) savedItems[item] = (item.Price, item.InitialStock);
     }
 
-    private static void RestoreItems()
+    // 사다 만 선택이 다음 판에 남지 않게 한다
+    private static void ResetItems()
     {
-        foreach (var kv in savedItems)
-        {
-            kv.Key.Price = kv.Value.price;
-            kv.Key.InitialStock = kv.Value.stock;
-            kv.Key.Cancel(null);
-        }
+        foreach (ItemData item in fixedItems) item.Cancel(null);
+        foreach (ItemData item in rotationItems) item.Cancel(null);
     }
 
     private bool IsUnlocked(ItemData item)
@@ -152,7 +143,7 @@ public sealed partial class RunSimulator : IShopWorld
         result.Purchases++;
         result.Mix(StableHash(item.PurchaseKey));
         item.Commit(shopContext);
-        shopContext.Shop.FinishPurchase(item, inventory);
+        shopContext.Shop.FinishPurchase(item, inventory, shopContext);
         return true;
     }
 

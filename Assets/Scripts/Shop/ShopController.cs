@@ -37,7 +37,7 @@ public class ShopController
 
     // ── 인벤토리 ──────────────────────────────────────────────────────────────
     // 이번 상점 방문의 목록을 캐시한다. 탭 전환/구매 갱신마다 GenerateInventory를 다시 부르면
-    // 아이템의 InitializePrice가 매번 실행돼(SO의 Price를 직접 수정하는 아이템 존재) 값이 흔들리므로,
+    // 아이템의 InitializePrice가 매번 실행돼 값이 흔들리므로,
     // 리롤/일일 리롤 때만 재생성한다.
     private ShopInventory cachedInventory;
     private int cachedStage = -1;
@@ -78,8 +78,8 @@ public class ShopController
         InitializeIfNeeded();
         if (data == null) return;
 
-        // 상점 세션 1회 제한
-        if (WasBoughtThisShop(data))
+        // 상점 세션 1회 제한, 하루 구매 한도
+        if (WasBoughtThisShop(data) || GameRun.Current.Shop.IsSoldOutToday(data, ctx))
         {
             showError(Loc.T("shop.error.cannot_buy"));
             return;
@@ -183,7 +183,7 @@ public class ShopController
     private void TryChargeAndCommit(ItemData data, Action onPurchased)
     {
         if (!shopManager.TryPurchase(ctx, data, out _)) return;
-        GameRun.Current.Shop.FinishPurchase(data, cachedInventory);
+        GameRun.Current.Shop.FinishPurchase(data, cachedInventory, ctx);
         onPurchased?.Invoke();
     }
 

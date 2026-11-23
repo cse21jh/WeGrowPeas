@@ -5,15 +5,13 @@ using UnityEngine;
 public class GoldenClockItemData : ItemData
 {
 
-    [Header("Pricing")]
-    [SerializeField] private int basePrice = 500;
 
     private void OnEnable()
     {
         FlowType = ShopFlowType.Instant;
         IsStackable = false;
         OnePerShopIfNotStackable = true;
-        if (Price <= 0) Price = basePrice;
+        if (Price <= 0) Price = 500;
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
@@ -44,6 +42,6 @@ public class GoldenClockItemData : ItemData
 
     public override void InitializePrice(ShopContext ctx)
     {
-        Price = basePrice;
+        CurrentPrice = Price;
     }
 }

@@ -41,6 +41,6 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        Price = 1000 + (purchaseCount * 500); // 구매 횟수당 500골드 증가
+        CurrentPrice = Price + purchaseCount * 500; // 구매 횟수당 500골드 증가
     }
 }

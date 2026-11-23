@@ -134,6 +134,8 @@ public class GridSave
     public List<WaveType> fertilizerType = new();
     /// <summary>저항력 흡수 비료가 깔린 타일 인덱스.</summary>
     public List<int> absorbFertilizerTiles = new();
+    /// <summary>사 두고 아직 쓰지 않은 냉각 방패.</summary>
+    public bool hasCoolingShield;
 
     // ── 신규 아이템 스탯 ───────────────────────────────────────────────────
     public int timeIsGoldLevel;

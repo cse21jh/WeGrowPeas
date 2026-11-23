@@ -154,9 +154,5 @@ public class ItemController : MonoBehaviour
 
     /// <summary>남은 구매 가능 횟수. 한도가 -1(무제한)이면 0을 반환(표시 안 함).</summary>
     private static int GetRemainingPurchaseCount(ItemData item)
-    {
-        int limit = item.EffectivePurchaseLimit;
-        if (limit < 0) return 0;
-        return Mathf.Max(0, limit - item.GetTotalPurchaseCount());
-    }
+        => Mathf.Max(0, item.GetRemainingPurchaseCount());
 }

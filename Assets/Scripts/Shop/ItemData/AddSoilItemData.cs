@@ -7,7 +7,6 @@ public class AddSoilItemData : ItemData
 {
 
     [Header("Pricing")]
-    [SerializeField] private int basePrice = 1000;
     [SerializeField] private int maxPurchase = 4; // 최대 4회까지 구매 가능 (maxCol 4 -> 8)
 
     private const int MAX_COL = 8; // 최대 열 수
@@ -36,9 +35,9 @@ public class AddSoilItemData : ItemData
         int purchaseCount = ctx.Shop.PurchaseHistory[key];
         // Commit 시점에는 이미 구매 이력이 증가했으므로, 다음 구매 가격 계산
         if (purchaseCount < EffectiveMaxPurchase)
-            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
+            CurrentPrice = Price * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
         else
-            Price = int.MaxValue; // 더 이상 구매 불가
+            CurrentPrice = int.MaxValue; // 더 이상 구매 불가
     }
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
@@ -91,7 +90,7 @@ public class AddSoilItemData : ItemData
     {
         if (ctx?.Shop == null)
         {
-            Price = basePrice;
+            CurrentPrice = Price;
             return;
         }
 
@@ -104,8 +103,8 @@ public class AddSoilItemData : ItemData
 
         // 다음 구매 가격 계산
         if (purchaseCount < EffectiveMaxPurchase)
-            Price = basePrice * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
+            CurrentPrice = Price * (purchaseCount + 1); // 1000, 2000, 3000, 4000 ...
         else
-            Price = int.MaxValue; // 더 이상 구매 불가
+            CurrentPrice = int.MaxValue; // 더 이상 구매 불가
     }
 }

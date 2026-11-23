@@ -16,6 +16,7 @@ public sealed class ShopState
     public const int CreditCardRequiredPurchaseCount = 3;
 
     private readonly HashSet<ItemData> boughtThisShop = new HashSet<ItemData>();
+    private readonly Dictionary<string, int> dailyPurchases = new Dictionary<string, int>(); // 오늘 아이템별 구매 횟수
     private int uniqueSeed = -1;
     private int rerollCount;
 
@@ -41,6 +42,16 @@ public sealed class ShopState
 
     public int GetItemPurchaseCount(ItemData data)
         => data != null && PurchaseHistory.TryGetValue(data.PurchaseKey, out int count) ? count : 0;
+
+    public int GetDailyPurchaseCount(ItemData data)
+        => data != null && dailyPurchases.TryGetValue(data.PurchaseKey, out int count) ? count : 0;
+
+    /// <summary>오늘 살 수 있는 횟수를 다 썼는가.</summary>
+    public bool IsSoldOutToday(ItemData data, ShopContext ctx)
+    {
+        int limit = data.GetDailyPurchaseLimit(ctx);
+        return limit >= 0 && GetDailyPurchaseCount(data) >= limit;
+    }
 
     // ───── 진열 ─────
 
@@ -69,7 +80,7 @@ public sealed class ShopState
         foreach (ItemData item in rotationPool)
         {
             if (item == null || !isUnlocked(item)) continue;
-            if (!item.IsRotationUnlockOk(ctx) || item.GetRotationWeight(ctx) <= 0 || !item.CanPurchaseByLimit()) continue;
+            if (!item.IsRotationUnlockOk(ctx) || item.GetRotationWeight(ctx) <= 0 || !item.CanPurchaseByLimit() || IsSoldOutToday(item, ctx)) continue;
             candidates.Add(item);
         }
 
@@ -99,13 +110,14 @@ public sealed class ShopState
         DailyPurchaseCount++;
         DailySpentGold += price;
         PurchaseHistory[data.PurchaseKey] = GetItemPurchaseCount(data) + 1;
+        dailyPurchases[data.PurchaseKey] = GetDailyPurchaseCount(data) + 1;
     }
 
     /// <summary>구매가 끝난 뒤. 더 살 수 없게 됐으면 진열에서 뺀다.</summary>
-    public void FinishPurchase(ItemData data, ShopInventory inventory)
+    public void FinishPurchase(ItemData data, ShopInventory inventory, ShopContext ctx)
     {
         if (!data.IsStackable) boughtThisShop.Add(data);
-        if (inventory == null || (data.CanPurchaseByLimit() && !WasBoughtThisShop(data))) return;
+        if (inventory == null || (data.CanPurchaseByLimit() && !WasBoughtThisShop(data) && !IsSoldOutToday(data, ctx))) return;
         inventory.Fixed.Remove(data);
         inventory.Rotation.Remove(data);
     }
@@ -146,6 +158,7 @@ public sealed class ShopState
         rerollCount = 0;
         IsProbabilityEqualized = false;
         boughtThisShop.Clear();
+        dailyPurchases.Clear();
         // 상점 연락처: 산 횟수만큼 매일 무료 리롤
         DailyRerollCount = PurchaseHistory.TryGetValue(ShopContactKey, out int contacts) ? contacts : 0;
     }

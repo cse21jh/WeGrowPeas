@@ -127,7 +127,7 @@ public sealed partial class RunSimulator : IFieldActions
         finally
         {
             DawnSystem.SetSelectedStage(savedDawn);
-            RestoreItems();
+            ResetItems();
             CurseState.ResetAll();
             SpecialItemSystem.ResetRun();
             GameRun.StartNew();
@@ -138,7 +138,7 @@ public sealed partial class RunSimulator : IFieldActions
     private static SimRunResult RunOne(SimConfig config, int seed)
     {
         GameRun.StartNew(seed);
-        RestoreItems(); // 앞 판에서 바뀐 가격을 되돌린다
+        ResetItems();
         CurseState.ResetAll();
         SpecialItemSystem.ResetRun();
         var sim = new RunSimulator(config, seed);

@@ -24,8 +24,8 @@ public static class ShopBadge
         if (gradeObj != null) gradeObj.SetActive(true);
         if (gradeText != null) gradeText.text = Loc.T("shop.badge.grade", ("grade", GetGrade(item)));
 
-        // 품목 제한: 전체 구매 제한이 있는 아이템만 표시
-        bool hasLimit = item.EffectivePurchaseLimit >= 0;
+        // 품목 제한: 전체 또는 하루 구매 제한이 있는 아이템만 표시
+        bool hasLimit = item.GetRemainingPurchaseCount() >= 0;
         if (limitObj != null) limitObj.SetActive(hasLimit);
         if (limitText != null) limitText.text = Loc.T(hasLimit ? "shop.badge.limited" : "shop.badge.no_limit");
     }
@@ -34,10 +34,9 @@ public static class ShopBadge
     public static string GetStockText(ItemData item)
     {
         if (item == null) return "";
-        int limit = item.EffectivePurchaseLimit;
-        if (limit < 0) return Loc.T("shop.badge.no_limit");
+        int remain = item.GetRemainingPurchaseCount();
+        if (remain < 0) return Loc.T("shop.badge.no_limit");
 
-        int remain = Mathf.Max(0, limit - item.GetTotalPurchaseCount());
         return Loc.T("shop.badge.remaining", ("count", remain));
     }
 
