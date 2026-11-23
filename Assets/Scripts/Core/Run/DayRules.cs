@@ -150,8 +150,8 @@ public static class DayRules
 
         var traits = new List<GeneticTrait>(peanut.Traits);
 
-        // 특수(임시땅콩B): 자가번식 때 양성 변종만 나온다
-        bool benign = SpecialItemSystem.Has("peanut_special_8")
+        // 특수(극단적 변이): 자가번식 때 양성 변종만 나온다
+        bool benign = SpecialItemSystem.Has("extreme_mutation")
             && GameRun.Rng.Field.Range(0f, 100f) < BreedingRules.GetMutationChancePercent(field.Modifiers);
         if (benign) BreedingRules.ApplyBenignResistance(traits);
 
@@ -166,12 +166,11 @@ public static class DayRules
         }
     }
 
-    // 위, 아래, 왼쪽, 오른쪽의 빈 칸 중 하나. 조건식과 순서는 기존 동작을 그대로 옮긴 것이다.
-    // (0번 칸은 -1번 칸도 후보에 들어가고, 그것이 뽑히면 번식하지 않는다)
+    // 위, 아래, 왼쪽, 오른쪽의 빈 칸 중 하나
     private static int PickCopyCell(FieldState field, int idx)
     {
         var empty = new List<int>();
-        if ((idx - 1) / 4 == idx / 4 && !field.Board.States.ContainsKey(idx - 1)) empty.Add(idx - 1);
+        if (idx % 4 > 0 && !field.Board.States.ContainsKey(idx - 1)) empty.Add(idx - 1);
         if ((idx + 1) / 4 == idx / 4 && !field.Board.States.ContainsKey(idx + 1)) empty.Add(idx + 1);
         if (idx - 4 >= 0 && !field.Board.States.ContainsKey(idx - 4)) empty.Add(idx - 4);
         if (idx + 4 < field.Board.CellCount && !field.Board.States.ContainsKey(idx + 4)) empty.Add(idx + 4);

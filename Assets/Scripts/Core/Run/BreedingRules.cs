@@ -92,7 +92,7 @@ public static class BreedingRules
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
 #endif
-            if (SpecialItemSystem.Has("peanut_special_8")) mutation = MutationKind.Malignant; // 특수(임시땅콩B): 교배 시 악성만
+            if (SpecialItemSystem.Has("extreme_mutation")) mutation = MutationKind.Malignant; // 특수(극단적 변이): 교배 시 악성만
             else if (GameRun.Rng.Breed.Value < malignantRatio) mutation = MutationKind.Malignant;
             else mutation = MutationKind.Benign;
         }
@@ -108,8 +108,8 @@ public static class BreedingRules
             if (randomGenes || mutation == MutationKind.Malignant)
                 genetics = GameRun.Rng.Breed.Range(0, 3);
 
-            // 특수(임시완두C): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로
-            if (mutation == MutationKind.Benign && SpecialItemSystem.Has("pea_special_12"))
+            // 특수(적응형 유전자): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로
+            if (mutation == MutationKind.Benign && SpecialItemSystem.Has("adaptive_genetics"))
                 genetics = GetSeasonFavoredGenetics(trait, season);
 
             float resistance = RollResistance(species, modifiers, trait, genetics, has1 ? t1.resistance : 0f, has2 ? t2.resistance : 0f);

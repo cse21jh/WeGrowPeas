@@ -23,13 +23,11 @@ public class SoilEffects
     private Dictionary<int, WaveType> fertilizerColumns => State.FertilizerColumns;
     private HashSet<int> absorbFertilizerTiles => State.AbsorbFertilizerTiles;
     private Dictionary<int, float> columnGoldMulBonus => State.ColumnGoldMulBonus;
-    private bool hasCoolingShield { get => State.HasCoolingShield; set => State.HasCoolingShield = value; }
-    private bool isCoolingShieldActivated { get => State.IsCoolingShieldActivated; set => State.IsCoolingShieldActivated = value; }
 
     public List<int> GoldSoilTiles => goldSoilTiles;
     public List<int> PetBottleTiles => petBottleTiles;
     public HashSet<int> AbsorbFertilizerTiles => absorbFertilizerTiles;
-    public bool HasCoolingShield => hasCoolingShield;
+    public bool HasCoolingShield => State.HasCoolingShield;
 
     public SoilEffects(Grid grid, GameObject petBottleMarkerPrefab, GameObject goldSoilMarkerPrefab)
     {
@@ -213,28 +211,6 @@ public class SoilEffects
         return false;
     }
     public void AddPetBottleBlockCount(int value) => State.AddPetBottleBlockCount(value);
-    /// <summary>
-    /// 냉각 방패 활성화 (구매 시 호출)
-    /// </summary>
-    public void ActivateCoolingShield()
-    {
-        hasCoolingShield = true;
-    }
-    /// <summary>
-    /// 냉각 방패가 활성화되었는지 확인 (1회 사용됨 여부)
-    /// </summary>
-    public bool IsCoolingShieldActivated()
-    {
-        return isCoolingShieldActivated;
-    }
-    /// <summary>
-    /// 냉각 방패 사용 처리 (1회 사용)
-    /// </summary>
-    public void SetCoolingShieldActivated()
-    {
-        isCoolingShieldActivated = true;
-        hasCoolingShield = false; // 사용 후 소멸
-    }
     public bool TryGetFertilizerType(int gridIndex, out WaveType type) => State.TryGetFertilizerType(gridIndex, out type);
     /// <summary>특수(땅부자): 무작위 세로줄에 고속 숙성 효과(+0.5 = 풀업과 동일) 추가.</summary>
     public void AddLandRichColumn()
@@ -261,7 +237,7 @@ public class SoilEffects
 
     /// <summary>특수(알록달록): 해당 칸에 적용 중인 땅/식물 효과 개수 (정보 UI 기준과 동일).</summary>
     public int CountTileEffects(int idx) => State.CountTileEffects(idx);
-    /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
+    /// <summary>특수(군체): 주변 4칸의 서로 다른 식물 종 수.</summary>
     public int CountDistinctNeighborSpecies(int idx) => State.CountDistinctNeighborSpecies(idx);
     /// <summary>특수(순환): 판매한 식물 주변 4칸 식물의 모든 저항력을 5%p 회복 (형질별 최대 90%).</summary>
     public void HealNeighborsBySell(int idx) => State.HealNeighborsBySell(idx);

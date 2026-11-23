@@ -100,6 +100,7 @@ public class GameManager : Singleton<GameManager>
 
             case GameStartType.ContinueAfterEnding:
                 Debug.Log("40일 이후 계속 불러오기");
+                enemyController.InitEnemyController();
                 LoadGame();
                 gameMode = 1;
                 break;

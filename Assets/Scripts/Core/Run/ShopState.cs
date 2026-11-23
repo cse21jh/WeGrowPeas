@@ -82,6 +82,7 @@ public sealed class ShopState
             item => IsProbabilityEqualized ? 8 : item.GetRotationWeight(ctx),
             new Random(GetSeed(day)),
             rotationCount);
+        foreach (ItemData item in inventory.Rotation) item.InitializePrice(ctx);
 
         return inventory;
     }

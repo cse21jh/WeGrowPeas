@@ -49,7 +49,7 @@ public class PlantSpawner
         plant.SetTrait(trait);
         placePlant(plant, grididx);
 
-        // 특수(임시땅콩A): 새 식물이 생겨날 때 가격의 50% 골드 (실제로 심어진 경우만)
+        // 특수(신상품): 새 식물이 생겨날 때 가격의 50% 골드 (실제로 심어진 경우만)
         int plantingGold = FieldState.GetPlantingGold(plant.State);
         if (plantingGold > 0
             && board.Plants.TryGetValue(plant.gridIndex, out Plant placed) && placed == plant)

@@ -42,9 +42,6 @@ public class SprinklerFertilizerSynergyItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        if (purchaseCount > 0)
-        {
-            Price = 1500 + (purchaseCount * 500); 
-        }
+        Price = 1500 + (purchaseCount * 500); 
     }
 }

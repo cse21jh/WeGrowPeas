@@ -151,8 +151,8 @@ public sealed class PlantState
 
         IsRooted = true;
 
-        // 특수(임시땅콩C): 뿌리를 내리면 모든 저항력 40%p 증가
-        if (SpecialItemSystem.Has("peanut_special_12"))
+        // 특수(뿌리 식물): 뿌리를 내리면 모든 저항력 40%p 증가
+        if (SpecialItemSystem.Has("root_plant"))
             for (int i = 0; i < Wave.NumberOfWave; i++)
                 ChangeResistance(i, 0.4f);
 
@@ -436,14 +436,14 @@ public sealed class PlantState
                 int basePrice = BasePriceByTaste(PeaBasePrices);
                 if (Field == null) return basePrice;
 
-                // 특수(임시완두B): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50
-                if (SpecialItemSystem.Has("pea_special_8"))
+                // 특수(군체): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50
+                if (SpecialItemSystem.Has("colony"))
                     basePrice += 50 * Field.Soil.CountDistinctNeighborSpecies(GridIndex);
 
                 int price = CalculateSellingPrice(basePrice, Field.Modifiers.GetAdditionalPlantGoldMultiplier());
 
-                // 특수(임시완두A): 보유 형질의 저항력 평균만큼 가격 추가 증가 (곱적용)
-                if (SpecialItemSystem.Has("pea_special_4") && Traits.Count > 0)
+                // 특수(보양식): 보유 형질의 저항력 평균만큼 가격 추가 증가 (곱적용)
+                if (SpecialItemSystem.Has("health_food") && Traits.Count > 0)
                 {
                     float sum = 0f;
                     foreach (var t in Traits) sum += GetResistanceValue((int)t.traitType);

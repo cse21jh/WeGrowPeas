@@ -57,7 +57,7 @@ public sealed class CurseBoard
     {
         int tomorrow = stage + 1;
         if (tomorrow % SeasonInterval == 3) SelectTemporal(stage);
-        if (tomorrow > SeasonInterval && tomorrow % SeasonInterval == 1) SelectSeasonal();
+        if (tomorrow > SeasonInterval && tomorrow % SeasonInterval == 1) SelectSeasonal(tomorrow);
     }
 
     private void SelectTemporal(int stage)
@@ -70,10 +70,15 @@ public sealed class CurseBoard
         Force(valid[GameRun.Rng.Curse.Range(0, valid.Count)], Level);
     }
 
-    private void SelectSeasonal()
+    // 내일부터 걸리므로 내일 일차로 해금을 따진다
+    private void SelectSeasonal(int tomorrow)
     {
-        if (seasonalPool.Count == 0) return;
-        Force(seasonalPool[GameRun.Rng.Curse.Range(0, seasonalPool.Count)], Level);
+        var valid = new List<CurseScriptable>();
+        foreach (CurseScriptable curse in seasonalPool)
+            if (curse != null && tomorrow >= curse.unlockStage) valid.Add(curse);
+        if (valid.Count == 0) return;
+
+        Force(valid[GameRun.Rng.Curse.Range(0, valid.Count)], Level);
     }
 
     /// <summary>저주 하나를 건다. 효과는 <see cref="Apply"/>에서 시작된다.</summary>

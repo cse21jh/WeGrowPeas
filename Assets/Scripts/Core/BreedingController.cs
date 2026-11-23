@@ -140,7 +140,7 @@ public class BreedingController : MonoBehaviour
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
-            else if (check == BreedCheck.NoSpace) // TODO: 아래 두 안내 문구가 서로 바뀌어 있다 (기존 동작 유지)
+            else if (check == BreedCheck.SpeciesMismatch)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.species_mismatch"), 1);
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);

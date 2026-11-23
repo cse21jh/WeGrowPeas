@@ -28,7 +28,6 @@ public sealed class SoilState
     /// <summary>특수(땅부자): 세로줄 번호 → 판매 배수 보너스.</summary>
     public Dictionary<int, float> ColumnGoldMulBonus { get; } = new Dictionary<int, float>();
     public bool HasCoolingShield { get; set; }
-    public bool IsCoolingShieldActivated { get; set; }
 
     public bool HasPetBottle(int idx) => PetBottleTiles.Contains(idx);
     public bool HasGoldSoil(int idx) => GoldSoilTiles.Contains(idx);
@@ -76,8 +75,7 @@ public sealed class SoilState
     /// <summary>냉각 방패를 쓸 수 있으면 써 버리고 true.</summary>
     public bool TryUseCoolingShield()
     {
-        if (!HasCoolingShield || IsCoolingShieldActivated) return false;
-        IsCoolingShieldActivated = true;
+        if (!HasCoolingShield) return false;
         HasCoolingShield = false; // 사용 후 소멸
         return true;
     }
@@ -96,7 +94,7 @@ public sealed class SoilState
         return count;
     }
 
-    /// <summary>특수(임시완두B): 주변 4칸의 서로 다른 식물 종 수.</summary>
+    /// <summary>특수(군체): 주변 4칸의 서로 다른 식물 종 수.</summary>
     public int CountDistinctNeighborSpecies(int idx)
     {
         var species = new HashSet<string>();
@@ -135,56 +133,36 @@ public sealed class SoilState
         return false;
     }
 
-    /// <summary>고추의 영향 범위 안에 있는가. 범위는 강화 단계에 따라 좌우, 상하, 대각선으로 넓어진다.</summary>
     public bool IsAffectedByChiliPepper(int gridIndex)
     {
-        int maxIndex = board.MaxCol * 4;
-
-        // 0단계: 좌우
-        if ((gridIndex - 4) >= 0 && IsChiliPepperAt(gridIndex - 4)) return true;
-        if ((gridIndex + 4) < maxIndex && IsChiliPepperAt(gridIndex + 4)) return true;
-
-        // 1단계: 상하
-        if (modifiers.ChiliPepperRangeLevel >= 1)
-        {
-            if ((gridIndex - 1) / 4 == gridIndex / 4 && IsChiliPepperAt(gridIndex - 1)) return true;
-            if ((gridIndex + 1) / 4 == gridIndex / 4 && IsChiliPepperAt(gridIndex + 1)) return true;
-        }
-
-        // 2단계: 대각선. 조건식은 기존 동작을 그대로 옮긴 것이다.
-        if (modifiers.ChiliPepperRangeLevel >= 2)
-        {
-            // 왼쪽 위
-            if ((gridIndex - 5) >= 0 && (gridIndex - 5) % 4 == (gridIndex - 1) % 4 && IsChiliPepperAt(gridIndex - 5)) return true;
-            // 오른쪽 위
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex - 1) % 4 && IsChiliPepperAt(gridIndex + 3)) return true;
-            // 왼쪽 아래
-            if ((gridIndex - 3) >= 0 && (gridIndex - 3) % 4 == (gridIndex + 1) % 4 && IsChiliPepperAt(gridIndex - 3)) return true;
-            // 오른쪽 아래
-            if ((gridIndex + 5) < maxIndex && (gridIndex + 5) % 4 == (gridIndex + 1) % 4 && IsChiliPepperAt(gridIndex + 5)) return true;
-        }
-
+        foreach (int offset in GetChiliPepperOffsets(gridIndex))
+            if (IsChiliPepperAt(gridIndex + offset)) return true;
         return false;
     }
 
-    /// <summary>고추의 치료 대상. 범위 칸은 기존 동작을 그대로 옮긴 것으로, 저항력 보너스 범위와 0·1단계 방향이 다르다.</summary>
+    /// <summary>고추의 치료 대상 (고추 제외).</summary>
     public List<PlantState> GetPlantsNearChiliPepper(int chiliIndex)
     {
         var list = new List<PlantState>();
-        AddHealTargets(list, chiliIndex - 1, chiliIndex + 1);
-        if (modifiers.ChiliPepperRangeLevel >= 1)
-            AddHealTargets(list, chiliIndex - 4, chiliIndex + 4);
-        if (modifiers.ChiliPepperRangeLevel >= 2)
-            AddHealTargets(list, chiliIndex - 5, chiliIndex - 3, chiliIndex + 3, chiliIndex + 5);
+        foreach (int offset in GetChiliPepperOffsets(chiliIndex))
+            if (board.States.TryGetValue(chiliIndex + offset, out PlantState plant) && plant.Kind != PlantKind.ChiliPepper)
+                list.Add(plant);
         return list;
     }
 
-    private void AddHealTargets(List<PlantState> list, params int[] cells)
+    // 저항력을 볼 때마다 불리므로 미리 만들어 둔다. [단계][줄 위치: 맨 위, 가운데, 맨 아래]
+    private static readonly int[][][] ChiliPepperOffsets =
     {
-        foreach (int idx in cells)
-            if (idx >= 0 && idx < board.CellCount && board.States.TryGetValue(idx, out PlantState plant)
-                && plant.Kind != PlantKind.ChiliPepper)
-                list.Add(plant);
+        new[] { new[] { -4, 4 }, new[] { -4, 4 }, new[] { -4, 4 } },
+        new[] { new[] { -4, 4, 1 }, new[] { -4, 4, -1, 1 }, new[] { -4, 4, -1 } },
+        new[] { new[] { -4, 4, 1, -3, 5 }, new[] { -4, 4, -1, 1, -5, 3, -3, 5 }, new[] { -4, 4, -1, -5, 3 } },
+    };
+
+    /// <summary>고추의 영향이 닿는 칸까지의 차이. 0단계: 좌우, 1단계: 상하 추가, 2단계: 대각선까지 8칸.</summary>
+    private int[] GetChiliPepperOffsets(int center)
+    {
+        int row = center % 4;
+        return ChiliPepperOffsets[modifiers.ChiliPepperRangeLevel][row == 0 ? 0 : row == 3 ? 2 : 1];
     }
 
     /// <summary>저항력 흡수 비료: 위의 식물이 상하좌우 식물과 겹치는 형질마다 3%p씩 뺏어 온다. 뺏기는 쪽은 10%까지만 준다.</summary>

@@ -110,7 +110,7 @@ public class TutorialBreedingController : BreedingController
                         SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                         isBreedButtonPressed = false;
                     }
-                    else if (isEqualPlant)
+                    else if (!isEqualPlant)
                     {
                         Debug.Log("두 종이 일치하지 않습니다");
                         SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);

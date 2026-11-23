@@ -38,9 +38,6 @@ public class BadGuyMoreRiceItemData : ItemData
         if (ctx?.Shop == null) return;
 
         int purchaseCount = ctx.Shop.GetItemPurchaseCount(this);
-        if (purchaseCount > 0)
-        {
-            Price = 500 + (purchaseCount * 500); 
-        }
+        Price = 500 + (purchaseCount * 500); 
     }
 }
