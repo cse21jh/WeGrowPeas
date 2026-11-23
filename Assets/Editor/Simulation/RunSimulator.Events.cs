@@ -36,8 +36,7 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
 
     void ICurseWorld.PrepareSecondWave()
     {
-        // EnemyController.UpdateSecondWaveIfNull
-        if (CurseState.DoubleWave && nextSecondWave == null) nextSecondWave = deck.PickSecond(nextWave, stage);
+        waves.PrepareSecond(stage);
     }
 
     void ICurseWorld.OnTilesChanged() { }
@@ -46,7 +45,7 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
     // ───── 의뢰 ─────
 
     RunEvents IRequestWorld.Events => events;
-    int IRequestWorld.PickTraitFromWaves() => (int)deck.PickNext(currentWave, stage);
+    int IRequestWorld.PickTraitFromWaves() => (int)waves.Deck.PickNext(currentWave, stage);
     bool IRequestWorld.IsFreeTime => isNight;
 
     private void ClaimRequests()
@@ -77,10 +76,7 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
     // Grid.TryPlacePlant → MovablePlant.OnMouseUp과 같은 순서
     private void MovePlant(PlantState plant, int cell)
     {
-        field.Board.Remove(plant.GridIndex);
-        plant.MoveTo(cell);
-        field.Board.PlaceState(cell, plant);
-        field.Board.NotifyChanged();
+        field.MovePlant(plant, cell);
         events.RaisePlantMoved();
         plant.TryRootByDawn();
     }
@@ -97,9 +93,8 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
     // 10일마다 받는 선물. 봇은 후보 중 아무거나 고른다(아이템별 효과를 견줄 수 있게).
     private void TakeSpecialItem()
     {
-        if (!config.specialItems || stage % 10 != 0 || stage >= EndlessMode.StartStage) return;
+        if (SpecialItemSystem.PendingGifts == 0) return;
 
-        SpecialItemSystem.AddGift();
         List<SpecialItemData> candidates = SpecialItemSystem.RollCandidates(config.species, 3, data => config.allUnlocked || !data.plantSpecific);
         if (candidates.Count == 0) return;
 

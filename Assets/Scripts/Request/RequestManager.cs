@@ -71,7 +71,6 @@ public class RequestManager : Singleton<RequestManager>
 
     private void HandleDayPassed()
     {
-        Board.DayPassed++;
         UpdateRequestAppTitle();
     }
 
@@ -80,7 +79,7 @@ public class RequestManager : Singleton<RequestManager>
         if (GameManager.Instance?.Tutorial?.CanUseQuests == false) return;
 
         ClearRequestAlarm();
-        if (Board.StartCycle(startRound, GameRun.Current.Shop.UniqueSeed + startRound * 100))
+        if (Board.StartCycle(startRound))
             PushRequestGenerateAlarm();
         UpdateRequestAppTitle();
 

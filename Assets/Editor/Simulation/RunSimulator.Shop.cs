@@ -11,7 +11,7 @@ public sealed partial class RunSimulator : IShopWorld
 
     private readonly ShopContext shopContext;
     private int bonusBreedAttempts;
-    private int waveSkips;
+    private int waveSkips => waves.Skips;
 
     // ───── 에셋 ─────
 
@@ -407,13 +407,12 @@ public sealed partial class RunSimulator : IShopWorld
             foreach (PlantState plant in plants) sum += plant.GetResistanceValue((int)currentWave);
             if (plants.Count > 0 && sum / plants.Count >= 0.5f) return;
         }
-        waveSkips--;
-        currentWave = WaveType.None;
+        waves.SkipToday();
     }
 
     /// <summary>빈 밭의 시뮬레이터 세계 하나. 아이템 효과를 게임과 대조할 때 쓴다.</summary>
     public static IShopWorld CreateWorld(SimConfig config, int stage, WaveType currentWave)
-        => new RunSimulator(config, 0) { stage = stage, currentWave = currentWave };
+        => new RunSimulator(config, 0) { stage = stage, waves = { Current = currentWave } };
 
     // ───── IShopWorld ─────
 
@@ -441,7 +440,7 @@ public sealed partial class RunSimulator : IShopWorld
 
     void IShopWorld.AddBreedAttempts(int count) => bonusBreedAttempts += count;
     void IShopWorld.AddBreedSeconds(int seconds) => bonusDaySeconds += seconds;
-    void IShopWorld.AddWaveSkips(int count) => waveSkips += count;
+    void IShopWorld.AddWaveSkips(int count) => waves.Skips += count;
 
     void IShopWorld.AddTimedMultiplier(StatId stat, int param, float multiplier, int days, string sourceTag)
         => mods.AddTimed(stat, param, ModOp.Multiply, multiplier, stage, days, sourceTag);

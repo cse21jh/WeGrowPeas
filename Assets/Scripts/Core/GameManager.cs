@@ -22,14 +22,9 @@ public class GameManager : Singleton<GameManager>
     //위는 저장 필요
 
     private bool gameOver = false;
-    public int requestCycle = 2;
-
     private bool isStopped = false;
 
     private int gameMode = 0; //0: normal 1: endless
-
-    /// <summary>저주가 이번 런에서 도는가. 무한모드(1) 또는 새벽 모드(저주 레벨 &gt; 0)일 때.</summary>
-    private bool CurseActive => DawnSystem.Current.curseLevel > 0;
 
     public Grid grid;
     public EnemyController enemyController;
@@ -137,15 +132,16 @@ public class GameManager : Singleton<GameManager>
         GameEvents.OnSaveGameRequested -= SaveGame;
     }
 
+    private DayFlow day;
+
+    /// <summary>하루의 순서. 규칙은 여기, 연출과 입력은 <see cref="PlayStep"/>.</summary>
+    public DayFlow Day => day ??= new DayFlow(new GameDayWorld(this));
+
     IEnumerator StartNormalMode()
     {
         while (!gameOver)
         {
-            UpdateStageUI();
-
-            if (CurseActive) curseManager.ApplyCurse(); // 새벽: 전날 밤 선택된 저주 발동
-
-            yield return StartCoroutine(StartStage());
+            yield return StartCoroutine(RunDay());
 
             if (stage == endStage)
             {
@@ -165,11 +161,7 @@ public class GameManager : Singleton<GameManager>
 
         while(!gameOver)
         {
-            UpdateStageUI();
-
-            if (CurseActive) curseManager.ApplyCurse(); // 새벽 저주만. 무한 모드 자체의 상시 저주는 없다.
-
-            yield return StartCoroutine(StartStage());
+            yield return StartCoroutine(RunDay());
             if (gameOver) break;
 
             // 엔딩 뒤 5일을 더 버틸 때마다 새벽 단계를 건너뛰어 연다(바로 저장된다).
@@ -182,11 +174,11 @@ public class GameManager : Singleton<GameManager>
 
     private void StageUpdate()
     {
-        stage++;
-        ModManager.Instance?.OnNewDay(stage);
+        foreach (Mod mod in Day.NextDay())
+            if (mod.IsSignPost) enemyController.signPost.HideSignPost();
+
         PhoneManager.Instance.messengerApp.RefreshchatPartnerList();
-        enemyController.UnlockWave(stage);
-        
+
         // 매일 상점 자동 리롤 (비활성화된 오브젝트도 포함해서 찾기)
         var shopCanvases = FindObjectsOfType<ShopCanvasController>(true);
         if (shopCanvases != null && shopCanvases.Length > 0 && shopCanvases[0] != null)
@@ -197,19 +189,61 @@ public class GameManager : Singleton<GameManager>
         GameEvents.RaiseDayStarted(); // 일차를 기준으로 표시하는 UI 갱신 (D-day, "N일 전" 등)
     }
 
-    IEnumerator StartStage()
+    private IEnumerator RunDay()
     {
-        // 세금 연체 시 낮 시작 직후(웨이브 전) 강제징수/압류
-        if (TaxManager.Instance != null && TaxManager.Instance.HasOverdueTax(stage))
-            yield return StartCoroutine(TaxCollectionRoutine());
+        foreach (DayStep step in Day.Run())
+        {
+            IEnumerator wait = PlayStep(step);
+            if (wait != null) yield return StartCoroutine(wait);
+        }
+    }
 
-        enemyController.ShowNextWaveText();
+    /// <summary>하루의 각 단계에서 할 일. 기다릴 것이 없으면 null.</summary>
+    private IEnumerator PlayStep(DayStep step)
+    {
+        switch (step)
+        {
+            case DayStep.DayStarted:
+                UpdateStageUI();
+                if (DawnSystem.Current.curseLevel > 0) curseManager.OnCurseApplied();
+                return null;
 
-        if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
+            case DayStep.TaxOverdue: // 낮 시작 직후(웨이브 전) 강제징수/압류
+                return TaxCollectionRoutine();
 
-        yield return StartCoroutine(grid.Breeder.Breeding());
+            case DayStep.FreeTime:
+                enemyController.ShowNextWaveText();
+                return grid.Breeder.Breeding();
 
-        yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
+            case DayStep.BeforeWave:
+                return enemyController.PlayWaveRoutine();
+
+            case DayStep.WaveResolved:
+                return WaveResolvedRoutine();
+
+            case DayStep.Evening:
+                return EveningRoutine();
+
+            case DayStep.Night:
+                return NightRoutine();
+
+            case DayStep.DayEnded:
+                AchievementHooks.OnDayEnded(grid.Board); // 업적: 식물별 생존 일수
+
+                // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
+                // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
+                RecallRecorder.CaptureDay();
+
+                economyManager.PushEarnedGold();
+                return null;
+        }
+        return null;
+    }
+
+    private IEnumerator WaveResolvedRoutine()
+    {
+        enemyController.OnWaveResolved();
+        yield return null;
 
         gameOver = grid.CheckGameOver();
 
@@ -218,29 +252,23 @@ public class GameManager : Singleton<GameManager>
 
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.Board.Plants.Count);
+    }
 
-        /*if (stage == endStage)
-        {
-            economyManager.PushEarnedGold();
-            yield return StartCoroutine(ClearNormalMode());
-        }*/
-
-        yield return StartCoroutine(BreedEndRoutine());
-
-        GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check + 저주 만료 처리
-
+    private IEnumerator EveningRoutine()
+    {
+        yield return null;
+        GameEvents.RaiseDayPassedForRequest(); // 저주 남은 일수 갱신
 
         // 여기다가 밤으로 바뀌는 이펙트 추가해야 함
         gcController.ToggleGlow(true);
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
+    }
 
-        if (CurseActive) curseManager.SelectCurse(stage);
-
-        // 특수 아이템: 엔딩 전 10·20·30일 밤에 선물 도착 (수령 전까지 유지).
-        // 폰에서 수령하므로 폰 페이즈 직전에 지급한다.
-        if (stage % 10 == 0 && stage < endStage)
+    private IEnumerator NightRoutine()
+    {
+        // 선물은 폰에서 받으므로 폰 페이즈 직전에 알린다
+        if (DayFlow.IsGiftNight)
         {
-            SpecialItemSystem.AddGift();
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
                 title = Loc.T("game.gift.title"),
@@ -251,27 +279,16 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
-
         gcController.ToggleGlow(false);
         yield return waveManager.StartCoroutine(waveManager.StopNightCoroutine());
-        /*
-        if (!enemyController.IsLastWaveNone())
-            yield return StartCoroutine(upgradeManager.UpgradePhase());            
-        
-        yield return StartCoroutine(shopManager.ShopPhase(grid));
-        */
-        GameEvents.RaiseQuestDayPassed();
+    }
 
-        // 업적: 식물별 생존 일수
-        foreach (var plant in grid.Board.Plants.Values)
-            if (plant != null && !plant.isDying) plant.AddDayOnField();
-        AchievementHooks.OnDayEnded(grid.Board);
-
-        // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
-        // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
-        RecallRecorder.CaptureDay();
-
-        economyManager.PushEarnedGold();
+    /// <summary>튜토리얼의 낮. 본 게임과 같은 앞뒤 처리를 한다.</summary>
+    public IEnumerator TutorialFreeTimeRoutine()
+    {
+        Day.StartFreeTime();
+        yield return grid.Breeder.Breeding();
+        Day.EndFreeTime();
     }
 
     private void UpdateStageUI()

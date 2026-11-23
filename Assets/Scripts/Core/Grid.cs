@@ -416,16 +416,13 @@ public class Grid : MonoBehaviour, IBugTargets
         {
             Dictionary<Plant, int> previousPrices = Upgrades.CapturePlantSellingPrices();
             // 빈 칸이면 원래대로 심기
-            Board.Remove(fromIndex); // 원래 위치에서 제거
-            plant.SetGridIndex(toIndex);
-            plant.transform.position = GetSoilTransform(toIndex).position;
-            Board.Place(toIndex, plant);
-
-            if (plant is MovablePlant p1)
+            Field.MovePlant(plant.State, toIndex, () =>
             {
-                p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
-            }
-            Board.NotifyChanged();
+                plant.SetGridIndex(toIndex);
+                PlaceOnSoil(plant);
+                if (plant is MovablePlant movable)
+                    movable.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
+            });
             Upgrades.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.Moved);
             if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;

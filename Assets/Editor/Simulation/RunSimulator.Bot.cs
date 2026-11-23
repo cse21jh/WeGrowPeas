@@ -55,7 +55,7 @@ public sealed partial class RunSimulator
     {
         futureWeights = new float[Wave.NumberOfWave];
         float sum = 0f;
-        foreach (var kv in deck.GetEffectiveWeights(stage))
+        foreach (var kv in waves.Deck.GetEffectiveWeights(stage))
         {
             if (kv.Value <= 0f || kv.Key == WaveType.None) continue;
             futureWeights[(int)kv.Key] = kv.Value;

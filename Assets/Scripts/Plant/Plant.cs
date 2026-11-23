@@ -532,7 +532,6 @@ public abstract class Plant : MonoBehaviour
 
     /// <summary>밭에 심긴 뒤 지난 날 수. 옮겨 심어도 유지된다.</summary>
     public int DaysOnField => daysOnField;
-    public void AddDayOnField() => daysOnField++;
     public void SetDaysOnField(int value) => daysOnField = Mathf.Max(0, value);
     public void SetFreeTimePassedCount(int value) => freeTimePassedCount = Mathf.Max(0, value);
 
@@ -540,12 +539,6 @@ public abstract class Plant : MonoBehaviour
     public void MarkBreedAttempted() => hasTriedBreed = true;
     public bool HasTriedBreed => hasTriedBreed;
     public void SetHasTriedBreed(bool value) => hasTriedBreed = value;
-
-    /// <summary>특수(세계여행): 낮(교배 페이즈) 시작 시 위치 기록. Grid.Breeding에서 호출.</summary>
-    public void MarkDayStartPosition()
-    {
-        dayStartGridIndex = gridIndex;
-    }
 
     // 특수(세계여행) 누적 배수 저장/복원용
     public float GetTravelSellBonus() => travelSellBonus;

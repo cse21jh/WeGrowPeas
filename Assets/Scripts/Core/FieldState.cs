@@ -76,6 +76,17 @@ public sealed class FieldState
         return true;
     }
 
+    /// <summary>빈 칸으로 옮긴다.</summary>
+    /// <param name="onPlaced">칸에 놓인 뒤, 밭이 바뀌었다고 알리기 전의 화면 처리.</param>
+    public void MovePlant(PlantState plant, int cell, System.Action onPlaced = null)
+    {
+        Board.Remove(plant.GridIndex);
+        plant.MoveTo(cell);
+        Board.PlaceState(cell, plant);
+        onPlaced?.Invoke();
+        Board.NotifyChanged();
+    }
+
     /// <summary>해충 저항력을 올린다. 지금 있는 식물과 앞으로 태어날 식물에 모두 적용된다.</summary>
     public void AddPestResistance(float value)
     {

@@ -60,10 +60,9 @@ public class CurseManager : Singleton<CurseManager>
         GameEvents.OnDayPassedForRequest -= OnDayPassed;
     }
 
-    /// <summary>하루가 끝날 때(OnDayPassedForRequest) 단발형 만료 + 지속형 일수 차감.</summary>
-    public void OnDayPassed()
+    /// <summary>하루가 끝날 때 남은 일수를 다시 그린다. 일수는 <see cref="DayFlow"/>가 줄인다.</summary>
+    private void OnDayPassed()
     {
-        Board.OnDayPassed();
         UpdateTempCurseUI();
         UpdateCurseUI();
     }
@@ -207,16 +206,9 @@ public class CurseManager : Singleton<CurseManager>
         if (active) sb.AppendLine($"· {text}");
     }
 
-    /// <summary>
-    /// stage = 오늘(밤 시점). 내일(stage+1)에 적용될 저주를 이 시점(전날 자유시간)에 선택·예고한다.
-    /// - 단발형: 매 계절 3일차(3, 8, 13, …)에 확정 발동
-    /// - 지속형: 매 계절 1일차(6, 11, 16, …)부터 적용, 첫 계절(1~5)은 미발생
-    /// </summary>
-    public void SelectCurse(int stage) => Board.Select(stage);
-
-    public void ApplyCurse()
+    /// <summary>저주가 발동한 뒤의 화면 처리.</summary>
+    public void OnCurseApplied()
     {
-        Board.Apply();
         // 도감: 저주 발견
         if (currentTempCurse != null) CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId);
         if (currentSeasonCurse != null) CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId);

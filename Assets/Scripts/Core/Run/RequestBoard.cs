@@ -40,6 +40,12 @@ public sealed class RequestBoard
 
     public void NotifyCompleted(RequestInstance request) => Completed?.Invoke(request);
 
+    private const int CycleStartOffset = 2; // 2, 7, 12, ...일차
+
+    public bool IsCycleStart(int stage) => stage % cycle == CycleStartOffset;
+
+    public bool StartCycle(int stage) => StartCycle(stage, unchecked(GameRun.Current.Shop.UniqueSeed + stage * 100));
+
     /// <param name="seed">판의 상점 시드와 일차로 정한다. 같은 판의 같은 날이면 같은 의뢰가 나온다.</param>
     /// <returns>뽑을 의뢰가 있었는가.</returns>
     public bool StartCycle(int stage, int seed)

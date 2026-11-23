@@ -34,7 +34,6 @@ public class EnemyController : MonoBehaviour
     public Grid grid;
 
 
-    private Wave noneWave;
 
     [SerializeField] TextMeshProUGUI tempSeasonText;
 
@@ -54,10 +53,10 @@ public class EnemyController : MonoBehaviour
     [Header("Wave Weights")]
     [SerializeField] private float defaultBaseWeight = 1f; // 기본 가중치
 
-    // 웨이브 추첨. 표지판 같은 가중치 배수는 ModManager에서 온다.
-    private readonly WaveDeck deck = new WaveDeck
+    /// <summary>오늘과 다음 웨이브. 추첨 가중치의 배수(표지판 등)는 ModManager에서 온다.</summary>
+    public WaveState Waves { get; } = new WaveState
     {
-        WeightMultiplier = type => ModManager.Instance ? ModManager.Instance.GetMul(StatId.WaveWeightMul, (int)type) : 1f,
+        Deck = { WeightMultiplier = type => ModManager.Instance ? ModManager.Instance.GetMul(StatId.WaveWeightMul, (int)type) : 1f },
     };
 
     private bool isWaveSkipped = false;
@@ -72,11 +71,6 @@ public class EnemyController : MonoBehaviour
 
 
 
-    private Wave lastWave;
-    private Wave currentWave = new AgingWave();
-    private Wave nextWave;
-    private Wave nextSecondWave;
-    private int waveSkipCount = 0;
     private int[] waveKillCount;
     private string shownWaveText;
 
@@ -85,13 +79,16 @@ public class EnemyController : MonoBehaviour
     private List<int> stageNoTraitRecord = new List<int>();
 
     public Season CurrentSeason => currentSeason;
-    public Wave CurrentWave => currentWave;
-    public Wave NextWave => nextWave;
-    
-    public Wave GetNextWave() => nextWave;
-    public Wave GetNextSecondWave() => nextSecondWave;
-    public Wave LastWave => lastWave;
-    public int WaveSkipCount => waveSkipCount;
+    public Wave CurrentWave => GetWaveFromWaveType(Waves.Current);
+    public Wave NextWave => ToWave(Waves.Next);
+
+    public Wave GetNextWave() => NextWave;
+    public Wave GetNextSecondWave() => ToWave(Waves.Second);
+    public Wave LastWave => ToWave(Waves.Last);
+    public int WaveSkipCount => Waves.Skips;
+
+    private static Wave ToWave(WaveType? type) => type.HasValue ? GetWaveFromWaveType(type.Value) : null;
+
     public int[] WaveKillCount => waveKillCount;
     public List<WaveType> StageWaveRecord => stageWaveRecord;
     public List<int> StageKillRecord => stageKillRecord;
@@ -124,30 +121,19 @@ public class EnemyController : MonoBehaviour
         SetWaveSkipCountText();
         HideWaveSkipButton();
 
-        InitBaseWeightsByStage(1);
+        Waves.Init(CurrentStage);
 
-        noneWave = new NoneWave();
-
-        lastWave = GetWaveFromWaveType(WaveType.Aging);
-        currentWave = lastWave;
-        nextWave = GetWaveFromWaveType(PickNextByWeight());
-        
-        if (CurseState.DoubleWave)
-            nextSecondWave = PickSecondWave(nextWave.WaveType);
-        else
-            nextSecondWave = null;
-
-
-        setWave = currentWave.WaveType;
-        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        setWave = Waves.Current;
+        FenceUIManager.Instance.SetWaveHighlight(CurrentWave);
     }
 
-    public IEnumerator EnemyWaveCoroutine()
+    private bool fullFieldWave;
+    private int plantsBeforeWave;
+
+    /// <summary>웨이브 연출을 보여주고 판정 전의 기록을 남긴다. 판정은 <see cref="DayFlow"/>가 한다.</summary>
+    public IEnumerator PlayWaveRoutine()
     {
-        bool tutorial = GameManager.Instance.Tutorial != null;
-        //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
-        Wave wave = currentWave;
-        // Debug.Log("현재 웨이브 타입 : " + currentWave);
+        Wave wave = CurrentWave;
         PlayerRecordForGraph.SetWED((int)wave.WaveType);
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
@@ -168,66 +154,50 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        stageWaveRecord.Add(currentWave.WaveType);
+        stageWaveRecord.Add(Waves.Current);
         stageKillRecord.Add(0);
-        stageNoTraitRecord.Add(grid.Board.CountNoTraitPlant(currentWave.WaveType));
+        stageNoTraitRecord.Add(grid.Board.CountNoTraitPlant(Waves.Current));
 
         // 업적: 모든 칸이 찬 상태에서 웨이브를 맞는지 기록
-        bool fullFieldWave = currentWave != noneWave && !tutorial && !grid.Board.HasEmptyCell();
-        int plantsBeforeWave = grid.Board.Plants.Count;
-
-        // 판정 순서는 DayRules에 있다 (흡수 비료 → 웨이브 → 두 번째 웨이브 → 버섯 → 해동)
-        DayRules.ResolveWave(grid.Field, currentWave.WaveType,
-            () => (nextSecondWave ?? PickSecondWave(currentWave.WaveType))?.WaveType,
-            new GridFieldActions(grid));
-
-        if (fullFieldWave) AchievementHooks.OnFullFieldWaveEnded(plantsBeforeWave, grid.Board.Plants.Count);
-
-
-        if (tutorial)
-            lastWave = currentWave;
-        else
-        {
-            SetNextSeason();
-            SetNextWave(); // 다음 바뀐 후, 플레이어레코드 정보를 받아야 함
-        }
-
-        grid.Scouter.UpdateGoldScouterImageInGrid(); // 웨이브로 인해 단체로 죽을 때는 한 번만 갱신해서 연산량 줄이기
-        grid.Scouter.UpdateResistanceScouterImageInGrid(currentWave.WaveType); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
-
-        int stage = GameManager.Instance.stage;
-        //FlushNextWaveText();
-        yield return null;
+        bool tutorial = GameManager.Instance.Tutorial != null;
+        fullFieldWave = Waves.Current != WaveType.None && !tutorial && !grid.Board.HasEmptyCell();
+        plantsBeforeWave = grid.Board.Plants.Count;
     }
 
-    private void InitBaseWeightsByStage(int stage) => deck.Init(stage);
-
-    public void UnlockWave(int stage) => deck.Unlock(stage);
-
-    public void SetNextWave()
+    /// <summary>웨이브 판정이 끝나고 다음 웨이브가 정해진 뒤의 화면 처리.</summary>
+    public void OnWaveResolved()
     {
-        lastWave = currentWave;
-        currentWave = nextWave;
-        grid.Scouter.UpdateResistanceScouterImageInGrid(currentWave.WaveType);
-        setWave = currentWave.WaveType;
-        FenceUIManager.Instance.SetWaveHighlight(currentWave);
-        WaveType picked = PickNextByWeight();
-        nextWave = GetWaveFromWaveType(picked);
-        
-        if (CurseState.DoubleWave)
-            nextSecondWave = PickSecondWave(nextWave.WaveType);
-        else
-            nextSecondWave = null;
-
+        SetNextSeason();
+        setWave = Waves.Current;
+        FenceUIManager.Instance.SetWaveHighlight(CurrentWave);
         GameEvents.RaiseWaveScheduleChanged(); // 예보 UI(홈 위젯 등) 즉시 갱신
+        RefreshAfterWave();
+    }
+
+    private void RefreshAfterWave()
+    {
+        if (fullFieldWave) AchievementHooks.OnFullFieldWaveEnded(plantsBeforeWave, grid.Board.Plants.Count);
+
+        grid.Scouter.UpdateGoldScouterImageInGrid(); // 웨이브로 인해 단체로 죽을 때는 한 번만 갱신해서 연산량 줄이기
+        grid.Scouter.UpdateResistanceScouterImageInGrid(Waves.Current); // 웨이브로 인해 저항력이 단체로 감소할 때는, 한 번만 갱신해서 연산량 줄이기
+    }
+
+    /// <summary>튜토리얼의 웨이브. 다음 웨이브는 튜토리얼이 정한다.</summary>
+    public IEnumerator TutorialChapterWaveRoutine()
+    {
+        yield return PlayWaveRoutine();
+        GameManager.Instance.Day.ResolveWave();
+        Waves.Last = Waves.Current;
+        RefreshAfterWave();
+        yield return null;
     }
 
     public void SetTutorialWave(WaveType current, WaveType next)
     {
-        currentWave = GetWaveFromWaveType(current);
-        nextWave = GetWaveFromWaveType(next);
+        Waves.Current = current;
+        Waves.Next = next;
         setWave = current;
-        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        FenceUIManager.Instance.SetWaveHighlight(CurrentWave);
         breedTimerManager.SetTimer(current);
         ShowNextWaveText();
         GameEvents.RaiseWaveScheduleChanged();
@@ -235,7 +205,7 @@ public class EnemyController : MonoBehaviour
 
     public void RecordTutorialDayWithoutWave()
     {
-        lastWave = currentWave;
+        Waves.Last = Waves.Current;
         stageWaveRecord.Add(WaveType.None);
         stageKillRecord.Add(0);
         stageNoTraitRecord.Add(0);
@@ -243,17 +213,11 @@ public class EnemyController : MonoBehaviour
 
     public void AdvanceTutorialWave(WaveType following)
     {
-        lastWave = currentWave;
-        SetTutorialWave(nextWave.WaveType, following);
+        Waves.Last = Waves.Current;
+        SetTutorialWave(Waves.Next.Value, following);
     }
 
-    public void UpdateSecondWaveIfNull()
-    {
-        if (CurseState.DoubleWave && nextSecondWave == null && nextWave != null)
-        {
-            nextSecondWave = PickSecondWave(nextWave.WaveType);
-        }
-    }
+    public void UpdateSecondWaveIfNull() => Waves.PrepareSecond(CurrentStage);
 
     /// <summary>
     /// 디버그 전용: 일차를 강제로 점프시킬 때, 일차별 기록 리스트를 목표 일차까지 0으로 채운다.
@@ -270,7 +234,7 @@ public class EnemyController : MonoBehaviour
     /// <summary>디버그 전용: 다음 웨이브를 지정한 종류로 바꾼다.</summary>
     public void DebugSetNextWave(WaveType waveType)
     {
-        nextWave = GetWaveFromWaveType(waveType);
+        Waves.Next = waveType;
         ShowNextWaveText();
 
 
@@ -279,7 +243,7 @@ public class EnemyController : MonoBehaviour
 
     public void SetCurrentWaveTimer()
     {
-        breedTimerManager.SetTimer(currentWave.WaveType);
+        breedTimerManager.SetTimer(Waves.Current);
         ShowNextWaveText();
     }
 
@@ -331,28 +295,18 @@ public class EnemyController : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.GetGameIsStopped())
             return;
 
-        if (grid.Breeder.GetIsBreeding() && waveSkipCount > 0 && currentWave != noneWave)
+        if (grid.Breeder.GetIsBreeding() && Waves.SkipToday())
         {
-            currentWave = noneWave;
-            waveSkipCount--;
             SetWaveSkipCountText();
             ShowNextWaveText();
         }
 
-        if (waveSkipCount <= 0)
+        if (Waves.Skips <= 0)
             HideWaveSkipButton();
         return;
     }
 
-    public bool IsLastWaveNone()
-    {
-        if (lastWave == noneWave)
-            return true;
-        else
-            return false;
-    }
-
-    public string NextWaveDescription => CurseState.WaveBlind ? "???" : currentWave.WaveDescription;
+    public string NextWaveDescription => CurseState.WaveBlind ? "???" : CurrentWave.WaveDescription;
 
     public void ShowNextWaveText()
     {
@@ -379,7 +333,7 @@ public class EnemyController : MonoBehaviour
     public void AddWaveSkipCount(int count)
     {
         ShowWaveSkipButton();
-        waveSkipCount += count;
+        Waves.Skips += count;
         SetWaveSkipCountText();
         return;
     }
@@ -389,7 +343,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipCountText == null)
             return;
 
-        waveSkipCountText.text = Loc.T("game.hud.extra_skips", ("count", waveSkipCount));
+        waveSkipCountText.text = Loc.T("game.hud.extra_skips", ("count", Waves.Skips));
         return;
     }
 
@@ -398,7 +352,7 @@ public class EnemyController : MonoBehaviour
         if (waveSkipButton == null)
             return;
 
-        if (waveSkipCount > 0)
+        if (Waves.Skips > 0)
             waveSkipButton.SetActive(true);
         return;
     }
@@ -446,20 +400,20 @@ public class EnemyController : MonoBehaviour
     /// <param name="stage">웨이브 가중치 초기화에 필요한 현재 스테이지(ProgressSave.stage).</param>
     public void LoadEnemyController(WaveSave saveData, int stage)
     {
-        InitBaseWeightsByStage(stage);
+        Waves.Deck.Init(stage);
 
-        currentWave = GetWaveFromWaveType(saveData.curWaveType);
-        grid.Scouter.UpdateResistanceScouterImageInGrid(currentWave.WaveType);
-        setWave = currentWave.WaveType;
-        lastWave = GetWaveFromWaveType(saveData.lastWaveType);
-        nextWave = GetWaveFromWaveType(saveData.nextWaveType);
+        Waves.Current = saveData.curWaveType;
+        grid.Scouter.UpdateResistanceScouterImageInGrid(Waves.Current);
+        setWave = Waves.Current;
+        Waves.Last = saveData.lastWaveType;
+        Waves.Next = saveData.nextWaveType;
 
-        waveSkipCount = saveData.remainWaveSkipCount;
+        Waves.Skips = saveData.remainWaveSkipCount;
         for (int i = 0; i < Wave.NumberOfWave; i++)
             waveKillCount[i] = saveData.waveKillCount[i];
-        FenceUIManager.Instance.SetWaveHighlight(currentWave);
+        FenceUIManager.Instance.SetWaveHighlight(CurrentWave);
         ShowNextWaveText();
-        breedTimerManager.SetTimer(currentWave.WaveType);
+        breedTimerManager.SetTimer(Waves.Current);
 
         SetSeason(saveData.currentSeason);
 
@@ -470,21 +424,12 @@ public class EnemyController : MonoBehaviour
 
     private void OnValidate()
     {
-        currentWave = GetWaveFromWaveType(setWave);
+        Waves.Current = setWave;
         ShowNextWaveText();
     }
 
     // ---------- 가중치 기반 & 리롤 ----------
     private static int? CurrentStage => GameManager.Instance != null ? GameManager.Instance.stage : (int?)null;
-
-    private WaveType PickNextByWeight() => deck.PickNext(currentWave?.WaveType, CurrentStage);
-
-    // 저주(이중 웨이브): 현재 웨이브와 다른, 이미 정식 등장 중인 웨이브 하나를 무작위 선택.
-    private Wave PickSecondWave(WaveType exclude)
-    {
-        WaveType? second = deck.PickSecond(exclude, CurrentStage);
-        return second.HasValue ? GetWaveFromWaveType(second.Value) : null;
-    }
 
     /// <summary>웨이브를 버티지 못한 식물 집계.</summary>
     public void RecordWaveHit(WaveType wave)
@@ -506,8 +451,7 @@ public class EnemyController : MonoBehaviour
     private IEnumerator TEnemyWaveCoroutine()
     {
         //Debug.Log($"웨이브 생성 할 때 사용합니다 {unlockedWave.Count}");
-        Wave wave = currentWave;
-        Debug.Log("currentWave : " + currentWave);
+        Wave wave = CurrentWave;
         SoundManager.Instance.PlayEffect(wave.WaveSoundString);
 
         if (waveManager != null)
@@ -517,7 +461,7 @@ public class EnemyController : MonoBehaviour
 
         yield return new WaitForSeconds(waveDuration); // 웨이브 이펙트 끝 날 때까지
 
-        if (currentWave != noneWave)
+        if (Waves.Current != WaveType.None)
         {
             for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
             {
@@ -534,16 +478,12 @@ public class EnemyController : MonoBehaviour
 
         //SetNextWave();
         //breedTimerManager 의 null reference issue를 에디터에서 함수 분리해서 해결
-        lastWave = currentWave;
-        currentWave = nextWave ?? GetWaveFromWaveType(WaveType.None);
-        setWave = currentWave.WaveType;
-        FenceUIManager.Instance.SetWaveHighlight(currentWave);
-        //breedTimerManager.SetTimer(currentWave.WaveType);
+        Waves.Advance(CurrentStage);
+        setWave = Waves.Current;
+        FenceUIManager.Instance.SetWaveHighlight(CurrentWave);
         ShowNextWaveText();
-        WaveType picked = PickNextByWeight();
-        nextWave = GetWaveFromWaveType(picked);
 
-        currentWave = GetWaveFromWaveType(WaveType.Aging);
+        Waves.Current = WaveType.Aging;
         //FlushNextWaveText();
         yield return null;
     }
@@ -565,8 +505,6 @@ public class EnemyController : MonoBehaviour
 
     public int PickTraitFromUnlockWave()
     {
-        int traitType = (int)PickNextByWeight();
-
-        return traitType;
+        return (int)Waves.Deck.PickNext(Waves.Current, CurrentStage);
     }
 }

@@ -159,6 +159,10 @@ public class BreedingController : MonoBehaviour
             isBreedButtonPressed = false;
         }
     }
+    /// <summary>방금 끝난 낮에 쓰지 않은 교배 횟수.</summary>
+    public int LastRemainingBreeds { get; private set; }
+
+    /// <summary>낮의 자유시간. 앞뒤의 규칙은 <see cref="DayFlow"/>가 처리한다.</summary>
     public IEnumerator Breeding()
     {
         TutorialChapter tutorial = GameManager.Instance.Tutorial;
@@ -186,22 +190,6 @@ public class BreedingController : MonoBehaviour
 
         // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
         if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
-
-        // 신용카드: 어제 상점에서 3슬롯 이상 구매했다면 소모 비용의 일부를 환급 (없어도 일일 집계는 초기화)
-        if (ShopManager.Instance != null)
-        {
-            int refund = ShopManager.Instance.ConsumeDailyPurchaseRefund(grid.Modifiers.CreditCardRefundPercent);
-            if (refund > 0)
-            {
-                GameManager.Instance.grid.Economy.AddGold(refund);
-                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.card_refund", ("gold", refund)), 1);
-            }
-        }
-
-        // 특수(세계여행): 낮 시작 시 각 식물의 위치 마킹 (웨이브 후 이동 거리 계산용)
-        if (SpecialItemSystem.Has("world_travel"))
-            foreach (var p in grid.Board.Plants.Values)
-                if (p != null) p.MarkDayStartPosition();
 
         Button practiceSkipButton = untimedPractice ? breedSkipButton.GetComponent<Button>() : null;
         if (practiceSkipButton != null)
@@ -267,9 +255,7 @@ public class BreedingController : MonoBehaviour
 
         if (!untimedPractice) breedTimerUI.StopTimer();
 
-        int currentEffectiveMaxBreedCount = GetEffectiveMaxBreedCount();
-        int remainingBreeds = Mathf.Max(0, currentEffectiveMaxBreedCount - breedCount);
-        GameEvents.RaiseDayEndedWithRemainingBreeds(remainingBreeds);
+        LastRemainingBreeds = Mathf.Max(0, GetEffectiveMaxBreedCount() - breedCount);
 
         breedCount = 0;
         // Debug.Log("교배 페이즈 종료");
@@ -282,10 +268,6 @@ public class BreedingController : MonoBehaviour
 
         // 저주(통신장애): 자유시간이 끝나면(스킵 포함) 노이즈도 바로 끈다
         if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
-
-        // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
-        DayRules.EndFreeTime(grid.Field, plant => grid.Board.Plants[plant.GridIndex].OnFreeTimePassed());
-        //GardenGrid 리로드
 
         yield return null;
     }

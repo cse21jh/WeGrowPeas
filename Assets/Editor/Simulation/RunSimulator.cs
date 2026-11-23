@@ -72,11 +72,12 @@ public class SimRunResult
 /// 아직 없는 것: 특성, 교배 시간 제한(시간은 금이다).
 /// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
-public sealed partial class RunSimulator : IFieldActions
+public sealed partial class RunSimulator : IFieldActions, IDayWorld
 {
     private readonly SimConfig config;
     private readonly FieldState field;
-    private readonly WaveDeck deck = new WaveDeck();
+    private readonly WaveState waves = new WaveState();
+    private readonly DayFlow day;
     private readonly SimRunResult result;
     private readonly RngStream botRng; // 봇의 무작위 선택. 게임 난수를 쓰지 않는다.
     private readonly PlantKind kind;
@@ -91,9 +92,8 @@ public sealed partial class RunSimulator : IFieldActions
     private readonly EconomyState economy;
     private readonly TaxState tax = new TaxState();
     private readonly ModState mods = new ModState();
-    private WaveType currentWave;
-    private WaveType nextWave;
-    private WaveType? nextSecondWave;
+    private WaveType currentWave => waves.Current;
+    private WaveType nextWave => waves.Next ?? WaveType.None;
 
     private RunSimulator(SimConfig config, int seed)
     {
@@ -107,7 +107,8 @@ public sealed partial class RunSimulator : IFieldActions
         curses = new CurseBoard(temporalCurses, seasonalCurses, this);
         economy = new EconomyState(config.startGold);
         field.Board.Changed += KillLonelyMoneyTrees;
-        deck.WeightMultiplier = type => mods.GetMul(StatId.WaveWeightMul, (int)type, stage);
+        day = new DayFlow(this);
+        waves.Deck.WeightMultiplier = type => mods.GetMul(StatId.WaveWeightMul, (int)type, stage);
     }
 
     // ───── 여러 판 ─────
@@ -167,89 +168,108 @@ public sealed partial class RunSimulator : IFieldActions
     private void Play()
     {
         // GameManager.Start의 새 게임 순서: 웨이브 준비 → 시작 식물 2포기 → 1일차
-        deck.Init(1);
-        currentWave = WaveType.Aging;
-        nextWave = deck.PickNext(currentWave, stage);
+        waves.Init(stage);
         for (int i = 0; i < 2; i++)
             Plant(new List<GeneticTrait> { new GeneticTrait(TraitType.NaturalDeath, Roll(TraitType.NaturalDeath, 1), 1, 0f) }, -1);
         _ = shopContext.Shop.UniqueSeed; // 새 게임에서 정해지는 순서와 맞춘다
-        NextStage();
 
-        while (true)
-        {
-            // GameManager.StartNormalMode → StartStage 순서
-            if (CursesActive) curses.Apply();
-            if (CursesActive && curses.Temporal != null) result.CursesApplied++;
-            if (IsWipedOut) { result.DeathDay = stage; break; }
-
-            CollectOverdueTax();
-            if (IsWipedOut) { result.DiedToTax = true; result.DeathDay = stage; break; }
-
-            if (config.requests && stage % 5 == 2)
-                requests.StartCycle(stage, unchecked(shopContext.Shop.UniqueSeed + stage * 100));
-
-            economy.Add(shopContext.Shop.ConsumeDailyPurchaseRefund(field.Modifiers.CreditCardRefundPercent));
-            foreach (PlantState plant in field.Board.States.Values) plant.DayStartGridIndex = plant.GridIndex;
-            RefreshForecast();
-            DecideNoSell();
-            if (script != null) ScriptDay();
-            else
-            {
-                BreedPhase();
-                MovePlantsForRequest();
-            }
-            BugPhase();
-            if (IsWipedOut) { result.DiedToBug = true; result.DeathDay = stage; break; }
-            if (script == null) UseWaveSkip();
-            if (script == null && IsPlanner) SellDoomed();
-            DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
-
-            if (currentWave != WaveType.None) result.WaveFaced[(int)currentWave]++;
-            WaveType faced = currentWave;
-            DayRules.ResolveWave(field, currentWave, () => nextSecondWave ?? deck.PickSecond(currentWave, stage), this);
-            if (IsWipedOut) { result.DeathWave = faced; result.DeathDay = stage; break; }
-            AdvanceWave();
-
-            DayRules.AfterWave(field, this);
-            curses.OnDayPassed();
-            if (CursesActive) curses.Select(stage);
-            isNight = true;
-            if (script != null) ScriptNight();
-            else NightPhase();
-            isNight = false;
-            requests.DayPassed++;
-            events.RaiseQuestDayPassed();
-            if (script == null) ClaimRequests();
-
-            foreach (PlantState plant in field.Board.States.Values) plant.DaysOnField++;
-            Record();
-
-            if (stage == config.days) { result.Cleared = true; break; }
-            NextStage();
-        }
+        do day.NextDay();
+        while (PlayDay());
 
         result.Gold = economy.Gold;
         result.Mix(result.DeathDay);
         result.Mix(economy.Gold);
     }
 
+    /// <returns>다음 날로 이어지면 true.</returns>
+    private bool PlayDay()
+    {
+        WaveType faced = WaveType.None;
+        foreach (DayStep step in day.Run())
+        {
+            switch (step)
+            {
+                case DayStep.DayStarted:
+                    if (CursesActive && curses.Temporal != null) result.CursesApplied++;
+                    break;
+
+                case DayStep.TaxOverdue:
+                    CollectOverdueTax();
+                    break;
+
+                case DayStep.FreeTime:
+                    PlayFreeTime();
+                    break;
+
+                case DayStep.BeforeWave:
+                    usedBreeds = 0;
+                    faced = currentWave;
+                    if (faced != WaveType.None) result.WaveFaced[(int)faced]++;
+                    break;
+
+                case DayStep.Night:
+                    isNight = true;
+                    if (script != null) ScriptNight();
+                    else NightPhase();
+                    isNight = false;
+                    break;
+
+                case DayStep.DayEnded:
+                    if (script == null) ClaimRequests();
+                    economy.TakeEarnedToday();
+                    Record();
+                    break;
+            }
+
+            if (!IsWipedOut || step == DayStep.Night || step == DayStep.DayEnded) continue;
+            result.DeathDay = stage;
+            result.DiedToTax = step == DayStep.TaxOverdue;
+            result.DiedToBug = step == DayStep.FreeTime;
+            if (step == DayStep.WaveResolved) result.DeathWave = faced;
+            return false;
+        }
+
+        result.Cleared = stage == config.days;
+        return !result.Cleared;
+    }
+
+    private void PlayFreeTime()
+    {
+        RefreshForecast();
+        DecideNoSell();
+        if (script != null) script.Day(this);
+        else
+        {
+            BreedPhase();
+            MovePlantsForRequest();
+        }
+        BugPhase();
+        if (script != null || IsWipedOut) return;
+
+        UseWaveSkip();
+        if (IsPlanner) SellDoomed();
+    }
+
+    // ───── IDayWorld ─────
+
+    FieldState IDayWorld.Field => field;
+    WaveState IDayWorld.Waves => waves;
+    ModState IDayWorld.Mods => mods;
+    CurseBoard IDayWorld.Curses => curses;
+    RequestBoard IDayWorld.Requests => requests;
+    TaxState IDayWorld.Tax => tax;
+    IFieldActions IDayWorld.Actions => this;
+    bool IDayWorld.CursesActive => CursesActive;
+    bool IDayWorld.RequestsActive => config.requests;
+    bool IDayWorld.SpecialItemsActive => config.specialItems;
+    int IDayWorld.RemainingBreeds => Math.Max(0, MaxBreedAttempts - usedBreeds);
+    void IDayWorld.StartRequests() => requests.StartCycle(stage);
+    void IDayWorld.AddRefund(int gold) => economy.Add(gold);
+    void IDayWorld.CountFreeTime(PlantState plant) => plant.FreeTimePassedCount++;
+    void IDayWorld.RaiseDayEndedWithRemainingBreeds(int remaining) => events.RaiseDayEndedWithRemainingBreeds(remaining);
+    void IDayWorld.RaiseQuestDayPassed() => events.RaiseQuestDayPassed();
+
     private bool IsWipedOut => field.Board.CountLivingPlants() == 0;
-
-    private void NextStage()
-    {
-        economy.TakeEarnedToday();
-        stage++;
-        mods.ExpireOn(stage);
-        deck.Unlock(stage);
-        shopContext.Shop.StartDay();
-    }
-
-    private void AdvanceWave()
-    {
-        currentWave = nextWave;
-        nextWave = deck.PickNext(currentWave, stage);
-        nextSecondWave = deck.PickNextSecond(nextWave, stage);
-    }
 
     private void Record()
     {
@@ -269,31 +289,29 @@ public sealed partial class RunSimulator : IFieldActions
 
     private void BreedPhase()
     {
-        int used = 0;
         for (int guard = 0; guard < 50; guard++)
         {
             int max = MaxBreedAttempts;
-            if (used >= max - BreedsToSave(max)) break;
+            if (usedBreeds >= max - BreedsToSave(max)) break;
             if (!field.Board.HasEmptyCell() && !(IsPlanner ? SellCheapest((int)Bot.minKeep, Bot.breedValue) : SellWorst(6))) break;
 
             List<PlantState> plants = SortedPlants().FindAll(p => p.Breedable); // 저주(꽃가루 실종)
             if (plants.Count < 2) break;
             (PlantState a, PlantState b) = PickParents(plants);
-            if (BreedingRules.Check(field, a, b, used, max) != BreedCheck.Ok) break;
+            if (BreedingRules.Check(field, a, b, usedBreeds, max) != BreedCheck.Ok) break;
 
-            BreedOnce(a, b, ref used);
+            BreedOnce(a, b);
         }
-        events.RaiseDayEndedWithRemainingBreeds(Math.Max(0, MaxBreedAttempts - used));
     }
 
     private int MaxBreedAttempts => BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
         mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
 
-    private void BreedOnce(PlantState a, PlantState b, ref int used)
+    private void BreedOnce(PlantState a, PlantState b)
     {
         BreedOutcome outcome = BreedingRules.Breed(field, a, b, config.species, WaveSchedule.GetSeasonByStage(stage),
             (traits, mutation, isTwin) => Plant(traits, -1));
-        if (outcome.ConsumesAttempt) used++;
+        if (outcome.ConsumesAttempt) usedBreeds++;
         if (!outcome.Failed) events.RaiseBreeded();
     }
 

@@ -59,7 +59,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
         grid.InitTGrid();
         UpdateStageUI();
-        enemyController.UnlockWave(tStage);
+        enemyController.Waves.Deck.Unlock(tStage);
         enemyController.ShowNextWaveText();
 
         yield return PlayTutorialSequence();

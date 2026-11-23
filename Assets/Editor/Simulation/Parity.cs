@@ -276,16 +276,8 @@ public sealed partial class RunSimulator : IParityActor
         return parity.Log.ToString();
     }
 
-    private void ScriptDay()
-    {
-        script.Day(this);
-        events.RaiseDayEndedWithRemainingBreeds(Math.Max(0, MaxBreedAttempts - usedBreeds));
-        usedBreeds = 0;
-    }
-
     private void ScriptNight()
     {
-        if (stage % 10 == 0 && stage < EndlessMode.StartStage) SpecialItemSystem.AddGift();
         scriptInventory = GenerateInventory();
         script.Night(this);
         scriptInventory = null;
@@ -305,16 +297,11 @@ public sealed partial class RunSimulator : IParityActor
 
     void IParityActor.AddGold(int amount) => economy.Add(amount);
     void IParityActor.Spawn(List<GeneticTrait> traits) => Plant(traits, -1);
-    void IParityActor.Breed(PlantState a, PlantState b) => BreedOnce(a, b, ref usedBreeds);
+    void IParityActor.Breed(PlantState a, PlantState b) => BreedOnce(a, b);
     void IParityActor.Move(PlantState plant, int cell) => MovePlant(plant, cell);
     void IParityActor.Sell(PlantState plant) => Sell(plant);
 
-    void IParityActor.SkipWave()
-    {
-        if (currentWave == WaveType.None) return;
-        waveSkips--;
-        currentWave = WaveType.None;
-    }
+    void IParityActor.SkipWave() => waves.SkipToday();
 
     void IParityActor.PayTax()
     {
@@ -339,5 +326,5 @@ public sealed partial class RunSimulator : IParityActor
     }
 
     void IParityActor.AppendExtra(StringBuilder sb)
-        => ParityScript.AppendShared(sb, currentWave, nextWave, nextSecondWave, curses, mods.Mods, scriptInventory);
+        => ParityScript.AppendShared(sb, currentWave, nextWave, waves.Second, curses, mods.Mods, scriptInventory);
 }
