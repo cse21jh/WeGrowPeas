@@ -27,7 +27,8 @@ public class CustomizeItemData : ScriptableObject
 
     public CustomizeCategory category;
 
-    [Tooltip("같은 종류 안에서의 표시 순서. 작을수록 위. 같으면 에셋 이름 순.")]
+    [Tooltip("같은 종류 안에서의 표시 순서. 작을수록 위. 같으면 에셋 이름 순. " +
+             "Tools/Customize/아이템 순서 편집 창에서 끌어다 놓아 한꺼번에 바꿀 수 있다.")]
     public int sortOrder;
 
     [Tooltip("이 종류의 기본 아이템. 처음부터 보유한다. 종류마다 하나만 둔다.")]
