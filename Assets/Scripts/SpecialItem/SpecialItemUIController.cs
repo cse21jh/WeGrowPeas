@@ -27,28 +27,30 @@ public class SpecialItemUIController : MonoBehaviour
 
     private void Update()
     {
-        bool hasGift = SpecialItemSystem.PendingGifts > 0 &&
-            GameManager.Instance?.Tutorial?.CanUseSpecialItems != false;
+        bool hasGift = GameRun.Special.PendingGifts > 0 &&
+            !IsBlockedByTutorial;
         if (giftButtonRoot != null && giftButtonRoot.activeSelf != hasGift)
             giftButtonRoot.SetActive(hasGift);
         // 개수가 바뀔 때만 문자열을 만들어 매 프레임 할당과 텍스트 재빌드를 피한다.
-        if (hasGift && giftCountText != null && SpecialItemSystem.PendingGifts != _shownGiftCount)
+        if (hasGift && giftCountText != null && GameRun.Special.PendingGifts != _shownGiftCount)
         {
-            _shownGiftCount = SpecialItemSystem.PendingGifts;
+            _shownGiftCount = GameRun.Special.PendingGifts;
             giftCountText.text = _shownGiftCount > 1 ? $"x{_shownGiftCount}" : "";
         }
     }
 
     private int _shownGiftCount = -1;
 
+    private static bool IsBlockedByTutorial => GameManager.Instance?.Tutorial?.CanUseSpecialItems == false;
+
     /// <summary>선물 버튼 클릭 → 3택 패널 열기.</summary>
     public void OpenChoicePanel()
     {
-        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
-        if (SpecialItemSystem.PendingGifts <= 0) return;
+        if (IsBlockedByTutorial) return;
+        if (GameRun.Special.PendingGifts <= 0) return;
 
         if (_candidates == null || _candidates.Count == 0)
-            _candidates = SpecialItemSystem.RollCandidates(CurrentPlant);
+            _candidates = GameRun.Special.RollCandidates(CurrentPlant);
 
         if (_candidates.Count == 0)
         {
@@ -79,7 +81,7 @@ public class SpecialItemUIController : MonoBehaviour
 
             cards[i].Bind(
                 item,
-                canReroll: SpecialItemSystem.CanRerollSlot(slot),
+                canReroll: GameRun.Special.CanRerollSlot(slot),
                 onSelect: () => Choose(slot),
                 onReroll: () => Reroll(slot));
         }
@@ -87,9 +89,10 @@ public class SpecialItemUIController : MonoBehaviour
 
     private void Choose(int slot)
     {
+        if (IsBlockedByTutorial) return;
         if (_candidates == null || slot < 0 || slot >= _candidates.Count) return;
 
-        SpecialItemSystem.Acquire(_candidates[slot]);
+        GameRun.Special.Acquire(_candidates[slot]);
         _candidates = null; // 다음 선물은 새로 롤
         CloseChoicePanel();
         GameEvents.RequestSaveGame();
@@ -98,18 +101,19 @@ public class SpecialItemUIController : MonoBehaviour
     /// <summary>카드별 리롤 — 해당 자리만 다른 아이템으로 교체한다.</summary>
     private void Reroll(int slot)
     {
-        if (SpecialItemSystem.PendingGifts <= 0) return;
+        if (IsBlockedByTutorial) return;
+        if (GameRun.Special.PendingGifts <= 0) return;
         if (_candidates == null || slot < 0 || slot >= _candidates.Count) return;
-        if (!SpecialItemSystem.CanRerollSlot(slot)) return;
+        if (!GameRun.Special.CanRerollSlot(slot)) return;
 
-        var replacement = SpecialItemSystem.RollReplacement(CurrentPlant, _candidates, slot);
+        var replacement = GameRun.Special.RollReplacement(CurrentPlant, _candidates);
         if (replacement == null)
         {
             Debug.Log("[SpecialItem] 교체할 다른 아이템이 없습니다.");
             return;
         }
 
-        if (!SpecialItemSystem.UseSlotReroll(slot)) return;
+        if (!GameRun.Special.UseSlotReroll(slot)) return;
 
         SoundManager.Instance?.PlayEffect(SoundIds.Button);
         _candidates[slot] = replacement;

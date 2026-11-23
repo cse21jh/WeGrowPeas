@@ -35,6 +35,8 @@ public class SaveData
     public CurseSave curse = new();
     public SpecialItemSave specialItem = new();
     public RecallSave recall = new();
+    /// <summary>게임플레이 난수 상태. 이 필드가 생기기 전 파일은 비어 있고, 그때는 새 시드로 이어 간다.</summary>
+    public RngSave rng = new();
 }
 
 /// <summary>진행 상황 전반 (GameManager / TaxManager / DawnSystem / 시작 방식).</summary>
@@ -272,7 +274,7 @@ public class CurseSave
     public int remainTempCurseDay;
 }
 
-/// <summary>특수 아이템 보유/선물 (SpecialItemSystem).</summary>
+/// <summary>특수 아이템 보유/선물 (SpecialItemState).</summary>
 [Serializable]
 public class SpecialItemSave
 {

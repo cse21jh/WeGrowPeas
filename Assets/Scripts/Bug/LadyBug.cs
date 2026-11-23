@@ -4,57 +4,12 @@ using UnityEngine;
 
 public class Ladybug : Bug
 {
+    protected override BugMove Move => BugMove.Wander;
+
     protected override void Start()
     {
         base.Start();
-        grid.Board.Ladybugs.Add(this);
-    }
-
-    protected override IEnumerator Moving()
-    {
-        yield return StartCoroutine(base.Moving());
-
-        float time = 0;
-
-        Vector2 startPos = transform.position;
-        Vector2 targetPos = SetRandomPos();
-        Vector2 controlPos1 = SetRandomPos();
-        Vector2 controlPos2 = SetRandomPos();
-
-        float distSelfToTarget;
-
-        while (true)
-        {
-            if (!grid.Breeder.GetIsBreeding() || isDie || isHit)
-            {
-                yield return null;
-                continue;
-            }
-            time += Time.deltaTime / 10 * speed;
-
-            distSelfToTarget = Vector2.Distance(transform.position, targetPos);
-
-            if (distSelfToTarget < 0.5f)
-            {
-                time = 0;
-
-                startPos = transform.position;
-                targetPos = SetRandomPos();
-                controlPos1 = SetRandomPos();
-                controlPos2 = SetRandomPos();
-            }
-
-            Vector2 position1 = Vector2.Lerp(startPos, controlPos1, time);
-            Vector2 position2 = Vector2.Lerp(controlPos1, controlPos2, time);
-            Vector2 position3 = Vector2.Lerp(controlPos2, targetPos, time);
-
-            Vector2 position4 = Vector2.Lerp(position1, position2, time);
-            Vector2 position5 = Vector2.Lerp(position2, position3, time);
-
-            MoveToward(Vector2.Lerp(position4, position5, time));
-
-            yield return null;
-        }
+        grid.AddLadybug(this);
     }
 
     public IEnumerator KillFuckingBug(Bug bug)
@@ -75,11 +30,6 @@ public class Ladybug : Bug
     {
         movingCoroutine = StartCoroutine(Moving());
         yield return null;
-    }
-
-    private Vector2 SetRandomPos()
-    {
-        return new Vector2(Random.Range(-9.0f, 9.0f), Random.Range(-5.0f, 5.0f));
     }
 
     protected override void OnTriggerEnter(Collider obj)
@@ -103,7 +53,7 @@ public class Ladybug : Bug
 
     public override IEnumerator KillBug()
     {
-        grid.Board.Ladybugs.Remove(this);
+        grid.RemoveLadybug(this);
         yield return StartCoroutine(base.KillBug());
     }
 }

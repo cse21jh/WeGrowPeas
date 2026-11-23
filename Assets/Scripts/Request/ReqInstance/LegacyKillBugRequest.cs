@@ -15,13 +15,13 @@ public class LegacyKillBugRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnBugKilled += HandleBugKilled;
+        Events.BugKilled += HandleBugKilled;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnBugKilled -= HandleBugKilled;
+        Events.BugKilled -= HandleBugKilled;
     }
 
     public override string GetProgressText()

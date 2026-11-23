@@ -268,7 +268,7 @@ public class ShopCanvasController : MonoBehaviour
     {
         if (optionDropdown == null) return;
 
-        string[] options = data.GetSelectableOptions();
+        string[] options = data.GetSelectableOptions(shop.Context);
         bool hasOptions = options != null && options.Length > 0;
 
         optionDropdown.gameObject.SetActive(hasOptions);
@@ -280,8 +280,8 @@ public class ShopCanvasController : MonoBehaviour
         optionDropdown.value = 0;
         optionDropdown.RefreshShownValue();
 
-        data.SetSelectedOption(0); // 기본 선택 반영
-        optionDropdown.onValueChanged.AddListener(idx => data.SetSelectedOption(idx));
+        data.SetSelectedOption(shop.Context, 0); // 기본 선택 반영
+        optionDropdown.onValueChanged.AddListener(idx => data.SetSelectedOption(shop.Context, idx));
     }
 
     /// <summary>이번 상점에서 이미 구매해 더 살 수 없는 아이템인가. (슬롯 구매 버튼 잠금용)</summary>

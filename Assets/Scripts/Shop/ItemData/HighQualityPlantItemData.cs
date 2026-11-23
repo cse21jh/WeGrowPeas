@@ -23,61 +23,23 @@ public class HighQualityPlantItemData : ItemData
     /// 완두콩 전용 아이템. 등장하는 웨이브만 구매 가능 (별도 새벽 해금 조건 없음)
     /// </summary>
     public override bool IsRotationUnlockOk(ShopContext ctx)
-    {
-        if (!IsCurrentPlant(PlantIds.Pea)) return false;
-
-        // 현재 웨이브가 None이 아니면 등장하는 웨이브가 있음
-        if (GameManager.Instance == null || GameManager.Instance.enemyController == null)
-            return false;
-
-        var currentWave = GameManager.Instance.enemyController.CurrentWave;
-        return currentWave != null && currentWave.WaveType != WaveType.None;
-    }
+        => IsCurrentPlant(ctx, PlantIds.Pea) && ctx.World.CurrentWave != WaveType.None;
 
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (!CheckHasEmptyGrid(ctx, out reason))
-            return false;
-        
-        // 현재 등장하는 웨이브가 있는지 확인
-        if (GameManager.Instance == null || GameManager.Instance.enemyController == null)
-        {
-            reason = Loc.T("shop.error.no_game_state");
-            return false;
-        }
-        
-        var currentWave = GameManager.Instance.enemyController.CurrentWave;
-        if (currentWave == null || currentWave.WaveType == WaveType.None)
-        {
-            reason = Loc.T("shop.error.no_wave");
-            return false;
-        }
-        
-        reason = null;
-        return true;
+        if (!CheckHasEmptyGrid(ctx, out reason)) return false;
+        if (ctx.World.CurrentWave == WaveType.None) reason = Loc.T("shop.error.no_wave");
+        return reason == null;
     }
 
     // 상세 패널 드롭다운용. 이 아이템은 "현재 등장 중인 웨이브"만 대상이라 그 웨이브 하나만 노출한다.
-    public override string[] GetSelectableOptions()
-    {
-        var wave = GameManager.Instance != null && GameManager.Instance.enemyController != null
-            ? GameManager.Instance.enemyController.CurrentWave
-            : null;
-        if (wave == null || wave.WaveType == WaveType.None) return null;
-        return new[] { WavePalette.GetName(wave.WaveType) };
-    }
+    public override string[] GetSelectableOptions(ShopContext ctx)
+        => ctx.World.CurrentWave == WaveType.None ? null : new[] { WavePalette.GetName(ctx.World.CurrentWave) };
 
-    public override void SetSelectedOption(int index)
-    {
-        var wave = GameManager.Instance != null && GameManager.Instance.enemyController != null
-            ? GameManager.Instance.enemyController.CurrentWave
-            : null;
-        pendingWave = (index == 0 && wave != null && wave.WaveType != WaveType.None)
-            ? wave.WaveType
-            : (WaveType?)null;
-    }
+    public override void SetSelectedOption(ShopContext ctx, int index)
+        => pendingWave = index == 0 && ctx.World.CurrentWave != WaveType.None ? ctx.World.CurrentWave : (WaveType?)null;
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
@@ -106,11 +68,11 @@ public class HighQualityPlantItemData : ItemData
         // 유전자를 2로 설정한 형질 생성 (고품질 = 유리한 유전자)
         List<GeneticTrait> traits = new List<GeneticTrait>
         {
-            new GeneticTrait(targetTrait, Plant.GetResistanceBasedOnGenetics(targetTrait, 2), 2, 0.0f) // genetics = 2 (유리한 유전자)
+            new GeneticTrait(targetTrait, ctx.World.RollResistance(targetTrait, 2), 2, 0.0f) // genetics = 2 (유리한 유전자)
         };
 
         // 완두콩 추가 (자동으로 가장 빠른 빈 칸에 설치)
-        ctx.Grid.Spawner.AddMovablePlant(traits);
+        ctx.World.PlantSeedling(traits);
 
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.high_quality", ("name", LocalizedName), ("wave", WavePalette.GetName(targetWave))));
         pendingWave = null;
@@ -118,6 +80,7 @@ public class HighQualityPlantItemData : ItemData
 
     public override void Cancel(ShopContext ctx)
     {
+        base.Cancel(ctx);
         pendingWave = null;
     }
 }

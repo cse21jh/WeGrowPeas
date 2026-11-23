@@ -27,7 +27,7 @@ public class SignPostItemData : ItemData
     // 로테이션 풀 해금 조건 (해금 시기 체크)
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;      // 컨텍스트의 stage를 사용해야 할 수도 있음
+        int stage = ctx.Stage;      // 컨텍스트의 stage를 사용해야 할 수도 있음
         return stage >= unlockStageDay;
     }
 
@@ -41,11 +41,11 @@ public class SignPostItemData : ItemData
     }
 
     // 웨이브는 상세 패널의 드롭다운으로 고른다.
-    public override string[] GetSelectableOptions()
-        => WaveSchedule.GetSelectableWaveNames(GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override string[] GetSelectableOptions(ShopContext ctx)
+        => WaveSchedule.GetSelectableWaveNames(ctx.Stage, ctx.World.IsNight);
 
-    public override void SetSelectedOption(int index)
-        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override void SetSelectedOption(ShopContext ctx, int index)
+        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, ctx.Stage, ctx.World.IsNight);
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
@@ -65,7 +65,7 @@ public class SignPostItemData : ItemData
             return;
         }
 
-        ModManager.Instance.AddTimedMultiplier(
+        ctx.World.AddTimedMultiplier(
             StatId.WaveWeightMul,
             (int)pendingWave.Value,                 // 어떤 웨이브를 감소시킬지
             1f - reducePercent,             // 75% 감소 -> multiplier 0.25f
@@ -76,14 +76,11 @@ public class SignPostItemData : ItemData
         pendingWave = null;
     }
 
-    public override void Cancel(ShopContext ctx) 
-    { 
+    public override void Cancel(ShopContext ctx)
+    {
+        base.Cancel(ctx);
         pendingWave = null;
     }
 
     // Instant 타입이므로 위치/대상 API는 사용하지 않음
-    public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason) { reason = null; return false; }
-    public override void SetPlacedPosition(Vector3 worldPos) { }
-    public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason) { reason = null; return false; }
-    public override void SetSelectedPlant(Plant plant) { }
 }

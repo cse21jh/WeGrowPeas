@@ -14,12 +14,10 @@ using UnityEngine;
 public class ShopController
 {
     private ShopManager shopManager;
-    private Grid grid;
     private EconomyManager economy;
     private PlacementController placement;
 
     private ShopContext ctx;
-    private readonly ShopSession session = new ShopSession();
 
     private readonly Action<string> showError;
 
@@ -35,8 +33,7 @@ public class ShopController
 
     /// <summary>이번 상점(세션)에서 이미 구매한 아이템인가. (비스택 1회 제한 표시용)</summary>
     // Buy()의 1회 제한 조건과 같아야 한다. OnePerShopIfNotStackable이 꺼진 아이템(땅문서 등)은 여러 번 살 수 있다.
-    public bool WasBoughtThisShop(ItemData data) =>
-        data != null && data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data);
+    public bool WasBoughtThisShop(ItemData data) => GameRun.Current.Shop.WasBoughtThisShop(data);
 
     // ── 인벤토리 ──────────────────────────────────────────────────────────────
     // 이번 상점 방문의 목록을 캐시한다. 탭 전환/구매 갱신마다 GenerateInventory를 다시 부르면
@@ -69,13 +66,6 @@ public class ShopController
         cachedStage = -1;
     }
 
-    /// <summary>더 이상 구매할 수 없게 된 아이템을 현재 목록에서 제거한다.</summary>
-    private void RemoveFromInventory(ItemData data)
-    {
-        if (cachedInventory == null || data == null) return;
-        cachedInventory.Fixed.Remove(data);
-        cachedInventory.Rotation.Remove(data);
-    }
 
     // ── 구매 ──────────────────────────────────────────────────────────────────
     /// <summary>
@@ -89,7 +79,7 @@ public class ShopController
         if (data == null) return;
 
         // 상점 세션 1회 제한, 하루 구매 한도
-        if (data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data) || data.IsSoldOutToday())
+        if (!GameRun.Current.Shop.CanBuyToday(data, ctx))
         {
             showError(Loc.T("shop.error.cannot_buy"));
             return;
@@ -122,11 +112,11 @@ public class ShopController
                         UIManager.Instance?.Popup?.ShowGuide(data.GetPlacementGuide());
                         placement?.BeginTilePlacement(
                             ctx,
-                            validate: pos => data.ValidatePosition(ctx, pos, out _),
+                            validate: pos => CellAt(pos) is int cell && data.ValidateCell(ctx, cell, out _),
                             onConfirm: pos =>
                             {
                                 UIManager.Instance?.Popup?.HideGuide();
-                                data.SetPlacedPosition(pos);
+                                if (CellAt(pos) is int cell) data.SelectCell(cell);
                                 TryChargeAndCommit(data, onPurchased);
                             },
                             onCancel: () =>
@@ -150,7 +140,7 @@ public class ShopController
                                 ctx,
                                 validate: plant =>
                                 {
-                                    try { return data.ValidateTarget(ctx, plant, out _); }
+                                    try { return data.ValidateTarget(ctx, plant != null ? plant.State : null, out _); }
                                     catch (Exception e)
                                     {
                                         Debug.LogError($"[ShopController] ValidateTarget error: {e.Message}");
@@ -162,7 +152,7 @@ public class ShopController
                                     UIManager.Instance?.Popup?.HideGuide();
                                     try
                                     {
-                                        data.SetSelectedPlant(plant);
+                                        data.SelectCell(plant.gridIndex);
                                         TryChargeAndCommit(data, onPurchased);
                                     }
                                     catch (Exception e)
@@ -192,18 +182,10 @@ public class ShopController
 
     private void TryChargeAndCommit(ItemData data, Action onPurchased)
     {
-        if (shopManager.TryPurchase(ctx, data, out _))
-        {
-            if (!data.IsStackable) session.MarkBought(data);
-
-            // 전체 구매 제한 도달 or 이번 상점 1회 제한 소진 or 오늘 재고 소진 → 목록에서 제거
-            bool reachedTotalLimit = !data.CanPurchaseByLimit();
-            bool reachedShopLimit = data.OnePerShopIfNotStackable && !data.IsStackable && session.WasBought(data);
-            if (reachedTotalLimit || reachedShopLimit || data.IsSoldOutToday()) RemoveFromInventory(data);
-
-            onPurchased?.Invoke();
-        }
+        if (shopManager.TryPurchase(ctx, data, cachedInventory)) onPurchased?.Invoke();
     }
+
+    private static int? CellAt(Vector3 screenPos) => GameManager.Instance.grid.GetGridIndexFromPosition(screenPos);
 
     // ── 리롤 ──────────────────────────────────────────────────────────────────
     /// <summary>리롤 버튼 라벨(무료 횟수 or 가격).</summary>
@@ -225,8 +207,7 @@ public class ShopController
         if (shopManager.UseReroll())
         {
             SoundManager.Instance?.PlayEffect(SoundIds.Button);
-            shopManager.IncrementRerollCount();
-            session.ClearThisShop();
+            GameRun.Current.Shop.Reroll();
             InvalidateInventory();
             return true;
         }
@@ -235,8 +216,7 @@ public class ShopController
         {
             economy.SpendGold(RerollPrice, GoldFeedbackReason.ShopReroll);
             SoundManager.Instance?.PlayEffect(SoundIds.Button);
-            shopManager.IncrementRerollCount();
-            session.ClearThisShop();
+            GameRun.Current.Shop.Reroll();
             InvalidateInventory();
             return true;
         }
@@ -255,9 +235,7 @@ public class ShopController
             return;
         }
 
-        shopManager.ResetRerollCount();
-        shopManager.ResetDailyRerollCount();
-        session.ClearThisShop();
+        GameRun.Current.Shop.StartDay();
         InvalidateInventory();
     }
 
@@ -266,9 +244,6 @@ public class ShopController
     {
         if (shopManager == null) shopManager = ShopManager.Instance;
 
-        if (grid == null)
-            grid = GameManager.Instance != null ? GameManager.Instance.grid : UnityEngine.Object.FindAnyObjectByType<Grid>();
-
         if (economy == null)
             economy = GameManager.Instance != null ? GameManager.Instance.economyManager : UnityEngine.Object.FindAnyObjectByType<EconomyManager>();
 
@@ -276,21 +251,8 @@ public class ShopController
 
         if (ctx == null)
         {
-            ctx = new ShopContext
-            {
-                Grid = grid,
-                Economy = economy,
-                Session = session,
-                Shop = shopManager,
-                ShowError = showError,
-            };
-        }
-        else
-        {
-            // 씬 로드 순서에 따라 뒤늦게 잡히는 참조 갱신
-            ctx.Grid = grid;
-            ctx.Economy = economy;
-            ctx.Shop = shopManager;
+            ctx = ShopContext.ForGame;
+            ctx.ShowError = showError;
         }
     }
 
@@ -302,14 +264,5 @@ public class ShopController
             message = msg,
             duration = 3.5f
         });
-    }
-
-    /// <summary>상점 1회 방문 동안의 구매 이력(비스택 1회 제한용).</summary>
-    private class ShopSession
-    {
-        private readonly HashSet<ItemData> once = new();
-        public bool WasBought(ItemData e) => once.Contains(e);
-        public void MarkBought(ItemData e) => once.Add(e);
-        public void ClearThisShop() => once.Clear();
     }
 }

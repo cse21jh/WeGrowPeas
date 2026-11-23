@@ -6,8 +6,6 @@ public class RapidFreezerItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4; // 희귀 등급
 
-    private int? pendingIndex;
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 2000;
@@ -37,38 +35,15 @@ public class RapidFreezerItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
         reason = null;
-        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
-            return false;
-
-        // 해당 타일에 식물이 있는지 여부는 상관없음 (빈 땅을 중심으로도 얼릴 수 있음)
-        // 유효한 그리드 인덱스인지만 확인 (TryGetGridIndexFromPosition에서 이미 확인됨)
-
-        pendingIndex = idx.Value;
         return true;
     }
 
-    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
-
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-        
-        // pendingIndex 검증 (ItemData에는 ValidatePendingIndex 메서드가 없을 수 있음. 직접 확인)
-        if (pendingIndex == null) return;
-
-        // 실제 효과 적용
-        ctx.Grid.Soil.ApplyRapidFreezer(pendingIndex.Value);
-        Debug.Log($"[RapidFreezer] Committed on index {pendingIndex.Value}");
-
-        pendingIndex = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
+        if (TakeSelectedCell(ctx, out int cell))
+            ctx.World.FreezeArea(cell);
     }
 }

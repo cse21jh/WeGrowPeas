@@ -21,13 +21,13 @@ public class LegacySellSpecificPeaRequest : RequestInstance
         currentCount = 0;
         SelectRandomTrait();
 
-        GameEvents.OnPeaSold += HandleCheckType;
+        Events.PlantSold += HandleCheckType;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaSold -= HandleCheckType;
+        Events.PlantSold -= HandleCheckType;
     }
 
     public override string GetProgressText()
@@ -45,12 +45,12 @@ public class LegacySellSpecificPeaRequest : RequestInstance
         return Data.GetDescription(("wave", WaveLabel));
     }
 
-    private void HandleCheckType(Plant p)
+    private void HandleCheckType(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
         //plant의 trait와 conditionType 비교
-        List<GeneticTrait> traits = p.GetGeneticTrait();
+        List<GeneticTrait> traits = p.Traits;
         Debug.Log("음" + conditionType);
 
         foreach (var g in traits)
@@ -92,7 +92,7 @@ public class LegacySellSpecificPeaRequest : RequestInstance
         //conditionType = Random.Range((int)TraitType.NaturalDeath, (int)(TraitType.Heat) + 1);
 
         //Dictionary<WaveType, float> d = GameManager.Instance.enemyController.BuildEffectiveWeights();
-        conditionType = GameManager.Instance.enemyController.PickTraitFromUnlockWave();
+        conditionType = Board.World.PickTraitFromWaves();
     }
 
     public override RequestInstanceSaveData ToSaveData()

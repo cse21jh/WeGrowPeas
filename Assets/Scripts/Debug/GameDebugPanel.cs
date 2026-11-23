@@ -52,8 +52,8 @@ public class GameDebugPanel : MonoBehaviour
 
         // ── 특수 아이템 ──
         GUILayout.Label("[특수 아이템]");
-        GUILayout.Label($"미수령 선물: {SpecialItemSystem.PendingGifts}개");
-        if (GUILayout.Button("선물 +1")) SpecialItemSystem.AddGift();
+        GUILayout.Label($"미수령 선물: {GameRun.Special.PendingGifts}개");
+        if (GUILayout.Button("선물 +1")) GameRun.Special.AddGift();
         // 식물별 특수 아이템은 이제 "그 식물로 새벽 unlockDawnStage(4/8/12) 클리어" 시 자동 해금된다.
         // (아래 [새벽] 섹션에서 각 식물 12단계로 올리면 해당 식물 특수 아이템이 전부 열림)
         if (GUILayout.Button("식물별 특수 아이템 해금 (양쪽 새벽 12단계)"))
@@ -65,8 +65,8 @@ public class GameDebugPanel : MonoBehaviour
             }
             Debug.Log("[Debug] 양쪽 식물 새벽 12단계 클리어 처리 → 식물별 아이템 전부 해금");
         }
-        GUILayout.Label("보유: " + (SpecialItemSystem.OwnedIds.Count > 0
-            ? string.Join(", ", SpecialItemSystem.OwnedIds) : "없음"), wrapLabel);
+        GUILayout.Label("보유: " + (GameRun.Special.OwnedIds.Count > 0
+            ? string.Join(", ", GameRun.Special.OwnedIds) : "없음"), wrapLabel);
 
         GUILayout.Space(8);
 

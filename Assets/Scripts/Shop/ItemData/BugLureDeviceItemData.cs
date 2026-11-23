@@ -26,7 +26,7 @@ public class BugLureDeviceItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
         // stage >= 6이므로 stage 6(6웨이브)부터 해금됨
@@ -53,6 +53,6 @@ public class BugLureDeviceItemData : ItemData
         // 벌레 스폰 시간 간격 10% 감소 (음수로 전달하여 감소)
         // Grid의 공식: effectiveBugSpawnTimeInterval * (1f + bugSpawnIntervalIncreasement)
         // -0.1f를 더하면 0.9배가 되어 10% 감소
-        ctx.Grid.Modifiers.AddBugSpawnIntervalIncreasement(-intervalReduction);
+        ctx.Modifiers.AddBugSpawnIntervalIncreasement(-intervalReduction);
     }
 }

@@ -34,7 +34,7 @@ public class SprinklerFertilizerSynergyItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Upgrades.AddSprinklerFertilizerSynergyBonus(resistanceBonus);
+        ctx.World.AddSprinklerFertilizerSynergyBonus(resistanceBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

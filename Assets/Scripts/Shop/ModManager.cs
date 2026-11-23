@@ -41,127 +41,48 @@ public class Mod
 
 public class ModManager : Singleton<ModManager>
 {
-    private int nextId = 1;
+    /// <summary>보정 목록과 합성 규칙. 이 컴포넌트는 오늘 일차와 표지판 표시를 더한다.</summary>
+    public ModState State { get; } = new ModState();
 
     private int Day => GameManager.Instance.stage;
 
 
-    // 저장 필요
-    private readonly List<Mod> mods = new();
-
-    public List<Mod> Mods => mods;
+    public List<Mod> Mods => State.Mods;
 
     // -------- 등록/해제/만료 --------
     public int AddTimedMultiplier(StatId stat, int param, float multiplier, int durationDays, string sourceTag = null)
-        => Add(new Mod
-        {
-            id = nextId++,
-            key = new ModKey(stat, param),
-            op = ModOp.Multiply,
-            value = Mathf.Max(0f, multiplier),
-            expireDay = Day + durationDays + 1,
-            sourceTag = sourceTag,
-        });
+        => Show(State.AddTimed(stat, param, ModOp.Multiply, multiplier, Day, durationDays, sourceTag));
 
     public int AddTimedAdditive(StatId stat, int param, float addValue, int durationDays, string sourceTag = null)
-        => Add(new Mod
-        {
-            id = nextId++,
-            key = new ModKey(stat, param),
-            op = ModOp.Add,
-            value = addValue,
-            expireDay = Day + durationDays + 1,
-            sourceTag = sourceTag,
-        });
+        => Show(State.AddTimed(stat, param, ModOp.Add, addValue, Day, durationDays, sourceTag));
 
-    public int Add(Mod m)
+    public int Add(Mod m) => Show(State.Add(m));
+
+    // 방금 넣은 것이 표지판이면 세운다
+    private int Show(int id)
     {
-        if (m.id == 0) m.id = nextId++;
-        mods.Add(m);
+        Mod m = Mods[Mods.Count - 1];
         if (m.IsSignPost)
             GameManager.Instance.enemyController.signPost.SetSignPost(m.key.param);
-        return m.id;
+        return id;
     }
 
-    public void Remove(int id) => mods.RemoveAll(x => x.id == id);
+    public void Remove(int id) => State.Remove(id);
 
-    public void OnNewDay(int day) // 하루 경과 시 호출
+    public void OnNewDay(int day)
     {
-        foreach(var m in mods.ToList())
+        foreach (Mod m in State.ExpireOn(day))
         {
-            if(m.expireDay <= day)
-            {
-                if (m.IsSignPost)
-                    GameManager.Instance.enemyController.signPost.HideSignPost();
-                mods.Remove(m);
-            }
+            if (m.IsSignPost)
+                GameManager.Instance.enemyController.signPost.HideSignPost();
         }
     }
 
     // -------- 조회(합성) --------
     public float GetMul(StatId stat, int param = -1, float minCap = 0f, float maxCap = float.PositiveInfinity)
-    {
-        float mul = 1f;
-        int? bestOverride = null;
-        float overrideValue = 1f;
+        => State.GetMul(stat, param, Day, minCap, maxCap);
 
-        foreach (var m in mods)
-        {
-            if (m.key.stat != stat) continue;
-            if (m.key.param != param) continue;
-            if (m.expireDay <= Day) continue;
-
-            if (m.op == ModOp.Override)
-            {
-                if (bestOverride == null || m.priority > bestOverride.Value)
-                {
-                    bestOverride = m.priority;
-                    overrideValue = m.value;
-                }
-            }
-            else if (m.op == ModOp.Multiply)
-            {
-                mul *= m.value;
-            }
-            else if (m.op == ModOp.Add)
-            {
-                // 곱 스탯에 Add를 허용하고 싶지 않으면 빼도 됨.
-                mul *= Mathf.Max(0f, 1f + m.value);
-            }
-        }
-
-        float v = bestOverride != null ? overrideValue : mul;
-        if (!float.IsInfinity(maxCap)) v = Mathf.Min(v, maxCap);
-        if (!float.IsNaN(minCap)) v = Mathf.Max(v, minCap);
-        return v;
-    }
-
-    public float GetAdd(StatId stat, int param = -1)
-    {
-        float sum = 0f;
-        int? bestOverride = null;
-        float overrideValue = 0f;
-
-        foreach (var m in mods)
-        {
-            if (m.key.stat != stat) continue;
-            if (m.key.param != param) continue;
-            if (m.expireDay <= Day) continue;
-
-            if (m.op == ModOp.Override)
-            {
-                if (bestOverride == null || m.priority > bestOverride.Value)
-                {
-                    bestOverride = m.priority;
-                    overrideValue = m.value;
-                }
-            }
-            else if (m.op == ModOp.Add) sum += m.value;
-            else if (m.op == ModOp.Multiply) sum += (m.value - 1f); // 필요 시 정책 조정
-        }
-
-        return bestOverride != null ? overrideValue : sum;
-    }
+    public float GetAdd(StatId stat, int param = -1) => State.GetAdd(stat, param, Day);
 
     /// <summary>보유 모드를 저장 데이터에 담는다. <see cref="LoadModManager"/>와 짝.</summary>
     public void SaveModManager(ModSave save)

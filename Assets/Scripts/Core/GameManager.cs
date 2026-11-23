@@ -10,21 +10,21 @@ using System.Linq;
 
 public class GameManager : Singleton<GameManager>
 {
-    public int stage = 0;
+    /// <summary>지금 일차. 값은 이번 판(<see cref="GameRun"/>)에 있다.</summary>
+    public int stage
+    {
+        get => GameRun.Current.Stage;
+        set => GameRun.Current.Stage = value;
+    }
     [HideInInspector] public bool seenFirstGold = false;
     public string currentPlant = PlantIds.Peanut;
 
     //위는 저장 필요
 
     private bool gameOver = false;
-    public int requestCycle = 2;
-
     private bool isStopped = false;
 
     private int gameMode = 0; //0: normal 1: endless
-
-    /// <summary>저주가 이번 런에서 도는가. 무한모드(1) 또는 새벽 모드(저주 레벨 &gt; 0)일 때.</summary>
-    private bool CurseActive => DawnSystem.Current.curseLevel > 0;
 
     public Grid grid;
     public EnemyController enemyController;
@@ -44,6 +44,14 @@ public class GameManager : Singleton<GameManager>
     [UnityEngine.Serialization.FormerlySerializedAs("tutorialChapter1")]
     [SerializeField] private TutorialChapter tutorialChapter;
     public TutorialChapter Tutorial => tutorialChapter;
+
+    // 다른 스크립트의 Start에 이전 판의 값이 보이지 않게, 씬이 열리자마자 새 판을 만든다.
+    // 이어하기면 LoadGame이 저장된 상태로 되돌린다.
+    private void Awake()
+    {
+        GameRun.StartNew();
+        Debug.Log($"[GameRun] 시드 {GameRun.Rng.Seed}");
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -80,8 +88,6 @@ public class GameManager : Singleton<GameManager>
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
                 RecallRecorder.ResetRun(); // 회상: 일자별 스냅샷 초기화
-                CurseState.ResetAll(); // 저주 상태 초기화
-                SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 DawnUnlockAnnouncement.Clear(); // 지난 런의 해금 연출이 남지 않게
                 gameMode = 0;
                 StageUpdate();
@@ -124,15 +130,16 @@ public class GameManager : Singleton<GameManager>
         GameEvents.OnSaveGameRequested -= SaveGame;
     }
 
+    private DayFlow day;
+
+    /// <summary>하루의 순서. 규칙은 여기, 연출과 입력은 <see cref="PlayStep"/>.</summary>
+    public DayFlow Day => day ??= new DayFlow(new GameDayWorld(this));
+
     IEnumerator StartNormalMode()
     {
         while (!gameOver)
         {
-            UpdateStageUI();
-
-            if (CurseActive) curseManager.ApplyCurse(); // 새벽: 전날 밤 선택된 저주 발동
-
-            yield return StartCoroutine(StartStage());
+            yield return StartCoroutine(RunDay());
 
             if (stage == endStage)
             {
@@ -152,11 +159,7 @@ public class GameManager : Singleton<GameManager>
 
         while(!gameOver)
         {
-            UpdateStageUI();
-
-            if (CurseActive) curseManager.ApplyCurse(); // 새벽 저주만. 무한 모드 자체의 상시 저주는 없다.
-
-            yield return StartCoroutine(StartStage());
+            yield return StartCoroutine(RunDay());
             if (gameOver) break;
 
             // 엔딩 뒤 5일을 더 버틸 때마다 새벽 단계를 건너뛰어 연다(바로 저장된다).
@@ -169,11 +172,11 @@ public class GameManager : Singleton<GameManager>
 
     private void StageUpdate()
     {
-        stage++;
-        ModManager.Instance?.OnNewDay(stage);
+        foreach (Mod mod in Day.NextDay())
+            if (mod.IsSignPost) enemyController.signPost.HideSignPost();
+
         PhoneManager.Instance.messengerApp.RefreshchatPartnerList();
-        enemyController.UnlockWave(stage);
-        
+
         // 매일 상점 자동 리롤 (비활성화된 오브젝트도 포함해서 찾기)
         var shopCanvases = FindObjectsOfType<ShopCanvasController>(true);
         if (shopCanvases != null && shopCanvases.Length > 0 && shopCanvases[0] != null)
@@ -184,19 +187,61 @@ public class GameManager : Singleton<GameManager>
         GameEvents.RaiseDayStarted(); // 일차를 기준으로 표시하는 UI 갱신 (D-day, "N일 전" 등)
     }
 
-    IEnumerator StartStage()
+    private IEnumerator RunDay()
     {
-        // 세금 연체 시 낮 시작 직후(웨이브 전) 강제징수/압류
-        if (TaxManager.Instance != null && TaxManager.Instance.HasOverdueTax(stage))
-            yield return StartCoroutine(TaxCollectionRoutine());
+        foreach (DayStep step in Day.Run())
+        {
+            IEnumerator wait = PlayStep(step);
+            if (wait != null) yield return StartCoroutine(wait);
+        }
+    }
 
-        enemyController.ShowNextWaveText();
+    /// <summary>하루의 각 단계에서 할 일. 기다릴 것이 없으면 null.</summary>
+    private IEnumerator PlayStep(DayStep step)
+    {
+        switch (step)
+        {
+            case DayStep.DayStarted:
+                UpdateStageUI();
+                if (GameRun.Dawn.curseLevel > 0) curseManager.OnCurseApplied();
+                return null;
 
-        if (stage % 5 == requestCycle) requestManager.StartNewCycle(stage);
+            case DayStep.TaxOverdue: // 낮 시작 직후(웨이브 전) 강제징수/압류
+                return TaxCollectionRoutine();
 
-        yield return StartCoroutine(grid.Breeder.Breeding());
+            case DayStep.FreeTime:
+                enemyController.ShowNextWaveText();
+                return grid.Breeder.Breeding();
 
-        yield return StartCoroutine(enemyController.EnemyWaveCoroutine());
+            case DayStep.BeforeWave:
+                return enemyController.PlayWaveRoutine();
+
+            case DayStep.WaveResolved:
+                return WaveResolvedRoutine();
+
+            case DayStep.Evening:
+                return EveningRoutine();
+
+            case DayStep.Night:
+                return NightRoutine();
+
+            case DayStep.DayEnded:
+                AchievementHooks.OnDayEnded(grid.Board); // 업적: 식물별 생존 일수
+
+                // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
+                // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
+                RecallRecorder.CaptureDay();
+
+                economyManager.PushEarnedGold();
+                return null;
+        }
+        return null;
+    }
+
+    private IEnumerator WaveResolvedRoutine()
+    {
+        enemyController.OnWaveResolved();
+        yield return null;
 
         gameOver = grid.CheckGameOver();
 
@@ -205,29 +250,23 @@ public class GameManager : Singleton<GameManager>
 
         yield return new WaitForSeconds(2.0f);
         PlayerRecordForGraph.SetSP(grid.Board.Plants.Count);
+    }
 
-        /*if (stage == endStage)
-        {
-            economyManager.PushEarnedGold();
-            yield return StartCoroutine(ClearNormalMode());
-        }*/
-
-        yield return StartCoroutine(BreedEndRoutine());
-
-        GameEvents.RaiseDayPassedForRequest(); //NoSellPeaRequest Check + 저주 만료 처리
-
+    private IEnumerator EveningRoutine()
+    {
+        yield return null;
+        GameEvents.RaiseDayPassedForRequest(); // 저주 남은 일수 갱신
 
         // 여기다가 밤으로 바뀌는 이펙트 추가해야 함
         gcController.ToggleGlow(true);
         yield return waveManager.StartCoroutine(waveManager.StartNightCoroutine());
+    }
 
-        if (CurseActive) curseManager.SelectCurse(stage);
-
-        // 특수 아이템: 엔딩 전 10·20·30일 밤에 선물 도착 (수령 전까지 유지).
-        // 폰에서 수령하므로 폰 페이즈 직전에 지급한다.
-        if (stage % 10 == 0 && stage < endStage)
+    private IEnumerator NightRoutine()
+    {
+        // 선물은 폰에서 받으므로 폰 페이즈 직전에 알린다
+        if (DayFlow.IsGiftNight)
         {
-            SpecialItemSystem.AddGift();
             PhoneNotificationBus.OnShow?.Invoke(new PhoneNotificationData
             {
                 title = Loc.T("game.gift.title"),
@@ -238,27 +277,16 @@ public class GameManager : Singleton<GameManager>
 
         yield return StartCoroutine(phoneManager.PhonePhase());
 
-
         gcController.ToggleGlow(false);
         yield return waveManager.StartCoroutine(waveManager.StopNightCoroutine());
-        /*
-        if (!enemyController.IsLastWaveNone())
-            yield return StartCoroutine(upgradeManager.UpgradePhase());            
-        
-        yield return StartCoroutine(shopManager.ShopPhase(grid));
-        */
-        GameEvents.RaiseQuestDayPassed();
+    }
 
-        // 업적: 식물별 생존 일수
-        foreach (var plant in grid.Board.Plants.Values)
-            if (plant != null && !plant.isDying) plant.AddDayOnField();
-        AchievementHooks.OnDayEnded(grid.Board);
-
-        // 회상: 자유시간이 끝난 지금이 하루의 마지막 상태.
-        // PushEarnedGold보다 앞이어야 오늘 번 골드(EarnedGoldToday)가 아직 살아 있다.
-        RecallRecorder.CaptureDay();
-
-        economyManager.PushEarnedGold();
+    /// <summary>튜토리얼의 낮. 본 게임과 같은 앞뒤 처리를 한다.</summary>
+    public IEnumerator TutorialFreeTimeRoutine()
+    {
+        Day.StartFreeTime();
+        yield return grid.Breeder.Breeding();
+        Day.EndFreeTime();
     }
 
     private void UpdateStageUI()
@@ -294,58 +322,7 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator BreedEndRoutine()
     {
-        Plant plant;
-        List<Peanut> peanutList = new List<Peanut>();
-        for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
-        {
-            plant = null;
-            grid.Board.Plants.TryGetValue(idx, out plant);
-            if (plant == null)
-                continue;
-            if (plant.GetType() == typeof(Peanut))
-                peanutList.Add(plant.gameObject.GetComponent<Peanut>());
-        }
-        for (int i = 0; i < peanutList.Count; i++)
-            peanutList[i].TrySpawnCopy();
-
-        // 땅과 콩: 웨이브가 지나간 후 식물이 확률적으로 뿌리를 내림
-        grid?.Upgrades.ProcessLandAndBeanRooting();
-
-        // 무당벌레당 골드 지급 (웨이브 종료 시)
-        if (grid != null && grid.Modifiers.AdditionalLadybugGoldPerUnit > 0 && grid.Board.Ladybugs != null)
-        {
-            int ladybugGold = grid.Board.Ladybugs.Count * grid.Modifiers.AdditionalLadybugGoldPerUnit;
-            if (ladybugGold > 0)
-            {
-                economyManager.AddGold(ladybugGold);
-            }
-        }
-
-        // 치료형 캡사이신: 고추 주변 식물의 저항력 회복
-        if (grid != null && grid.Modifiers.ChiliPepperHealPercent > 0f)
-        {
-            foreach (var currentPlant in grid.Board.Plants.Values)
-            {
-                if (currentPlant is ChiliPepper chiliPepper)
-                {
-                    var nearbyPlants = grid.Soil.GetPlantsNearChiliPepper(chiliPepper);
-                    foreach (var nearbyPlant in nearbyPlants)
-                    {
-                        // 모든 저항력을 회복 (구매 횟수 * 3%)
-                        var traits = nearbyPlant.GetGeneticTrait();
-                        for (int i = 0; i < traits.Count; i++)
-                        {
-                            float healAmount = grid.Modifiers.ChiliPepperHealPercent;
-                            float currentResistance = traits[i].resistance;
-                            float newResistance = Mathf.Clamp(currentResistance + healAmount, 0.1f, 1.0f);
-                            traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
-                        }
-                        nearbyPlant.SetTrait(traits);
-                    }
-                }
-            }
-        }
-        
+        DayRules.AfterWave(grid.Field, new GridFieldActions(grid));
         yield return null;
     }
 
@@ -396,11 +373,10 @@ public class GameManager : Singleton<GameManager>
         else
         {
             // 압류분 강제매각(비싼 것부터, 골드 0 이상 될 때까지)
-            var toSell = new System.Collections.Generic.List<Plant>(seized);
-            toSell.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
-            foreach (var p in toSell)
+            RefreshSeizure(seized); // 유예 중 압류 식물이 벌레에 먹혔을 수 있어 매각 대상과 스티커를 맞춘다
+            foreach (PlantState target in TaxState.PickSeizure(grid.Board, -economyManager.GetGold()))
             {
-                if (p == null) continue;
+                if (!grid.Board.Plants.TryGetValue(target.GridIndex, out Plant p) || p.State != target) continue;
                 if (economyManager.GetGold() >= 0) { p.SetSeized(false); continue; }
                 economyManager.AddGold(p.GetSellingPrice());
                 p.Die(DeathCause.Other);
@@ -417,21 +393,9 @@ public class GameManager : Singleton<GameManager>
     // 현재 빚(-gold)만큼 Pea/Peanut을 비싼 순으로 압류. seized 집합과 스티커를 갱신.
     private void RefreshSeizure(System.Collections.Generic.HashSet<Plant> seized)
     {
-        int debt = Mathf.Max(0, -economyManager.GetGold());
-
-        var seizable = new System.Collections.Generic.List<Plant>();
-        foreach (var p in grid.Board.Plants.Values)
-            if (p != null && (p is Pea || p is Peanut)) seizable.Add(p);
-        seizable.Sort((a, b) => b.GetSellingPrice().CompareTo(a.GetSellingPrice()));
-
         var needed = new System.Collections.Generic.HashSet<Plant>();
-        int sum = 0;
-        foreach (var p in seizable)
-        {
-            if (sum >= debt) break;
-            needed.Add(p);
-            sum += p.GetSellingPrice();
-        }
+        foreach (PlantState plant in TaxState.PickSeizure(grid.Board, Mathf.Max(0, -economyManager.GetGold())))
+            needed.Add(grid.Board.Plants[plant.GridIndex]);
 
         // 더 이상 불필요한 압류 해제
         foreach (var p in new System.Collections.Generic.List<Plant>(seized))
@@ -471,10 +435,7 @@ public class GameManager : Singleton<GameManager>
      
     private IEnumerator ClearNormalMode()
     {
-        if (TaxManager.Instance != null && TaxManager.Instance.DueTaxStage == 40)
-        {
-            TaxManager.Instance.MarkPaidForcibly();
-        }
+        TaxManager.Instance?.State.SettleAtEnding();
 
         AchievementHooks.OnRunCleared(economyManager.GetGold());
         DawnSystem.RecordRunCleared(); // 엔딩 도달: 다음 새벽 단계 해금(= 이번 단계 클리어 기록)
@@ -527,7 +488,8 @@ public class GameManager : Singleton<GameManager>
         seenFirstGold = saveData.progress.seenFirstGold;
         currentPlant = saveData.progress.currentPlant;
         if (TaxManager.Instance != null) TaxManager.Instance.LoadFromSave(saveData.progress.lastPaidTaxStage);
-        DawnSystem.SetSelectedStage(saveData.progress.selectedDawnStage); // 새벽 제약이 이어하기에도 적용되도록
+        DawnSystem.SetSelectedStage(saveData.progress.selectedDawnStage);
+        GameRun.Current.DawnStage = saveData.progress.selectedDawnStage; // 새벽 제약이 이어하기에도 적용되도록
 
         // 시스템별 복원. 각 필드가 무엇인지는 해당 시스템의 LoadXxx가 안다.
         // 순서를 바꾸면 로드 중 초기화 순서가 달라지므로 주의.
@@ -539,7 +501,7 @@ public class GameManager : Singleton<GameManager>
         requestManager.LoadRequestManager(saveData.request);
         phoneManager.LoadPhoneManager(saveData.phone);
         curseManager.LoadCurseManager(saveData.curse);
-        SpecialItemSystem.LoadFromSave(saveData.specialItem);
+        GameRun.Special.LoadFromSave(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.LoadCurrentAbilityManager(saveData.ability, saveData.progress.currentPlant);
@@ -549,7 +511,11 @@ public class GameManager : Singleton<GameManager>
         PlayerRecordForGraph.SetDataFromLoad(saveData.graph);
         RecallRecorder.LoadFromSave(saveData.recall);
 
-        Debug.Log("불러옴");
+        // 반드시 마지막. 위에서 식물을 다시 만들면서 난수를 쓰기 때문에(맛 등),
+        // 먼저 되돌리면 저장했을 때와 다른 지점에서 이어 가게 된다.
+        GameRun.Current.RestoreRng(saveData.rng);
+
+        Debug.Log($"불러옴 (시드 {GameRun.Rng.Seed})");
     }
 
     private void SaveGame()
@@ -562,7 +528,7 @@ public class GameManager : Singleton<GameManager>
         saveData.progress.seenFirstGold = seenFirstGold;
         saveData.progress.currentPlant = currentPlant;
         saveData.progress.lastPaidTaxStage = TaxManager.Instance != null ? TaxManager.Instance.GetSaveValue() : 0;
-        saveData.progress.selectedDawnStage = DawnSystem.SelectedDawnStage;
+        saveData.progress.selectedDawnStage = GameRun.Current.DawnStage;
         // 불러올 때 무조건 이어하기 상태로 시작하도록 정규화해서 저장
         saveData.progress.gst = stage > endStage ? GameStartType.ContinueAfterEnding : GameStartType.ContinueGame;
 
@@ -575,13 +541,14 @@ public class GameManager : Singleton<GameManager>
         requestManager.SaveRequestManager(saveData.request);
         phoneManager.SavePhoneManager(saveData.phone);
         curseManager.SaveCurseManager(saveData.curse);
-        SpecialItemSystem.SaveTo(saveData.specialItem);
+        GameRun.Special.SaveTo(saveData.specialItem);
         if (AbilityManager.Instance != null)
         {
             AbilityManager.Instance.SaveCurrentAbilityManager(saveData.ability);
         }
         PlayerRecordForGraph.SaveTo(saveData.graph);
         RecallRecorder.SaveTo(saveData.recall);
+        GameRun.Rng.Save(saveData.rng);
 
         RunSave.Save(GetSavePath(), saveData);
         GameStartContext.SetStartType(GameStartType.ContinueGame);

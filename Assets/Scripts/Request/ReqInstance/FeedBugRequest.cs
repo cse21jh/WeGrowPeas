@@ -15,13 +15,13 @@ public class FeedBugRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnPeaDiedByBug += HandlePeaDiedByBug;
+        Events.PlantDiedByBug += HandlePeaDiedByBug;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaDiedByBug -= HandlePeaDiedByBug;
+        Events.PlantDiedByBug -= HandlePeaDiedByBug;
     }
 
     public override string GetProgressText()

@@ -6,8 +6,6 @@ public class AbsorbFertilizerItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 4; // 희귀 등급
 
-    private int? pendingIndex;
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -33,42 +31,16 @@ public class AbsorbFertilizerItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        reason = null;
-        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
-            return false;
-
-        // 이미 비료가 있는 곳에는 못 뿌리게? -> 일단 중복 허용하되 효과는 중복 안되게 Grid에서 처리 (HashSet 사용중이라 OK)
-        // 하지만 사용자 경험상 이미 뿌려진 곳은 막는 게 좋을 수 있음.
-        if (ctx.Grid.Soil.HasAbsorbFertilizer(idx.Value))
-        {
-             reason = Loc.T("shop.error.absorb_exists");
-             return false;
-        }
-
-        pendingIndex = idx.Value;
-        return true;
+        bool exists = ctx.Soil.HasAbsorbFertilizer(cell);
+        reason = exists ? Loc.T("shop.error.absorb_exists") : null;
+        return !exists;
     }
-
-    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-        
-        if (pendingIndex == null) return;
-
-        // 실제 효과 적용
-        ctx.Grid.Soil.AddAbsorbFertilizer(pendingIndex.Value);
-        Debug.Log($"[AbsorbFertilizer] Committed on index {pendingIndex.Value}");
-
-        pendingIndex = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
+        if (TakeSelectedCell(ctx, out int cell))
+            ctx.World.AddAbsorbFertilizer(cell);
     }
 }

@@ -4,20 +4,20 @@ using UnityEngine;
 // EnemyController(웨이브 선택)와 Plant(저항 감소)가 CurseState를 읽어 반영.
 public class HeavyFireCurse : CurseInstance
 {
-    public HeavyFireCurse(CurseScriptable data, int level) : base(data, level)
+    public HeavyFireCurse(CurseScriptable data, int level, CurseBoard board) : base(data, level, board)
     {
 
     }
 
     public override void Activate()
     {
-        CurseState.HeavyFire = true;
-        CurseState.HeavyFireExtraDecayPercent = Lv != null ? Lv.valueA : 0f;
+        GameRun.Curse.HeavyFire = true;
+        GameRun.Curse.HeavyFireExtraDecayPercent = Lv != null ? Lv.valueA : 0f;
     }
 
     public override void Deactivate()
     {
-        CurseState.HeavyFire = false;
-        CurseState.HeavyFireExtraDecayPercent = 0f;
+        GameRun.Curse.HeavyFire = false;
+        GameRun.Curse.HeavyFireExtraDecayPercent = 0f;
     }
 }

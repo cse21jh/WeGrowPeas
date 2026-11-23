@@ -6,7 +6,6 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
     [Header("Effect")]
     [SerializeField] private float resistanceBonus = 0.05f; // 5% 증가
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -34,7 +33,7 @@ public class WeakGeneticsResistanceUpgradeItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Upgrades.AddWeakGeneticsResistanceBonus(resistanceBonus);
+        ctx.World.AddWeakGeneticsResistanceBonus(resistanceBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

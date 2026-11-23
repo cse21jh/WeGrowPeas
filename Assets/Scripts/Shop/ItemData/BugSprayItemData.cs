@@ -23,7 +23,7 @@ public class BugSprayItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -35,9 +35,5 @@ public class BugSprayItemData : ItemData
     { onReady?.Invoke(); }
 
     public override void Commit(ShopContext ctx)
-    {
-        ModManager.Instance.AddTimedMultiplier(StatId.BugSpeedMul, param: -1, multiplier: 1-reducePercent, durationDays: durationDays, sourceTag: "BugSpray");
-    }
-
-    public override void Cancel(ShopContext ctx) { }
+        => ctx.World.AddTimedMultiplier(StatId.BugSpeedMul, -1, 1 - reducePercent, durationDays, "BugSpray");
 }

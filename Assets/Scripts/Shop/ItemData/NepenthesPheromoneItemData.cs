@@ -23,10 +23,10 @@ public class NepenthesPheromoneItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // 이미 페로몬이 활성화되어 있으면 표시하지 않음
-        if (ctx?.Grid != null && ctx.Grid.Modifiers.HasNepenthesPheromone)
+        if (ctx?.Field != null && ctx.Modifiers.HasNepenthesPheromone)
         {
             return false;
         }
@@ -38,7 +38,7 @@ public class NepenthesPheromoneItemData : ItemData
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         // 이미 페로몬이 활성화되어 있으면 구매 불가
-        if (ctx?.Grid != null && ctx.Grid.Modifiers.HasNepenthesPheromone)
+        if (ctx?.Field != null && ctx.Modifiers.HasNepenthesPheromone)
         {
             reason = Loc.T("shop.error.pheromone_active");
             return false;
@@ -58,8 +58,8 @@ public class NepenthesPheromoneItemData : ItemData
             return;
 
         // 네펜데스 페로몬 활성화
-        ctx.Grid.Upgrades.SetNepenthesPheromoneEnabled(true);
+        ctx.World.EnableNepenthesPheromone();
         // 네펜데스 등장 확률 5% 증가
-        ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
+        ctx.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }
 }

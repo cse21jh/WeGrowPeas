@@ -6,8 +6,6 @@ public class ChiliPepperItemData : ItemData
     [Header("Rotation")]
     [Min(0)] public int rotationWeight = 8;
 
-    private int? pendingIndex;
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1500;
@@ -23,9 +21,9 @@ public class ChiliPepperItemData : ItemData
     {
         // 고추 등장 확률 증가 적용
         int baseWeight = rotationWeight;
-        if (ctx?.Grid != null)
+        if (ctx?.Field != null)
         {
-            float probabilityBonus = ctx.Grid.Modifiers.ChiliPepperSpawnProbability;
+            float probabilityBonus = ctx.Modifiers.ChiliPepperSpawnProbability;
             // 확률을 가중치로 변환 (예: 0.02 = 2% -> 가중치 2 증가)
             int weightBonus = Mathf.RoundToInt(probabilityBonus * 100);
             return baseWeight + weightBonus;
@@ -35,12 +33,12 @@ public class ChiliPepperItemData : ItemData
 
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
-        if (ctx == null || ctx.Grid == null)
+        if (ctx == null || ctx.Field == null)
         {
             reason = Loc.T("shop.error.no_game_state");
             return false;
         }
-        if (!ctx.Grid.Board.HasEmptyCell())
+        if (!ctx.Board.HasEmptyCell())
         {
             reason = Loc.T("shop.error.no_empty_cell");
             return false;
@@ -54,53 +52,16 @@ public class ChiliPepperItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        reason = null;
-        if (ctx == null || ctx.Grid == null)
-        {
-            reason = Loc.T("shop.error.no_game_state");
-            return false;
-        }
-
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
-        {
-            reason = Loc.T("shop.error.invalid_position");
-            return false;
-        }
-
-        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
-        {
-            reason = Loc.T("shop.error.occupied");
-            return false;
-        }
-
-        pendingIndex = idx.Value;
-        return true;
+        bool occupied = ctx.Board.States.ContainsKey(cell);
+        reason = occupied ? Loc.T("shop.error.occupied") : null;
+        return !occupied;
     }
-    public override void SetPlacedPosition(Vector3 worldOrScreenPos) { /* no-op */ }
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx == null || ctx.Grid == null)
-        {
-            ctx?.ShowError?.Invoke(Loc.T("shop.error.no_game_state"));
-            return;
-        }
-        if (!pendingIndex.HasValue)
-        {
-            ctx.ShowError?.Invoke(Loc.T("shop.error.invalid_selection"));
-            return;
-        }
-
-        ctx.Grid.Spawner.AddChiliPepper(pendingIndex.Value);
-
-        pendingIndex = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
+        if (TakeSelectedCell(ctx, out int cell))
+            ctx.World.PlantFixed(PlantKind.ChiliPepper, cell);
     }
 }

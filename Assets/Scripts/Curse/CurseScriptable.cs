@@ -5,7 +5,7 @@ public enum CurseType { Temporal, Seasonal }
 
 /// <summary>
 /// 저주 1종의 정적 데이터. 실제 수치는 <see cref="levels"/>에 1/2/3단계별로 담고,
-/// 런타임에는 새벽 저주 레벨(<c>DawnSystem.Current.curseLevel</c>)로 해당 레벨을 골라 쓴다.
+/// 런타임에는 새벽 저주 레벨(<c>GameRun.Dawn.curseLevel</c>)로 해당 레벨을 골라 쓴다.
 /// 필드 의미는 저주마다 다르므로 각 Curse 인스턴스 클래스 주석 참고.
 /// </summary>
 [CreateAssetMenu(menuName = "Curse/CurseItem")]

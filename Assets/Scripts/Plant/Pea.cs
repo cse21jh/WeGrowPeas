@@ -9,6 +9,8 @@ public class Pea : MovablePlant
     [SerializeField] private Sprite[] deathFrames;
     [SerializeField] private Sprite[] selectedSprite;
 
+    public override PlantKind Kind => PlantKind.Pea;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Pea;
@@ -104,38 +106,6 @@ public class Pea : MovablePlant
         if (!grid.Upgrades.showingAllPrice)
             priceSign.gameObject.SetActive(false);
     }
-
-
-    private static readonly int[] BasePrices = { 90, 130, 160, 180, 200, 230, 270 };
-
-    public override int GetSellingPrice()
-    {
-        //if (isFrozen) return frozenPrice;
-
-        int basePrice = (taste >= 0 && taste < BasePrices.Length) ? BasePrices[taste] : 0;
-
-        if (grid == null)
-        {
-            return basePrice;
-        }
-
-        // 특수(군체): 주변 4칸의 서로 다른 식물 1종마다 기본 가격 +50골드
-        if (SpecialItemSystem.Has("colony"))
-            basePrice += 50 * grid.Soil.CountDistinctNeighborSpecies(gridIndex);
-
-        int price = CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
-
-        // 특수(보양식): 저항력 평균 수치만큼 가격 추가 증가 (곱적용, 보유 형질만 평균)
-        if (SpecialItemSystem.Has("health_food") && traits.Count > 0)
-        {
-            float sum = 0f;
-            foreach (var t in traits) sum += GetResistanceValue((int)t.traitType);
-            price = Mathf.RoundToInt(price * (1f + sum / traits.Count));
-        }
-
-        return price;
-    }
-
 
 
 }

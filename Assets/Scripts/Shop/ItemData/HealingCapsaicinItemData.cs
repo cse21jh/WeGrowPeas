@@ -36,7 +36,7 @@ public class HealingCapsaicinItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Modifiers.AddChiliPepperHealPercent(healPercentPerPurchase);
-        ctx.Grid.Modifiers.AddChiliPepperSpawnProbability(probabilityIncrease);
+        ctx.Modifiers.AddChiliPepperHealPercent(healPercentPerPurchase);
+        ctx.Modifiers.AddChiliPepperSpawnProbability(probabilityIncrease);
     }
 }

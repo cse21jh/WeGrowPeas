@@ -91,7 +91,7 @@ public sealed class TutorialChapter1 : TutorialChapter
         cameraManager.OnCameraZoomed += RecordZoom;
         breeder.OnParentSelected += RecordSelection;
         GameEvents.OnPeaBreeded += RecordBreed;
-        Coroutine breeding = StartCoroutine(breeder.Breeding());
+        Coroutine breeding = StartCoroutine(game.TutorialFreeTimeRoutine());
         yield return PlayPractice(CameraPractice,
             new PracticeGoal("pan", () => HasGoal(Goal.Pan)),
             new PracticeGoal("zoom_in", () => HasGoal(Goal.ZoomIn)),

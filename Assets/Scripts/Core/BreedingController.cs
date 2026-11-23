@@ -33,12 +33,6 @@ public class BreedingController : MonoBehaviour
     internal RectTransform BreedSkipRect => breedSkipButton.transform as RectTransform;
     internal RectTransform BreedCountRect => breedCountUI.rectTransform;
     internal event System.Action OnParentSelected;
-    private int lastMutationKind = 0;
-
-    /// <summary>직전 교배에서 변종이 발생했는가.</summary>
-    public bool LastBreedWasMutation => lastMutationKind != 0;
-    /// <summary>직전 변종이 양성이었는가. (변종이 아니면 의미 없음)</summary>
-    public bool LastBreedWasBenign => lastMutationKind == 2;
 
     private Grid cachedGrid;
     protected Grid grid => cachedGrid != null ? cachedGrid : (cachedGrid = GetComponent<Grid>());
@@ -109,96 +103,44 @@ public class BreedingController : MonoBehaviour
             //자식 완두콩 형질 계산 후 Instantiate
 
             // 교배 횟수 증가 아이템이 구매되었을 때 바로 적용되도록 매번 재계산
-            int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
+            int maxAttempts = GetEffectiveMaxBreedCount();
+            BreedCheck check = BreedingRules.Check(grid.Field, parent1.State, parent2.State, breedCount, maxAttempts);
 
-            bool canBreed = false;
-            for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++) // 빈 칸이 있는가
+            if (check == BreedCheck.Ok)
             {
-                if (!grid.Board.Plants.ContainsKey(idx))
+                // 무엇이 태어나는지는 BreedingRules가 정하고, 여기서는 심기와 연출을 한다
+                BreedOutcome outcome = BreedingRules.Breed(grid.Field, parent1.State, parent2.State,
+                    GameManager.Instance.currentPlant, grid.Enemy.CurrentSeason, SpawnChild);
+
+                if (outcome.ConsumesAttempt) breedCount++;
+
+                if (outcome.Failed)
                 {
-                    canBreed = true;
-                    break;
-                }
-            }
-
-            bool isEqualPlant = false;
-            if ((parent1.GetType() == parent2.GetType())) // 추후 아종 교배가 생긴다면 이곳과 교배 로직 수정을...
-            {
-                isEqualPlant = true;
-            }
-
-            if (canBreed && breedCount < currentEffectiveMaxBreedCount && isEqualPlant)
-            {
-                // 활성형 껍질: 교배를 시도한 식물은 이후 자가번식 확률 보너스를 받지 못함
-                parent1.MarkBreedAttempted();
-                parent2.MarkBreedAttempted();
-
-                // 저주: 씨 없는 수박 — 확률적으로 교배 실패(시도는 소모)
-                if (CurseState.SeedlessFailPercent > 0f && Random.Range(0f, 100f) < CurseState.SeedlessFailPercent)
-                {
-                    breedCount++;
                     Debug.Log("씨 없는 수박 저주로 교배 실패");
                     SoundManager.Instance.PlayEffect(SoundIds.WrongSelect); // TODO: 실패 전용 효과음/연기 이펙트
-                    UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
-                    breedObj1.GetComponent<Plant>().MakeDefaultSprite();
-                    breedObj2.GetComponent<Plant>().MakeDefaultSprite();
-                    breedObj1 = null;
-                    breedObj2 = null;
-                    DeactivateBreed();
-                    return;
                 }
-
-                // 저주: 광란 — 확률적으로 랜덤 교배
-                bool madnessBreed = CurseState.BreedMadnessPercent > 0f && Random.Range(0f, 100f) < CurseState.BreedMadnessPercent;
-                Plant plant = grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed));
-                PlayMutationEffectIfAny(plant); // 변종(돌연변이) 이펙트
-                if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting &&
-                    GameManager.Instance.Tutorial?.CanBreedDuringOpeningMessage != true)
+                else
                 {
-                    UIManager.Instance.Popup.ShowBreedPopup(plant);
+                    GameEvents.RaisePeaBreeded();
+                    Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (maxAttempts - breedCount) + "입니다");
+                    SoundManager.Instance.PlayEffect(SoundIds.Breed);
+                    CountBreed();
                 }
 
-                // 쌍둥이: 확률적으로 교배를 한 번 더 실행해 유전자가 다른 이란성 쌍둥이를 생성
-                if (grid.Modifiers.TwinBreedProbability > 0f && Random.Range(0f, 1f) < grid.Modifiers.TwinBreedProbability && grid.Board.HasEmptyCell())
-                {
-                    // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
-                    PlayMutationEffectIfAny(
-                        grid.Spawner.AddMovablePlant(Breed(parent1.GetGeneticTrait(), parent2.GetGeneticTrait(), madnessBreed)));
-                    UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.twins"), 1);
-                    totalBreedCount++;
-                    if (GameManager.Instance.currentPlant == PlantIds.Pea)
-                        totalPeaBreedcount++;
-                    else if (GameManager.Instance.currentPlant == PlantIds.Peanut)
-                        totalPeanutBreedCount++;
-                }
-
-                // 특수(밑장빼기): 25% 확률로 교배 횟수 미소모
-                if (!(SpecialItemSystem.Has("bottom_deal") && Random.Range(0f, 100f) < 25f))
-                    breedCount++;
-                GameEvents.RaisePeaBreeded();
-                Debug.Log("자식 생성 성공. 남은 교배 횟수는 " + (currentEffectiveMaxBreedCount - breedCount) + "입니다");
-                SoundManager.Instance.PlayEffect(SoundIds.Breed);
-                totalBreedCount++;
-                if (GameManager.Instance.currentPlant == PlantIds.Pea)
-                    totalPeaBreedcount++;
-                else if (GameManager.Instance.currentPlant == PlantIds.Peanut)
-                    totalPeanutBreedCount++;
-                UpdateBreedCountUI(currentEffectiveMaxBreedCount - breedCount);
-                Plant p1 = breedObj1.GetComponent<Plant>();
-                Plant p2 = breedObj2.GetComponent<Plant>();
-                p1.MakeDefaultSprite();
-                p2.MakeDefaultSprite();
+                UpdateBreedCountUI(maxAttempts - breedCount);
+                parent1.MakeDefaultSprite();
+                parent2.MakeDefaultSprite();
                 breedObj1 = null;
                 breedObj2 = null;
                 DeactivateBreed();
             }
-            else if (breedCount >= currentEffectiveMaxBreedCount)
+            else if (check == BreedCheck.NoAttemptsLeft)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.no_attempts"), 1);
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
                 isBreedButtonPressed = false;
             }
-            else if (!isEqualPlant)
+            else if (check == BreedCheck.SpeciesMismatch)
             {
                 UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.species_mismatch"), 1);
                 SoundManager.Instance.PlayEffect(SoundIds.WrongSelect);
@@ -217,6 +159,10 @@ public class BreedingController : MonoBehaviour
             isBreedButtonPressed = false;
         }
     }
+    /// <summary>방금 끝난 낮에 쓰지 않은 교배 횟수.</summary>
+    public int LastRemainingBreeds { get; private set; }
+
+    /// <summary>낮의 자유시간. 앞뒤의 규칙은 <see cref="DayFlow"/>가 처리한다.</summary>
     public IEnumerator Breeding()
     {
         TutorialChapter tutorial = GameManager.Instance.Tutorial;
@@ -229,7 +175,7 @@ public class BreedingController : MonoBehaviour
         breedObj2 = null;
 
         //int breedCount = 0;
-        int effectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
+        int effectiveMaxBreedCount = GetEffectiveMaxBreedCount();
         // 저주: 불면증 — 밤시간(폰 페이즈) 단축으로 변경되어 교배시간 영향 제거
         float effectiveMaxBreedTimer = tutorial != null ? TutorialChapter.DaySeconds
             : MaxBreedTimer * ModManager.Instance.GetMul(StatId.BreedingPhaseDurationMul, -1);
@@ -244,22 +190,6 @@ public class BreedingController : MonoBehaviour
 
         // 저주(통신장애): 낮 시간(교배 페이즈)의 앞부분 동안 폰 차단 시작
         if (PhoneManager.Instance != null) PhoneManager.Instance.BeginEmpBlockIfActive(effectiveMaxBreedTimer);
-
-        // 신용카드: 어제 상점에서 3슬롯 이상 구매했다면 소모 비용의 일부를 환급 (없어도 일일 집계는 초기화)
-        if (ShopManager.Instance != null)
-        {
-            int refund = ShopManager.Instance.ConsumeDailyPurchaseRefund(grid.Modifiers.CreditCardRefundPercent);
-            if (refund > 0)
-            {
-                GameManager.Instance.grid.Economy.AddGold(refund);
-                UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.card_refund", ("gold", refund)), 1);
-            }
-        }
-
-        // 특수(세계여행): 낮 시작 시 각 식물의 위치 마킹 (웨이브 후 이동 거리 계산용)
-        if (SpecialItemSystem.Has("world_travel"))
-            foreach (var p in grid.Board.Plants.Values)
-                if (p != null) p.MarkDayStartPosition();
 
         Button practiceSkipButton = untimedPractice ? breedSkipButton.GetComponent<Button>() : null;
         if (practiceSkipButton != null)
@@ -325,9 +255,7 @@ public class BreedingController : MonoBehaviour
 
         if (!untimedPractice) breedTimerUI.StopTimer();
 
-        int currentEffectiveMaxBreedCount = Mathf.Max(1, Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1)) + GetKingReturnBreedDelta());
-        int remainingBreeds = Mathf.Max(0, currentEffectiveMaxBreedCount - breedCount);
-        GameEvents.RaiseDayEndedWithRemainingBreeds(remainingBreeds);
+        LastRemainingBreeds = Mathf.Max(0, GetEffectiveMaxBreedCount() - breedCount);
 
         breedCount = 0;
         // Debug.Log("교배 페이즈 종료");
@@ -341,144 +269,45 @@ public class BreedingController : MonoBehaviour
         // 저주(통신장애): 자유시간이 끝나면(스킵 포함) 노이즈도 바로 끈다
         if (PhoneManager.Instance != null) PhoneManager.Instance.EndEmpBlock();
 
-        // 완두커피: 자유시간이 지난 식물은 조금 더 비싸짐
-        if (grid.Modifiers.PeaCoffeeMultiplier > 0f)
-        {
-            foreach (var p in grid.Board.Plants.Values)
-                if (p != null) p.OnFreeTimePassed();
-        }
-        //GardenGrid 리로드
-
         yield return null;
     }
-    protected List<GeneticTrait> Breed(List<GeneticTrait> parent1, List<GeneticTrait> parent2, bool randomBreed = false)
+    private void SpawnChild(List<GeneticTrait> traits, MutationKind mutation, bool isTwin)
     {
-        List<GeneticTrait> childTrait = new List<GeneticTrait>();
+        Plant plant = grid.Spawner.AddMovablePlant(traits);
 
-        // 변종 판정(식물 단위, 악성:양성 = 80:20)
-        // - 악성: 부모 무관 유전자 무작위, 저항력은 해당 유전자의 일반 범위 롤
-        // - 양성: 유전자는 부모 상속, 모든 저항력 90~100%
-        bool malignant = false, benign = false;
-        if (Random.Range(0f, 100f) < Plant.GetMutationChancePercent())
+        if (mutation != MutationKind.None)
         {
-            // 악성 비율: 기본 0.8, 슈퍼 변종이면 반전(0.2), 디버그 패널이 지정하면 그 값
-            float malignantRatio = grid.Modifiers.HasSuperMutation ? 0.2f : 0.8f;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (MutationDebug.HasRatioOverride) malignantRatio = MutationDebug.MalignantRatioOverride;
-#endif
-
-            if (SpecialItemSystem.Has("extreme_mutation")) malignant = true; // 특수(극단적 변이): 교배 시 악성만
-            else if (Random.value < malignantRatio) malignant = true;
-            else benign = true;
-            Debug.Log($"[변종] {(malignant ? "악성" : "양성")} 변종 발생!");
+            Debug.Log($"[변종] {(mutation == MutationKind.Malignant ? "악성" : "양성")} 변종 발생!");
+            if (plant != null) CurseEffectManager.PlayMutation(plant, mutation == MutationKind.Benign);
         }
-        lastMutationKind = malignant ? 1 : (benign ? 2 : 0);
 
-        foreach (TraitType trait in System.Enum.GetValues(typeof(TraitType)))
+        if (isTwin)
         {
-            if (trait == TraitType.None || trait == TraitType.Drought || trait == TraitType.Heat)
-                break; // 가뭄, 더위에 대한 형질은 SetTrait에서 삽입해줌.따로따로 교배 로직을 거치면 이상하게 나옴. 
-
-            int p1Trait;
-            int p2Trait;
-
-            float p1Resistance = 0f;
-            float p2Resistance = 0f;
-
-            int childGenetic = 0;
-
-            int traitNotInParent = 0;
-
-            if (parent1.Any(t => t.traitType == trait))
-            {
-                p1Trait = parent1.First(t => t.traitType == trait).genetics;
-                p1Resistance = parent1.First(t => t.traitType == trait).resistance;
-            }
-            else
-            {
-                p1Trait = 0;
-                traitNotInParent += 1;
-            }
-
-            if (parent2.Any(t => t.traitType == trait))
-            {
-                p2Trait = parent2.First(t => t.traitType == trait).genetics;
-                p2Resistance = parent2.First(t => t.traitType == trait).resistance;
-            }
-            else
-            {
-                p2Trait = 0;
-                traitNotInParent += 1;
-            }
-
-            if (traitNotInParent == 2)
-                continue;
-
-            switch (p1Trait)
-            {
-                case 2: childGenetic += 1; break;
-                case 1:
-                    // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
-                    int p1Bonus = (int)(grid.Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p1Bonus) ? 1 : 0);
-                    break;
-                default: break;
-            }
-
-            switch (p2Trait)
-            {
-                case 2: childGenetic += 1; break;
-                case 1:
-                    // 황금 유전자 확률 보너스 적용: genetics = 1에서 우수한 형질이 나올 확률 증가
-                    int p2Bonus = (int)(grid.Modifiers.GoldenGeneticsProbabilityBonus * 100); // 보너스를 퍼센트로 변환
-                    childGenetic += (Random.Range(1, 101) <= (grid.Modifiers.AdditionalInheritance + 50 + p2Bonus) ? 1 : 0);
-                    break;
-                default: break;
-            }
-
-            if (randomBreed || malignant) childGenetic = Random.Range(0, 3); // 저주: 광란 / 악성 변종(유전자 무작위)
-
-            // 특수(적응형 유전자): 양성 변종의 유전자를 현재 계절에 유리한 쪽으로 변경
-            if (benign && SpecialItemSystem.Has("adaptive_genetics"))
-                childGenetic = GetSeasonFavoredGenetics(trait);
-
-            float resistance = Plant.GetResistanceBasedOnGenetics(trait, childGenetic, p1Resistance, p2Resistance);
-
-            if (benign) resistance = Random.Range(90, 101) / 100f; // 양성 변종: 모든 저항 90~100%
-
-            if (trait == TraitType.Pest)
-                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, grid.Modifiers.AdditionalPestResistance));
-            else
-                childTrait.Add(new GeneticTrait(trait, resistance, childGenetic, 0.0f));
+            // 교배 팝업은 인스턴스를 하나만 재사용하므로 쌍둥이는 플로팅 팝업으로만 알림
+            UIManager.Instance.Popup.ShowFloatingPopup(Loc.T("game.breed.twins"), 1);
+            CountBreed();
         }
-        return childTrait;
+        else if (UIManager.Instance != null && UIManager.Instance.ShowBreedPopupSetting &&
+                 GameManager.Instance.Tutorial?.CanBreedDuringOpeningMessage != true)
+        {
+            UIManager.Instance.Popup.ShowBreedPopup(plant);
+        }
     }
-    /// <summary>직전 교배가 변종이었다면 해당 식물에 변종 이펙트를 재생한다.</summary>
-    public void PlayMutationEffectIfAny(Plant plant)
+
+    private void CountBreed()
     {
-        if (plant == null || !LastBreedWasMutation) return;
-        CurseEffectManager.PlayMutation(plant, LastBreedWasBenign);
+        totalBreedCount++;
+        if (GameManager.Instance.currentPlant == PlantIds.Pea)
+            totalPeaBreedcount++;
+        else if (GameManager.Instance.currentPlant == PlantIds.Peanut)
+            totalPeanutBreedCount++;
     }
-    /// <summary>
-    /// 특수(적응형 유전자): 양성 변종의 계절 유리 유전자.
-    /// 앞쪽 4개(자연사·해충·바람·홍수) = 금색 2개(genetics 2).
-    /// 뒤쪽 2개(장마·추위) = 계절 따라: 겨울·가을 → 금색(2, 장마/추위 저항↑), 여름·봄 → 회색(0, 짝 형질 가뭄/더위 저항↑).
-    /// // 계절→유불리 매핑은 기획 확정 시 조정
-    /// </summary>
-    private int GetSeasonFavoredGenetics(TraitType trait)
-    {
-        if (trait != TraitType.HeavyRain && trait != TraitType.Cold) return 2;
-        Season season = grid.Enemy.CurrentSeason;
-        bool coldSide = season == Season.Winter || season == Season.Fall;
-        return coldSide ? 2 : 0;
-    }
-    /// <summary>특수(왕의 귀환): 기본 교배 횟수 -2, 누적 획득 골드 5000당 +1.</summary>
-    private int GetKingReturnBreedDelta()
-    {
-        if (!SpecialItemSystem.Has("king_return")) return 0;
-        int total = GameManager.Instance != null ? GameManager.Instance.grid.Economy.TotalGold : 0;
-        return -2 + total / 5000;
-    }
+
+    private int GetEffectiveMaxBreedCount()
+        => BreedingRules.GetMaxAttempts(maxBreedCount,
+            ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1),
+            GameManager.Instance != null ? GameManager.Instance.grid.Economy.TotalGold : 0);
+
     public void AddMaxBreedTimer(int time)
     {
         maxBreedTimer += time;
@@ -521,11 +350,7 @@ public class BreedingController : MonoBehaviour
     }
     public int GetEffectiveRemainingBreedCount()
     {
-        int effectiveMaxBreedCount = Mathf.Max(
-            1,
-            Mathf.FloorToInt(maxBreedCount * ModManager.Instance.GetMul(StatId.BreedingAttemptsMul, -1))
-                + GetKingReturnBreedDelta());
-        return Mathf.Max(0, effectiveMaxBreedCount - breedCount);
+        return Mathf.Max(0, GetEffectiveMaxBreedCount() - breedCount);
     }
     public virtual void RequestBreedSelect(GameObject clickedObject)
     {

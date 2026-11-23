@@ -25,7 +25,7 @@ public class GoldenLadybugItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (새벽 1단계 클리어 조건은 metaRequiredDawnStage)
         return stage >= BugSchedule.AppearStage;
     }
@@ -48,8 +48,8 @@ public class GoldenLadybugItemData : ItemData
             return;
 
         // 웨이브 종료 시 무당벌레당 100골드 획득 (중첩 시 합적용)
-        ctx.Grid.Modifiers.AddAdditionalLadybugGoldPerUnit(goldPerUnit);
+        ctx.Modifiers.AddAdditionalLadybugGoldPerUnit(goldPerUnit);
         // 무당벌레 등장 확률 1% 증가
-        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

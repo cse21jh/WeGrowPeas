@@ -153,10 +153,10 @@ public abstract class ItemData : ScriptableObject
     /// null/빈 배열이면 드롭다운을 숨긴다. (예: 전용 비료 = 웨이브 목록)
     /// 선택 결과는 <see cref="SetSelectedOption"/>로 전달된다.
     /// </summary>
-    public virtual string[] GetSelectableOptions() => null;
+    public virtual string[] GetSelectableOptions(ShopContext ctx) => null;
 
     /// <summary>드롭다운에서 고른 항목의 인덱스를 전달. 옵션이 있는 아이템만 override.</summary>
-    public virtual void SetSelectedOption(int index) { }
+    public virtual void SetSelectedOption(ShopContext ctx, int index) { }
 
     [Header("Unlock")]
     [Tooltip("체크 시 해금되기 전까지 상점에 뜨지 않음. UnlockManager.Unlock(...)로 해금.")]
@@ -223,15 +223,28 @@ public abstract class ItemData : ScriptableObject
     public abstract void Commit(ShopContext ctx);
 
     // 구매 시작(미리보기/선택 모드 진입 등)
-    public virtual void Cancel(ShopContext ctx) { }
+    public virtual void Cancel(ShopContext ctx) => selectedCell = null;
+
+    /// <summary>배치형과 선택형에서 고른 칸.</summary>
+    protected int? selectedCell;
 
     // 배치/선택형의 유효성 검사(즉시형은 필요 없음)
-    public virtual bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason) { reason = null; return true; }
-    public virtual bool ValidateTarget(ShopContext ctx, Plant target, out string reason) { reason = null; return true; }
+    public virtual bool ValidateCell(ShopContext ctx, int cell, out string reason) { reason = null; return true; }
+    public virtual bool ValidateTarget(ShopContext ctx, PlantState target, out string reason) { reason = null; return true; }
 
-    // 최종 확정에 필요한 외부 입력 보관
-    public virtual void SetPlacedPosition(Vector3 worldPos) { }
-    public virtual void SetSelectedPlant(Plant plant) { }
+    /// <summary>고른 칸(또는 고른 식물의 칸)을 정한다. 구매 확정 직전에 불린다.</summary>
+    public void SelectCell(int cell) => selectedCell = cell;
+
+    /// <summary>고른 칸을 꺼내고 비운다. 고르지 않았으면 안내하고 false.</summary>
+    protected bool TakeSelectedCell(ShopContext ctx, out int cell)
+    {
+        cell = selectedCell ?? -1;
+        bool selected = selectedCell.HasValue;
+        selectedCell = null;
+        if (!selected) ctx.ShowError?.Invoke(Loc.T("shop.error.invalid_selection"));
+        return selected;
+    }
+
     public virtual void InitializePrice(ShopContext ctx) { }
 
     public virtual int GetDisplayPrice()
@@ -242,15 +255,14 @@ public abstract class ItemData : ScriptableObject
         if (CurrentPrice == int.MaxValue) return int.MaxValue;
 
         // 새벽 상점 가격 배수 적용(표시·차감 공통). 가격을 override 하는 아이템은 각자 반영 필요.
-        float mul = DawnSystem.Current.shopPriceMultiplier;
+        float mul = GameRun.Dawn.shopPriceMultiplier;
         float price = CurrentPrice * (mul > 0f ? mul : 1f);
 
         // 저주(독점시장): 품목별 가격이 무작위 배율(하루 동안 고정)로 변동
-        if (CurseState.ShopMonopoly)
+        if (GameRun.Curse.ShopMonopoly)
         {
-            int day = GameManager.Instance != null ? GameManager.Instance.stage : 0;
-            float h = StableHash01(name + "#" + day);
-            price *= Mathf.Lerp(CurseState.ShopPriceMinMul, CurseState.ShopPriceMaxMul, h);
+            float h = StableHash01(name + "#" + GameRun.Current.Stage);
+            price *= Mathf.Lerp(GameRun.Curse.ShopPriceMinMul, GameRun.Curse.ShopPriceMaxMul, h);
         }
         return Mathf.RoundToInt(price);
     }
@@ -267,10 +279,7 @@ public abstract class ItemData : ScriptableObject
     }
 
     // 최종 확정에 필요한 외부 입력 보관
-    public int GetTotalPurchaseCount()
-    {
-        return ShopManager.Instance?.GetItemPurchaseCount(this) ?? 0;
-    }
+    public int GetTotalPurchaseCount() => GameRun.Current.Shop.GetItemPurchaseCount(this);
 
     // 게임 전체에서의 구매 가능 여부 (MaxPurchaseCount 체크)
     public bool CanPurchaseByLimit()
@@ -287,17 +296,13 @@ public abstract class ItemData : ScriptableObject
     public virtual int EffectivePurchaseLimit => MaxPurchaseCount;
 
     /// <summary>하루 구매 한도. -1이면 무제한. 리롤해도 늘지 않고 날이 바뀌면 다시 찬다.</summary>
-    public virtual int DailyPurchaseLimit => -1;
-
-    /// <summary>오늘 살 수 있는 횟수를 다 썼는가.</summary>
-    public bool IsSoldOutToday()
-        => DailyPurchaseLimit >= 0 && ShopManager.Instance != null && ShopManager.Instance.GetDailyPurchaseCount(this) >= DailyPurchaseLimit;
+    public virtual int GetDailyPurchaseLimit(ShopContext ctx) => -1;
 
     /// <summary>앞으로 더 살 수 있는 횟수(표시용). -1이면 무제한.</summary>
     public int GetRemainingPurchaseCount()
     {
-        if (DailyPurchaseLimit >= 0)
-            return Mathf.Max(0, DailyPurchaseLimit - (ShopManager.Instance != null ? ShopManager.Instance.GetDailyPurchaseCount(this) : 0));
+        int daily = GetDailyPurchaseLimit(ShopContext.ForGame);
+        if (daily >= 0) return Mathf.Max(0, daily - GameRun.Current.Shop.GetDailyPurchaseCount(this));
         return EffectivePurchaseLimit < 0 ? -1 : Mathf.Max(0, EffectivePurchaseLimit - GetTotalPurchaseCount());
     }
 
@@ -306,10 +311,7 @@ public abstract class ItemData : ScriptableObject
     /// <summary>
     /// 전용 아이템용: 이번 런에서 키우는 식물이 지정한 종인지 확인. (예: "완두콩", "땅콩")
     /// </summary>
-    protected static bool IsCurrentPlant(string speciesName)
-    {
-        return GameManager.Instance != null && GameManager.Instance.currentPlant == speciesName;
-    }
+    protected static bool IsCurrentPlant(ShopContext ctx, string speciesName) => ctx.World.Species == speciesName;
 
     /// <summary>
     /// Grid null 체크 및 에러 처리 헬퍼
@@ -317,7 +319,7 @@ public abstract class ItemData : ScriptableObject
     protected bool ValidateGrid(ShopContext ctx, out string errorReason)
     {
         errorReason = null;
-        if (ctx?.Grid == null)
+        if (ctx?.Field == null)
         {
             errorReason = Loc.T("shop.error.no_game_state");
             ctx?.ShowError?.Invoke(errorReason);
@@ -349,7 +351,7 @@ public abstract class ItemData : ScriptableObject
         if (!ValidateGrid(ctx, out reason))
             return false;
 
-        if (!ctx.Grid.Board.HasEmptyCell())
+        if (!ctx.Board.HasEmptyCell())
         {
             reason = Loc.T("shop.error.no_space");
             return false;
@@ -370,59 +372,4 @@ public abstract class ItemData : ScriptableObject
 
         return count;
     }
-
-    // === PlaceOnTile 플로우 헬퍼 메서드 ===
-
-    /// <summary>
-    /// ValidatePosition에서 위치를 그리드 인덱스로 변환하는 헬퍼
-    /// </summary>
-    protected bool TryGetGridIndexFromPosition(ShopContext ctx, Vector3 pos, out int? gridIndex, out string errorReason)
-    {
-        gridIndex = null;
-        errorReason = null;
-
-        if (!ValidateGrid(ctx, out errorReason))
-            return false;
-
-        int? idx = ctx.Grid.GetGridIndexFromPosition(pos);
-        if (!idx.HasValue)
-        {
-            errorReason = Loc.T("shop.error.invalid_position");
-            return false;
-        }
-
-        gridIndex = idx.Value;
-        return true;
-    }
-
-    /// <summary>
-    /// Commit에서 pendingIndex가 유효한지 체크하는 헬퍼
-    /// </summary>
-    protected bool ValidatePendingIndex(int? pendingIndex, ShopContext ctx, out string errorReason)
-    {
-        errorReason = null;
-        if (!pendingIndex.HasValue)
-        {
-            errorReason = Loc.T("shop.error.invalid_selection");
-            ctx?.ShowError?.Invoke(errorReason);
-            return false;
-        }
-        return true;
-    }
 }
-
-    // 최종 확정에 필요한 외부 입력 보관
-public class ShopContext
-{
-    //public PlayerManager Player;
-    public Grid Grid;
-    //public WaveManager Wave;
-    //public BugManager Bugs;
-    public EconomyManager Economy;
-    public ShopManager Shop;
-    public object Session; // 필요하면 인터페이스로 확장
-
-    public System.Action<string> ShowInfo;
-    public System.Action<string> ShowError;
-    public System.Action<string> ShowGuide;
-}

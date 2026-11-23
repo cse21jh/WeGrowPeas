@@ -17,15 +17,15 @@ public class LegacyNoSellPeaRequest : RequestInstance
         currentCount = 0;
         isPeaSoldToday = false;
 
-        GameEvents.OnQuestDayPassed += HandleDayPassed;
-        GameEvents.OnPeaSold += HandlePeaSold;
+        Events.QuestDayPassed += HandleDayPassed;
+        Events.PlantSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnQuestDayPassed -= HandleDayPassed;
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        Events.QuestDayPassed -= HandleDayPassed;
+        Events.PlantSold -= HandlePeaSold;
     }
 
     public override string GetProgressText()
@@ -48,7 +48,7 @@ public class LegacyNoSellPeaRequest : RequestInstance
         else RaiseChanged();
     }
 
-    private void HandlePeaSold(Plant p)
+    private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 

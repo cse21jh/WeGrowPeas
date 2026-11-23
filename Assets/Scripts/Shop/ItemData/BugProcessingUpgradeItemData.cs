@@ -26,7 +26,7 @@ public class BugProcessingUpgradeItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         // BugSchedule.DefaultAppearStage = 6, unlockStageDay = 6
         // stage >= 6이므로 stage 6(6웨이브)부터 해금됨
@@ -51,6 +51,6 @@ public class BugProcessingUpgradeItemData : ItemData
             return;
 
         // 벌레 처치 시 골드 획득량 50골드 증가
-        ctx.Grid.Modifiers.AddAdditionalBugGold(goldBonus);
+        ctx.Modifiers.AddAdditionalBugGold(goldBonus);
     }
 }

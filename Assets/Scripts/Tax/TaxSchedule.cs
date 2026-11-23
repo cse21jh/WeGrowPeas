@@ -99,7 +99,7 @@ public static class TaxSchedule
             amount *= Mathf.Pow(_endlessGrowth > 0 ? _endlessGrowth : DefaultEndlessGrowth, endlessSteps);
 
         // 새벽 세금 배수 적용. 무한 모드 세금은 int 범위를 넘을 수 있으므로 상한에서 멈춘다.
-        float dawnMul = DawnSystem.Current.taxMultiplier;
+        float dawnMul = GameRun.Dawn.taxMultiplier;
         amount *= dawnMul > 0f ? dawnMul : 1f;
         return amount >= int.MaxValue ? int.MaxValue : Mathf.RoundToInt(amount);
     }

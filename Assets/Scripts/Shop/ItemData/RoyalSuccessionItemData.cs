@@ -7,7 +7,6 @@ public class RoyalSuccessionItemData : ItemData
     [Tooltip("구매 1회당 계승되는 가격 배율 비율 (0.1 = 10%p)")]
     [SerializeField] private float inheritRatioPerPurchase = 0.1f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1500;
@@ -20,7 +19,7 @@ public class RoyalSuccessionItemData : ItemData
     }
 
     // 땅콩 전용 아이템 (새벽 6단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Peanut);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Peanut);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Rare;
 
@@ -39,6 +38,6 @@ public class RoyalSuccessionItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.Modifiers.AddSuccessionInheritRatio(inheritRatioPerPurchase);
+        ctx.Modifiers.AddSuccessionInheritRatio(inheritRatioPerPurchase);
     }
 }

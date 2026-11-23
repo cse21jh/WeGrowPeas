@@ -7,7 +7,6 @@ public class GoldSoilItemData : ItemData
     [Min(0)] public int rotationWeight = 1;
 
     // 배치 확정 시 사용할 그리드 인덱스
-    private int? pendingIndex;
 
     private void OnEnable()
     {
@@ -33,54 +32,21 @@ public class GoldSoilItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidatePosition(ShopContext ctx, Vector3 pos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        // 화면 좌표를 그리드 인덱스로 변환
-        if (!TryGetGridIndexFromPosition(ctx, pos, out int? idx, out reason))
-            return false;
-
-        // 이미 황금 비료가 있는 칸인지 확인
-        if (ctx.Grid.Soil.HasGoldSoil(idx.Value))
-        {
-            reason = Loc.T("shop.error.gold_soil_exists");
-            return false;
-        }
-
-        // 식물이 있는 칸인지 확인
-        if (ctx.Grid.Board.Plants.ContainsKey(idx.Value))
-        {
-            reason = Loc.T("shop.error.gold_soil_occupied");
-            return false;
-        }
-
-        pendingIndex = idx.Value;
-        return true;
-    }
-
-    public override void SetPlacedPosition(Vector3 worldPos)
-    {
-        // ValidatePosition에서 이미 처리됨
+        reason = null;
+        if (ctx.Soil.HasGoldSoil(cell)) reason = Loc.T("shop.error.gold_soil_exists");
+        else if (ctx.Board.States.ContainsKey(cell)) reason = Loc.T("shop.error.gold_soil_occupied");
+        return reason == null;
     }
 
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-        if (!ValidatePendingIndex(pendingIndex, ctx, out _))
-            return;
+        if (!TakeSelectedCell(ctx, out int cell)) return;
 
-        if (!ctx.Grid.Soil.TryPlaceGoldSoil(pendingIndex.Value))
-        {
+        if (ctx.World.PlaceGoldSoil(cell))
+            ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
+        else
             ctx.ShowError?.Invoke(Loc.T("shop.error.gold_soil_failed"));
-            return;
-        }
-
-        ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
-        pendingIndex = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        pendingIndex = null;
     }
 }

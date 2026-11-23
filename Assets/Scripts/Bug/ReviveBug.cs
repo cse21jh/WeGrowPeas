@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ReviveBug : Bug
 {
+    protected override BugMove Move => BugMove.Chase;
+
     private int reviveCount = 1;
     [SerializeField]
     private Sprite eggSprite;
@@ -12,34 +14,6 @@ public class ReviveBug : Bug
     [SerializeField] private GameObject[] metalBodies;
     [SerializeField] private GameObject[] normalBodies;
     [SerializeField] private GameObject fragEffect;
-
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-    protected override IEnumerator Moving()
-    {
-        yield return StartCoroutine(base.Moving());
-
-        while (true)
-        {
-            if (eatingPlant)
-            {
-                yield return new WaitForSeconds(eatingTime);
-                eatingPlant = false;
-            }
-
-            if (!grid.Board.Plants.TryGetValue(targetObjIdx, out Plant plant))
-                FindNewTargetObj();
-            else if (grid.Breeder.GetIsBreeding() && !isDie && !isHit)
-            {
-                Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
-                MoveToward(targetPos);
-            }
-            yield return null;
-        }
-    }
 
     protected override IEnumerator HitBug()
     {
@@ -77,7 +51,7 @@ public class ReviveBug : Bug
                 {
                     effect.Play();
                 }
-                yield return new WaitForSeconds(1.0f);
+                yield return new WaitForSeconds(BugRules.ReviveSeconds);
 
                 reviveCount--;
                 isHit = false;
@@ -89,8 +63,4 @@ public class ReviveBug : Bug
         }
     }
 
-    public override IEnumerator KillBug()
-    {
-        yield return StartCoroutine(base.KillBug());
-    }
 }

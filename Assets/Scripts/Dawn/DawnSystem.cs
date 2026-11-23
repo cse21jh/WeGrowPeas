@@ -5,7 +5,7 @@ using UnityEngine;
 /// 새벽 모드(승천) 런타임 접근자. 단계별 데이터/누적 제약/해금·선택 상태를 제공.
 /// - 설정: Resources의 <see cref="DawnStageConfig"/> 에셋.
 /// - 해금(MaxUnlockedDawnStage): 메타 진행 → 프로필(<see cref="DawnProfile"/>)에 저장.
-/// - 선택(SelectedDawnStage): 이번 런에 고른 단계(게임 시작 시 UI가 설정).
+/// - 선택(SelectedDawnStage): 다음 판에 쓸 단계(게임 시작 시 UI가 설정). 판이 시작되면 GameRun이 가져간다.
 /// </summary>
 public static class DawnSystem
 {
@@ -104,14 +104,14 @@ public static class DawnSystem
     {
         string plant = CurrentPlant;
         int before = GetMaxUnlockedStage(plant);
-        UnlockUpTo(SelectedDawnStage + 1, plant);
+        UnlockUpTo(GameRun.Current.DawnStage + 1, plant);
         DawnUnlockAnnouncement.Record(before, GetMaxUnlockedStage(plant));
 
         // 이번 런에서 클리어한 새벽 단계에 맞춰, 조건을 만족하는 상점/특수 아이템을 실제로 해금(기록).
-        UnlockGrants.GrantDawnClearUnlocks(plant, SelectedDawnStage);
-        AchievementHooks.OnDawnCleared(plant, SelectedDawnStage);
+        UnlockGrants.GrantDawnClearUnlocks(plant, GameRun.Current.DawnStage);
+        AchievementHooks.OnDawnCleared(plant, GameRun.Current.DawnStage);
 
-        Debug.Log($"[Dawn] {plant} 클리어 기록: {SelectedDawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
+        Debug.Log($"[Dawn] {plant} 클리어 기록: {GameRun.Current.DawnStage}단계 → {GetMaxUnlockedStage(plant)}단계까지 해금");
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public static class DawnSystem
     {
         string plant = CurrentPlant;
         int before = GetMaxUnlockedStage(plant);
-        UnlockUpTo(SelectedDawnStage + 1 + extraStages, plant);
+        UnlockUpTo(GameRun.Current.DawnStage + 1 + extraStages, plant);
         int after = GetMaxUnlockedStage(plant);
         if (after <= before) return;
 
@@ -177,23 +177,11 @@ public static class DawnSystem
         return profile;
     }
 
-    // ── 선택(이번 런) ─────────────────────────────────────────────────────────
-    /// <summary>이번 런에 선택한 새벽 단계. 0 = 새벽 모드 아님(일반).</summary>
+    // ── 선택 ──────────────────────────────────────────────────────────────────
+    /// <summary>다음 판에 쓸 새벽 단계. 0 = 새벽 모드 아님(일반). 진행 중인 판의 단계는 <see cref="GameRun.DawnStage"/>.</summary>
     public static int SelectedDawnStage { get; private set; } = 0;
-    public static void SetSelectedStage(int stage) { SelectedDawnStage = stage; _currentValid = false; }
-    public static void ClearSelection() { SelectedDawnStage = 0; _currentValid = false; }
-
-    private static bool _currentValid;
-    private static DawnCumulative _current;
-    /// <summary>선택된 새벽 단계의 누적 제약(런타임 각 시스템이 참조). 저주는 여기서 처리하지 않음.</summary>
-    public static DawnCumulative Current
-    {
-        get
-        {
-            if (!_currentValid) { _current = GetCumulative(SelectedDawnStage); _currentValid = true; }
-            return _current;
-        }
-    }
+    public static void SetSelectedStage(int stage) => SelectedDawnStage = stage;
+    public static void ClearSelection() => SelectedDawnStage = 0;
 
     // ── 누적 제약 ─────────────────────────────────────────────────────────────
     /// <summary>1..stage 의 제약 설명을 줄바꿈으로 이어붙여 반환(UI 표시용).</summary>

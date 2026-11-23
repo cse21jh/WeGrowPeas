@@ -30,7 +30,7 @@ public class BreedTimerManager : MonoBehaviour
 
     public void SetTimer(WaveType type)
     {
-        if (CurseState.WaveBlind)
+        if (GameRun.Curse.WaveBlind)
         {
             type = WaveType.Aging;
         }

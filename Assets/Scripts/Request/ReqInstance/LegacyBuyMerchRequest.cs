@@ -20,13 +20,13 @@ public class LegacyBuyMerchRequest : RequestInstance
         currentCount = 0;
         boughtItems.Clear();
 
-        GameEvents.OnShopBought += HandleMerchBought;
+        Events.ShopBought += HandleMerchBought;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnShopBought -= HandleMerchBought;
+        Events.ShopBought -= HandleMerchBought;
     }
 
     public override string GetProgressText()

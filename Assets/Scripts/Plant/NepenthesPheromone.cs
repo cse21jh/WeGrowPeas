@@ -19,7 +19,7 @@ public class NepenthesPheromone : MonoBehaviour
         {
             if (bug.GetType() != typeof(Ladybug))
             {
-                StartCoroutine(bug.MoveToNepenthes(nepenthes.gameObject));
+                bug.LureTo(nepenthes);
             }
         }
         return;

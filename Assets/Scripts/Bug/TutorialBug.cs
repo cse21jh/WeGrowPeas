@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TutorialBug : Bug
 {
+    protected override BugMove Move => BugMove.Chase;
+
     private bool letMove = true;
     public bool canCatchBug = false;
     internal bool HasBeenCaught => isHit || isDie;
@@ -31,23 +33,18 @@ public class TutorialBug : Bug
     protected override void InitBug()
     {
         SetFixedPosition();
-        spawnEdge = 1;
+        Motion.Edge = 1;
         StartCoroutine(Moving());
     }
 
     protected override IEnumerator Moving()
     {
-        yield return StartCoroutine(base.Moving());
+        Motion.Begin();
+        yield return null;
 
-        while(letMove)
+        while (letMove && Motion.Step(Time.deltaTime, !isDie && !isHit, Targets))
         {
-            if (!grid.Board.Plants.TryGetValue(targetObjIdx, out Plant plant))
-                FindNewTargetObj();
-            else if (/*grid.Breeder.GetIsBreeding() &&*/ !isDie && !isHit)
-            {
-                Vector2 targetPos = new Vector2(plant.gameObject.transform.position.x, plant.gameObject.transform.position.y);
-                MoveToward(targetPos);
-            }
+            ApplyMotion();
             yield return null;
         }
     }
@@ -67,6 +64,7 @@ public class TutorialBug : Bug
     private void SetFixedPosition()
     {
         transform.position = spawnPosition;
+        Motion.Position = spawnPosition;
     }
 
     public void PrepareStationaryPractice(Vector3 position)

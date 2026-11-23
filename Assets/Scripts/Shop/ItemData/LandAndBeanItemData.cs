@@ -16,7 +16,7 @@ public class LandAndBeanItemData : ItemData
     }
 
     // 땅콩 전용 아이템 (새벽 10단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Peanut);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Peanut);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Special;
 
@@ -36,6 +36,6 @@ public class LandAndBeanItemData : ItemData
             return;
 
         // 웨이브 후 뿌리 확률 +10%p + 뿌리내린 식물의 가격 +10%p
-        ctx.Grid.Upgrades.AddLandAndBeanLevel(1);
+        ctx.World.AddLandAndBeanLevel(1);
     }
 }

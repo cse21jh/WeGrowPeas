@@ -22,22 +22,10 @@ public class GridUpgrades
         mostExpensivePlant = value;
     }
 
-    public void AddAdditionalResistanceInGrid(TraitType traitType, float value, bool byUpgrade = false)
-    {
-        for (int idx = 0; idx < board.MaxCol * 4; idx++) // grid에 있는 식물들 저항력 증가
-        {
-            if (board.Plants.ContainsKey(idx))
-            {
-                Plant plant = board.Plants[idx];
-                plant.AddAdditionalResistance(traitType, value, byUpgrade);
-            }
-        }
-        return;
-    }
     public void AddAdditionalPestResistance(float value)
     {
-        grid.Modifiers.AddAdditionalPestResistance(value);
-        AddAdditionalResistanceInGrid(TraitType.Pest, value);
+        grid.Field.AddPestResistance(value);
+        foreach (Plant plant in board.Plants.Values) plant.RefreshAdditionalResistance(TraitType.Pest);
     }
     public void SetNepenthesPheromoneEnabled(bool enabled)
     {
@@ -195,24 +183,6 @@ public class GridUpgrades
         Dictionary<Plant, int> previousPrices = CapturePlantSellingPrices();
         grid.Modifiers.AddLandAndBeanLevel(value);
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
-    }
-    /// <summary>
-    /// 땅과 콩: 웨이브가 지나간 후, 아직 뿌리내리지 않은 식물이 확률적으로 뿌리를 내려 이동 불가가 된다.
-    /// (GameManager.BreedEndRoutine에서 웨이브 정산 시 호출)
-    /// </summary>
-    public void ProcessLandAndBeanRooting()
-    {
-        float chance = grid.Modifiers.GetLandAndBeanRootChance();
-        if (chance <= 0f) return;
-
-        foreach (var p in board.Plants.Values)
-        {
-            if (p is MovablePlant mp && mp.IsMovable && !mp.isDying)
-            {
-                if (Random.value < chance)
-                    mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
-            }
-        }
     }
     public void ShowAllPriceSign()
     {

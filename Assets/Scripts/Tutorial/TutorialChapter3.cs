@@ -52,8 +52,8 @@ public sealed class TutorialChapter3 : TutorialChapter
             specialItemsUnlocked = true;
             GiveSpecialItem();
             yield return PlayPractice("day10.special",
-                new PracticeGoal("open_gift", () => IsGiftChoiceOpen || SpecialItemSystem.PendingGifts == 0, HighlightGift),
-                new PracticeGoal("choose_gift", () => SpecialItemSystem.PendingGifts == 0, HighlightGift));
+                new PracticeGoal("open_gift", () => IsGiftChoiceOpen || GameRun.Special.PendingGifts == 0, HighlightGift),
+                new PracticeGoal("choose_gift", () => GameRun.Special.PendingGifts == 0, HighlightGift));
         }
         else if (stage == 20 || stage == 30)
         {
