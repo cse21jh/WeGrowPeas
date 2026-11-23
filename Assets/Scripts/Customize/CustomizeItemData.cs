@@ -29,7 +29,7 @@ public class CustomizeItemData : ScriptableObject
     // (Resources/Data/Customize/CustomizeItemOrder 에셋 인스펙터에서 끌어다 놓아 바꾼다)
     public CustomizeCategory category;
 
-    [Tooltip("이 종류의 기본 아이템. 처음부터 보유한다. 종류마다 하나만 둔다.")]
+    [Tooltip("이 종류의 기본 아이템. 처음부터 보유한다. 종류마다 하나만 둔다(장식품은 여러 개 둘 수 있다).")]
     public bool isDefault;
 
     [Header("모습")]
@@ -42,6 +42,17 @@ public class CustomizeItemData : ScriptableObject
 
     [Tooltip("장식품: 농장에 놓았을 때의 높이(월드 단위). 아이콘 그림을 이 높이에 맞춰 줄여서 놓는다. 텃밭 한 칸이 약 1.1.")]
     [Min(0.1f)] public float placedHeight = 2f;
+
+    [Tooltip("장식품: 농장에 놓았을 때 기울이는 각도(도). +는 반시계 방향.")]
+    public float placedRotation;
+
+    [Header("장식품 기본 배치")]
+    [Tooltip("장식품: 처음부터 농장에 놓여 있게 한다(원래 배경에 있던 통나무·돌 등). 기본 아이템(isDefault)에 쓴다. " +
+             "한 번 놓아 준 뒤에는 플레이어가 치워도 다시 놓지 않는다.")]
+    public bool placedByDefault;
+
+    [Tooltip("장식품: 처음 놓여 있을 자리. 월드 위치이고 그림의 피벗 위치다. 배경에 짝지은 오브젝트(DecorationFixture)의 위치와 같아야 한다.")]
+    public Vector2 defaultPosition;
 
     [Header("해금")]
     [Tooltip("토양·목재·풀밭·케이스: 구매에 드는 치장 토큰 수.")]

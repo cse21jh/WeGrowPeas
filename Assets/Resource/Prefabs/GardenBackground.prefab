@@ -5977,6 +5977,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6768782016334165824}
   - component: {fileID: 1328404001856655914}
+  - component: {fileID: 1917935570165372750}
   m_Layer: 0
   m_Name: wood_1
   m_TagString: Untagged
@@ -6058,6 +6059,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1917935570165372750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995386502990975627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf05752aece6b143abec987145bb90b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationFixture
+  item: {fileID: 11400000, guid: 64e2e08e785efed488c3f489304a6f10, type: 2}
 --- !u!1 &1010837747006728139
 GameObject:
   m_ObjectHideFlags: 0
@@ -33808,6 +33822,7 @@ GameObject:
   m_Component:
   - component: {fileID: 445090784315034309}
   - component: {fileID: 987688604431120669}
+  - component: {fileID: 9220084247687354386}
   m_Layer: 0
   m_Name: rock_2 (1)
   m_TagString: Untagged
@@ -33889,6 +33904,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &9220084247687354386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4449403641646155296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf05752aece6b143abec987145bb90b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationFixture
+  item: {fileID: 11400000, guid: f2379d6f6002dfe4a87ba29b572dc65b, type: 2}
 --- !u!1 &4572559413191532527
 GameObject:
   m_ObjectHideFlags: 0
@@ -39863,6 +39891,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5747917773388606265}
   - component: {fileID: 5566091978703123690}
+  - component: {fileID: 1093985402541467895}
   m_Layer: 0
   m_Name: wood_2
   m_TagString: Untagged
@@ -39944,6 +39973,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1093985402541467895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5821081838153430219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf05752aece6b143abec987145bb90b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationFixture
+  item: {fileID: 11400000, guid: 82a3bba884b671149aad2b89dfcf278a, type: 2}
 --- !u!1 &6141413442307244275
 GameObject:
   m_ObjectHideFlags: 0
@@ -40338,6 +40380,11 @@ MonoBehaviour:
   - {fileID: 3893057070561754722}
   fallbackSortingLayer: BG
   material: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  fixtures:
+  - {fileID: 1093985402541467895}
+  - {fileID: 1917935570165372750}
+  - {fileID: 6252953063617582259}
+  - {fileID: 9220084247687354386}
 --- !u!1 &6482663100392986072
 GameObject:
   m_ObjectHideFlags: 0
@@ -40348,6 +40395,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1290351751785013916}
   - component: {fileID: 664754662448324669}
+  - component: {fileID: 6252953063617582259}
   m_Layer: 0
   m_Name: rock_1
   m_TagString: Untagged
@@ -40429,6 +40477,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &6252953063617582259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6482663100392986072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf05752aece6b143abec987145bb90b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationFixture
+  item: {fileID: 11400000, guid: 49c44c90a86caaf47a1cead624948ac8, type: 2}
 --- !u!1 &6539428147430467683
 GameObject:
   m_ObjectHideFlags: 0

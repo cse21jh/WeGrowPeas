@@ -6,6 +6,12 @@ using UnityEngine;
 ///
 /// GardenBackground 프리팹 안에 있어서 농장 씬(Garden_GrassUpdate)과 치장 씬 양쪽에 같은 자리로 보인다.
 /// 배치가 바뀔 때마다(놓기, 치우기, 되돌리기, 프로필 읽기) 전부 다시 만든다.
+/// 단, 배경에 원래 박혀 있는 장식품(<see cref="fixtures"/>: 통나무·그루터기·돌멩이)은 새로 만들지 않고
+/// 그 오브젝트를 옮기거나 숨긴다(<see cref="DecorationFixture"/>). 원래 자리에 있으면 씬에 배치한 모습 그대로 둔다.
+///
+/// 영역(앞뒤 순서를 정하는 아래쪽 끝 y, 클릭 영역, 놓을 수 있는지 판정)은 아이콘의 투명한 여백을 뺀
+/// 실제 그림 영역(<see cref="SpriteArea"/>)으로 계산하고, 기울기(<see cref="CustomizeItemData.placedRotation"/>)가 있으면
+/// 기울인 그림을 감싸는 사각형으로 계산한다.
 ///
 /// 앞뒤 순서는 바위·통나무와 같은 방식을 따른다. 풀밭은 위에서 아래로 여러 줄(<see cref="depthRows"/>)로 나뉘어 있고
 /// 줄마다 정렬 레이어·순서·z가 다르다. 장식품은 그림 아래쪽 끝이 걸린 줄과 같은 레이어·순서를 쓰고,
@@ -28,6 +34,9 @@ public class DecorationLayer : MonoBehaviour
     [Tooltip("장식품에 쓸 머티리얼. 비우면 SpriteRenderer 기본값. 다른 배경 그림과 같은 조명을 받게 Sprite-Lit-Default를 넣는다.")]
     [SerializeField] private Material material;
 
+    [Tooltip("배경에 원래 박혀 있는 장식품(통나무, 그루터기, 돌멩이 등). 이 아이템들은 새로 만들지 않고 이 오브젝트를 옮기거나 숨긴다.")]
+    [SerializeField] private DecorationFixture[] fixtures;
+
     private readonly List<DecorationView> _views = new List<DecorationView>();
 
     public Material Material => material;
@@ -48,14 +57,30 @@ public class DecorationLayer : MonoBehaviour
     public void Rebuild()
     {
         foreach (var view in _views)
-            if (view != null) Destroy(view.gameObject);
+            if (view != null && view.GetComponent<DecorationFixture>() == null) Destroy(view.gameObject);
         _views.Clear();
+
+        // 배경 장식품은 일단 모두 숨기고, 놓여 있는 것만 아래에서 다시 보인다.
+        if (fixtures != null)
+            foreach (var fixture in fixtures)
+                if (fixture != null && fixture.Item != null)
+                {
+                    fixture.Capture();
+                    fixture.SetShown(false);
+                }
 
         foreach (var placement in DecorationLayout.Current)
         {
             var item = CustomizeCatalog.Find(placement.itemId);
             // 지워진 아이템이나 이 프로필이 보유하지 않은 장식품은 그리지 않는다(저장 목록에는 남겨 둔다).
             if (item == null || item.icon == null || !CustomizeInventory.IsOwned(item)) continue;
+
+            var fixture = FindFixture(item);
+            if (fixture != null)
+            {
+                ShowFixture(fixture, placement);
+                continue;
+            }
 
             var go = new GameObject($"Decoration_{item.Id}");
             go.transform.SetParent(transform, false);
@@ -67,15 +92,62 @@ public class DecorationLayer : MonoBehaviour
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = item.icon;
             if (material != null) sr.sharedMaterial = material;
-            var rect = RectAt(item, placement.Position);
-            ApplyDepth(sr, rect.yMin, out float z);
-            RaiseAboveSeasonEffects(sr, rect);
-            go.transform.position = new Vector3(placement.x, placement.y, z);
+            float z = ApplyPlacementDepth(sr, item, placement.Position);
+            go.transform.SetPositionAndRotation(new Vector3(placement.x, placement.y, z), RotationFor(item));
 
             var view = go.AddComponent<DecorationView>();
             view.Init(placement, item, sr);
             _views.Add(view);
         }
+    }
+
+    private DecorationFixture FindFixture(CustomizeItemData item)
+    {
+        if (fixtures == null) return null;
+        foreach (var fixture in fixtures)
+            if (fixture != null && fixture.Item == item) return fixture;
+        return null;
+    }
+
+    /// <summary>
+    /// 그 장식품을 피벗이 <paramref name="pivot"/>에 오게 놓았을 때의 정렬 레이어·순서를 <paramref name="sr"/>에 넣고 z를 돌려준다.
+    /// 실제 배치와 놓기 미리보기(<see cref="DecorationPlacer"/>)가 함께 써서, 놓기 전에 보이는 앞뒤(풀에 묻히는 정도)가 놓은 뒤와 같다.
+    ///
+    /// 아래쪽 끝 y가 걸린 풀밭 줄로 앞뒤를 정한다(<see cref="ApplyDepth"/>).
+    /// 예: 걸린 줄이 4면 순서 4 → 4 이하 줄의 풀보다 앞, 5 줄의 풀보다 뒤(아래쪽이 5 줄 풀에 묻힌다).
+    /// 배경 소품(<see cref="fixtures"/>)은 원래 배경과 같게 하려고 여기까지만 한다. 다른 장식품은 계절 효과와 겹치면
+    /// 그 위로 올린다(<see cref="RaiseAboveSeasonEffects"/>. 화면 전체를 덮는 겨울 눈 덮개 때문에 사실상 모든 풀 줄보다 앞이 된다).
+    /// </summary>
+    public float ApplyPlacementDepth(SpriteRenderer sr, CustomizeItemData item, Vector2 pivot)
+    {
+        var rect = RectAt(item, pivot);
+        ApplyDepth(sr, rect.yMin, out float z);
+        if (FindFixture(item) == null) RaiseAboveSeasonEffects(sr, rect);
+        return z;
+    }
+
+    /// <summary>
+    /// 배경 장식품을 그 배치대로 보인다. 원래 자리면 씬에 배치한 모습 그대로,
+    /// 아니면 그 자리로 옮기고 다른 장식품과 같은 계산(<see cref="ApplyPlacementDepth"/>)으로 앞뒤를 정한다.
+    /// </summary>
+    private void ShowFixture(DecorationFixture fixture, DecorationPlacement placement)
+    {
+        fixture.SetShown(true);
+        var sr = fixture.Renderer;
+        if (fixture.IsHome(placement.Position))
+        {
+            fixture.RestoreHome();
+        }
+        else
+        {
+            float z = ApplyPlacementDepth(sr, fixture.Item, placement.Position);
+            fixture.transform.position = new Vector3(placement.x, placement.y, z);
+        }
+
+        var view = fixture.GetComponent<DecorationView>();
+        if (view == null) view = fixture.gameObject.AddComponent<DecorationView>();
+        view.Init(placement, fixture.Item, sr);
+        _views.Add(view);
     }
 
     /// <summary>그 점을 덮고 있는 장식품 중 맨 앞에 그려진 것. 없으면 null.</summary>
@@ -166,17 +238,69 @@ public class DecorationLayer : MonoBehaviour
         return h > 0f ? item.placedHeight / h : 1f;
     }
 
-    /// <summary>그 장식품을 피벗이 <paramref name="pivotPosition"/>에 오게 놓았을 때 차지하는 영역(2D).</summary>
+    private static readonly Dictionary<Sprite, Rect> _spriteAreas = new Dictionary<Sprite, Rect>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => _spriteAreas.Clear();
+
+    /// <summary>
+    /// 그림에서 투명한 여백을 뺀 실제 그림 영역(피벗 기준 로컬 좌표). 스프라이트 메시 정점으로 구하므로
+    /// 메시 종류가 Tight면 그림에 딱 맞고, Full Rect면 그림 사각형 전체가 된다.
+    /// 통나무·돌 그림은 512px 캔버스에 여백이 커서, 사각형 전체로 아래쪽 끝 y를 재면 풀밭 줄이 한 칸씩 어긋난다.
+    /// </summary>
+    public static Rect SpriteArea(Sprite sprite)
+    {
+        if (_spriteAreas.TryGetValue(sprite, out var area)) return area;
+
+        var vertices = sprite.vertices;
+        if (vertices == null || vertices.Length == 0)
+        {
+            var b = sprite.bounds;
+            area = new Rect(b.min, b.size);
+        }
+        else
+        {
+            Vector2 min = vertices[0], max = vertices[0];
+            foreach (var v in vertices)
+            {
+                min = Vector2.Min(min, v);
+                max = Vector2.Max(max, v);
+            }
+            area = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        }
+        _spriteAreas[sprite] = area;
+        return area;
+    }
+
+    /// <summary>놓았을 때의 회전.</summary>
+    public static Quaternion RotationFor(CustomizeItemData item)
+        => item != null ? Quaternion.Euler(0f, 0f, item.placedRotation) : Quaternion.identity;
+
+    /// <summary>
+    /// 그 장식품을 피벗이 <paramref name="pivotPosition"/>에 오게 놓았을 때 차지하는 영역(2D, 실제 그림 영역).
+    /// 기울어 있으면 기울인 그림을 감싸는 사각형.
+    /// </summary>
     public static Rect RectAt(CustomizeItemData item, Vector2 pivotPosition)
     {
         float scale = ScaleFor(item);
-        var b = item.icon.bounds;
-        Vector2 size = (Vector2)b.size * scale;
-        Vector2 center = pivotPosition + (Vector2)b.center * scale;
-        return new Rect(center - size * 0.5f, size);
+        var a = SpriteArea(item.icon);
+        Vector2 half = a.size * scale * 0.5f;
+
+        float rad = item.placedRotation * Mathf.Deg2Rad;
+        float cos = Mathf.Abs(Mathf.Cos(rad)), sin = Mathf.Abs(Mathf.Sin(rad));
+        Vector2 extents = new Vector2(half.x * cos + half.y * sin, half.x * sin + half.y * cos);
+
+        Vector2 center = pivotPosition + Rotate(a.center * scale, rad);
+        return new Rect(center - extents, extents * 2f);
     }
 
-    /// <summary>그림의 가운데가 <paramref name="center"/>에 오도록 할 때의 피벗 위치.</summary>
+    /// <summary>실제 그림 영역의 가운데가 <paramref name="center"/>에 오도록 할 때의 피벗 위치.</summary>
     public static Vector2 PivotForCenter(CustomizeItemData item, Vector2 center)
-        => center - (Vector2)item.icon.bounds.center * ScaleFor(item);
+        => center - Rotate(SpriteArea(item.icon).center * ScaleFor(item), item.placedRotation * Mathf.Deg2Rad);
+
+    private static Vector2 Rotate(Vector2 v, float rad)
+    {
+        float c = Mathf.Cos(rad), s = Mathf.Sin(rad);
+        return new Vector2(v.x * c - v.y * s, v.x * s + v.y * c);
+    }
 }

@@ -7,7 +7,9 @@ using UnityEngine.UI;
 ///
 /// 놓기 (<see cref="BeginPlacing"/>: 치장 목록에서 보유한 장식품을 누르면 시작)
 ///   - 치장 패널을 닫고, 장식품 그림이 반투명하게 마우스를 따라다닌다. 텃밭(<see cref="DecorationBlockedArea"/>)은 어둡게 표시된다.
-///   - 텃밭과 겹치거나 화면 밖으로 나가면 붉게 바뀌고, 놓을 수 있는 곳에서 좌클릭하면 그 자리에 놓는다.
+///   - 놓을 수 있는 곳에서는 실제로 놓았을 때와 같은 레이어·순서로 그려서, 풀에 묻히는 정도까지 놓은 뒤와 같게 보인다
+///     (<see cref="DecorationLayer.ApplyPlacementDepth"/>).
+///   - 텃밭과 겹치거나 화면 밖으로 나가면 맨 앞에 붉게 그리고, 놓을 수 있는 곳에서 좌클릭하면 그 자리에 놓는다.
 ///   - Esc / 패널을 다시 열면 취소한다. 놓거나 취소하면 패널을 다시 연다.
 ///   - 들고 있는 동안에도 우클릭 드래그로 화면을 옮길 수 있다(VcamManager). 놓을 수 있는 곳은 지금 화면에 보이는 땅이다.
 ///
@@ -24,10 +26,12 @@ public class DecorationPlacer : MonoBehaviour
     [Header("미리보기")]
     [SerializeField] private Color validTint = new Color(1f, 1f, 1f, 0.6f);
     [SerializeField] private Color invalidTint = new Color(1f, 0.25f, 0.25f, 0.6f);
-    [Tooltip("미리보기는 텃밭 위에서도 보이도록 맨 앞 레이어에 그린다.")]
+    [Tooltip("놓을 수 없는 자리(텃밭과 겹침, 화면 밖)에서는 미리보기를 이 맨 앞 레이어에 붉게 그려 텃밭 그림에 가려지지 않게 한다. " +
+             "놓을 수 있는 자리에서는 실제로 놓았을 때와 같은 레이어·순서로 그린다(풀에 묻히는 정도까지 같게).")]
     [SerializeField] private string previewSortingLayer = "FX";
     [SerializeField] private int previewSortingOrder = 1000;
-    [Tooltip("미리보기 머티리얼. 맨 앞 레이어는 조명이 달라 어둡게 보이므로 조명을 받지 않는 Sprites-Default를 쓴다.")]
+    [Tooltip("놓을 수 없는 자리의 미리보기 머티리얼. 맨 앞 레이어는 조명이 달라 어둡게 보이므로 조명을 받지 않는 Sprites-Default를 쓴다. " +
+             "놓을 수 있는 자리에서는 실제 장식품과 같은 머티리얼(DecorationLayer.Material)을 쓴다.")]
     [SerializeField] private Material previewMaterial;
     [Tooltip("화면 가장자리에서 이만큼(월드 단위) 안쪽까지만 놓을 수 있다.")]
     [SerializeField] private float screenMargin = 0.1f;
@@ -91,6 +95,7 @@ public class DecorationPlacer : MonoBehaviour
         _placingItem = item;
         _preview.sprite = item.icon;
         _preview.transform.localScale = Vector3.one * DecorationLayer.ScaleFor(item);
+        _preview.transform.rotation = DecorationLayer.RotationFor(item);
         _preview.gameObject.SetActive(true);
         DecorationBlockedArea.SetAllDimmed(true);
         if (panel != null) panel.Close();
@@ -134,11 +139,32 @@ public class DecorationPlacer : MonoBehaviour
     {
         Vector2 mouse = MouseWorld();
         _previewPivot = DecorationLayer.PivotForCenter(_placingItem, mouse);
-        _preview.transform.position = new Vector3(_previewPivot.x, _previewPivot.y, layer != null ? layer.transform.position.z : 0f);
 
         // UI 위에 있을 때는 놓을 수 없지만 붉게 하지는 않는다(버튼을 누르려는 것일 수 있다).
         _previewValid = CanPlaceAt(_placingItem, _previewPivot);
         _preview.color = _previewValid ? validTint : invalidTint;
+
+        float z;
+        if (_previewValid && layer != null)
+        {
+            // 놓을 수 있는 자리: 실제로 놓았을 때와 같은 계산으로 레이어·순서·z를 정한다(풀에 묻히는 정도가 같다).
+            z = layer.ApplyPlacementDepth(_preview, _placingItem, _previewPivot);
+            SetPreviewMaterial(layer.Material);
+        }
+        else
+        {
+            // 놓을 수 없는 자리: 텃밭 그림 등에 가려지지 않게 맨 앞에 붉게 그린다.
+            _preview.sortingLayerName = previewSortingLayer;
+            _preview.sortingOrder = previewSortingOrder;
+            SetPreviewMaterial(previewMaterial);
+            z = layer != null ? layer.transform.position.z : 0f;
+        }
+        _preview.transform.position = new Vector3(_previewPivot.x, _previewPivot.y, z);
+    }
+
+    private void SetPreviewMaterial(Material material)
+    {
+        if (material != null && _preview.sharedMaterial != material) _preview.sharedMaterial = material;
     }
 
     /// <summary>그 장식품을 그 자리에 놓을 수 있는가. 화면 안에 다 들어오고 텃밭과 겹치지 않아야 한다.</summary>

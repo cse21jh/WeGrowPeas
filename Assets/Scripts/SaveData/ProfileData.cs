@@ -113,6 +113,9 @@ public class CustomizeProfile
 
     /// <summary>마지막으로 저장한 장식품 배치 (<see cref="DecorationLayout"/>).</summary>
     public List<DecorationPlacement> decorations = new();
+
+    /// <summary>처음부터 놓아 준 기본 장식품 id(<see cref="CustomizeItemData.placedByDefault"/>). 여기 있으면 치워도 다시 놓지 않는다.</summary>
+    public List<string> seededDecorations = new();
 }
 
 /// <summary>읽은 메신저 메시지 (MessengerSaveSystem).</summary>
