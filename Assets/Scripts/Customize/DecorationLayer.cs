@@ -15,18 +15,14 @@ using UnityEngine;
 ///
 /// 앞뒤 순서는 바위·통나무와 같은 방식을 따른다. 풀밭은 위에서 아래로 여러 줄(<see cref="depthRows"/>)로 나뉘어 있고
 /// 줄마다 정렬 레이어·순서·z가 다르다. 장식품은 그림 아래쪽 끝이 걸린 줄과 같은 레이어·순서를 쓰고,
-/// z를 그 줄보다 조금 앞(카메라 쪽)으로 두어 그 줄의 풀보다 앞, 아래 줄의 풀보다 뒤에 그려지게 한다.
-/// 다만 계절 효과(봄 꽃, 가을 단풍, 겨울 눈 더미, <see cref="seasonEffects"/>)와 겹치면 그 효과보다 한 단계 앞으로 올려
-/// 계절이 바뀌어도 장식품이 가려지지 않게 한다.
+/// z를 그 줄보다 조금 앞(카메라 쪽)으로 두어 그 줄의 풀보다 앞, 아래 줄의 풀보다 뒤에 그려지게 한다
+/// (아래쪽이 아래 줄 풀에 묻힌다). 모든 장식품이 같은 규칙을 쓰고, 계절 효과(꽃, 단풍, 눈)도 원래 배경 소품처럼 장식품 위에 겹칠 수 있다.
 /// 콜라이더는 붙이지 않는다(농장 씬의 다른 클릭을 가리지 않게). 치장 씬에서 클릭 판정은 <see cref="HitTest"/>로 한다.
 /// </summary>
 public class DecorationLayer : MonoBehaviour
 {
     [Tooltip("풀밭 줄들(GrassProps의 Grass_ (0)~(8)), 위쪽 줄부터 순서대로. 장식품의 앞뒤 순서를 이 줄들에 맞춘다.")]
     [SerializeField] private Renderer[] depthRows;
-
-    [Tooltip("장식품이 가려지면 안 되는 계절 효과(Spring_Flower, Fall_Maple, winter_snow 아래 그림들). 겹치면 장식품을 이것들보다 앞에 그린다. 떨어지는 눈 같은 날씨 효과는 넣지 않는다.")]
-    [SerializeField] private Renderer[] seasonEffects;
 
     [Tooltip("풀밭 줄을 지정하지 않았을 때 쓸 정렬 레이어.")]
     [SerializeField] private string fallbackSortingLayer = "BG";
@@ -115,20 +111,20 @@ public class DecorationLayer : MonoBehaviour
     ///
     /// 아래쪽 끝 y가 걸린 풀밭 줄로 앞뒤를 정한다(<see cref="ApplyDepth"/>).
     /// 예: 걸린 줄이 4면 순서 4 → 4 이하 줄의 풀보다 앞, 5 줄의 풀보다 뒤(아래쪽이 5 줄 풀에 묻힌다).
-    /// 배경 소품(<see cref="fixtures"/>)은 원래 배경과 같게 하려고 여기까지만 한다. 다른 장식품은 계절 효과와 겹치면
-    /// 그 위로 올린다(<see cref="RaiseAboveSeasonEffects"/>. 화면 전체를 덮는 겨울 눈 덮개 때문에 사실상 모든 풀 줄보다 앞이 된다).
+    /// 모든 장식품(배경 소품, 허수아비, 앞으로 추가할 장식품)이 같은 규칙을 쓴다.
+    ///
+    /// 놓기 미리보기에서는 매 프레임 부른다. 풀 줄 9개의 y 비교와 캐시된 그림 영역 계산뿐이고 메모리 할당이 없어 부담이 거의 없다.
     /// </summary>
     public float ApplyPlacementDepth(SpriteRenderer sr, CustomizeItemData item, Vector2 pivot)
     {
-        var rect = RectAt(item, pivot);
-        ApplyDepth(sr, rect.yMin, out float z);
-        if (FindFixture(item) == null) RaiseAboveSeasonEffects(sr, rect);
+        ApplyDepth(sr, RectAt(item, pivot).yMin, out float z);
         return z;
     }
 
     /// <summary>
     /// 배경 장식품을 그 배치대로 보인다. 원래 자리면 씬에 배치한 모습 그대로,
     /// 아니면 그 자리로 옮기고 다른 장식품과 같은 계산(<see cref="ApplyPlacementDepth"/>)으로 앞뒤를 정한다.
+    /// (원래 자리의 정렬 값도 이 규칙과 같다. 통나무만 GardenBG/0으로 박혀 있지만 풀 줄과의 앞뒤 관계는 같다)
     /// </summary>
     private void ShowFixture(DecorationFixture fixture, DecorationPlacement placement)
     {
@@ -198,34 +194,6 @@ public class DecorationLayer : MonoBehaviour
         float nextY = row + 1 < depthRows.Length && depthRows[row + 1] != null ? depthRows[row + 1].transform.position.y : rowY - 2f;
         float t = rowY > nextY ? Mathf.Clamp01((rowY - baseY) / (rowY - nextY)) : 0f;
         z = r.transform.position.z - 0.1f - 0.8f * t;
-    }
-
-    /// <summary>
-    /// 장식품과 겹치는 계절 효과 중 장식품보다 앞에 그려지는 것이 있으면, 그중 가장 앞인 것보다 한 단계 앞으로 올린다.
-    /// 효과의 그림 자체는 계절에 따라 보였다 숨었다 하지만(머티리얼 값) 오브젝트는 늘 켜져 있으므로, 계절과 상관없이 한 번 정한다.
-    /// </summary>
-    private void RaiseAboveSeasonEffects(SpriteRenderer sr, Rect rect)
-    {
-        if (seasonEffects == null) return;
-        foreach (var fx in seasonEffects)
-        {
-            if (fx == null || !fx.enabled || !fx.gameObject.activeInHierarchy) continue;
-            var b = fx.bounds;
-            var fxRect = new Rect(b.min.x, b.min.y, b.size.x, b.size.y);
-            if (!fxRect.Overlaps(rect)) continue;
-            if (IsDrawnBefore(fx.sortingLayerID, fx.sortingOrder, sr.sortingLayerID, sr.sortingOrder)) continue;
-
-            sr.sortingLayerID = fx.sortingLayerID;
-            sr.sortingOrder = fx.sortingOrder + 1;
-        }
-    }
-
-    /// <summary>a(레이어, 순서)가 b보다 먼저(뒤에) 그려지는가.</summary>
-    private static bool IsDrawnBefore(int layerA, int orderA, int layerB, int orderB)
-    {
-        int la = SortingLayer.GetLayerValueFromID(layerA);
-        int lb = SortingLayer.GetLayerValueFromID(layerB);
-        return la != lb ? la < lb : orderA < orderB;
     }
 
     // ── 크기·영역 계산 (배치 미리보기와 공용) ─────────────────────────────────
