@@ -24,6 +24,8 @@ public class SaveBreedingCountRequest : RequestInstance
         Events.DayEndedWithRemainingBreeds -= HandleDayEnded;
     }
 
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;

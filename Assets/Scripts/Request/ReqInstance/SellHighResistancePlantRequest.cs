@@ -27,6 +27,8 @@ public class SellHighResistancePlantRequest : RequestInstance
         Events.PlantSold -= HandlePeaSold;
     }
 
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;
@@ -47,11 +49,13 @@ public class SellHighResistancePlantRequest : RequestInstance
         conditionType = Board.World.PickTraitFromWaves();
     }
 
+    public override bool AcceptsSale(PlantState plant) => plant.GetResistanceValue(conditionType) >= 0.6f;
+
     private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
-        if (p.GetResistanceValue(conditionType) >= 0.6f)
+        if (AcceptsSale(p))
         {
             currentCount++;
             if (currentCount >= requiredCount) CompleteOnce();

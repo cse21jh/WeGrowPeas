@@ -3,7 +3,7 @@ using System.Collections.Generic;
 // 시뮬레이터의 저주, 의뢰, 특수 아이템. 규칙은 게임과 같은 코드이고 여기서는 봇의 선택과 상태 변화만 정한다.
 public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
 {
-    private const int MovesPerDay = 5; // 의뢰를 채우려고 하루에 옮기는 횟수
+    private const int MovesPerDay = 10; // 의뢰를 채우려고 하루에 옮기는 횟수
 
     private static CurseScriptable[] temporalCurses;
     private static CurseScriptable[] seasonalCurses;

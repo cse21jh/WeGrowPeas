@@ -13,6 +13,7 @@ public class SimulatorWindow : EditorWindow
     private string report = "";
     private List<SimRunResult> results;
     private Vector2 scroll;
+    private int tuneSeconds = 180;
 
     [MenuItem("Tools/판 시뮬레이터")]
     private static void Open() => GetWindow<SimulatorWindow>("판 시뮬레이터");
@@ -39,10 +40,13 @@ public class SimulatorWindow : EditorWindow
         config.specialItems = EditorGUILayout.Toggle("특수 아이템", config.specialItems);
 
         EditorGUILayout.HelpBox("벌레와 특성은 아직 없습니다. 벌레 관련 아이템은 사지 않습니다. "
-            + "절대 수치보다 값을 바꾸기 전후의 비교로 읽어 주세요.", MessageType.Info);
+            + "절대 수치보다 값을 바꾸기 전후의 비교로 읽어 주세요. 밸런스를 크게 바꿨으면 봇도 다시 튜닝해야 공정합니다.", MessageType.Info);
 
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             if (GUILayout.Button("돌리기", GUILayout.Height(28))) Run();
+        tuneSeconds = EditorGUILayout.IntField("봇 튜닝 시간(초)", tuneSeconds);
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode || config.bot != SimBotKind.Planner))
+            if (GUILayout.Button("지금 설정으로 봇 튜닝 (그동안 에디터가 멈춥니다)")) Tune();
         using (new EditorGUI.DisabledScope(results == null))
             if (GUILayout.Button("CSV로 저장")) SaveCsv();
 
@@ -61,6 +65,16 @@ public class SimulatorWindow : EditorWindow
         }
         finally { EditorUtility.ClearProgressBar(); }
         report = BuildReport(config, results) + $"\n{watch.Elapsed.TotalSeconds:F1}초";
+    }
+
+    // 찾은 값은 이 창에서만 쓴다. 계속 쓰려면 SimBotParams의 기본값에 옮긴다.
+    private void Tune()
+    {
+        var log = new StringBuilder();
+        var target = JsonUtility.FromJson<SimConfig>(JsonUtility.ToJson(config));
+        target.runs = 80;
+        config.botParams = SimBotTuner.Tune(new[] { target }, config.botParams, tuneSeconds, Environment.TickCount, log);
+        report = log + SimBotTuner.Describe(config.botParams).Replace(';', (char)10);
     }
 
     public static string BuildReport(SimConfig config, List<SimRunResult> results)

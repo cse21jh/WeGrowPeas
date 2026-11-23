@@ -28,6 +28,8 @@ public class SellGrayGenePlantRequest : RequestInstance
         Events.PlantSold -= HandlePeaSold;
     }
 
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;
@@ -48,24 +50,23 @@ public class SellGrayGenePlantRequest : RequestInstance
         conditionType = Board.World.PickTraitFromWaves();
     }
 
+    // 회색 유전자 2개 (우성 0개)
+    public override bool AcceptsSale(PlantState plant)
+    {
+        foreach (var g in plant.Traits)
+            if (conditionType == (int)g.traitType) return g.genetics == 0;
+        return false;
+    }
+
     private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
-        List<GeneticTrait> traits = p.Traits;
-        foreach (var g in traits)
-        {
-            if (conditionType == (int)g.traitType)
-            {
-                if (g.genetics == 0) // 회색 유전자 2개 (우성 0개)
-                {
-                    currentCount++;
-                    if (currentCount >= requiredCount) CompleteOnce();
-                    else RaiseChanged();
-                }
-                return;
-            }
-        }
+        if (!AcceptsSale(p)) return;
+
+        currentCount++;
+        if (currentCount >= requiredCount) CompleteOnce();
+        else RaiseChanged();
     }
 
     private int SetDifficulty(string requestId)

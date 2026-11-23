@@ -52,18 +52,19 @@ public sealed partial class RunSimulator : IShopWorld
     {
         if (!config.buySeedlings && !config.buyItems) return;
 
-        // 새 웨이브에 쓸 모종 값이 모자라면 남는 식물을 판다
-        if (config.buySeedlings && config.bot == SimBotKind.Planner && FindMissingTraitSet(out int owned) >= 0 && owned < 2)
-            while (economy.Gold < SeedlingPrice && SellWorst(5)) { }
-
         // 자리가 없으면 한 포기를 팔아 새 식물이 들어올 칸을 만든다
         if (!field.Board.HasEmptyCell()) SellWorst(6);
+        BuyAll(GenerateInventory());
+    }
 
-        ShopInventory inventory = shopContext.Shop.Generate(fixedItems, rotationItems, config.rotationCount, shopContext, stage, IsUnlocked);
+    private ShopInventory GenerateInventory()
+        => shopContext.Shop.Generate(fixedItems, rotationItems, config.rotationCount, shopContext, stage, IsUnlocked);
 
+    private void BuyAll(ShopInventory inventory)
+    {
         for (int i = 0; i < MaxPurchasesPerNight; i++)
         {
-            Choice choice = config.bot == SimBotKind.Random ? PickRandom(inventory) : PickBest(inventory);
+            Choice choice = IsPlanner ? PickBest(inventory) : PickRandom(inventory);
             if (choice.item == null || !Buy(choice, inventory)) break;
         }
     }
@@ -79,7 +80,7 @@ public sealed partial class RunSimulator : IShopWorld
     private IEnumerable<ItemData> Buyable(ShopInventory inventory)
     {
         int budget = Budget;
-        int reserve = config.bot == SimBotKind.Planner ? SeedlingReserve : 0;
+        int reserve = IsPlanner ? SeedlingReserve : 0;
         foreach (List<ItemData> list in new[] { inventory.Fixed, inventory.Rotation })
             foreach (ItemData item in list)
             {
@@ -91,37 +92,8 @@ public sealed partial class RunSimulator : IShopWorld
             }
     }
 
-    private int SeedlingPrice
-    {
-        get
-        {
-            foreach (ItemData item in fixedItems)
-                if (item is PeaItemData) return item.GetDisplayPrice();
-            return 0;
-        }
-    }
-
-    // 모자란 형질이 있거나 사흘 안에 새 형질이 풀리면 모종 두 번 살 돈은 남겨 둔다
-    private int SeedlingReserve
-    {
-        get
-        {
-            if (!config.buySeedlings) return 0;
-            bool soon = TraitOptions.GetTraitSets(stage + 3, true).Count > TraitOptions.GetTraitSets(stage, true).Count;
-            bool missing = FindMissingTraitSet(out int owners) >= 0 && owners < 2;
-            return soon || missing ? SeedlingPrice * 2 : 0;
-        }
-    }
-
-    // 세금 마감이 이틀 안이면 낼 돈은 남겨 둔다
-    private int Budget
-    {
-        get
-        {
-            bool dueSoon = config.payTax && config.bot == SimBotKind.Planner && tax.DueStage - stage <= 2;
-            return dueSoon ? economy.Gold - tax.DueAmount : economy.Gold;
-        }
-    }
+    // 세금 마감이 가까우면 낼 돈은 남겨 둔다
+    private int Budget => IsPlanner ? economy.Gold - TaxReserve : economy.Gold;
 
     private bool Buy(Choice choice, ShopInventory inventory)
     {
@@ -191,14 +163,16 @@ public sealed partial class RunSimulator : IShopWorld
 
     // ───── 계획 봇 ─────
 
-    // 아이템별 선호는 사람이 정한 어림값이다. 봇의 성적은 밸런스 수치가 아니라 변경 전후를 견주는 잣대로 쓴다.
+    // 아이템별 점수는 SimBotTuner가 찾은 값이다. 봇의 성적은 밸런스 수치가 아니라 변경 전후를 견주는 잣대로 쓴다.
     private Choice PickBest(ShopInventory inventory)
     {
         Choice best = default;
         foreach (ItemData item in Buyable(inventory))
         {
             Choice choice = Evaluate(item);
-            if (choice.item != null && choice.score > best.score) best = choice;
+            if (choice.item == null || choice.score < Bot.buyThreshold) continue;
+            choice.score *= (float)System.Math.Pow(1000.0 / item.GetDisplayPrice(), Bot.priceExponent);
+            if (choice.score > best.score) best = choice;
         }
         return best;
     }
@@ -208,7 +182,7 @@ public sealed partial class RunSimulator : IShopWorld
         var choice = new Choice { item = item, option = -1, cell = -1 };
         int plants = field.Board.CountLivingPlants();
         int empty = field.Board.CellCount - field.Board.States.Count;
-        bool late = stage > config.days - 4; // 막판에는 투자성 아이템을 사지 않는다
+        bool late = stage > config.days - Bot.lateDays; // 막판에는 투자성 아이템을 사지 않는다
 
         switch (item)
         {
@@ -216,75 +190,75 @@ public sealed partial class RunSimulator : IShopWorld
                 int set = FindMissingTraitSet(out int owners);
                 if (set < 0) return default;
                 choice.option = set;
-                choice.score = owners == 0 ? 100f : 70f - owners * 5f;
+                choice.score = owners == 0 ? Bot.seedlingFirst : Bot.seedlingMore - owners * 5f;
                 break;
             case HighQualityPlantItemData _:
                 choice.option = 0;
-                choice.score = CountOwners(currentWave) < 4 ? 90f : 35f;
+                choice.score = CountOwners(currentWave) < 4 ? Bot.highQuality : Bot.highQuality * 0.4f;
                 break;
             case PlantHealingItemData _:
-                return WithWave(choice, currentWave, CountOwners(currentWave) >= 3 ? 80f : 0f);
+                return WithWave(choice, currentWave, CountOwners(currentWave) >= 3 ? Bot.healing : 0f);
             case FertilizerItemData _:
                 choice.cell = BestColumnCell(item);
-                return choice.cell < 0 ? default : WithWave(choice, nextWave == WaveType.Aging ? currentWave : nextWave, 45f);
+                return choice.cell < 0 ? default : WithWave(choice, nextWave == WaveType.Aging ? currentWave : nextWave, Bot.fertilizer);
             case SignPostItemData _:
                 WaveType weakest = WeakestWave();
-                return WithWave(choice, weakest, 40f);
+                return WithWave(choice, weakest, Bot.signPost);
 
-            case BreedCountItemData _: choice.score = late ? 0f : 60f; break;
-            case AddSoilItemData _: choice.score = late || empty > 3 ? 0f : 65f; break;
-            case CoolingShieldItemData _: choice.score = 30f; break;
-            case TimeMachineItemData _: choice.score = waveSkips < 2 ? 50f : 10f; break;
-            case AdrenalineItemData _: choice.score = late ? 0f : 35f; break;
+            case BreedCountItemData _: choice.score = late ? 0f : Bot.breedCount; break;
+            case AddSoilItemData _: choice.score = late || empty > 3 ? 0f : Bot.addSoil; break;
+            case CoolingShieldItemData _: choice.score = Bot.coolingShield; break;
+            case TimeMachineItemData _: choice.score = waveSkips < 2 ? Bot.timeMachine : 10f; break;
+            case AdrenalineItemData _: choice.score = late ? 0f : Bot.adrenaline; break;
             case DNAExtractionItemData _:
                 if (empty < 3) return default;
                 choice.cell = BestPlantCell(item);
-                choice.score = plants < 8 ? 55f : 15f;
+                choice.score = plants < 8 ? Bot.dna : Bot.dna * 0.5f;
                 break;
             case ChiliPepperItemData _:
                 if (empty < 2) return default;
                 choice.cell = CellWithMostNeighbours(item, vertical: field.Modifiers.ChiliPepperRangeLevel >= 1);
-                choice.score = CountKind(PlantKind.ChiliPepper) < 2 ? 50f : 10f;
+                choice.score = CountKind(PlantKind.ChiliPepper) < (int)Bot.chiliMax ? Bot.chili : 0f;
                 break;
             case SprinklerItemData _:
                 if (empty < 2 || late) return default;
                 choice.cell = CellWithMostNeighbours(item, vertical: true);
-                choice.score = CountKind(PlantKind.Sprinkler) < 2 ? 40f : 5f;
+                choice.score = CountKind(PlantKind.Sprinkler) < (int)Bot.sprinklerMax ? Bot.sprinkler : 0f;
                 break;
             case MoneyTreeItemData _:
                 if (empty < 2 || stage > config.days - 6) return default;
                 choice.cell = CellWithMostNeighbours(item, vertical: true);
-                choice.score = CountKind(PlantKind.MoneyTree) < 2 ? 55f : 5f;
+                choice.score = CountKind(PlantKind.MoneyTree) < (int)Bot.moneyTreeMax ? Bot.moneyTree : 0f;
                 break;
             case RapidFreezerItemData _:
                 choice.cell = CellWithMostPlantsAround();
-                choice.score = 45f;
+                choice.score = Bot.freezer;
                 break;
             case PetBottleItemData _:
                 choice.cell = BestPlantCell(item);
-                choice.score = field.Soil.PetBottleTiles.Count < 3 ? 35f : 0f;
+                choice.score = field.Soil.PetBottleTiles.Count < (int)Bot.petBottleMax ? Bot.petBottle : 0f;
                 break;
             case GoldSoilItemData _:
                 List<int> free = ValidCells(item);
                 choice.cell = free.Count > 0 ? free[0] : -1;
-                choice.score = late ? 0f : 40f;
+                choice.score = late ? 0f : Bot.goldSoil;
                 break;
 
-            case StrongGeneticsResistanceUpgradeItemData _: choice.score = 42f; break;
-            case WeakGeneticsResistanceUpgradeItemData _: choice.score = 44f; break;
-            case GoldenGeneticsItemData _: choice.score = late ? 0f : 48f; break;
-            case PeaMaturationUpgradeItemData _: choice.score = late ? 0f : 55f; break;
-            case PeaTasteUpgradeItemData _: choice.score = late ? 0f : 52f; break;
-            case BadGuyMoreRiceItemData _: choice.score = late ? 0f : 40f; break;
-            case TwinsItemData _: choice.score = late ? 0f : 45f; break;
-            case PeaCoffeeItemData _: choice.score = late ? 0f : 42f; break;
-            case LandAndBeanItemData _: choice.score = late ? 0f : 30f; break;
-            case RoyalSuccessionItemData _: choice.score = late ? 0f : 25f; break;
-            case ActiveShellItemData _: choice.score = late ? 0f : 40f; break;
-            case HealingCapsaicinItemData _: choice.score = CountKind(PlantKind.ChiliPepper) > 0 ? 25f : 0f; break;
-            case ChiliPepperRangeUpgradeItemData _: choice.score = CountKind(PlantKind.ChiliPepper) > 0 ? 40f : 0f; break;
-            case SprinklerRangeUpgradeItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && !late ? 25f : 0f; break;
-            case SprinklerFertilizerSynergyItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && field.Soil.FertilizerColumns.Count > 0 ? 15f : 0f; break;
+            case StrongGeneticsResistanceUpgradeItemData _: choice.score = Bot.strong; break;
+            case WeakGeneticsResistanceUpgradeItemData _: choice.score = Bot.weak; break;
+            case GoldenGeneticsItemData _: choice.score = late ? 0f : Bot.goldenGenetics; break;
+            case PeaMaturationUpgradeItemData _: choice.score = late ? 0f : Bot.maturation; break;
+            case PeaTasteUpgradeItemData _: choice.score = late ? 0f : Bot.taste; break;
+            case BadGuyMoreRiceItemData _: choice.score = late ? 0f : Bot.badGuy; break;
+            case TwinsItemData _: choice.score = late ? 0f : Bot.twins; break;
+            case PeaCoffeeItemData _: choice.score = late ? 0f : Bot.coffee; break;
+            case LandAndBeanItemData _: choice.score = late ? 0f : Bot.landAndBean; break;
+            case RoyalSuccessionItemData _: choice.score = late ? 0f : Bot.royal; break;
+            case ActiveShellItemData _: choice.score = late ? 0f : Bot.activeShell; break;
+            case HealingCapsaicinItemData _: choice.score = CountKind(PlantKind.ChiliPepper) > 0 ? Bot.capsaicin : 0f; break;
+            case ChiliPepperRangeUpgradeItemData _: choice.score = CountKind(PlantKind.ChiliPepper) > 0 ? Bot.chiliRange : 0f; break;
+            case SprinklerRangeUpgradeItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && !late ? Bot.sprinklerRange : 0f; break;
+            case SprinklerFertilizerSynergyItemData _: choice.score = CountKind(PlantKind.Sprinkler) > 0 && field.Soil.FertilizerColumns.Count > 0 ? Bot.synergy : 0f; break;
 
             // 벌레, 리롤, 교배 시간처럼 시뮬레이터에 없는 것을 돕는 아이템은 사지 않는다
             default: return default;

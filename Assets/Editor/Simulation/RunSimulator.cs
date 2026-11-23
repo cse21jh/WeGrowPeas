@@ -6,7 +6,7 @@ public enum SimBotKind
 {
     /// <summary>아무나 고른다. 봇 실력의 바닥 기준.</summary>
     Random,
-    /// <summary>닥칠 웨이브의 저항력을 보고 고른다.</summary>
+    /// <summary>웨이브, 의뢰, 세금을 보고 판매와 투자를 정한다.</summary>
     Planner,
 }
 
@@ -31,6 +31,7 @@ public class SimConfig
     public bool requests = true;
     public bool specialItems = true;
     public bool payTax = true;
+    [NonSerialized] public SimBotParams botParams = new SimBotParams();
 }
 
 public class SimRunResult
@@ -62,7 +63,7 @@ public class SimRunResult
 /// <summary>
 /// 씬 없이 한 판을 돌린다. 교배, 웨이브, 죽음, 저항력, 판매가는 게임과 같은 코드를 쓴다.
 ///
-/// 아직 없는 것: 특성, 벌레, 교배 시간 제한(시간은 금이다), 리롤.
+/// 아직 없는 것: 특성, 벌레, 교배 시간 제한(시간은 금이다).
 /// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
 public sealed partial class RunSimulator : IFieldActions
@@ -174,10 +175,13 @@ public sealed partial class RunSimulator : IFieldActions
 
             economy.Add(shopContext.Shop.ConsumeDailyPurchaseRefund(field.Modifiers.CreditCardRefundPercent));
             foreach (PlantState plant in field.Board.States.Values) plant.DayStartGridIndex = plant.GridIndex;
+            RefreshForecast();
+            DecideNoSell();
             BreedPhase();
             MovePlantsForRequest();
-            DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
             UseWaveSkip();
+            if (IsPlanner) SellDoomed();
+            DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
 
             if (currentWave != WaveType.None) result.WaveFaced[(int)currentWave]++;
             WaveType faced = currentWave;
@@ -249,8 +253,8 @@ public sealed partial class RunSimulator : IFieldActions
         {
             int max = BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
                 mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
-            if (used >= max) break;
-            if (!field.Board.HasEmptyCell() && !SellWorst(6)) break;
+            if (used >= max - BreedsToSave(max)) break;
+            if (!field.Board.HasEmptyCell() && !(IsPlanner ? SellCheapest((int)Bot.minKeep, Bot.breedValue) : SellWorst(6))) break;
 
             List<PlantState> plants = SortedPlants().FindAll(p => p.Breedable); // 저주(꽃가루 실종)
             if (plants.Count < 2) break;
@@ -277,29 +281,8 @@ public sealed partial class RunSimulator : IFieldActions
             return (plants[i], plants[j >= i ? j + 1 : j]);
         }
 
-        // 두 부모 중 나은 쪽의 저항력을 중시하되, 유전자가 좋은 쪽과 형질이 다양한 쪽을 높게 친다
-        float[] weights = TraitWeights();
-        float best = float.NegativeInfinity;
-        (PlantState, PlantState) pick = (plants[0], plants[1]);
-        for (int i = 0; i < plants.Count; i++)
-        {
-            for (int j = i + 1; j < plants.Count; j++)
-            {
-                float score = 0f;
-                for (int t = 0; t < weights.Length; t++)
-                {
-                    if (weights[t] <= 0f) continue;
-                    float ra = plants[i].GetResistanceValue(t), rb = plants[j].GetResistanceValue(t);
-                    score += weights[t] * (Math.Max(ra, rb) + (ra + rb) * 0.25f + GeneticsWeight * (Genetics(plants[i], t) + Genetics(plants[j], t)));
-                }
-                if (score > best) { best = score; pick = (plants[i], plants[j]); }
-            }
-        }
-        return pick;
+        return PickBestParents(plants);
     }
-
-    // 교배 짝과 남길 식물을 고를 때 유전자(0~2) 하나를 저항력 얼마로 치는가
-    private const float GeneticsWeight = 0.3f;
 
     private static int Genetics(PlantState plant, int trait)
     {
@@ -314,10 +297,10 @@ public sealed partial class RunSimulator : IFieldActions
         var weights = new float[Wave.NumberOfWave];
         for (int t = 0; t < weights.Length; t++)
             if (t == (int)WaveType.Aging || WaveSchedule.IsShopWaveUnlocked((WaveType)t, stage, true))
-                weights[t] = 1f;
+                weights[t] = Bot.weightFuture;
         if (CurseState.WaveBlind) return weights; // 저주(기상이변): 웨이브를 볼 수 없다
-        weights[(int)nextWave] += 2f;
-        weights[(int)currentWave] += 3f;
+        if (nextWave != WaveType.None) weights[(int)nextWave] += Bot.weightNext;
+        if (currentWave != WaveType.None) weights[(int)currentWave] += Bot.weightToday;
         return weights;
     }
 
@@ -325,7 +308,7 @@ public sealed partial class RunSimulator : IFieldActions
     {
         float score = 0f;
         for (int t = 0; t < weights.Length; t++)
-            score += weights[t] * (plant.GetResistanceValue(t) + GeneticsWeight * Genetics(plant, t));
+            score += weights[t] * (plant.GetResistanceValue(t) + Bot.genetics * Genetics(plant, t));
         return score;
     }
 
@@ -333,6 +316,8 @@ public sealed partial class RunSimulator : IFieldActions
 
     private void NightPhase()
     {
+        if (IsPlanner) { PlannerNight(); return; }
+
         if (config.payTax && tax.IsDue(stage))
         {
             while (!tax.CanPay(economy, out _) && economy.Gold < tax.DueAmount && SellWorst(4)) { }
@@ -349,26 +334,13 @@ public sealed partial class RunSimulator : IFieldActions
         ShopPhase();
     }
 
-    /// <summary>가장 쓸모없는 식물을 판다. minKeep포기 이하로는 팔지 않는다.</summary>
+    /// <summary>무작위 봇: 아무 식물이나 판다. minKeep포기 이하로는 팔지 않는다.</summary>
     private bool SellWorst(int minKeep)
     {
         List<PlantState> plants = SortedPlants();
         if (plants.Count <= minKeep) return false;
 
-        PlantState worst = null;
-        if (config.bot == SimBotKind.Random)
-            worst = plants[botRng.Range(0, plants.Count)];
-        else
-        {
-            float[] weights = TraitWeights();
-            float lowest = float.PositiveInfinity;
-            foreach (PlantState plant in plants)
-            {
-                float score = Score(plant, weights);
-                if (score < lowest) { lowest = score; worst = plant; }
-            }
-        }
-        return Sell(worst);
+        return Sell(plants[botRng.Range(0, plants.Count)]);
     }
 
     private bool Sell(PlantState plant)

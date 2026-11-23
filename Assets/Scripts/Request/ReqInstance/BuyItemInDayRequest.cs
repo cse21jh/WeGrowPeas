@@ -26,6 +26,9 @@ public class BuyItemInDayRequest : RequestInstance
         Events.ShopBought -= HandleShopBought;
     }
 
+    // 하루가 지나면 처음부터 다시 센다
+    public override int Remaining => IsCompleted ? 0 : Board.DayPassed != startDayPassed ? requiredCount : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;

@@ -26,26 +26,25 @@ public class SellLowResistancePlantRequest : RequestInstance
         Events.PlantSold -= HandlePeaSold;
     }
 
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;
+    }
+
+    public override bool AcceptsSale(PlantState plant)
+    {
+        foreach (var t in plant.Traits)
+            if (plant.GetResistanceValue((int)t.traitType) <= targetResistance) return true;
+        return false;
     }
 
     private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
-        bool hasLowRes = false;
-        foreach (var t in p.Traits)
-        {
-            if (p.GetResistanceValue((int)t.traitType) <= targetResistance)
-            {
-                hasLowRes = true;
-                break;
-            }
-        }
-
-        if (hasLowRes)
+        if (AcceptsSale(p))
         {
             currentCount++;
             if (currentCount >= requiredCount) CompleteOnce();

@@ -28,6 +28,8 @@ public class NoSellDayRequest : RequestInstance
         Events.PlantSold -= HandlePeaSold;
     }
 
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
+
     public override string GetProgressText()
     {
         return currentCount + "/" + requiredCount;

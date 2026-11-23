@@ -41,6 +41,23 @@ public abstract class RequestInstance
 
     public abstract string GetProgressText();
 
+    /// <summary>완료까지 남은 양.</summary>
+    public virtual int Remaining => IsCompleted ? 0 : 1;
+
+    /// <summary>이 식물을 팔면 진행되는가. 시간대 조건은 보지 않는다.</summary>
+    public virtual bool AcceptsSale(PlantState plant) => false;
+
+    public int GoldReward
+    {
+        get
+        {
+            int gold = 0;
+            foreach (var r in Data.rewards)
+                if (r.type == RewardType.Gold) gold += r.amount;
+            return gold;
+        }
+    }
+
     public virtual string GetTitleText()
     {
         return Data.GetTitle();
@@ -84,8 +101,7 @@ public abstract class RequestInstance
     {
         gold = 0;
         if (!CanAcceptReward) return false;
-        foreach (var r in Data.rewards)
-            if (r.type == RewardType.Gold) gold += r.amount;
+        gold = GoldReward;
 
         State = RequestState.Granted;
         Board.CompletedCount++;
