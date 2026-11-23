@@ -69,6 +69,9 @@ public class GameManager : Singleton<GameManager>
         {
             case GameStartType.NewGame:
                 Debug.Log("새 게임");
+                // 시작 식물과 첫 웨이브가 이전 판의 값에 영향받지 않게 먼저 비운다
+                CurseState.ResetAll(); // 저주 상태 초기화
+                SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 if (AbilityManager.Instance != null)
                 {
                     AbilityManager.Instance.ResetRunStorage(); // 이전 판에서 남은 유전자·치장 토큰 저장고를 비운다
@@ -80,8 +83,6 @@ public class GameManager : Singleton<GameManager>
                 shopManager.InitializeGameSeed(); // 새 게임 시작 시 게임 고유 시드 초기화                
                 PlayerRecordForGraph.ClearAll();
                 RecallRecorder.ResetRun(); // 회상: 일자별 스냅샷 초기화
-                CurseState.ResetAll(); // 저주 상태 초기화
-                SpecialItemSystem.ResetRun(); // 특수 아이템 초기화
                 DawnUnlockAnnouncement.Clear(); // 지난 런의 해금 연출이 남지 않게
                 gameMode = 0;
                 StageUpdate();

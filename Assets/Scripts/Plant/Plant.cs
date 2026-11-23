@@ -63,8 +63,9 @@ public abstract class Plant : MonoBehaviour
 
     public void SetFogEffect(bool on)
     {
-        if (on) fogEffect?.Play(true);
-        else fogEffect?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (fogEffect == null) return; // 네펜데스, 스프링클러 등에는 없다
+        if (on) fogEffect.Play(true);
+        else fogEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     public void SetMushroomEffect(bool on)
@@ -86,7 +87,7 @@ public abstract class Plant : MonoBehaviour
 
     public void PlayMadnessEffect()
     {
-        madnessEffect?.Play(true);
+        if (madnessEffect != null) madnessEffect.Play(true);
     }
 
     // 급속 냉각기 관련
