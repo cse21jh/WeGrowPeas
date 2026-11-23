@@ -254,7 +254,11 @@ Shader "Custom/2D/GrassChunkSwayEffect"
             half4 LitFragment(Varyings input) : SV_Target
             {
                 half4 litColor = CommonLitFragment(input, _White);
-                return ApplyGrassSurfaceEffects(litColor, input.grassUV);
+                litColor = ApplyGrassSurfaceEffects(litColor, input.grassUV);
+                // 거의 투명한 픽셀은 버린다. 안 버리면 풀잎 사각형의 투명한 부분도 스텐실을 덮어써서,
+                // 장식품이 기록해 둔 "겨울 눈 덮개 빼기" 표시(DecorationSnowStencil)를 지운다. 보이는 모습은 같다.
+                clip(litColor.a - 0.05);
+                return litColor;
             }
             ENDHLSL
         }
@@ -703,7 +707,9 @@ Shader "Custom/2D/GrassChunkSwayEffect"
             half4 UnlitFragment(Varyings input) : SV_Target
             {
                 half4 unlitColor = CommonUnlitFragment(input, _White);
-                return ApplyGrassSurfaceEffects(unlitColor, input.grassUV);
+                unlitColor = ApplyGrassSurfaceEffects(unlitColor, input.grassUV);
+                clip(unlitColor.a - 0.05); // LitFragment와 같은 이유
+                return unlitColor;
             }
             ENDHLSL
         }

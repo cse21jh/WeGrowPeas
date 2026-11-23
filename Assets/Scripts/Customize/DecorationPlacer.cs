@@ -95,8 +95,7 @@ public class DecorationPlacer : MonoBehaviour
         _placingItem = item;
         _preview.sprite = item.icon;
         _preview.transform.localScale = Vector3.one * DecorationLayer.ScaleFor(item);
-        _preview.transform.rotation = DecorationLayer.RotationFor(item);
-        _preview.gameObject.SetActive(true);
+        _preview.transform.rotation = DecorationLayer.RotationFor(item);        _preview.gameObject.SetActive(true);
         DecorationBlockedArea.SetAllDimmed(true);
         if (panel != null) panel.Close();
         UpdatePreview();
@@ -160,6 +159,9 @@ public class DecorationPlacer : MonoBehaviour
             z = layer != null ? layer.transform.position.z : 0f;
         }
         _preview.transform.position = new Vector3(_previewPivot.x, _previewPivot.y, z);
+
+        // 놓은 뒤처럼 겨울 눈 덮개에 덮이지 않게(앞줄 풀잎 위에는 눈이 남는다). 정렬이 바뀌었을 수 있으니 매번 맞춘다.
+        if (layer != null) layer.SyncSnowStencil(_preview);
     }
 
     private void SetPreviewMaterial(Material material)

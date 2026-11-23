@@ -16,7 +16,14 @@ using UnityEngine;
 /// 앞뒤 순서는 바위·통나무와 같은 방식을 따른다. 풀밭은 위에서 아래로 여러 줄(<see cref="depthRows"/>)로 나뉘어 있고
 /// 줄마다 정렬 레이어·순서·z가 다르다. 장식품은 그림 아래쪽 끝이 걸린 줄과 같은 레이어·순서를 쓰고,
 /// z를 그 줄보다 조금 앞(카메라 쪽)으로 두어 그 줄의 풀보다 앞, 아래 줄의 풀보다 뒤에 그려지게 한다
-/// (아래쪽이 아래 줄 풀에 묻힌다). 모든 장식품이 같은 규칙을 쓰고, 계절 효과(꽃, 단풍, 눈)도 원래 배경 소품처럼 장식품 위에 겹칠 수 있다.
+/// (아래쪽이 아래 줄 풀에 묻힌다). 모든 장식품이 같은 규칙을 쓰고, 봄 꽃·가을 단풍은 원래 배경 소품처럼 장식품 위에 겹칠 수 있다.
+///
+/// 겨울 눈 덮개(<see cref="snowOverlays"/>)는 화면 전체를 모든 풀 줄 위로 덮는 그림이라 정렬 순서로는 장식품을 그 위로 올릴 수 없다.
+/// 대신 실제로 보이는 장식품 픽셀에만 눈을 빼고, 장식품 앞을 가리는 풀잎 위에는 눈이 그대로 덮이게 한다(<see cref="SyncSnowStencil"/>).
+///   장식품마다 스텐실만 기록하는 그림(DecorationSnowStencil 셰이더)을 자식으로 붙여 장식품과 같은 정렬 순서로 그린다
+///   → 앞줄 풀(GrassChunkSwayEffect)이 그 뒤에 그려지며 풀잎 자리의 기록을 지운다
+///   → 눈 덮개는 "마스크 바깥만 보임"이라 기록이 남은 자리(보이는 장식품 픽셀)에만 그려지지 않는다.
+/// SpriteMask는 URP 2D에서 정렬 순서와 상관없이 먼저 그려져 뒤쪽 풀에까지 지워지므로 쓰지 않는다.
 /// 콜라이더는 붙이지 않는다(농장 씬의 다른 클릭을 가리지 않게). 치장 씬에서 클릭 판정은 <see cref="HitTest"/>로 한다.
 /// </summary>
 public class DecorationLayer : MonoBehaviour
@@ -33,10 +40,24 @@ public class DecorationLayer : MonoBehaviour
     [Tooltip("배경에 원래 박혀 있는 장식품(통나무, 그루터기, 돌멩이 등). 이 아이템들은 새로 만들지 않고 이 오브젝트를 옮기거나 숨긴다.")]
     [SerializeField] private DecorationFixture[] fixtures;
 
+    [Tooltip("장식품을 덮지 않게 할 겨울 눈 덮개(winter_snow/Snow). 보이는 장식품 픽셀만큼 이 그림을 빼고 그린다. " +
+             "작은 눈 더미(Plant 레이어)는 완두콩·땅콩의 마스크에도 같이 빠져 버리므로 넣지 않는다.")]
+    [SerializeField] private SpriteRenderer[] snowOverlays;
+
+    [Tooltip("장식품 모양을 스텐실에 기록하는 머티리얼(Mat_DecorationSnowStencil, DecorationSnowStencil 셰이더). 화면에는 그리지 않는다.")]
+    [SerializeField] private Material snowStencilMaterial;
+
+    private const string SnowStencilName = "SnowStencil";
+
     private readonly List<DecorationView> _views = new List<DecorationView>();
+
+    private bool _snowConfigured;
+    private bool _hasSnow;
 
     public Material Material => material;
     public IReadOnlyList<DecorationView> Views => _views;
+
+    private void Awake() => ConfigureSnowOverlays();
 
     private void OnEnable()
     {
@@ -90,6 +111,7 @@ public class DecorationLayer : MonoBehaviour
             if (material != null) sr.sharedMaterial = material;
             float z = ApplyPlacementDepth(sr, item, placement.Position);
             go.transform.SetPositionAndRotation(new Vector3(placement.x, placement.y, z), RotationFor(item));
+            SyncSnowStencil(sr);
 
             var view = go.AddComponent<DecorationView>();
             view.Init(placement, item, sr);
@@ -139,11 +161,62 @@ public class DecorationLayer : MonoBehaviour
             float z = ApplyPlacementDepth(sr, fixture.Item, placement.Position);
             fixture.transform.position = new Vector3(placement.x, placement.y, z);
         }
+        SyncSnowStencil(sr);
 
         var view = fixture.GetComponent<DecorationView>();
         if (view == null) view = fixture.gameObject.AddComponent<DecorationView>();
         view.Init(placement, fixture.Item, sr);
         _views.Add(view);
+    }
+
+    // ── 겨울 눈 덮개 빼기 ────────────────────────────────────────────────────
+
+    /// <summary>눈 덮개를 "마스크 바깥만 보임"으로 바꾼다. 한 번만. 눈 덮개나 스텐실 머티리얼이 없으면 false.</summary>
+    private bool ConfigureSnowOverlays()
+    {
+        if (_snowConfigured) return _hasSnow;
+        _snowConfigured = true;
+
+        _hasSnow = false;
+        if (snowStencilMaterial == null || snowOverlays == null) return false;
+        foreach (var snow in snowOverlays)
+        {
+            if (snow == null) continue;
+            snow.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+            _hasSnow = true;
+        }
+        return _hasSnow;
+    }
+
+    /// <summary>
+    /// 그 장식품(또는 놓기 미리보기) 그림 아래에 눈 덮개를 빼는 스텐실 기록용 그림을 붙이고, 그림·정렬 레이어·순서를 장식품과 맞춘다.
+    /// 장식품의 정렬이 정해진 뒤에 부른다(미리보기는 정렬이 바뀔 때마다).
+    /// 자식이라 위치·크기·기울기·좌우 반전을 그대로 따라가고, 장식품이 숨으면 같이 꺼진다.
+    /// </summary>
+    public void SyncSnowStencil(SpriteRenderer owner)
+    {
+        if (owner == null || !ConfigureSnowOverlays()) return;
+
+        var child = owner.transform.Find(SnowStencilName);
+        SpriteRenderer stencil;
+        if (child != null)
+        {
+            stencil = child.GetComponent<SpriteRenderer>();
+        }
+        else
+        {
+            var go = new GameObject(SnowStencilName);
+            go.transform.SetParent(owner.transform, false);
+            stencil = go.AddComponent<SpriteRenderer>();
+            stencil.sharedMaterial = snowStencilMaterial;
+        }
+        if (stencil == null) return;
+
+        stencil.sprite = owner.sprite;
+        stencil.flipX = owner.flipX;
+        stencil.flipY = owner.flipY;
+        stencil.sortingLayerID = owner.sortingLayerID;
+        stencil.sortingOrder = owner.sortingOrder;
     }
 
     /// <summary>그 점을 덮고 있는 장식품 중 맨 앞에 그려진 것. 없으면 null.</summary>
