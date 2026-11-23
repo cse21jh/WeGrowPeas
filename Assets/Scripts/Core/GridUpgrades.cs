@@ -196,24 +196,6 @@ public class GridUpgrades
         grid.Modifiers.AddLandAndBeanLevel(value);
         RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.UpgradeBonus);
     }
-    /// <summary>
-    /// 땅과 콩: 웨이브가 지나간 후, 아직 뿌리내리지 않은 식물이 확률적으로 뿌리를 내려 이동 불가가 된다.
-    /// (GameManager.BreedEndRoutine에서 웨이브 정산 시 호출)
-    /// </summary>
-    public void ProcessLandAndBeanRooting()
-    {
-        float chance = grid.Modifiers.GetLandAndBeanRootChance();
-        if (chance <= 0f) return;
-
-        foreach (var p in board.Plants.Values)
-        {
-            if (p is MovablePlant mp && mp.IsMovable && !mp.isDying)
-            {
-                if (GameRun.Rng.Field.Value < chance)
-                    mp.SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
-            }
-        }
-    }
     public void ShowAllPriceSign()
     {
         showingAllPrice = true;

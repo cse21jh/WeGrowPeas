@@ -297,58 +297,7 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator BreedEndRoutine()
     {
-        Plant plant;
-        List<Peanut> peanutList = new List<Peanut>();
-        for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
-        {
-            plant = null;
-            grid.Board.Plants.TryGetValue(idx, out plant);
-            if (plant == null)
-                continue;
-            if (plant.GetType() == typeof(Peanut))
-                peanutList.Add(plant.gameObject.GetComponent<Peanut>());
-        }
-        for (int i = 0; i < peanutList.Count; i++)
-            peanutList[i].TrySpawnCopy();
-
-        // 땅과 콩: 웨이브가 지나간 후 식물이 확률적으로 뿌리를 내림
-        grid?.Upgrades.ProcessLandAndBeanRooting();
-
-        // 무당벌레당 골드 지급 (웨이브 종료 시)
-        if (grid != null && grid.Modifiers.AdditionalLadybugGoldPerUnit > 0 && grid.Board.Ladybugs != null)
-        {
-            int ladybugGold = grid.Board.Ladybugs.Count * grid.Modifiers.AdditionalLadybugGoldPerUnit;
-            if (ladybugGold > 0)
-            {
-                economyManager.AddGold(ladybugGold);
-            }
-        }
-
-        // 치료형 캡사이신: 고추 주변 식물의 저항력 회복
-        if (grid != null && grid.Modifiers.ChiliPepperHealPercent > 0f)
-        {
-            foreach (var currentPlant in grid.Board.Plants.Values)
-            {
-                if (currentPlant is ChiliPepper chiliPepper)
-                {
-                    var nearbyPlants = grid.Soil.GetPlantsNearChiliPepper(chiliPepper);
-                    foreach (var nearbyPlant in nearbyPlants)
-                    {
-                        // 모든 저항력을 회복 (구매 횟수 * 3%)
-                        var traits = nearbyPlant.GetGeneticTrait();
-                        for (int i = 0; i < traits.Count; i++)
-                        {
-                            float healAmount = grid.Modifiers.ChiliPepperHealPercent;
-                            float currentResistance = traits[i].resistance;
-                            float newResistance = Mathf.Clamp(currentResistance + healAmount, 0.1f, 1.0f);
-                            traits[i] = new GeneticTrait(traits[i].traitType, newResistance, traits[i].genetics, traits[i].additionalResistance);
-                        }
-                        nearbyPlant.SetTrait(traits);
-                    }
-                }
-            }
-        }
-        
+        DayRules.AfterWave(grid.Field, new GridFieldActions(grid));
         yield return null;
     }
 

@@ -109,11 +109,14 @@ public static class WaveSchedule
     /// 웨이브 선택 UI와 상점 드롭다운이 같은 기준을 쓰도록 여기로 모았다.
     /// </summary>
     public static bool IsShopWaveUnlocked(WaveType type, int currentStage)
+        => IsShopWaveUnlocked(type, currentStage, IsNightNow);
+
+    public static bool IsNightNow => PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime();
+
+    public static bool IsShopWaveUnlocked(WaveType type, int currentStage, bool isNight)
     {
         int unlock = GetShopUnlockStage(type);
-        if (currentStage > unlock) return true;
-        if (currentStage < unlock) return false;
-        return PhoneManager.Instance != null && PhoneManager.Instance.GetIsPhoneTime();
+        return currentStage > unlock || (currentStage == unlock && isNight);
     }
 
     /// <summary>현재 스테이지에서 선택 가능한 웨이브 목록(None 제외).</summary>

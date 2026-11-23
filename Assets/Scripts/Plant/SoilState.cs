@@ -167,6 +167,65 @@ public sealed class SoilState
         return false;
     }
 
+    /// <summary>고추의 치료 대상. 범위 칸은 기존 동작을 그대로 옮긴 것으로, 저항력 보너스 범위와 0·1단계 방향이 다르다.</summary>
+    public List<PlantState> GetPlantsNearChiliPepper(int chiliIndex)
+    {
+        var list = new List<PlantState>();
+        AddHealTargets(list, chiliIndex - 1, chiliIndex + 1);
+        if (modifiers.ChiliPepperRangeLevel >= 1)
+            AddHealTargets(list, chiliIndex - 4, chiliIndex + 4);
+        if (modifiers.ChiliPepperRangeLevel >= 2)
+            AddHealTargets(list, chiliIndex - 5, chiliIndex - 3, chiliIndex + 3, chiliIndex + 5);
+        return list;
+    }
+
+    private void AddHealTargets(List<PlantState> list, params int[] cells)
+    {
+        foreach (int idx in cells)
+            if (idx >= 0 && idx < board.CellCount && board.States.TryGetValue(idx, out PlantState plant)
+                && plant.Kind != PlantKind.ChiliPepper)
+                list.Add(plant);
+    }
+
+    /// <summary>저항력 흡수 비료: 위의 식물이 상하좌우 식물과 겹치는 형질마다 3%p씩 뺏어 온다. 뺏기는 쪽은 10%까지만 준다.</summary>
+    public void ProcessResistanceAbsorption()
+    {
+        const float amount = 0.03f;
+        foreach (int centerIdx in AbsorbFertilizerTiles)
+        {
+            if (!board.States.TryGetValue(centerIdx, out PlantState center) || center.IsDying) continue;
+            var centerTraits = new List<GeneticTrait>(center.Traits);
+
+            int col = centerIdx / 4, row = centerIdx % 4;
+            int[] neighbors =
+            {
+                row + 1 < 4 ? centerIdx + 1 : -1,
+                row - 1 >= 0 ? centerIdx - 1 : -1,
+                col - 1 >= 0 ? centerIdx - 4 : -1,
+                col + 1 < board.MaxCol ? centerIdx + 4 : -1,
+            };
+
+            foreach (int idx in neighbors)
+            {
+                if (idx < 0 || !board.States.TryGetValue(idx, out PlantState neighbor) || neighbor.IsDying) continue;
+                var neighborTraits = new List<GeneticTrait>(neighbor.Traits);
+
+                foreach (var c in centerTraits)
+                {
+                    foreach (var n in neighborTraits)
+                    {
+                        if (c.traitType != n.traitType || n.resistance <= 0.1f) continue;
+
+                        float absorbed = n.resistance - amount < 0.1f ? n.resistance - 0.1f : amount;
+                        if (absorbed <= 0.0001f) continue;
+                        neighbor.ChangeResistance((int)n.traitType, -absorbed);
+                        center.ChangeResistance((int)c.traitType, absorbed);
+                    }
+                }
+            }
+        }
+    }
+
     private bool IsChiliPepperAt(int idx)
         => board.States.TryGetValue(idx, out PlantState plant) && plant.Kind == PlantKind.ChiliPepper;
 }

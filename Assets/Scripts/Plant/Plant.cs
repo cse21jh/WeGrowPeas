@@ -159,8 +159,7 @@ public abstract class Plant : MonoBehaviour
     {
         traits = newTraits;
 
-        EnsurePairedTraitExists(TraitType.HeavyRain, TraitType.Drought);
-        EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
+        BreedingRules.CompletePairs(traits, (trait, genetics) => GetResistanceBasedOnGenetics(trait, genetics));
 
         if (State.IsMovableKind) State.UpdateGoldFromTraits();
     }
@@ -176,38 +175,7 @@ public abstract class Plant : MonoBehaviour
         return peas.Concat(peanuts).ToList();
     }
 
-    private void EnsurePairedTraitExists(TraitType traitA, TraitType traitB) // 대응 형질 넣어주는 
-    {
-        bool hasTraitA = traits.Any(t => t.traitType == traitA);
-        bool hasTraitB = traits.Any(t => t.traitType == traitB);
 
-
-        // 둘 다 있거나 둘 다 없으면 스탑
-        if (hasTraitA && hasTraitB || !hasTraitA && !hasTraitB)
-        {
-            return;
-        }
-
-        // 하나만 존재하는 경우 반대 형질 넣어줘야 함
-        if (hasTraitA) // A만 존재
-        {
-            GeneticTrait existingTrait = traits.First(t => t.traitType == traitA);
-            int genetics = existingTrait.genetics;
-
-            GeneticTrait newTraitB = new GeneticTrait(traitB, GetResistanceBasedOnGenetics(traitB, 2 - genetics), 2 - genetics, 0f);
-
-            traits.Add(newTraitB);
-        }
-        else // B만 존재
-        {
-            GeneticTrait existingTrait = traits.First(t => t.traitType == traitB);
-            int genetics = existingTrait.genetics;
-
-            GeneticTrait newTraitA = new GeneticTrait(traitA, GetResistanceBasedOnGenetics(traitA, 2 - genetics), 2 - genetics, 0f);
-
-            traits.Add(newTraitA);
-        }
-    }
 
     public void SetTaste(int val) => State.SetTaste(val);
 
@@ -440,109 +408,11 @@ public abstract class Plant : MonoBehaviour
         }
     }
 
+    /// <summary>지금 판의 식물과 밭 보정으로 저항력을 굴린다. 공식은 <see cref="BreedingRules.RollResistance"/>에 있다.</summary>
     public static float GetResistanceBasedOnGenetics(TraitType traitType, int genetics, float p1Resistance = 0f, float p2Resistance = 0f)
-    {
-        float resistance = 0.0f;
+        => BreedingRules.RollResistance(GameManager.Instance.currentPlant, GameManager.Instance.grid.Modifiers,
+            traitType, genetics, p1Resistance, p2Resistance);
 
-        float minResistance = (p1Resistance + p2Resistance) * 0.45f;
-        float maxResistance = 0.9f;
-
-        switch (GameManager.Instance.currentPlant)
-        {
-            case PlantIds.Pea:
-                if ((int)traitType >= (int)TraitType.HeavyRain)
-                {
-                    switch (genetics)
-                    {
-                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
-                        case 1: minResistance = Mathf.Max(0.5f, minResistance); maxResistance = 0.7f; break;
-                        case 2: minResistance = Mathf.Max(0.7f, minResistance); maxResistance = 0.9f; break;
-                    }
-                }
-                else
-                {
-                    switch (genetics)
-                    {
-                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
-                        case 1: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.5f; break;
-                        case 2: minResistance = Mathf.Max(0.5f, minResistance); maxResistance = 0.9f; break;
-                    }
-                }
-                break;
-            case PlantIds.Peanut:
-                if ((int)traitType >= (int)TraitType.HeavyRain)
-                {
-                    switch (genetics)
-                    {
-                        case 0: minResistance = Mathf.Max(0.2f, minResistance); maxResistance = 0.4f; break;
-                        case 1: minResistance = Mathf.Max(0.4f, minResistance); maxResistance = 0.6f; break;
-                        case 2: minResistance = Mathf.Max(0.6f, minResistance); maxResistance = 0.8f; break;
-                    }
-                }
-                else
-                {
-                    switch (genetics)
-                    {
-                        case 0: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.4f; break;
-                        case 1: minResistance = Mathf.Max(0.3f, minResistance); maxResistance = 0.4f; break;
-                        case 2: minResistance = Mathf.Max(0.4f, minResistance); maxResistance = 0.8f; break;
-                    }
-                }
-                break;
-        }
-
-        if (minResistance > maxResistance)
-            minResistance = maxResistance;
-
-        // 변종 판정은 식물 단위로 이동(Grid.Breed / Peanut 자가번식) — 여기서는 일반 롤만
-        resistance += Mathf.Round(GameRun.Rng.Breed.Range(minResistance, maxResistance) * 100f) / 100f; // 소수점 둘째 자리 반올림
-
-
-
-        resistance += GameManager.Instance.grid.Modifiers.ResistanceBonus;
-
-        // 강한 유전자 저항력 보너스 적용
-        if (genetics == 2)
-        {
-            resistance += GameManager.Instance.grid.Modifiers.StrongGeneticsResistanceBonus;
-        }
-        // 약한 유전자 저항력 보너스 적용
-        else
-        {
-            resistance += GameManager.Instance.grid.Modifiers.WeakGeneticsResistanceBonus;
-        }
-
-
-
-
-        // 특수(이중 시도): 최초 저항력이 결정된 직후 35% 감소 (대신 생존 시도 2회)
-        if (SpecialItemSystem.Has("double_try"))
-            resistance *= 0.65f;
-
-        return Mathf.Min(resistance, 1.0f);
-    }
-
-    // ───── 변종 (식물 단위) ─────
-
-    /// <summary>변종 발생 확률(%) = 기본 1% + 새벽(2·10단계) + 저주(돌연변이) + 슈퍼 변종.</summary>
-    public static float GetMutationChancePercent()
-    {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        if (MutationDebug.HasChanceOverride) return MutationDebug.ChanceOverride; // 디버그 패널(F11)
-#endif
-        return 1f + DawnSystem.Current.mutationChanceAddPercent + CurseState.MutationAddPercent
-           + (GameManager.Instance != null && GameManager.Instance.grid != null
-              ? GameManager.Instance.grid.Modifiers.SuperMutationChanceBonus : 0f);
-    }
-
-    /// <summary>양성 변종: 모든 형질의 저항력을 90~100%로 설정 (유전자는 유지).</summary>
-    public static void ApplyBenignResistance(List<GeneticTrait> traitList)
-    {
-        for (int i = 0; i < traitList.Count; i++)
-            traitList[i] = new GeneticTrait(traitList[i].traitType,
-                GameRun.Rng.Breed.Range(90, 101) / 100f,
-                traitList[i].genetics, traitList[i].additionalResistance);
-    }
 
     public int GetSellingPrice() => State.GetSellingPrice();
 

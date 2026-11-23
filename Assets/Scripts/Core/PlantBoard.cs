@@ -53,6 +53,17 @@ public class PlantBoard
         states.Clear();
     }
 
+    /// <summary>
+    /// 칸 번호 순서의 식물. 난수를 뽑으며 훑을 때는 반드시 이것을 쓴다.
+    /// <see cref="States"/>의 순서는 심고 뽑은 이력에 따라 달라져서, 같은 시드라도 이어하기 뒤 결과가 바뀐다.
+    /// </summary>
+    public IEnumerable<PlantState> StatesInOrder()
+    {
+        for (int idx = 0; idx < CellCount; idx++)
+            if (states.TryGetValue(idx, out PlantState plant))
+                yield return plant;
+    }
+
     public bool HasEmptyCell()
     {
         for (int idx = 0; idx < CellCount; idx++)

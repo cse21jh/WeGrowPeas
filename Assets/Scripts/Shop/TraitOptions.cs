@@ -12,32 +12,42 @@ public static class TraitOptions
     /// <summary>드롭다운 한 항목이 부여할 형질 묶음.</summary>
     private struct Option
     {
-        public string name;
         public TraitType[] traits;
-        public Option(string name, params TraitType[] traits) { this.name = name; this.traits = traits; }
+        public Option(params TraitType[] traits) { this.traits = traits; }
+
+        public string Name => traits.Length == 1
+            ? WavePalette.GetName(traits[0])
+            : $"{WavePalette.GetName(traits[0])}/{WavePalette.GetName(traits[1])}";
     }
 
-    private static Option Single(TraitType trait) => new Option(WavePalette.GetName(trait), trait);
+    private static Option Single(TraitType trait) => new Option(trait);
 
     private static Option Pair(TraitType a, TraitType b)
-        => new Option($"{WavePalette.GetName(a)}/{WavePalette.GetName(b)}", a, b);
+        => new Option(a, b);
+
+    /// <summary>고를 수 있는 형질 묶음. (시뮬레이터용: 밤인지를 직접 넘긴다)</summary>
+    public static List<TraitType[]> GetTraitSets(int currentStage, bool isNight)
+        => Build(currentStage, isNight).ConvertAll(o => o.traits);
 
     private static List<Option> Build(int currentStage)
+        => Build(currentStage, WaveSchedule.IsNightNow);
+
+    private static List<Option> Build(int currentStage, bool isNight)
     {
         var list = new List<Option>();
 
         // 자연사는 항상 해금
         list.Add(Single(TraitType.NaturalDeath));
 
-        if (IsUnlocked(TraitType.Pest, currentStage)) list.Add(Single(TraitType.Pest));
-        if (IsUnlocked(TraitType.Wind, currentStage)) list.Add(Single(TraitType.Wind));
-        if (IsUnlocked(TraitType.Flood, currentStage)) list.Add(Single(TraitType.Flood));
+        if (IsUnlocked(TraitType.Pest, currentStage, isNight)) list.Add(Single(TraitType.Pest));
+        if (IsUnlocked(TraitType.Wind, currentStage, isNight)) list.Add(Single(TraitType.Wind));
+        if (IsUnlocked(TraitType.Flood, currentStage, isNight)) list.Add(Single(TraitType.Flood));
 
         // 쌍 형질: 둘 중 하나라도 해금되면 함께 제공 (기존 UI와 동일)
-        if (IsUnlocked(TraitType.HeavyRain, currentStage) || IsUnlocked(TraitType.Drought, currentStage))
+        if (IsUnlocked(TraitType.HeavyRain, currentStage, isNight) || IsUnlocked(TraitType.Drought, currentStage, isNight))
             list.Add(Pair(TraitType.HeavyRain, TraitType.Drought));
 
-        if (IsUnlocked(TraitType.Cold, currentStage) || IsUnlocked(TraitType.Heat, currentStage))
+        if (IsUnlocked(TraitType.Cold, currentStage, isNight) || IsUnlocked(TraitType.Heat, currentStage, isNight))
             list.Add(Pair(TraitType.Cold, TraitType.Heat));
 
         return list;
@@ -48,7 +58,7 @@ public static class TraitOptions
     {
         var opts = Build(currentStage);
         var names = new string[opts.Count];
-        for (int i = 0; i < opts.Count; i++) names[i] = opts[i].name;
+        for (int i = 0; i < opts.Count; i++) names[i] = opts[i].Name;
         return names;
     }
 
@@ -64,10 +74,10 @@ public static class TraitOptions
         return result;
     }
 
-    private static bool IsUnlocked(TraitType trait, int currentStage)
+    private static bool IsUnlocked(TraitType trait, int currentStage, bool isNight)
     {
         if (trait == TraitType.NaturalDeath) return true;
-        return WaveSchedule.IsShopWaveUnlocked(ToWaveType(trait), currentStage);
+        return WaveSchedule.IsShopWaveUnlocked(ToWaveType(trait), currentStage, isNight);
     }
 
     private static WaveType ToWaveType(TraitType traitType)

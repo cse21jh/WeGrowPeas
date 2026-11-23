@@ -54,7 +54,11 @@ public class EnemyController : MonoBehaviour
     [Header("Wave Weights")]
     [SerializeField] private float defaultBaseWeight = 1f; // 기본 가중치
 
-    [SerializeField] private Dictionary<WaveType, float> baseWeights = new Dictionary<WaveType, float>();
+    // 웨이브 추첨. 표지판 같은 가중치 배수는 ModManager에서 온다.
+    private readonly WaveDeck deck = new WaveDeck
+    {
+        WeightMultiplier = type => ModManager.Instance ? ModManager.Instance.GetMul(StatId.WaveWeightMul, (int)type) : 1f,
+    };
 
     private bool isWaveSkipped = false;
 
@@ -164,9 +168,6 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        // 저항력 흡수 비료 로직 실행 (상대 저항력을 흡수)
-        grid.Soil.ProcessResistanceAbsorption();
-
         stageWaveRecord.Add(currentWave.WaveType);
         stageKillRecord.Add(0);
         stageNoTraitRecord.Add(grid.Board.CountNoTraitPlant(currentWave.WaveType));
@@ -175,68 +176,12 @@ public class EnemyController : MonoBehaviour
         bool fullFieldWave = currentWave != noneWave && !tutorial && !grid.Board.HasEmptyCell();
         int plantsBeforeWave = grid.Board.Plants.Count;
 
-        if (currentWave != noneWave)
-        {
-            for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
-            {
-                if (grid.Board.Plants.ContainsKey(idx))
-                {
-                    Plant plant = grid.Board.Plants[idx];
-
-                    if (plant.CanResist(wave.WaveType))
-                    {
-                        // 특수(도박꾼): 저항력 40% 이하 웨이브를 스스로 버티면 가격의 20% 골드
-                        if (SpecialItemSystem.Has("gambler") && !plant.IsFrozen()
-                            && plant.GetResistanceValue((int)wave.WaveType) <= 0.4f)
-                            GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.2f));
-
-                        // Debug.Log(idx + "번째 식물이 웨이브를 버틸 수 있습니다");
-                        plant.ResistWave(wave.WaveType);
-                    }
-                    else
-                    {
-                        if (tutorial && grid.Board.CountLivingPlants() <= 1)
-                            continue;
-                        waveKillCount[(int)currentWave.WaveType] += 1;
-                        stageKillRecord[GameManager.Instance.stage]++;
-                        GameEvents.RaisePeaDied();
-                        // Debug.Log(idx + "번째 식물이 죽었습니다");
-                        if (!plant.Die())
-                            plant.ResistWave(wave.WaveType);
-                    }
-
-                }
-            }
-        }
-
-        // 저주(이중 웨이브): 서로 다른 두 번째 웨이브도 동시 판정. 저항 감소 중복 방지 위해 '죽이는 판정'만.
-        if (CurseState.DoubleWave && currentWave != noneWave)
-        {
-            Wave second = nextSecondWave ?? PickSecondWave(currentWave.WaveType);
-            if (second != null && second != noneWave)
-            {
-                for (int idx = 0; idx < grid.Board.MaxCol * 4; idx++)
-                {
-                    if (grid.Board.Plants.ContainsKey(idx))
-                    {
-                        Plant plant = grid.Board.Plants[idx];
-                        if (!plant.CanResist(second.WaveType))
-                        {
-                            GameEvents.RaisePeaDied();
-                            plant.Die(); // TODO: 두 번째 웨이브 시각효과
-                        }
-                    }
-                }
-            }
-        }
-
-        // 저주(버섯): 버섯 타일 위 식물은 이번 웨이브에 피해(페트병은 방어)
-        CurseManager.Instance?.ResolveMushroomWave();
+        // 판정 순서는 DayRules에 있다 (흡수 비료 → 웨이브 → 두 번째 웨이브 → 버섯 → 해동)
+        DayRules.ResolveWave(grid.Field, currentWave.WaveType,
+            () => (nextSecondWave ?? PickSecondWave(currentWave.WaveType))?.WaveType,
+            new GridFieldActions(grid));
 
         if (fullFieldWave) AchievementHooks.OnFullFieldWaveEnded(plantsBeforeWave, grid.Board.Plants.Count);
-
-        // 웨이브 처리 종료 후 얼어있는 식물 해동 (급속 냉각기 효과 종료)
-        grid.Soil.UnfreezeAllPlants();
 
 
         if (tutorial)
@@ -255,26 +200,9 @@ public class EnemyController : MonoBehaviour
         yield return null;
     }
 
-    private void InitBaseWeightsByStage(int stage) // 첫 게임, 불러온 후 웨이브 해금
-    {
-        // 해금 기준은 WaveSchedule(단일 기준)에서 가져온다. (stage + 2 >= unlockStage 시 가중치 ON)
-        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
-        {
-            if (type == WaveType.None) { baseWeights[WaveType.None] = 0f; continue; } // 리롤에서 제외
-            baseWeights[type] = (stage + 2 >= WaveSchedule.GetUnlockStage(type)) ? 1f : 0f;
-        }
-    }
+    private void InitBaseWeightsByStage(int stage) => deck.Init(stage);
 
-    public void UnlockWave(int stage) // 다음 스테이지에서 해금 될 웨이브 해금
-    {
-        // 이번 증가로 해금 스테이지에 도달한 웨이브의 가중치를 켠다. (기존 switch와 동일 동작)
-        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
-        {
-            if (type == WaveType.None) continue;
-            if (stage + 2 == WaveSchedule.GetUnlockStage(type))
-                baseWeights[type] = 1f;
-        }
-    }
+    public void UnlockWave(int stage) => deck.Unlock(stage);
 
     public void SetNextWave()
     {
@@ -547,85 +475,22 @@ public class EnemyController : MonoBehaviour
     }
 
     // ---------- 가중치 기반 & 리롤 ----------
-    private Dictionary<WaveType, float> BuildEffectiveWeights()
-    {
-        // 기본 가중치 복사
-        var map = new Dictionary<WaveType, float>(baseWeights);
+    private static int? CurrentStage => GameManager.Instance != null ? GameManager.Instance.stage : (int?)null;
 
-        Season nextSeason;
-        if (GameManager.Instance == null)
-            nextSeason = Season.Summer;
-        else
-        {
-            nextSeason = GetSeasonByStage(GameManager.Instance.stage + 2); // 다음 스테이지가 시작될 때 계절에 맞는 가중치 0으로 제외
-        }
-        // 계절 제약은 WaveSchedule(단일 기준)에서 가져온다. 해당 계절에 허용되지 않는 웨이브는 0으로 제외.
-        foreach (WaveType type in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
-        {
-            if (type == WaveType.None) continue;
-            if (map.ContainsKey(type) && !WaveSchedule.IsSeasonAllowed(type, nextSeason))
-                map[type] = 0f;
-        }
-
-        foreach (var t in (WaveType[])System.Enum.GetValues(typeof(WaveType)))
-        {
-            if (t == WaveType.None) { map[t] = 0f; continue; }
-
-            float modMul = ModManager.Instance
-                ? ModManager.Instance.GetMul(StatId.WaveWeightMul, (int)t)
-                : 1f;
-
-            if (map.ContainsKey(t))
-                map[t] *= modMul;
-        }
-
-        // None은 항상 제외
-        map[WaveType.None] = 0f;
-        return map;
-    }
-
-    private WaveType PickNextByWeight()
-    {
-        // 저주(집중포화): 5턴간 같은(현재 None이 아닌) 웨이브 고정
-        if (CurseState.HeavyFire && currentWave != null && currentWave.WaveType != WaveType.None)
-            return currentWave.WaveType;
-
-        var map = BuildEffectiveWeights();
-
-        // 총 합계
-        float sum = 0f;
-        foreach (var kv in map) sum += kv.Value;
-
-        // 합계 0이면 자연사
-        if (sum <= 0f)
-            return WaveType.Aging;
-
-        float r = GameRun.Rng.Wave.Range(0f, sum);
-        float acc = 0f;
-        foreach (var kv in map)
-        {
-            acc += kv.Value;
-            if (r <= acc) return kv.Key;
-        }
-        return WaveType.Aging; // 예외처리용 기본값
-    }
+    private WaveType PickNextByWeight() => deck.PickNext(currentWave?.WaveType, CurrentStage);
 
     // 저주(이중 웨이브): 현재 웨이브와 다른, 이미 정식 등장 중인 웨이브 하나를 무작위 선택.
     private Wave PickSecondWave(WaveType exclude)
     {
-        // baseWeights는 등장 2스테이지 전부터 미리 켜지므로(예고용), 그대로 쓰면 아직 안 나온 웨이브가
-        // 두 번째로 겹칠 수 있다. 자연사만 나오는 초반 등에서 이중 웨이브가 뜨지 않도록,
-        // 현재 스테이지 기준으로 이미 정식 해금된 웨이브만 후보로 삼는다.
-        int stage = GameManager.Instance != null ? GameManager.Instance.stage : 0;
-        var candidates = new List<WaveType>();
-        foreach (var kv in BuildEffectiveWeights())
-        {
-            if (kv.Value <= 0f || kv.Key == exclude || kv.Key == WaveType.None) continue;
-            if (stage < WaveSchedule.GetUnlockStage(kv.Key)) continue; // 아직 정식 등장 전이면 제외
-            candidates.Add(kv.Key);
-        }
-        if (candidates.Count == 0) return null;
-        return GetWaveFromWaveType(candidates[GameRun.Rng.Wave.Range(0, candidates.Count)]);
+        WaveType? second = deck.PickSecond(exclude, CurrentStage);
+        return second.HasValue ? GetWaveFromWaveType(second.Value) : null;
+    }
+
+    /// <summary>웨이브를 버티지 못한 식물 집계.</summary>
+    public void RecordWaveHit(WaveType wave)
+    {
+        waveKillCount[(int)wave] += 1;
+        stageKillRecord[GameManager.Instance.stage]++;
     }
 
     public void TutorialWave()
