@@ -33,7 +33,7 @@ public class CameraManager : MonoBehaviour
 
         foreach (CinemachineVirtualCamera cam in cameras)
         {
-            if (cam != cameras[camIndex])
+            if (cam != null && cam != cameras[camIndex]) // 쓰지 않는 칸은 비어 있다
             {
                 cam.Priority = 0;
             }
