@@ -25,11 +25,9 @@ public class CustomizeItemData : ScriptableObject
     [TextArea(2, 5)]
     public string description;
 
+    // 목록에 보이는 순서는 여기 적지 않고 CustomizeItemOrder 에셋 하나에 모아 둔다.
+    // (Resources/Data/Customize/CustomizeItemOrder 에셋 인스펙터에서 끌어다 놓아 바꾼다)
     public CustomizeCategory category;
-
-    [Tooltip("같은 종류 안에서의 표시 순서. 작을수록 위. 같으면 에셋 이름 순. " +
-             "Tools/Customize/아이템 순서 편집 창에서 끌어다 놓아 한꺼번에 바꿀 수 있다.")]
-    public int sortOrder;
 
     [Tooltip("이 종류의 기본 아이템. 처음부터 보유한다. 종류마다 하나만 둔다.")]
     public bool isDefault;

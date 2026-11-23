@@ -39,10 +39,31 @@ public static class CustomizeCatalog
             _byCategory[item.category].Add(item);
         }
 
-        foreach (var list in _byCategory.Values)
-            list.Sort((a, b) => a.sortOrder != b.sortOrder
-                ? a.sortOrder.CompareTo(b.sortOrder)
-                : string.CompareOrdinal(a.name, b.name));
+        var order = Resources.Load<CustomizeItemOrder>(ResourcePaths.CustomizeItemOrder);
+        if (order == null) Debug.LogWarning($"[Customize] 순서 에셋({ResourcePaths.CustomizeItemOrder})이 없어 에셋 이름 순으로 보입니다.");
+        foreach (var pair in _byCategory)
+            SortByOrder(pair.Value, order != null ? order.Get(pair.Key) : null);
+    }
+
+    /// <summary>
+    /// 순서 에셋에 적힌 순서대로 정렬한다. 목록에 없는 아이템은 맨 뒤에 에셋 이름 순.
+    /// 같은 아이템이 두 번 적혀 있으면 앞의 것을 쓴다.
+    /// </summary>
+    public static void SortByOrder(List<CustomizeItemData> items, IReadOnlyList<CustomizeItemData> order)
+    {
+        var rank = new Dictionary<CustomizeItemData, int>();
+        if (order != null)
+            for (int i = 0; i < order.Count; i++)
+                if (order[i] != null && !rank.ContainsKey(order[i])) rank[order[i]] = i;
+
+        items.Sort((a, b) =>
+        {
+            bool hasA = rank.TryGetValue(a, out int ra);
+            bool hasB = rank.TryGetValue(b, out int rb);
+            if (hasA && hasB) return ra.CompareTo(rb);
+            if (hasA != hasB) return hasA ? -1 : 1;
+            return string.CompareOrdinal(a.name, b.name);
+        });
     }
 
     /// <summary>한 종류의 아이템 전부(잠긴 것 포함), 표시 순서대로.</summary>
