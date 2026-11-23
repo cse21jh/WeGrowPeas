@@ -1,7 +1,21 @@
 using System;
 using UnityEngine;
 
-/// <summary>벌레를 잡았을 때의 보상.</summary>
+/// <summary>벌레 접촉과 보상이 일으키는 일.</summary>
+public interface IBug
+{
+    GridModifiers Modifiers { get; }
+    void AddGold(int amount);
+    void AddPestResistance(float value);
+    /// <summary>먹어서 죽였으면 true. 페트병이나 무당벌레가 막았으면 false.</summary>
+    bool EatPlant(PlantState plant);
+    void OnPlantEaten();
+    void StartEating();
+    void Die();
+    void OnKilled();
+}
+
+/// <summary>벌레의 접촉과 보상 규칙.</summary>
 public static class BugRules
 {
     public const int BaseGold = 100;
@@ -14,6 +28,28 @@ public static class BugRules
     public const float WarningSeconds = 1f;
     /// <summary>갑옷 벌레가 한 번 맞고 다시 움직일 때까지의 시간(초).</summary>
     public const float ReviveSeconds = 1f;
+
+    /// <summary>벌레가 식물에 닿았을 때.</summary>
+    public static void Touch(IBug bug, PlantState plant)
+    {
+        if (plant.Kind == PlantKind.Nepenthes)
+        {
+            bug.AddGold(GetNepenthesGold(bug.Modifiers));
+            bug.Die();
+            return;
+        }
+
+        if (bug.EatPlant(plant)) bug.OnPlantEaten();
+        bug.StartEating();
+    }
+
+    /// <summary>벌레가 죽었을 때.</summary>
+    public static void Reward(IBug bug, int baseGold)
+    {
+        bug.AddPestResistance(PestResistancePerKill);
+        bug.OnKilled();
+        bug.AddGold(GetKillGold(baseGold, bug.Modifiers));
+    }
 
     public static int GetKillGold(int baseGold, GridModifiers modifiers)
         => Math.Max(0, baseGold + modifiers.AdditionalBugGold - DawnSystem.Current.bugPriceReduction); // 새벽: 벌레 기본 가격 감소

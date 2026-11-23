@@ -99,7 +99,6 @@ public sealed partial class RunSimulator : IShopWorld
     private bool Buy(Choice choice, ShopInventory inventory)
     {
         ItemData item = choice.item;
-        int price = item.GetDisplayPrice();
 
         if (choice.option >= 0) item.SetSelectedOption(shopContext, choice.option);
         if (choice.cell >= 0) item.SelectCell(choice.cell);
@@ -108,16 +107,22 @@ public sealed partial class RunSimulator : IShopWorld
         item.StartEffect(shopContext, () => ready = true, _ => { });
         if (!ready) { item.Cancel(shopContext); return false; }
 
-        // ShopManager.TryPurchase와 같은 순서: 결제 → 기록 → 효과
-        economy.Spend(price);
+        return shopContext.Shop.TryPurchase(item, shopContext, inventory);
+    }
+
+    bool IShopWorld.TrySpend(int gold)
+    {
+        if (!economy.HasGold(gold)) return false;
+        economy.Spend(gold);
+        return true;
+    }
+
+    void IShopWorld.OnPurchased(ItemData item)
+    {
         events.RaiseShopBought(item);
-        shopContext.Shop.RecordPurchase(item, price);
         if (!result.FirstBought.ContainsKey(item.PurchaseKey)) result.FirstBought[item.PurchaseKey] = stage;
         result.Purchases++;
         result.Mix(StableHash(item.PurchaseKey));
-        item.Commit(shopContext);
-        shopContext.Shop.FinishPurchase(item, inventory, shopContext);
-        return true;
     }
 
     private static int StableHash(string s)
@@ -414,7 +419,6 @@ public sealed partial class RunSimulator : IShopWorld
 
     FieldState IShopWorld.Field => field;
     ModState IShopWorld.Mods => mods;
-    int IShopWorld.Stage => stage;
     WaveType IShopWorld.CurrentWave => currentWave;
     string IShopWorld.Species => config.species;
     bool IShopWorld.IsNight => true; // 봇은 밤에만 산다

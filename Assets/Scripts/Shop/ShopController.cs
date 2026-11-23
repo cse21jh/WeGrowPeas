@@ -79,7 +79,7 @@ public class ShopController
         if (data == null) return;
 
         // 상점 세션 1회 제한, 하루 구매 한도
-        if (WasBoughtThisShop(data) || GameRun.Current.Shop.IsSoldOutToday(data, ctx))
+        if (!GameRun.Current.Shop.CanBuyToday(data, ctx))
         {
             showError(Loc.T("shop.error.cannot_buy"));
             return;
@@ -182,9 +182,7 @@ public class ShopController
 
     private void TryChargeAndCommit(ItemData data, Action onPurchased)
     {
-        if (!shopManager.TryPurchase(ctx, data, out _)) return;
-        GameRun.Current.Shop.FinishPurchase(data, cachedInventory, ctx);
-        onPurchased?.Invoke();
+        if (shopManager.TryPurchase(ctx, data, cachedInventory)) onPurchased?.Invoke();
     }
 
     private static int? CellAt(Vector3 screenPos) => GameManager.Instance.grid.GetGridIndexFromPosition(screenPos);

@@ -83,7 +83,11 @@ public sealed partial class RunSimulator : IFieldActions
 
     private const int RequestsPerCycle = 6; // 정원 씬 RequestManager의 의뢰 수
 
-    private int stage;
+    private int stage
+    {
+        get => GameRun.Current.Stage;
+        set => GameRun.Current.Stage = value;
+    }
     private readonly EconomyState economy;
     private readonly TaxState tax = new TaxState();
     private readonly ModState mods = new ModState();
@@ -235,7 +239,6 @@ public sealed partial class RunSimulator : IFieldActions
     {
         economy.TakeEarnedToday();
         stage++;
-        GameRun.Current.Stage = stage;
         mods.ExpireOn(stage);
         deck.Unlock(stage);
         shopContext.Shop.StartDay();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Bug : MonoBehaviour
+public class Bug : MonoBehaviour, IBug
 {
     protected Grid grid;
     protected EconomyManager economyManager;
@@ -170,19 +170,28 @@ public class Bug : MonoBehaviour
         Plant plant = obj.gameObject.GetComponent<Plant>();
         if (plant != null && !isDie)
         {
-            if (plant.GetType() == typeof(Nepenthes))
-            {
-                economyManager.AddGold(BugRules.GetNepenthesGold(grid.Modifiers));
-                StartCoroutine(KillBug());
-                return;
-            }
-            
-            if (plant.Die(DeathCause.Bug, this))
-            {
-                GameEvents.RaisePeaDiedByBug();
-            }
-            Motion.Eat();
+            touched = plant;
+            BugRules.Touch(this, plant.State);
         }
+    }
+
+    // ───── IBug ─────
+
+    private Plant touched;
+
+    GridModifiers IBug.Modifiers => grid.Modifiers;
+    void IBug.AddGold(int amount) => economyManager.AddGold(amount);
+    void IBug.AddPestResistance(float value) => grid.Upgrades.AddAdditionalPestResistance(value);
+    bool IBug.EatPlant(PlantState plant) => touched.Die(DeathCause.Bug, this);
+    void IBug.OnPlantEaten() => GameEvents.RaisePeaDiedByBug();
+    void IBug.StartEating() => Motion.Eat();
+    void IBug.Die() => StartCoroutine(KillBug());
+
+    void IBug.OnKilled()
+    {
+        GameEvents.RaiseBugKilled();
+        if (GameManager.Instance?.Tutorial == null)
+            CodexProgress.AddBugKill(GetType().Name);
     }
 
     protected void MoveToward(Vector2 targetPos, float s)
@@ -208,12 +217,8 @@ public class Bug : MonoBehaviour
         if(!isDie)
         { 
             grid.killBugCount++;
-            grid.Upgrades.AddAdditionalPestResistance(BugRules.PestResistancePerKill);
             isDie = true;
-            GameEvents.RaiseBugKilled();
-            if (GameManager.Instance?.Tutorial == null)
-                CodexProgress.AddBugKill(GetType().Name);
-            economyManager.AddGold(BugRules.GetKillGold(gold, grid.Modifiers));
+            BugRules.Reward(this, gold);
             yield return StartCoroutine(Vanish());
             Destroy(this.gameObject);
         }

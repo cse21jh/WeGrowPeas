@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using DG.Tweening;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -134,6 +135,10 @@ public static class ParityRunner
         GameStartContext.SetStartType(GameStartType.NewGame);
         DawnSystem.SetSelectedStage(c.dawn);
         GameRun.EditorNextSeed = c.seed;
+        // 20배속에서 트윈이 몰리면 DOTween의 내부 목록이 깨질 수 있어, 넉넉히 잡고 판마다 비운다
+        DOTween.Clear(true);
+        DOTween.Init();
+        DOTween.SetTweensCapacity(5000, 500);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

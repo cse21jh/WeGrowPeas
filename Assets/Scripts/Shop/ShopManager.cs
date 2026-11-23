@@ -82,42 +82,8 @@ public class ShopManager : Singleton<ShopManager>
     /// </summary>
     public void InitializeGameSeed() => Debug.Log($"[ShopManager] 게임 고유 시드: {State.UniqueSeed}");
 
-    public bool TryPurchase(ShopContext ctx, ItemData data, out string error)
-    {
-        error = null;
-        if (GameManager.Instance?.Tutorial?.CanUseShop == false)
-            return false;
-
-        if (data == null)
-        {
-            error = Loc.T("shop.error.no_item");
-            return false;
-        }
-
-        int price = data.GetDisplayPrice();
-
-        // 골드 체크
-        EconomyManager economy = GameManager.Instance != null ? GameManager.Instance.economyManager : null;
-        if (economy == null || !economy.HasGold(price))
-        {
-            error = Loc.T("shop.error.low_gold");
-            return false;
-        }
-
-        // 결제
-        economy.SpendGold(price, GoldFeedbackReason.ShopPurchase);
-        GameEvents.RaiseShopBought(data);
-
-        State.RecordPurchase(data, price);
-
-        if (GameManager.Instance?.Tutorial == null)
-            CodexProgress.Discover(CodexProgress.Category.Item, data.UnlockId);
-
-        // 효과 확정 반영
-        data.Commit(ctx);
-
-        return true;
-    }
+    public bool TryPurchase(ShopContext ctx, ItemData data, ShopInventory inventory)
+        => GameManager.Instance?.Tutorial?.CanUseShop != false && data != null && State.TryPurchase(data, ctx, inventory);
 
     public string ReturnMostPurchasedItem()
     {

@@ -341,29 +341,16 @@ public abstract class Plant : MonoBehaviour
     }
 
 
-    public void AddAdditionalResistance(TraitType traitType, float value, bool byUpgrade = false)
+    /// <summary>상태 쪽에서 추가 저항력이 바뀐 뒤 화면을 맞춘다.</summary>
+    public void RefreshAdditionalResistance(TraitType traitType)
     {
-        for (int i = 0; i < traits.Count; i++)
-        {
-            if (traits[i].traitType == traitType)
-            {
-                State.AddAdditionalResistance(traitType, value,
-                    byUpgrade ? GetResistanceBasedOnGenetics(traitType, traits[i].genetics) : (float?)null);
+        if (!State.HasTrait((WaveType)(int)traitType)) return;
 
-                if (stemController != null)
-                {
-                    if (stemController.CheckGold(traits))
-                        stemController.SetGold(true);
-                }
+        if (stemController != null && stemController.CheckGold(traits))
+            stemController.SetGold(true);
 
-                if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
-                {
-                    FenceUIManager.Instance.SetFenceElements(plantID, this);
-                }
-
-                return;
-            }
-        }
+        if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
+            FenceUIManager.Instance.SetFenceElements(plantID, this);
     }
 
     public void IncreaseResistance(float bonus)

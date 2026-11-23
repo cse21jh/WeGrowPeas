@@ -10,7 +10,12 @@ using System.Linq;
 
 public class GameManager : Singleton<GameManager>
 {
-    public int stage = 0;
+    /// <summary>지금 일차. 값은 이번 판(<see cref="GameRun"/>)에 있다.</summary>
+    public int stage
+    {
+        get => GameRun.Current.Stage;
+        set => GameRun.Current.Stage = value;
+    }
     [HideInInspector] public bool seenFirstGold = false;
     public string currentPlant = PlantIds.Peanut;
 
@@ -44,6 +49,9 @@ public class GameManager : Singleton<GameManager>
     [UnityEngine.Serialization.FormerlySerializedAs("tutorialChapter1")]
     [SerializeField] private TutorialChapter tutorialChapter;
     public TutorialChapter Tutorial => tutorialChapter;
+
+    // 이전 판의 일차가 다른 스크립트의 Start에 보이지 않게
+    private void Awake() => stage = 0;
 
     // Start is called before the first frame update
     void Start()

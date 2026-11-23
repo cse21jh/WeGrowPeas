@@ -8,11 +8,24 @@ public sealed class GridShopWorld : IShopWorld
 
     public FieldState Field => Grid != null ? Grid.Field : null;
     public ModState Mods => ModManager.Instance != null ? ModManager.Instance.State : null;
-    public int Stage => Game != null ? Game.stage : 0;
     public WaveType CurrentWave => Game != null && Game.enemyController != null && Game.enemyController.CurrentWave != null
         ? Game.enemyController.CurrentWave.WaveType : WaveType.None;
     public string Species => Game != null ? Game.currentPlant : null;
     public bool IsNight => WaveSchedule.IsNightNow;
+
+    public bool TrySpend(int gold)
+    {
+        EconomyManager economy = Game != null ? Game.economyManager : null;
+        if (economy == null || !economy.HasGold(gold)) return false;
+        economy.SpendGold(gold, GoldFeedbackReason.ShopPurchase);
+        return true;
+    }
+
+    public void OnPurchased(ItemData item)
+    {
+        GameEvents.RaiseShopBought(item);
+        if (Game.Tutorial == null) CodexProgress.Discover(CodexProgress.Category.Item, item.UnlockId);
+    }
 
     public float RollResistance(TraitType trait, int genetics) => Plant.GetResistanceBasedOnGenetics(trait, genetics);
 

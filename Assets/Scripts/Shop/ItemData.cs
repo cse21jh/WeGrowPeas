@@ -261,9 +261,7 @@ public abstract class ItemData : ScriptableObject
         // 저주(독점시장): 품목별 가격이 무작위 배율(하루 동안 고정)로 변동
         if (CurseState.ShopMonopoly)
         {
-            // Play가 끝난 뒤에도 Instance가 남아 있을 수 있다(도메인 리로드 꺼짐)
-            int day = Application.isPlaying && GameManager.Instance != null ? GameManager.Instance.stage : GameRun.Current.Stage;
-            float h = StableHash01(name + "#" + day);
+            float h = StableHash01(name + "#" + GameRun.Current.Stage);
             price *= Mathf.Lerp(CurseState.ShopPriceMinMul, CurseState.ShopPriceMaxMul, h);
         }
         return Mathf.RoundToInt(price);

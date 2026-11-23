@@ -9,11 +9,16 @@ public interface IShopWorld
 {
     FieldState Field { get; }
     ModState Mods { get; }
-    int Stage { get; }
     /// <summary>다음에 닥칠 웨이브. (밤에는 내일 웨이브)</summary>
     WaveType CurrentWave { get; }
     string Species { get; }
     bool IsNight { get; }
+
+    // 구매
+    /// <summary>골드가 모자라면 쓰지 않고 false.</summary>
+    bool TrySpend(int gold);
+    /// <summary>결제한 직후, 효과가 나기 전.</summary>
+    void OnPurchased(ItemData item);
 
     float RollResistance(TraitType trait, int genetics);
 
@@ -69,7 +74,7 @@ public class ShopContext
     public GridModifiers Modifiers => World.Field.Modifiers;
     public SoilState Soil => World.Field.Soil;
     public ShopState Shop => GameRun.Current.Shop;
-    public int Stage => World.Stage;
+    public int Stage => GameRun.Current.Stage;
 
     public Action<string> ShowInfo;
     public Action<string> ShowError;

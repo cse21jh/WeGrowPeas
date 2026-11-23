@@ -22,22 +22,10 @@ public class GridUpgrades
         mostExpensivePlant = value;
     }
 
-    public void AddAdditionalResistanceInGrid(TraitType traitType, float value, bool byUpgrade = false)
-    {
-        for (int idx = 0; idx < board.MaxCol * 4; idx++) // grid에 있는 식물들 저항력 증가
-        {
-            if (board.Plants.ContainsKey(idx))
-            {
-                Plant plant = board.Plants[idx];
-                plant.AddAdditionalResistance(traitType, value, byUpgrade);
-            }
-        }
-        return;
-    }
     public void AddAdditionalPestResistance(float value)
     {
-        grid.Modifiers.AddAdditionalPestResistance(value);
-        AddAdditionalResistanceInGrid(TraitType.Pest, value);
+        grid.Field.AddPestResistance(value);
+        foreach (Plant plant in board.Plants.Values) plant.RefreshAdditionalResistance(TraitType.Pest);
     }
     public void SetNepenthesPheromoneEnabled(bool enabled)
     {

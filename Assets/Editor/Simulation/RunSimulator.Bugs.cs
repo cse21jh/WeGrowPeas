@@ -77,8 +77,9 @@ public sealed partial class RunSimulator : IBugTargets
 
     // ───── 하루 ─────
 
-    private sealed class SimBug
+    private sealed class SimBug : IBug
     {
+        public RunSimulator sim;
         public BugInfo info;
         public BugMotion motion;
         public float warning = BugRules.WarningSeconds; // 움직이기 시작할 때까지
@@ -88,6 +89,20 @@ public sealed partial class RunSimulator : IBugTargets
         public bool armored, dead, isLadybug;
         public readonly HashSet<PlantState> touching = new HashSet<PlantState>();
         public readonly HashSet<PlantState> smelling = new HashSet<PlantState>();
+
+        GridModifiers IBug.Modifiers => sim.field.Modifiers;
+        void IBug.AddGold(int amount) => sim.economy.Add(amount);
+        void IBug.AddPestResistance(float value) => sim.field.AddPestResistance(value);
+        bool IBug.EatPlant(PlantState plant) => sim.EatPlant(this, plant);
+        void IBug.StartEating() => motion.Eat();
+        void IBug.Die() => sim.KillBug(this);
+        void IBug.OnKilled() => sim.events.RaiseBugKilled();
+
+        void IBug.OnPlantEaten()
+        {
+            sim.result.PlantsEaten++;
+            sim.events.RaisePlantDiedByBug();
+        }
     }
 
     private readonly BugSpawnState bugSpawn = new BugSpawnState();
@@ -117,6 +132,7 @@ public sealed partial class RunSimulator : IBugTargets
         {
             var ladybug = new SimBug
             {
+                sim = this,
                 info = ladybugInfo,
                 motion = new BugMotion(ladybugInfo.move, GetBugSpeed(ladybugInfo), true),
                 isLadybug = true,
@@ -132,6 +148,7 @@ public sealed partial class RunSimulator : IBugTargets
         BugInfo info = bugInfos[kindIndex];
         var bug = new SimBug
         {
+            sim = this,
             info = info,
             motion = new BugMotion(info.move, GetBugSpeed(info), info.stopsToEat),
             armored = info.revives,
@@ -213,28 +230,22 @@ public sealed partial class RunSimulator : IBugTargets
             if (dx * dx + dy * dy > bug.info.radius * bug.info.radius) { bug.touching.Remove(plant); continue; }
             if (!bug.touching.Add(plant)) continue;
 
-            if (plant.Kind == PlantKind.Nepenthes)
-            {
-                economy.Add(BugRules.GetNepenthesGold(field.Modifiers));
-                KillBug(bug);
-                return;
-            }
-            DeathOutcome outcome = field.TryKill(plant, DeathCause.Bug, field.Board.LadybugCount != 0);
-            if (outcome.Died)
-            {
-                economy.Add(outcome.BonusGold);
-                result.PlantsEaten++;
-                events.RaisePlantDiedByBug();
-            }
-            else if (outcome.Result == DeathResult.BlockedByLadybug)
-            {
-                // 무당벌레가 곧바로 날아와 벌레와 함께 죽는다
-                KillBug(bug);
-                KillBug(bugs.Find(b => b.isLadybug && !b.dead));
-                return;
-            }
-            bug.motion.Eat();
+            BugRules.Touch(bug, plant);
+            if (bug.dead) return;
         }
+    }
+
+    private bool EatPlant(SimBug bug, PlantState plant)
+    {
+        DeathOutcome outcome = field.TryKill(plant, DeathCause.Bug, field.Board.LadybugCount != 0);
+        if (outcome.Result == DeathResult.BlockedByLadybug)
+        {
+            // 무당벌레가 곧바로 날아와 벌레와 함께 죽는다
+            KillBug(bug);
+            KillBug(bugs.Find(b => b.isLadybug && !b.dead));
+        }
+        economy.Add(outcome.BonusGold);
+        return outcome.Died;
     }
 
     private static int CellCountForBugs => cellPositions.Length;
@@ -265,9 +276,7 @@ public sealed partial class RunSimulator : IBugTargets
         bug.dead = true;
         if (bug.isLadybug) field.Board.LadybugCount--;
         result.BugsKilled++;
-        field.AddPestResistance(BugRules.PestResistancePerKill);
-        events.RaiseBugKilled();
-        economy.Add(BugRules.GetKillGold(BugRules.BaseGold, field.Modifiers));
+        BugRules.Reward(bug, BugRules.BaseGold);
     }
 
     // ───── IBugTargets ─────

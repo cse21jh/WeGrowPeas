@@ -20,7 +20,7 @@ public sealed class GameRun
     /// <summary>이번 판의 상점.</summary>
     public ShopState Shop { get; } = new ShopState();
 
-    /// <summary>시뮬레이터의 일차. 게임의 일차는 아직 GameManager.stage에 있다.</summary>
+    /// <summary>지금 일차.</summary>
     public int Stage { get; set; }
 
     private GameRun(int seed)

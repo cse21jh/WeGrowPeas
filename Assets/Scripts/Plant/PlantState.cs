@@ -256,14 +256,13 @@ public sealed class PlantState
     }
 
     /// <summary>추가 저항력을 올린다. 해당 형질이 없으면 false.</summary>
-    /// <param name="newResistance">기본 저항력도 바꿀 때의 값.</param>
-    public bool AddAdditionalResistance(TraitType trait, float value, float? newResistance = null)
+    public bool AddAdditionalResistance(TraitType trait, float value)
     {
         for (int i = 0; i < Traits.Count; i++)
         {
             GeneticTrait t = Traits[i];
             if (t.traitType != trait) continue;
-            Traits[i] = new GeneticTrait(trait, newResistance ?? t.resistance, t.genetics, t.additionalResistance + value);
+            Traits[i] = new GeneticTrait(trait, t.resistance, t.genetics, t.additionalResistance + value);
             if (IsMovableKind) UpdateGoldFromTraits();
             return true;
         }

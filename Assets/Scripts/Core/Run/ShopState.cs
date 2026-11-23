@@ -104,23 +104,32 @@ public sealed class ShopState
     public bool WasBoughtThisShop(ItemData data)
         => data != null && data.OnePerShopIfNotStackable && !data.IsStackable && boughtThisShop.Contains(data);
 
-    /// <summary>결제 직후, 효과를 적용하기 전에 부른다.</summary>
-    public void RecordPurchase(ItemData data, int price)
+    /// <summary>결제 → 기록 → 효과 → 진열 정리. 구매 조건은 부르는 쪽이 먼저 확인한다. 골드가 모자라면 false.</summary>
+    public bool TryPurchase(ItemData data, ShopContext ctx, ShopInventory inventory)
     {
+        int price = data.GetDisplayPrice();
+        if (!ctx.World.TrySpend(price)) return false;
+
+        ctx.World.OnPurchased(data);
         DailyPurchaseCount++;
         DailySpentGold += price;
         PurchaseHistory[data.PurchaseKey] = GetItemPurchaseCount(data) + 1;
         dailyPurchases[data.PurchaseKey] = GetDailyPurchaseCount(data) + 1;
+
+        data.Commit(ctx);
+
+        // 더 살 수 없게 됐으면 진열에서 뺀다
+        if (!data.IsStackable) boughtThisShop.Add(data);
+        if (inventory != null && (!data.CanPurchaseByLimit() || !CanBuyToday(data, ctx)))
+        {
+            inventory.Fixed.Remove(data);
+            inventory.Rotation.Remove(data);
+        }
+        return true;
     }
 
-    /// <summary>구매가 끝난 뒤. 더 살 수 없게 됐으면 진열에서 뺀다.</summary>
-    public void FinishPurchase(ItemData data, ShopInventory inventory, ShopContext ctx)
-    {
-        if (!data.IsStackable) boughtThisShop.Add(data);
-        if (inventory == null || (data.CanPurchaseByLimit() && !WasBoughtThisShop(data) && !IsSoldOutToday(data, ctx))) return;
-        inventory.Fixed.Remove(data);
-        inventory.Rotation.Remove(data);
-    }
+    /// <summary>하루 1회 제한이나 하루 구매 한도에 걸리지 않았는가.</summary>
+    public bool CanBuyToday(ItemData data, ShopContext ctx) => !WasBoughtThisShop(data) && !IsSoldOutToday(data, ctx);
 
     /// <summary>신용카드: 3번 이상 산 날이면 쓴 골드의 일부를 돌려준다. 다음 날 낮이 시작될 때 한 번 부른다.</summary>
     public int ConsumeDailyPurchaseRefund(float refundPercent)
