@@ -18,13 +18,13 @@ public class SellHighResistancePlantRequest : RequestInstance
         currentCount = 0;
         SelectRandomTrait();
 
-        GameEvents.OnPeaSold += HandlePeaSold;
+        Events.PlantSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        Events.PlantSold -= HandlePeaSold;
     }
 
     public override string GetProgressText()
@@ -44,11 +44,10 @@ public class SellHighResistancePlantRequest : RequestInstance
 
     private void SelectRandomTrait()
     {
-        if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
-            conditionType = GameManager.Instance.enemyController.PickTraitFromUnlockWave();
+        conditionType = Board.World.PickTraitFromWaves();
     }
 
-    private void HandlePeaSold(Plant p)
+    private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 

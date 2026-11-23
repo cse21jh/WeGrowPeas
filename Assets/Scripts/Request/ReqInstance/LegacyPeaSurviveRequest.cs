@@ -17,15 +17,15 @@ public class LegacyPeaSurviveRequest : RequestInstance
         currentCount = 0;
         date = 5;
 
-        GameEvents.OnPeaDied += HandlePeaDied;
-        GameEvents.OnQuestDayPassed += HandleDayPassed;
+        Events.PlantDied += HandlePeaDied;
+        Events.QuestDayPassed += HandleDayPassed;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaDied -= HandlePeaDied;
-        GameEvents.OnQuestDayPassed -= HandleDayPassed;
+        Events.PlantDied -= HandlePeaDied;
+        Events.QuestDayPassed -= HandleDayPassed;
     }
 
     public override string GetProgressText()

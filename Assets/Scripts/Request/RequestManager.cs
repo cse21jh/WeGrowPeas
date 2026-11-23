@@ -19,8 +19,7 @@ public class RequestManager : Singleton<RequestManager>
 {
     public int cycle = 5;
     public int requestNum = 3;
-    private int dayPassed = 0;
-    public int DayPassed => dayPassed;
+    public int DayPassed => Board.DayPassed;
 
     [SerializeField] private TextMeshProUGUI appTitle;
 
@@ -28,32 +27,41 @@ public class RequestManager : Singleton<RequestManager>
 
     [SerializeField] private List<RequestScriptable> requestPool = new();
 
-    private readonly List<RequestInstance> activeReq = new();
-    public IReadOnlyList<RequestInstance> ActiveReq => activeReq;
+    /// <summary>의뢰 뽑기와 진행. 이 컴포넌트는 알림과 저장, 화면 갱신을 더한다.</summary>
+    public RequestBoard Board
+    {
+        get
+        {
+            if (board != null) return board;
+            board = new RequestBoard(requestPool, cycle, requestNum, new GameRequestWorld());
+            board.Changed += _ => OnProgressUpdated?.Invoke();
+            board.Completed += _ => PushRequestCompleteAlarm();
+            return board;
+        }
+    }
+    private RequestBoard board;
 
-    private readonly HashSet<RequestInstance> rewardGranted = new();
-
-    private int cycleEndRound = -1;
-    public int CycleEndRound => cycleEndRound;
+    public IReadOnlyList<RequestInstance> ActiveReq => Board.Active;
+    public int CycleEndRound => Board.CycleEndRound;
 
     public event Action OnBoardUpdated;
     public event Action OnProgressUpdated;
 
-    private int completeRequestCount = 0;
-
-    public int CompleteRequestCount => completeRequestCount;
+    public int CompleteRequestCount => Board.CompletedCount;
 
     private void OnEnable()
     {
         Loc.LanguageChanged += UpdateRequestAppTitle;
         GameEvents.OnQuestDayPassed += HandleDayPassed;
+        ((GameRequestWorld)Board.World).Connect();
     }
 
     private void OnDisable()
     {
         Loc.LanguageChanged -= UpdateRequestAppTitle;
         GameEvents.OnQuestDayPassed -= HandleDayPassed;
-        ClearActive();
+        ((GameRequestWorld)Board.World).Disconnect();
+        Board.ClearActive();
     }
 
     private void Start()
@@ -63,167 +71,29 @@ public class RequestManager : Singleton<RequestManager>
 
     private void HandleDayPassed()
     {
-        dayPassed++;
+        Board.DayPassed++;
         UpdateRequestAppTitle();
     }
 
     public void StartNewCycle(int startRound)
     {
         if (GameManager.Instance?.Tutorial?.CanUseQuests == false) return;
-        cycleEndRound = startRound + cycle - 1;
-        dayPassed = 0;
 
-        ClearActive();
-        GenerateRandomRequests();
+        ClearRequestAlarm();
+        if (Board.StartCycle(startRound, GameRun.Current.Shop.UniqueSeed + startRound * 100))
+            PushRequestGenerateAlarm();
         UpdateRequestAppTitle();
 
         OnBoardUpdated?.Invoke();
     }
 
-    private void GenerateRandomRequests()
-    {
-        ClearRequestAlarm();
-
-        var valid = requestPool.Where(p => p != null && GameManager.Instance.stage >= p.minStage).ToList();
-
-        if (valid.Count == 0) return;
-
-        int seed = Environment.TickCount;
-        if (GameManager.Instance != null && ShopManager.Instance != null)
-        {
-            seed = ShopManager.Instance.GetGameUniqueSeed() + GameManager.Instance.stage * 100;
-        }
-        var rng = new System.Random(seed);
-        var picked = new List<RequestScriptable>();
-        int safety = 2000;
-
-        while (picked.Count < requestNum && safety-- > 0)
-        {
-            var cand = valid[rng.Next(valid.Count)];
-
-            if (picked.Any(x => x.requestId == cand.requestId)) continue;
-            picked.Add(cand);
-        }
-
-        foreach (var data in picked)
-        {
-            var req = CreateInstanceById(data);
-            if (req == null) continue;
-
-            req.OnChanged += HandleRequestChanged;
-            req.Start();
-            activeReq.Add(req);
-        }
-
-        PushRequestGenerateAlarm();
-    }
-
-    private RequestInstance CreateInstanceById(RequestScriptable data)
-    {
-        string typeCode = data.requestId.Substring(0, 3);
-
-        return typeCode switch
-        {
-            "000" => new MovePlantRequest(data),
-            "001" => new SaveBreedingCountRequest(data),
-            "002" => new FeedBugRequest(data),
-            "003" => new NoSellDayRequest(data),
-            "004" => new BuyItemInDayRequest(data),
-            "005" => new SellHighResistancePlantRequest(data),
-            "006" => new SellGrayGenePlantRequest(data),
-            "007" => new SellPlantFreeTimeRequest(data),
-            "008" => new SellLowResistancePlantRequest(data),
-
-            "990" => new LegacyKillBugRequest(data),
-            "991" => new LegacyPeaBreedingRequest(data),
-            "992" => new LegacyPeaSurviveRequest(data),
-            "993" => new LegacyNoSellPeaRequest(data),
-            "994" => new LegacyBuyMerchRequest(data),
-            "995" => new LegacySpendGoldRequest(data),
-            "996" => new LegacySellSpecificPeaRequest(data),
-
-            _ => null
-        };
-    }
-
-    private void HandleRequestChanged(RequestInstance _)
-    {
-        OnProgressUpdated?.Invoke();
-    }
-
-    private void GrantRewardsForCompleted()
-    {
-        /*foreach (var req in activeReq)
-        {
-            if (!req.IsCompleted) continue;
-            if (rewardGranted.Contains(req)) continue;
-
-            req.GrantRewardOnce();
-            rewardGranted.Add(req);
-        }*/
-    }
-
-    private void ClearActive()
-    {
-        foreach (var req in activeReq)
-        {
-            req.OnChanged -= HandleRequestChanged;
-            req.Stop();
-        }
-
-        activeReq.Clear();
-        rewardGranted.Clear();
-    }
-
     /// <summary>진행 중인 의뢰를 저장 데이터에 담는다. <see cref="LoadRequestManager"/>와 짝.</summary>
-    public void SaveRequestManager(RequestSave save)
-    {
-        save.cycleEndRound = cycleEndRound;
-        save.dayPassed = dayPassed;
-        save.completeRequestCount = completeRequestCount;
-
-        save.activeRequests.Clear();
-        foreach (var req in activeReq)
-        {
-            if (req != null)
-            {
-                save.activeRequests.Add(req.ToSaveData());
-            }
-        }
-    }
+    public void SaveRequestManager(RequestSave save) => Board.Save(save);
 
     public void LoadRequestManager(RequestSave saveData)
     {
-        ClearActive();
-
-        cycleEndRound = saveData.cycleEndRound;
-        dayPassed = saveData.dayPassed;
-
-        if (saveData.activeRequests == null || saveData.activeRequests.Count == 0) return;
-
-        foreach (var reqSave in saveData.activeRequests)
-        {
-            var scriptable = FindScriptableById(reqSave.requestId);
-            if (scriptable == null) continue;
-
-            var instance = CreateInstanceById(scriptable);
-            if (instance == null) continue;
-
-            instance.OnChanged += HandleRequestChanged;
-            instance.Start();
-            instance.LoadFromSaveData(reqSave);
-
-            activeReq.Add(instance);
-        }
-
-        completeRequestCount = saveData.completeRequestCount;
-
+        Board.Load(saveData);
         OnBoardUpdated?.Invoke();
-    }
-
-    private RequestScriptable FindScriptableById(string id)
-    {
-        return requestPool.FirstOrDefault(p => p != null && p.requestId == id);
     }
 
     private void ClearRequestAlarm()
@@ -253,6 +123,22 @@ public class RequestManager : Singleton<RequestManager>
         }
     }
 
+    private static void PushRequestCompleteAlarm()
+    {
+        //완료 알람을 보내야 함(상단바)
+        PhoneNotificationBus.OnShow?.Invoke(
+                    new PhoneNotificationData
+                    {
+                        title = Loc.T("game.quest.complete_title"),
+                        message = Loc.T("game.quest.complete_message"),
+                        duration = 3f
+                    }
+                );
+
+        //완료 알람(앱 아이콘)
+        PhoneManager.Instance?.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+    }
+
     public void OnCheckedNewRequest()
     {
         if (newRequestArrived)
@@ -264,13 +150,8 @@ public class RequestManager : Singleton<RequestManager>
 
     public void UpdateRequestAppTitle()
     {
-        if (cycleEndRound < 0 || appTitle == null) return;
+        if (CycleEndRound < 0 || appTitle == null) return;
 
-        appTitle.text = Loc.T("game.quest.weekly_title", ("days", cycle - dayPassed));
-    }
-
-    public void AddCompleteRequestCount()
-    {
-        completeRequestCount++;
+        appTitle.text = Loc.T("game.quest.weekly_title", ("days", cycle - DayPassed));
     }
 }

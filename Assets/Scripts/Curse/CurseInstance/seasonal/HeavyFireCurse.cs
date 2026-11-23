@@ -4,7 +4,7 @@ using UnityEngine;
 // EnemyController(웨이브 선택)와 Plant(저항 감소)가 CurseState를 읽어 반영.
 public class HeavyFireCurse : CurseInstance
 {
-    public HeavyFireCurse(CurseScriptable data, int level) : base(data, level)
+    public HeavyFireCurse(CurseScriptable data, int level, CurseBoard board) : base(data, level, board)
     {
 
     }

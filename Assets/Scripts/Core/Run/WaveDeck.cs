@@ -70,6 +70,9 @@ public sealed class WaveDeck
         return WaveType.Aging;
     }
 
+    /// <summary>다음 웨이브를 정할 때 함께 정해 두는 두 번째 웨이브. 이중 웨이브가 아니면 null.</summary>
+    public WaveType? PickNextSecond(WaveType next, int? stage) => CurseState.DoubleWave ? PickSecond(next, stage) : null;
+
     /// <summary>
     /// 저주(이중 웨이브): exclude와 다르고 이미 정식 등장 중인 웨이브 하나. 없으면 null.
     /// 가중치는 등장 2일 전부터 켜지므로(예고용) 정식 해금 여부를 한 번 더 거른다.

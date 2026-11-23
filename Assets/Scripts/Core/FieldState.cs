@@ -59,6 +59,10 @@ public sealed class FieldState
         return true;
     }
 
+    /// <summary>특수(임시땅콩A): 새 식물이 심겼을 때 받는 골드.</summary>
+    public static int GetPlantingGold(PlantState plant)
+        => SpecialItemSystem.Has("peanut_special_4") ? (int)System.Math.Round(plant.GetSellingPrice() * 0.5f) : 0;
+
     // ───── 죽음 ─────
 
     /// <summary>

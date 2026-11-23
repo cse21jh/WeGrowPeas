@@ -73,6 +73,9 @@ public sealed class ShopState
             candidates.Add(item);
         }
 
+        // 추첨은 목록 순서를 따르는데 에셋을 읽어 온 순서는 때마다 다를 수 있다
+        candidates.Sort((a, b) => string.CompareOrdinal(a.PurchaseKey, b.PurchaseKey));
+
         inventory.Rotation = Game.Util.WeightedRandom.PickWithoutReplacement(
             candidates,
             // 확률 증가 이벤트 중에는 뜰 수 있는 아이템의 가중치가 모두 8이다

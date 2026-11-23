@@ -18,7 +18,7 @@ public static class SpecialItemSystem
     private static SpecialItemData[] _all;
     private static SpecialItemData[] All
     {
-        get { if (_all == null) _all = Resources.LoadAll<SpecialItemData>(ResourcePath); return _all; }
+        get { if (_all == null) _all = Resources.LoadAll<SpecialItemData>(ResourcePath).Where(d => d != null).OrderBy(d => d.id, System.StringComparer.Ordinal).ToArray(); return _all; }
     }
 
     // ── 조회 ──────────────────────────────────────────────────────────────────
@@ -52,6 +52,10 @@ public static class SpecialItemSystem
     }
 
     // ── 리롤 ──────────────────────────────────────────────────────────────────
+    // Play가 끝난 뒤에도 Instance가 남아 있을 수 있다(도메인 리로드 꺼짐)
+    private static bool IsBlockedByTutorial
+        => Application.isPlaying && GameManager.Instance?.Tutorial?.CanUseSpecialItems == false;
+
     /// <summary>선택지 한 칸당 사용할 수 있는 리롤 횟수.</summary>
     public const int RerollPerSlot = 1;
 
@@ -77,7 +81,7 @@ public static class SpecialItemSystem
     /// <summary>해당 칸의 리롤 1회 소모. 성공하면 true.</summary>
     public static bool UseSlotReroll(int slot)
     {
-        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return false;
+        if (IsBlockedByTutorial) return false;
         if (!CanRerollSlot(slot)) return false;
         _slotRerolls[slot]--;
         return true;
@@ -93,15 +97,14 @@ public static class SpecialItemSystem
     /// <summary>10·20·30일 자유시간 시작 시 호출 — 선물 +1 (수령 전까지 유지·누적).</summary>
     public static void AddGift()
     {
-        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
+        if (IsBlockedByTutorial) return;
         PendingGifts++;
-        Debug.Log($"[SpecialItem] 선물 도착 (미수령 {PendingGifts}개)");
     }
 
     /// <summary>선택 후보 3개 롤. 공용 전체 + (현재 식물 + 언락된) 식물별 − 이미 보유.</summary>
-    public static List<SpecialItemData> RollCandidates(string currentPlant, int count = 3)
+    public static List<SpecialItemData> RollCandidates(string currentPlant, int count = 3, System.Func<SpecialItemData, bool> isUnlocked = null)
     {
-        var pool = GetAvailablePool(currentPlant);
+        var pool = GetAvailablePool(currentPlant, isUnlocked);
 
         // 셔플 후 앞에서 count개
         for (int i = pool.Count - 1; i > 0; i--)
@@ -129,7 +132,7 @@ public static class SpecialItemSystem
     }
 
     /// <summary>획득 가능한(미보유 + 조건 충족) 아이템 목록.</summary>
-    private static List<SpecialItemData> GetAvailablePool(string currentPlant)
+    private static List<SpecialItemData> GetAvailablePool(string currentPlant, System.Func<SpecialItemData, bool> isUnlocked = null)
     {
         var pool = new List<SpecialItemData>();
         foreach (var d in All)
@@ -138,7 +141,7 @@ public static class SpecialItemSystem
             if (d.plantSpecific)
             {
                 if (d.plantName != currentPlant) continue;
-                if (!d.IsUnlocked()) continue; // 그 식물로 새벽 unlockDawnStage 클리어 필요
+                if (!(isUnlocked != null ? isUnlocked(d) : d.IsUnlocked())) continue; // 그 식물로 새벽 unlockDawnStage 클리어 필요
             }
             pool.Add(d);
         }
@@ -148,12 +151,11 @@ public static class SpecialItemSystem
     /// <summary>3택에서 하나 선택 — 보유 등록 + 선물 1개 소모.</summary>
     public static void Acquire(SpecialItemData item)
     {
-        if (GameManager.Instance?.Tutorial?.CanUseSpecialItems == false) return;
+        if (IsBlockedByTutorial) return;
         if (item == null || string.IsNullOrEmpty(item.id)) return;
         _owned.Add(item.id);
         PendingGifts = Mathf.Max(0, PendingGifts - 1);
         ResetSlotRerolls(); // 다음 선물을 위해 칸별 리롤 횟수 회복
-        Debug.Log($"[SpecialItem] 획득: {item.name} ({item.id})");
     }
 
     // ── 저장/로드 (per-run) ────────────────────────────────────────────────────

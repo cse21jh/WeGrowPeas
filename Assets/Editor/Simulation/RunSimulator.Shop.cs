@@ -21,6 +21,21 @@ public sealed partial class RunSimulator : IShopWorld
         fixedItems = Resources.LoadAll<ItemData>("Data/Item Data/Fixed");
         rotationItems = Resources.LoadAll<ItemData>(ResourcePaths.RotationItems);
 
+        temporalCurses = Resources.LoadAll<CurseScriptable>("Data/Codex/Curse/temporal");
+        seasonalCurses = Resources.LoadAll<CurseScriptable>("Data/Codex/Curse/seasonal");
+        // 추첨은 목록 순서를 따른다. 정원 씬의 순서: 단발형은 이름순, 지속형과 의뢰는 번호순
+        System.Array.Sort(temporalCurses, (a, b) => string.CompareOrdinal(a.name, b.name));
+        System.Array.Sort(seasonalCurses, (a, b) => string.CompareOrdinal(a.curseId, b.curseId));
+
+        var found = new List<RequestScriptable>();
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:RequestScriptable", new[] { "Assets/Scripts/Request/ReqItems" }))
+        {
+            var request = UnityEditor.AssetDatabase.LoadAssetAtPath<RequestScriptable>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+            if (request != null && !request.requestId.StartsWith("99")) found.Add(request); // 99로 시작하면 옛 의뢰
+        }
+        found.Sort((a, b) => string.CompareOrdinal(a.requestId, b.requestId));
+        requestPool = found;
+
         // 아이템이 자기 가격과 재고를 고치므로(가격 상승 등) 판마다, 그리고 끝나고 되돌린다
         savedItems.Clear();
         foreach (ItemData item in fixedItems) savedItems[item] = (item.Price, item.InitialStock);
@@ -131,6 +146,7 @@ public sealed partial class RunSimulator : IShopWorld
 
         // ShopManager.TryPurchase와 같은 순서: 결제 → 기록 → 효과
         economy.Spend(price);
+        events.RaiseShopBought(item);
         shopContext.Shop.RecordPurchase(item, price);
         if (!result.FirstBought.ContainsKey(item.PurchaseKey)) result.FirstBought[item.PurchaseKey] = stage;
         result.Purchases++;

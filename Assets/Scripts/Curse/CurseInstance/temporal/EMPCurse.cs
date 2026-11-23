@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class EMPCurse : CurseInstance
 {
-    public EMPCurse(CurseScriptable data, int lvIndex) : base(data, lvIndex)
+    public EMPCurse(CurseScriptable data, int level, CurseBoard board) : base(data, level, board)
     {
     }
 
     public override void Activate()
     {
         CurseState.EmpBlockRatio = (Lv != null ? Lv.valueA : 0f) / 100f;
-        CurseEffectManager.Instance?.SetEMPCurse(true);
+        World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
         CurseState.EmpBlockRatio = 0f;
-        CurseEffectManager.Instance?.SetEMPCurse(false);
+        World.ShowEffect(Data.curseId, false);
     }
 }

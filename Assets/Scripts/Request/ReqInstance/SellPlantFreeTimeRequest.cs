@@ -15,13 +15,13 @@ public class SellPlantFreeTimeRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnPeaSold += HandlePeaSold;
+        Events.PlantSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        Events.PlantSold -= HandlePeaSold;
     }
 
     public override string GetProgressText()
@@ -29,12 +29,12 @@ public class SellPlantFreeTimeRequest : RequestInstance
         return currentCount + "/" + requiredCount;
     }
 
-    private void HandlePeaSold(Plant p)
+    private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
         // 자유시간인지 체크 (핸드폰 페이즈)
-        if (PhoneManager.Instance != null && PhoneManager.Instance.IsPhonePhase)
+        if (Board.World.IsFreeTime)
         {
             currentCount++;
             if (currentCount >= requiredCount) CompleteOnce();

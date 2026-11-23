@@ -34,7 +34,11 @@ public class SimulatorWindow : EditorWindow
         config.buySeedlings = EditorGUILayout.Toggle("모종 구매", config.buySeedlings);
         config.payTax = EditorGUILayout.Toggle("세금", config.payTax);
 
-        EditorGUILayout.HelpBox("저주, 벌레, 의뢰, 특성, 특수 아이템은 아직 없습니다. 벌레 관련 아이템은 사지 않습니다. "
+        config.curses = EditorGUILayout.Toggle("저주 (새벽 단계에 따라)", config.curses);
+        config.requests = EditorGUILayout.Toggle("의뢰", config.requests);
+        config.specialItems = EditorGUILayout.Toggle("특수 아이템", config.specialItems);
+
+        EditorGUILayout.HelpBox("벌레와 특성은 아직 없습니다. 벌레 관련 아이템은 사지 않습니다. "
             + "절대 수치보다 값을 바꾸기 전후의 비교로 읽어 주세요.", MessageType.Info);
 
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
@@ -80,6 +84,9 @@ public class SimulatorWindow : EditorWindow
         sb.AppendLine($"{n}판, {config.species}, 봇 {config.bot}, 새벽 {config.dawnStage}, 시드 {config.firstSeed}~");
         sb.AppendLine($"{config.days}일 클리어 {100.0 * cleared / n:F1}%  (95% 구간 {low * 100:F1}~{high * 100:F1}%)");
         sb.AppendLine($"세금 때문에 전멸 {taxDeaths}판");
+        double requests = 0, curses = 0;
+        foreach (var r in results) { requests += r.RequestsCompleted; curses += r.CursesApplied; }
+        sb.AppendLine($"판마다 달성한 의뢰 {requests / n:F1}개, 겪은 단발형 저주 {curses / n:F1}일");
         sb.AppendLine();
         sb.AppendLine("일차 | 도달 전 전멸(누적) | 그날 전멸 | 남은 식물 평균 | 골드 평균");
         int dead = 0;
@@ -97,8 +104,34 @@ public class SimulatorWindow : EditorWindow
         sb.AppendLine("웨이브 | 한 번에 못 버틴 식물 평균 | 전멸시킨 판");
         for (int i = 0; i < hits.Length; i++)
             if (faced[i] > 0) sb.AppendLine($"{(WaveType)i} | {(double)hits[i] / faced[i]:F2} | {wipes[i]}");
+        AppendSpecialItems(sb, results);
         AppendItems(sb, results);
         return sb.ToString();
+    }
+
+    // 특수 아이템은 봇이 무작위로 고르므로, 하나라도 받은 판끼리 클리어율과 버틴 날을 견줄 수 있다
+    private static void AppendSpecialItems(StringBuilder sb, List<SimRunResult> results)
+    {
+        var rows = new Dictionary<string, (int runs, int cleared, double days)>();
+        int total = 0, totalCleared = 0; double totalDays = 0;
+        foreach (var r in results)
+        {
+            if (r.SpecialItems.Count == 0) continue;
+            total++; totalDays += r.Plants.Count; if (r.Cleared) totalCleared++;
+            string first = r.SpecialItems[0]; // 첫 선물만 본다. 두 번째부터는 오래 산 판에만 있다
+            rows.TryGetValue(first, out var row);
+            rows[first] = (row.runs + 1, row.cleared + (r.Cleared ? 1 : 0), row.days + r.Plants.Count);
+        }
+        if (total == 0) return;
+
+        var sorted = new List<KeyValuePair<string, (int runs, int cleared, double days)>>(rows);
+        sorted.Sort((a, b) => (b.Value.days / b.Value.runs).CompareTo(a.Value.days / a.Value.runs));
+        sb.AppendLine().AppendLine($"첫 특수 아이템 | 판 | 클리어 (95% 구간) | 버틴 날 평균  (전체 {100.0 * totalCleared / total:F1}%, {totalDays / total:F1}일)");
+        foreach (var kv in sorted)
+        {
+            (double low, double high) = Wilson(kv.Value.cleared, kv.Value.runs);
+            sb.AppendLine($"{kv.Key} | {kv.Value.runs} | {100.0 * kv.Value.cleared / kv.Value.runs:F1}% ({low * 100:F0}~{high * 100:F0}) | {kv.Value.days / kv.Value.runs:F1}");
+        }
     }
 
     // 늦게 산 아이템은 오래 산 판에만 있어 좋아 보인다(생존 편향). 그래서 처음 산 날 이후 며칠을 더 버텼는지와,

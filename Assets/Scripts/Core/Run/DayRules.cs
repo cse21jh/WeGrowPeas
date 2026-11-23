@@ -13,7 +13,8 @@ public interface IFieldActions
     bool Kill(PlantState plant);
     /// <summary>버티지 못한 식물이 나왔다(죽음이 막히기 전). 집계용.</summary>
     void OnWaveHit(PlantState plant, WaveType wave, bool isSecondWave);
-    void ResolveMushrooms();
+    /// <summary>저주(버섯)가 난 칸.</summary>
+    IReadOnlyList<int> MushroomTiles { get; }
     void Unfreeze(PlantState plant);
     void AddGold(int amount);
     void Root(PlantState plant);
@@ -74,7 +75,8 @@ public static class DayRules
             }
         }
 
-        actions.ResolveMushrooms();
+        foreach (int cell in actions.MushroomTiles)
+            if (field.Board.States.TryGetValue(cell, out PlantState plant)) actions.Kill(plant); // 페트병이 막을 수 있다
 
         foreach (PlantState plant in field.Board.States.Values)
             if (plant.IsFrozen) actions.Unfreeze(plant);

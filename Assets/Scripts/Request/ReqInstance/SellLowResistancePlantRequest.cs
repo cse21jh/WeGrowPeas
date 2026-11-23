@@ -17,13 +17,13 @@ public class SellLowResistancePlantRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnPeaSold += HandlePeaSold;
+        Events.PlantSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        Events.PlantSold -= HandlePeaSold;
     }
 
     public override string GetProgressText()
@@ -31,12 +31,12 @@ public class SellLowResistancePlantRequest : RequestInstance
         return currentCount + "/" + requiredCount;
     }
 
-    private void HandlePeaSold(Plant p)
+    private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
         bool hasLowRes = false;
-        foreach (var t in p.GetGeneticTrait())
+        foreach (var t in p.Traits)
         {
             if (p.GetResistanceValue((int)t.traitType) <= targetResistance)
             {

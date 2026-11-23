@@ -50,9 +50,10 @@ public class PlantSpawner
         placePlant(plant, grididx);
 
         // 특수(임시땅콩A): 새 식물이 생겨날 때 가격의 50% 골드 (실제로 심어진 경우만)
-        if (SpecialItemSystem.Has("peanut_special_4")
+        int plantingGold = FieldState.GetPlantingGold(plant.State);
+        if (plantingGold > 0
             && board.Plants.TryGetValue(plant.gridIndex, out Plant placed) && placed == plant)
-            GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.5f));
+            GameManager.Instance.economyManager.AddGold(plantingGold);
 
         return plant;
     }

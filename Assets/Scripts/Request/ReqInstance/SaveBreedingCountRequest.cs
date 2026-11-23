@@ -15,13 +15,13 @@ public class SaveBreedingCountRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnDayEndedWithRemainingBreeds += HandleDayEnded;
+        Events.DayEndedWithRemainingBreeds += HandleDayEnded;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnDayEndedWithRemainingBreeds -= HandleDayEnded;
+        Events.DayEndedWithRemainingBreeds -= HandleDayEnded;
     }
 
     public override string GetProgressText()

@@ -4,7 +4,7 @@ using UnityEngine;
 // NOTE: Notion상 며칠(days)간 지속이나, 현재 단발형은 1일 제거 모델 → 다일 지속은 단발형 duration 카운터 추가 시 반영(후속).
 public class WaveBlindCurse : CurseInstance
 {
-    public WaveBlindCurse(CurseScriptable data, int level) : base(data, level)
+    public WaveBlindCurse(CurseScriptable data, int level, CurseBoard board) : base(data, level, board)
     {
 
     }
@@ -12,12 +12,12 @@ public class WaveBlindCurse : CurseInstance
     public override void Activate()
     {
         CurseState.WaveBlind = true;
-        CurseEffectManager.Instance?.SetWaveBlind(true);
+        World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()
     {
         CurseState.WaveBlind = false;
-        CurseEffectManager.Instance?.SetWaveBlind(false);
+        World.ShowEffect(Data.curseId, false);
     }
 }

@@ -22,7 +22,8 @@ public sealed class GridFieldActions : IFieldActions
         GameEvents.RaisePeaDied();
     }
 
-    public void ResolveMushrooms() => CurseManager.Instance?.ResolveMushroomWave();
+    public IReadOnlyList<int> MushroomTiles
+        => CurseManager.Instance != null ? CurseManager.Instance.Board.MushroomTiles : (IReadOnlyList<int>)System.Array.Empty<int>();
 
     public void Unfreeze(PlantState plant) => ViewOf(plant).SetFrozen(false);
 

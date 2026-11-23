@@ -15,10 +15,13 @@ public class CurseManager : Singleton<CurseManager>
 
     private readonly List<GameObject> _fogObjects = new();
     private readonly List<GameObject> _mushroomObjects = new();
-    private readonly List<int> _foggedTiles = new();    // 안개 낀 타일(저항 확인 불가)
-    private readonly List<int> _mushroomTiles = new();   // 버섯 타일(웨이브 시 피해)
-    public bool IsFogged(int idx) => _foggedTiles.Contains(idx);
-    public bool IsMushroom(int idx) => _mushroomTiles.Contains(idx);
+
+    /// <summary>걸린 저주와 선택 규칙. 이 컴포넌트는 안내 UI와 칸 표시를 더한다.</summary>
+    public CurseBoard Board => board ??= new CurseBoard(temporalCursePool, seasonalCursePool, new GridCurseWorld(RefreshTiles));
+    private CurseBoard board;
+
+    public bool IsFogged(int idx) => Board.FogTiles.Contains(idx);
+    public bool IsMushroom(int idx) => Board.MushroomTiles.Contains(idx);
 
     [Header("Debug")]
     [Tooltip("좌상단에 현재 적용 중인 저주 오버레이 표시 (F9로 토글)")]
@@ -33,14 +36,10 @@ public class CurseManager : Singleton<CurseManager>
     [Range(1, 3)]
     [SerializeField] private int debugForceLevel = 1;
 
-    private int seasonInterval = 5; //지속형 저주 설정 단위 (계절 = 5일)
-    private int remainingCurseDay = 0; // 지속형 저주 남은 기간
-    public int RemainingCurseDay => remainingCurseDay;
-    private int remainingTempCurseDay = 0; // 단발형 저주 남은 기간(다일 지속)
-    public int RemainingTempCurseDay => remainingTempCurseDay;
-
-    public CurseInstance currentTempCurse = null;
-    public CurseInstance currentSeasonCurse = null;
+    public int RemainingCurseDay => Board.RemainingSeasonalDays;
+    public int RemainingTempCurseDay => Board.RemainingTemporalDays;
+    public CurseInstance currentTempCurse => Board.Temporal;
+    public CurseInstance currentSeasonCurse => Board.Seasonal;
 
     private CurseTooltipUI _activeCurseTooltip;
     private CurseTooltipUI _activeTempCurseTooltip;
@@ -64,8 +63,9 @@ public class CurseManager : Singleton<CurseManager>
     /// <summary>하루가 끝날 때(OnDayPassedForRequest) 단발형 만료 + 지속형 일수 차감.</summary>
     public void OnDayPassed()
     {
-        RemoveCurse();
-        UpdateSeasonalCurse();
+        Board.OnDayPassed();
+        UpdateTempCurseUI();
+        UpdateCurseUI();
     }
 
     private void Update()
@@ -81,113 +81,46 @@ public class CurseManager : Singleton<CurseManager>
     public void DebugForceCurse(CurseScriptable data)
     {
         if (data == null) return;
-        var inst = CreateInstanceById(data, debugForceLevel);
-        if (inst == null) return;
 
-        if (data.curseType == CurseType.Temporal)
-        {
-            currentTempCurse?.Deactivate();
-            currentTempCurse = inst;
-            var lv = data.GetLevel(debugForceLevel);
-            remainingTempCurseDay = Mathf.Max(1, lv != null ? lv.days : 0);
-            currentTempCurse.Activate();
-            UpdateTempCurseUI();
+        bool temporal = data.curseType == CurseType.Temporal;
+        (temporal ? currentTempCurse : currentSeasonCurse)?.Deactivate();
+        Board.Force(data, debugForceLevel)?.Activate();
+        UpdateTempCurseUI();
+        UpdateCurseUI();
 
-            // 자유시간 시작 때만 도는 초기화를 디버그 강제 적용 시에도 태워준다.
-            // (통신장애는 여기서 지속 시간이 정해지므로, 없으면 다음 날 자유시간까지 효과가 안 보임)
-            if (PhoneManager.Instance != null && GameManager.Instance != null && GameManager.Instance.grid != null)
-                PhoneManager.Instance.BeginEmpBlockIfActive(GameManager.Instance.grid.Breeder.MaxBreedTimer);
-        }
-        else
-        {
-            currentSeasonCurse?.Deactivate();
-            currentSeasonCurse = inst;
-            remainingCurseDay = seasonInterval;
-            currentSeasonCurse.Activate();
-            UpdateCurseUI();
-        }
+        // 자유시간 시작 때만 도는 초기화를 디버그 강제 적용 시에도 태워준다.
+        // (통신장애는 여기서 지속 시간이 정해지므로, 없으면 다음 날 자유시간까지 효과가 안 보임)
+        if (temporal && PhoneManager.Instance != null && GameManager.Instance != null && GameManager.Instance.grid != null)
+            PhoneManager.Instance.BeginEmpBlockIfActive(GameManager.Instance.grid.Breeder.MaxBreedTimer);
         Debug.Log($"[Curse][강제] {data.name} 적용 (레벨 {debugForceLevel})");
     }
 
     /// <summary>[디버그] 현재 적용 중인 저주 모두 해제.</summary>
     public void DebugClearCurses()
     {
-        currentTempCurse?.Deactivate();
-        currentTempCurse = null;
-        currentSeasonCurse?.Deactivate();
-        currentSeasonCurse = null;
-        remainingCurseDay = 0;
-        remainingTempCurseDay = 0;
+        Board.Clear();
         UpdateCurseUI();
         UpdateTempCurseUI();
         Debug.Log("[Curse][강제] 모든 저주 해제");
     }
 
-    // ───── 저주 시각/타일 액션 (CurseInstance.Activate에서 호출) ─────
-
-    /// <summary>저주(안개): 무작위 count개 타일에 안개 생성(해당 타일 식물 저항 확인 불가).</summary>
-    public void SpawnFog(int count)
+    /// <summary>안개와 버섯 칸의 표시를 지금 상태에 맞춘다.</summary>
+    private void RefreshTiles()
     {
-        ClearFog();
-        SpawnOnRandomTiles(fog, count, _fogObjects, _foggedTiles);
-        if (fog == null) Debug.LogWarning("[Curse] fog 프리팹 미할당 — 안개 시각효과 없음(저항 숨김은 적용됨)");
+        ShowTiles(fog, Board.FogTiles, _fogObjects);
+        ShowTiles(mushroom, Board.MushroomTiles, _mushroomObjects);
     }
 
-    public void ClearFog()
+    private static void ShowTiles(GameObject prefab, List<int> tiles, List<GameObject> objects)
     {
-        foreach (var go in _fogObjects) if (go != null) Destroy(go);
-        _fogObjects.Clear();
-        _foggedTiles.Clear();
-    }
+        foreach (var go in objects) if (go != null) Destroy(go);
+        objects.Clear();
+        if (prefab == null) return;
 
-    /// <summary>저주(버섯): 무작위 count개 타일에 버섯 생성. 피해는 웨이브 통과 시 <see cref="ResolveMushroomWave"/>에서.</summary>
-    public void SpawnMushroom(int count)
-    {
-        ClearMushroom();
-        SpawnOnRandomTiles(mushroom, count, _mushroomObjects, _mushroomTiles);
-    }
-
-    public void ClearMushroom()
-    {
-        foreach (var go in _mushroomObjects) if (go != null) Destroy(go);
-        _mushroomObjects.Clear();
-        _mushroomTiles.Clear();
-    }
-
-    /// <summary>저주(버섯): 웨이브가 지나갈 때 호출 — 버섯 타일 위 식물에 피해(페트병은 방어).</summary>
-    public void ResolveMushroomWave()
-    {
-        if (_mushroomTiles.Count == 0) return;
-        var grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
-        if (grid == null) return;
-
-        foreach (int idx in _mushroomTiles)
-            if (grid.Board.Plants.TryGetValue(idx, out Plant p) && p != null)
-                p.Die(DeathCause.Generic); // Die가 페트병을 자동 방어
-    }
-
-    private void SpawnOnRandomTiles(GameObject prefab, int count, List<GameObject> store, List<int> tileStore)
-    {
-        var grid = GameManager.Instance != null ? GameManager.Instance.grid : null;
-        if (grid == null) return;
-
-        int tiles = grid.Board.MaxCol * 4;
-        var idxs = new List<int>();
-        for (int i = 0; i < tiles; i++) idxs.Add(i);
-        for (int i = idxs.Count - 1; i > 0; i--)
+        foreach (int idx in tiles)
         {
-            int j = GameRun.Rng.Curse.Range(0, i + 1);
-            (idxs[i], idxs[j]) = (idxs[j], idxs[i]);
-        }
-
-        for (int i = 0; i < count && i < idxs.Count; i++)
-        {
-            int idx = idxs[i];
-            tileStore.Add(idx);
-
-            var soil = grid.GetSoilTransform(idx);
-            if (soil != null && prefab != null)
-                store.Add(Instantiate(prefab, soil.position, Quaternion.identity));
+            Transform soil = GameManager.Instance.grid.GetSoilTransform(idx);
+            if (soil != null) objects.Add(Instantiate(prefab, soil.position, Quaternion.identity));
         }
     }
 
@@ -208,7 +141,7 @@ public class CurseManager : Singleton<CurseManager>
         sb.AppendLine("<b>── 저주 상태 (F9) ──</b>");
         sb.AppendLine($"저주 레벨: {DawnSystem.Current.curseLevel}");
         sb.AppendLine(currentSeasonCurse != null
-            ? $"지속형: <color=#FF6E6E>{currentSeasonCurse.Data.LocalizedTitle}</color>  ({remainingCurseDay}일 남음)"
+            ? $"지속형: <color=#FF6E6E>{currentSeasonCurse.Data.LocalizedTitle}</color>  ({RemainingCurseDay}일 남음)"
             : "지속형: 없음");
         sb.AppendLine(currentTempCurse != null
             ? $"단발형: <color=#6EC1FF>{currentTempCurse.Data.LocalizedTitle}</color>"
@@ -279,171 +212,27 @@ public class CurseManager : Singleton<CurseManager>
     /// - 단발형: 매 계절 3일차(3, 8, 13, …)에 확정 발동
     /// - 지속형: 매 계절 1일차(6, 11, 16, …)부터 적용, 첫 계절(1~5)은 미발생
     /// </summary>
-    public void SelectCurse(int stage)
-    {
-        int tomorrow = stage + 1;
-
-        if (tomorrow % seasonInterval == 3) SelectTemporalCurse();
-
-        if (tomorrow > seasonInterval && tomorrow % seasonInterval == 1) SelectSeasonalCurse();
-    }
+    public void SelectCurse(int stage) => Board.Select(stage);
 
     public void ApplyCurse()
     {
-        ApplyTemporalCurse();
-        ApplySeasonalCurse();
-    }
-
-    private void SelectTemporalCurse()
-    {
-        if (temporalCursePool == null || temporalCursePool.Count == 0) return;
-
-        int currentStage = GameManager.Instance != null ? GameManager.Instance.stage : 1;
-        var validCurses = temporalCursePool.Where(c => c != null && currentStage >= c.unlockStage).ToList();
-        if (validCurses.Count == 0) return;
-
-        var data = validCurses[GameRun.Rng.Curse.Range(0, validCurses.Count)];
-        int level = GetCurseLevel();
-        currentTempCurse = CreateInstanceById(data, level);
-        var lv = data.GetLevel(level);
-        remainingTempCurseDay = Mathf.Max(1, lv != null ? lv.days : 0); // 다일 지속(기상이변·이중웨이브), 그 외는 1일
-    }
-
-    private void ApplyTemporalCurse()
-    {
-        if (currentTempCurse != null)
-        {
-            currentTempCurse.Activate();
-            CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId); // 도감: 저주 발견
-        }
+        Board.Apply();
+        // 도감: 저주 발견
+        if (currentTempCurse != null) CodexProgress.Discover(CodexProgress.Category.Curse, currentTempCurse.Data.curseId);
+        if (currentSeasonCurse != null) CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId);
         UpdateTempCurseUI();
-    }
-
-    private void SelectSeasonalCurse()
-    {
-        if (seasonalCursePool == null || seasonalCursePool.Count == 0) return;
-
-        var data = seasonalCursePool[GameRun.Rng.Curse.Range(0, seasonalCursePool.Count)];
-        currentSeasonCurse = CreateInstanceById(data, GetCurseLevel());
-        remainingCurseDay = seasonInterval;
-
-        Debug.Log($"[Curse] 다음 계절 지속형 저주 예고: {currentSeasonCurse?.Data.LocalizedTitle}");
-        //TODO: 다음 지속형 저주에 대한 경고 UI(안전재난경보) 표시
-    }
-
-    private void ApplySeasonalCurse()
-    {
-        if (currentSeasonCurse != null)
-        {
-            currentSeasonCurse.Activate();
-            CodexProgress.Discover(CodexProgress.Category.Curse, currentSeasonCurse.Data.curseId); // 도감: 저주 발견
-        }
         UpdateCurseUI();
-    }
-
-    private void RemoveCurse()
-    {
-        if (currentTempCurse == null) return;
-
-        remainingTempCurseDay--;
-        if (remainingTempCurseDay <= 0)
-        {
-            currentTempCurse.Deactivate();
-            currentTempCurse = null;
-        }
-        UpdateTempCurseUI();
-    }
-
-    private void UpdateSeasonalCurse()
-    {
-        if (currentSeasonCurse == null) return;
-
-        remainingCurseDay--;
-        Debug.Log($"[Curse] {currentSeasonCurse.Data.LocalizedTitle} 저주 {remainingCurseDay}일 남음");
-
-        if (remainingCurseDay <= 0)
-        {
-            currentSeasonCurse.Deactivate();
-            currentSeasonCurse = null;
-        }
-        UpdateCurseUI();
-    }
-
-    private CurseInstance CreateInstanceById(CurseScriptable data, int level)
-    {
-        string typeCode = data.curseId;
-
-        return typeCode switch
-        {
-            "101" => new ReverseCurse(data, level),
-            "102" => new FogCurse(data, level),
-            "103" => new ThiefCurse(data, level),
-            "104" => new WaveBlindCurse(data, level),
-            "105" => new MushroomCurse(data, level),
-            "106" => new BreedMadnessCurse(data, level),
-            "107" => new RearrangeCurse(data, level),
-            "108" => new DoubleWaveCurse(data, level),
-            "109" => new EMPCurse(data, level),
-
-            "201" => new BugFestivalCurse(data, level),
-            "202" => new MutationCurse(data, level),
-            "203" => new RadiationCurse(data, level),
-            "204" => new PollenLostCurse(data, level),
-            "205" => new ShopMonopolyCurse(data, level),
-            "206" => new InsomniaCurse(data, level),
-            "207" => new SeedlessCurse(data, level),
-            "208" => new HeavyFireCurse(data, level),
-
-            _ => null
-        };
-    }
-
-    /// <summary>이번 런의 저주 레벨(1~3). 새벽 저주 레벨을 따르며, 최소 1로 보정.</summary>
-    private int GetCurseLevel()
-    {
-        int lv = DawnSystem.Current.curseLevel;
-        return lv < 1 ? 1 : lv;
     }
 
     /// <summary>진행 중인 저주를 저장 데이터에 담는다. <see cref="LoadCurseManager"/>와 짝.</summary>
-    public void SaveCurseManager(CurseSave save)
-    {
-        save.curseId[0] = currentTempCurse != null ? currentTempCurse.Data.curseId : null;
-        save.curseId[1] = currentSeasonCurse != null ? currentSeasonCurse.Data.curseId : null;
-
-        save.remainSeasonCurseDay = RemainingCurseDay;
-        save.remainTempCurseDay = RemainingTempCurseDay;
-    }
+    public void SaveCurseManager(CurseSave save) => Board.Save(save);
 
     public void LoadCurseManager(CurseSave saveData)
     {
-        int level = GetCurseLevel();
-
-        var scriptable = FindTempScriptableById(saveData.curseId[0]); //temp
-
-        if (scriptable != null) currentTempCurse = CreateInstanceById(scriptable, level);
-        else currentTempCurse = null;
-
-        scriptable = FindSeasonScriptableById(saveData.curseId[1]); //season
-
-        if (scriptable != null) currentSeasonCurse = CreateInstanceById(scriptable, level);
-        else currentSeasonCurse = null;
-
-        remainingCurseDay = saveData.remainSeasonCurseDay;
-        remainingTempCurseDay = saveData.remainTempCurseDay;
-
+        CurseState.ResetAll(); // 다른 판에서 켜진 저주 수치가 남지 않게. 걸린 저주는 낮이 시작될 때 다시 발동한다
+        Board.Load(saveData);
         UpdateCurseUI();
         UpdateTempCurseUI();
-    }
-
-    private CurseScriptable FindTempScriptableById(string id)
-    {
-        return temporalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
-    }
-
-    private CurseScriptable FindSeasonScriptableById(string id)
-    {
-        return seasonalCursePool.FirstOrDefault(p => p != null && p.curseId == id);
     }
 
     public void UpdateCurseUI()
@@ -468,7 +257,7 @@ public class CurseManager : Singleton<CurseManager>
 
             if (UIManager.Instance != null && UIManager.Instance.Popup != null)
             {
-                _activeCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(seasonalTooltipPos, icon, tooltipDesc, remainingCurseDay);
+                _activeCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(seasonalTooltipPos, icon, tooltipDesc, RemainingCurseDay);
                 if (_activeCurseTooltip != null)
                 {
                     RectTransform rect = _activeCurseTooltip.GetComponent<RectTransform>();
@@ -506,7 +295,7 @@ public class CurseManager : Singleton<CurseManager>
 
             if (UIManager.Instance != null && UIManager.Instance.Popup != null)
             {
-                _activeTempCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(temporalTooltipPos, icon, tooltipDesc, remainingTempCurseDay);
+                _activeTempCurseTooltip = UIManager.Instance.Popup.ShowCurseTooltip(temporalTooltipPos, icon, tooltipDesc, RemainingTempCurseDay);
                 if (_activeTempCurseTooltip != null)
                 {
                     RectTransform rect = _activeTempCurseTooltip.GetComponent<RectTransform>();

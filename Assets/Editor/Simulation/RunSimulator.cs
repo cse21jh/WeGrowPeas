@@ -27,6 +27,9 @@ public class SimConfig
     public bool allUnlocked = true;
     public int rotationCount = 6;      // 정원 씬 ShopManager의 로테이션 칸 수
     public bool buySeedlings = true;
+    public bool curses = true;         // 새벽 저주 레벨이 있을 때만 걸린다
+    public bool requests = true;
+    public bool specialItems = true;
     public bool payTax = true;
 }
 
@@ -46,6 +49,9 @@ public class SimRunResult
     /// <summary>산 아이템 이름과 처음 산 날.</summary>
     public readonly Dictionary<string, int> FirstBought = new Dictionary<string, int>();
     public int Purchases;
+    public int RequestsCompleted;
+    public int CursesApplied;
+    public readonly List<string> SpecialItems = new List<string>();
     public readonly int[] WaveFaced = new int[Wave.NumberOfWave];
     /// <summary>판 전체의 요약값. 같은 시드로 두 번 돌려 같은지 비교한다.</summary>
     public ulong Digest = 14695981039346656037UL;
@@ -56,7 +62,7 @@ public class SimRunResult
 /// <summary>
 /// 씬 없이 한 판을 돌린다. 교배, 웨이브, 죽음, 저항력, 판매가는 게임과 같은 코드를 쓴다.
 ///
-/// 아직 없는 것: 특수 아이템, 저주, 의뢰, 특성, 벌레, 교배 시간 제한(시간은 금이다), 리롤.
+/// 아직 없는 것: 특성, 벌레, 교배 시간 제한(시간은 금이다), 리롤.
 /// 경제, 세금, 기간제 보정도 게임과 같은 상태 클래스를 쓴다. 강제 매각의 10초 유예만 없다(봇은 기다리지 않는다).
 /// </summary>
 public sealed partial class RunSimulator : IFieldActions
@@ -74,6 +80,7 @@ public sealed partial class RunSimulator : IFieldActions
     private readonly ModState mods = new ModState();
     private WaveType currentWave;
     private WaveType nextWave;
+    private WaveType? nextSecondWave;
 
     private RunSimulator(SimConfig config, int seed)
     {
@@ -83,6 +90,8 @@ public sealed partial class RunSimulator : IFieldActions
         result = new SimRunResult { Seed = seed };
         botRng = new RngStream(unchecked((ulong)(uint)seed) ^ 0xB07B07B07UL);
         shopContext = new ShopContext(this);
+        requests = new RequestBoard(requestPool, 5, 3, this);
+        curses = new CurseBoard(temporalCurses, seasonalCurses, this);
         economy = new EconomyState(config.startGold);
         field.Board.Changed += KillLonelyMoneyTrees;
         deck.WeightMultiplier = type => mods.GetMul(StatId.WaveWeightMul, (int)type, stage);
@@ -106,8 +115,6 @@ public sealed partial class RunSimulator : IFieldActions
         var results = new List<SimRunResult>(config.runs);
         try
         {
-            CurseState.ResetAll();
-            SpecialItemSystem.ResetRun();
             MutationDebug.Reset();
             DawnSystem.SetSelectedStage(config.dawnStage);
 
@@ -121,6 +128,8 @@ public sealed partial class RunSimulator : IFieldActions
         {
             DawnSystem.SetSelectedStage(savedDawn);
             RestoreItems();
+            CurseState.ResetAll();
+            SpecialItemSystem.ResetRun();
             GameRun.StartNew();
         }
         return results;
@@ -130,6 +139,8 @@ public sealed partial class RunSimulator : IFieldActions
     {
         GameRun.StartNew(seed);
         RestoreItems(); // 앞 판에서 바뀐 가격을 되돌린다
+        CurseState.ResetAll();
+        SpecialItemSystem.ResetRun();
         var sim = new RunSimulator(config, seed);
         sim.Play();
         return sim.result;
@@ -150,22 +161,39 @@ public sealed partial class RunSimulator : IFieldActions
 
         while (true)
         {
+            // GameManager.StartNormalMode → StartStage 순서
+            if (CursesActive) curses.Apply();
+            if (CursesActive && curses.Temporal != null) result.CursesApplied++;
+            if (IsWipedOut) { result.DeathDay = stage; break; }
+
             CollectOverdueTax();
             if (IsWipedOut) { result.DiedToTax = true; result.DeathDay = stage; break; }
 
+            if (config.requests && stage % 5 == 2)
+                requests.StartCycle(stage, unchecked(shopContext.Shop.UniqueSeed + stage * 100));
+
             economy.Add(shopContext.Shop.ConsumeDailyPurchaseRefund(field.Modifiers.CreditCardRefundPercent));
+            foreach (PlantState plant in field.Board.States.Values) plant.DayStartGridIndex = plant.GridIndex;
             BreedPhase();
+            MovePlantsForRequest();
             DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
             UseWaveSkip();
 
             if (currentWave != WaveType.None) result.WaveFaced[(int)currentWave]++;
             WaveType faced = currentWave;
-            DayRules.ResolveWave(field, currentWave, () => deck.PickSecond(currentWave, stage), this);
+            DayRules.ResolveWave(field, currentWave, () => nextSecondWave ?? deck.PickSecond(currentWave, stage), this);
             if (IsWipedOut) { result.DeathWave = faced; result.DeathDay = stage; break; }
             AdvanceWave();
 
             DayRules.AfterWave(field, this);
+            curses.OnDayPassed();
+            if (CursesActive) curses.Select(stage);
+            isNight = true;
             NightPhase();
+            isNight = false;
+            requests.DayPassed++;
+            events.RaiseQuestDayPassed();
+            ClaimRequests();
 
             foreach (PlantState plant in field.Board.States.Values) plant.DaysOnField++;
             Record();
@@ -185,6 +213,7 @@ public sealed partial class RunSimulator : IFieldActions
     {
         economy.TakeEarnedToday();
         stage++;
+        GameRun.Current.Stage = stage;
         mods.ExpireOn(stage);
         deck.Unlock(stage);
         shopContext.Shop.StartDay();
@@ -194,6 +223,7 @@ public sealed partial class RunSimulator : IFieldActions
     {
         currentWave = nextWave;
         nextWave = deck.PickNext(currentWave, stage);
+        nextSecondWave = deck.PickNextSecond(nextWave, stage);
     }
 
     private void Record()
@@ -222,7 +252,7 @@ public sealed partial class RunSimulator : IFieldActions
             if (used >= max) break;
             if (!field.Board.HasEmptyCell() && !SellWorst(6)) break;
 
-            List<PlantState> plants = SortedPlants();
+            List<PlantState> plants = SortedPlants().FindAll(p => p.Breedable); // 저주(꽃가루 실종)
             if (plants.Count < 2) break;
             (PlantState a, PlantState b) = PickParents(plants);
             if (BreedingRules.Check(field, a, b, used, max) != BreedCheck.Ok) break;
@@ -230,7 +260,12 @@ public sealed partial class RunSimulator : IFieldActions
             BreedOutcome outcome = BreedingRules.Breed(field, a, b, config.species, WaveSchedule.GetSeasonByStage(stage),
                 (traits, mutation, isTwin) => Plant(traits, -1));
             if (outcome.ConsumesAttempt) used++;
+            if (!outcome.Failed) events.RaiseBreeded();
         }
+
+        int limit = BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
+            mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
+        events.RaiseDayEndedWithRemainingBreeds(Math.Max(0, limit - used));
     }
 
     private (PlantState, PlantState) PickParents(List<PlantState> plants)
@@ -280,6 +315,7 @@ public sealed partial class RunSimulator : IFieldActions
         for (int t = 0; t < weights.Length; t++)
             if (t == (int)WaveType.Aging || WaveSchedule.IsShopWaveUnlocked((WaveType)t, stage, true))
                 weights[t] = 1f;
+        if (CurseState.WaveBlind) return weights; // 저주(기상이변): 웨이브를 볼 수 없다
         weights[(int)nextWave] += 2f;
         weights[(int)currentWave] += 3f;
         return weights;
@@ -308,6 +344,8 @@ public sealed partial class RunSimulator : IFieldActions
         }
         if (stage == EndlessMode.StartStage) tax.SettleAtEnding();
 
+        TakeSpecialItem();
+        ClaimRequests();
         ShopPhase();
     }
 
@@ -343,6 +381,7 @@ public sealed partial class RunSimulator : IFieldActions
         economy.CountSale(plant.Kind);
         economy.Add(price);
         field.Soil.HealNeighborsBySell(plant.GridIndex);
+        events.RaisePlantSold(plant);
         return true;
     }
 
@@ -384,7 +423,9 @@ public sealed partial class RunSimulator : IFieldActions
     {
         var plant = new PlantState(kind) { Traits = traits };
         RefreshTraits(plant);
-        return field.AddPlant(plant, cell) ? plant : null;
+        if (!field.AddPlant(plant, cell)) return null;
+        economy.Add(FieldState.GetPlantingGold(plant));
+        return plant;
     }
 
     // ───── IFieldActions ─────
@@ -423,8 +464,13 @@ public sealed partial class RunSimulator : IFieldActions
         return outcome.Died;
     }
 
-    public void OnWaveHit(PlantState plant, WaveType wave, bool isSecondWave) => result.WaveHits[(int)wave]++;
-    public void ResolveMushrooms() { }
+    public void OnWaveHit(PlantState plant, WaveType wave, bool isSecondWave)
+    {
+        result.WaveHits[(int)wave]++;
+        events.RaisePlantDied();
+    }
+
+    public IReadOnlyList<int> MushroomTiles => curses.MushroomTiles;
     public void Unfreeze(PlantState plant) => plant.SetFrozen(false);
     public void AddGold(int amount) => economy.Add(amount);
     public void Root(PlantState plant) => plant.IsRooted = true;
