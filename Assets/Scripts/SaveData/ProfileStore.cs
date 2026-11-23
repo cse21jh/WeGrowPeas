@@ -21,7 +21,13 @@ public static class ProfileStore
     /// <summary>지금 플레이 중인 프로필 번호(0부터).</summary>
     public static int CurrentIndex { get; private set; }
 
+#if UNITY_EDITOR
+    /// <summary>자동 테스트가 실제 세이브를 건드리지 않게 다른 폴더를 쓴다.</summary>
+    public static string EditorRootOverride;
+    public static string RootPath => string.IsNullOrEmpty(EditorRootOverride) ? Application.persistentDataPath : EditorRootOverride;
+#else
     public static string RootPath => Application.persistentDataPath;
+#endif
     public static string SettingsPath => Path.Combine(RootPath, "settings.json");
     public static string GlobalPath => Path.Combine(RootPath, "profiles.json");
 

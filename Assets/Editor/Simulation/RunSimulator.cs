@@ -81,6 +81,8 @@ public sealed partial class RunSimulator : IFieldActions
     private readonly RngStream botRng; // 봇의 무작위 선택. 게임 난수를 쓰지 않는다.
     private readonly PlantKind kind;
 
+    private const int RequestsPerCycle = 6; // 정원 씬 RequestManager의 의뢰 수
+
     private int stage;
     private readonly EconomyState economy;
     private readonly TaxState tax = new TaxState();
@@ -97,7 +99,7 @@ public sealed partial class RunSimulator : IFieldActions
         result = new SimRunResult { Seed = seed };
         botRng = new RngStream(unchecked((ulong)(uint)seed) ^ 0xB07B07B07UL);
         shopContext = new ShopContext(this);
-        requests = new RequestBoard(requestPool, 5, 3, this);
+        requests = new RequestBoard(requestPool, 5, RequestsPerCycle, this);
         curses = new CurseBoard(temporalCurses, seasonalCurses, this);
         economy = new EconomyState(config.startGold);
         field.Board.Changed += KillLonelyMoneyTrees;
@@ -108,6 +110,9 @@ public sealed partial class RunSimulator : IFieldActions
 
     /// <summary>여러 판을 돌린다. 전역 상태를 건드리므로 Play 중에는 돌리지 않는다. 중간에 취소하면 그때까지의 결과를 준다.</summary>
     public static List<SimRunResult> RunMany(SimConfig config, Func<int, bool> onProgress = null)
+        => RunMany(config, config.firstSeed, null, onProgress);
+
+    private static List<SimRunResult> RunMany(SimConfig config, int firstSeed, ParityScript script, Func<int, bool> onProgress = null)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Play 중에는 시뮬레이터를 돌릴 수 없습니다.");
@@ -127,7 +132,7 @@ public sealed partial class RunSimulator : IFieldActions
 
             for (int i = 0; i < config.runs; i++)
             {
-                results.Add(RunOne(config, config.firstSeed + i));
+                results.Add(RunOne(config, firstSeed + i, script));
                 if (onProgress != null && i % 20 == 0 && !onProgress(i)) break;
             }
         }
@@ -142,13 +147,13 @@ public sealed partial class RunSimulator : IFieldActions
         return results;
     }
 
-    private static SimRunResult RunOne(SimConfig config, int seed)
+    private static SimRunResult RunOne(SimConfig config, int seed, ParityScript script)
     {
         GameRun.StartNew(seed);
         ResetItems();
         CurseState.ResetAll();
         SpecialItemSystem.ResetRun();
-        var sim = new RunSimulator(config, seed);
+        var sim = new RunSimulator(config, seed) { script = script };
         sim.Play();
         return sim.result;
     }
@@ -183,12 +188,16 @@ public sealed partial class RunSimulator : IFieldActions
             foreach (PlantState plant in field.Board.States.Values) plant.DayStartGridIndex = plant.GridIndex;
             RefreshForecast();
             DecideNoSell();
-            BreedPhase();
-            MovePlantsForRequest();
+            if (script != null) ScriptDay();
+            else
+            {
+                BreedPhase();
+                MovePlantsForRequest();
+            }
             BugPhase();
             if (IsWipedOut) { result.DiedToBug = true; result.DeathDay = stage; break; }
-            UseWaveSkip();
-            if (IsPlanner) SellDoomed();
+            if (script == null) UseWaveSkip();
+            if (script == null && IsPlanner) SellDoomed();
             DayRules.EndFreeTime(field, plant => plant.FreeTimePassedCount++);
 
             if (currentWave != WaveType.None) result.WaveFaced[(int)currentWave]++;
@@ -201,11 +210,12 @@ public sealed partial class RunSimulator : IFieldActions
             curses.OnDayPassed();
             if (CursesActive) curses.Select(stage);
             isNight = true;
-            NightPhase();
+            if (script != null) ScriptNight();
+            else NightPhase();
             isNight = false;
             requests.DayPassed++;
             events.RaiseQuestDayPassed();
-            ClaimRequests();
+            if (script == null) ClaimRequests();
 
             foreach (PlantState plant in field.Board.States.Values) plant.DaysOnField++;
             Record();
@@ -259,8 +269,7 @@ public sealed partial class RunSimulator : IFieldActions
         int used = 0;
         for (int guard = 0; guard < 50; guard++)
         {
-            int max = BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
-                mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
+            int max = MaxBreedAttempts;
             if (used >= max - BreedsToSave(max)) break;
             if (!field.Board.HasEmptyCell() && !(IsPlanner ? SellCheapest((int)Bot.minKeep, Bot.breedValue) : SellWorst(6))) break;
 
@@ -269,15 +278,20 @@ public sealed partial class RunSimulator : IFieldActions
             (PlantState a, PlantState b) = PickParents(plants);
             if (BreedingRules.Check(field, a, b, used, max) != BreedCheck.Ok) break;
 
-            BreedOutcome outcome = BreedingRules.Breed(field, a, b, config.species, WaveSchedule.GetSeasonByStage(stage),
-                (traits, mutation, isTwin) => Plant(traits, -1));
-            if (outcome.ConsumesAttempt) used++;
-            if (!outcome.Failed) events.RaiseBreeded();
+            BreedOnce(a, b, ref used);
         }
+        events.RaiseDayEndedWithRemainingBreeds(Math.Max(0, MaxBreedAttempts - used));
+    }
 
-        int limit = BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
-            mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
-        events.RaiseDayEndedWithRemainingBreeds(Math.Max(0, limit - used));
+    private int MaxBreedAttempts => BreedingRules.GetMaxAttempts(config.breedAttempts + bonusBreedAttempts,
+        mods.GetMul(StatId.BreedingAttemptsMul, -1, stage), economy.TotalGold);
+
+    private void BreedOnce(PlantState a, PlantState b, ref int used)
+    {
+        BreedOutcome outcome = BreedingRules.Breed(field, a, b, config.species, WaveSchedule.GetSeasonByStage(stage),
+            (traits, mutation, isTwin) => Plant(traits, -1));
+        if (outcome.ConsumesAttempt) used++;
+        if (!outcome.Failed) events.RaiseBreeded();
     }
 
     private (PlantState, PlantState) PickParents(List<PlantState> plants)

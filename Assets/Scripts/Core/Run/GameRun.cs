@@ -28,9 +28,18 @@ public sealed class GameRun
         Random = new GameRng(seed);
     }
 
+#if UNITY_EDITOR
+    /// <summary>자동 테스트용: 다음 판의 시드. 한 번 쓰면 지워진다.</summary>
+    public static int? EditorNextSeed;
+#endif
+
     /// <summary>새 판을 시작한다. 시드를 주면 같은 난수열이 다시 나온다.</summary>
     public static GameRun StartNew(int? seed = null)
     {
+#if UNITY_EDITOR
+        seed ??= EditorNextSeed;
+        EditorNextSeed = null;
+#endif
         current = new GameRun(seed ?? NewSeed());
         return current;
     }

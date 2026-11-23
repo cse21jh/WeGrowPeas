@@ -70,14 +70,19 @@ public sealed partial class RunSimulator : ICurseWorld, IRequestWorld
             int cell = field.FindCellFor();
             if (plant == null || cell < 0) return;
 
-            // Grid.TryPlacePlant → MovablePlant.OnMouseUp과 같은 순서
-            field.Board.Remove(plant.GridIndex);
-            plant.MoveTo(cell);
-            field.Board.PlaceState(cell, plant);
-            field.Board.NotifyChanged();
-            events.RaisePlantMoved();
-            plant.TryRootByDawn();
+            MovePlant(plant, cell);
         }
+    }
+
+    // Grid.TryPlacePlant → MovablePlant.OnMouseUp과 같은 순서
+    private void MovePlant(PlantState plant, int cell)
+    {
+        field.Board.Remove(plant.GridIndex);
+        plant.MoveTo(cell);
+        field.Board.PlaceState(cell, plant);
+        field.Board.NotifyChanged();
+        events.RaisePlantMoved();
+        plant.TryRootByDawn();
     }
 
     private bool HasOpenRequest<T>() where T : RequestInstance
