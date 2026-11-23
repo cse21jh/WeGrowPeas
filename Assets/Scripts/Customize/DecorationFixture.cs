@@ -20,6 +20,8 @@ public class DecorationFixture : MonoBehaviour
 
     private bool _captured;
     private Vector3 _homePosition;
+    private Quaternion _homeRotation;
+    private Vector3 _homeLocalScale;
     private int _homeLayerId;
     private int _homeOrder;
 
@@ -35,19 +37,43 @@ public class DecorationFixture : MonoBehaviour
         _captured = true;
         Renderer = GetComponent<SpriteRenderer>();
         _homePosition = transform.position;
+        _homeRotation = transform.rotation;
+        _homeLocalScale = transform.localScale;
         _homeLayerId = Renderer.sortingLayerID;
         _homeOrder = Renderer.sortingOrder;
     }
 
-    /// <summary>그 위치가 원래 자리인가.</summary>
-    public bool IsHome(Vector2 position) => ((Vector2)_homePosition - position).sqrMagnitude <= SamePlaceTolerance * SamePlaceTolerance;
+    /// <summary>원래 자리에 크기·기울기·반전도 처음 모습(<see cref="DecorationPose.DefaultFor"/>) 그대로인가.</summary>
+    public bool IsHome(DecorationPose pose)
+    {
+        if (item == null) return false;
+        var home = DecorationPose.DefaultFor(item);
+        return Mathf.Approximately(pose.scale, 1f)
+               && Mathf.Abs(Mathf.DeltaAngle(pose.rotation, home.rotation)) < 0.01f
+               && pose.flipX == home.flipX
+               && ((Vector2)_homePosition - pose.position).sqrMagnitude <= SamePlaceTolerance * SamePlaceTolerance;
+    }
 
-    /// <summary>원래 자리·원래 앞뒤 순서로 되돌린다.</summary>
+    /// <summary>원래 자리·모습·앞뒤 순서로 되돌린다.</summary>
     public void RestoreHome()
     {
-        transform.position = _homePosition;
+        transform.SetPositionAndRotation(_homePosition, _homeRotation);
+        transform.localScale = _homeLocalScale;
         Renderer.sortingLayerID = _homeLayerId;
         Renderer.sortingOrder = _homeOrder;
+    }
+
+    /// <summary>
+    /// 그 위치·기울기(월드 각도)로 옮기고, 원래 크기에 <paramref name="scale"/>를 곱한다.
+    /// 좌우 반전은 Transform의 x 배율 부호로 한다(원래 반전된 소품도 있으므로 <paramref name="flipX"/>는 최종 방향).
+    /// </summary>
+    public void ApplyTransform(Vector3 position, float angle, float scale, bool flipX)
+    {
+        transform.SetPositionAndRotation(position, Quaternion.Euler(0f, 0f, angle));
+        var s = new Vector3(Mathf.Abs(_homeLocalScale.x), Mathf.Abs(_homeLocalScale.y), _homeLocalScale.z) * scale;
+        s.z = _homeLocalScale.z;
+        if (flipX) s.x = -s.x;
+        transform.localScale = s;
     }
 
     public void SetShown(bool shown)
