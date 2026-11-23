@@ -104,6 +104,7 @@ public class Bug : MonoBehaviour
 
     protected virtual IEnumerator Moving()
     {
+        Motion.Position = transform.position; // 무당벌레는 벌레를 쫓다가 다른 자리에서 다시 시작한다
         Motion.Begin();
         yield return null;
 

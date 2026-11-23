@@ -85,7 +85,7 @@ public sealed partial class RunSimulator : IBugTargets
         public float reaction;                          // 움직이기 시작하고 클릭할 때까지
         public float stun;                              // 맞아서 멈춘 시간
         public float dyingIn = -1f;                     // 0 이상이면 맞아서 곧 죽는다
-        public bool armored, dead;
+        public bool armored, dead, isLadybug;
         public readonly HashSet<PlantState> touching = new HashSet<PlantState>();
         public readonly HashSet<PlantState> smelling = new HashSet<PlantState>();
     }
@@ -115,18 +115,25 @@ public sealed partial class RunSimulator : IBugTargets
         int kindIndex = BugSpawnState.RollKind(field.Modifiers, field.Board.LadybugCount, stage, bugInfos.Count);
         if (kindIndex == BugSpawnState.Ladybug)
         {
-            // 게임의 무당벌레는 나타난 화면 밖 자리에서 움직이지 않고, 잡히거나 벌레와 부딪히지도 않는다
+            var ladybug = new SimBug
+            {
+                info = ladybugInfo,
+                motion = new BugMotion(ladybugInfo.move, GetBugSpeed(ladybugInfo), true),
+                isLadybug = true,
+                warning = 0f,
+            };
+            ladybug.motion.PlaceAtRandomEdge();
+            ladybug.motion.Begin();
+            bugs.Add(ladybug);
             field.Board.LadybugCount++;
-            new BugMotion(ladybugInfo.move, 0f, true).PlaceAtRandomEdge();
             return;
         }
 
         BugInfo info = bugInfos[kindIndex];
-        float speed = BugRules.GetSpeed(info.speed, field.Modifiers, mods.GetMul(StatId.BugSpeedMul, -1, stage));
         var bug = new SimBug
         {
             info = info,
-            motion = new BugMotion(info.move, speed, info.stopsToEat),
+            motion = new BugMotion(info.move, GetBugSpeed(info), info.stopsToEat),
             armored = info.revives,
             reaction = config.bugReaction * (0.5f + botRng.Range(0, 1001) * 0.001f),
         };
@@ -134,12 +141,22 @@ public sealed partial class RunSimulator : IBugTargets
         bugs.Add(bug);
     }
 
+    private float GetBugSpeed(BugInfo info)
+        => BugRules.GetSpeed(info.speed, field.Modifiers, mods.GetMul(StatId.BugSpeedMul, -1, stage));
+
     private void StepBugs()
     {
         clickCooldown -= StepSeconds;
         for (int i = 0; i < bugs.Count; i++)
         {
             SimBug bug = bugs[i];
+            if (bug.dead) continue;
+            if (bug.isLadybug)
+            {
+                bug.motion.Step(StepSeconds, true, this);
+                Catch(bug);
+                continue;
+            }
             if (bug.warning > 0f)
             {
                 bug.warning -= StepSeconds;
@@ -158,6 +175,20 @@ public sealed partial class RunSimulator : IBugTargets
             if (!bug.dead) TryClick(bug);
         }
         bugs.RemoveAll(b => b.dead);
+    }
+
+    // Ladybug.OnTriggerEnter: 벌레와 부딪히면 함께 죽는다
+    private void Catch(SimBug ladybug)
+    {
+        foreach (SimBug bug in bugs)
+        {
+            if (bug.isLadybug || bug.dead) continue;
+            float range = ladybug.info.radius + bug.info.radius;
+            if ((bug.motion.Position - ladybug.motion.Position).sqrMagnitude > range * range) continue;
+            KillBug(bug);
+            KillBug(ladybug);
+            return;
+        }
     }
 
     // Bug.OnTriggerEnter와 NepenthesPheromone.OnTriggerEnter: 닿기 시작할 때 한 번
@@ -195,6 +226,13 @@ public sealed partial class RunSimulator : IBugTargets
                 result.PlantsEaten++;
                 events.RaisePlantDiedByBug();
             }
+            else if (outcome.Result == DeathResult.BlockedByLadybug)
+            {
+                // 무당벌레가 곧바로 날아와 벌레와 함께 죽는다
+                KillBug(bug);
+                KillBug(bugs.Find(b => b.isLadybug && !b.dead));
+                return;
+            }
             bug.motion.Eat();
         }
     }
@@ -225,6 +263,7 @@ public sealed partial class RunSimulator : IBugTargets
     {
         if (bug.dead) return;
         bug.dead = true;
+        if (bug.isLadybug) field.Board.LadybugCount--;
         result.BugsKilled++;
         field.AddPestResistance(BugRules.PestResistancePerKill);
         events.RaiseBugKilled();
