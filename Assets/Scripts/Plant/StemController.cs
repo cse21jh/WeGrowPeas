@@ -167,38 +167,20 @@ public class StemController : MonoBehaviour
         SetGold(CheckGold(traits));
     } 
 
+    /// <summary>
+    /// 황금 여부를 다시 판정해 표시용 값에 넣는다. 판정 기준은 <see cref="PlantState.AreTraitsGold"/> 한 곳에 있고,
+    /// 규칙 계산은 PlantState.IsGold를 본다. 여기서는 황금이 됐을 때의 해금과 업적만 더한다.
+    /// </summary>
     public bool CheckGold(List<GeneticTrait> traits)
     {
-        bool result = CheckGoldInternal(traits);
-        SyncGoldToPlantState();
-        return result;
-    }
-
-    // 황금 여부는 웨이브 뒤 저항력 감소 판정에도 쓰이므로, 바뀔 때마다 식물 상태에 그대로 넣어 준다.
-    private Plant ownerPlant;
-    private void SyncGoldToPlantState()
-    {
-        if (ownerPlant == null) ownerPlant = GetComponentInParent<Plant>();
-        if (ownerPlant != null) ownerPlant.State.IsGold = isGold;
-    }
-
-    private bool CheckGoldInternal(List<GeneticTrait> traits)
-    {
-        int n = 0;
-        foreach(var t in traits)
-        {
-            if (t.resistance + t.additionalResistance < 0.7999f) //부동소수점 이슈로 임시로 이렇게 처리하겠습니다 ㅎ
-                return  isGold = false;
-            n++;
-        }
-        if (n == (int)TraitType.None)
+        isGold = PlantState.AreTraitsGold(traits);
+        if (isGold)
         {
             FindAnyObjectByType<FirstGoldManager>().SetFirstGold();
             UnlockGrants.GrantEventUnlocks(UnlockManager.Ids.GoldenPlantCreated);
             AchievementHooks.OnGoldenPlant(GetComponentInParent<Plant>()); // 황금 비료 해금
-            return isGold = true;
         }
-        return isGold = false;
+        return isGold;
     }
 
     public void SetGold(bool isG)
@@ -239,7 +221,6 @@ public class StemController : MonoBehaviour
             goldCrown.SetActive(false);
             isGold = false;
         }
-        SyncGoldToPlantState();
     }
 
     public bool IsGold()

@@ -60,8 +60,13 @@ public sealed class PlantState
     public int FrozenPrice { get; private set; }
     /// <summary>저주(꽃가루 실종): 교배 가능 여부.</summary>
     public bool Breedable { get; set; } = true;
-    /// <summary>황금 식물 여부. 지금은 StemController가 판정해 넣어 준다.</summary>
+    /// <summary>
+    /// 황금 식물 여부. 황금 식물은 웨이브 뒤 저항력 감소를 받지 않는다.
+    /// 형질이 바뀔 때마다 다시 판정하고(<see cref="UpdateGoldFromTraits"/>), 황금 비료 칸에 놓이면 켜진다.
+    /// </summary>
     public bool IsGold { get; set; }
+    /// <summary>돈나무: 버틴 웨이브 수. 저장된다.</summary>
+    public int SurvivedTurns { get; set; }
 
     /// <summary>기본 저항력이 바뀐 직후 발생한다. 인자는 형질 번호.</summary>
     public event Action<int> ResistanceChanged;
@@ -89,6 +94,69 @@ public sealed class PlantState
     {
         Field = field;
         GridIndex = gridIndex;
+    }
+
+    /// <summary>밭에 심길 때. 칸을 정하고 맛을 굴린다. 불러오기에서도 거치며, 그때는 저장된 맛이 뒤에 덮어쓴다.</summary>
+    public void OnPlanted(FieldState field, int gridIndex)
+    {
+        Attach(field, gridIndex);
+        Taste = GameRun.Rng.Field.Range(0, 7);
+        if (IsMovableKind) MarkGoldIfOnGoldSoil();
+    }
+
+    /// <summary>다른 칸으로 옮긴다. 밭의 칸 지도는 호출한 쪽이 맞춘다.</summary>
+    public void MoveTo(int gridIndex)
+    {
+        GridIndex = gridIndex;
+        MarkGoldIfOnGoldSoil();
+    }
+
+    private void MarkGoldIfOnGoldSoil()
+    {
+        if (Field != null && Field.Soil.HasGoldSoil(GridIndex))
+            IsGold = true;
+    }
+
+    // ───── 황금 ─────
+
+    /// <summary>모든 형질(8개)을 갖고 각각의 기본 + 추가 저항력이 80% 이상이면 황금이다.</summary>
+    public static bool AreTraitsGold(List<GeneticTrait> traits)
+    {
+        int n = 0;
+        foreach (var t in traits)
+        {
+            if (t.resistance + t.additionalResistance < 0.7999f) // 부동소수점 오차 때문에 0.8 대신
+                return false;
+            n++;
+        }
+        return n == (int)TraitType.None;
+    }
+
+    /// <summary>형질이 바뀐 뒤 황금 여부를 다시 판정한다. 황금 비료로 켜진 표시도 이때 형질 기준으로 돌아간다.</summary>
+    public bool UpdateGoldFromTraits()
+    {
+        IsGold = AreTraitsGold(Traits);
+        return IsGold;
+    }
+
+    // ───── 뿌리 ─────
+
+    /// <summary>새벽: 심기거나 옮겨질 때 확률로 뿌리를 내려 옮길 수 없게 된다. 뿌리를 내렸으면 true.</summary>
+    public bool TryRootByDawn()
+    {
+        if (!IsMovableKind || IsRooted) return false;
+        float chance = DawnSystem.Current.rootChancePercent;
+        if (chance <= 0f) return false;
+        if (GameRun.Rng.Field.Range(0f, 100f) >= chance) return false;
+
+        IsRooted = true;
+
+        // 특수(임시땅콩C): 뿌리를 내리면 모든 저항력 40%p 증가
+        if (SpecialItemSystem.Has("peanut_special_12"))
+            for (int i = 0; i < Wave.NumberOfWave; i++)
+                ChangeResistance(i, 0.4f);
+
+        return true;
     }
 
     // ───── 저항력 ─────
@@ -180,6 +248,7 @@ public sealed class PlantState
                 value = 0.1f;
 
             Traits[i] = new GeneticTrait((TraitType)traitNum, value, Traits[i].genetics, Traits[i].additionalResistance);
+            if (IsMovableKind) UpdateGoldFromTraits();
             ResistanceChanged?.Invoke(traitNum);
             return true;
         }
@@ -264,6 +333,88 @@ public sealed class PlantState
         // 저주(집중포화): 이번 웨이브에 대한 저항력 추가 감소
         if (CurseState.HeavyFire && CurseState.HeavyFireExtraDecayPercent > 0f && !isGoldPlant && !hasMatchingFertilizer)
             ChangeResistance((int)waveType, -CurseState.HeavyFireExtraDecayPercent / 100f);
+    }
+
+    /// <summary>
+    /// 스프링클러: 웨이브 뒤 범위 안의 판매 가능한 식물 하나를 골라 판매 배수를 한 번 더 준다.
+    /// 고른 식물과 주기 전 가격을 돌려준다. 대상이 없으면 false.
+    /// </summary>
+    public bool SprinklerAfterWave(out PlantState target, out int previousPrice)
+    {
+        target = null;
+        previousPrice = 0;
+        if (Kind != PlantKind.Sprinkler || Field == null) return false;
+
+        var neighbors = new List<PlantState>();
+        int maxIndex = Field.Board.MaxCol * 4;
+        int range = 1 + Field.Modifiers.SprinklerRangeBonus;
+
+        // 위, 아래, 왼쪽, 오른쪽 순서. 순서가 난수로 고르는 대상을 정하므로 바꾸지 않는다.
+        for (int i = 1; i <= range; i++)
+            if (GridIndex % 4 >= i) AddSprinklerTarget(GridIndex - i, neighbors);
+        for (int i = 1; i <= range; i++)
+            if (GridIndex % 4 <= 3 - i) AddSprinklerTarget(GridIndex + i, neighbors);
+        for (int i = 1; i <= range; i++)
+            if (GridIndex - 4 * i >= 0) AddSprinklerTarget(GridIndex - 4 * i, neighbors);
+        for (int i = 1; i <= range; i++)
+            if (GridIndex + 4 * i < maxIndex) AddSprinklerTarget(GridIndex + 4 * i, neighbors);
+
+        if (neighbors.Count == 0) return false;
+
+        PlantState lucky = neighbors[GameRun.Rng.Field.Range(0, neighbors.Count)];
+        if (!lucky.IsMovableKind) return false; // 완두·땅콩만 골드 배수를 받는다
+
+        target = lucky;
+        previousPrice = lucky.GetSellingPrice();
+        // 특수(마법부여자): 밤낮 전환 발동형 아이템 수치 2배
+        lucky.BonusGoldMultiplierCount += SpecialItemSystem.Has("enchanter") ? 2 : 1;
+        return true;
+    }
+
+    private void AddSprinklerTarget(int idx, List<PlantState> list)
+    {
+        // 살아 있고 판매 가능한 식물만 (스프링클러, 돈나무 등 제외)
+        if (Field.Board.States.TryGetValue(idx, out PlantState plant)
+            && plant != null && !plant.IsDying && plant.GetSellingPrice() > 0)
+            list.Add(plant);
+    }
+
+    public const int MoneyTreeRequiredTurns = 5;
+    public const int MoneyTreeRewardGold = 5000;
+
+    /// <summary>돈나무: 상하좌우에 완두나 땅콩이 있는가. 없으면 죽는다.</summary>
+    public bool HasAdjacentBreedablePlant()
+    {
+        if (Field == null) return false;
+
+        int maxIndex = Field.Board.MaxCol * 4;
+        int[] offsets = { -4, 4, -1, 1 };
+        foreach (int offset in offsets)
+        {
+            int adjacent = GridIndex + offset;
+            if (adjacent < 0 || adjacent >= maxIndex) continue;
+
+            if (offset == -4 || offset == 4)
+            {
+                if (GridIndex % 4 != adjacent % 4) continue;
+            }
+            else if (GridIndex / 4 != adjacent / 4) continue; // 세로줄 경계를 넘지 않게
+
+            if (Field.Board.States.TryGetValue(adjacent, out PlantState plant) && plant.IsMovableKind)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 돈나무: 웨이브를 하나 버틴 뒤의 결과. 죽이기와 보상 지급은 호출한 쪽이 한다.
+    /// </summary>
+    public MoneyTreeResult MoneyTreeAfterWave()
+    {
+        SurvivedTurns++;
+        if (!HasAdjacentBreedablePlant()) return MoneyTreeResult.DiesAlone;
+        if (SurvivedTurns >= MoneyTreeRequiredTurns) return MoneyTreeResult.Matured;
+        return MoneyTreeResult.Growing;
     }
 
     // ───── 판매가 ─────
@@ -367,4 +518,14 @@ public sealed class PlantState
         if (Field != null && Field.Soil.HasGoldSoil(GridIndex)) return false;
         return true;
     }
+}
+
+public enum MoneyTreeResult
+{
+    /// <summary>아직 자라는 중.</summary>
+    Growing,
+    /// <summary>주변에 완두나 땅콩이 없어 죽는다.</summary>
+    DiesAlone,
+    /// <summary>다 자라 보상을 주고 사라진다.</summary>
+    Matured,
 }

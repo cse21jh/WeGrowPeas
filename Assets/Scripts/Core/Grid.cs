@@ -118,6 +118,7 @@ public class Grid : MonoBehaviour
         enemyController = FindAnyObjectByType<EnemyController>();
         InitSoils();
         Board.Clear();
+        Field.IsTutorial = GameManager.Instance != null && GameManager.Instance.Tutorial != null;
         Breeder.Initialize();
         initialized = true;
     }
@@ -150,30 +151,16 @@ public class Grid : MonoBehaviour
 
     public void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
     {
-        if (grididx != -1)
+        // 심는 순서는 FieldState.AddPlant(씬 없는 쪽)와 같다. 순서를 바꿀 때는 양쪽을 함께 바꾼다.
+        int idx = Field.FindCellFor(grididx);
+        if (idx < 0)
         {
-            if (!Board.Plants.ContainsKey(grididx))
-            {
-                plant.Init(grididx, this);
-                PlantPlant(plant);
-
-                return;
-            }
+            Destroy(plant.gameObject); // 빈 칸이 없다
+            return;
         }
 
-        for (int idx = 0; idx < Board.MaxCol * 4; idx++)
-        {
-            if (!Board.Plants.ContainsKey(idx))
-            {
-                plant.Init(idx, this);
-                //Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
-                PlantPlant(plant);
-
-                return;
-            }
-        }
-        Destroy(plant.gameObject);
-        return;
+        plant.Init(idx, this);
+        PlantPlant(plant);
     }
     private void PlantPlant(Plant plant)
     {

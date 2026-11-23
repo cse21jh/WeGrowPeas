@@ -130,10 +130,9 @@ public abstract class Plant : MonoBehaviour
     public virtual void Init(int gridIndex, Grid grid)
     {
         this.grid = grid;
-        State.Attach(grid.Field, gridIndex);
+        State.OnPlanted(grid.Field, gridIndex); // 칸을 정하고 맛을 굴린다
         State.ResistanceChanged -= OnResistanceChanged;
         State.ResistanceChanged += OnResistanceChanged;
-        taste = GameRun.Rng.Field.Range(0, 7);
 
         // 밭에 등장했으면 도감에 발견 처리. 하위 클래스가 speciesname을 정한 뒤 base.Init을 부르므로
         // 여기가 모든 식물이 거치는 유일한 지점이다. (이미 발견된 종이면 아무 일도 하지 않는다)
@@ -162,6 +161,8 @@ public abstract class Plant : MonoBehaviour
 
         EnsurePairedTraitExists(TraitType.HeavyRain, TraitType.Drought);
         EnsurePairedTraitExists(TraitType.Cold, TraitType.Heat);
+
+        if (State.IsMovableKind) State.UpdateGoldFromTraits();
     }
 
     public virtual List<Vector2> GetPairData_TraitFace()
@@ -229,7 +230,7 @@ public abstract class Plant : MonoBehaviour
 
     public void SetGridIndex(int idx)
     {
-        gridIndex = idx;
+        State.MoveTo(idx);
         if (isOnGoldenSoil())
         {
             stemController.SetGold(true);
@@ -248,29 +249,27 @@ public abstract class Plant : MonoBehaviour
     /// <summary>(int)waveType 또는 (int)traitType에 대한 최종 저항력.</summary>
     public float GetResistanceValue(int traitNum) => State.GetResistanceValue(traitNum);
 
+    /// <summary>
+    /// 식물을 죽인다. 죽을지 말지는 <see cref="FieldState.TryKill"/>이 정하고, 여기서는 그 결과를 화면에 반영한다.
+    /// 막혔으면 false.
+    /// </summary>
     public virtual bool Die(DeathCause cause = DeathCause.Generic, Bug killer = null)
     {
-        if (GameManager.Instance?.Tutorial != null && grid != null && grid.Board.CountLivingPlants() <= 1)
-            return false;
+        // 벌레가 죽이려는데 밭에 무당벌레가 있으면 무당벌레가 대신 벌레를 잡는다
+        bool ladybugCanIntercept = cause == DeathCause.Bug && killer != null && grid.Board.Ladybugs.Count != 0;
 
-        // 페트병이 막으면 true 리턴 → 사망 취소
-        if (grid != null && grid.Soil.TryInterceptDeath(gridIndex, cause, killer))
-            return false;
-
-        if (isFrozen && cause == DeathCause.Generic) return false; // 얼어있으면 웨이브(Generic)로 인한 죽음 면역
-
-        int alive = grid.Board.CountLivingPlants();
-
-        // 냉각 방패: 식물이 1개 이하가 될 경우 1회에 한해 보호
-        if (alive <= 1 && grid != null && grid.Soil.HasCoolingShield && !grid.Soil.IsCoolingShieldActivated())
+        DeathOutcome outcome = grid.Field.TryKill(State, cause, ladybugCanIntercept);
+        if (!outcome.Died)
         {
-            grid.Soil.SetCoolingShieldActivated();
-            return false; // 살아있는 식물이 1개 이하이고 냉각 방패가 있으면 죽지 않음
+            if (outcome.PetBottleRemoved)
+                grid.Soil.RemovePetBottleMarker(gridIndex);
+            if (outcome.Result == DeathResult.BlockedByLadybug)
+                grid.StartCoroutine(grid.Board.Ladybugs[0].KillFuckingBug(killer));
+            return false;
         }
-        isDying = true;
+
         StartCoroutine(Vanish());
-        //UIPlantStat.Instance.HideInfo();
-        grid.ClearGridIndex(gridIndex);
+        grid.ClearGridIndex(gridIndex); // 밭에서는 이미 빠졌다. 여기서는 게임 오버 판정만 일어난다.
         grid.Breeder.CheckBreedButtonBeforeDie(this.gameObject);
         if (cause == DeathCause.Shovel || cause == DeathCause.Bug) // 웨이브로 인해 단체로 죽을 때는 최종 한 번만 갱신하도록
             grid.Scouter.UpdateGoldScouterImageInGrid();
@@ -279,7 +278,7 @@ public abstract class Plant : MonoBehaviour
         if (FenceUIManager.Instance.CheckFenceIsShowingMe(this.gridIndex))
             FenceUIManager.Instance.HideFenceElements();
         if (GameManager.Instance != null)
-            GameManager.Instance.economyManager.AddGold((int)(GetSellingPrice() * grid.Modifiers.BonusRatioWhenDie));
+            GameManager.Instance.economyManager.AddGold(outcome.BonusGold);
         Destroy(this.gameObject, dissolveDuration);
         return true;
     }
@@ -385,6 +384,7 @@ public abstract class Plant : MonoBehaviour
                     resistance = GetResistanceBasedOnGenetics(traitType, traits[i].genetics);
 
                 traits[i] = new GeneticTrait(traitType, resistance, traits[i].genetics, traits[i].additionalResistance + value);
+                if (State.IsMovableKind) State.UpdateGoldFromTraits();
 
                 if (stemController != null)
                 {

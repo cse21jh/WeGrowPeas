@@ -316,50 +316,14 @@ public class SoilEffects
             Debug.LogError($"[Grid] PlacePetBottle exception: idx={idx}, error={e.Message}\n{e.StackTrace}");
         }
     }
-    public bool TryInterceptDeath(int idx, DeathCause cause, Bug killer = null)
+    /// <summary>보호 횟수를 다 쓴 페트병의 마커를 치운다. 판정은 <see cref="SoilState.TryBlockDeathWithPetBottle"/>가 한다.</summary>
+    public void RemovePetBottleMarker(int idx)
     {
-        if (petBottleTiles.Contains(idx) && (cause == DeathCause.Generic || cause == DeathCause.Shovel)) // 웨이브나 삽에 의해 제거될 때, 페트병이 있는 경우
+        if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
         {
-            // 보호 횟수 확인
-            if (petBottleBlockCount.ContainsKey(idx) && petBottleBlockCount[idx] > 0)
-            {
-                petBottleBlockCount[idx]--;
-                if (petBottleBlockCount[idx] <= 0)
-                {
-                    // 보호 횟수 소진 → 페트병 제거
-                    petBottleTiles.Remove(idx);
-                    petBottleBlockCount.Remove(idx);
-
-                    if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
-                    {
-                        Object.Destroy(marker);
-                        petMarkers.Remove(idx);
-                    }
-                }
-                return true; // 보호 성공
-            }
-            else
-            {
-                // 보호 횟수가 없으면 기존 로직대로 제거
-                petBottleTiles.Remove(idx);
-                petBottleBlockCount.Remove(idx);
-
-                if (petMarkers.TryGetValue(idx, out var marker) && marker != null)
-                {
-                    Object.Destroy(marker);
-                    petMarkers.Remove(idx);
-                }
-                return true;
-            }
+            Object.Destroy(marker);
+            petMarkers.Remove(idx);
         }
-
-        if (cause == DeathCause.Bug && killer != null && board.Ladybugs.Count != 0) // 벌레로 인한 죽음인데, 필드에 익충이 있는 경우
-        {
-            grid.StartCoroutine(board.Ladybugs[0].KillFuckingBug(killer));
-            return true;
-        }
-
-        return false; // 죽음 방어 실패
     }
     public Dictionary<int, WaveType> GetFertilizerColumns()
     {

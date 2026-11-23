@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class MoneyTree : Plant
 {
-    private int survivedTurns = 0;
-    private const int REQUIRED_TURNS = 5;
-    private const int REWARD_GOLD = 5000;
+    private const int REWARD_GOLD = PlantState.MoneyTreeRewardGold;
 
     public override PlantKind Kind => PlantKind.MoneyTree;
 
@@ -65,19 +63,16 @@ public class MoneyTree : Plant
 
     public override void ResistWave(WaveType waveType)
     {
-        // 웨이브를 버틸 때마다 턴 증가
-        survivedTurns++;
+        // 턴을 올리고, 주변에 완두·땅콩이 없으면 죽고, 5턴을 채우면 보상을 주고 사라진다. 판정은 State가 한다.
+        MoneyTreeResult outcome = State.MoneyTreeAfterWave();
 
-        // 인접 식물이 있는지 확인
-        if (!CheckAdjacentPlants())
+        if (outcome == MoneyTreeResult.DiesAlone)
         {
-            // 인접 식물이 없으면 즉시 사망
             Die(DeathCause.Other);
             return;
         }
 
-        // 5턴 생존 시 보상 지급 후 소멸
-        if (survivedTurns >= REQUIRED_TURNS)
+        if (outcome == MoneyTreeResult.Matured)
         {
             // 골드 지급
             if (GameManager.Instance != null && GameManager.Instance.economyManager != null)
@@ -103,61 +98,9 @@ public class MoneyTree : Plant
     /// <summary>
     /// 인접 4칸(상하좌우)에 완두콩류 식물(Pea 또는 Peanut)이 있는지 확인
     /// </summary>
-    private bool CheckAdjacentPlants()
-    {
-        if (grid == null)
-            return false;
+    private bool CheckAdjacentPlants() => State.HasAdjacentBreedablePlant();
 
-        int maxIndex = grid.Board.MaxCol * 4;
-        // offset: -4(왼쪽), +4(오른쪽), -1(위), +1(아래)
-        int[] adjacentOffsets = { -4, 4, -1, 1 };
+    public int GetSurvivedTurns() => State.SurvivedTurns;
 
-        foreach (int offset in adjacentOffsets)
-        {
-            int adjacentIndex = gridIndex + offset;
-
-            // 범위 체크
-            if (adjacentIndex < 0 || adjacentIndex >= maxIndex)
-                continue;
-
-            // 좌우(±4): 같은 행인지 체크
-            if (offset == -4 || offset == 4)
-            {
-                int currentRow = gridIndex % 4;
-                int adjacentRow = adjacentIndex % 4;
-                if (currentRow != adjacentRow)
-                    continue;
-            }
-            // 상하(±1): 같은 열인지 체크 (열 경계에서 wrap-around 방지)
-            else if (offset == -1 || offset == 1)
-            {
-                int currentCol = gridIndex / 4;
-                int adjacentCol = adjacentIndex / 4;
-                if (currentCol != adjacentCol)
-                    continue;
-            }
-
-            // 인접 칸에 식물이 있는지 확인
-            if (grid.Board.Plants.TryGetValue(adjacentIndex, out Plant adjacentPlant))
-            {
-                // 완두콩류 식물인지 확인
-                if (adjacentPlant is Pea || adjacentPlant is Peanut)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public int GetSurvivedTurns()
-    {
-        return survivedTurns;
-    }
-
-    public void SetSurvivedTurns(int turns)
-    {
-        survivedTurns = turns;
-    }
+    public void SetSurvivedTurns(int turns) => State.SurvivedTurns = turns;
 }

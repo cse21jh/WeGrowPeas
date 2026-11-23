@@ -44,6 +44,44 @@ public sealed class SoilState
     public bool IsPlantFrozen(int gridIndex)
         => board.States.TryGetValue(gridIndex, out PlantState plant) && plant.IsFrozen;
 
+    /// <summary>
+    /// 페트병이 죽음을 막는지 판정하고 보호 횟수를 쓴다. 웨이브와 삽으로 인한 죽음만 막는다.
+    /// 횟수를 다 써서 페트병이 사라졌으면 removed가 true다.
+    /// </summary>
+    public bool TryBlockDeathWithPetBottle(int idx, DeathCause cause, out bool removed)
+    {
+        removed = false;
+        if (!PetBottleTiles.Contains(idx) || (cause != DeathCause.Generic && cause != DeathCause.Shovel))
+            return false;
+
+        if (PetBottleBlockCount.ContainsKey(idx) && PetBottleBlockCount[idx] > 0)
+        {
+            PetBottleBlockCount[idx]--;
+            if (PetBottleBlockCount[idx] <= 0)
+            {
+                PetBottleTiles.Remove(idx);
+                PetBottleBlockCount.Remove(idx);
+                removed = true;
+            }
+            return true;
+        }
+
+        // 보호 횟수 기록이 없으면 한 번 막고 사라진다
+        PetBottleTiles.Remove(idx);
+        PetBottleBlockCount.Remove(idx);
+        removed = true;
+        return true;
+    }
+
+    /// <summary>냉각 방패를 쓸 수 있으면 써 버리고 true.</summary>
+    public bool TryUseCoolingShield()
+    {
+        if (!HasCoolingShield || IsCoolingShieldActivated) return false;
+        IsCoolingShieldActivated = true;
+        HasCoolingShield = false; // 사용 후 소멸
+        return true;
+    }
+
     /// <summary>특수(알록달록): 해당 칸에 적용 중인 땅과 식물 효과 개수 (정보 UI 기준과 같다).</summary>
     public int CountTileEffects(int idx)
     {

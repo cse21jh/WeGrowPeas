@@ -169,18 +169,9 @@ public abstract class MovablePlant : Plant
     // 새벽: 등장/이동 시 확률로 뿌리를 내려 이동 불가가 됨
     private void TryRootByDawn()
     {
-        if (!isReallyMovable) return; // 이미 뿌리내림
-        float chance = DawnSystem.Current.rootChancePercent;
-        if (chance <= 0f) return;
-        if (GameRun.Rng.Field.Range(0f, 100f) < chance)
-        {
-            SetMovable(false, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
-
-            // 특수(임시땅콩C): 뿌리를 내리면 모든 저항력 40%p 증가
-            if (SpecialItemSystem.Has("peanut_special_12"))
-                for (int i = 0; i < Wave.NumberOfWave; i++)
-                    ChangeResistance(i, 0.4f);
-        }
+        int previousSellingPrice = GetSellingPrice();
+        if (State.TryRootByDawn())
+            RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.Rooted); // TODO: 뿌리 시각효과
     }
 
     /// <summary>새 식물이 실제 흙 위치에 놓인 뒤 등장 시 뿌리 판정을 수행한다.</summary>
