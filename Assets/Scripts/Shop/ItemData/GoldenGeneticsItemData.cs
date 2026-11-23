@@ -6,7 +6,6 @@ public class GoldenGeneticsItemData : ItemData
     [Header("Effect")]
     [SerializeField] private float probabilityBonus = 0.1f; // 10% 증가 (0.1 = 10%)
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 3000;
@@ -34,7 +33,7 @@ public class GoldenGeneticsItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Modifiers.AddGoldenGeneticsProbabilityBonus(probabilityBonus);
+        ctx.Modifiers.AddGoldenGeneticsProbabilityBonus(probabilityBonus);
     }
 
     public override void InitializePrice(ShopContext ctx)

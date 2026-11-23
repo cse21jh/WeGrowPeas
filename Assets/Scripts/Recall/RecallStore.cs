@@ -211,7 +211,7 @@ public static class RecallStore
             day = GameRecordHolder.maxStageReached,
             clearDay = GameManager.Instance != null ? GameManager.Instance.EndStage : 0,
             plantName = GameManager.Instance != null ? GameManager.Instance.currentPlant : string.Empty,
-            dawnStage = DawnSystem.SelectedDawnStage
+            dawnStage = GameRun.Current.DawnStage
         };
 
         run.summary = GameRecordHolder.Current;

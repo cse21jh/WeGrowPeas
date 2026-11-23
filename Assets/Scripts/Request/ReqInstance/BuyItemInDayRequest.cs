@@ -15,17 +15,19 @@ public class BuyItemInDayRequest : RequestInstance
     {
         base.Start();
         currentCount = 0;
-        if (RequestManager.Instance != null)
-            startDayPassed = RequestManager.Instance.DayPassed;
+        startDayPassed = Board.DayPassed;
 
-        GameEvents.OnShopBought += HandleShopBought;
+        Events.ShopBought += HandleShopBought;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnShopBought -= HandleShopBought;
+        Events.ShopBought -= HandleShopBought;
     }
+
+    // 하루가 지나면 처음부터 다시 센다
+    public override int Remaining => IsCompleted ? 0 : Board.DayPassed != startDayPassed ? requiredCount : requiredCount - currentCount;
 
     public override string GetProgressText()
     {
@@ -36,10 +38,10 @@ public class BuyItemInDayRequest : RequestInstance
     {
         if (IsCompleted || IsFailed) return;
 
-        if (RequestManager.Instance != null && RequestManager.Instance.DayPassed != startDayPassed)
+        if (Board.DayPassed != startDayPassed)
         {
             currentCount = 0;
-            startDayPassed = RequestManager.Instance.DayPassed;
+            startDayPassed = Board.DayPassed;
         }
 
         currentCount++;
@@ -78,8 +80,7 @@ public class BuyItemInDayRequest : RequestInstance
         currentCount = data.progressCount;
         State = (RequestState)data.state;
 
-        if (RequestManager.Instance != null)
-            startDayPassed = RequestManager.Instance.DayPassed;
+        startDayPassed = Board.DayPassed;
 
         RaiseChanged();
     }

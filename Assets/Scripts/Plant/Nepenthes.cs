@@ -7,6 +7,8 @@ public class Nepenthes : Plant
 {
     [SerializeField] private GameObject NepenthesPheromone;
     [SerializeField] private float pheromoneSize = 4f;
+    public override PlantKind Kind => PlantKind.Nepenthes;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Nepenthes;
@@ -15,28 +17,11 @@ public class Nepenthes : Plant
         UpdatePheromone();
         UpdatePheromoneSize();
     }
-    public override float GetResistanceValue(int order)
-    {
-        return 1f;
-    }
-
-
     public override void ResistWave(WaveType waveType)
     {
         int previousSellingPrice = GetSellingPrice();
-
-        // 특수(채식주의자): 웨이브를 버틸 때마다 가치 증가
-        if (SpecialItemSystem.Has("vegetarian")) resistWaveCount++;
-
+        State.ResistWave(waveType); // 특수(채식주의자)일 때만 가치가 오른다
         RefreshSellingPriceAndNotify(previousSellingPrice, PlantValueChangeReason.WaveSurvived);
-        return;
-    }
-    public override int GetSellingPrice()
-    {
-        // 특수(채식주의자): 판매가 500 통일 + 다른 식물과 동일한 가격 상승 공식 적용
-        if (SpecialItemSystem.Has("vegetarian") && grid != null)
-            return CalculateSellingPrice(500, grid.Modifiers.GetAdditionalPlantGoldMultiplier());
-        return 0;
     }
 
     public void UpdatePheromone()

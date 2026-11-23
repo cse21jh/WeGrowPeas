@@ -8,7 +8,6 @@ public class FertilizerItemData : ItemData
     [Min(1)] public int unlockStageDay = 1; // 웨이브별 해금 시기
     [Min(0)] public int rotationWeight = 8;
 
-    private int? selectedIdx;
     private WaveType? pendingWave = null;
 
     private void OnEnable()
@@ -22,7 +21,7 @@ public class FertilizerItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return stage >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -34,11 +33,11 @@ public class FertilizerItemData : ItemData
     }
 
     // 웨이브는 상세 패널의 드롭다운으로 고른다.
-    public override string[] GetSelectableOptions()
-        => WaveSchedule.GetSelectableWaveNames(GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override string[] GetSelectableOptions(ShopContext ctx)
+        => WaveSchedule.GetSelectableWaveNames(ctx.Stage, ctx.World.IsNight);
 
-    public override void SetSelectedOption(int index)
-        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, GameManager.Instance != null ? GameManager.Instance.stage : 0);
+    public override void SetSelectedOption(ShopContext ctx, int index)
+        => pendingWave = WaveSchedule.GetSelectableWaveAt(index, ctx.Stage, ctx.World.IsNight);
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     {
@@ -52,57 +51,28 @@ public class FertilizerItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (!selectedIdx.HasValue)
-        {
-            Debug.LogError("[Fertilizer] Selected index is null.");
-            return;
-        }
-        if (!pendingWave.HasValue)
-        {
-            Debug.LogError("[Fertilizer] Selected wave is null.");
-            return;
-        }
-        var g = ctx.Grid;
-        if (!g)
-        {
-            Debug.LogError("[Fertilizer] Grid not found.");
-            return;
-        }
-        if (!g.Soil.TryPlaceFertilizer(selectedIdx.Value, pendingWave.Value))
+        if (!pendingWave.HasValue || !TakeSelectedCell(ctx, out int cell)) return;
+
+        if (!ctx.World.PlaceFertilizer(cell, pendingWave.Value))
         {
             ctx.ShowError?.Invoke(Loc.T("shop.error.fertilizer_exists"));
             return;
         }
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.placed", ("name", LocalizedName)));
-        selectedIdx = null;
         pendingWave = null;
     }
 
     public override void Cancel(ShopContext ctx)
     {
-        selectedIdx = null;
+        base.Cancel(ctx);
         pendingWave = null;
     }
 
     // === PlaceOnTile 타입 ===
-    public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        reason = null;
-        var g = ctx.Grid;
-        if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
-
-        int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
-
-        if (g.Soil.HasFertilizerAt(idx.Value)) { reason = Loc.T("shop.error.fertilizer_exists"); return false; }
-
-        return true;
-    }
-
-    public override void SetPlacedPosition(Vector3 worldPos)
-    {
-        var g = FindAnyObjectByType<Grid>();
-        int? idx = g ? g.GetGridIndexFromPosition(worldPos) : null;
-        selectedIdx = idx;
+        bool exists = ctx.Soil.HasFertilizerAt(cell);
+        reason = exists ? Loc.T("shop.error.fertilizer_exists") : null;
+        return !exists;
     }
 }

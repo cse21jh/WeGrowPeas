@@ -5,6 +5,8 @@ public class Sprinkler : Plant
 {
     private Animator anim;
     public ParticleSystem waterParticle;
+    public override PlantKind Kind => PlantKind.Sprinkler;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Sprinkler;
@@ -25,80 +27,16 @@ public class Sprinkler : Plant
     {
         if (grid == null) return;
 
-        // 인접 4칸 식물 찾기 (상하좌우 + 범위 업그레이드 반영)
-        List<Plant> neighbors = new List<Plant>();
-        int maxIndex = grid.Board.MaxCol * 4;
-        int range = 1 + grid.Modifiers.SprinklerRangeBonus;
-
         anim.Play(AnimParams.SprinklerState);
         waterParticle.Play();
 
-        // 1. 상 (Up)
-        for (int i = 1; i <= range; i++)
+        // 어느 식물이 받는지는 State가 고른다. 여기서는 받은 식물의 가격표와 물 이펙트만 처리한다.
+        if (State.SprinklerAfterWave(out PlantState target, out int previousPrice)
+            && grid.Board.Plants.TryGetValue(target.GridIndex, out Plant plant) && plant is MovablePlant p)
         {
-            if (gridIndex % 4 >= i) CheckAndAddNeighbor(gridIndex - i, neighbors);
+            p.RefreshSellingPriceAndNotifyExternal(previousPrice, PlantValueChangeReason.SprinklerBonus);
+            p.PlayWaterParticle();
+            p.ShowPriceSign();
         }
-        // 2. 하 (Down)
-        for (int i = 1; i <= range; i++)
-        {
-            if (gridIndex % 4 <= 3 - i) CheckAndAddNeighbor(gridIndex + i, neighbors);
-        }
-        // 3. 좌 (Left)
-        for (int i = 1; i <= range; i++)
-        {
-            int target = gridIndex - (4 * i);
-            if (target >= 0) CheckAndAddNeighbor(target, neighbors);
-        }
-        // 4. 우 (Right)
-        for (int i = 1; i <= range; i++)
-        {
-            int target = gridIndex + (4 * i);
-            if (target < maxIndex) CheckAndAddNeighbor(target, neighbors);
-        }
-
-        if (neighbors.Count > 0)
-        {
-            // 무작위 1개 식물 선택
-            Plant luckyPlant = neighbors[Random.Range(0, neighbors.Count)];
-
-            // 판매 골드 배수 2회 획득 효과
-            // = 이미 로직상 1회 올랐을 것이므로, 여기서 1회 더 올려줌
-            // 단, 저항 횟수(ResistWaveCount) 자체는 올리지 않고 보너스 배수만 추가
-            if (luckyPlant is MovablePlant p) // 일반 판매 식물인 경우에만 골드 추가
-            {
-                // 특수(마법부여자): 밤낮 전환 발동형 아이템 수치 2배
-                p.AddBonusGoldMultiplier(
-                    SpecialItemSystem.Has("enchanter") ? 2 : 1,
-                    PlantValueChangeReason.SprinklerBonus);
-                // UI 갱신 (가격표)
-                p.PlayWaterParticle();
-                p.ShowPriceSign();
-            }
-        }
-    }
-
-    private void CheckAndAddNeighbor(int adjIndex, List<Plant> neighbors)
-    {
-        if (grid.Board.Plants.TryGetValue(adjIndex, out Plant plant))
-        {
-            // 살아있고 판매 가능한 식물만 대상 (스프링클러, 돈나무 등 제외)
-            if (plant != null && !plant.isDying && plant.GetSellingPrice() > 0)
-            {
-                neighbors.Add(plant);
-            }
-        }
-    }
-
-    public override float GetResistanceValue(int order)
-    {
-        // 무적
-        return 1f;
-    }
-
-    public override int GetSellingPrice()
-    {
-        // 판매 불가 (MoneyTree와 동일하게 처리)
-        // 1000골드짜리지만 판매 시 0골드 (전략적 배치 필요)
-        return 0;
     }
 }

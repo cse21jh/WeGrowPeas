@@ -22,7 +22,7 @@ public class TimeMachineItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -33,10 +33,5 @@ public class TimeMachineItemData : ItemData
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
     { onReady?.Invoke(); }
 
-    public override void Commit(ShopContext ctx)
-    {
-        GameManager.Instance.enemyController.AddWaveSkipCount(skipCount);
-    }
-
-    public override void Cancel(ShopContext ctx) { }
+    public override void Commit(ShopContext ctx) => ctx.World.AddWaveSkips(skipCount);
 }

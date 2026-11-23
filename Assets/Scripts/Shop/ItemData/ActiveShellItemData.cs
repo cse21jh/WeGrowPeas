@@ -7,7 +7,6 @@ public class ActiveShellItemData : ItemData
     [Tooltip("구매 1회당 증가하는 자가번식 확률 (0.05 = 5%p)")]
     [SerializeField] private float probabilityPerPurchase = 0.05f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -20,7 +19,7 @@ public class ActiveShellItemData : ItemData
     }
 
     // 땅콩 전용 아이템 (새벽 2단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Peanut);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Peanut);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Common;
 
@@ -39,6 +38,6 @@ public class ActiveShellItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.Modifiers.AddActiveShellProbability(probabilityPerPurchase);
+        ctx.Modifiers.AddActiveShellProbability(probabilityPerPurchase);
     }
 }

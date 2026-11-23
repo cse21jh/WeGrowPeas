@@ -24,7 +24,7 @@ public class LadybugLureDeviceItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (새벽 1단계 클리어 조건은 metaRequiredDawnStage)
         return stage >= BugSchedule.AppearStage;
     }
@@ -47,6 +47,6 @@ public class LadybugLureDeviceItemData : ItemData
             return;
 
         // 무당벌레 등장 확률 3% 증가 (중첩 시 합적용)
-        ctx.Grid.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
+        ctx.Modifiers.AddLadybugSpawnProbability(spawnProbabilityIncrease);
     }
 }

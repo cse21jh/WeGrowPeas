@@ -24,7 +24,7 @@ public class NepenthesDigestionUpgradeItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         // 벌레가 실제로 나오기 시작하는 시점부터 해금 (BugSchedule.DefaultAppearStage 상수 사용)
         return stage >= BugSchedule.AppearStage;
     }
@@ -47,8 +47,8 @@ public class NepenthesDigestionUpgradeItemData : ItemData
             return;
 
         // 네펜데스가 벌레 먹을 시 추가 골드 80 증가 (중첩 시 합적용)
-        ctx.Grid.Modifiers.AddAdditionalNepenthesGold(goldBonus);
+        ctx.Modifiers.AddAdditionalNepenthesGold(goldBonus);
         // 네펜데스 등장 확률 1% 증가
-        ctx.Grid.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
+        ctx.Modifiers.AddNepenthesSpawnProbability(spawnProbabilityIncrease);
     }
 }

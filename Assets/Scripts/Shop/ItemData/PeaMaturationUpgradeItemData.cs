@@ -18,7 +18,7 @@ public class PeaMaturationUpgradeItemData : ItemData
     }
 
     // 완두콩 전용 (새벽 2단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Pea);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Pea);
 
     public override int GetRotationWeight(ShopContext ctx) => 8;
 
@@ -38,6 +38,6 @@ public class PeaMaturationUpgradeItemData : ItemData
             return;
 
         // 완두콩 웨이브 저항 횟수당 골드 배수 0.1 증가
-        ctx.Grid.Upgrades.AddAdditionalPlantGoldMultiplier(multiplierBonus);
+        ctx.World.AddAdditionalPlantGoldMultiplier(multiplierBonus);
     }
 }

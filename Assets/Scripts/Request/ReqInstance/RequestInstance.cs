@@ -20,6 +20,10 @@ public abstract class RequestInstance
     public bool CanAcceptReward => State == RequestState.Complete;
     public bool IsFailed => State == RequestState.Fail;
 
+    /// <summary>이 의뢰가 걸린 게시판. 게시판이 넣어 준다.</summary>
+    public RequestBoard Board { get; set; }
+    protected RunEvents Events => Board.World.Events;
+
     public event Action<RequestInstance> OnChanged;
 
     protected RequestInstance(RequestScriptable data)
@@ -36,6 +40,23 @@ public abstract class RequestInstance
     public virtual void Stop() { }
 
     public abstract string GetProgressText();
+
+    /// <summary>완료까지 남은 양.</summary>
+    public virtual int Remaining => IsCompleted ? 0 : 1;
+
+    /// <summary>이 식물을 팔면 진행되는가. 시간대 조건은 보지 않는다.</summary>
+    public virtual bool AcceptsSale(PlantState plant) => false;
+
+    public int GoldReward
+    {
+        get
+        {
+            int gold = 0;
+            foreach (var r in Data.rewards)
+                if (r.type == RewardType.Gold) gold += r.amount;
+            return gold;
+        }
+    }
 
     public virtual string GetTitleText()
     {
@@ -71,18 +92,21 @@ public abstract class RequestInstance
     {
         if (IsCompleted) return;
         State = RequestState.Complete;
-        //완료 알람을 보내야 함(상단바)
-        PhoneNotificationBus.OnShow?.Invoke(
-                    new PhoneNotificationData
-                    {
-                        title = Loc.T("game.quest.complete_title"),
-                        message = Loc.T("game.quest.complete_message"),
-                        duration = 3f
-                    }
-                );
-        //완료 알람(앱 아이콘)
-        PhoneManager.Instance?.UpdateAppAlarmState(AppKey.Quest, AlarmState.NonMandatory);
+        Board.NotifyCompleted(this);
         RaiseChanged();
+    }
+
+    /// <summary>보상을 받은 것으로 바꾸고 받을 골드를 돌려준다. 받을 수 없으면 false.</summary>
+    public bool TryGrant(out int gold)
+    {
+        gold = 0;
+        if (!CanAcceptReward) return false;
+        gold = GoldReward;
+
+        State = RequestState.Granted;
+        Board.CompletedCount++;
+        RaiseChanged();
+        return true;
     }
 
     protected void RaiseChanged() => OnChanged?.Invoke(this);
@@ -103,27 +127,17 @@ public abstract class RequestInstance
     public virtual void GrantRewardOnce()
     {
         if (GameManager.Instance?.Tutorial?.CanUseQuests == false) return;
+
         if (!IsCompleted)
         {
             SoundManager.Instance?.PlayEffect(SoundIds.WrongSelect);
             return;
         }
-        if (rewardGranted) return;
+        if (!TryGrant(out int gold)) return;
 
         // 아래 매니저들은 씬 구성에 따라 없을 수 있다(농장 씬만 열고 테스트하는 경우 등).
         // 하나가 없다고 보상 지급 자체가 중간에 끊기면 안 되므로 전부 널 검사한다.
-        foreach (var r in Data.rewards)
-        {
-            switch (r.type)
-            {
-                case RewardType.Gold:
-                    GameManager.Instance?.economyManager?.AddGold(r.amount);
-                    break;
-                case RewardType.Gene:
-                    //추가
-                    break;
-            }
-        }
+        if (gold > 0) GameManager.Instance?.economyManager?.AddGold(gold);
 
         if (GameManager.Instance?.Tutorial == null)
         {
@@ -141,20 +155,12 @@ public abstract class RequestInstance
             AbilityManager.Instance?.AddCustomizeSeed(AbilityManager.CustomizeTokensPerQuest);
         }
 
-        State = RequestState.Granted;
-
-        RaiseChanged();
-
         // 아직 받지 않은 보상이 남아 있으면 알람을 끄지 않는다.
-        // (예전에는 하나만 받아도 꺼져서, 남은 보상이 있는데도 알림이 사라졌다)
         PhoneManager.Instance?.UpdateAppAlarmState(
             AppKey.Quest,
             HasOtherClaimableReward() ? AlarmState.NonMandatory : AlarmState.None);
 
         SoundManager.Instance?.PlayEffect(SoundIds.QuestSuccess);
-
-        RequestManager.Instance?.AddCompleteRequestCount();
-
         Debug.Log("보상 획득 완료");
     }
 

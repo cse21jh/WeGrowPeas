@@ -15,14 +15,16 @@ public class MovePlantRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnPlantMoved += HandlePlantMoved;
+        Events.PlantMoved += HandlePlantMoved;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPlantMoved -= HandlePlantMoved;
+        Events.PlantMoved -= HandlePlantMoved;
     }
+
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
 
     public override string GetProgressText()
     {

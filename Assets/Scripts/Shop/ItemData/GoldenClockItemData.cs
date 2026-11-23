@@ -38,17 +38,7 @@ public class GoldenClockItemData : ItemData
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
         => onReady?.Invoke();
 
-    public override void Commit(ShopContext ctx)
-    {
-        if (GameManager.Instance?.grid == null)
-        {
-            Debug.LogWarning("GoldenClock: GameManager.Instance.grid가 없습니다.");
-            return;
-        }
-
-        GameManager.Instance.grid.Breeder.AddMaxBreedTimer(10);
-        Debug.Log("황금 시계 구매: 교배 시간이 10초 증가했습니다.");
-    }
+    public override void Commit(ShopContext ctx) => ctx.World.AddBreedSeconds(10);
 
     public override void InitializePrice(ShopContext ctx)
     {

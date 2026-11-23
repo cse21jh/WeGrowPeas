@@ -9,8 +9,6 @@ public class GeneExtractorItemData : ItemData
     [Min(1)] public int unlockStageDay = 1;
     [Min(0)] public int rotationWeight = 8;
 
-    private Plant selected;
-
     private void OnValidate()
     {
         FlowType = ShopFlowType.SelectExistingPlant;
@@ -23,7 +21,7 @@ public class GeneExtractorItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -31,16 +29,9 @@ public class GeneExtractorItemData : ItemData
     public override bool CanPurchase(ShopContext ctx, out string reason)
     {
         reason = null;
-        var g = ctx.Grid;
-        if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
-
-        int maxSlots = g.Board.MaxCol * 4;
-        int empty = maxSlots - g.Board.Plants.Count;
-        if (empty <= 0) { reason = Loc.T("shop.error.no_empty_cell"); return false; }
-
-        if (g.Board.Plants.Count <= 0) { reason = Loc.T("shop.error.no_selectable_plant"); return false; }
-
-        return true;
+        if (!ctx.Board.HasEmptyCell()) reason = Loc.T("shop.error.no_empty_cell");
+        else if (ctx.Board.States.Count <= 0) reason = Loc.T("shop.error.no_selectable_plant");
+        return reason == null;
     }
 
     public override void StartEffect(ShopContext ctx, Action onReady, Action<string> onError)
@@ -48,56 +39,24 @@ public class GeneExtractorItemData : ItemData
         onReady?.Invoke();
     }
 
-    public override bool ValidateTarget(ShopContext ctx, Plant target, out string reason)
+    public override bool ValidateTarget(ShopContext ctx, PlantState target, out string reason)
     {
-        if (target == null) { reason = Loc.T("shop.error.select_plant"); return false; }
-        reason = null;
-        return true;
-    }
-
-    public override void SetSelectedPlant(Plant plant)
-    {
-        selected = plant;
+        reason = target == null ? Loc.T("shop.error.select_plant") : null;
+        return target != null;
     }
 
     public override void Commit(ShopContext ctx)
     {
-        if (!selected)
-        {
-            ctx.ShowError?.Invoke(Loc.T("shop.error.no_plant_selected"));
-            return;
-        }
+        if (!TakeSelectedCell(ctx, out int cell)) return;
 
-        var g = ctx.Grid;
-        if (!g)
-        {
-            Debug.LogError("[GeneExtractor] Grid not found");
-            return;
-        }
-
-        List<GeneticTrait> genes = selected.GetGeneticTrait();
-
-        int maxSlots = g.Board.MaxCol * 4;
-        int empty = maxSlots - g.Board.Plants.Count;
-        int toSpawn = Mathf.Clamp(3, 0, empty);
-
+        List<GeneticTrait> genes = ctx.Board.States[cell].Traits;
         int spawned = 0;
-        for (int i = 0; i < toSpawn; i++)
-        {
-            g.Spawner.AddMovablePlant(genes);
-            spawned++;
-        }
+        for (; spawned < 3 && ctx.Board.HasEmptyCell(); spawned++)
+            ctx.World.PlantSeedling(new List<GeneticTrait>(genes));
 
         if (spawned > 0)
             ctx.ShowInfo?.Invoke(Loc.T("shop.info.gene_extracted", ("name", LocalizedName), ("count", spawned)));
         else
             ctx.ShowError?.Invoke(Loc.T("shop.error.not_enough_empty"));
-
-        selected = null;
-    }
-
-    public override void Cancel(ShopContext ctx)
-    {
-        selected = null;
     }
 }

@@ -19,7 +19,7 @@ public class AddSoilItemData : ItemData
     }
 
     // 특수(땅부자): 추가 구매 가능 횟수 +8 (구매마다 무작위 세로줄 고속 숙성)
-    private int EffectiveMaxPurchase => maxPurchase + (SpecialItemSystem.Has("land_rich") ? 8 : 0);
+    private int EffectiveMaxPurchase => maxPurchase + (GameRun.Special.Has("land_rich") ? 8 : 0);
 
     // MaxPurchaseCount는 -1(무제한)이라 목록에서 제거되지 않는다. 표시만 실제 한도를 따르게 한다.
     public override int EffectivePurchaseLimit => EffectiveMaxPurchase;
@@ -44,14 +44,14 @@ public class AddSoilItemData : ItemData
     {
         reason = null;
 
-        if (ctx?.Grid == null)
+        if (ctx?.Field == null)
         {
             reason = Loc.T("shop.error.no_game_state");
             return false;
         }
 
         // maxCol이 이미 최대치인지 확인 — 땅부자 보유 시엔 확장 없이도 구매 가능(고속 숙성 부여)
-        if (ctx.Grid.Board.MaxCol >= MAX_COL && !SpecialItemSystem.Has("land_rich"))
+        if (ctx.Board.MaxCol >= MAX_COL && !GameRun.Special.Has("land_rich"))
         {
             reason = Loc.T("shop.error.max_expand");
             return false;
@@ -76,21 +76,13 @@ public class AddSoilItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (ctx?.Grid == null)
-        {
-            Debug.Log("그리드가 없습니다.");
-            return;
-        }
+        if (ctx?.Field == null) return;
 
-        // 땅 확장은 최대 크기(8열) 한도 내에서만
-        if (ctx.Grid.Board.MaxCol < MAX_COL)
-            ctx.Grid.AddSoil();
-
-        // 특수(땅부자): 구매할 때마다 무작위 세로줄에 고속 숙성 효과 추가
-        if (SpecialItemSystem.Has("land_rich"))
-            ctx.Grid.Soil.AddLandRichColumn();
-
-        // 가격 업데이트 (구매 이력이 업데이트된 후)
+        // 최대 열 수까지만 밭을 넓히고, 특수(땅부자)면 구매할 때마다 무작위 세로줄을 강화한다
+        if (ctx.Board.MaxCol < MAX_COL)
+            ctx.World.ExpandField();
+        if (GameRun.Special.Has("land_rich"))
+            ctx.World.AddLandRichColumn();
         UpdatePrice(ctx);
     }
 

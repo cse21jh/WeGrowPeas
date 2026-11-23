@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ThiefCurse : CurseInstance
 {
-    public ThiefCurse(CurseScriptable data, int level) : base(data, level)
+    public ThiefCurse(CurseScriptable data, int level, CurseBoard board) : base(data, level, board)
     {
 
     }
@@ -10,8 +10,8 @@ public class ThiefCurse : CurseInstance
     public override void Activate()
     {
         int count = Mathf.RoundToInt(Lv != null ? Lv.valueA : 0f);
-        GameManager.Instance?.grid?.CurseActions.StealPlants(count);
-        CurseEffectManager.Instance?.SetThiefCurse(true);
+        Board.StealPlants(count);
+        World.ShowEffect(Data.curseId, true);
     }
 
     public override void Deactivate()

@@ -172,13 +172,13 @@ public class PhoneManager : Singleton<PhoneManager>
     [SerializeField] private GameObject empNoiseOverlay;
 
     /// <summary>저주(통신장애)가 지금 적용 중인가.</summary>
-    public bool IsEmpActive => CurseState.EmpBlockRatio > 0f && Time.time < _empBlockEndTime;
+    public bool IsEmpActive => GameRun.Curse.EmpBlockRatio > 0f && Time.time < _empBlockEndTime;
 
     /// <summary>저주(통신장애): 자유시간 시작 시 호출 — 낮 시간의 일부(EmpBlockRatio) 동안 통신장애.</summary>
     public void BeginEmpBlockIfActive(float freeTimeDuration)
     {
-        _empBlockEndTime = CurseState.EmpBlockRatio > 0f
-            ? Time.time + freeTimeDuration * CurseState.EmpBlockRatio
+        _empBlockEndTime = GameRun.Curse.EmpBlockRatio > 0f
+            ? Time.time + freeTimeDuration * GameRun.Curse.EmpBlockRatio
             : -1f;
         UpdateEmpNoise();
     }
@@ -465,7 +465,7 @@ public class PhoneManager : Singleton<PhoneManager>
     public float GetMaxPhoneTimer()
     {
         if (GameManager.Instance?.Tutorial != null) return TutorialChapter.PhoneSeconds;
-        float ratio = IsPhonePhase ? CurseState.InsomniaFreeTimeRatio : 1f;
+        float ratio = IsPhonePhase ? GameRun.Curse.InsomniaFreeTimeRatio : 1f;
         if (GameManager.Instance != null)
             return GameManager.Instance.grid.Breeder.GetMaxBreedTimer() * ratio;
         return 30f * ratio;

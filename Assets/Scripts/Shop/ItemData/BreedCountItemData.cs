@@ -37,21 +37,8 @@ public class BreedCountItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (!ValidateGrid(ctx, out _))
-            return;
-
-        bool counterWasActive = ctx.Grid.Breeder.GetIsBreeding();
-        int previousRemainingCount = ctx.Grid.Breeder.GetEffectiveRemainingBreedCount();
-        ctx.Grid.Breeder.AddMaxBreedCount(1);
-        int currentRemainingCount = ctx.Grid.Breeder.GetEffectiveRemainingBreedCount();
-
-        GameEvents.RaiseBreedCountFeedback(
-            new BreedCountFeedbackData(
-                1,
-                previousRemainingCount,
-                currentRemainingCount,
-                counterWasActive));
-
+        if (!ValidateGrid(ctx, out _)) return;
+        ctx.World.AddBreedAttempts(1);
         UpdatePrice(ctx);
     }
 

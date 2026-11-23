@@ -15,13 +15,13 @@ public class LegacySpendGoldRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnShopBought += HandleGoldSpent;
+        Events.ShopBought += HandleGoldSpent;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnShopBought -= HandleGoldSpent;
+        Events.ShopBought -= HandleGoldSpent;
     }
 
     public override string GetProgressText()

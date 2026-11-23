@@ -15,13 +15,13 @@ public class LegacyPeaBreedingRequest : RequestInstance
         base.Start();
         currentCount = 0;
 
-        GameEvents.OnPeaBreeded += HandlePeaBreeded;
+        Events.Breeded += HandlePeaBreeded;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaBreeded -= HandlePeaBreeded;
+        Events.Breeded -= HandlePeaBreeded;
     }
 
     public override string GetProgressText()

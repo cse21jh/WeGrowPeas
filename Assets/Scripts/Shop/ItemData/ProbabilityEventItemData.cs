@@ -16,7 +16,7 @@ public class ProbabilityEventItemData : ItemData
     {
         // 이미 이벤트가 적용 중이라면 구매 불가? -> 중복 적용해도 상관없긴 함 (돈만 날림)
         // 하지만 사용자 경험상 막는 게 좋을 수도 있음.
-        if (ShopManager.Instance.isProbabilityEqualized)
+        if (ctx.Shop.IsProbabilityEqualized)
         {
             reason = Loc.T("shop.error.event_active");
             return false;
@@ -34,7 +34,7 @@ public class ProbabilityEventItemData : ItemData
     public override void Commit(ShopContext ctx)
     {
         // 확률 평탄화 활성화
-        ShopManager.Instance.isProbabilityEqualized = true;
+        ctx.Shop.IsProbabilityEqualized = true;
         Debug.Log("[ProbabilityEvent] Probability Equalized! All weights set to 8.");
         
         // 시각적/청각적 피드백 추가 가능

@@ -7,7 +7,7 @@ public class PlantSpawner
 {
     private readonly Action<Plant, int> placePlant;
     private readonly Action onChiliPepperPlaced;
-    private readonly PlantBoard board;
+    private readonly Action<Plant, int> placeNewPlant;
     private readonly GameObject peaPrefab;
     private readonly GameObject peanutPrefab;
     private readonly GameObject nepenthesPrefab;
@@ -15,10 +15,10 @@ public class PlantSpawner
     private readonly GameObject moneyTreePrefab;
     private readonly GameObject sprinklerPrefab;
 
-    public PlantSpawner(PlantBoard board, Action<Plant, int> placePlant, Action onChiliPepperPlaced, GameObject peaPrefab, GameObject peanutPrefab, GameObject nepenthesPrefab,
+    public PlantSpawner(Action<Plant, int> placePlant, Action<Plant, int> placeNewPlant, Action onChiliPepperPlaced, GameObject peaPrefab, GameObject peanutPrefab, GameObject nepenthesPrefab,
         GameObject chiliPepperPrefab, GameObject moneyTreePrefab, GameObject sprinklerPrefab)
     {
-        this.board = board;
+        this.placeNewPlant = placeNewPlant;
         this.placePlant = placePlant;
         this.onChiliPepperPlaced = onChiliPepperPlaced;
         this.peaPrefab = peaPrefab;
@@ -47,13 +47,7 @@ public class PlantSpawner
         GameObject obj = InstantiatePlant(GameManager.Instance.currentPlant);
         Plant plant = obj.GetComponent<Plant>();
         plant.SetTrait(trait);
-        placePlant(plant, grididx);
-
-        // 특수(신상품): 새 식물이 생겨날 때 가격의 50% 골드 (실제로 심어진 경우만)
-        if (SpecialItemSystem.Has("new_product")
-            && board.Plants.TryGetValue(plant.gridIndex, out Plant placed) && placed == plant)
-            GameManager.Instance.economyManager.AddGold(Mathf.RoundToInt(plant.GetSellingPrice() * 0.5f));
-
+        placeNewPlant(plant, grididx);
         return plant;
     }
     public void AddNepenthes(int idx)

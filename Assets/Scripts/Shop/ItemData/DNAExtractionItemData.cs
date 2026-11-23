@@ -12,8 +12,6 @@ public class DNAExtractionItemData : ItemData
     [Min(1)] public int unlockStageDay = 1;
     [Min(0)] public int rotationWeight = 8;
 
-    private int? selectedIdx;
-
     private void OnValidate()
     {
         FlowType = ShopFlowType.PlaceOnTile;
@@ -26,7 +24,7 @@ public class DNAExtractionItemData : ItemData
 
     public override bool IsRotationUnlockOk(ShopContext ctx)
     {
-        int stage = GameManager.Instance.stage;
+        int stage = ctx.Stage;
         return (stage + 1) >= unlockStageDay;
     }
     public override int GetRotationWeight(ShopContext ctx) => rotationWeight;
@@ -39,60 +37,27 @@ public class DNAExtractionItemData : ItemData
 
     public override void Commit(ShopContext ctx)
     {
-        if (!selectedIdx.HasValue)
-        {
-            Debug.LogError("[DNAExtraction] Selected index is null.");
-            return;
-        }
-        var g = ctx.Grid;
-        if (!g)
-        {
-            Debug.LogError("[DNAExtraction] Grid not found.");
-            return;
-        }
-        Plant plant = g.Board.Plants[selectedIdx.Value];
+        if (!TakeSelectedCell(ctx, out int cell)) return;
 
-        List<GeneticTrait> trait;
+        var source = new List<GeneticTrait>(ctx.Board.States[cell].Traits);
         for (int i = 0; i < copyCount; i++)
         {
-            trait = new List<GeneticTrait>();
-            foreach(var r in plant.GetGeneticTrait())
+            var traits = new List<GeneticTrait>();
+            foreach (GeneticTrait r in source)
             {
-                int genetics = UnityEngine.Random.Range(0, 3);
-                if(r.traitType == TraitType.Pest)
-                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, g.Modifiers.AdditionalPestResistance));
-                else
-                    trait.Add(new GeneticTrait(r.traitType, Plant.GetResistanceBasedOnGenetics(r.traitType, genetics), genetics, 0.0f));
+                int genetics = GameRun.Rng.Item.Range(0, 3);
+                traits.Add(new GeneticTrait(r.traitType, ctx.World.RollResistance(r.traitType, genetics), genetics,
+                    r.traitType == TraitType.Pest ? ctx.Modifiers.AdditionalPestResistance : 0f));
             }
-            g.Spawner.AddMovablePlant(trait);
+            ctx.World.PlantSeedling(traits);
         }
-
         ctx.ShowInfo?.Invoke(Loc.T("shop.info.dna", ("name", LocalizedName)));
     }
 
-    public override void Cancel(ShopContext ctx)
+    public override bool ValidateCell(ShopContext ctx, int cell, out string reason)
     {
-        selectedIdx = null;
-    }
-
-    public override bool ValidatePosition(ShopContext ctx, Vector3 worldPos, out string reason)
-    {
-        reason = null;
-        var g = ctx.Grid;
-        if (!g) { reason = Loc.T("shop.error.no_game_state"); return false; }
-
-        int? idx = g.GetGridIndexFromPosition(worldPos);
-        if (!idx.HasValue) { reason = Loc.T("shop.error.invalid_position"); return false; }
-
-        if (!g.Board.HasBreedablePlantAt(idx.Value)) { reason = Loc.T("shop.error.no_breedable"); return false; }
-
-        return true;
-    }
-
-    public override void SetPlacedPosition(Vector3 worldPos)
-    {
-        var g = FindAnyObjectByType<Grid>();
-        int? idx = g ? g.GetGridIndexFromPosition(worldPos) : null;
-        selectedIdx = idx;
+        bool ok = ctx.Board.HasBreedablePlantAt(cell);
+        reason = ok ? null : Loc.T("shop.error.no_breedable");
+        return ok;
     }
 }

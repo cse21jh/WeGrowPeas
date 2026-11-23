@@ -7,7 +7,6 @@ public class PeaCoffeeItemData : ItemData
     [Tooltip("구매 1회당 증가하는, 자유시간 경과당 판매 골드 배수")]
     [SerializeField] private float multiplierPerPurchase = 0.15f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1500;
@@ -20,7 +19,7 @@ public class PeaCoffeeItemData : ItemData
     }
 
     // 완두콩 전용 아이템 (새벽 6단계 클리어 조건은 metaRequiredDawnStage)
-    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(PlantIds.Pea);
+    public override bool IsRotationUnlockOk(ShopContext ctx) => IsCurrentPlant(ctx, PlantIds.Pea);
 
     public override int GetRotationWeight(ShopContext ctx) => (int)ItemRarity.Rare;
 
@@ -39,6 +38,6 @@ public class PeaCoffeeItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.Upgrades.AddPeaCoffeeMultiplier(multiplierPerPurchase);
+        ctx.World.AddPeaCoffeeMultiplier(multiplierPerPurchase);
     }
 }

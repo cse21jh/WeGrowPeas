@@ -19,14 +19,16 @@ public class SellGrayGenePlantRequest : RequestInstance
         currentCount = 0;
         SelectRandomTrait();
 
-        GameEvents.OnPeaSold += HandlePeaSold;
+        Events.PlantSold += HandlePeaSold;
         RaiseChanged();
     }
 
     public override void Stop()
     {
-        GameEvents.OnPeaSold -= HandlePeaSold;
+        Events.PlantSold -= HandlePeaSold;
     }
+
+    public override int Remaining => IsCompleted ? 0 : requiredCount - currentCount;
 
     public override string GetProgressText()
     {
@@ -45,28 +47,26 @@ public class SellGrayGenePlantRequest : RequestInstance
 
     private void SelectRandomTrait()
     {
-        if (GameManager.Instance != null && GameManager.Instance.enemyController != null)
-            conditionType = GameManager.Instance.enemyController.PickTraitFromUnlockWave();
+        conditionType = Board.World.PickTraitFromWaves();
     }
 
-    private void HandlePeaSold(Plant p)
+    // 회색 유전자 2개 (우성 0개)
+    public override bool AcceptsSale(PlantState plant)
+    {
+        foreach (var g in plant.Traits)
+            if (conditionType == (int)g.traitType) return g.genetics == 0;
+        return false;
+    }
+
+    private void HandlePeaSold(PlantState p)
     {
         if (IsCompleted || IsFailed) return;
 
-        List<GeneticTrait> traits = p.GetGeneticTrait();
-        foreach (var g in traits)
-        {
-            if (conditionType == (int)g.traitType)
-            {
-                if (g.genetics == 0) // 회색 유전자 2개 (우성 0개)
-                {
-                    currentCount++;
-                    if (currentCount >= requiredCount) CompleteOnce();
-                    else RaiseChanged();
-                }
-                return;
-            }
-        }
+        if (!AcceptsSale(p)) return;
+
+        currentCount++;
+        if (currentCount >= requiredCount) CompleteOnce();
+        else RaiseChanged();
     }
 
     private int SetDifficulty(string requestId)

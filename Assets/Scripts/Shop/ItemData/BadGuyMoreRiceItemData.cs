@@ -30,7 +30,7 @@ public class BadGuyMoreRiceItemData : ItemData
     {
         if (!ValidateGrid(ctx, out _))
             return;
-        ctx.Grid.Modifiers.AddBadGuyMoreRiceLevel(1);
+        ctx.Modifiers.AddBadGuyMoreRiceLevel(1);
     }
 
     public override void InitializePrice(ShopContext ctx)

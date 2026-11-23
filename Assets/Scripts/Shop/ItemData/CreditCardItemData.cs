@@ -7,7 +7,6 @@ public class CreditCardItemData : ItemData
     [Tooltip("구매 1회당 증가하는 환급 비율 (0.1 = 10%p)")]
     [SerializeField] private float refundPercentPerPurchase = 0.1f;
 
-
     private void OnEnable()
     {
         if (Price <= 0) Price = 1000;
@@ -38,6 +37,6 @@ public class CreditCardItemData : ItemData
         if (!ValidateGrid(ctx, out _))
             return;
 
-        ctx.Grid.Modifiers.AddCreditCardRefundPercent(refundPercentPerPurchase);
+        ctx.Modifiers.AddCreditCardRefundPercent(refundPercentPerPurchase);
     }
 }

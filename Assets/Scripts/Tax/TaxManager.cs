@@ -9,8 +9,8 @@ public class TaxManager : Singleton<TaxManager>
 {
     [SerializeField] private EconomyManager economy;
 
-    [Tooltip("이미 납부 완료한 가장 높은 세금일. (저장 대상)")]
-    [SerializeField] private int lastPaidTaxStage = 0;
+    /// <summary>납부 상태와 규칙. 이 컴포넌트는 골드 차감 연출과 튜토리얼 제한을 더한다.</summary>
+    public TaxState State { get; } = new TaxState();
 
     private EconomyManager Economy
     {
@@ -22,34 +22,31 @@ public class TaxManager : Singleton<TaxManager>
     }
 
     public int Interval => TaxSchedule.Interval;
-    public int LastPaidTaxStage => lastPaidTaxStage;
+    public int LastPaidTaxStage => State.LastPaidStage;
 
     /// <summary>다음에 내야 할(미납) 세금일.</summary>
-    public int DueTaxStage => lastPaidTaxStage + Interval;
+    public int DueTaxStage => State.DueStage;
 
     /// <summary>이번에 내야 할 금액.</summary>
-    public int DueAmount => TaxSchedule.GetTaxAmount(DueTaxStage);
+    public int DueAmount => State.DueAmount;
 
     /// <summary>해당 세금일이 이미 납부 완료됐는가.</summary>
-    public bool IsPaidForStage(int taxStage) => taxStage <= lastPaidTaxStage;
+    public bool IsPaidForStage(int taxStage) => taxStage <= State.LastPaidStage;
 
     /// <summary>현재 스테이지 기준으로 이번 세금이 마감 도달(미납 상태)인가.</summary>
-    public bool IsDueNow(int currentStage) => currentStage >= DueTaxStage;
+    public bool IsDueNow(int currentStage) => State.IsDue(currentStage);
 
     /// <summary>세금 마감(밤)이 지났는데 미납 상태인가 → 낮에 강제징수 대상.</summary>
-    public bool HasOverdueTax(int currentStage)
-    {
-        return currentStage > DueTaxStage;
-    }
+    public bool HasOverdueTax(int currentStage) => State.IsOverdue(currentStage);
 
     /// <summary>연체된 세금액(강제징수 금액).</summary>
     public int OverdueAmount => DueAmount;
 
     /// <summary>강제징수 처리(납부 완료로 간주하고 다음 세금일로 넘어감).</summary>
-    public void MarkPaidForcibly() => lastPaidTaxStage = DueTaxStage;
+    public void MarkPaidForcibly() => State.MarkPaid();
 
     /// <summary>다음 회차(이번 것을 낸 뒤) 세금액. 미리보기용.</summary>
-    public int NextAmount => TaxSchedule.GetTaxAmount(DueTaxStage + Interval);
+    public int NextAmount => State.NextAmount;
 
     /// <summary>마감까지 남은 일수. 0이면 오늘이 마감, 음수면 연체.</summary>
     public int DaysLeft(int currentStage) => DueTaxStage - currentStage;
@@ -75,23 +72,18 @@ public class TaxManager : Singleton<TaxManager>
     /// <summary>이번 세금 납부 시도. 성공 시 골드 차감 + 납부 처리.</summary>
     public bool TryPay()
     {
-        if (DueTaxStage == 40) return false;
         TutorialChapter tutorial = GameManager.Instance?.Tutorial;
         if (tutorial != null && !tutorial.CanPayTax(DueTaxStage)) return false;
+        if (Economy == null || !State.CanPay(Economy.State, out int amount)) return false;
 
         int taxStage = DueTaxStage;
-        int amount = TaxSchedule.GetTaxAmount(taxStage);
-
-        if (Economy == null || !Economy.HasGold(amount))
-            return false;
-
         Economy.SpendGold(amount, GoldFeedbackReason.Tax);
-        lastPaidTaxStage = taxStage;
+        State.MarkPaid();
         Debug.Log($"[Tax] {taxStage}일차 세금 {amount} 납부 완료. 다음 세금일 {DueTaxStage} ({DueAmount})");
         return true;
     }
 
     // ── 저장/로드 (SaveData 연동은 후속) ──────────────────────────────────────
-    public void LoadFromSave(int paidTaxStage) => lastPaidTaxStage = paidTaxStage;
-    public int GetSaveValue() => lastPaidTaxStage;
+    public void LoadFromSave(int paidTaxStage) => State.LastPaidStage = paidTaxStage;
+    public int GetSaveValue() => State.LastPaidStage;
 }

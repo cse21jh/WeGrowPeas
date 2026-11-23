@@ -291,7 +291,7 @@ public class GridModifiers
         // 특수(마법부여자): 밤낮 전환 발동형 아이템(고속 숙성 등)의 수치 2배 — 기본값(0.2) 초과분만 2배
         const float baseMul = 0.2f;
         float added = AdditionalPlantGoldMultiplier - baseMul;
-        if (added > 0f && SpecialItemSystem.Has("enchanter"))
+        if (added > 0f && GameRun.Special.Has("enchanter"))
             return baseMul + added * 2f;
         return AdditionalPlantGoldMultiplier;
     }

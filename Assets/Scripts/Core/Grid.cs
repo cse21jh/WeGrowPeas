@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Grid : MonoBehaviour
+public class Grid : MonoBehaviour, IBugTargets
 {
     protected EnemyController enemyController;
     [SerializeField] protected EconomyManager economyManager;
@@ -72,7 +72,7 @@ public class Grid : MonoBehaviour
     public void SkipBreed() => Breeder.SkipBreed();
 
     /// <summary>식물 생성과 추가.</summary>
-    public PlantSpawner Spawner => spawner ??= new PlantSpawner(Board, AddPlantToGrid, RefreshResistanceScouter, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
+    public PlantSpawner Spawner => spawner ??= new PlantSpawner(AddPlantToGrid, AddNewPlantToGrid, RefreshResistanceScouter, peaPrefab, peanutPrefab, nepenthesPrefab, chiliPepperPrefab, moneyTreePrefab, sprinklerPrefab);
     private PlantSpawner spawner;
 
     /// <summary>값을 올리면서 밭 위 식물과 가격 표시도 갱신하는 강화.</summary>
@@ -85,6 +85,10 @@ public class Grid : MonoBehaviour
 
     /// <summary>칸과 식물 데이터. 다른 시스템은 Grid 대신 이 객체로 밭을 읽는다.</summary>
     public PlantBoard Board { get; } = new PlantBoard();
+
+    /// <summary>규칙 계산이 참조하는 밭 상태 묶음. 식물 상태(<see cref="PlantState"/>)가 이것만 보고 계산한다.</summary>
+    public FieldState Field => field ??= new FieldState(Board, Modifiers, Soil.State);
+    private FieldState field;
 
     //저장 필요
     public int killBugCount = 0;
@@ -100,8 +104,6 @@ public class Grid : MonoBehaviour
     // 그리드 상태 변경 이벤트 (식물 배치/제거/이동 등)
 
 
-    // LoadGrid 중에는 Board.Changed 발생을 억제 (MoneyTree가 로드 순서에 따라 즉시 Die하는 버그 방지)
-    private bool isLoadingGrid = false;
 
     private bool initialized;
 
@@ -113,7 +115,8 @@ public class Grid : MonoBehaviour
         if (initialized) return;
         enemyController = FindAnyObjectByType<EnemyController>();
         InitSoils();
-        Board.Plants.Clear();
+        Board.Clear();
+        Field.IsTutorial = GameManager.Instance != null && GameManager.Instance.Tutorial != null;
         Breeder.Initialize();
         initialized = true;
     }
@@ -144,49 +147,48 @@ public class Grid : MonoBehaviour
 
     private void RefreshResistanceScouter() => Scouter.UpdateResistanceScouterImageInGrid(enemyController.CurrentWave.WaveType);
 
-    public void AddPlantToGrid(Plant plant, int grididx = -1) // 이미 오브젝트로 만들어진 식물 그리드에 추가. grididx에 숫자 삽입 시 해당 위치에 식물 심어줌
+    /// <summary>이미 만든 식물 오브젝트를 심는다. 자리가 없으면 오브젝트를 없앤다.</summary>
+    /// <param name="grididx">-1이면 앞에서부터 첫 빈 칸.</param>
+    public void AddPlantToGrid(Plant plant, int grididx = -1)
     {
-        if (grididx != -1)
-        {
-            if (!Board.Plants.ContainsKey(grididx))
-            {
-                plant.Init(grididx, this);
-                PlantPlant(plant);
-
-                return;
-            }
-        }
-
-        for (int idx = 0; idx < Board.MaxCol * 4; idx++)
-        {
-            if (!Board.Plants.ContainsKey(idx))
-            {
-                plant.Init(idx, this);
-                //Debug.Log($"[Grid.AddPlant] Init called for {plant.name} at idx {idx}", plant);
-                PlantPlant(plant);
-
-                return;
-            }
-        }
-        Destroy(plant.gameObject);
-        return;
+        if (!Field.AddPlant(plant.State, grididx, new PlantingView(this, plant)))
+            Destroy(plant.gameObject);
     }
-    private void PlantPlant(Plant plant)
+
+    /// <summary>태어나거나 산 식물을 심는다.</summary>
+    private void AddNewPlantToGrid(Plant plant, int grididx)
     {
-        Board.Plants[plant.gridIndex] = plant;
-        Transform soilT = GetSoilTransform(plant.gridIndex);
-        plant.transform.position = soilT.position;
+        if (!Field.AddNewPlant(plant.State, grididx, new PlantingView(this, plant), GameManager.Instance.economyManager.AddGold))
+            Destroy(plant.gameObject);
+    }
 
-        // 저장 복원 중에는 기존 뿌리 상태를 아래에서 그대로 불러온다.
-        // 새 식물은 실제 흙 위치로 옮긴 뒤 판정해야 가격 상승 팝업도 올바른 곳에서 시작한다.
-        if (!isLoadingGrid && plant is MovablePlant movablePlant)
-            movablePlant.TryRootAfterPlacement();
+    private sealed class PlantingView : IPlantingView
+    {
+        private readonly Grid grid;
+        private readonly Plant plant;
 
-        Scouter.UpdateGoldScouterImageInGrid();
+        public PlantingView(Grid grid, Plant plant)
+        {
+            this.grid = grid;
+            this.plant = plant;
+        }
 
-        // 그리드 상태 변경 알림 (로딩 중에는 억제 — 모든 식물 로드 후 일괄 발송)
-        if (!isLoadingGrid)
-            Board.NotifyChanged();
+        public void OnPlaced(int idx)
+        {
+            plant.Init(idx, grid);
+            grid.PlaceOnSoil(plant);
+        }
+
+        // 실제 흙 위치로 옮긴 뒤라서 가격 상승 팝업이 올바른 곳에서 시작한다
+        public void OnRooted(int previousPrice) => ((MovablePlant)plant).OnRootedWhenPlanted(previousPrice);
+
+        public void OnSettled() => grid.Scouter.UpdateGoldScouterImageInGrid();
+    }
+
+    private void PlaceOnSoil(Plant plant)
+    {
+        Board.Place(plant.gridIndex, plant);
+        plant.transform.position = GetSoilTransform(plant.gridIndex).position;
     }
 
     // 특수(땅부자): 세로줄별 고속 숙성 배수 보너스 (col → +mul, 중첩 가능)
@@ -245,7 +247,7 @@ public class Grid : MonoBehaviour
     {
         if (Board.Plants.ContainsKey(gridIndex))
         {
-            Board.Plants.Remove(gridIndex);
+            Board.Remove(gridIndex);
             Board.NotifyChanged();
         }
 
@@ -268,6 +270,33 @@ public class Grid : MonoBehaviour
                 return false;
         }
         return true;
+    }
+
+    // ───── 벌레 ─────
+
+    private readonly List<Ladybug> ladybugs = new List<Ladybug>();
+    public Ladybug FirstLadybug => ladybugs[0];
+
+    public void AddLadybug(Ladybug ladybug)
+    {
+        ladybugs.Add(ladybug);
+        Board.LadybugCount = ladybugs.Count;
+    }
+
+    public void RemoveLadybug(Ladybug ladybug)
+    {
+        ladybugs.Remove(ladybug);
+        Board.LadybugCount = ladybugs.Count;
+    }
+
+    int IBugTargets.CellCount => Board.CellCount;
+
+    bool IBugTargets.TryGetPlant(int cell, out Vector2 position, out bool isNepenthes)
+    {
+        bool found = Board.Plants.TryGetValue(cell, out Plant plant) && plant != null;
+        position = found ? (Vector2)plant.transform.position : Vector2.zero;
+        isNepenthes = found && plant is Nepenthes;
+        return found;
     }
 
     public void AddSoil()
@@ -365,8 +394,8 @@ public class Grid : MonoBehaviour
             targetPlant.transform.position = fromSoil.position;
 
             // Board.Plants 업데이트
-            Board.Plants[toIndex] = plant;
-            Board.Plants[fromIndex] = targetPlant;
+            Board.Place(toIndex, plant);
+            Board.Place(fromIndex, targetPlant);
 
             //스카우터 확인 (고추, 비료 때문)
             if (plant is MovablePlant p1)
@@ -387,16 +416,13 @@ public class Grid : MonoBehaviour
         {
             Dictionary<Plant, int> previousPrices = Upgrades.CapturePlantSellingPrices();
             // 빈 칸이면 원래대로 심기
-            Board.Plants.Remove(fromIndex); // 원래 위치에서 제거
-            plant.SetGridIndex(toIndex);
-            plant.transform.position = GetSoilTransform(toIndex).position;
-            Board.Plants[toIndex] = plant;
-
-            if (plant is MovablePlant p1)
+            Field.MovePlant(plant.State, toIndex, () =>
             {
-                p1.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
-            }
-            Board.NotifyChanged();
+                plant.SetGridIndex(toIndex);
+                PlaceOnSoil(plant);
+                if (plant is MovablePlant movable)
+                    movable.CheckResistanceScouterImage(enemyController.CurrentWave.WaveType);
+            });
             Upgrades.RefreshPlantSellingPricesAndNotify(previousPrices, PlantValueChangeReason.Moved);
             if (fromIndex != toIndex) GameEvents.RaisePlantMoved();
             return true;
@@ -501,15 +527,14 @@ public class Grid : MonoBehaviour
 
     public void LoadGrid(GridSave saveData)
     {
-        // 로딩 중 Board.Changed 억제 (MoneyTree 등이 로드 순서에 따라 조기 사망하는 것 방지)
-        isLoadingGrid = true;
-
+        // 다 놓은 뒤에 한 번만 알린다. 도중에 알리면 MoneyTree가 이웃 식물보다 먼저 놓였을 때 죽는다.
         List<PlantData> plantList = saveData.plantList;
         foreach (var item in plantList)
         {
             GameObject obj = Spawner.InstantiatePlant(item.speciesname);
 
             Plant plant = obj.GetComponent<Plant>();
+            plant.State.OnPlanted(Field, item.gridIndex);
             plant.Init(item.gridIndex, this);
             plant.SetTrait(item.traits);
             plant.SetTaste(item.taste);
@@ -527,15 +552,15 @@ public class Grid : MonoBehaviour
             if (plant is MoneyTree moneyTree)
                 moneyTree.SetSurvivedTurns(item.survivedTurns);
 
-            PlantPlant(plant);
+            PlaceOnSoil(plant);
+            Scouter.UpdateGoldScouterImageInGrid();
         }
 
         // 모든 식물 로드 완료 후 Board.Changed 한 번 발송
-        isLoadingGrid = false;
         Board.NotifyChanged();
         Board.MaxCol = saveData.maxCol;
         UpdateSoil();
-        if (saveData.hasCoolingShield) Soil.ActivateCoolingShield();
+        Field.Soil.HasCoolingShield = saveData.hasCoolingShield;
         Soil.LoadColumnGoldMulBonus(saveData.columnGoldMulBonusList); // 특수(땅부자) 세로줄 배수 복원
         killBugCount = saveData.killBugCount;
 

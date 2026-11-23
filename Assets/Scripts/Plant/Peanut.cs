@@ -10,7 +10,8 @@ public class Peanut : MovablePlant
     [SerializeField] private Sprite[] deathFrames;
     [SerializeField] private Sprite[] selectedSprite;
 
-    private float peanutCopyProbability = 0.25f;
+    public override PlantKind Kind => PlantKind.Peanut;
+
     public override void Init(int gridIndex, Grid grid)
     {
         speciesname = PlantIds.Peanut;
@@ -79,97 +80,5 @@ public class Peanut : MovablePlant
         FenceUIManager.Instance.HideFenceElements();
         if(!grid.Upgrades.showingAllPrice)
             priceSign.gameObject.SetActive(false);
-    }
-
-    public int FindEmptyGridToCopy()
-    {
-        List<int> emptyGrid = new List<int>();
-        if (gridIndex % 4 > 0) // 위칸
-        {
-            if (!grid.Board.Plants.ContainsKey(gridIndex - 1))
-                emptyGrid.Add(gridIndex - 1);
-
-        }
-
-        if ((gridIndex + 1) / 4 == gridIndex / 4) // 아래칸
-        {
-            if (!grid.Board.Plants.ContainsKey(gridIndex + 1))
-                emptyGrid.Add(gridIndex + 1);
-
-        }
-
-        if ((gridIndex - 4) >= 0) // 왼쪽칸
-        {
-            if (!grid.Board.Plants.ContainsKey(gridIndex - 4))
-                emptyGrid.Add(gridIndex - 4);
-
-        }
-
-        if ((gridIndex + 4) < grid.Board.MaxCol * 4) // 오른쪽칸
-        {
-            if (!grid.Board.Plants.ContainsKey(gridIndex + 4))
-                emptyGrid.Add(gridIndex + 4);
-
-        }
-
-        if (emptyGrid.Count == 0)
-            return -1;
-
-        return emptyGrid[Random.Range(0, emptyGrid.Count)];
-    }
-
-    public void TrySpawnCopy()
-    {
-        float copyProbability = peanutCopyProbability + grid.Modifiers.AdditionalPeanutCopyProbability;
-        // 활성형 껍질: 한 번도 교배를 시도하지 않은 식물은 자가번식 확률 증가
-        if (!HasTriedBreed)
-            copyProbability += grid.Modifiers.ActiveShellProbability;
-
-        if (Random.Range(0f, 100f) >= 100f * copyProbability) // 25% 확률로 복사
-            return;
-        int spawnGridIdx = FindEmptyGridToCopy();
-
-        if (spawnGridIdx == -1) // 복사할 수 있는 위치가 없음
-            return;
-
-        List<GeneticTrait> copyTriats = traits.ToList();
-
-        // 특수(극단적 변이): 자가번식 시 양성 변종만 등장 (변종 확률로 판정, 유전자 유지 + 모든 저항 90~100%)
-        bool benignMutation = SpecialItemSystem.Has("extreme_mutation")
-            && Random.Range(0f, 100f) < Plant.GetMutationChancePercent();
-        if (benignMutation)
-        {
-            Plant.ApplyBenignResistance(copyTriats);
-            Debug.Log("[변종] 자가번식 양성 변종 발생!");
-        }
-
-        Plant child = grid.Spawner.AddMovablePlant(copyTriats, spawnGridIdx);
-        if (benignMutation) CurseEffectManager.PlayMutation(child, benign: true); // 변종 이펙트
-
-        // 왕위 계승: 자가번식한 자식이 부모 가격 배율의 일부를 계승 (유전자로 인한 최종 가격은 계승 X)
-        float inheritRatio = grid.Modifiers.SuccessionInheritRatio;
-        if (child != null && inheritRatio > 0f)
-        {
-            int inherited = Mathf.FloorToInt((GetResistWaveCount() + GetBonusGoldMultiplierCount()) * inheritRatio);
-            if (inherited > 0) child.AddBonusGoldMultiplier(inherited);
-        }
-
-        grid.Breeder.totalPeanutBreedCount++;
-        return;
-    }
-    private static readonly int[] BasePrices = { 60, 100, 130, 150, 170, 200, 240 };
-
-    public override int GetSellingPrice()
-    {
-        //if (isFrozen) return frozenPrice;
-
-        int basePrice = (taste >= 0 && taste < BasePrices.Length) ? BasePrices[taste] : 0;
-
-        if (grid == null)
-        {
-            return basePrice;
-        }
-
-        return CalculateSellingPrice(basePrice, grid.Modifiers.GetAdditionalPlantGoldMultiplier()); 
     }
 }

@@ -79,7 +79,7 @@ public class ItemController : MonoBehaviour
     {
         if (buyButton == null) return;
 
-        var options = item.GetSelectableOptions();
+        var options = item.GetSelectableOptions(ShopContext.ForGame);
         bool needsSelection = options != null && options.Length > 0;
 
         if (buyButtonText != null)

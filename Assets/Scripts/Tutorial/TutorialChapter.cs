@@ -158,8 +158,7 @@ public abstract class TutorialChapter : MonoBehaviour
 
         game.currentPlant = PlantIds.Pea;
         DawnSystem.ClearSelection();
-        CurseState.ResetAll();
-        SpecialItemSystem.ResetRun();
+        GameRun.Current.DawnStage = 0;
         PlayerRecordForGraph.ClearAll();
         game.economyManager.InitEconomyManager();
         game.enemyController.InitEnemyController();
@@ -198,7 +197,7 @@ public abstract class TutorialChapter : MonoBehaviour
             yield return game.phoneManager.PhonePhase();
             game.SetTutorialNightGlow(false);
             yield return game.waveManager.StopNightCoroutine();
-            if (questsUnlocked) GameEvents.RaiseQuestDayPassed();
+            if (questsUnlocked) game.Day.PassQuestDay();
             game.economyManager.PushEarnedGold();
         }
 
@@ -217,8 +216,8 @@ public abstract class TutorialChapter : MonoBehaviour
     protected virtual IEnumerator RunDay(int stage)
     {
         yield return StartDay(stage);
-        yield return game.grid.Breeder.Breeding();
-        yield return game.enemyController.EnemyWaveCoroutine();
+        yield return game.TutorialFreeTimeRoutine();
+        yield return game.enemyController.TutorialChapterWaveRoutine();
     }
 
     protected virtual IEnumerator StartDay(int stage)
@@ -372,7 +371,7 @@ public abstract class TutorialChapter : MonoBehaviour
 
     protected void HighlightGift()
     {
-        if (specialItemUI != null && SpecialItemSystem.PendingGifts > 0)
+        if (specialItemUI != null && GameRun.Special.PendingGifts > 0)
             Highlight(specialItemUI.GiftButtonRect);
     }
 
@@ -441,7 +440,7 @@ public abstract class TutorialChapter : MonoBehaviour
             }
             specialItemUI?.CloseChoicePanel();
         }
-        SpecialItemSystem.AddGift();
+        if (CanUseSpecialItems) GameRun.Special.AddGift();
     }
 
     private IEnumerator Complete()
