@@ -123,6 +123,13 @@ public class MessengerApp : MonoBehaviour
     {
         RefreshchatPartnerList();
 
+        // Refresh the visible mandatory message without advancing or replaying tutorial events.
+        if (mandatoryPopupOpen && mandatoryMessagePopup != null && mandatoryEntries.Count > 0)
+        {
+            MessageReference reference = mandatoryEntries[mandatoryPopupIndex].reference;
+            mandatoryMessagePopup.Show(reference.chat.chatPartner, reference.chat.GetText(reference.message), animateText: false);
+        }
+
         if (currentChat == null) return;
         if (chatRoomHeaderName != null) chatRoomHeaderName.text = currentChat.chatPartner.LocalizedName;
         chatMessageList?.SetSender(currentChat.chatPartner.LocalizedName, currentChat.chatPartner.chatPartnerImage);

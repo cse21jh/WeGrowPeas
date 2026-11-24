@@ -12,5 +12,9 @@ public class ChatPartner : ScriptableObject
     [Tooltip("읽음 상태의 저장 키. 표시 이름은 번역 표에서 고치고, 이 값은 바꾸지 않는다.")]
     public string chatPartnerName;
     public Sprite chatPartnerImage;
+    [Tooltip("필수 대화창의 프로필 그림. 비워 두면 기존 채팅 프로필 그림을 사용한다.")]
+    public Sprite messagePopupPortrait;
+
+    public Sprite MessagePopupPortrait => messagePopupPortrait != null ? messagePopupPortrait : chatPartnerImage;
     // 필요하다면 다른 정보 추가 (예: 프로필 메시지)
 }
