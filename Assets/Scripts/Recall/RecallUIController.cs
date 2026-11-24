@@ -17,6 +17,7 @@ public class RecallUIController : MonoBehaviour
     [Header("Root")]
     [SerializeField] private GameObject recallPanel;
     [SerializeField] private BookCloseMotion closeMotion;
+    [SerializeField] private ArchiveBookController archive;
 
     [Header("List")]
     [SerializeField] private Transform listContainer;
@@ -63,7 +64,8 @@ public class RecallUIController : MonoBehaviour
     private bool IsTurning => bookLayouts != null && bookLayouts.IsTurning;
     public bool IsClosing => closeMotion != null && closeMotion.IsClosing;
     public bool IsOpening => closeMotion != null && closeMotion.IsOpening;
-    private bool IsBusy => IsTurning || IsClosing || IsOpening;
+    private bool IsBusy => IsTurning || IsClosing || IsOpening || (archive != null && archive.IsSwitching);
+    public bool HasResultOverlay => detailUI != null && detailUI.IsOpen;
     private bool IsBookListVisible => IsOpen && bookLayouts != null && bookLayouts.CurrentIndex == listLayoutIndex;
     public bool IsBookDetailVisible => IsOpen && bookLayouts != null && bookTimeline != null &&
                                        bookLayouts.CurrentIndex == detailLayoutIndex;
@@ -111,6 +113,8 @@ public class RecallUIController : MonoBehaviour
     private void Update()
     {
         if (IsClosing || IsOpening) return;
+        if (archive != null && (archive.IsSwitching ||
+            (archive.IsOpen && archive.CurrentTab != ArchiveBookController.Tab.Recall))) return;
         // F7은 디버그용 단축키(정식 진입은 버튼). 디버그 패널이 꺼져 있으면 동작하지 않는다.
         if (DebugPanels.Enabled && Input.GetKeyDown(KeyCode.F7)) Toggle();
         else if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
@@ -143,6 +147,7 @@ public class RecallUIController : MonoBehaviour
 
     public void OpenRecall()
     {
+        if (archive != null) { archive.OpenTab((int)ArchiveBookController.Tab.Recall); return; }
         if (IsBusy) return;
         if (recallPanel != null) recallPanel.SetActive(true);
         if (bookLayouts != null) BuildBookList(RecallStore.GetEntries());
@@ -174,7 +179,10 @@ public class RecallUIController : MonoBehaviour
         RefreshBookNavigation();
     }
 
-    private void BuildBookList(List<RecallIndexEntry> entries)
+    // Prepare data without changing the layout, so Archive can capture the outgoing pages first.
+    public void PrepareArchiveRecall() => BuildBookList(RecallStore.GetEntries(), false);
+
+    private void BuildBookList(List<RecallIndexEntry> entries, bool showLayout = true)
     {
         if (detailUI != null) detailUI.Close();
         if (bookTimeline != null) bookTimeline.Close();
@@ -184,7 +192,7 @@ public class RecallUIController : MonoBehaviour
         _entries = entries;
         _spread = 0;
         if (countText != null) countText.text = $"{entries.Count} / {RecallStore.MaxEntries}";
-        bookLayouts.ShowImmediate(listLayoutIndex);
+        if (showLayout) bookLayouts.ShowImmediate(listLayoutIndex);
         RenderSpread();
     }
 

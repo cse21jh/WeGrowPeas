@@ -38,7 +38,7 @@ public static class DeviceSettings
 [Serializable]
 public class SettingsData
 {
-    public const int CurrentVersion = 3;
+    public const int CurrentVersion = 4;
 
     public int version;
 
@@ -50,6 +50,9 @@ public class SettingsData
 
     /// <summary>이미 읽은 메시지도 알림음 재생.</summary>
     public bool playAlarmForSeenMessages = true;
+
+    /// <summary>마우스 주변 말풍선 투명도. 0은 효과 없음, 1은 완전히 투명.</summary>
+    public float speechBubblePointerTransparency = 0f;
 
     /// <summary>표시 언어 코드(<see cref="Loc"/>). 비어 있으면 원문 언어를 쓴다.</summary>
     public string language = "";

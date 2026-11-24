@@ -15,14 +15,13 @@ namespace WeGrowPeas.UI
         [SerializeField, Min(1)] private float hoverScale = 1.08f;
         [SerializeField, Min(0)] private float scaleDuration = 0.12f;
         [SerializeField] private AnimationCurve scaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-        [Header("마우스 진입 · 이탈마다 한 바퀴")]
+        [Header("마우스 진입 시 한 바퀴 · 이탈 시 남은 회전만 완료")]
         [SerializeField, Min(0.01f)] private float spinDuration = 0.32f;
         [Tooltip("회전 속도 커브: X는 시간 0~1, Y는 상대 속도. 면적을 정규화해 항상 정확히 360도 회전합니다.")]
         [SerializeField] private AnimationCurve spinSpeed = new AnimationCurve(
             new Keyframe(0, 0, 0, 0), new Keyframe(0.5f, 1, 0, 0), new Keyframe(1, 0, 0, 0));
         private Tween scaleTween, spinTween;
         private bool pointerInside, hovered;
-        private int pendingSpins;
         private float spinTime;
         private readonly float[] accumulatedSpeed = new float[129];
         public bool IsHovered => hovered;
@@ -46,17 +45,18 @@ namespace WeGrowPeas.UI
             scaleTween?.Kill();
             scaleTween = artwork.rectTransform.DOScale(hovered ? hoverScale : 1, scaleDuration).SetUpdate(true).SetEase(scaleCurve);
             if (!interactable) return;
-            pendingSpins++;
-            if (!IsSpinning) BeginSpin();
+            // Keep the current turn when the pointer leaves or re-enters. Never queue
+            // another turn: the in-flight tween already ends at the resting angle.
+            if (hovered && !IsSpinning) BeginSpin();
         }
         private void StopSpin()
         {
-            spinTween?.Kill(); spinTween = null; pendingSpins = 0;
+            spinTween?.Kill(); spinTween = null;
             if (artwork != null) artwork.rectTransform.localRotation = Quaternion.identity;
         }
         private void BeginSpin()
         {
-            pendingSpins--; spinTime = 0;
+            spinTime = 0;
             BuildSpeedIntegral();
             spinTween = DOTween.To(() => spinTime, t =>
             {
@@ -66,7 +66,6 @@ namespace WeGrowPeas.UI
                 .OnComplete(() =>
                 {
                     spinTween = null; artwork.rectTransform.localRotation = Quaternion.identity;
-                    if (pendingSpins > 0) BeginSpin();
                 });
         }
         private void BuildSpeedIntegral()

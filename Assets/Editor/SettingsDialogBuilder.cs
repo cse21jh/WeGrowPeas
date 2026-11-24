@@ -87,7 +87,7 @@ public static class SettingsDialogBuilder
         Art("ContentBackground", dialog, "Content", 766, 712, 1181, 451).material = panelBlend;
         var pages = new List<GameObject>();
         SettingsEntry[][] entries = {
-            new[] { SettingsEntry.Language, SettingsEntry.BreedPopup, SettingsEntry.MessageAlarm, SettingsEntry.EndlessMode, SettingsEntry.Codex, SettingsEntry.MainMenu, SettingsEntry.Quit, SettingsEntry.AddGold },
+            new[] { SettingsEntry.Language, SettingsEntry.BreedPopup, SettingsEntry.MessageAlarm, SettingsEntry.SpeechBubbleTransparency, SettingsEntry.EndlessMode, SettingsEntry.Codex, SettingsEntry.MainMenu, SettingsEntry.Quit, SettingsEntry.AddGold },
             new[] { SettingsEntry.Resolution, SettingsEntry.WindowMode, SettingsEntry.Quality, SettingsEntry.VSync, SettingsEntry.FrameRate },
             new[] { SettingsEntry.BgmVolume, SettingsEntry.EffectVolume },
             new[] { SettingsEntry.Skip, SettingsEntry.WaveSkip, SettingsEntry.Breed, SettingsEntry.Shovel, SettingsEntry.Scouter, SettingsEntry.Phone, SettingsEntry.ResetKeys }
@@ -118,7 +118,7 @@ public static class SettingsDialogBuilder
                 Image("Bullet", item, "Bullet", 0, 20, 14, 14);
                 binding.label = Text("Label", item, Loc.T(binding.LabelKey), 32, 0, 235, 62, 32, bodyFont, Cream, TextAlignmentOptions.TopLeft);
                 binding.label.enableAutoSizing = true; binding.label.fontSizeMin = 23; binding.label.fontSizeMax = 32;
-                if (entry == SettingsEntry.BgmVolume || entry == SettingsEntry.EffectVolume) CreateSlider(item, binding);
+                if (entry == SettingsEntry.BgmVolume || entry == SettingsEntry.EffectVolume || entry == SettingsEntry.SpeechBubbleTransparency) CreateSlider(item, binding);
                 else if (entry >= SettingsEntry.Skip && entry != SettingsEntry.EndlessMode)
                 {
                     var field = Image("Action", item, "Field", 280, 6, 243, 41); field.type = UnityEngine.UI.Image.Type.Sliced; field.material = contentBlend;

@@ -11,7 +11,8 @@ namespace WeGrowPeas.UI
         Resolution, WindowMode, Quality, VSync, FrameRate,
         BgmVolume, EffectVolume,
         Skip, WaveSkip, Breed, Shovel, Scouter, Phone, ResetKeys,
-        Codex, MainMenu, Quit, AddGold, EndlessMode
+        Codex, MainMenu, Quit, AddGold, EndlessMode,
+        SpeechBubbleTransparency
     }
 
     public sealed class SettingsDialogRow : MonoBehaviour, IPointerEnterHandler
@@ -30,7 +31,7 @@ namespace WeGrowPeas.UI
         {
             owner = view;
             if (dropdown != null) dropdown.onValueChanged.AddListener(v => owner.ChangeOption(this, v));
-            if (slider != null) slider.onValueChanged.AddListener(v => owner.ChangeVolume(this, v));
+            if (slider != null) slider.onValueChanged.AddListener(v => owner.ChangeSlider(this, v));
             if (button != null) button.onClick.AddListener(() => owner.Activate(this));
         }
         public void OnPointerEnter(PointerEventData eventData) => owner?.Describe(this);

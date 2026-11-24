@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[DefaultExecutionOrder(9000)]
 public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerClickHandler
 {
     [Header("Popup Animation")]
@@ -26,8 +25,8 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
 
     [Header("Typewriter Animation")]
     [SerializeField] private bool animateTyping = true;
-    [Tooltip("초당 표시할 글자 수. 한글과 조합 문자는 한 글자 단위로 표시합니다.")]
-    [SerializeField, Min(1f)] private float charactersPerSecond = 32f;
+    [Tooltip("조달청 대화 효과와 동일하게 TMP 글자를 순서대로 표시합니다.")]
+    [SerializeField, Min(1f)] private float charactersPerSecond = 36f;
     [SerializeField, Min(0f)] private float typingStartDelay = 0.08f;
     [Tooltip("표시된 글자에 맞춰 말풍선 크기가 따라가는 시간. 0이면 즉시 조절합니다.")]
     [SerializeField, Min(0f)] private float resizeSmoothTime = 0.08f;
@@ -56,10 +55,12 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
     private bool hasShownTransform;
     private Vector2 lastAvailableSize;
     private string laidOutText;
-    private readonly List<int> revealEnds = new List<int>();
     private string fullMessage = string.Empty;
     private int revealedElements;
-    private float typingElapsed;
+    private int notifiedCharacters;
+    private int laidOutCharacters;
+    private Tween revealTween;
+    private SpeechTextBounce textBounce;
     private bool isTyping;
     private bool hasLayout;
     private bool layoutNeedsApply;
@@ -69,8 +70,11 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
     private Vector2 layoutVelocity;
     private float targetTextWidth;
     private float targetTextHeight;
+    private float fullTextHeight;
 
     public bool IsTyping => isTyping;
+    public event Action<char, int> CharacterRevealed;
+    public event Action RevealStopped;
 
     public void Initialize(
         Action previous,
@@ -152,6 +156,7 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
     private void OnDestroy()
     {
         showTween?.Kill();
+        revealTween?.Kill();
     }
 
     private void LateUpdate()
@@ -159,7 +164,8 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         if (messageText == null) return;
         bool revealed = UpdateTyping();
         Vector2 available = AvailableSize();
-        if (available != lastAvailableSize || laidOutText != messageText.text)
+        if (available != lastAvailableSize || laidOutText != messageText.text ||
+            laidOutCharacters != messageText.maxVisibleCharacters)
             RefreshLayout(!revealed && laidOutText != messageText.text);
 
         if (!hasLayout) return;
@@ -191,44 +197,46 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         if (!Application.isPlaying || !animateTyping || !animateText || body.Length == 0)
             return;
 
-        // TMP supplies source indices after parsing rich-text tags and sprite tokens.
-        // Combine them with Unicode text-element boundaries to avoid revealing half a glyph.
+        // JODAL's reveal keeps the complete string in TMP, including rich text and wrapping.
         messageText.ForceMeshUpdate(true);
-        int[] elements = StringInfo.ParseCombiningCharacters(body);
-        var info = messageText.textInfo;
-        for (int i = 0; i < info.characterCount; i++)
-        {
-            var character = info.characterInfo[i];
-            int end = Mathf.Clamp(character.index + character.stringLength, 0, body.Length);
-            int boundary = Array.BinarySearch(elements, end);
-            if (boundary < 0)
-            {
-                boundary = ~boundary;
-                end = boundary < elements.Length ? elements[boundary] : body.Length;
-            }
-            if (end > 0 && (revealEnds.Count == 0 || end > revealEnds[revealEnds.Count - 1]))
-                revealEnds.Add(end);
-        }
-        if (revealEnds.Count == 0) return;
-        revealEnds[revealEnds.Count - 1] = body.Length;
-        messageText.text = string.Empty;
-        typingElapsed = -typingStartDelay;
+        int characterCount = messageText.textInfo.characterCount;
+        if (characterCount == 0) return;
+        messageText.maxVisibleCharacters = 0;
         revealedElements = 0;
+        notifiedCharacters = 0;
         isTyping = true;
+        if (textBounce == null) textBounce = messageText.GetComponent<SpeechTextBounce>();
+        if (textBounce != null) textBounce.BeginReveal();
+        var tween = messageText.DOMaxVisibleCharacters(characterCount,
+                characterCount / Mathf.Max(1f, charactersPerSecond))
+            .SetDelay(typingStartDelay)
+            .SetEase(Ease.Linear)
+            .SetUpdate(UpdateType.Late, true)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+        revealTween = tween;
+        tween.OnUpdate(NotifyRevealedCharacters);
+        tween.OnComplete(() => isTyping = false);
+        tween.OnKill(() => { if (revealTween == tween) { revealTween = null; isTyping = false; } });
+    }
+
+    private void NotifyRevealedCharacters()
+    {
+        if (!isTyping || messageText == null) return;
+        var info = messageText.textInfo;
+        int visible = Mathf.Min(messageText.maxVisibleCharacters, info.characterCount);
+        while (notifiedCharacters < visible)
+        {
+            int index = notifiedCharacters++;
+            if (info.characterInfo[index].elementType == TMP_TextElementType.Character)
+                CharacterRevealed?.Invoke(info.characterInfo[index].character, index);
+        }
     }
 
     private bool UpdateTyping()
     {
-        if (!isTyping) return false;
-        typingElapsed += Time.unscaledDeltaTime;
-        if (typingElapsed < 0f) return false;
-        int count = Mathf.Min(revealEnds.Count,
-            Mathf.FloorToInt(typingElapsed * Mathf.Max(1f, charactersPerSecond)) + 1);
+        int count = messageText.maxVisibleCharacters;
         if (count == revealedElements) return false;
         revealedElements = count;
-        messageText.text = count == revealEnds.Count
-            ? fullMessage : fullMessage.Substring(0, revealEnds[count - 1]);
-        isTyping = count < revealEnds.Count;
         scrollToLatest = true;
         return true;
     }
@@ -239,6 +247,7 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         if (!isTyping || messageText == null) return false;
         StopTyping();
         messageText.text = fullMessage;
+        messageText.maxVisibleCharacters = int.MaxValue;
         RefreshLayout(true);
         return true;
     }
@@ -252,7 +261,10 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
     private void StopTyping()
     {
         isTyping = false;
-        revealEnds.Clear();
+        RevealStopped?.Invoke();
+        revealTween?.Kill();
+        revealTween = null;
+        if (textBounce != null) textBounce.FinishInstantly();
         scrollToLatest = false;
         layoutVelocity = Vector2.zero;
     }
@@ -271,16 +283,22 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         var root = (RectTransform)transform;
         lastAvailableSize = AvailableSize();
         laidOutText = messageText.text;
+        laidOutCharacters = messageText.maxVisibleCharacters;
+        string visibleText = VisibleLayoutText();
 
         // Keep the portrait and tail fixed; only the sliced body stretches.
         float availableWidth = lastAvailableSize.x - Mathf.Max(screenMargin, root.anchoredPosition.x)
             - bubbleOffset.x - navigationOverhang - screenMargin;
         float widthLimit = Mathf.Max(1f, Mathf.Min(maximumWidth, availableWidth));
         float naturalWidth = messageText.GetPreferredValues(laidOutText, Mathf.Infinity, Mathf.Infinity).x;
-        float width = Mathf.Clamp(naturalWidth + textPadding.x + textPadding.z,
+        float fullWidth = Mathf.Clamp(naturalWidth + textPadding.x + textPadding.z,
             Mathf.Min(minimumWidth, widthLimit), widthLimit);
-        float textWidth = Mathf.Max(1f, width - textPadding.x - textPadding.z);
-        float textHeight = messageText.GetPreferredValues(laidOutText, textWidth, Mathf.Infinity).y;
+        float textWidth = Mathf.Max(1f, fullWidth - textPadding.x - textPadding.z);
+        fullTextHeight = messageText.GetPreferredValues(laidOutText, textWidth, Mathf.Infinity).y;
+        float visibleWidth = messageText.GetPreferredValues(visibleText, Mathf.Infinity, Mathf.Infinity).x;
+        float width = Mathf.Clamp(visibleWidth + textPadding.x + textPadding.z,
+            Mathf.Min(minimumWidth, widthLimit), fullWidth);
+        float textHeight = messageText.GetPreferredValues(visibleText, textWidth, Mathf.Infinity).y;
         float heightLimit = Mathf.Max(minimumHeight,
             lastAvailableSize.y * maximumScreenHeight - bubbleOffset.y - bottomMargin);
         float height = Mathf.Clamp(textHeight + textPadding.y + textPadding.w, minimumHeight, heightLimit);
@@ -295,6 +313,17 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
             layoutVelocity = Vector2.zero;
             ApplyLayout(targetBodySize);
         }
+    }
+
+    private string VisibleLayoutText()
+    {
+        int count = messageText.maxVisibleCharacters;
+        var info = messageText.textInfo;
+        if (count <= 0) return string.Empty;
+        if (count >= info.characterCount) return messageText.text;
+        var last = info.characterInfo[count - 1];
+        int end = Mathf.Clamp(last.index + last.stringLength, 0, messageText.text.Length);
+        return messageText.text.Substring(0, end);
     }
 
     private void ApplyLayout(Vector2 size)
@@ -313,7 +342,7 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         messageViewport.sizeDelta = new Vector2(Mathf.Max(1f, size.x - textPadding.x - rightClipInset), viewportHeight);
         // Lay out the text at its destination width, while the viewport follows the background.
         // Otherwise the growing background makes the last word wrap back and forth every frame.
-        messageText.rectTransform.sizeDelta = new Vector2(targetTextWidth, Mathf.Max(targetTextHeight, viewportHeight));
+        messageText.rectTransform.sizeDelta = new Vector2(targetTextWidth, Mathf.Max(fullTextHeight, viewportHeight));
 
         if (messageScroll != null)
         {
@@ -327,7 +356,9 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
             else if (scrollToLatest)
             {
                 messageScroll.StopMovement();
-                messageScroll.verticalNormalizedPosition = 0f;
+                // The full string is laid out already; follow the revealed lines, not the hidden ending.
+                messageScroll.verticalNormalizedPosition = 1f - Mathf.Clamp01(
+                    (targetTextHeight - viewportHeight) / Mathf.Max(0.001f, fullTextHeight - viewportHeight));
             }
         }
         resetScrollPending = false;

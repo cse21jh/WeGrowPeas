@@ -11,6 +11,8 @@ public class CodexEntry
     public Sprite icon;
     public bool discovered;
     public string detail; // 우측 상세(리치텍스트)
+    public int price = -1; // Archive's separate price row; legacy detail stays intact.
+    public string archiveDetail;
 
     public bool locked;      // 아직 해금되지 않음(등장 조건 미충족). 발견 여부와 별개.
     public string unlockHint; // 잠김일 때 상세에 보여줄 해금 조건 설명
@@ -57,6 +59,8 @@ public static class CodexCatalog
                 icon = it.Icon,
                 discovered = CodexProgress.IsDiscovered(CodexProgress.Category.Item, id),
                 detail = sb.ToString().TrimEnd(),
+                price = it.Price,
+                archiveDetail = (string.IsNullOrEmpty(it.GradeTagText) ? "" : $"[{it.GradeTagText}] {it.Rarity}\n") + it.LocalizedDescription,
                 locked = locked,
                 unlockHint = locked ? it.GetUnlockConditionText() : null
             });

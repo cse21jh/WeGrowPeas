@@ -84,6 +84,20 @@ public class UIClickEvent : MonoBehaviour
         SceneLoader.Instance?.LoadCustomizeScene();
     }
 
+    /// <summary>현재 씬의 아카이브를 연다. 씬을 떠나기 전 책 인스턴스를 참조하지 않는다.</summary>
+    public void OnClick_OpenArchive()
+    {
+        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        foreach (var archive in FindObjectsByType<WeGrowPeas.UI.Book.ArchiveBookController>(FindObjectsSortMode.None))
+        {
+            if (archive.gameObject.scene != scene || !archive.isActiveAndEnabled) continue;
+            archive.Open();
+            return;
+        }
+
+        Debug.LogWarning("[Archive] 현재 씬에 아카이브 UI(ArchiveBookController)가 없습니다.", this);
+    }
+
     public void OnClick_GoToTutorial()
     {
         SceneLoader.Instance?.LoadTutorialScene();

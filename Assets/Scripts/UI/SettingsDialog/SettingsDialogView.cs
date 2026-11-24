@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace WeGrowPeas.UI
 {
     /// <summary>Standalone settings window backed by the game's shared device settings.</summary>
-    public sealed class SettingsDialogView : MonoBehaviour
+    public sealed class SettingsDialogView : MonoBehaviour, IScrollHandler
     {
         [Serializable] public sealed class TabEvent : UnityEvent<int> { }
         [SerializeField] private GameObject modal;
@@ -157,6 +157,18 @@ namespace WeGrowPeas.UI
         }
         private void HideDropdowns()
         { foreach (var row in rows) if (row.dropdown != null) row.dropdown.Hide(); }
+        public void OnScroll(PointerEventData eventData)
+        {
+            if (!IsOpen || IsClosing) return;
+            // The description is beside the viewport, so its wheel events need the active page's ScrollRect.
+            bool overDescription = RectTransformUtility.RectangleContainsScreenPoint(
+                (RectTransform)description.transform.parent, eventData.position, eventData.enterEventCamera);
+            bool overHeading = RectTransformUtility.RectangleContainsScreenPoint(
+                (RectTransform)descriptionTitle.transform.parent, eventData.position, eventData.enterEventCamera);
+            if (!overDescription && !overHeading) return;
+            var scroll = pages[SelectedTab].GetComponentInChildren<ScrollRect>();
+            if (scroll != null && scroll.IsActive()) scroll.OnScroll(eventData);
+        }
         private void BuildDisplayChoices()
         {
             var current = SettingsDisplay.Current;
@@ -203,6 +215,7 @@ namespace WeGrowPeas.UI
                         row.dropdown.interactable = display.vSyncCount == 0; break;
                     case SettingsEntry.BgmVolume: Volume(row, data.bgmVolume); break;
                     case SettingsEntry.EffectVolume: Volume(row, data.effectVolume); break;
+                    case SettingsEntry.SpeechBubbleTransparency: Volume(row, data.speechBubblePointerTransparency); break;
                     case SettingsEntry.ResetKeys: row.valueText.text = T("reset"); break;
                     case SettingsEntry.Codex: row.valueText.text = T("open"); row.button.interactable = CodexUIController.Instance != null; break;
                     case SettingsEntry.MainMenu:
@@ -259,17 +272,25 @@ namespace WeGrowPeas.UI
             if (row.entry >= SettingsEntry.Resolution && row.entry <= SettingsEntry.FrameRate) SettingsDisplay.Apply(DeviceSettings.Data.display);
             savePending = true; Flush(); Refresh();
         }
-        public void ChangeVolume(SettingsDialogRow row, float value)
+        public void ChangeSlider(SettingsDialogRow row, float value)
         {
             value = Mathf.Clamp01(value);
             var sound = SoundManager.Instance;
-            if (row.entry == SettingsEntry.BgmVolume)
-            { DeviceSettings.Data.bgmVolume = value; if (sound != null) sound.ChangeBGMVolume(value); }
-            else
-            { DeviceSettings.Data.effectVolume = value; if (sound != null) sound.ChangeEffectVolume(value); }
+            switch (row.entry)
+            {
+                case SettingsEntry.BgmVolume:
+                    DeviceSettings.Data.bgmVolume = value; if (sound != null) sound.ChangeBGMVolume(value); break;
+                case SettingsEntry.EffectVolume:
+                    DeviceSettings.Data.effectVolume = value; if (sound != null) sound.ChangeEffectVolume(value); break;
+                case SettingsEntry.SpeechBubbleTransparency:
+                    DeviceSettings.Data.speechBubblePointerTransparency = value; break;
+                default: return;
+            }
             row.valueText.text = Mathf.RoundToInt(value * 100) + "%";
             Describe(row); savePending = true; saveAt = Time.unscaledTime + 0.25f;
         }
+        // Preserve any existing editor / UnityEvent callers of the original volume entry point.
+        public void ChangeVolume(SettingsDialogRow row, float value) => ChangeSlider(row, value);
         public void Activate(SettingsDialogRow row)
         {
             CancelCapture(); Describe(row);

@@ -1,0 +1,323 @@
+{
+  "fileKey": "VLFS95iAYAulwtVnyfDBxt",
+  "screens": {
+    "achievements": "208:84",
+    "codex": "167:68"
+  },
+  "implementation": "ArchiveRoot.prefab — new layouts 3 and 4; source book and recall layouts remain unchanged.",
+  "canvas": {
+    "referenceResolution": [
+      1920,
+      1080
+    ],
+    "book": "Existing BookRootScaler and page bounds are reused.",
+    "anchors": "Top-left; positive Figma y maps to negative anchoredPosition.y."
+  },
+  "bookmarks": {
+    "component": "ArchiveBookmark",
+    "export": "Separate white fill/ink, face/depth/outline PNGs exported from source-vector duplicates at 4x. Originals are unchanged.",
+    "displayScale": 0.6,
+    "colors": "Original Figma RGB floats are serialized in ArchiveBookmark. Editor builder preserves already-authored palettes.",
+    "layerOrder": [
+      "Shadow",
+      "Outline",
+      "Depth",
+      "Face",
+      "IconFill",
+      "IconInk",
+      "Label"
+    ],
+    "selection": "Long/short shapes are separately exported; selecting a category does not stretch the PNG.",
+    "sourcePaletteNodes": {
+      "item": [
+        "109:261",
+        "109:262"
+      ],
+      "plant": [
+        "109:270",
+        "109:271"
+      ],
+      "curse": [
+        "109:278",
+        "109:279"
+      ],
+      "bug": [
+        "109:286",
+        "109:287"
+      ]
+    }
+  },
+  "assets": [
+    {
+      "file": "AchievementTab.png",
+      "nodes": [
+        "167:207"
+      ],
+      "scale": "original image",
+      "slot": "Archive navigation or entry rows"
+    },
+    {
+      "file": "CodexTab.png",
+      "nodes": [
+        "141:106"
+      ],
+      "scale": "original image",
+      "slot": "Archive navigation or entry rows"
+    },
+    {
+      "file": "RecallTab.png",
+      "nodes": [
+        "167:216"
+      ],
+      "scale": "original image",
+      "slot": "Archive navigation or entry rows"
+    },
+    {
+      "file": "InProgress.png",
+      "nodes": [
+        "174:141"
+      ],
+      "scale": "original image",
+      "slot": "Layout4"
+    },
+    {
+      "file": "Complete.png",
+      "nodes": [
+        "174:116"
+      ],
+      "scale": "original image",
+      "slot": "Layout4"
+    },
+    {
+      "file": "EntryBackground.png",
+      "nodes": [
+        "167:184"
+      ],
+      "scale": 2,
+      "slot": "Archive navigation or entry rows"
+    },
+    {
+      "file": "BookmarkLongOutline.png",
+      "nodes": [
+        "109:261"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BookmarkLongDepth.png",
+      "nodes": [
+        "109:261"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BookmarkLongFace.png",
+      "nodes": [
+        "109:262"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BookmarkShortOutline.png",
+      "nodes": [
+        "109:270"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BookmarkShortDepth.png",
+      "nodes": [
+        "109:270"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BookmarkShortFace.png",
+      "nodes": [
+        "109:271"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "ItemIconFill.png",
+      "nodes": [
+        "112:464"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "ItemIconInk.png",
+      "nodes": [
+        "112:464",
+        "112:500"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "PlantIconFill.png",
+      "nodes": [
+        "112:513"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "PlantIconInk.png",
+      "nodes": [
+        "112:514"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "CurseIconFill.png",
+      "nodes": [
+        "112:526"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "CurseIconInk.png",
+      "nodes": [
+        "112:526"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BugIconFill.png",
+      "nodes": [
+        "112:539"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "BugIconInk.png",
+      "nodes": [
+        "112:539",
+        "112:554",
+        "112:563",
+        "112:564"
+      ],
+      "scale": 4,
+      "slot": "Layout3/Category_*/ArchiveBookmark"
+    },
+    {
+      "file": "Coin.png",
+      "nodes": [
+        "109:309"
+      ],
+      "scale": 2,
+      "slot": "Layout3/right"
+    },
+    {
+      "file": "CodexDescription.png",
+      "nodes": [
+        "109:317"
+      ],
+      "scale": 2,
+      "slot": "Layout3/right"
+    },
+    {
+      "file": "AchievementDescription.png",
+      "nodes": [
+        "167:174"
+      ],
+      "scale": 2,
+      "slot": "Layout4"
+    },
+    {
+      "file": "CodexFrameDecoration.png",
+      "nodes": [
+        "109:297",
+        "109:299",
+        "109:301",
+        "109:302",
+        "109:304",
+        "109:306",
+        "109:368",
+        "109:370"
+      ],
+      "scale": 2,
+      "bounds": {
+        "x": 2658.265869140625,
+        "y": 8988.0078125,
+        "width": 679.527099609375,
+        "height": 385.3251953125
+      },
+      "slot": "Layout3/right/FigmaFrameDecoration",
+      "displayScale": 0.6
+    },
+    {
+      "file": "ProgressTrack.png",
+      "nodes": [
+        "174:206",
+        "174:207"
+      ],
+      "scale": 4,
+      "bounds": {
+        "x": 5444,
+        "y": 10548,
+        "width": 584,
+        "height": 42
+      },
+      "slot": "Layout4/right/ProgressTrack",
+      "displayScale": 0.625
+    },
+    {
+      "file": "ProgressRail.png",
+      "nodes": [
+        "174:207"
+      ],
+      "scale": 4,
+      "bounds": {
+        "x": 5449,
+        "y": 10553,
+        "width": 574,
+        "height": 32
+      },
+      "slot": "Layout4/right/ProgressTrack",
+      "displayScale": 0.625
+    },
+    {
+      "file": "ProgressFill.png",
+      "nodes": [
+        "174:209"
+      ],
+      "scale": 4,
+      "bounds": {
+        "x": 5449,
+        "y": 10553,
+        "width": 335,
+        "height": 32
+      },
+      "slot": "Layout4/right/ProgressTrack",
+      "displayScale": 0.625
+    },
+    {
+      "file": "ProgressStripeTile.png",
+      "nodes": [
+        "208:80"
+      ],
+      "scale": 4,
+      "bounds": {
+        "x": 5509,
+        "y": 10553,
+        "width": 30,
+        "height": 32
+      },
+      "slot": "Layout4/right/ProgressTrack",
+      "displayScale": 0.625
+    }
+  ]
+}

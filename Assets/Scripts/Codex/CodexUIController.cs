@@ -11,6 +11,7 @@ public class CodexUIController : MonoBehaviour
 {
     [Header("Root")]
     [SerializeField] private GameObject codexPanel;
+    [SerializeField] private WeGrowPeas.UI.Book.ArchiveBookController archive;
 
     [Header("Category Buttons (Item, Plant, Curse, Bug, Achievement 순서)")]
     [SerializeField] private Button[] categoryButtons;
@@ -55,7 +56,8 @@ public class CodexUIController : MonoBehaviour
     /// 설정창 위에 도감이 떠 있을 때 같은 ESC 입력을 설정창이 또 먹지 않게 하려는 것이다.
     /// (Update 실행 순서가 보장되지 않아 IsOpen만으론 부족하다.)
     /// </summary>
-    public bool ConsumedEscapeThisFrame => _escapeFrame == Time.frameCount;
+    public bool ConsumedEscapeThisFrame => _escapeFrame == Time.frameCount ||
+        (archive != null && archive.ConsumedEscapeThisFrame);
 
     private CodexProgress.Category _cat = CodexProgress.Category.Item;
     private List<CodexEntry> _entries = new List<CodexEntry>();
@@ -63,7 +65,7 @@ public class CodexUIController : MonoBehaviour
     private int _selected = -1;
 
     /// <summary>도감이 열려 있는가.</summary>
-    public bool IsOpen => codexPanel != null && codexPanel.activeSelf;
+    public bool IsOpen => archive != null ? archive.IsOpen : codexPanel != null && codexPanel.activeSelf;
 
     // 컨트롤러는 항상 켜진 루트에 있어야 함(패널만 토글). 그래야 닫힌 상태에서도 F8이 동작.
     private void OnEnable() => Loc.LanguageChanged += RefreshLocalizedTexts;
@@ -72,11 +74,13 @@ public class CodexUIController : MonoBehaviour
 
     private void RefreshLocalizedTexts()
     {
+        if (archive != null) return;
         if (IsOpen) SelectCategory((int)_cat);
     }
 
     private void Update()
     {
+        if (archive != null) return;
         // F8은 디버그용 단축키(정식 진입은 버튼). 디버그 패널이 꺼져 있으면 동작하지 않는다.
         if (DebugPanels.Enabled && Input.GetKeyDown(KeyCode.F8)) Toggle();
         else if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
@@ -94,6 +98,7 @@ public class CodexUIController : MonoBehaviour
 
     public void OpenCodex()
     {
+        if (archive != null) { archive.OpenCodexCategory((int)_cat); return; }
         if (codexPanel != null) codexPanel.SetActive(true);
         WireCategoryButtons();
         SelectCategory((int)_cat);
@@ -102,12 +107,20 @@ public class CodexUIController : MonoBehaviour
     /// <summary>도감을 특정 카테고리 탭으로 연다. 버튼 onClick에서 int 인자로 호출한다.</summary>
     public void OpenCategory(int catIndex)
     {
+        if (archive != null)
+        {
+            if (catIndex == (int)CodexProgress.Category.Achievement)
+                archive.OpenTab((int)WeGrowPeas.UI.Book.ArchiveBookController.Tab.Achievement);
+            else archive.OpenCodexCategory(catIndex);
+            return;
+        }
         _cat = (CodexProgress.Category)catIndex;
         OpenCodex();
     }
 
     public void CloseCodex()
     {
+        if (archive != null) { archive.Close(); return; }
         if (codexPanel != null) codexPanel.SetActive(false);
     }
 
