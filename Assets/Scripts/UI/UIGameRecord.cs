@@ -35,7 +35,7 @@ public class UIGameRecord : MonoBehaviour
         if (filledExternally) return;
 
         Show(GameRecordHolder.Current);
-        ShowNewlyUnlockedItems();
+        ShowRunRewards();
     }
 
     /// <summary>요약 하나로 결과 화면을 채운다. 회상도 이 경로로 과거 기록을 그린다.</summary>
@@ -66,19 +66,24 @@ public class UIGameRecord : MonoBehaviour
         pg4 = texts.FirstOrDefault(t => t.name == "PG4");
     }
 
-    /// <summary>이번 판에 새로 해금된 아이템이 있으면 해금 팝업으로 보여준다.</summary>
-    private void ShowNewlyUnlockedItems()
+    /// <summary>이번 판에 새로 해금된 아이템과 달성한 업적을 차례로 보여준다.</summary>
+    private void ShowRunRewards()
     {
-        List<ItemData> newlyUnlocked = UnlockRunTracker.GetNewlyUnlocked();
-        if (newlyUnlocked.Count == 0) return;
-
         if (UIManager.Instance == null || UIManager.Instance.Popup == null)
         {
-            Debug.LogWarning("[UIGameRecord] UIManager가 없어 해금 팝업을 띄우지 못했습니다");
+            Debug.LogWarning("[UIGameRecord] UIManager가 없어 해금·업적 팝업을 띄우지 못했습니다");
             return;
         }
 
-        UIManager.Instance.Popup.ShowUnlockPopup(newlyUnlocked);
+        List<ItemData> newlyUnlocked = UnlockRunTracker.GetNewlyUnlocked();
+        if (newlyUnlocked.Count > 0) UIManager.Instance.Popup.ShowUnlockPopup(newlyUnlocked, ShowAchievements);
+        else ShowAchievements();
+    }
+
+    private static void ShowAchievements()
+    {
+        List<AchievementData> achievements = AchievementSystem.TakeNotShown();
+        if (achievements.Count > 0) UIManager.Instance.Popup.ShowAchievementList(achievements);
     }
 
     private void SetPeaEmotion(int rank)

@@ -95,6 +95,8 @@ public class AchievementProfile
 {
     public List<string> unlocked = new();
     public List<long> unlockedAtUnix = new();
+    /// <summary>달성했지만 아직 결과 화면에서 보여주지 않은 업적.</summary>
+    public List<string> notShown = new();
 }
 
 /// <summary>

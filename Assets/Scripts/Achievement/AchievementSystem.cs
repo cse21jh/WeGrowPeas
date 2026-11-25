@@ -39,6 +39,9 @@ public static class AchievementSystem
     // 현재 프로필의 달성 기록: id → 달성 시각(UTC 유닉스 초)
     private static readonly Dictionary<string, long> _unlocked = new();
 
+    // 달성했지만 아직 결과 화면에서 보여주지 않은 업적. 판 도중에 꺼도 남도록 프로필에 둔다.
+    private static readonly List<string> _notShown = new();
+
     // ── 정의 ──────────────────────────────────────────────────────────────────
 
     private static void EnsureInit()
@@ -127,6 +130,19 @@ public static class AchievementSystem
                 Grant(a, notify);
     }
 
+    /// <summary>결과 화면에서 보여줄 업적을 꺼낸다. 한 번 꺼내면 다시 나오지 않는다.</summary>
+    public static List<AchievementData> TakeNotShown()
+    {
+        EnsureInit();
+        var list = new List<AchievementData>();
+        foreach (string id in _notShown)
+            if (_byId.TryGetValue(id, out var a)) list.Add(a);
+
+        if (_notShown.Count > 0) SaveManager.RequestProfileSave();
+        _notShown.Clear();
+        return list;
+    }
+
     private static void HandleStatChanged(string key, int value)
     {
         EnsureInit();
@@ -144,8 +160,11 @@ public static class AchievementSystem
         Platform?.SetAchievement(a.id);
         Debug.Log($"[Achievement] 달성: {a.id} ({a.name})");
 
-        if (notify && UIManager.Instance != null && UIManager.Instance.Popup != null)
-            UIManager.Instance.Popup.ShowToastPopup(Loc.T("game.achievement.unlocked"), a.LocalizedTitle, a.icon, 3f);
+        if (notify)
+        {
+            _notShown.Add(a.id);
+            AchievementToast.Show(a);
+        }
 
         OnUnlocked?.Invoke(a);
     }
@@ -162,11 +181,14 @@ public static class AchievementSystem
             profile.unlocked.Add(kv.Key);
             profile.unlockedAtUnix.Add(kv.Value);
         }
+        profile.notShown = new List<string>(_notShown);
     }
 
     public static void LoadFrom(AchievementProfile profile)
     {
         _unlocked.Clear();
+        _notShown.Clear();
+        if (profile?.notShown != null) _notShown.AddRange(profile.notShown);
         if (profile?.unlocked == null) return;
         for (int i = 0; i < profile.unlocked.Count; i++)
         {

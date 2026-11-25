@@ -13,5 +13,7 @@ public static class ResourcePaths
     public const string CustomizeItemOrder = "Data/Customize/CustomizeItemOrder";
     public const string BugKillerPrefab = "BugKiller";
     public const string WarningPrefab = "Warning";
+    public const string AchievementListPopupPrefab = "Prefabs/UI/AchievementListPopup";
+    public const string AchievementToastPrefab = "Prefabs/UI/AchievementToast";
     public const string PeaFaceSheet = "peaFace_1-sheet";
 }

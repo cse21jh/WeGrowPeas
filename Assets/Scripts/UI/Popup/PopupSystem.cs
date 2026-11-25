@@ -36,6 +36,21 @@ public class PopupSystem
         return popup;
     }
 
+    /// <summary>달성한 업적 목록. 결과 화면에서 쓴다.</summary>
+    public CloseablePopup ShowAchievementList(List<AchievementData> achievements, System.Action onClose = null)
+    {
+        CloseablePopup popup = ShowPopup(Resources.Load<CloseablePopup>(ResourcePaths.AchievementListPopupPrefab));
+        if (popup == null) return null;
+
+        AchievementToast.ClearWaiting(); // 목록으로 다 보여준다
+
+        var lines = new List<string>();
+        foreach (AchievementData a in achievements)
+            lines.Add($"{a.LocalizedTitle}\n<size=80%><color=#777777>{a.LocalizedDescription}</color></size>");
+        popup.Setup(Loc.T("game.achievement.list_title"), string.Join("\n", lines), null, onClose);
+        return popup;
+    }
+
     public ToastPopup ShowToastPopup(string title, string content, Sprite sprite = null, float duration = 2.0f, System.Action onClose = null)
     {
         ToastPopup popup = ShowPopup(defaultToastPrefab);
