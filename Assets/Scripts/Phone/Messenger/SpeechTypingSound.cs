@@ -9,12 +9,17 @@ public sealed class SpeechTypingSound : MonoBehaviour
     [Tooltip("아, 에, 이, 오, 우 순서의 짧은 모음 효과음입니다.")]
     [SerializeField] private AudioClip[] vowels = new AudioClip[5];
     [Tooltip("설정창의 효과음 볼륨에 곱할 목소리 크기입니다.")]
-    [SerializeField, Range(0f, 1f)] private float volume = .78f;
-    [SerializeField, Range(0f, .25f)] private float pitchVariation = .1f;
+    [SerializeField, Range(0f, 1f)] private float volume = .72f;
+    [Tooltip("모음 효과음의 기본 음높이입니다. 1보다 낮으면 조금 더 낮고 부드럽게 들립니다.")]
+    [SerializeField, Range(.5f, 1.5f)] private float basePitch = .88f;
+    [SerializeField, Range(0f, .25f)] private float pitchVariation = .04f;
+    [Tooltip("목소리의 날카로운 고음을 완화하는 저역 통과 필터입니다.")]
+    [SerializeField, Range(1000f, 22000f)] private float lowPassCutoff = 4200f;
     [Tooltip("빠른 타이핑이나 느린 프레임에서 소리가 과하게 겹치지 않도록 제한합니다.")]
     [SerializeField, Range(0f, .2f)] private float minimumSyllableInterval = .024f;
 
     private readonly AudioSource[] sources = new AudioSource[6];
+    private readonly AudioLowPassFilter[] filters = new AudioLowPassFilter[6];
     private int nextSource;
     private double nextSyllable, nextAllowedSyllable;
     private float EffectiveVolume => Mathf.Clamp01(volume) * Mathf.Clamp01(DeviceSettings.Data.effectVolume);
@@ -32,6 +37,10 @@ public sealed class SpeechTypingSound : MonoBehaviour
             source.dopplerLevel = 0f;
             source.priority = 40;
             sources[i] = source;
+            var filter = child.AddComponent<AudioLowPassFilter>();
+            filter.cutoffFrequency = lowPassCutoff;
+            filter.lowpassResonanceQ = 1f;
+            filters[i] = filter;
         }
     }
 
@@ -48,6 +57,8 @@ public sealed class SpeechTypingSound : MonoBehaviour
         // Read the shared setting so the settings slider also changes active syllables.
         foreach (var source in sources)
             if (source != null) source.volume = level;
+        foreach (var filter in filters)
+            if (filter != null) filter.cutoffFrequency = lowPassCutoff;
         if (level <= 0f) StopPlayback();
     }
 
@@ -66,7 +77,7 @@ public sealed class SpeechTypingSound : MonoBehaviour
         nextSource = (nextSource + 1) % sources.Length;
         source.Stop();
         source.clip = clip;
-        source.pitch = 1f + ((character * 17 + index * 31) % 101 / 50f - 1f) * pitchVariation;
+        source.pitch = basePitch + ((character * 17 + index * 31) % 101 / 50f - 1f) * pitchVariation;
         source.volume = level;
         // Keep any catch-up audio within 45ms instead of queuing a whole sentence.
         double at = System.Math.Max(now + .008, System.Math.Min(nextSyllable, now + .045));

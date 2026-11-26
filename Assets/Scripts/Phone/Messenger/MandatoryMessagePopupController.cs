@@ -3,6 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [DefaultExecutionOrder(9000)]
@@ -31,11 +32,12 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
     [Tooltip("표시된 글자에 맞춰 말풍선 크기가 따라가는 시간. 0이면 즉시 조절합니다.")]
     [SerializeField, Min(0f)] private float resizeSmoothTime = 0.08f;
 
-    [Header("Adaptive Bubble Layout")]
+    [Header("Fixed Width Bubble Layout")]
     [SerializeField] private ScrollRect messageScroll;
     [SerializeField] private RectTransform messageViewport;
-    [SerializeField, Min(1f)] private float minimumWidth = 160f;
-    [SerializeField, Min(1f)] private float maximumWidth = 420f;
+    [Tooltip("텍스트 양과 무관한 말풍선 가로 폭입니다. 화면보다 넓을 때만 줄어듭니다.")]
+    [FormerlySerializedAs("maximumWidth")]
+    [SerializeField, Min(1f)] private float fixedWidth = 420f;
     [SerializeField, Min(1f)] private float minimumHeight = 53.333f;
     [SerializeField, Range(0.2f, 0.9f)] private float maximumScreenHeight = 0.6f;
     [Tooltip("본문 여백: 왼쪽, 위, 오른쪽, 아래 (Canvas 단위)")]
@@ -249,6 +251,8 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         messageText.text = fullMessage;
         messageText.maxVisibleCharacters = int.MaxValue;
         RefreshLayout(true);
+        // Completing a message also reveals its full viewport in this frame.
+        if (hasLayout) ApplyLayout(targetBodySize);
         return true;
     }
 
@@ -286,18 +290,12 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         laidOutCharacters = messageText.maxVisibleCharacters;
         string visibleText = VisibleLayoutText();
 
-        // Keep the portrait and tail fixed; only the sliced body stretches.
+        // Width depends only on the available screen, never on the revealed text.
         float availableWidth = lastAvailableSize.x - Mathf.Max(screenMargin, root.anchoredPosition.x)
             - bubbleOffset.x - navigationOverhang - screenMargin;
-        float widthLimit = Mathf.Max(1f, Mathf.Min(maximumWidth, availableWidth));
-        float naturalWidth = messageText.GetPreferredValues(laidOutText, Mathf.Infinity, Mathf.Infinity).x;
-        float fullWidth = Mathf.Clamp(naturalWidth + textPadding.x + textPadding.z,
-            Mathf.Min(minimumWidth, widthLimit), widthLimit);
-        float textWidth = Mathf.Max(1f, fullWidth - textPadding.x - textPadding.z);
+        float width = Mathf.Max(1f, Mathf.Min(fixedWidth, availableWidth));
+        float textWidth = Mathf.Max(1f, width - textPadding.x - textPadding.z);
         fullTextHeight = messageText.GetPreferredValues(laidOutText, textWidth, Mathf.Infinity).y;
-        float visibleWidth = messageText.GetPreferredValues(visibleText, Mathf.Infinity, Mathf.Infinity).x;
-        float width = Mathf.Clamp(visibleWidth + textPadding.x + textPadding.z,
-            Mathf.Min(minimumWidth, widthLimit), fullWidth);
         float textHeight = messageText.GetPreferredValues(visibleText, textWidth, Mathf.Infinity).y;
         float heightLimit = Mathf.Max(minimumHeight,
             lastAvailableSize.y * maximumScreenHeight - bubbleOffset.y - bottomMargin);
@@ -307,6 +305,12 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         targetTextHeight = textHeight;
         resetScrollPending |= resetScroll;
         layoutNeedsApply = true;
+        // A screen resize must not animate the width or reflow text at an intermediate width.
+        if (hasLayout && !Mathf.Approximately(msgBox.rect.width, width))
+        {
+            layoutVelocity.x = 0f;
+            ApplyLayout(new Vector2(width, msgBox.rect.height));
+        }
         if (!hasLayout || !Application.isPlaying || resizeSmoothTime <= 0f)
         {
             hasLayout = true;
@@ -336,12 +340,10 @@ public sealed class MandatoryMessagePopupController : MonoBehaviour, IPointerCli
         msgBox.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
         msgBox.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
         messageViewport.anchoredPosition = new Vector2(textPadding.x, -textPadding.y);
-        // The right padding also buffers the short resize lag, so a newly typed glyph is
-        // not cut in half while the bubble catches up. Content still keeps its full padding.
+        // Leave a little room for the existing glyph bounce at the clipping edge.
         float rightClipInset = Mathf.Min(3f, textPadding.z);
         messageViewport.sizeDelta = new Vector2(Mathf.Max(1f, size.x - textPadding.x - rightClipInset), viewportHeight);
-        // Lay out the text at its destination width, while the viewport follows the background.
-        // Otherwise the growing background makes the last word wrap back and forth every frame.
+        // Text and background share the same fixed wrapping width throughout the reveal.
         messageText.rectTransform.sizeDelta = new Vector2(targetTextWidth, Mathf.Max(fullTextHeight, viewportHeight));
 
         if (messageScroll != null)

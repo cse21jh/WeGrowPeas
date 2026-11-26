@@ -29,6 +29,7 @@ public sealed class SpeechBubblePointerFade : MonoBehaviour, ICanvasRaycastFilte
     private readonly Vector3[] corners = new Vector3[4];
     private readonly Vector4[] protectedRects = new Vector4[3];
     private Canvas popupCanvas;
+    private MandatoryMessagePopupController popup;
     private Vector2 pointerPosition;
     private float fadeAmount;
     private float pixelScale = 1f;
@@ -48,6 +49,7 @@ public sealed class SpeechBubblePointerFade : MonoBehaviour, ICanvasRaycastFilte
     private void OnEnable()
     {
         popupCanvas = GetComponent<Canvas>();
+        popup = GetComponent<MandatoryMessagePopupController>();
         fadeAmount = 0f;
         pointerAvailable = false;
         EnsureGraphics();
@@ -158,6 +160,8 @@ public sealed class SpeechBubblePointerFade : MonoBehaviour, ICanvasRaycastFilte
 
     public bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)
     {
+        // The first click belongs to the current line, even inside the transparent area.
+        if (popup != null && popup.IsTyping) return true;
         if (!isActiveAndEnabled || !passPointerThrough || !pointerAvailable ||
             fadeAmount < 0.99f || MinimumOpacity >= 0.999f) return true;
         foreach (var rect in protectedRects)
